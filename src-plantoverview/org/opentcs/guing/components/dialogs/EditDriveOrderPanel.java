@@ -12,7 +12,6 @@ package org.opentcs.guing.components.dialogs;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -33,15 +32,15 @@ public class EditDriveOrderPanel
   /**
    * Die zur Auswahl stehenden Stationen.
    */
-  protected List<LocationModel> fLocations;
+  private final List<LocationModel> fLocations;
   /**
    * Die ausgewählte Station.
    */
-  protected LocationModel fSelectedLocation;
+  private LocationModel fSelectedLocation;
   /**
    * Die ausgewählte Aktion.
    */
-  protected String fSelectedAction;
+  private String fSelectedAction;
 
   /**
    * Creates new form EditDriveOrderPanel
@@ -121,7 +120,8 @@ public class EditDriveOrderPanel
    * @return die ausgewählte Station
    */
   public Optional<LocationModel> getSelectedLocation() {
-    return Optional.ofNullable((LocationModel) locationComboBox.getSelectedItem());
+    int index = locationComboBox.getSelectedIndex();
+    return index == -1 ? Optional.empty() : Optional.ofNullable(fLocations.get(index));
   }
 
   /**

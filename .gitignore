@@ -1,0 +1,9 @@
+build/
+config/docbook/custom/opentcs-fo-titlepage.xsl
+doc/README.xml~
+lib/openTCS-Base.jar
+lib/openTCS-Kernel.jar
+lib/openTCS-PlantOverview.jar
+config/docbook/unpacked/
+dist/
+/nbproject/private/

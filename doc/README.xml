@@ -3,7 +3,7 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <article>
   <articleinfo>
-    <title>openTCS version 3.1</title>
+    <title>openTCS version 3.1.1</title>
   </articleinfo>
 
   <section>
@@ -189,6 +189,17 @@
 
   <section>
     <title>Changelog</title>
+
+    <section>
+      <title>Version 3.1.1 (2015-05-06)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Fix a crash in the plant overview client that occured when the
+          user tried to add a drive order to a transport order.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
 
     <section>
       <title>Version 3.1 (2015-03-23)</title>

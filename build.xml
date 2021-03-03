@@ -4,7 +4,7 @@
   <tstamp>
     <format property="opentcs.builddate" pattern="yyyyMMdd" timezone=""/>
   </tstamp>
-  <property name="opentcs.version" value="3.1"/>
+  <property name="opentcs.version" value="3.1.1"/>
   <property name="src.base" value="${basedir}/src-base"/>
   <property name="src.kernel" value="${basedir}/src-kernel"/>
   <property name="src.plantoverview" value="${basedir}/src-plantoverview"/>
@@ -190,7 +190,7 @@
     <zip destfile="${dist}/${dist.src.zip}"
          basedir="${basedir}"
          includes="**"
-         excludes="build/**, config/docbook/unpacked/**, config/openTCS-*config.xml, config/plantoverview-docking-layout.xml, config/docbook/custom/opentcs-fo-titlepage.xsl, data/accounts.xml, data/Demo-01, data/backups/**, dist/**, lib/openTCS-*.jar, log/openTCS*, nbproject/private/**"/>
+         excludes="build/**, config/docbook/unpacked/**, config/openTCS-*config.xml, config/plantoverview-docking-layout.xml, config/docbook/custom/opentcs-fo-titlepage.xsl, data/accounts.xml, data/Demo-01, data/backups/**, dist/**, lib/openTCS-*.jar, log/openTCS*, log/statistics/openTCS*, nbproject/private/**"/>
   </target>
   
   <!-- cleaning of dist/ -->
