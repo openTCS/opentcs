@@ -15,6 +15,7 @@ import java.util.Objects;
  * A single configuration item.
  * <p>
  * A configuration item consists of the following data:
+ * </p>
  * <ul>
  * <li>A namespace the configuration item belongs to.</li>
  * <li>A key uniquely identifying the configuration item within the namespace it
@@ -24,7 +25,6 @@ import java.util.Objects;
  * <li>An optional human-readable description explaining what can be configured
  * with this configuration item.</li>
  * </ul>
- * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

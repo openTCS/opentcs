@@ -1,7 +1,12 @@
-/**
- * Copyright (c) 2007 - 2013 Fraunhofer Institut fuer Materialfluss und Logistik
- * (FhG-IML). All rights reserved.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2007 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
 import java.awt.event.ActionEvent;

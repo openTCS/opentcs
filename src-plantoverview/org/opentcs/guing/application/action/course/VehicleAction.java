@@ -1,33 +1,35 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.application.action.course;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import org.jhotdraw.draw.Figure;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.exchange.KernelProxyManager;
-import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
-import org.opentcs.guing.exchange.TransportOrderDispatcher;
-import org.opentcs.guing.exchange.adapter.VehicleAdapter;
+import org.opentcs.guing.exchange.TransportOrderUtil;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
@@ -38,8 +40,9 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 /**
  * Different actions are unified here. One can call this class to get
  * a popup menu containing several vehicle action.
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleAction
     extends AbstractAction {
@@ -60,10 +63,6 @@ public class VehicleAction
    * Sends a vehicle directly to a location.
    */
   public static final String SEND_TO_LOCATION = "course.vehicle.sendToLocation";
-  /**
-   * Shows the properties of a vehicle.
-   */
-  public static final String SHOW_PROPERTIES = "course.vehicle.showProperties";
   /**
    * Withdraws the current transport order from a vehicle.
    */
@@ -87,81 +86,62 @@ public class VehicleAction
    */
   private final VehicleModel fVehicle;
   /**
-   * The kernel proxy/connection manager to be used.
+   * The application's main view.
    */
-  private final KernelProxyManager kernelProxyManager;
+  private final OpenTCSView view;
+  /**
+   * Provides access to a kernel.
+   */
+  private final SharedKernelProvider kernelProvider;
+  /**
+   * The drawing editor.
+   */
+  private final OpenTCSDrawingEditor drawingEditor;
+  /**
+   * Provides the current system model.
+   */
+  private final ModelManager modelManager;
+  /**
+   * A helper for creating transport orders with the kernel.
+   */
+  private final TransportOrderUtil orderUtil;
 
   /**
    * Creates a new instance.
    *
    * @param actionId
    * @param vehicle
+   * @param view The application's main view.
+   * @param kernelProvider Provides access to a kernel.
+   * @param drawingEditor The drawing editor.
+   * @param modelManager Provides the current system model.
+   * @param orderUtil A helper for creating transport orders with the kernel.
    */
-  public VehicleAction(String actionId, VehicleModel vehicle) {
-    this.fVehicle = vehicle;
-    this.kernelProxyManager = DefaultKernelProxyManager.instance();
+  @Inject
+  public VehicleAction(@Assisted String actionId,
+                       @Assisted VehicleModel vehicle,
+                       OpenTCSView view,
+                       SharedKernelProvider kernelProvider,
+                       OpenTCSDrawingEditor drawingEditor,
+                       ModelManager modelManager,
+                       TransportOrderUtil orderUtil) {
+    this.fVehicle = requireNonNull(vehicle, "vehicle");
+    this.view = requireNonNull(view, "view");
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+
     ResourceBundleUtil.getBundle().configureAction(this, actionId);
-  }
-
-  /**
-   * Creates a popup menu, which contains several vehicle actions.
-   * 
-   * @param model The <code>VehicleModel</code> to create the menu for.
-   * @return The <code>JPopupMenu</code> to show.
-   */
-  public static JPopupMenu createVehicleMenu(VehicleModel model) {
-    Objects.requireNonNull(model, "model is null");
-
-    JPopupMenu menu = new JPopupMenu();
-    JMenuItem mi = new JMenuItem(ResourceBundleUtil.getBundle().getString("VehicleAction.vehicle") + model.getName());
-    // Disabled, Foreground, Background, ...
-    mi.setEnabled(false);
-    menu.add(mi);
-
-    menu.addSeparator();
-
-    menu.add(new VehicleAction(VehicleAction.SHOW_PROPERTIES, model));
-    menu.add(new VehicleAction(VehicleAction.SCROLL_TO, model));
-
-    JCheckBoxMenuItem followCheckBox = new JCheckBoxMenuItem();
-    followCheckBox.setAction(new VehicleAction(VehicleAction.FOLLOW, model));
-    followCheckBox.setSelected(model.isViewFollows());
-    menu.add(followCheckBox);
-
-    menu.addSeparator();
-
-    VehicleAction vehicleAction;
-    vehicleAction = new VehicleAction(VehicleAction.SEND_TO_POINT, model);
-    vehicleAction.setEnabled(!pointModels().isEmpty());
-    menu.add(vehicleAction);
-    vehicleAction = new VehicleAction(VehicleAction.SEND_TO_LOCATION, model);
-    vehicleAction.setEnabled(!locationModels().isEmpty());
-    menu.add(vehicleAction);
-
-    menu.addSeparator();
-
-    VehicleAdapter vehicleAdapter = (VehicleAdapter) OpenTCSView.instance().getSystemModel().getEventDispatcher().findProcessAdapter(model);
-    vehicleAction = new VehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER, model);
-    vehicleAction.setEnabled(vehicleAdapter.isVehicleAvailable());
-    menu.add(vehicleAction);
-    vehicleAction = new VehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE, model);
-    vehicleAction.setEnabled(vehicleAdapter.isVehicleAvailable());
-    menu.add(vehicleAction);
-    menu.add(new VehicleAction(VehicleAction.DISPATCH_VEHICLE, model));
-
-    return menu;
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
-    if (evt.getActionCommand().equals(labels.getString(SHOW_PROPERTIES + ".text"))) {
-      OpenTCSView.instance().getPropertiesComponent().setModel(fVehicle);
-    }
-    else if (evt.getActionCommand().equals(labels.getString(SCROLL_TO + ".text"))) {
+    if (evt.getActionCommand().equals(labels.getString(SCROLL_TO + ".text"))) {
       Figure figure = fVehicle.getFigure();
-      OpenTCSDrawingView drawingView = OpenTCSView.instance().getEditor().getActiveView();
+      OpenTCSDrawingView drawingView = drawingEditor.getActiveView();
 
       if (drawingView != null && figure != null) {
         drawingView.clearSelection();
@@ -171,7 +151,7 @@ public class VehicleAction
     }
     else if (evt.getActionCommand().equals(labels.getString(FOLLOW + ".text"))) {
       JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem) evt.getSource();
-      OpenTCSDrawingView drawingView = OpenTCSView.instance().getEditor().getActiveView();
+      OpenTCSDrawingView drawingView = drawingEditor.getActiveView();
 
       if (drawingView != null) {
         if (checkBox.isSelected()) {
@@ -187,22 +167,22 @@ public class VehicleAction
 
       if (!pointModels.isEmpty()) {
         PointPanel contentPanel = new PointPanel(pointModels);
-        StandardContentDialog fDialog = new StandardContentDialog(OpenTCSView.instance(), contentPanel);
+        StandardContentDialog fDialog = new StandardContentDialog(view, contentPanel);
         fDialog.setTitle(evt.getActionCommand());
         fDialog.setVisible(true);
 
         if (fDialog.getReturnStatus() == StandardContentDialog.RET_OK) {
           PointModel point = (PointModel) contentPanel.getSelectedItem();
-          orderDispatcher().createTransportOrder(point, fVehicle);
+          orderUtil.createTransportOrder(point, fVehicle);
         }
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(SEND_TO_LOCATION + ".text"))) {
       List<LocationModel> locModels = locationModels();
-      
+
       if (!locModels.isEmpty()) {
         LocationActionPanel contentPanel = new LocationActionPanel(locModels);
-        StandardContentDialog fDialog = new StandardContentDialog(OpenTCSView.instance(), contentPanel);
+        StandardContentDialog fDialog = new StandardContentDialog(view, contentPanel);
         fDialog.setTitle(evt.getActionCommand());
         fDialog.setVisible(true);
 
@@ -212,7 +192,7 @@ public class VehicleAction
           locations.add(location);
           List<String> actions = new ArrayList<>();
           actions.add(contentPanel.getSelectedAction());
-          orderDispatcher().createTransportOrder(locations,
+          orderUtil.createTransportOrder(locations,
                                                  actions,
                                                  System.currentTimeMillis(),
                                                  fVehicle);
@@ -223,7 +203,7 @@ public class VehicleAction
       try {
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), false);
       }
-      catch (ObjectUnknownException | CredentialsException e) {
+      catch (KernelRuntimeException e) {
         log.log(Level.WARNING, "Unexpected exception", e);
       }
     }
@@ -231,7 +211,7 @@ public class VehicleAction
       try {
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), true);
       }
-      catch (ObjectUnknownException | CredentialsException e) {
+      catch (KernelRuntimeException e) {
         log.log(Level.WARNING, "Unexpected exception", e);
       }
     }
@@ -239,37 +219,25 @@ public class VehicleAction
       try {
         kernel().dispatchVehicle(vehicleReference(), true);
       }
-      catch (ObjectUnknownException | CredentialsException e) {
+      catch (KernelRuntimeException e) {
         log.log(Level.WARNING, "Unexpected exception", e);
       }
     }
   }
 
-  private OpenTCSEventDispatcher eventDispatcher() {
-    return (OpenTCSEventDispatcher) OpenTCSView.instance().getSystemModel().getEventDispatcher();
-  }
-
-  private TransportOrderDispatcher orderDispatcher() {
-    return eventDispatcher().getTransportOrderDispatcher();
-  }
-
-  private VehicleAdapter processAdapter() {
-    return (VehicleAdapter) eventDispatcher().findProcessAdapter(fVehicle);
-  }
-
   private Kernel kernel() {
-    return kernelProxyManager.kernel();
+    return kernelProvider.getKernel();
   }
 
   private TCSObjectReference<Vehicle> vehicleReference() {
-    return processAdapter().getProcessObject();
+    return kernel().getTCSObject(Vehicle.class, fVehicle.getName()).getReference();
   }
 
-  private static List<LocationModel> locationModels() {
-    return OpenTCSView.instance().getSystemModel().getLocationModels();
+  private List<LocationModel> locationModels() {
+    return modelManager.getModel().getLocationModels();
   }
 
-  private static List<PointModel> pointModels() {
-    return OpenTCSView.instance().getSystemModel().getPointModels();
+  private List<PointModel> pointModels() {
+    return modelManager.getModel().getPointModels();
   }
 }

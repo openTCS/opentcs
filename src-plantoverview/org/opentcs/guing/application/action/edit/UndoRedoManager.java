@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -16,7 +17,9 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoableEdit;
-import org.opentcs.guing.components.properties.panel.PropertiesTableContent;
+import net.engio.mbassy.listener.Handler;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
+import static org.opentcs.guing.event.SystemModelTransitionEvent.Stage.UNLOADING;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -32,7 +35,11 @@ public class UndoRedoManager
   public final static String UNDO_ACTION_ID = "edit.undo";
   public final static String REDO_ACTION_ID = "edit.redo";
 
-  private static final Logger logger = Logger.getLogger(PropertiesTableContent.class.getName());
+  /**
+   * This class's logger.
+   */
+  private static final Logger logger
+      = Logger.getLogger(UndoRedoManager.class.getName());
 
   protected PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
 
@@ -121,6 +128,7 @@ public class UndoRedoManager
   /**
    * Creates new UndoRedoManager
    */
+  @Inject
   public UndoRedoManager() {
     undoAction = new UndoAction();
     redoAction = new RedoAction();
@@ -131,6 +139,20 @@ public class UndoRedoManager
     super.discardAllEdits();
     updateActions();
     setHasSignificantEdits(false);
+  }
+  
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        discardAllEdits();
+        break;
+      case LOADED:
+        discardAllEdits();
+        break;
+      default:
+      // Do nada.
+    }
   }
 
   public void setHasSignificantEdits(boolean newValue) {

@@ -30,7 +30,9 @@ import org.opentcs.access.Kernel;
 public @interface Availability {
 
   /**
-   * The kernel states in which the annotated query is available.
+   * Returns the kernel states in which the annotated query is available.
+   *
+   * @return the kernel states in which the annotated query is available.
    */
   Kernel.State[] value();
 }

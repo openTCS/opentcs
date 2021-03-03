@@ -4,11 +4,13 @@
  */
 package org.opentcs.drivers;
 
-import org.junit.After;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import org.junit.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.vehicles.StandardVehicleManagerPool;

@@ -10,6 +10,7 @@ package org.opentcs.kernel.persistence;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 import org.opentcs.kernel.workingset.Model;
 
 /**
@@ -28,9 +29,11 @@ interface XMLModelWriter {
    * Writes a model to an output stream as XML.
    *
    * @param model The model to be written.
+   * @param name If present, the model will be saved with this name instead of
+   * it's current one.
    * @param outStream The output stream the model is to be written to.
    * @throws IOException If there was a problem writing the model.
    */
-  void writeXMLModel(Model model, OutputStream outStream)
+  void writeXMLModel(Model model, Optional<String> name, OutputStream outStream)
   throws IOException;
 }

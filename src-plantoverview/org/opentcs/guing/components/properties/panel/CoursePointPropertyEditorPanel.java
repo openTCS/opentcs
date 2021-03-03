@@ -1,18 +1,25 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 21.08.2013 10:09:47
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.panel;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.model.SystemModel;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -20,19 +27,27 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * Panel that allows selection of a single point in the course model.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class CoursePointPropertyEditorPanel
     extends JPanel
     implements DetailsDialogContent {
 
+  /**
+   * Provides the current system model.
+   */
+  private final ModelManager modelManager;
   private final List<String> pointNames = new ArrayList<>();
-  private SystemModel fSystemModel;
   private CoursePointProperty fProperty;
 
   /**
    * Creates a new instance.
+   * 
+   * @param modelManager Provides the current system model.
    */
-  public CoursePointPropertyEditorPanel() {
+  @Inject
+  public CoursePointPropertyEditorPanel(ModelManager modelManager) {
+    this.modelManager = requireNonNull(modelManager, "modelManager");
     initComponents();
   }
 
@@ -52,7 +67,7 @@ public class CoursePointPropertyEditorPanel
 
     // Update the list of point names from the system model.
     pointNames.clear();
-    for (PointModel pointModel : fSystemModel.getPointModels()) {
+    for (PointModel pointModel : modelManager.getModel().getPointModels()) {
       String pointName = pointModel.getName();
       pointNames.add(pointName);
     }
@@ -64,11 +79,6 @@ public class CoursePointPropertyEditorPanel
   @Override
   public Property getProperty() {
     return fProperty;
-  }
-
-  @Override
-  public void setSystemModel(SystemModel systemModel) {
-    fSystemModel = systemModel;
   }
 
   private void updateView() {

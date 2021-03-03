@@ -1,9 +1,16 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
+import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
@@ -13,46 +20,42 @@ import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.tree.elements.PathUserObject;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Ein Weg zwischen zwei Knoten. Path ist das passende Datenobjekt zur
- * PathConnection. Eine solche Strecke kennt ihren Startknoten und Endknoten.
- *
+ * A connection between two points.
+ * 
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PathModel
     extends AbstractConnection {
 
-  // Der Schlüssel für die Länge.
+  /**
+   * Key for the length.
+   */
   public static final String LENGTH = "length";
-  // Der Schlüssel für die Kosten beim Routing.
+  /**
+   * Key for routing costs.
+   */
   public static final String ROUTING_COST = "cost";
-  // Der Schlüssel für die Höchstgeschwindigkeit in Vorwärts- und die
-  // Höchstgeschwindigkeit in Rückwärtsfahrrichtung.
+  /**
+   * Key for maximum forward velocity.
+   */
   public static final String MAX_VELOCITY = "maxVelocity";
+  /**
+   * Key for maximum reverse velocity.
+   */
   public static final String MAX_REVERSE_VELOCITY = "maxReverseVelocity";
-  // Der Schlüssel für den Gesperrt-Zustand.
+  /**
+   * Key for the locked state.
+   */
   public static final String LOCKED = "locked";
 
   /**
    * Creates a new instance.
    */
   public PathModel() {
-    super(null);
     createProperties();
-  }
-
-  /**
-   * Setzt den Namen des Knotens.
-   *
-   * @param name der neue Knotenname
-   */
-  public void setName(String name) {
-    StringProperty p = (StringProperty) getProperty(ModelComponent.NAME);
-    p.setText(name);
   }
 
   @Override
@@ -60,21 +63,6 @@ public class PathModel
     return ResourceBundleUtil.getBundle().getString("path.description");
   }
 
-  /**
-   * Setzt die relative Position der Richtungspfeile.
-   *
-   * @param value der Wert zwischen 0 und 100
-   */
-////	public void setArrowLocation(int value) {
-////		ImmutableUnitProperty p = (ImmutableUnitProperty) getProperty(ElementPropKeys.PATH_ARROW_POSITION);
-////	
-////		try {
-////			p.setValueAndUnit(value, "%");
-////		}
-////		catch (Exception e) {
-////			e.printStackTrace();
-////		}
-////	}
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     // Name
@@ -106,7 +94,7 @@ public class PathModel
     pMaxReverseVelocity.setCollectiveEditable(true);
     setProperty(MAX_REVERSE_VELOCITY, pMaxReverseVelocity);
     // Type of path coonection
-    SelectionProperty pPathConnType = new SelectionProperty(this, LinerType.values(), LinerType.values()[0]);
+    SelectionProperty<LinerType> pPathConnType = new SelectionProperty<>(this, Arrays.asList(LinerType.values()), LinerType.values()[0]);
     pPathConnType.setDescription(bundle.getString("element.pathConnType.text"));
     pPathConnType.setHelptext(bundle.getString("element.pathConnType.helptext"));
     pPathConnType.setCollectiveEditable(true);
@@ -119,6 +107,17 @@ public class PathModel
     // TODO: Auch in der Tabelle editieren?
     pPathControlPoints.setModellingEditable(false);
     setProperty(ElementPropKeys.PATH_CONTROL_POINTS, pPathControlPoints);
+    // Components
+    StringProperty startComponent = new StringProperty(this);
+    startComponent.setDescription(bundle.getString("element.startComponent.text"));
+    startComponent.setModellingEditable(false);
+    startComponent.setOperatingEditable(false);
+    setProperty(START_COMPONENT, startComponent);
+    StringProperty endComponent = new StringProperty(this);
+    endComponent.setDescription(bundle.getString("element.endComponent.text"));
+    endComponent.setModellingEditable(false);
+    endComponent.setOperatingEditable(false);
+    setProperty(END_COMPONENT, endComponent);
     // Arrow position (relative)
     // HH 2014-02-14: Verschieben der Pfeilspitze ist in der Figure noch nicht
     // implementiert, daher dieses Property auch nicht anzeigen
@@ -142,13 +141,6 @@ public class PathModel
     // HH 2014-02-17: Miscellaneous Properties vorerst nicht collective editable
     // pMiscellaneous.setCollectiveEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
-  }
-
-  @Override // AbstractFigureComponent
-  public PathUserObject createUserObject() {
-    fUserObject = new PathUserObject(this);
-
-    return (PathUserObject) fUserObject;
   }
 
   /**

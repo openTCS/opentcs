@@ -87,7 +87,7 @@ class RoutingTableBuilderBfs
       }
     }
     double timePassed = (System.currentTimeMillis() - timeStampBefore) / 1000.0;
-    log.log(Level.INFO,
+    log.log(Level.FINE,
             "Computed routing table for {0} in {1,number,#.##} seconds.",
             new Object[] {vehicle.getName(), timePassed});
     for (StaticRoute staticRoute : model.getStaticRoutes(null)) {

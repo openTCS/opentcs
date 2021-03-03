@@ -1,7 +1,12 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 20.08.2013 11:50:30
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.exchange;
 
 import org.opentcs.access.Kernel;
@@ -32,6 +37,11 @@ public interface KernelProxyManager {
    * successfully.
    */
   boolean connect(ConnectionParamSet connParamSet);
+  
+  /**
+   * Tells the proxy manager the connection to the kernel was lost.
+   */
+  void disconnect();
 
   /**
    * Checks whether a connection to the kernel is established.

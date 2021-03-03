@@ -8,23 +8,32 @@
  */
 package org.opentcs.util.gui.plugins;
 
-import java.util.Set;
+import java.awt.Image;
 import org.opentcs.data.model.Vehicle;
 
 /**
  * Provides a vehicle theme.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public interface VehicleTheme {
 
   /**
-   * Returns the path to the image for the given vehicle.
+   * Returns an image for the given vehicle, representing its current state.
    *
-   * @param vehicle The vehicle for which to return the path.
-   * @return The path to the image for the given location representation.
+   * @param vehicle The vehicle for which to return the image.
+   * @return An image for the given vehicle.
    */
-  String getImagePathFor(Vehicle vehicle);
+  Image getImageFor(Vehicle vehicle);
+
+  /**
+   * Returns an image representing this theme, usually an image of the vehicle
+   * in its normal state.
+   *
+   * @return A default image for this theme.
+   */
+  Image getThemeImage();
 
   /**
    * Returns a name/short description of this theme.
@@ -32,12 +41,4 @@ public interface VehicleTheme {
    * @return A name/short description of this theme.
    */
   String getName();
-  
-  /**
-   * Returns all image paths used by this theme. If a path to an image is 
-   * missing the image will not be loaded and therefore not be available.
-   * 
-   * @return Set containing all image paths.
-   */
-  Set<String> getAllImagePaths();
 }

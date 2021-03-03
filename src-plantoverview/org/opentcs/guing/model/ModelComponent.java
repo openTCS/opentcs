@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model;
 
 import java.util.List;
@@ -9,7 +15,6 @@ import java.util.Map;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.tree.TreeViewManager;
-import org.opentcs.guing.components.tree.elements.UserObject;
 
 /**
  * Interface für alle Komponenten des Systemmodells. Konkrete Implementierungen
@@ -37,20 +42,6 @@ public interface ModelComponent
    * Der Schlüssel für sonstige Eigenschaften.
    */
   String MISCELLANEOUS = "Miscellaneous";
-
-  /**
-   * Erzeugt das UserObject, das im TreeView eingesetzt wird.
-   *
-   * @return
-   */
-  UserObject createUserObject();
-
-  /**
-   * Liefert das UserObject, das im TreeView eingesetzt wird.
-   *
-   * @return
-   */
-  UserObject getUserObject();
 
   /**
    * Fügt das eigene Objekt dem TreeView hinzu und ruft die restore()- Methode
@@ -150,6 +141,13 @@ public interface ModelComponent
    * @return
    */
   String getName();
+
+  /**
+   * Sets this model component's name.
+   *
+   * @param name The new name.
+   */
+  void setName(String name);
 
   /**
    * Liefert zum aktuellen Schlüssel das Attribut mit dem übergebenen Namen.

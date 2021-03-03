@@ -1,14 +1,31 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.tree;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import java.awt.Cursor;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.swing.tree.TreeNode;
+import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.tree.elements.UserObject;
+import org.opentcs.guing.components.tree.elements.UserObjectUtil;
+import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -21,28 +38,110 @@ import org.opentcs.guing.model.ModelComponent;
  * @see ModelingApplication
  * @see TreeView
  */
-public class TreeViewManager {
+public abstract class TreeViewManager {
 
   /**
    * The tree view.
    */
   private final TreeView fTreeView;
   /**
-   * Whether to hide blocks from the tree view or not.
+   * A factory for UserObjects.
    */
-  private boolean hideBlocks;
+  protected final UserObjectUtil userObjectUtil;
+  /**
+   * This manager's component filter.
+   */
+  private Predicate<ModelComponent> componentFilter = Predicates.alwaysTrue();
 
   /**
    * Creates a new instance.
    *
-   * @param treeView
+   * @param treeView The actual tree view.
+   * @param userObjectUtil A factory for UserObjects.
+   * @param mouseListener The MouseListener for the TreeView.
    */
-  public TreeViewManager(TreeView treeView) {
-    fTreeView = Objects.requireNonNull(treeView, "treeView is null");
+  @Inject
+  public TreeViewManager(TreeView treeView, 
+                         UserObjectUtil userObjectUtil,
+                         MouseListener mouseListener) {
+    this.fTreeView = requireNonNull(treeView, "treeView is null");
+    this.userObjectUtil = requireNonNull(userObjectUtil, "userObjectUtil");
+    requireNonNull(mouseListener, "mouseListener");
+    fTreeView.getTree().addMouseListener(mouseListener);
   }
 
   public TreeView getTreeView() {
     return fTreeView;
+  }
+
+  /**
+   * Delegates the call to the <code>TreeView</code>.
+   *
+   * @param mouseListener The Listener to add.
+   */
+  public void addMouseListener(MouseListener mouseListener) {
+    getTreeView().addMouseListener(mouseListener);
+  }
+
+  /**
+   * Delegates the call to the <code>TreeView</code>.
+   *
+   * @param mouseListener The Listener to add.
+   */
+  public void addMouseMotionListener(MouseMotionListener mouseListener) {
+    getTreeView().addMouseMotionListener(mouseListener);
+  }
+
+  /**
+   * Sorts the items of the <code>TreeView</code>.
+   */
+  public void sortItems() {
+    Enumeration<TreeNode> eTreeNodes
+        = ((TreeNode) getTreeView().getTree().getModel().getRoot()).children();
+
+    while (eTreeNodes.hasMoreElements()) {
+      TreeNode node = eTreeNodes.nextElement();
+      getTreeView().sortItems(node);
+    }
+  }
+
+  /**
+   * Updates the text at the top of the <code>TreeView</code>.
+   *
+   * @param event The <code>ModelNameChangeEvent</code>.
+   */
+  @Handler
+  public void updateModelName(ModelNameChangeEvent event) {
+    String newName = event.getNewName();
+    getTreeView().updateText(newName);
+  }
+
+  /**
+   * Returns whether the <code>TreeView</code> has buffered objects.
+   *
+   * @return <code>true</code> if it has some.
+   */
+  public boolean hasBufferedObjects() {
+    return getTreeView().hasBufferedObjects();
+  }
+
+  /**
+   * Returns the dragged user object of the <code>TreeView</code>.
+   *
+   * @param e The event where the mouse click happened.
+   * @return The user object that was dragged.
+   */
+  public UserObject getDraggedUserObject(MouseEvent e) {
+    return getTreeView().getDraggedUserObject(e);
+  }
+
+  /**
+   * Sets the cursor in the <code>TreeView</code>.
+   *
+   * @param cursor The new cursor.
+   */
+  public void setCursor(Cursor cursor) {
+    getTreeView().setCursor(cursor);
   }
 
   /**
@@ -87,12 +186,12 @@ public class TreeViewManager {
     component.treeRestore(null, this);
   }
 
-  public void setHideBlocks(boolean hideBlocks) {
-    this.hideBlocks = hideBlocks;
+  public void setComponentFilter(Predicate<ModelComponent> componentFilter) {
+    this.componentFilter = requireNonNull(componentFilter, "componentFilter");
   }
 
-  public boolean isHideBlocks() {
-    return hideBlocks;
+  public boolean accepts(ModelComponent component) {
+    return componentFilter.apply(component);
   }
 
   /**
@@ -101,11 +200,7 @@ public class TreeViewManager {
    * @param parent das Elternobjekt
    * @param item das hinzuzufügende Element
    */
-  public void addItem(Object parent, ModelComponent item) {
-    if (item.isTreeViewVisible()) {
-      fTreeView.addItem(parent, item.createUserObject());
-    }
-  }
+  public abstract void addItem(Object parent, ModelComponent item);
 
   /**
    * Teilt dem TreeView mit, dass sich ein Item geändert hat, welches also

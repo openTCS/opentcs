@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.drawing.figures;
 
 import java.awt.geom.Point2D;
@@ -50,7 +56,7 @@ public class TCSLabelFigure
 		isLabelVisible = visible;
 
 		if (visible) {
-			setText(((TCSFigure) fParent.getPresentationFigure()).getModel().getName());
+			setText(fParent.getPresentationFigure().getModel().getName());
 		}
 		else {
 			setText("");
@@ -83,7 +89,7 @@ public class TCSLabelFigure
 		super.changed();
 
 		if (fParent != null) {
-			TCSFigure figure = (TCSFigure) fParent.getPresentationFigure();
+			TCSFigure figure = fParent.getPresentationFigure();
 			FigureComponent model = figure.getModel();
 
 			Point2D.Double newOffset = new Point2D.Double(
@@ -128,7 +134,7 @@ public class TCSLabelFigure
 	public void figureChanged(FigureEvent event) {
 		if (event.getFigure() instanceof LabeledFigure) {
 			LabeledFigure lf = (LabeledFigure) event.getFigure();
-			TCSFigure figure = (TCSFigure) lf.getPresentationFigure();
+			TCSFigure figure = lf.getPresentationFigure();
 			FigureComponent model = figure.getModel();
 			String name = model.getName();
 			setText(name);

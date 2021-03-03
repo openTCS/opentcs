@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.panel;
 
 import java.util.logging.Level;
@@ -11,7 +17,6 @@ import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.AbstractQuantity;
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -92,11 +97,6 @@ public class QuantityEditorPanel
   @Override
   public AbstractQuantity<?> getProperty() {
     return fProperty;
-  }
-
-  @Override
-  public void setSystemModel(SystemModel systemModel) {
-    // Do nada.
   }
 
   // CHECKSTYLE:OFF

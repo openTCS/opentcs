@@ -19,7 +19,6 @@ import org.opentcs.data.TCSObjectReference;
 
 /**
  * A location at which a vehicle may perform an action.
- * <p>
  * <ul>
  * <li>A <code>Location</code> must be linked to at least one <code>Point</code>
  * to be reachable for a vehicle.</li>
@@ -31,7 +30,6 @@ import org.opentcs.data.TCSObjectReference;
  * only the operations contained in it are allowed at the linked
  * <code>Point</code>.</li>
  * </ul>
- * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

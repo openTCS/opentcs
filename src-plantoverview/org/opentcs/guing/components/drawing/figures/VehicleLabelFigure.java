@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.drawing.figures;
 
 import java.awt.Color;
@@ -60,7 +66,7 @@ public class VehicleLabelFigure
 	public void figureChanged(FigureEvent event) {
 		if (event.getFigure() instanceof LabeledFigure) {
 			LabeledFigure lf = (LabeledFigure) event.getFigure();
-			TCSFigure figure = (TCSFigure) lf.getPresentationFigure();
+			TCSFigure figure = lf.getPresentationFigure();
 			VehicleModel model = (VehicleModel) figure.getModel();
 			String name = model.getName();
 			

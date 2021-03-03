@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -91,14 +92,14 @@ class XMLModel002Builder
   }
 
   @Override
-  public void writeXMLModel(Model model, OutputStream outStream)
+  public void writeXMLModel(Model model, Optional<String> name, OutputStream outStream)
       throws IOException {
     Objects.requireNonNull(model, "model is null");
     Objects.requireNonNull(outStream, "outStream is null");
 
     Element rootElement = new Element("model");
     rootElement.setAttribute("version", versionString);
-    rootElement.setAttribute("name", model.getName());
+    rootElement.setAttribute("name", name.orElse(model.getName()));
     // Add model data.
     rootElement.addContent(getXMLPoints(model));
     rootElement.addContent(getXMLPaths(model));

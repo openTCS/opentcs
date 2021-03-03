@@ -4,20 +4,19 @@
  */
 package org.opentcs.guing.application.toolbar;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -32,33 +31,18 @@ import org.jhotdraw.draw.tool.DelegationSelectionTool;
 import org.jhotdraw.draw.tool.DragTracker;
 import org.jhotdraw.draw.tool.SelectAreaTracker;
 import org.jhotdraw.draw.tool.Tool;
-import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.guing.application.GuiManager;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.application.action.LayoutToModelMenuItem;
-import org.opentcs.guing.application.action.ModelToLayoutMenuItem;
-import org.opentcs.guing.components.drawing.figures.FigureConstants;
-import org.opentcs.guing.components.drawing.figures.LabeledFigure;
-import org.opentcs.guing.components.properties.CoordinateUndoActivity;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
-import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.ModelAttribute;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.application.OperationMode;
+import org.opentcs.guing.application.menus.MenuFactory;
 
 /**
  * The default selection tool.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class MultipleSelectionTool
-    extends DelegationSelectionTool
-    implements AttributesChangeListener {
+    extends DelegationSelectionTool {
 
   /**
    * A bit mask for the left mouse button being clicked and the ctrl key being
@@ -67,74 +51,59 @@ public class MultipleSelectionTool
   private static final int CTRL_LEFT_MASK
       = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.CTRL_DOWN_MASK;
   /**
+   * Stores the application's current state.
+   */
+  private final ApplicationState appState;
+  /**
+   * A factory for menu items.
+   */
+  private final MenuFactory menuFactory;
+  /**
    * We store the last mouse click here, to support multi-click behavior, that
    * is, a behavior that is invoked, when the user clicks on the same spot
    * multiple times, but in a longer interval than needed for a double click.
    */
   private MouseEvent lastClickEvent;
   /**
-   * The tracker encapsulates the current state of the SelectionTool. Overrides
-   * SelectionTool.selectAreaTracker
+   * Drawing-related actions for popup menus created by this tool.
    */
-  private SelectAreaTracker selectAreaTracker;
-  /**
-   * The tracker encapsulates the current state of the SelectionTool.
-   */
-  private DragTracker dragTracker;
-  /**
-   * Flag to
-   */
-  private boolean aligntLayoutWithModel;
   private final Collection<Action> drawingActions;
+  /**
+   * Selection-related actions for popup menus created by this tool.
+   */
   private final Collection<Action> selectionActions;
 
   /**
    * Creates a new instance.
    *
-   * @param drawingActions
-   * @param selectionActions
+   * @param appState Stores the application's current state.
+   * @param menuFactory A factory for menu items in popup menus created by this
+   * tool.
+   * @param selectAreaTracker The tracker to be used for area selections in the
+   * drawing.
+   * @param dragTracker The tracker to be used for dragging figures.
+   * @param drawingActions Drawing-related actions for the popup menus created
+   * by this tool.
+   * @param selectionActions Selection-related actions for the popup menus
+   * created by this tool.
    */
-  public MultipleSelectionTool(Collection<Action> drawingActions,
-                               Collection<Action> selectionActions) {
+  @Inject
+  public MultipleSelectionTool(ApplicationState appState,
+                               MenuFactory menuFactory,
+                               SelectAreaTracker selectAreaTracker,
+                               DragTracker dragTracker,
+                               @Assisted("drawingActions") Collection<Action> drawingActions,
+                               @Assisted("selectionActions") Collection<Action> selectionActions) {
     super(drawingActions, selectionActions);
-    this.drawingActions = drawingActions;
-    this.selectionActions = selectionActions;
-  }
+    this.appState = requireNonNull(appState, "appState");
+    this.menuFactory = requireNonNull(menuFactory, "menuFactory");
+    requireNonNull(selectAreaTracker, "selectAreaTracker");
+    requireNonNull(dragTracker, "dragTracker");
+    this.drawingActions = requireNonNull(drawingActions, "drawingActions");
+    this.selectionActions = requireNonNull(selectionActions, "selectionActions");
 
-  @Override
-  public void propertiesChanged(AttributesChangeEvent e) {
-    if (e.getInitiator() == this) {
-      OpenTCSView.instance().resetSelectionTool();
-    }
-  }
-
-  @Override // SelectionTool
-  protected SelectAreaTracker getSelectAreaTracker() {
-    if (selectAreaTracker == null) {
-      selectAreaTracker = new OpenTCSSelectAreaTracker();
-    }
-
-    return selectAreaTracker;
-  }
-
-  @Override // SelectionTool
-  public void setSelectAreaTracker(SelectAreaTracker newValue) {
-    selectAreaTracker = newValue;
-  }
-
-  @Override // SelectionTool
-  protected DragTracker getDragTracker(Figure f) {
-    if (dragTracker == null) {
-      dragTracker = new OpenTCSDragTracker();
-    }
-
-    dragTracker.setDraggedFigure(f);
-    return dragTracker;
-  }
-
-  @Override // SelectionTool
-  public void setDragTracker(DragTracker newValue) {
-    dragTracker = newValue;
+    setSelectAreaTracker(selectAreaTracker);
+    setDragTracker(dragTracker);
   }
 
   @Override // DelegationSelectionTool
@@ -232,10 +201,6 @@ public class MultipleSelectionTool
 
   @Override
   protected void showPopupMenu(Figure figure, Point p, Component c) {
-    if(OpenTCSView.instance().hasOperationMode(GuiManager.OperationMode.OPERATING)) {
-      return;
-    }
-    
     // --- JHotDraw code starts here ---
     JPopupMenu menu = new JPopupMenu();
     JMenu submenu = null;
@@ -311,10 +276,11 @@ public class MultipleSelectionTool
     // --- JHotDraw code ends here ---
 
     // Points and Locations get two additional entries
-    JMenuItem toLayout = new ModelToLayoutMenuItem(editor, false);
-    menu.add(toLayout);
-    JMenuItem fromLayout = new LayoutToModelMenuItem(editor, false);
-    menu.add(fromLayout);
+//    if (OperationMode.MODELLING.equals(operationMode)) {
+    if (appState.hasOperationMode(OperationMode.MODELLING)) {
+      menu.add(menuFactory.createModelToLayoutMenuItem(false));
+      menu.add(menuFactory.createLayoutToModelMenuItem(false));
+    }
 
     menu.show(c, p.x, p.y);
   }

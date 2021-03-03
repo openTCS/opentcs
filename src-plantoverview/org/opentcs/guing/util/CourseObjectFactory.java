@@ -1,14 +1,27 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.util;
 
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import org.opentcs.guing.components.drawing.figures.FigureFactory;
+import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
+import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.LinkConnection;
 import org.opentcs.guing.components.drawing.figures.LocationFigure;
+import org.opentcs.guing.components.drawing.figures.OffsetFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
+import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.model.elements.BlockModel;
+import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
@@ -26,60 +39,67 @@ import org.opentcs.guing.model.elements.VehicleModel;
 public class CourseObjectFactory {
 
   /**
-   * Creates a new instance.
+   * A factory for figures.
    */
-  public CourseObjectFactory() {
-  }
+  private final FigureFactory figureFactory;
 
-  public VehicleModel createVehicleModel() {
-    return new VehicleModel();
+  /**
+   * Creates a new instance.
+   *
+   * @param figureFactory A factory for figures.
+   */
+  @Inject
+  public CourseObjectFactory(FigureFactory figureFactory) {
+    this.figureFactory = requireNonNull(figureFactory, "figureFactory");
   }
 
   public LayoutModel createLayoutModel() {
     return new LayoutModel();
   }
 
-  public PointModel createPointModel() {
-    return new PointModel();
-  }
-
-  public PathModel createPathModel() {
-    return new PathModel();
-  }
-
-  public LocationModel createLocationModel() {
-    return new LocationModel();
+  public VehicleModel createVehicleModel() {
+    return new VehicleModel();
   }
 
   public LocationTypeModel createLocationTypeModel() {
     return new LocationTypeModel();
   }
 
-  public LinkModel createLinkModel() {
-    return new LinkModel();
-  }
-
   public BlockModel createBlockModel() {
     return new BlockModel();
+  }
+
+  public GroupModel createGroupModel() {
+    return new GroupModel();
   }
 
   public StaticRouteModel createStaticRouteModel() {
     return new StaticRouteModel();
   }
 
-  public PointFigure createPointFigure() {
-    return new PointFigure(new PointModel());
+  public LabeledPointFigure createPointFigure() {
+    PointFigure pointFigure = figureFactory.createPointFigure(new PointModel());
+    return figureFactory.createLabeledPointFigure(pointFigure);
   }
 
   public PathConnection createPathConnection() {
-    return new PathConnection(new PathModel());
+    return figureFactory.createPathConnection(new PathModel());
   }
 
-  public LocationFigure createLocationFigure() {
-    return new LocationFigure(new LocationModel());
+  public LabeledLocationFigure createLocationFigure() {
+    LocationFigure location = figureFactory.createLocationFigure(new LocationModel());
+    return figureFactory.createLabeledLocationFigure(location);
   }
 
   public LinkConnection createLinkConnection() {
-    return new LinkConnection(new LinkModel());
+    return figureFactory.createLinkConnection(new LinkModel());
+  }
+  
+  public VehicleFigure createVehicleFigure(VehicleModel model) {
+    return figureFactory.createVehicleFigure(model);
+  }
+  
+  public OffsetFigure createOffsetFigure() {
+    return figureFactory.createOffsetFigure();
   }
 }

@@ -1,17 +1,26 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.dialogs;
 
+import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.LinkModel;
@@ -47,14 +56,19 @@ public class AddNodesToStaticRoutePanel
   /**
    * Creates new form AddNodesToStaticRoutePanel.
    *
+   * @param guiManager The GUI manager.
    * @param point der Knoten, von dem die nachfolgenden Knoten bestimmt werden
    * sollen
    * @param allPoints alle im Fahrkurs verfügbaren Knoten
    */
-  public AddNodesToStaticRoutePanel(PointModel point, List<PointModel> allPoints) {
-    initComponents();
+  @Inject
+  public AddNodesToStaticRoutePanel(final GuiManager guiManager,
+                                    @Assisted @Nullable PointModel point,
+                                    @Assisted List<PointModel> allPoints) {
     fStartPoint = point;
-    fAllPoints = allPoints;
+    fAllPoints = requireNonNull(allPoints, "allPoints");
+
+    initComponents();
     fAddedPoints = new ArrayList<>();
     setDialogTitle(ResourceBundleUtil.getBundle().getString("staticRoute.dialog.title"));
     listAvailablePoints.addListSelectionListener(new ListSelectionListener() {
@@ -76,7 +90,7 @@ public class AddNodesToStaticRoutePanel
             PointModel point = e.next();
 
             if (point.getName().equals(entry)) {
-              OpenTCSView.instance().figureSelected(point);
+              guiManager.figureSelected(point);
             }
           }
         }
@@ -119,7 +133,7 @@ public class AddNodesToStaticRoutePanel
       labelTo.setText(bundle.getString("staticRoute.to.text"));
       buttonSelect.setText(bundle.getString("staticRoute.add.text"));
     }
-   
+
     Collections.sort(fAvailablePoints);
     Iterator<PointModel> ePoints = fAvailablePoints.iterator();
 
@@ -127,7 +141,7 @@ public class AddNodesToStaticRoutePanel
       PointModel point = ePoints.next();
       listModel.addElement(point.getName());
     }
-    
+
     listAvailablePoints.setModel(listModel);
 
     if (!listModel.isEmpty()) {
@@ -145,11 +159,8 @@ public class AddNodesToStaticRoutePanel
    */
   private List<PointModel> getPointsFrom(PointModel point) {
     List<PointModel> points = new ArrayList<>();
-    Iterator<AbstractConnection> iConnections = point.getConnections().iterator();
 
-    while (iConnections.hasNext()) {
-      AbstractConnection connection = iConnections.next();
-
+    for (AbstractConnection connection : point.getConnections()) {
       if (connection instanceof LinkModel) {
         continue;
       }
@@ -174,6 +185,7 @@ public class AddNodesToStaticRoutePanel
     return points;
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -273,4 +285,5 @@ public class AddNodesToStaticRoutePanel
     private javax.swing.JScrollPane scrollPaneAvailablePoints;
     private javax.swing.JTextField textFieldFrom;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

@@ -1,33 +1,40 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Level;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.undo.CannotUndoException;
+import javax.inject.Inject;
+import net.engio.mbassy.bus.MBassador;
+import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.TCSKernelStateEvent;
 import org.opentcs.access.TCSMessageEvent;
 import org.opentcs.access.TCSModelTransitionEvent;
 import org.opentcs.access.rmi.RemoteKernelConnection;
 import org.opentcs.access.rmi.TCSProxyStateEvent;
 import org.opentcs.data.TCSObjectEvent;
+import static org.opentcs.data.TCSObjectEvent.Type.OBJECT_MODIFIED;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.exchange.adapter.OpenTCSProcessAdapter;
+import org.opentcs.guing.application.OperationMode;
+import org.opentcs.guing.event.KernelStateChangeEvent;
+import org.opentcs.guing.event.OperationModeChangeEvent;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
-import org.opentcs.guing.exchange.adapter.ProcessAdapterFactory;
+import org.opentcs.guing.util.MessageDisplay;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
@@ -36,6 +43,7 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * The openTCS implementation of the abstract event dispatcher.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSEventDispatcher
     extends AbstractEventDispatcher
@@ -44,12 +52,12 @@ public class OpenTCSEventDispatcher
   /**
    * This class's logger.
    */
-  private static final Logger logger
+  private static final Logger log
       = Logger.getLogger(OpenTCSEventDispatcher.class.getName());
   /**
-   * The OpenTCSView.
+   * A display for messages received from the kernel.
    */
-  private OpenTCSView fOpenTCSView;
+  private final MessageDisplay messageDisplay;
   /**
    * The transport order dispatcher.
    */
@@ -59,57 +67,43 @@ public class OpenTCSEventDispatcher
    */
   private final OrderSequenceDispatcher fOrderSequenceDispatcher;
   /**
-   * Flag to show if an undo is requested because something went wrong.
-   * If set following requests will be ignored.
+   * The application's event bus.
    */
-  private boolean fUndoRequested;
-  /**
-   * Flag if we are currently in a model transition.
-   * Prevents flooding of the log with unneccessary messages.
-   */
-  private boolean isInTransition;
+  private final MBassador<Object> eventBus;
 
   /**
    * Creates a new instance.
    *
-   * @param procAdapterFactory The process adapter factory to be used.
+   * @param kernelProvider Provides a access to a kernel.
+   * @param messageDisplay A display for messages received from the kernel.
+   * @param eventBus The application's event bus.
+   * @param orderDispatcher Handles events concerning transport orders.
+   * @param sequenceDispatcher Handles events concerning order sequences.
    */
-  public OpenTCSEventDispatcher(ProcessAdapterFactory procAdapterFactory) {
-    super(procAdapterFactory);
-    fTransportOrderDispatcher = new TransportOrderDispatcher(this);
-    fOrderSequenceDispatcher = new OrderSequenceDispatcher(this);
-  }
-
-  /**
-   * Returns the transport order dispatcher.
-   *
-   * @return The {@link TransportOrderDispatcher}.
-   */
-  public TransportOrderDispatcher getTransportOrderDispatcher() {
-    return fTransportOrderDispatcher;
-  }
-
-  /**
-   * Returns the order sequence dispatcher.
-   * 
-   * @return The {@link OrderSequenceDispatcher}.
-   */
-  public OrderSequenceDispatcher getOrderSequenceDispatcher() {
-    return fOrderSequenceDispatcher;
-  }
-
-  /**
-   * Sets the view.
-   *
-   * @param view The openTCS view.
-   */
-  public void setView(OpenTCSView view) {
-    fOpenTCSView = view;
+  @Inject
+  public OpenTCSEventDispatcher(SharedKernelProvider kernelProvider,
+                                MessageDisplay messageDisplay,
+                                MBassador<Object> eventBus,
+                                TransportOrderDispatcher orderDispatcher,
+                                OrderSequenceDispatcher sequenceDispatcher) {
+    super(kernelProvider);
+    this.messageDisplay = requireNonNull(messageDisplay, "messageDisplay");
+    this.eventBus = requireNonNull(eventBus, "eventBus");
+    this.fTransportOrderDispatcher = requireNonNull(orderDispatcher,
+                                                    "orderDispatcher");
+    this.fOrderSequenceDispatcher = requireNonNull(sequenceDispatcher,
+                                                   "sequenceDispatcher");
   }
 
   @Override
   public void register() {
+    log.fine("Dispatcher " + this + " registering with kernel...");
     Kernel kernel = getKernel();
+    if (kernel == null) {
+      log.warning("No kernel to register with, aborting.");
+      return;
+    }
+
     // Listener for TCSObjectEvents on TransportOrders
     EventFilter<TCSEvent> filter = new EventFilter<TCSEvent>() {
       @Override
@@ -186,7 +180,13 @@ public class OpenTCSEventDispatcher
 
   @Override
   public void release() {
+    log.fine("Dispatcher " + this + " unregistering with kernel...");
     Kernel kernel = getKernel();
+    if (kernel == null) {
+      log.warning("No kernel to unregister with, aborting.");
+      return;
+    }
+
     kernel.removeEventListener(fTransportOrderDispatcher);
     kernel.removeEventListener(fOrderSequenceDispatcher);
     kernel.removeEventListener(this);
@@ -195,123 +195,85 @@ public class OpenTCSEventDispatcher
   @Override
   public void processEvent(TCSEvent event) {
     if (event instanceof TCSObjectEvent) {
-      TCSObjectEvent objectEvent = (TCSObjectEvent) event;
-      OpenTCSProcessAdapter adapter
-          = (OpenTCSProcessAdapter) findProcessAdapter(
-              objectEvent.getCurrentOrPreviousObjectState().getReference());
-
-      // If we are in a model transition there don't exist adapters for
-      // the newly created objects, yet, but the kernel fires an event
-      // for every object created, what causes the OpenTCSProcessAdapter
-      // to find wrong adapters, because it only compares the ids.
-      if (!isInTransition) {
-        if (adapter == null) {
-          if (objectEvent.getCurrentOrPreviousObjectState() instanceof Path) {
-            // PointConnectorPanel is the only one creating paths in the kernel
-            Path path = (Path) objectEvent.getCurrentOrPreviousObjectState();
-            fOpenTCSView.insertPath(path.getSourcePoint(), path.getDestinationPoint());
-            return;
-          }
-          else {
-            logger.log(Level.INFO, "TCSObject without adapter: {0} Id: {1} Name: {2}",
-                       new Object[] {
-                         objectEvent.getType().toString(),
-                         objectEvent.getCurrentOrPreviousObjectState().getId(),
-                         objectEvent.getCurrentOrPreviousObjectState().getName()});
-            return;
-          }
-        }
-
-        adapter.processTCSObjectEvent(event);
-      }
+      processObjectEvent((TCSObjectEvent) event);
     }
     else if (event instanceof TCSKernelStateEvent) {
       TCSKernelStateEvent kse = (TCSKernelStateEvent) event;
-      Kernel.State leftState = kse.getLeftState();
-      Kernel.State enteredState = kse.getEnteredState();
 
       // React instantly on SHUTDOWN of the kernel, otherwise wait for
       // the transition to finish
-      if (kse.isTransitionFinished() || enteredState == Kernel.State.SHUTDOWN) {
-        fOpenTCSView.switchKernelState(leftState, enteredState);
+      if (kse.isTransitionFinished()
+          || kse.getEnteredState() == Kernel.State.SHUTDOWN) {
+        eventBus.publish(new KernelStateChangeEvent(this, 
+            KernelStateChangeEvent.convertKernelState(kse.getEnteredState())));
       }
     }
     else if (event instanceof TCSProxyStateEvent) {
       TCSProxyStateEvent pse = (TCSProxyStateEvent) event;
-      RemoteKernelConnection.State enteredState = pse.getEnteredState();
 
-      if (enteredState == RemoteKernelConnection.State.DISCONNECTED) {
-        fOpenTCSView.switchKernelState(enteredState);
-      }
-    }
-    else if (event instanceof TCSModelTransitionEvent) {
-      TCSModelTransitionEvent mte = (TCSModelTransitionEvent) event;
-
-      if (mte.hasModelContentChanged()) {
-        if (mte.isTransitionFinished()) {
-          isInTransition = false;
-          fOpenTCSView.loadCurrentKernelModel();
-        }
-        else {
-          isInTransition = true;
-        }
+      if (pse.getEnteredState() == RemoteKernelConnection.State.DISCONNECTED) {
+        eventBus.publish(new KernelStateChangeEvent(this, 
+            KernelStateChangeEvent.State.DISCONNECTED));
       }
     }
     else if (event instanceof TCSMessageEvent) {
-      TCSMessageEvent tme = (TCSMessageEvent) event;
-      fOpenTCSView.log(tme.getMessage());
+      messageDisplay.display(((TCSMessageEvent) event).getMessage());
     }
   }
 
-  /**
-   * Undoes the last change on the application side. This is neccessary
-   * when the kernel declined a change because it was against its rules.
-   *
-   * @param message The message the kernel sent.
-   */
-  public void undo(final String message) {
-    if (!fUndoRequested) {
-      Timer timer = new Timer(200, new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          realUndo(message);
-          ((Timer) e.getSource()).stop();
-        }
-      });
-
-      timer.start();
-      fUndoRequested = true;
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        release();
+        break;
+      case UNLOADED:
+        // XXX Explicitly unsubscribing from the event bus when the old
+        // XXX system model is thrown away is unelegant but currently necessary.
+        // XXX If we did not do this, the dispatcher would re-register with the
+        // XXX kernel upon the following LOADED event before the garbage
+        // XXX collection has a chance to implicitly unsubscribe it.
+        eventBus.unsubscribe(this);
+        break;
+      case LOADED:
+        register();
+        break;
+      default:
+      // Do nada.
     }
   }
 
-  /**
-   * Update the model properties by copying the properties of the kernel
-   * objects.
-   */
-  public void updateModelProperties() {
-    for (ProcessAdapter adapter : fAdaptersByModel.values()) {
-      ((OpenTCSProcessAdapter) adapter).updateModelProperties();
+  @Handler
+  public void handleOperationModeChange(OperationModeChangeEvent evt) {
+    // If the application switches to any state other than OPERATING, we will
+    // not be able to permanently communicate with the kernel any more, so
+    // unregister from it.
+    if (evt.getNewMode() != OperationMode.OPERATING) {
+      release();
     }
   }
 
-  /**
-   * Actually undoes the last change.
-   *
-   * @param message The message the kernel sent.
-   */
-  private void realUndo(final String message) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          fOpenTCSView.getUndoRedoManager().undo();
-        }
-        catch (CannotUndoException | NullPointerException e) {
-          logger.log(Level.WARNING, "Unexpected exception", e);
-        }
+  private void processObjectEvent(TCSObjectEvent objectEvent) {
+    logObjectEvent(objectEvent);
 
-        fUndoRequested = false;
-      }
-    });
+    if (objectEvent.getType() == OBJECT_MODIFIED) {
+      ProcessAdapter adapter = findProcessAdapter(
+          objectEvent.getCurrentObjectState().getReference());
+      adapter.updateModelProperties(getKernel(),
+                                    objectEvent.getCurrentObjectState(),
+                                    null);
+    }
   }
+
+  private void logObjectEvent(TCSObjectEvent objectEvent) {
+    StringBuilder msg = new StringBuilder();
+    msg.append("TCSObject created. Id: ")
+        .append(objectEvent.getCurrentObjectState().getId())
+        .append(" Name: ")
+        .append(objectEvent.getCurrentObjectState().getName())
+        .append(" Event type:")
+        .append(objectEvent.getType().name());
+    log.fine(msg.toString());
+  }
+
 }

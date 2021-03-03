@@ -1,6 +1,10 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.application.action;
 
@@ -10,12 +14,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.event.ToolAdapter;
 import org.jhotdraw.draw.event.ToolEvent;
@@ -23,22 +28,18 @@ import org.jhotdraw.draw.event.ToolListener;
 import org.jhotdraw.draw.tool.CreationTool;
 import org.jhotdraw.draw.tool.Tool;
 import org.jhotdraw.gui.JPopupButton;
-import org.opentcs.guing.application.GuiManager.OperationMode;
-import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.actions.CreateBlockAction;
 import org.opentcs.guing.application.action.actions.CreateGroupAction;
 import org.opentcs.guing.application.action.actions.CreateLocationTypeAction;
 import org.opentcs.guing.application.action.actions.CreateStaticRouteAction;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
-import org.opentcs.guing.application.action.actions.ShowVehiclesAction;
 import org.opentcs.guing.application.action.draw.BringToFrontAction;
 import org.opentcs.guing.application.action.draw.DefaultPathSelectedAction;
 import org.opentcs.guing.application.action.draw.DefaultPointSelectedAction;
 import org.opentcs.guing.application.action.draw.SelectSameAction;
 import org.opentcs.guing.application.action.draw.SendToBackAction;
-import org.opentcs.guing.application.action.file.SaveModelAction;
-import org.opentcs.guing.application.action.file.SaveModelAsAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
 import org.opentcs.guing.application.action.view.LoadViewBookmarkAction;
 import org.opentcs.guing.application.action.view.PauseAllVehiclesAction;
@@ -46,13 +47,14 @@ import org.opentcs.guing.application.action.view.SaveViewBookmarkAction;
 import org.opentcs.guing.application.toolbar.DragTool;
 import org.opentcs.guing.application.toolbar.MultipleSelectionTool;
 import org.opentcs.guing.application.toolbar.OpenTCSConnectionTool;
+import org.opentcs.guing.application.toolbar.SelectionToolFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.LinkConnection;
-import org.opentcs.guing.components.drawing.figures.LocationFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
-import org.opentcs.guing.components.drawing.figures.PointFigure;
+import org.opentcs.guing.event.OperationModeChangeEvent;
+import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.CourseObjectFactory;
@@ -65,6 +67,10 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  */
 public class ToolBarManager {
 
+  /**
+   * A factory for selectiont tools.
+   */
+  private final SelectionToolFactory selectionToolFactory;
   /**
    * A list of all toolbars.
    */
@@ -87,9 +93,17 @@ public class ToolBarManager {
    */
   private final JToggleButton selectionToolButton;
   /**
+   * The actual selection tool.
+   */
+  private MultipleSelectionTool selectionTool;
+  /**
    * A toggle button for the drag tool.
    */
   private final JToggleButton dragToolButton;
+  /**
+   * The actual drag tool.
+   */
+  private DragTool dragTool;
   /**
    * A button for creating points.
    * Available in modelling mode only.
@@ -146,11 +160,6 @@ public class ToolBarManager {
    */
   private final JButton buttonFindVehicle;
   /**
-   * A button for showing all vehicles.
-   * Available in operating mode.
-   */
-  private final JButton buttonShowVehicles;
-  /**
    * A button for pausing/unpausing all vehicles.
    * Available in operating mode.
    */
@@ -159,15 +168,21 @@ public class ToolBarManager {
   /**
    * Creates a new instance.
    *
-   * @param view The view this instance is managing tool bars for.
+   * @param actionMap The action map to be used.
    * @param crsObjFactory A factory for course objects.
+   * @param editor The drawing editor.
    */
-  public ToolBarManager(OpenTCSView view, CourseObjectFactory crsObjFactory) {
-    requireNonNull(view, "view is null");
+  @Inject
+  public ToolBarManager(ViewActionMap actionMap,
+                        CourseObjectFactory crsObjFactory,
+                        OpenTCSDrawingEditor editor,
+                        SelectionToolFactory selectionToolFactory) {
+    requireNonNull(actionMap, "actionMap");
     requireNonNull(crsObjFactory, "crsObjFactory");
+    requireNonNull(editor, "editor");
+    this.selectionToolFactory = requireNonNull(selectionToolFactory,
+                                               "selectionToolFactory");
 
-    ActionMap actionMap = view.getActionMap();
-    OpenTCSDrawingEditor editor = view.getEditor();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
     // --- 1. ToolBar: Creation ---
@@ -183,15 +198,13 @@ public class ToolBarManager {
     toolBarCreation.addSeparator();
 
     // --- Create Point Figure (only in Modelling mode) ---
-    PointFigure pf = crsObjFactory.createPointFigure();
-    LabeledPointFigure lpf = new LabeledPointFigure(pf);
+    LabeledPointFigure lpf = crsObjFactory.createPointFigure();
     CreationTool creationTool = new CreationTool(lpf);
     buttonCreatePoint = pointToolButton(toolBarCreation, editor, creationTool);
     creationTool.setToolDoneAfterCreation(false);
 
     // --- Create Location Figure (only in Modelling mode) ---
-    LocationFigure lf = crsObjFactory.createLocationFigure();
-    LabeledLocationFigure llf = new LabeledLocationFigure(lf);
+    LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
     creationTool = new CreationTool(llf);
     buttonCreateLocation = addToolButton(toolBarCreation,
                                          editor,
@@ -261,23 +274,10 @@ public class ToolBarManager {
     labels.configureNamelessButton(buttonFindVehicle, FindVehicleAction.ID);
     toolBarCreation.add(buttonFindVehicle);
 
-    // --- Show Vehicles (only in Operating mode) ---
-    buttonShowVehicles = new JButton(actionMap.get(ShowVehiclesAction.ID));
-    labels.configureNamelessButton(buttonShowVehicles, ShowVehiclesAction.ID);
-    toolBarCreation.add(buttonShowVehicles);
-
     toolBarCreation.addSeparator();
 
-    // --- Save File, Save/Load View Bookmark ---
-    JButton button = new JButton(actionMap.get(SaveModelAction.ID));
-    labels.configureNamelessButton(button, SaveModelAction.ID);
-    toolBarCreation.add(button);
-
-    button = new JButton(actionMap.get(SaveModelAsAction.ID));
-    labels.configureNamelessButton(button, SaveModelAsAction.ID);
-    toolBarCreation.add(button);
-
-    button = new JButton(actionMap.get(LoadViewBookmarkAction.ID));
+    // --- Save/Load View Bookmark ---
+    JButton button = new JButton(actionMap.get(LoadViewBookmarkAction.ID));
     labels.configureNamelessButton(button, LoadViewBookmarkAction.ID);
     toolBarCreation.add(button);
 
@@ -328,6 +328,26 @@ public class ToolBarManager {
     return dragToolButton;
   }
 
+  /**
+   * Handles changes of the application's operation mode.
+   *
+   * @param evt The mode change event.
+   */
+  @Handler
+  public void handleModeChange(OperationModeChangeEvent evt) {
+    setOperationMode(evt.getNewMode());
+  }
+
+  /**
+   * Resets the user's tool to the selection tool.
+   *
+   * @param evt The reset command.
+   */
+  @Handler
+  public void handleToolReset(ResetInteractionToolCommand evt) {
+    selectionToolButton.setSelected(true);
+  }
+
   public void setOperationMode(OperationMode mode) {
 //		toolBarAttributes.setVisible(mode == OperationMode.MODELLING);
     toolBarAlignment.setVisible(mode == OperationMode.MODELLING);
@@ -346,19 +366,18 @@ public class ToolBarManager {
     }
 
     buttonCreateOrder.setEnabled(mode == OperationMode.OPERATING);
-    buttonShowVehicles.setEnabled(mode == OperationMode.OPERATING);
     buttonFindVehicle.setEnabled(mode == OperationMode.OPERATING);
     buttonPauseAllVehicles.setVisible(mode == OperationMode.OPERATING);
   }
 
   /**
    * Adds the selection tool to the given toolbar.
-   * 
+   *
    * @param toolBar The toolbar to add to.
    * @param editor The DrawingEditor.
    */
-  private static JToggleButton addSelectionToolButton(JToolBar toolBar,
-                                                      DrawingEditor editor) {
+  private JToggleButton addSelectionToolButton(JToolBar toolBar,
+                                               DrawingEditor editor) {
     LinkedList<Action> drawingActions = new LinkedList<>();
     // Drawing Actions
     drawingActions.add(new SelectSameAction(editor));
@@ -373,7 +392,7 @@ public class ToolBarManager {
     selectionActions.add(new BringToFrontAction(editor));
     selectionActions.add(new SendToBackAction(editor));
 
-    Tool selectionTool = new MultipleSelectionTool(drawingActions, selectionActions);
+    selectionTool = selectionToolFactory.createMultipleSelectionTool(drawingActions, selectionActions);
 
     ButtonGroup buttonGroup;
 
@@ -415,10 +434,10 @@ public class ToolBarManager {
    * @param toolBar
    * @param editor
    */
-  private static JToggleButton addDragToolButton(JToolBar toolBar, DrawingEditor editor) {
+  private JToggleButton addDragToolButton(JToolBar toolBar, DrawingEditor editor) {
     final JToggleButton button = new JToggleButton();
-    Tool tool = new DragTool();
-    editor.setTool(tool);
+    dragTool = new DragTool();
+    editor.setTool(dragTool);
 
     if (!(toolBar.getClientProperty("toolHandler") instanceof ToolListener)) {
       ToolListener toolHandler = new ToolAdapter() {
@@ -434,7 +453,7 @@ public class ToolBarManager {
     labels.configureToolBarButton(button, "openTCS.dragTool");
 
     button.setSelected(false);
-    button.addItemListener(new ToolButtonListener(tool, editor));
+    button.addItemListener(new ToolButtonListener(dragTool, editor));
 //		button.setFocusable(false);
 
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
@@ -453,9 +472,9 @@ public class ToolBarManager {
    * @param labels
    * @return
    */
-  private static JPopupButton pointToolButton(JToolBar toolBar,
-                                              DrawingEditor editor,
-                                              Tool tool) {
+  private JPopupButton pointToolButton(JToolBar toolBar,
+                                       DrawingEditor editor,
+                                       Tool tool) {
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     JPopupButton popupButton = new JPopupButton();
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
@@ -491,11 +510,11 @@ public class ToolBarManager {
    * @param labels
    * @return
    */
-  private static JToggleButton addToolButton(JToolBar toolBar,
-                                             DrawingEditor editor,
-                                             Tool tool,
-                                             String labelKey,
-                                             ResourceBundleUtil labels) {
+  private JToggleButton addToolButton(JToolBar toolBar,
+                                      DrawingEditor editor,
+                                      Tool tool,
+                                      String labelKey,
+                                      ResourceBundleUtil labels) {
     JToggleButton toggleButton = new JToggleButton();
 
     labels.configureToolBarButton(toggleButton, labelKey);
@@ -522,9 +541,9 @@ public class ToolBarManager {
    * @param types
    * @return
    */
-  private static JPopupButton pathToolButton(JToolBar toolBar,
-                                             DrawingEditor editor,
-                                             Tool tool) {
+  private JPopupButton pathToolButton(JToolBar toolBar,
+                                      DrawingEditor editor,
+                                      Tool tool) {
     JPopupButton popupButton = new JPopupButton();
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
     popupButton.setAction(new DefaultPathSelectedAction(editor, tool, popupButton, group),

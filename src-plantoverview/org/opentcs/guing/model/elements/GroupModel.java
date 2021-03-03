@@ -1,7 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.model.elements;
 
@@ -9,7 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.tree.elements.GroupUserObject;
+import org.opentcs.guing.components.properties.type.StringSetProperty;
+import org.opentcs.guing.model.ModelComponent;
 import static org.opentcs.guing.model.ModelComponent.MISCELLANEOUS;
 import static org.opentcs.guing.model.ModelComponent.NAME;
 import org.opentcs.guing.model.SimpleFolder;
@@ -23,6 +27,10 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class GroupModel
     extends SimpleFolder {
 
+  /**
+   * Key for the elements.
+   */
+  public static final String ELEMENTS = "groupElements";
   private boolean groupVisibleInAllDrawingViews = true;
   private final Map<String, Boolean> drawingViewVisibilityMap = new HashMap<>();
 
@@ -112,6 +120,24 @@ public class GroupModel
     }
   }
 
+  @Override
+  public void add(ModelComponent component) {
+    super.add(component);
+    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+    String addedModelName = component.getName();
+    if (!pElements.getItems().contains(addedModelName)) {
+      pElements.addItem(addedModelName);
+    }
+  }
+
+  @Override
+  public void remove(ModelComponent component) {
+    super.remove(component);
+    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+    String removedModelName = component.getName();
+    pElements.getItems().remove(removedModelName);
+  }
+
   @Override	// AbstractModelComponent
   public String getTreeViewName() {
     String treeViewName = getDescription() + " " + getName();
@@ -122,13 +148,6 @@ public class GroupModel
   @Override	// AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("group.description");
-  }
-
-  @Override // CompositeModelComponent
-  public GroupUserObject createUserObject() {
-    fUserObject = new GroupUserObject(this);
-
-    return (GroupUserObject) fUserObject;
   }
 
   /**
@@ -146,6 +165,12 @@ public class GroupModel
 //    pColor.setDescription(bundle.getString("element.blockColor.text"));
 //    pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
 //    setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
+    // Elements
+    StringSetProperty pElements = new StringSetProperty(this);
+    pElements.setDescription(bundle.getString("group.elements.text"));
+    pElements.setModellingEditable(false);
+    pElements.setOperatingEditable(false);
+    setProperty(ELEMENTS, pElements);
     // Miscellaneous
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("group.miscellaneous.text"));

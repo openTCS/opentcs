@@ -1,16 +1,21 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 24.07.2013 10:29:22
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
-import org.opentcs.guing.components.properties.panel.LocationThemePropertyEditorPanel;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
  * A property containing the name of the currently used theme.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationThemeProperty
     extends AbstractComplexProperty {
@@ -23,10 +28,10 @@ public class LocationThemeProperty
   /**
    * Creates a new instance.
    *
-   * @param model
+   * @param model The model component this property belongs to.
    */
   public LocationThemeProperty(ModelComponent model) {
-    super(model, LocationThemePropertyEditorPanel.class);
+    super(model);
   }
 
   @Override

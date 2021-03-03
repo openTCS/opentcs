@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
 import org.opentcs.guing.model.ModelComponent;
@@ -20,10 +26,9 @@ public class CoordinateProperty
    * Creates a new instance of CoordinateProperty.
    *
    * @param model Point- or LocationModel.
-   * @param isXAxis If this property will represent the x-axis.
    */
-  public CoordinateProperty(ModelComponent model, boolean isXAxis) {
-    this(model, 0, Unit.MM, isXAxis);
+  public CoordinateProperty(ModelComponent model) {
+    this(model, 0, Unit.MM);
   }
 
   /**
@@ -32,9 +37,8 @@ public class CoordinateProperty
    * @param model Point- or LocationModel.
    * @param value The initial value.
    * @param unit The initial unit.
-   * @param isXAxis If this property will represent the x-axis.
    */
-  public CoordinateProperty(ModelComponent model, double value, Unit unit, boolean isXAxis) {
+  public CoordinateProperty(ModelComponent model, double value, Unit unit) {
     super(model, value, unit);
   }
   

@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.opentcs.data.model.TCSResource;
 import org.opentcs.access.Kernel;
+import org.opentcs.data.model.TCSResource;
 
 /**
  * A query for resources currently allocated.

@@ -9,10 +9,12 @@
 package org.opentcs.kernel.module.routing;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import java.util.Objects;
+import java.util.logging.Logger;
 import javax.inject.Singleton;
 import org.opentcs.algorithms.Router;
 import org.opentcs.util.configuration.ConfigurationStore;
-import org.opentcs.util.configuration.ItemConstraintBoolean;
 
 /**
  * A Guice module for the openTCS router implementation.
@@ -22,58 +24,102 @@ import org.opentcs.util.configuration.ItemConstraintBoolean;
 public class RouterInjectionModule
     extends AbstractModule {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger log
+      = Logger.getLogger(RouterInjectionModule.class.getName());
+
   @Override
   protected void configure() {
     ConfigurationStore routerConfig
         = ConfigurationStore.getStore(BasicRouter.class.getName());
-    String costTypeProp = routerConfig.getEnum("costType",
-                                               CostType.LENGTH_BASED.name(),
-                                               CostType.class);
-    CostType costType;
-    try {
-      costType = CostType.valueOf(costTypeProp);
-    }
-    catch (IllegalArgumentException exc) {
-      costType = CostType.LENGTH_BASED;
-    }
-    switch (costType) {
-      case HOP_BASED:
-        bind(RouteEvaluator.class).to(RouteEvaluatorHops.class);
-        break;
-      case TIME_BASED:
-        bind(RouteEvaluator.class).to(RouteEvaluatorTravelTime.class);
-        break;
-      case EXPLICIT:
-        bind(RouteEvaluator.class).to(RouteEvaluatorExplicit.class);
-        break;
-      case LENGTH_BASED:
-      default:
-        bind(RouteEvaluator.class).to(RouteEvaluatorDistance.class);
-    }
-//    bind(RouteEvaluator.class).to(RouteEvaluatorCourseChangePenalty.class);
 
-//    bindConstant()
-//        .annotatedWith(RoutingTableBuilderDfs.SearchDepth.class)
-//        .to(Integer.MAX_VALUE);
-//    bindConstant()
-//        .annotatedWith(RoutingTableBuilderDfs.TerminateEarly.class)
-//        .to(true);
-//    bind(RoutingTableBuilder.class).to(RoutingTableBuilderDfs.class);
-    bindConstant()
-        .annotatedWith(RoutingTableBuilderBfs.TerminateEarly.class)
-        .to(true);
-    bind(RoutingTableBuilder.class).to(RoutingTableBuilderBfs.class);
+    configureTableBuilder(routerConfig.getString("tableBuilderType", "BFS"));
 
-    boolean routeToCurrentPosition = routerConfig.getBoolean(
-        "routeToCurrentPosition",
-        false,
-        "Whether to explicitly look for a (static or computed) route even if "
-        + "the destination position is the source position",
-        new ItemConstraintBoolean());
     bindConstant()
         .annotatedWith(BasicRouter.RouteToCurrentPos.class)
-        .to(routeToCurrentPosition);
+        .to(routerConfig.getBoolean("routeToCurrentPosition", false));
 
     bind(Router.class).to(BasicRouter.class).in(Singleton.class);
+  }
+
+  @Provides
+  RouteEvaluator provideRouteEvaluator() {
+    ConfigurationStore routerConfig
+        = ConfigurationStore.getStore(BasicRouter.class.getName());
+    // hops, distance, traveltime, turns, explicit (+null)
+    String costFactorsString = routerConfig.getString("routingCostFactors",
+                                                      "distance, turns");
+    String[] costFactors = costFactorsString.trim().toLowerCase().split("[, ]+");
+    RouteEvaluator result = new RouteEvaluatorNull();
+    for (String costFactor : costFactors) {
+      if (costFactor == null || costFactor.isEmpty()) {
+        continue;
+      }
+      switch (costFactor) {
+        case "hops":
+          result = new RouteEvaluatorHops(result);
+          break;
+        case "distance":
+          result = new RouteEvaluatorDistance(result);
+          break;
+        case "traveltime":
+          result = new RouteEvaluatorTravelTime(result);
+          break;
+        case "turns":
+          ConfigurationStore turnsConfig
+              = ConfigurationStore.getStore(RouteEvaluatorTurns.class.getName());
+          result = new RouteEvaluatorTurns(
+              result, turnsConfig.getLong("penaltyPerTurn", 5000));
+          break;
+        case "explicit":
+          result = new RouteEvaluatorExplicit(result);
+          break;
+        default:
+          log.warning("Illegal cost factor '" + costFactor + "', ignored.");
+      }
+    }
+    // Make sure at least one cost factor is used.
+    if (result instanceof RouteEvaluatorNull) {
+      log.warning("No cost factor configured, falling back to distance.");
+      result = new RouteEvaluatorDistance(result);
+    }
+    return result;
+  }
+
+  private void configureTableBuilder(String builderType) {
+    if (Objects.equals(builderType, "DFS")) {
+      configureTableBuilderDfs();
+    }
+    else if (Objects.equals(builderType, "BFS")) {
+      configureTableBuilderBfs();
+    }
+    else {
+      log.warning("Unknown builder type '" + builderType + "', using BFS");
+      configureTableBuilderBfs();
+    }
+  }
+
+  private void configureTableBuilderDfs() {
+    ConfigurationStore dfsConfigStore
+        = ConfigurationStore.getStore(RoutingTableBuilderBfs.class.getName());
+    bindConstant()
+        .annotatedWith(RoutingTableBuilderDfs.SearchDepth.class)
+        .to(dfsConfigStore.getInt("searchDepth", Integer.MAX_VALUE));
+    bindConstant()
+        .annotatedWith(RoutingTableBuilderDfs.TerminateEarly.class)
+        .to(dfsConfigStore.getBoolean("terminateEarly", true));
+    bind(RoutingTableBuilder.class).to(RoutingTableBuilderDfs.class);
+  }
+
+  private void configureTableBuilderBfs() {
+    ConfigurationStore bfsConfigStore
+        = ConfigurationStore.getStore(RoutingTableBuilderBfs.class.getName());
+    bindConstant()
+        .annotatedWith(RoutingTableBuilderBfs.TerminateEarly.class)
+        .to(bfsConfigStore.getBoolean("terminateEarly", true));
+
+    bind(RoutingTableBuilder.class).to(RoutingTableBuilderBfs.class);
   }
 }

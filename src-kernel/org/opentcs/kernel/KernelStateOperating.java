@@ -8,7 +8,12 @@
  */
 package org.opentcs.kernel;
 
+import com.google.inject.BindingAnnotation;
 import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -62,8 +67,8 @@ import org.opentcs.kernel.xmlorders.ScriptFileManager;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-final class KernelStateOperating
-    extends KernelState {
+class KernelStateOperating
+    extends KernelStateOnline {
 
   /**
    * This class's Logger.
@@ -121,6 +126,8 @@ final class KernelStateOperating
    * @param kernel The kernel.
    * @param objectPool The object pool to be used.
    * @param messageBuffer The message buffer to be used.
+   * @param saveModelOnTerminate Whether to save the model when this state is
+   * terminated.
    * @param recoveryEvaluator The recovery evaluator to be used.
    */
   @Inject
@@ -130,6 +137,7 @@ final class KernelStateOperating
                        Model model,
                        TransportOrderPool orderPool,
                        MessageBuffer messageBuffer,
+                       @SaveModelOnTerminate boolean saveModelOnTerminate,
                        RecoveryEvaluator recoveryEvaluator,
                        Router router,
                        Scheduler scheduler,
@@ -139,7 +147,8 @@ final class KernelStateOperating
                        ScriptFileManager scriptFileManager,
                        OrderCleanerTask orderCleanerTask,
                        @KernelExtension.Operating Set<KernelExtension> extensions) {
-    super(kernel, globalSyncObject, objectPool, model, messageBuffer);
+    super(kernel, globalSyncObject, objectPool, model, messageBuffer,
+          saveModelOnTerminate);
     this.orderPool = requireNonNull(orderPool, "orderPool");
     this.recoveryEvaluator = requireNonNull(recoveryEvaluator,
                                             "recoveryEvaluator");
@@ -194,6 +203,7 @@ final class KernelStateOperating
       throw new IllegalStateException("Not initialized, cannot terminate");
     }
     log.fine("Terminating operating state...");
+    super.terminate();
 
     // Terminate everything that may still use resources.
     for (KernelExtension extension : extensions) {
@@ -237,24 +247,8 @@ final class KernelStateOperating
   }
 
   @Override
-  public void saveModel(String modelName, boolean overwrite)
-      throws IOException {
-    log.finer("method entry");
-    synchronized (globalSyncObject) {
-      if (modelName != null) {
-        verifyModelNameCaseMatch(modelName);
-        model.setName(modelName);
-      }
-      kernel.modelPersister.saveModel(model,
-                                      model.getName(),
-                                      overwrite);
-    }
-  }
-
-  @Override
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       TCSObject<?> object = globalObjectPool.getObject(ref);
       if (object == null) {
@@ -309,7 +303,6 @@ final class KernelStateOperating
   public void setPathLocked(TCSObjectReference<Path> ref,
                             boolean locked)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPathLocked(ref, locked);
       router.updateRoutingTables();
@@ -321,7 +314,6 @@ final class KernelStateOperating
   public void setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                     int energyLevel)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Vehicle vehicle = model.setVehicleEnergyLevel(ref,
                                                     energyLevel);
@@ -337,7 +329,6 @@ final class KernelStateOperating
   public void setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                           String rechargeOperation)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleRechargeOperation(ref, rechargeOperation);
     }
@@ -347,7 +338,6 @@ final class KernelStateOperating
   public void setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                             List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleLoadHandlingDevices(ref, devices);
     }
@@ -357,7 +347,6 @@ final class KernelStateOperating
   public void setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref,
                                     int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleMaxVelocity(ref, velocity);
     }
@@ -367,7 +356,6 @@ final class KernelStateOperating
   public void setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                            int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleMaxReverseVelocity(ref, velocity);
     }
@@ -377,7 +365,6 @@ final class KernelStateOperating
   public void setVehicleState(TCSObjectReference<Vehicle> ref,
                               Vehicle.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleState(ref, newState);
     }
@@ -387,7 +374,6 @@ final class KernelStateOperating
   public void setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                   Vehicle.ProcState newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Vehicle vehicle = model.setVehicleProcState(ref, newState);
       switch (newState) {
@@ -405,7 +391,6 @@ final class KernelStateOperating
   public void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
                                      CommunicationAdapter.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleAdapterState(ref, newState);
     }
@@ -415,7 +400,6 @@ final class KernelStateOperating
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       final String pointName = pointRef == null ? "<null>" : pointRef.getName();
       log.fine("Vehicle " + vehicleRef.getName() + " has reached point "
@@ -433,7 +417,6 @@ final class KernelStateOperating
   public void setVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleNextPosition(vehicleRef, pointRef);
     }
@@ -443,7 +426,6 @@ final class KernelStateOperating
   public void setVehiclePrecisePosition(TCSObjectReference<Vehicle> vehicleRef,
                                         Triple newPosition)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehiclePrecisePosition(vehicleRef, newPosition);
     }
@@ -453,7 +435,6 @@ final class KernelStateOperating
   public void setVehicleOrientationAngle(TCSObjectReference<Vehicle> vehicleRef,
                                          double angle)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleOrientationAngle(vehicleRef, angle);
     }
@@ -464,7 +445,6 @@ final class KernelStateOperating
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleTransportOrder(vehicleRef, orderRef);
     }
@@ -474,7 +454,6 @@ final class KernelStateOperating
   public void setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleOrderSequence(vehicleRef, seqRef);
     }
@@ -485,7 +464,6 @@ final class KernelStateOperating
       TCSObjectReference<Vehicle> vehicleRef,
       int index)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleRouteProgressIndex(vehicleRef, index);
     }
@@ -493,7 +471,6 @@ final class KernelStateOperating
 
   @Override
   public TransportOrder createTransportOrder(List<Destination> destinations) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return orderPool.createTransportOrder(destinations).clone();
     }
@@ -503,7 +480,6 @@ final class KernelStateOperating
   public void setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
                                         long deadline)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderDeadline(ref, deadline);
     }
@@ -512,7 +488,6 @@ final class KernelStateOperating
   @Override
   public void activateTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       TransportOrder order = orderPool.getTransportOrder(ref);
       // Check if the transport order hasn't been activated before.
@@ -544,7 +519,6 @@ final class KernelStateOperating
   public void setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                      TransportOrder.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       switch (newState) {
         case ACTIVE:
@@ -568,7 +542,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderIntendedVehicle(orderRef, vehicleRef);
     }
@@ -579,7 +552,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderProcessingVehicle(orderRef, vehicleRef);
     }
@@ -590,7 +562,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderFutureDriveOrders(orderRef, newOrders);
     }
@@ -600,7 +571,6 @@ final class KernelStateOperating
   public void setTransportOrderInitialDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderInitialDriveOrder(ref);
     }
@@ -610,7 +580,6 @@ final class KernelStateOperating
   public void setTransportOrderNextDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderNextDriveOrder(ref);
     }
@@ -621,7 +590,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> newDepRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.addTransportOrderDependency(orderRef, newDepRef);
     }
@@ -632,7 +600,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.addTransportOrderDependency(orderRef, rmDepRef);
     }
@@ -643,7 +610,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       Rejection newRejection)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.addTransportOrderRejection(orderRef, newRejection);
     }
@@ -654,7 +620,6 @@ final class KernelStateOperating
       TCSObjectReference<TransportOrder> orderRef,
       boolean dispensable)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setTransportOrderDispensable(orderRef, dispensable);
     }
@@ -662,7 +627,6 @@ final class KernelStateOperating
 
   @Override
   public OrderSequence createOrderSequence() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return orderPool.createOrderSequence().clone();
     }
@@ -672,7 +636,6 @@ final class KernelStateOperating
   public void addOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.addOrderSequenceOrder(seqRef, orderRef);
     }
@@ -682,7 +645,6 @@ final class KernelStateOperating
   public void removeOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.removeOrderSequenceOrder(seqRef, orderRef);
     }
@@ -692,7 +654,6 @@ final class KernelStateOperating
   public void setOrderSequenceFinishedIndex(
       TCSObjectReference<OrderSequence> ref,
       int index) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setOrderSequenceFinishedIndex(ref, index);
     }
@@ -700,7 +661,6 @@ final class KernelStateOperating
 
   @Override
   public void setOrderSequenceComplete(TCSObjectReference<OrderSequence> ref) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       OrderSequence seq = orderPool.getOrderSequence(ref);
       // Make sure we don't execute this if the sequence is already marked as
@@ -727,7 +687,6 @@ final class KernelStateOperating
 
   @Override
   public void setOrderSequenceFinished(TCSObjectReference<OrderSequence> ref) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       OrderSequence seq = orderPool.getOrderSequence(ref);
       // Make sure we don't execute this if the sequence is already marked as
@@ -751,7 +710,6 @@ final class KernelStateOperating
   public void setOrderSequenceFailureFatal(
       TCSObjectReference<OrderSequence> ref,
       boolean fatal) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setOrderSequenceFailureFatal(ref, fatal);
     }
@@ -761,7 +719,6 @@ final class KernelStateOperating
   public void setOrderSequenceIntendedVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setOrderSequenceIntendedVehicle(seqRef, vehicleRef);
     }
@@ -771,7 +728,6 @@ final class KernelStateOperating
   public void setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       orderPool.setOrderSequenceProcessingVehicle(seqRef, vehicleRef);
     }
@@ -781,7 +737,6 @@ final class KernelStateOperating
   public void withdrawTransportOrder(TCSObjectReference<TransportOrder> ref,
                                      boolean disableVehicle)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       TransportOrder order = orderPool.getTransportOrder(ref);
       if (order.getState().isFinalState()) {
@@ -802,7 +757,6 @@ final class KernelStateOperating
   public void withdrawTransportOrderByVehicle(
       TCSObjectReference<Vehicle> vehicleRef, boolean disableVehicle)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Vehicle vehicle
           = model.getVehicle(vehicleRef);
@@ -813,7 +767,6 @@ final class KernelStateOperating
   @Override
   public void dispatchVehicle(TCSObjectReference<Vehicle> vehicleRef,
                               boolean setIdleIfUnavailable) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Vehicle vehicle = model.getVehicle(vehicleRef);
       // If the vehicle's processing state is currently UNAVAILABLE and we're
@@ -838,7 +791,6 @@ final class KernelStateOperating
   @Override
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef,
                                      Object message) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,
                                                    vehicleRef);
@@ -853,7 +805,6 @@ final class KernelStateOperating
   @Override
   public List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws ObjectUnknownException, IOException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       List<TransportOrder> orders
           = scriptFileManager.createTransportOrdersFromScript(fileName);
@@ -872,8 +823,6 @@ final class KernelStateOperating
       TCSObjectReference<Location> srcRef,
       Set<TCSObjectReference<Location>> destRefs)
       throws ObjectUnknownException {
-
-    log.finer("method entry");
     // If vTypeRef is null get any vehicleType instead
     Vehicle vehicle;
     if (vRef == null) {
@@ -963,7 +912,6 @@ final class KernelStateOperating
    */
   private void setTOStateFinished(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     assert ref != null;
     // Set the transport order's state.
     TransportOrder order
@@ -1012,7 +960,6 @@ final class KernelStateOperating
    */
   private void setTOStateFailed(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     assert ref != null;
     TransportOrder failedOrder = orderPool.getTransportOrder(ref);
     // A transport order has failed - check if it's part of an order
@@ -1059,5 +1006,15 @@ final class KernelStateOperating
       orderPool.setTransportOrderState(failedOrder.getReference(),
                                        TransportOrder.State.FAILED);
     }
+  }
+
+  /**
+   * Annotation type for marking/binding the "save on terminate" parameter.
+   */
+  @BindingAnnotation
+  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface SaveModelOnTerminate {
+    // Nothing here.
   }
 }

@@ -27,7 +27,6 @@ import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Layout;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -131,7 +130,6 @@ public class Model {
           || curObject instanceof Location
           || curObject instanceof Block
           || curObject instanceof Group
-          || curObject instanceof Layout
           || curObject instanceof StaticRoute
           || curObject instanceof VisualLayout) {
         objectPool.removeObject(curObject.getReference());
@@ -140,121 +138,6 @@ public class Model {
                                    TCSObjectEvent.Type.OBJECT_REMOVED);
       }
     }
-  }
-
-  /**
-   * Creates a new layout with a unique name and all other attributes set to
-   * default values.
-   *
-   * @param objectID The object ID of the newly created layout. If
-   * <code>null</code>, a new, unique one will be generated.
-   * @param layoutData The actual data the layout is supposed to contain.
-   * @return The newly created layout.
-   */
-  public Layout createLayout(Integer objectID, byte[] layoutData) {
-    log.finer("method entry");
-    // Get a unique ID and name for the new point and create an instance.
-    int layoutID =
-        objectID != null ? objectID : objectPool.getUniqueObjectId();
-    String layoutName = objectPool.getUniqueObjectName("Layout-", "00");
-    Layout newLayout = new Layout(layoutID, layoutName, layoutData);
-    // Store the instance in the global object pool.
-    try {
-      objectPool.addObject(newLayout);
-    }
-    catch (ObjectExistsException exc) {
-      log.log(Level.SEVERE, "Allegedly unique object ID/name already exists",
-              exc);
-      throw new IllegalStateException(
-          "Allegedly unique object ID/name already exists", exc);
-    }
-    objectPool.emitObjectEvent(newLayout.clone(),
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created layout.
-    return newLayout;
-  }
-
-  /**
-   * Returns the layout belonging to the given reference.
-   *
-   * @param ref A reference to the layout to return.
-   * @return The referenced layout, if it exists, or <code>null</code>, if it
-   * doesn't.
-   */
-  public Layout getLayout(TCSObjectReference<Layout> ref) {
-    log.finer("method entry");
-    return objectPool.getObject(Layout.class, ref);
-  }
-
-  /**
-   * Returns the layout with the given name.
-   *
-   * @param layoutName The name of the layout to return.
-   * @return The layout with the given name, if it exists, or <code>null</code>,
-   * if it doesn't.
-   */
-  public Layout getLayout(String layoutName) {
-    log.finer("method entry");
-    return objectPool.getObject(Layout.class, layoutName);
-  }
-
-  /**
-   * Returns a set of layouts whose names match the given regular expression.
-   *
-   * @param regexp The regular expression selecting the layouts returned. If
-   * <code>null</code>, all layouts will be returned.
-   * @return A set of points whose names match the given regular expression. If
-   * no such layouts exist, the returned set is empty.
-   */
-  public Set<Layout> getLayouts(Pattern regexp) {
-    log.finer("method entry");
-    return objectPool.getObjects(Layout.class, regexp);
-  }
-
-  /**
-   * Sets the layout data of a given layout.
-   *
-   * @param ref A reference to the layout to be modified.
-   * @param newData The layout's new data.
-   * @return The modified layout.
-   * @throws ObjectUnknownException If the referenced layout does not exist.
-   */
-  public Layout setLayoutData(TCSObjectReference<Layout> ref, byte[] newData)
-      throws ObjectUnknownException {
-    log.finer("method entry");
-    Layout layout = objectPool.getObject(Layout.class, ref);
-    if (layout == null) {
-      throw new ObjectUnknownException(ref);
-    }
-    Layout previousState = layout.clone();
-    layout.setData(newData);
-    objectPool.emitObjectEvent(layout.clone(),
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
-    return layout;
-  }
-
-  /**
-   * Removes a layout.
-   *
-   * @param ref A reference to the layout to be removed.
-   * @return The removed layout.
-   * @throws ObjectUnknownException If the referenced layout does not exist.
-   */
-  public Layout removeLayout(TCSObjectReference<Layout> ref)
-      throws ObjectUnknownException {
-    log.finer("method entry");
-    Layout layout = objectPool.getObject(Layout.class, ref);
-    if (layout == null) {
-      throw new ObjectUnknownException(ref);
-    }
-    // Remove the layout.
-    objectPool.removeObject(ref);
-    objectPool.emitObjectEvent(null,
-                               layout.clone(),
-                               TCSObjectEvent.Type.OBJECT_REMOVED);
-    return layout;
   }
 
   /**

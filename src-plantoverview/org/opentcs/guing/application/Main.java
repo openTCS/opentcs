@@ -1,13 +1,17 @@
-/**
- * (c): Fraunhofer IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.application;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.util.Locale;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -15,12 +19,8 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.jhotdraw.app.Application;
-import org.opentcs.guing.exchange.ConnectToServerDialog;
-import org.opentcs.guing.exchange.ConnectionParamSet;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.exchange.KernelProxyManager;
+import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.util.Environment;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
 
 /**
@@ -32,14 +32,13 @@ import org.opentcs.util.logging.UncaughtExceptionLogger;
 public class Main {
 
   /**
-   * This class's configuration store.
-   */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(OpenTCSView.class.getName());
-  /**
    * This class's logger.
    */
   private static final Logger log = Logger.getLogger(Main.class.getName());
+  /**
+   * The key of the (optional) system property for the initial mode.
+   */
+  private static final String PROP_INITIAL_MODE = "opentcs.initialmode";
   /**
    * Our startup progress indicator.
    */
@@ -52,24 +51,33 @@ public class Main {
    * The actual document view.
    */
   private final OpenTCSView opentcsView;
+
   /**
-   * A manager for the kernel proxy/connection.
+   * The plant overview client's main entry point.
+   *
+   * @param args the command line arguments
    */
-  private final KernelProxyManager kernelProxyManager;
+  public static void main(final String args[]) {
+    // Make sure we log everything, especially uncaught exceptions leading to
+    // threads terminating.
+    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(true));
+    Environment.logSystemInfo();
 
-  static {
-    switch (configStore.getString("LANGUAGE", "ENGLISH")) {
-      case "GERMAN":
-        Locale.setDefault(Locale.GERMAN);
-        break;
+    Injector injector = Guice.createInjector(new ApplicationInjectionModule());
 
-      case "ENGLISH":
-        Locale.setDefault(Locale.ENGLISH);
-        break;
+    initialize(injector.getInstance(ApplicationConfiguration.class));
 
-      default:
-        Locale.setDefault(Locale.ENGLISH);
-    }
+    Main main = injector.getInstance(Main.class);
+    main.startApplication();
+  }
+
+  /**
+   * Initializes the application according to the given configuration.
+   *
+   * @param appConfig The configuration.
+   */
+  private static void initialize(ApplicationConfiguration appConfig) {
+    Locale.setDefault(appConfig.getLocale());
     // Look and feel
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -83,77 +91,56 @@ public class Main {
   }
 
   /**
-   * The plant overview client's main entry point.
-   *
-   * @param args the command line arguments
-   */
-  public static void main(final String args[]) {
-    // Make sure we log everything, especially uncaught exceptions leading to
-    // threads terminating.
-    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(true));
-    Environment.logSystemInfo();
-    
-    // Currently the kernel needs to be connected to before starting/injecting
-    // application parts.
-    connectKernel();
-    
-    Injector injector = Guice.createInjector(new ApplicationInjectionModule());
-    Main main = injector.getInstance(Main.class);
-    main.startApplication();
-  }
-
-  /**
    * Creates a new instance.
    *
    * @param progressIndicator The progress indicator to be used.
    * @param application The application to be used.
    * @param opentcsView The view to be used.
-   * @param kernelProxyManager The proxy/connection manager to be used.
    */
   @Inject
   public Main(ProgressIndicator progressIndicator,
               Application application,
-              OpenTCSView opentcsView,
-              KernelProxyManager kernelProxyManager) {
-    this.progressIndicator = Objects.requireNonNull(progressIndicator);
-    this.application = Objects.requireNonNull(application);
-    this.opentcsView = Objects.requireNonNull(opentcsView);
-    this.kernelProxyManager = Objects.requireNonNull(kernelProxyManager);
+              OpenTCSView opentcsView) {
+    this.progressIndicator = requireNonNull(progressIndicator,
+                                            "progressIndicator");
+    this.application = requireNonNull(application, "application");
+    this.opentcsView = requireNonNull(opentcsView, "opentcsView");
   }
 
   /**
-   * Connects the kernel.
+   * Sets the application's initial mode of operation, either by reading it from
+   * the system properties, or, failing that, by letting the user select it in a
+   * dialog.
    */
-  private static void connectKernel() {
-    // If connection parameters are given in the system properties, try
-    // connecting with them.
-    ConnectionParamSet connParamSet
-        = ConnectionParamSet.getParamSet(System.getProperties());
-    KernelProxyManager localkernelProxyManager = DefaultKernelProxyManager.instance();
-    if (connParamSet != null) {
-      localkernelProxyManager.connect(connParamSet);
-    }
+  private void setInitialMode() {
+    final OperationMode initialMode;
 
-    // If we are not connected, yet, show a dialog for entering the connection
-    // parameters.
-    if (!localkernelProxyManager.isConnected()) {
-      ConnectToServerDialog dialog = new ConnectToServerDialog(localkernelProxyManager);
-      dialog.setVisible(true);
-
-      if (dialog.getReturnStatus() != ConnectToServerDialog.RET_OK) {
-        log.info("User cancelled kernel connection dialog, terminating...");
-        System.exit(0);
+    String modeProp = System.getProperty(PROP_INITIAL_MODE);
+    if (modeProp != null) {
+      if (modeProp.toLowerCase().equals("operating")) {
+        initialMode = OperationMode.OPERATING;
+      }
+      else {
+        initialMode = OperationMode.MODELLING;
       }
     }
+    else {
+      ChooseStateDialog chooseStateDialog = new ChooseStateDialog();
+      chooseStateDialog.setVisible(true);
+      initialMode = chooseStateDialog.getSelection();
+    }
+
+    opentcsView.switchPlantOverviewState(initialMode);
   }
 
   private void startApplication() {
+    opentcsView.init();
+    setInitialMode();
     progressIndicator.initialize();
     progressIndicator.setProgress(0, "Start openTCS visualization");
     // XXX We currently do this to iteratively eliminate (circular) references
     // to the OpenTCSView instance. This should eventually go away.
     OpenTCSView.setInstance(opentcsView);
-    // XXX connectKernel() removed
     progressIndicator.setProgress(5, "Launch openTCS visualization application");
     opentcsView.setApplication(application);
     // Start the view.

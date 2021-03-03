@@ -6,8 +6,10 @@ package org.opentcs.kernel.workingset;
 
 import java.util.HashSet;
 import java.util.Set;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Path;

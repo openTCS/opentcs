@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.drawing.figures;
 
@@ -9,12 +14,14 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.awt.geom.Rectangle2D;
+import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.AbstractAttributedDecoratedFigure;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.geom.Geom;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.ZoomPoint;
+import org.opentcs.guing.components.properties.AttributesComponent;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
+import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 
@@ -28,6 +35,14 @@ public abstract class TCSFigure
     extends AbstractAttributedDecoratedFigure {
 
   /**
+   * The manager for the components tree view.
+   */
+  private final TreeViewManager componentsTreeManager;
+  /**
+   * Displays properties of the currently selected model component(s).
+   */
+  private final SelectionPropertiesComponent propertiesComponent;
+  /**
    * The enclosing rectangle.
    */
   protected Rectangle fDisplayBox;
@@ -39,10 +54,19 @@ public abstract class TCSFigure
   /**
    * Creates a new instance.
    *
-   * @param modelComponent Das Modell dieses grafischen Objekts
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param modelComponent The model corresponding to this graphical object.
    */
-  public TCSFigure(FigureComponent modelComponent) {
+  public TCSFigure(TreeViewManager componentsTreeManager,
+                   SelectionPropertiesComponent propertiesComponent,
+                   FigureComponent modelComponent) {
     super();
+    this.componentsTreeManager = requireNonNull(componentsTreeManager,
+                                                "componentsTreeManager");
+    this.propertiesComponent = requireNonNull(propertiesComponent,
+                                              "propertiesComponent");
     set(FigureConstants.MODEL, modelComponent);
   }
 
@@ -82,6 +106,19 @@ public abstract class TCSFigure
     }
   }
 
+  @Override
+  protected Rectangle2D.Double getFigureDrawingArea() {
+    // Add some margin to the drawing area of the figure, so the 
+    // drawing area scrolls a little earlier
+    Rectangle2D.Double drawingArea = super.getFigureDrawingArea();
+    // if we add these two lines the Drawing becomes grey, if we start
+    // the application in operating mode..
+//    drawingArea.height += 50;
+//    drawingArea.width += 100;
+
+    return drawingArea;
+  }
+
   /**
    * Returns the model object for this figure.
    *
@@ -119,14 +156,29 @@ public abstract class TCSFigure
     // 1. Das zugehörige Objekt im Tree markieren
     // 2. Die Eigenschaften dieses Objekts im Property Panel anzeigen
     ModelComponent model = getModel();
-    OpenTCSView tcsView = ((OpenTCSDrawingView) drawingView).getTCSView();
-    tcsView.getTreeViewManager().selectItem(model);
-    tcsView.getPropertiesComponent().setModel(model);
-    // 3. Wenn <Ctrl> gedrückt, zusätzlich Popup-Dialog für Eigenschaften
-    if ((evt.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0) {
-      tcsView.showPropertiesDialog(model);
-    }
+    componentsTreeManager.selectItem(model);
+    propertiesComponent.setModel(model);
 
     return false;
+  }
+
+  /**
+   * Returns the manager for the components tree view.
+   *
+   * @return The manager for the components tree view.
+   */
+  protected TreeViewManager getComponentsTreeManager() {
+    return componentsTreeManager;
+  }
+
+  /**
+   * Returns the component that displays properties for the currently selected
+   * model component.
+   *
+   * @return The component that displays properties for the currently selected
+   * model component.
+   */
+  protected AttributesComponent getPropertiesComponent() {
+    return propertiesComponent;
   }
 }

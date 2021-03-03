@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.dialogs;
 
@@ -35,6 +40,7 @@ public class StandardDialog
    * Der Inhalt des Dialogs.
    */
   protected JComponent fContent;
+  private int returnStatus = RET_CANCEL;
 
   /**
    * Erzeugt ein neues Exemplar von StandardDialog. Die Größe des Dialogs wird
@@ -84,6 +90,7 @@ public class StandardDialog
     return returnStatus;
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -127,6 +134,7 @@ public class StandardDialog
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
       doClose(RET_OK);
@@ -151,10 +159,12 @@ public class StandardDialog
     setVisible(false);
     dispose();
   }
+
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonPanel;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables
-	private int returnStatus = RET_CANCEL;
+  // CHECKSTYLE:ON
 }

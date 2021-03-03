@@ -10,6 +10,8 @@ package org.opentcs.util;
 
 import com.google.common.base.Strings;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -18,19 +20,38 @@ import java.util.TreeSet;
  * Provides a way to acquire unique strings.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @param <S> The type of the selectors/keys to be used for mapping to name
+ * patterns.
  */
-public class UniqueStringGenerator {
+public class UniqueStringGenerator<S> {
 
+  /**
+   * Configured name patterns.
+   */
+  private final Map<S, NamePattern> namePatterns = new HashMap<>();
   /**
    * All strings known to this generator, sorted lexicographically.
    */
   private final SortedSet<String> existingStrings = new TreeSet<>();
 
   /**
-   * Creates a new instance.
+   * Creates a new instance without any name patterns.
    */
   public UniqueStringGenerator() {
     // Do nada.
+  }
+
+  /**
+   * Registers a name pattern for the given selector.
+   *
+   * @param selector The selector.
+   * @param prefix The prefix of names to be used for the given selector.
+   * @param suffixPattern The suffix pattern to be used for the given selector.
+   */
+  public void registerNamePattern(S selector,
+                                  String prefix,
+                                  String suffixPattern) {
+    namePatterns.put(selector, new NamePattern(prefix, suffixPattern));
   }
 
   /**
@@ -63,6 +84,25 @@ public class UniqueStringGenerator {
   }
 
   /**
+   * Returns a string that is unique among all strings registered with this
+   * generator.
+   *
+   * @param selector A selector for the name pattern to be used.
+   * @return A string that is unique among all strings registered with this
+   * generator.
+   */
+  public String getUniqueString(S selector) {
+    requireNonNull(selector, "selector");
+
+    NamePattern namePattern = namePatterns.get(selector);
+    if (namePattern == null) {
+      throw new IllegalArgumentException("Unknown selector: " + selector);
+    }
+
+    return getUniqueString(namePattern.prefix, namePattern.suffixPattern);
+  }
+
+  /**
    * Returns a String that is unique among all known Strings in this generator.
    * The returned String will consist of the given prefix followed by an integer
    * formatted according to the given pattern. The pattern has to be of the form
@@ -77,6 +117,7 @@ public class UniqueStringGenerator {
   public String getUniqueString(final String prefix,
                                 final String suffixPattern) {
     requireNonNull(suffixPattern, "suffixPattern is null");
+
     final String actualPrefix = Strings.nullToEmpty(prefix);
     final DecimalFormat format = new DecimalFormat(suffixPattern);
     final String lBound = actualPrefix + "0";
@@ -119,5 +160,31 @@ public class UniqueStringGenerator {
       }
     }
     return true;
+  }
+
+  /**
+   * A name pattern.
+   */
+  private static class NamePattern {
+
+    /**
+     * The prefix to be used.
+     */
+    private final String prefix;
+    /**
+     * The suffix pattern to be used.
+     */
+    private final String suffixPattern;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param prefix The prefix to be used.
+     * @param suffixPattern The suffix pattern to be used.
+     */
+    private NamePattern(String prefix, String suffixPattern) {
+      this.prefix = requireNonNull(prefix, "prefix");
+      this.suffixPattern = requireNonNull(suffixPattern, "suffixPattern");
+    }
   }
 }

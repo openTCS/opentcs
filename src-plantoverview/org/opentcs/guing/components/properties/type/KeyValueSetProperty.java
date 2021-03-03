@@ -1,19 +1,25 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.opentcs.guing.components.properties.panel.KeyValueSetPropertyEditorPanel;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * An attribute which contains a quantity of key-value-pairs.
+ * An attribute which contains a quantity of key-value pairs.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class KeyValueSetProperty
     extends AbstractComplexProperty {
@@ -21,16 +27,15 @@ public class KeyValueSetProperty
   /**
    * The quantity of key-value-pairs.
    */
-  protected List<KeyValueProperty> fItems;
+  private List<KeyValueProperty> fItems = new ArrayList<>();
 
   /**
-   * Creates a new instance of KeyValueSetProperty.
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component this property belongs to.
    */
   public KeyValueSetProperty(ModelComponent model) {
-    super(model, KeyValueSetPropertyEditorPanel.class);
-    fItems = new ArrayList<>();
+    super(model);
   }
 
   @Override

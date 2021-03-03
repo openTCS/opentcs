@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
 import java.util.ArrayList;
@@ -14,17 +20,15 @@ import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.components.tree.elements.LocationUserObject;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Basisimplementierung für alle Arten von Stationen (auch Aufzüge, Drehteller
- * und dergleichen).
+ * Basic implementation for every kind of location.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -36,10 +40,8 @@ public class LocationModel
    * The property key for the location's type.
    */
   public static final String TYPE = "Type";
-////	// Schlüssel für das Label -> TODO: in ObjectPropConstants definieren
-////	public static final String LABEL = "Label";
   /**
-   * Der Stationstyp.
+   * The model of the type.
    */
   private transient LocationTypeModel fLocationType;
 
@@ -51,22 +53,15 @@ public class LocationModel
     createProperties();
   }
 
-  @Override // AbstractFigureComponent
-  public LocationUserObject createUserObject() {
-    fUserObject = new LocationUserObject(this);
-
-    return (LocationUserObject) fUserObject;
-  }
-
   @Override
   public LabeledLocationFigure getFigure() {
     return (LabeledLocationFigure) super.getFigure();
   }
 
   /**
-   * Setzt den Stationstyp.
+   * Sets the location type.
    *
-   * @param type der Stationstyp
+   * @param type The model of the type.
    */
   public void setLocationType(LocationTypeModel type) {
     if (fLocationType != null) {
@@ -80,16 +75,16 @@ public class LocationModel
   }
 
   /**
-   * Liefert den Stationstyp.
+   * Returns the location type.
    *
-   * @return den Stationstyp
+   * @return The type.
    */
   public LocationTypeModel getLocationType() {
     return fLocationType;
   }
 
   /**
-   * Aktualisiert den Namen der Location.
+   * Refreshes the name of this location.
    */
   protected void updateName() {
     StringProperty property = (StringProperty) getProperty(NAME);
@@ -102,16 +97,6 @@ public class LocationModel
     }
 
     propertiesChanged(this);
-  }
-
-  /**
-   * Setzt den Namen des Knotens.
-   *
-   * @param name der neue Knotenname
-   */
-  public void setName(String name) {
-    StringProperty p = (StringProperty) getProperty(ModelComponent.NAME);
-    p.setText(name);
   }
 
   @Override // AbstractModelComponent
@@ -148,15 +133,10 @@ public class LocationModel
       }
     }
 
-    SelectionProperty pType = (SelectionProperty) getProperty(LocationModel.TYPE);
-    pType.setPossibleValues(possibleValues.toArray());
+    LocationTypeProperty pType = (LocationTypeProperty) getProperty(LocationModel.TYPE);
+    pType.setPossibleValues(possibleValues);
     pType.setValue(value);
     pType.markChanged();
-  }
-
-  @Override
-  public int compareTo(AbstractFigureComponent o) {
-    return getName().compareTo(o.getName());
   }
 
   private void createProperties() {
@@ -167,17 +147,17 @@ public class LocationModel
     pName.setHelptext(bundle.getString("location.name.helptext"));
     setProperty(NAME, pName);
     // Position x
-    CoordinateProperty pPosX = new CoordinateProperty(this, true);
+    CoordinateProperty pPosX = new CoordinateProperty(this);
     pPosX.setDescription(bundle.getString("location.x.text"));
     pPosX.setHelptext(bundle.getString("location.x.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
     // Position y
-    CoordinateProperty pPosY = new CoordinateProperty(this, false);
+    CoordinateProperty pPosY = new CoordinateProperty(this);
     pPosY.setDescription(bundle.getString("location.y.text"));
     pPosY.setHelptext(bundle.getString("location.y.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
     // Location type
-    SelectionProperty pType = new SelectionProperty(this);
+    LocationTypeProperty pType = new LocationTypeProperty(this);
     pType.setDescription(bundle.getString("location.type.text"));
     pType.setHelptext(bundle.getString("location.type.helptext"));
     setProperty(TYPE, pType);
@@ -194,9 +174,6 @@ public class LocationModel
     pSymbol.setCollectiveEditable(true);
     pSymbol.setOperatingEditable(true);
     setProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION, pSymbol);
-    // Das zugehörige Model-Layout-Element
-    // Die Position kann nur in der Drawing verschoben werden.
-    // TODO: Auch in der Tabelle editieren?
     // Position x im Layout
     StringProperty pLocPosX = new StringProperty(this);
     pLocPosX.setDescription(bundle.getString("element.locPosX.text"));

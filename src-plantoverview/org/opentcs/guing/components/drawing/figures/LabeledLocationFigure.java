@@ -1,31 +1,35 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.inject.assistedinject.Assisted;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.Action;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.guing.application.action.edit.CopyAction;
-import org.opentcs.guing.application.action.edit.CutAction;
-import org.opentcs.guing.application.action.edit.DuplicateAction;
-import org.opentcs.guing.application.action.edit.PasteAction;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
-import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
@@ -35,37 +39,36 @@ import org.opentcs.guing.model.elements.LocationModel;
  * Figur bewegt wird.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class LabeledLocationFigure
     extends LabeledFigure {
 
   /**
-   * DOM support
+   * Creates a new instance.
+   *
+   * @param figure The presentation figure.
    */
-  public LabeledLocationFigure() {
-    LocationFigure lf = new LocationFigure(new LocationModel());
-    setPresentationFigure(lf);
-  }
+  @Inject
+  public LabeledLocationFigure(@Assisted LocationFigure figure) {
+    requireNonNull(figure, "figure");
 
-  /**
-   * @param figure
-   */
-  public LabeledLocationFigure(LocationFigure figure) {
     setPresentationFigure(figure);
   }
 
-  /**
-   * Liefert das Figure-Objekt.
-   *
-   * @return
-   */
-  public LocationFigure getLocationFigure() {
-    return (LocationFigure) getPresentationFigure();
+  @Override
+  public LocationFigure getPresentationFigure() {
+    return (LocationFigure) super.getPresentationFigure();
+  }
+
+  @Override
+  public Shape getShape() {
+    return getPresentationFigure().getDrawingArea();
   }
 
   @Override	// AbstractFigure
   public String getToolTipText(Point2D.Double p) {
-    LocationFigure lf = (LocationFigure) getPresentationFigure();
+    LocationFigure lf = getPresentationFigure();
     StringBuilder sb = new StringBuilder("<html>Location ");
     sb.append("<b>").append(lf.getModel().getName()).append("</b>");
     // Show miscellaneous properties in tooltip
@@ -93,8 +96,7 @@ public class LabeledLocationFigure
       that.removeChild(0);
     }
 
-    that.fLabel = null;
-    LocationFigure thatPresentationFigure = (LocationFigure) that.getPresentationFigure();
+    LocationFigure thatPresentationFigure = that.getPresentationFigure();
     thatPresentationFigure.addFigureListener(that.eventHandler);
     // Force loading of the symbol bitmap
     thatPresentationFigure.propertiesChanged(null);
@@ -111,7 +113,7 @@ public class LabeledLocationFigure
 
   @Override	// GraphicalCompositeFigure
   public void write(DOMOutput out) throws IOException {
-    LocationFigure lf = (LocationFigure) getPresentationFigure();
+    LocationFigure lf = getPresentationFigure();
     out.addAttribute("x", lf.getZoomPoint().getX());
     out.addAttribute("y", lf.getZoomPoint().getY());
     out.addAttribute("name", get(FigureConstants.MODEL).getName());
@@ -136,10 +138,10 @@ public class LabeledLocationFigure
 
     // Move the figure if the model coordinates have been changed in the
     // Properties panel
-    Origin origin = (Origin) get(FigureConstants.ORIGIN);
+    Origin origin = get(FigureConstants.ORIGIN);
 
     if (origin != null) {
-      LocationFigure lf = (LocationFigure) getPresentationFigure();
+      LocationFigure lf = getPresentationFigure();
       StringProperty xLayout = (StringProperty) lf.getModel().getProperty(ElementPropKeys.LOC_POS_X);
       StringProperty yLayout = (StringProperty) lf.getModel().getProperty(ElementPropKeys.LOC_POS_Y);
 
@@ -156,15 +158,15 @@ public class LabeledLocationFigure
     }
 
     // Update the image of the actual Location type
-    ((LocationFigure) getPresentationFigure()).propertiesChanged(event);
+    getPresentationFigure().propertiesChanged(event);
     // Auch das Label aktualisieren
     fireFigureChanged();
   }
 
   @Override // LabeledFigure
   public void updateModel() {
-    Origin origin = (Origin) get(FigureConstants.ORIGIN);
-    LocationFigure lf = (LocationFigure) getPresentationFigure();
+    Origin origin = get(FigureConstants.ORIGIN);
+    LocationFigure lf = getPresentationFigure();
     FigureComponent model = lf.getModel();
     CoordinateProperty cpx = (CoordinateProperty) model.getProperty(LocationModel.MODEL_X_POSITION);
     CoordinateProperty cpy = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);

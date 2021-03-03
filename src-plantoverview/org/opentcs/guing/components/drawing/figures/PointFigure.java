@@ -1,9 +1,15 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -13,9 +19,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import javax.inject.Inject;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.guing.components.drawing.ZoomPoint;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PointModel;
 
@@ -24,6 +33,7 @@ import org.opentcs.guing.model.elements.PointModel;
  * ist vom Typ Point. Darstellung als Kreis mit 20 Layout-Units Durchmesser
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class PointFigure
     extends TCSFigure {
@@ -48,10 +58,17 @@ public class PointFigure
   /**
    * Creates a new instance.
    *
-   * @param model The corresponding model object.
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param model The model corresponding to this graphical object.
    */
-  public PointFigure(PointModel model) {
-    super(model);
+  @Inject
+  public PointFigure(ComponentsTreeViewManager componentsTreeManager,
+                     SelectionPropertiesComponent propertiesComponent,
+                     @Assisted PointModel model) {
+    super(componentsTreeManager, propertiesComponent, model);
+
     // TO DO: Grid Constrainer anpassen, sodass auch kleinere Figur auf das "10er" Raster gezogen wird.
     fDiameter = 10;
     fDisplayBox = new Rectangle(fDiameter, fDiameter);

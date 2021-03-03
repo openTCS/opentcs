@@ -1,24 +1,25 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.tree.elements;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import com.google.inject.assistedinject.Assisted;
+import java.util.Objects;
+import javax.inject.Inject;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTree;
 import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.util.IconToolkit;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Die Repräsentation einer Station in der Baumansicht.
@@ -26,15 +27,23 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationUserObject
-    extends FigureUserObject {
+    extends FigureUserObject implements ContextObject {
+  
+  private final UserObjectContext context;
 
   /**
    * Creates a new instance.
    *
    * @param model The corresponding model object.
    */
-  public LocationUserObject(LocationModel model) {
-    super(model);
+  @Inject
+  public LocationUserObject(@Assisted LocationModel model,
+                            @Assisted UserObjectContext context,
+                            OpenTCSView view,
+                            OpenTCSDrawingEditor editor,
+                            ModelManager modelManager) {
+    super(model, view, editor, modelManager);
+    this.context = Objects.requireNonNull(context, "context");
   }
 
   @Override
@@ -42,46 +51,9 @@ public class LocationUserObject
     return (LocationModel) super.getModelComponent();
   }
 
-  @Override // UserObject
-  public void rightClicked(JComponent component, int x, int y) {
-    userObjectItems = getSelectedUserObjects(((JTree) component));
-    JPopupMenu popupMenu = getPopupMenu();
-
-    if (popupMenu != null) {
-      popupMenu.show(component, x, y);
-    }
-  }
-
-  @Override // AbstractUserObject
-  public void rightClicked(JComponent component, int x, int y, boolean isGroupView) {
-    userObjectItems = getSelectedUserObjects(((JTree) component));
-    JPopupMenu menu = getGroupPopupMenu();
-    menu.show(component, x, y);
-  }
-
   @Override // AbstractUserObject
   public JPopupMenu getPopupMenu() {
-    JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-
-    JMenuItem item = new JMenuItem(labels.getString("tree.createGroup"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        Set<ModelComponent> items = new HashSet<>();
-        Iterator<UserObject> it = userObjectItems.iterator();
-
-        while (it.hasNext()) {
-          UserObject next = it.next();
-          ModelComponent dataObject = next.getModelComponent();
-          items.add(dataObject);
-        }
-        OpenTCSView.instance().createGroup(items);
-      }
-    });
-
-    menu.add(item);
+    JPopupMenu menu = context.getPopupMenu(userObjectItems);
 
     return menu;
   }
@@ -90,22 +62,14 @@ public class LocationUserObject
   public ImageIcon getIcon() {
     return IconToolkit.instance().createImageIcon("tree/location.18x18.png");
   }
+  
+  @Override
+  public boolean removed() {
+    return context.removed(this);
+  }
 
-  private JPopupMenu getGroupPopupMenu() {
-    JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-
-    JMenuItem item = new JMenuItem(labels.getString("tree.removeFromGroup"));
-    item.addActionListener(new ActionListener() {
-
-      @Override // ActionListener
-      public void actionPerformed(ActionEvent e) {
-        OpenTCSView.instance().removeGroupMembers(userObjectItems);
-      }
-    });
-
-    menu.add(item);
-
-    return menu;
+  @Override
+  public UserObjectContext.CONTEXT_TYPE getContextType() {
+    return context.getType();
   }
 }

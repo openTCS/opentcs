@@ -1,27 +1,36 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange.adapter;
 
+import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
-import java.util.Iterator;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectPropConstants;
-import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
+import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
+import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 
@@ -29,9 +38,10 @@ import org.opentcs.guing.model.elements.LocationTypeModel;
  * An adapter for location types.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationTypeAdapter
-    extends OpenTCSProcessAdapter {
+    extends AbstractProcessAdapter {
 
   /**
    * This class's logger.
@@ -40,16 +50,15 @@ public class LocationTypeAdapter
       = Logger.getLogger(LocationTypeAdapter.class.getName());
 
   /**
-   * Creates a new instance of LocationTypeAdapter.
+   * Creates a new instance.
+   *
+   * @param model The corresponding model component.
+   * @param eventDispatcher The event dispatcher.
    */
-  public LocationTypeAdapter() {
-    super();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public TCSObjectReference<LocationType> getProcessObject() {
-    return (TCSObjectReference<LocationType>) super.getProcessObject();
+  @Inject
+  public LocationTypeAdapter(@Assisted LocationTypeModel model,
+                             @Assisted EventDispatcher eventDispatcher) {
+    super(model, eventDispatcher);
   }
 
   @Override
@@ -57,169 +66,99 @@ public class LocationTypeAdapter
     return (LocationTypeModel) super.getModel();
   }
 
-  @Override
-  public void setModel(ModelComponent model) {
-    if (!LocationTypeModel.class.isInstance(model)) {
-      throw new IllegalArgumentException(model + " is not a LocationTypeModel");
+  @Override // OpenTCSProcessAdapter
+  public void updateModelProperties(Kernel kernel,
+                                    TCSObject<?> tcsObject,
+                                    @Nullable ModelLayoutElement layoutElement) {
+    LocationType locationType = requireNonNull((LocationType) tcsObject,
+                                               "tcsObject");
+    try {
+      // Name
+      StringProperty pNname
+          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+      pNname.setText(locationType.getName());
+      // Allowed operations
+      StringSetProperty pOperations = (StringSetProperty) getModel()
+          .getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
+      pOperations.setItems(new ArrayList<>(locationType.getAllowedOperations()));
+      updateMiscModelProperties(locationType);
+      KeyValueSetProperty miscellaneous = (KeyValueSetProperty) getModel()
+          .getProperty(ModelComponent.MISCELLANEOUS);
+
+      for (KeyValueProperty next : miscellaneous.getItems()) {
+        if (next.getKey().equals(
+            ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
+          SymbolProperty symbol = (SymbolProperty) getModel().getProperty(
+              ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+          symbol.setLocationRepresentation(
+              LocationRepresentation.valueOf(next.getValue()));
+          break;
+        }
+      }
     }
-    super.setModel(model);
+    catch (CredentialsException e) {
+      log.log(Level.SEVERE, null, e);
+    }
   }
 
-  @Override // AbstractProcessAdapter
-  public void releaseProcessObject() {
+  @Override // OpenTCSProcessAdapter
+  public void updateProcessProperties(Kernel kernel) {
+    LocationType locType = kernel.createLocationType();
+    TCSObjectReference<LocationType> reference = locType.getReference();
+
+    StringProperty pName
+        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    String name = pName.getText();
+
     try {
-      kernel().removeTCSObject(getProcessObject());
-      super.releaseProcessObject(); // also delete the Adapter
+      kernel.renameTCSObject(reference, name);
+
+      updateProcessActions(kernel, reference);
+
+      updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.log(Level.WARNING, "Exception removing object", e);
+      log.log(Level.WARNING, null, e);
     }
   }
 
-  @Override // AbstractProcessAdapter
-  public LocationType createProcessObject() throws KernelRuntimeException {
-    if (!hasModelingState()) {
-      return null;
-    }
-    LocationType locationType = kernel().createLocationType();
-    setProcessObject(locationType.getReference());
-
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    if (pName.getText().isEmpty()) {
-      // Only set the name generated by the kernel
-      nameToModel(locationType);
-    }
-    else {
-        // if an "old" object was restored by undo() save the properties
-      // in the kernel
-      pName.setText(locationType.getName());
-      updateProcessProperties(true);
-    }
-
-    register();
-
-    return locationType;
-  }
-
-  @Override // OpenTCSProcessAdapter
-  public void propertiesChanged(AttributesChangeEvent event) {
-    if (hasModelingState() && event.getInitiator() != this) {
-      updateProcessProperties(false);
-    }
-  }
-
-  @Override // OpenTCSProcessAdapter
-  public void updateModelProperties() {
-    TCSObjectReference<LocationType> reference = getProcessObject();
-
-    synchronized (reference) {
-      try {
-        LocationType locationType = kernel().getTCSObject(LocationType.class, reference);
-
-        if (locationType != null) {
-          // Name
-          StringProperty pNname = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-          pNname.setText(locationType.getName());
-          // Allowed operations
-          StringSetProperty pOperations = (StringSetProperty) getModel().getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
-          Iterator<String> iOperations = locationType.getAllowedOperations().iterator();
-          ArrayList<String> operationItems = new ArrayList<>();
-
-          while (iOperations.hasNext()) {
-            operationItems.add(iOperations.next());
-          }
-
-          pOperations.setItems(operationItems);
-          updateMiscModelProperties(locationType);
-          KeyValueSetProperty miscellaneous = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
-
-          for (KeyValueProperty next : miscellaneous.getItems()) {
-            if (next.getKey().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
-              SymbolProperty symbol = (SymbolProperty) getModel().getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-              symbol.setLocationRepresentation(LocationRepresentation.valueOf(next.getValue()));
-              break;
-            }
-          }
-        }
-        else {
-          log.log(Level.SEVERE, "locationType = null: {0}", getModel().getName());
-        }
-      }
-      catch (CredentialsException e) {
-        log.log(Level.SEVERE, null, e);
-      }
-    }
-  }
-
-  @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(boolean updateAllProperties) {
-    super.updateProcessProperties(updateAllProperties);
-    TCSObjectReference<LocationType> reference = getProcessObject();
-
-    if (isInTransition()) {
-      return;
-    }
-
-    synchronized (reference) {
-      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      String name = pName.getText();
-
-      try {
-        if (updateAllProperties || pName.hasChanged()) {
-          kernel().renameTCSObject(reference, name);
-        }
-        updateProcessActions(updateAllProperties, reference);
-
-        updateMiscProcessProperties(updateAllProperties);
-      }
-      catch (ObjectExistsException e) {
-        undo(name, e);
-      }
-      catch (CredentialsException | ObjectUnknownException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
-  private void updateProcessActions(boolean updateAllProperties,
+  private void updateProcessActions(Kernel kernel,
                                     TCSObjectReference<LocationType> reference)
-      throws CredentialsException, ObjectUnknownException {
-    StringSetProperty pActions = (StringSetProperty) getModel().getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
+      throws KernelRuntimeException {
+    StringSetProperty pActions = (StringSetProperty) getModel().getProperty(
+        LocationTypeModel.ALLOWED_OPERATIONS);
 
-    if (updateAllProperties || pActions.hasChanged()) {
-      LocationType locationType = kernel().getTCSObject(LocationType.class,
-                                                        reference);
-
-      if (locationType != null) {
-        for (String oldOp : locationType.getAllowedOperations()) {
-          kernel().removeLocationTypeAllowedOperation(reference, oldOp);
-        }
-      }
-
-      for (String newOp : pActions.getItems()) {
-        kernel().addLocationTypeAllowedOperation(reference, newOp);
-      }
+    for (String newOp : pActions.getItems()) {
+      kernel.addLocationTypeAllowedOperation(reference, newOp);
     }
   }
 
   @Override // OpenTCSProcessAdapter
-  protected void updateMiscProcessProperties(boolean updateAllProperties)
-      throws ObjectUnknownException, CredentialsException {
-    kernel().clearTCSObjectProperties(getProcessObject());
-    KeyValueSetProperty pMisc = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
+  protected void updateMiscProcessProperties(Kernel kernel,
+                                             TCSObjectReference<?> ref)
+      throws KernelRuntimeException {
+    kernel.clearTCSObjectProperties(ref);
+    KeyValueSetProperty pMisc = (KeyValueSetProperty) getModel().getProperty(
+        ModelComponent.MISCELLANEOUS);
 
     if (pMisc != null) {
       // Update the location representation (symbol) from the model.
-      SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-      LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
+      SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(
+          ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+      LocationRepresentation locationRepresentation = pSymbol
+          .getLocationRepresentation();
 
       if (locationRepresentation != null) {
-        KeyValueProperty kvp = new KeyValueProperty(getModel(), ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, locationRepresentation.name());
+        KeyValueProperty kvp = new KeyValueProperty(getModel(),
+                                                    ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION,
+                                                    locationRepresentation
+                                                    .name());
         pMisc.addItem(kvp);
       }
       else {
         for (KeyValueProperty kvp : pMisc.getItems()) {
-          if (kvp.getKey().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
+          if (kvp.getKey().equals(
+              ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
             pMisc.removeItem(kvp);
             break;
           }
@@ -228,7 +167,7 @@ public class LocationTypeAdapter
 
       // Set all properties on the kernel object.
       for (KeyValueProperty kvp : pMisc.getItems()) {
-        kernel().setTCSObjectProperty(getProcessObject(), kvp.getKey(), kvp.getValue());
+        kernel.setTCSObjectProperty(ref, kvp.getKey(), kvp.getValue());
       }
     }
   }

@@ -9,6 +9,9 @@
 package org.opentcs.guing.util;
 
 import com.google.inject.AbstractModule;
+import javax.inject.Singleton;
+import org.opentcs.util.gui.plugins.LocationThemeRegistry;
+import org.opentcs.util.gui.plugins.VehicleThemeRegistry;
 
 /**
  * A default Guice module for this package.
@@ -21,13 +24,28 @@ public class UtilInjectionModule
   @Override
   protected void configure() {
 
-    // XXX This should actually bind properly with in(Singleton.class), not with
-    // toInstance(). Should be changed once getInstance() could be removed from
-    // the rest of the code.
-    bind(VehicleThemeManager.class).toInstance(DefaultVehicleThemeManager.getInstance());
-    // XXX This should actually bind properly with in(Singleton.class), not with
-    // toInstance(). Should be changed once getInstance() could be removed from
-    // the rest of the code.
-    bind(LocationThemeManager.class).toInstance(DefaultLocationThemeManager.getInstance());
+    bind(ApplicationConfiguration.class).in(Singleton.class);
+    
+    bind(PanelRegistry.class).in(Singleton.class);
+
+    bind(VehicleThemeRegistry.class)
+        .in(Singleton.class);
+    // XXX There are still some classes that need to access the singleton via
+    // XXX getInstance(), so it also has to be set via setInstance() on startup
+    // XXX for now.
+    bind(DefaultVehicleThemeManager.class)
+        .in(Singleton.class);
+    bind(VehicleThemeManager.class)
+        .to(DefaultVehicleThemeManager.class);
+
+    bind(LocationThemeRegistry.class)
+        .in(Singleton.class);
+    // XXX There are still some classes that need to access the singleton via
+    // XXX getInstance(), so it also has to be set via setInstance() on startup
+    // XXX for now.
+    bind(DefaultLocationThemeManager.class)
+        .in(Singleton.class);
+    bind(LocationThemeManager.class)
+        .to(DefaultLocationThemeManager.class);
   }
 }

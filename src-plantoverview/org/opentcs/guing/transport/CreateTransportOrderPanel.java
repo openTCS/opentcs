@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.transport;
 
@@ -15,16 +20,18 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.EditDriveOrderPanel;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.DateUtility;
@@ -34,6 +41,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * Benutzerschnittstelle zur Eingabe eines neuen Transportauftrags.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class CreateTransportOrderPanel
     extends DialogContent {
@@ -45,38 +53,38 @@ public class CreateTransportOrderPanel
   /**
    * Die anzufahrenden Stationen.
    */
-  private final List<LocationModel> fLocationModels;
+  private final List<LocationModel> fLocationModels = new ArrayList<>();
   /**
    * Die an den Stationen auszuführenden Aktionen.
    */
-  private final List<String> fActions;
+  private final List<String> fActions = new ArrayList<>();
   /**
    * Die zur Auswahl stehenden Fahrzeuge.
    */
   private final List<VehicleModel> fVehicles;
   /**
-   * Der GuiManager.
+   * The manager for accessing the current system model.
    */
-  private final OpenTCSView fOpenTCSView;
+  private final ModelManager fModelManager;
   /**
    * Der Transportauftrag, der als Vorlage dienen soll.
    */
   private TransportOrder fPattern;
 
   /**
-   * Creates new instance..
+   * Creates new instance.
    *
-   * @param openTCSView
+   * @param modelManager The manager for accessing the current system model.
    */
-  public CreateTransportOrderPanel(OpenTCSView openTCSView) {
+  @Inject
+  public CreateTransportOrderPanel(ModelManager modelManager) {
+    this.fModelManager = requireNonNull(modelManager, "modelManager");
+
     initComponents();
     Object[] columnNames = {ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.location"),
                             ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.action")};
     DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
     model.setColumnIdentifiers(columnNames);
-    fOpenTCSView = openTCSView;
-    fLocationModels = new ArrayList<>();
-    fActions = new ArrayList<>();
 
     driveOrdersTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
@@ -88,7 +96,7 @@ public class CreateTransportOrderPanel
       }
     });
 
-    fVehicles = fOpenTCSView.getSystemModel().getVehicleModels();
+    fVehicles = fModelManager.getModel().getVehicleModels();
 
     Comparator<VehicleModel> c = new Comparator<VehicleModel>() {
 
@@ -235,7 +243,7 @@ public class CreateTransportOrderPanel
         row[1] = action;
         model.addRow(row);
 
-        fLocationModels.add(fOpenTCSView.getSystemModel().getLocationModel(location));
+        fLocationModels.add(fModelManager.getModel().getLocationModel(location));
         fActions.add(action);
       }
     }
@@ -576,8 +584,10 @@ public class CreateTransportOrderPanel
 
       LocationModel location = fLocationModels.get(index);
       String action = fActions.get(index);
-      EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fOpenTCSView.getSystemModel().getLocationModels(), location, action);
-      StandardContentDialog dialog = new StandardContentDialog(fOpenTCSView, contentPanel);
+      EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels(), location, action);
+      StandardContentDialog dialog
+          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
+                                      contentPanel);
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
@@ -598,8 +608,10 @@ public class CreateTransportOrderPanel
    * @param evt das auslösende Ereignis
    */
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-      EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fOpenTCSView.getSystemModel().getLocationModels());
-      StandardContentDialog dialog = new StandardContentDialog(fOpenTCSView, contentPanel);
+      EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels());
+      StandardContentDialog dialog
+          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
+                                      contentPanel);
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {

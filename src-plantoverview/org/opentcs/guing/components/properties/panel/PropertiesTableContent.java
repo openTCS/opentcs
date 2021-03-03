@@ -1,14 +1,23 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.panel;
 
+import com.google.inject.assistedinject.Assisted;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -19,19 +28,20 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.CannotUndoException;
-import org.opentcs.guing.application.GuiManager;
+import net.engio.mbassy.bus.MBassador;
 import org.opentcs.guing.components.dialogs.DetailsDialog;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.AbstractTableContent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
+import org.opentcs.guing.components.properties.table.AttributesTable;
 import org.opentcs.guing.components.properties.table.AttributesTableModel;
 import org.opentcs.guing.components.properties.table.BooleanPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.BooleanPropertyCellRenderer;
+import org.opentcs.guing.components.properties.table.CellEditorFactory;
 import org.opentcs.guing.components.properties.table.ColorPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.ColorPropertyCellRenderer;
-import org.opentcs.guing.components.properties.table.ComplexPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.CoordinateCellEditor;
 import org.opentcs.guing.components.properties.table.IntegerPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.QuantityCellEditor;
@@ -46,11 +56,13 @@ import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.event.ConnectionChangeEvent;
 import org.opentcs.guing.event.ConnectionChangeListener;
+import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.elements.AbstractConnection;
@@ -63,6 +75,7 @@ import org.opentcs.guing.util.UserMessageHelper;
  * Fahrzeugtyp anzeigen oder je nach aktivem Fahrzeugtyp variieren.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class PropertiesTableContent
     extends AbstractTableContent
@@ -70,12 +83,23 @@ public class PropertiesTableContent
                ConnectionChangeListener,
                CellEditorListener {
 
+  /**
+   * This class's logger.
+   */
   private static final Logger logger
       = Logger.getLogger(PropertiesTableContent.class.getName());
   /**
-   * The drawing view.
+   * A factory for cell editors.
    */
-  private final GuiManager guiManager;
+  private final CellEditorFactory cellEditorFactory;
+  /**
+   * Provides attribute table models.
+   */
+  private final Provider<AttributesTableModel> tableModelProvider;
+  /**
+   * The application's event bus.
+   */
+  private final MBassador<Object> eventBus;
   /**
    * A parent for dialogs created by this instance.
    */
@@ -84,11 +108,24 @@ public class PropertiesTableContent
   /**
    * Creates a new instance.
    *
-   * @param guiManager The GUI manager to be used.
+   * @param cellEditorFactory A factory for cell editors.
+   * @param tableProvider Provides attribute tables.
+   * @param tableModelProvider Provides attribute table models.
+   * @param eventBus The application's event bus.
    * @param dialogParent A parent for dialogs created by this instance.
    */
-  public PropertiesTableContent(GuiManager guiManager, JPanel dialogParent) {
-    this.guiManager = guiManager;
+  @Inject
+  public PropertiesTableContent(CellEditorFactory cellEditorFactory,
+                                Provider<AttributesTable> tableProvider,
+                                Provider<AttributesTableModel> tableModelProvider,
+                                MBassador<Object> eventBus,
+                                @Assisted JPanel dialogParent) {
+    super(tableProvider);
+    this.cellEditorFactory = requireNonNull(cellEditorFactory,
+                                            "cellEditorFactory");
+    this.tableModelProvider = requireNonNull(tableModelProvider,
+                                             "tableModelProvider");
+    this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
   }
 
@@ -104,6 +141,7 @@ public class PropertiesTableContent
 
     if (fModel instanceof PropertiesCollection) {
       fModel.propertiesChanged(this);
+      eventBus.publish(new ResetInteractionToolCommand(this));
       // updates some values required by PropertiesCollection
       setModel(fModel);
     }
@@ -121,6 +159,7 @@ public class PropertiesTableContent
       }
       // 2013-11-04 HH: Alle Änderungen im Modell speichern, nicht nur den Namen!
       fModel.propertiesChanged(this);
+      eventBus.publish(new ResetInteractionToolCommand(this));
     }
   }
 
@@ -169,11 +208,11 @@ public class PropertiesTableContent
 
   @Override	// AttributesChangeListener
   public void propertiesChanged(AttributesChangeEvent e) {
-    if (e.getInitiator() == this) {
-      // Setzt das SelectionTool zurück, wenn der Benutzer Änderungen
-      // an der Tabelle vorgenommen hat
-      guiManager.resetSelectionTool();
-    }
+//    if (e.getInitiator() == this) {
+//      // Setzt das SelectionTool zurück, wenn der Benutzer Änderungen
+//      // an der Tabelle vorgenommen hat
+//      guiManager.resetSelectionTool();
+//    }
 //    else {
     // 2013-12-09 HH Test: Tabelle immer sofort aktualisieren - gibt das Performance-Verluste?
     fEvaluateTableChanges = false;
@@ -189,12 +228,12 @@ public class PropertiesTableContent
 
   @Override
   public void editingStopped(ChangeEvent e) {
-    
+
   }
 
   @Override
   public void editingCanceled(ChangeEvent e) {
-    
+
   }
 
   @Override	// AbstractTableContent
@@ -249,8 +288,8 @@ public class PropertiesTableContent
     content = new QuantityEditorPanel();
     dialog = new StandardDetailsDialog(dialogParent, true, content);
     // CoordinateCellEditor with buttons "copy model <-> layout"
-    CoordinateCellEditor wrappedCoordinateCellEditor = 
-        new CoordinateCellEditor(new JTextField(), umh);
+    CoordinateCellEditor wrappedCoordinateCellEditor
+        = new CoordinateCellEditor(new JTextField(), umh);
     wrappedCoordinateCellEditor.addCellEditorListener(this);
     undoableEditor = new UndoableCellEditor(wrappedCoordinateCellEditor);
     undoableEditor.setDetailsDialog(dialog);
@@ -261,30 +300,40 @@ public class PropertiesTableContent
     // Selection property: Path type etc.
     content = new SelectionPropertyEditorPanel();
     dialog = new StandardDetailsDialog(dialogParent, true, content);
-    undoableEditor = 
-        new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox(), umh));
+    undoableEditor
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox(), umh));
     undoableEditor.setDetailsDialog(dialog);
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(SelectionProperty.class, undoableEditor);
+    
+    // Location type property
+    content = new SelectionPropertyEditorPanel();
+    dialog = new StandardDetailsDialog(dialogParent, true, content);
+    undoableEditor
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox(), umh));
+    undoableEditor.setDetailsDialog(dialog);
+    undoableEditor.setUndoManager(fUndoRedoManager);
+    fCellEditors.add(undoableEditor);
+    fTable.setDefaultEditor(LocationTypeProperty.class, undoableEditor);
 
     // Boolean property: Path locked etc.
-    undoableEditor = 
-        new UndoableCellEditor(new BooleanPropertyCellEditor(new JCheckBox(), umh));
+    undoableEditor
+        = new UndoableCellEditor(new BooleanPropertyCellEditor(new JCheckBox(), umh));
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(BooleanProperty.class, undoableEditor);
 
     // Abstract complex property:
-    undoableEditor = 
-        new UndoableCellEditor(new ComplexPropertyCellEditor(guiManager, dialogParent));
+    undoableEditor = new UndoableCellEditor(
+        cellEditorFactory.createComplexPropertyCellEditor(dialogParent));
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(AbstractComplexProperty.class, undoableEditor);
 
     // Integer property:
-    IntegerPropertyCellEditor integerPropertyCellEditor = 
-        new IntegerPropertyCellEditor(new JFormattedTextField(), umh);
+    IntegerPropertyCellEditor integerPropertyCellEditor
+        = new IntegerPropertyCellEditor(new JFormattedTextField(), umh);
     undoableEditor = new UndoableCellEditor(integerPropertyCellEditor);
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);
@@ -299,7 +348,7 @@ public class PropertiesTableContent
 
   @Override	// AbstractTableContent
   protected TableModel createTableModel(Map<String, Property> content) {
-    AttributesTableModel model = new AttributesTableModel(guiManager);
+    AttributesTableModel model = tableModelProvider.get();
     ResourceBundleUtil r = ResourceBundleUtil.getBundle();
     String attributeColumn = r.getString("PropertiesTableContent.column.attribute");
     String valueColumn = r.getString("PropertiesTableContent.column.value");

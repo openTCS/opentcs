@@ -1,23 +1,26 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.TreeViewManager;
-import org.opentcs.guing.components.tree.elements.UserObject;
 
 /**
  * Standardimplementierung für eine Blatt-Komponente des Systemmodells.
@@ -32,13 +35,9 @@ public abstract class AbstractModelComponent
     implements ModelComponent {
 
   /**
-   * Das UserObject, das im Tree dargestellt wird;
-   */
-  protected UserObject fUserObject;
-  /**
    * Der Name der Komponente, wie er im TreeView erscheint.
    */
-  private String fTreeViewName;
+  private final String fTreeViewName;
   /**
    * Ob die Komponente im TreeView angezeigt werden soll.
    */
@@ -50,7 +49,8 @@ public abstract class AbstractModelComponent
   /**
    * Die Objekte, die an Änderungen der Attribute interessiert sind.
    */
-  private transient List<AttributesChangeListener> fAttributesChangeListeners;
+  private transient List<AttributesChangeListener> fAttributesChangeListeners
+      = new CopyOnWriteArrayList<>();
   /**
    * The actual parent of this component. PropertiesCollection e.g.
    * overwrites it.
@@ -59,7 +59,7 @@ public abstract class AbstractModelComponent
   /**
    * The component's attributes.
    */
-  private Map<String, Property> fProperties;
+  private Map<String, Property> fProperties = new LinkedHashMap<>();
 
   /**
    * Creates a new instance.
@@ -74,17 +74,7 @@ public abstract class AbstractModelComponent
    * @param treeViewName The name.
    */
   public AbstractModelComponent(String treeViewName) {
-    fTreeViewName = Objects.requireNonNull(treeViewName, "treeViewName is null");
-    fProperties = new LinkedHashMap<>();
-    fAttributesChangeListeners = new CopyOnWriteArrayList<>();
-  }
-
-  @Override
-  public abstract UserObject createUserObject();
-
-  @Override
-  public UserObject getUserObject() {
-    return fUserObject;
+    fTreeViewName = requireNonNull(treeViewName, "treeViewName is null");
   }
 
   @Override
@@ -151,13 +141,13 @@ public abstract class AbstractModelComponent
   @Override
   public String getName() {
     StringProperty property = (StringProperty) getProperty(NAME);
+    return property == null ? "" : property.getText();
+  }
 
-    if (property != null) {
-      return property.getText();
-    }
-    else {
-      return new String();
-    }
+  @Override
+  public void setName(String name) {
+    StringProperty property = (StringProperty) getProperty(NAME);
+    property.setText(name);
   }
 
   @Override
@@ -221,24 +211,15 @@ public abstract class AbstractModelComponent
     // "Shallow" copy of the Map
     clonedModelComponent.fProperties = new LinkedHashMap<>();
     // "Deep" copy: clone all properties
-    Map<String, Property> map = getProperties();
-    Set<Map.Entry<String, Property>> entrySet = map.entrySet();
-    Iterator<Map.Entry<String, Property>> iMap = entrySet.iterator();
-    Map.Entry<String, Property> entry;
-    String propertyName;
-    Property clonedProperty;
-
-    while (iMap.hasNext()) {
-      entry = iMap.next();
-      propertyName = entry.getKey();
-      clonedProperty = (Property) entry.getValue().clone();
-      // Don't clone the name - the kernel will create a unique new name
-      if (propertyName.equals(NAME)) {
+    for (Map.Entry<String, Property> entry : getProperties().entrySet()) {
+      Property clonedProperty = (Property) entry.getValue().clone();
+      // XXX Don't clone the name but create a new, unique one here!
+      if (entry.getKey().equals(NAME)) {
         ((StringProperty) clonedProperty).setText("");
       }
 
       clonedProperty.setModel(clonedModelComponent);
-      clonedModelComponent.setProperty(propertyName, clonedProperty);
+      clonedModelComponent.setProperty(entry.getKey(), clonedProperty);
     }
 
     return clonedModelComponent;

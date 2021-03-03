@@ -9,6 +9,8 @@
 package org.opentcs.guing.exchange;
 
 import com.google.inject.AbstractModule;
+import javax.inject.Singleton;
+import org.opentcs.access.SharedKernelProvider;
 
 /**
  * A Guice configuration module for this package.
@@ -21,9 +23,19 @@ public class ExchangeInjectionModule
   @Override
   protected void configure() {
 
-    // XXX This should actually bind properly with in(Singleton.class), not with
-    // toInstance(). Should be changed once getInstance() could be removed from
-    // the rest of the code.
-    bind(KernelProxyManager.class).toInstance(DefaultKernelProxyManager.instance());
+    bind(KernelProxyManager.class)
+        .to(DefaultKernelProxyManager.class)
+        .in(Singleton.class);
+
+    bind(SharedKernelProvider.class)
+        .to(ApplicationKernelProvider.class)
+        .in(Singleton.class);
+
+    bind(Object.class)
+        .annotatedWith(ApplicationKernelClient.class)
+        .to(Object.class)
+        .in(Singleton.class);
+
+    bind(EventDispatcher.class).to(OpenTCSEventDispatcher.class);
   }
 }

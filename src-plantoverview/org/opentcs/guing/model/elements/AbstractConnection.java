@@ -1,13 +1,18 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
@@ -18,16 +23,27 @@ import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierungen für Verbindungen:
- * 1. zwischen zwei Meldepunkten (-> PathModel)
- * 2. zwischen Punkt und Station (-> LinkModel)
+ * Abstract implementation for connections:
+ * <ol>
+ * <li>between two points {@see PathModel}</li>
+ * <li>between a point and a location {@link LinkModel}</li>
+ * </ol>
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractConnection
     extends AbstractFigureComponent
     implements AttributesChangeListener {
-
+  
+  /**
+   * Key for the start component.
+   */
+  public static final String START_COMPONENT = "startComponent";
+  /**
+   * Key for the end component.
+   */
+  public static final String END_COMPONENT = "endComponent";
   /**
    * The start component (Location or Point).
    */
@@ -37,8 +53,7 @@ public abstract class AbstractConnection
    */
   private transient ModelComponent fEndComponent;
   /**
-   * Objekte, die an Änderungen hinsichtlich der verbundenen Komponenten
-   * interessiert sind.
+   * Listeners that are interested in changes of the connected objects.
    */
   private transient List<ConnectionChangeListener> fConnectionChangeListeners
       = new LinkedList<>();
@@ -47,39 +62,35 @@ public abstract class AbstractConnection
    * Creates a new instance.
    */
   public AbstractConnection() {
-    this(null);
+    // Do nada.
   }
 
   /**
-   * Creates a new instance using the given Figure.
+   * Returns this connection's start component.
    *
-   * @param figure The Figure to be used.
-   */
-  public AbstractConnection(Figure figure) {
-    super(figure);
-  }
-
-  /**
-   * @return The start component (Location or Point)
+   * @return The start component.
    */
   public ModelComponent getStartComponent() {
     return fStartComponent;
   }
 
   /**
-   * @return The end component (Location or Point)
+   * Returns this connection's end component.
+   *
+   * @return The end component.
    */
   public ModelComponent getEndComponent() {
     return fEndComponent;
   }
 
   /**
-   * Setzt den Start- und Endknoten.
+   * Sets this connection's start and end component.
    *
-   * @param startComponent die Startkomponente
-   * @param endComponent die Endkomponente
+   * @param startComponent The start component.
+   * @param endComponent The end component.
    */
-  public void setConnectedComponents(ModelComponent startComponent, ModelComponent endComponent) {
+  public void setConnectedComponents(ModelComponent startComponent,
+                                     ModelComponent endComponent) {
     updateListenerRegistrations(startComponent, endComponent);
     updateComponents(startComponent, endComponent);
 
@@ -88,13 +99,17 @@ public abstract class AbstractConnection
         || !Objects.equals(fEndComponent, endComponent)) {
       fStartComponent = startComponent;
       fEndComponent = endComponent;
+      StringProperty stringProperty = (StringProperty) getProperty(START_COMPONENT);
+      stringProperty.setText(startComponent.getName());
+      stringProperty = (StringProperty) getProperty(END_COMPONENT);
+      stringProperty.setText(endComponent.getName());
       updateName();
       connectionChanged();
     }
   }
 
   /**
-   * Nachricht des Figures, dass die Verbindung gelöscht wurde.
+   * Notifies this connection that it is being removed.
    */
   public void removingConnection() {
     if (fStartComponent != null) {
@@ -115,9 +130,9 @@ public abstract class AbstractConnection
   }
 
   /**
-   * Fügt einen Listener hinzu.
+   * Adds a listener.
    *
-   * @param listener
+   * @param listener The new listener.
    */
   public void addConnectionChangeListener(ConnectionChangeListener listener) {
     if (fConnectionChangeListeners == null) {
@@ -130,26 +145,12 @@ public abstract class AbstractConnection
   }
 
   /**
-   * Entfernt einen Listener.
+   * Removes a listener.
    *
-   * @param listener
+   * @param listener The listener to remove.
    */
   public void removeConnectionChangeListener(ConnectionChangeListener listener) {
     fConnectionChangeListeners.remove(listener);
-  }
-
-  /**
-   * Benachrichtigt alle registrierten Listener, dass Start- und oder
-   * Endkomponente gewechselt haben.
-   */
-  public void connectionChanged() {
-    if (fConnectionChangeListeners == null) {
-      return;
-    }
-
-    for (ConnectionChangeListener listener : fConnectionChangeListeners) {
-      listener.connectionChanged(new ConnectionChangeEvent(this));
-    }
   }
 
   @Override // AttributesChangeListener
@@ -161,11 +162,6 @@ public abstract class AbstractConnection
   }
 
   @Override
-  public int compareTo(AbstractFigureComponent other) {
-    return getName().compareTo(other.getName());
-  }
-
-  @Override
   public AbstractConnection clone() throws CloneNotSupportedException {
     AbstractConnection clone = (AbstractConnection) super.clone();
     clone.fConnectionChangeListeners = new LinkedList<>();
@@ -174,13 +170,14 @@ public abstract class AbstractConnection
   }
 
   /**
-   * Fügt diese Strecke den verbundenen Knoten mit oder entfernt sie von diesen.
+   * Removes the current start and end components and establishes this connection
+   * between the given components.
    *
-   * @param startComponent die Startkomponente
-   * @param endComponent die Endkomponente
+   * @param startComponent The new start component.
+   * @param endComponent The new end component.
    */
-  protected void updateComponents(ModelComponent startComponent,
-                              ModelComponent endComponent) {
+  private void updateComponents(ModelComponent startComponent,
+                                ModelComponent endComponent) {
     if (fStartComponent instanceof AbstractFigureComponent) {
       ((AbstractFigureComponent) fStartComponent).removeConnection(this);
     }
@@ -199,12 +196,25 @@ public abstract class AbstractConnection
   }
 
   /**
-   * Führt die Registrierungen und Deregistrierungen als Listener bei den
-   * angeschlossenen Komponenten durch. Ist wichtig, da der Name der Verbindung
-   * aus den Namen der angeschlossenen Komponenten zusammengesetzt sein soll.
+   * Informs all listener that the start and/or end component have changed.
+   */
+  private void connectionChanged() {
+    if (fConnectionChangeListeners == null) {
+      return;
+    }
+
+    for (ConnectionChangeListener listener : fConnectionChangeListeners) {
+      listener.connectionChanged(new ConnectionChangeEvent(this));
+    }
+  }
+
+  /**
+   * Deregistrates and reregistrates itself as a listener on the
+   * connected components. This is important as the name of the connection
+   * is dependant on the connected components.
    *
-   * @param startComponent
-   * @param endComponent
+   * @param startComponent The new start component to register with.
+   * @param endComponent The new end component to register with.
    */
   private void updateListenerRegistrations(ModelComponent startComponent,
                                            ModelComponent endComponent) {
@@ -221,8 +231,7 @@ public abstract class AbstractConnection
   }
 
   /**
-   * Aktualisiert den Namen der Verbindung, der sich aus den Namen der
-   * verbundenen Komponenten zusammensetzt.
+   * Refreshes the name of this connection.
    */
   private void updateName() {
     StringProperty property = (StringProperty) getProperty(NAME);

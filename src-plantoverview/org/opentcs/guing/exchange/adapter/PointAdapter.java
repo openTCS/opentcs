@@ -1,19 +1,28 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange.adapter;
 
+import com.google.common.collect.Iterables;
+import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.ObjectExistsException;
-import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
@@ -24,12 +33,12 @@ import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
@@ -38,9 +47,10 @@ import org.opentcs.guing.model.elements.PointModel;
  * An adapter for points.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class PointAdapter
-    extends OpenTCSProcessAdapter {
+    extends AbstractProcessAdapter {
 
   /**
    * This class's logger.
@@ -49,16 +59,15 @@ public class PointAdapter
       = Logger.getLogger(PointAdapter.class.getName());
 
   /**
-   * Creates a new instance of PointAdapter.
+   * Creates a new instance.
+   *
+   * @param model The corresponding model component.
+   * @param eventDispatcher The event dispatcher.
    */
-  public PointAdapter() {
-    super();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public TCSObjectReference<Point> getProcessObject() {
-    return (TCSObjectReference<Point>) super.getProcessObject();
+  @Inject
+  public PointAdapter(@Assisted PointModel model,
+                      @Assisted EventDispatcher eventDispatcher) {
+    super(model, eventDispatcher);
   }
 
   @Override
@@ -66,104 +75,95 @@ public class PointAdapter
     return (PointModel) super.getModel();
   }
 
-  @Override
-  public void setModel(ModelComponent model) {
-    if (!PointModel.class.isInstance(model)) {
-      throw new IllegalArgumentException(model + " is not a PointModel");
-    }
-    super.setModel(model);
-  }
-
-  @Override	// AbstractProcessAdapter
-  public Object createProcessObject() throws KernelRuntimeException {
-    if (!hasModelingState()) {
-      return null;
-    }
-    Point point = kernel().createPoint();
-    setProcessObject(point.getReference());
-    // Only adopt the name
-    nameToModel(point);
-    register();
-
-    return point;
-  }
-
-  @Override	// AbstractProcessAdapter
-  public void releaseProcessObject() {
+  @Override	// OpenTCSProcessAdapter
+  public void updateModelProperties(Kernel kernel,
+                                    TCSObject<?> tcsObject,
+                                    @Nullable ModelLayoutElement layoutElement) {
+    Point point = requireNonNull((Point) tcsObject, "tcsObject");
     try {
-      releaseLayoutElement();
-      kernel().removeTCSObject(getProcessObject());
-      super.releaseProcessObject(); // also delete the Adapter
+      // Name
+      StringProperty pName
+          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+      pName.setText(point.getName());
+
+      // Position in model
+      CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(
+          AbstractFigureComponent.MODEL_X_POSITION);
+      cpx.setValueAndUnit(point.getPosition().getX(), LengthProperty.Unit.MM);
+
+      CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(
+          AbstractFigureComponent.MODEL_Y_POSITION);
+      cpy.setValueAndUnit(point.getPosition().getY(), LengthProperty.Unit.MM);
+
+      AngleProperty pAngle = (AngleProperty) getModel().getProperty(
+          PointModel.VEHICLE_ORIENTATION_ANGLE);
+      pAngle.setValueAndUnit(point.getVehicleOrientationAngle(),
+                             AngleProperty.Unit.DEG);
+
+      updateModelType(point);
+      if (layoutElement != null) {
+        updateModelLayoutProperties(layoutElement);
+      }
+      updateMiscModelProperties(point);
+    }
+    catch (CredentialsException e) {
+      log.log(Level.WARNING, null, e);
+    }
+  }
+
+  @Override	// OpenTCSProcessAdapter
+  public void updateProcessProperties(Kernel kernel) {
+    Point point = kernel.createPoint();
+    TCSObjectReference<Point> reference = point.getReference();
+
+    StringProperty pName
+        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    String name = pName.getText();
+
+    try {
+      // Name
+      kernel.renameTCSObject(reference, name);
+      updateProcessPosition(kernel, reference);
+
+      // Write new position into the layout element
+      Set<VisualLayout> layouts = kernel.getTCSObjects(VisualLayout.class);
+
+      for (VisualLayout layout : layouts) {
+        updateLayoutElement(kernel, layout, reference);
+      }
+      updateProcessAngle(kernel, reference);
+      updateProcessType(kernel, reference);
+      updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
       log.log(Level.WARNING, null, e);
     }
   }
 
-  @Override	// OpenTCSProcessAdapter
-  public void propertiesChanged(AttributesChangeEvent event) {
-    if (hasModelingState() && event.getInitiator() != this) {
-      updateProcessProperties(false);
-    }
-  }
+  private void updateModelLayoutProperties(ModelLayoutElement layoutElement) {
+    Map<String, String> properties = layoutElement.getProperties();
 
-  @Override	// OpenTCSProcessAdapter
-  public void updateModelProperties() {
-    TCSObjectReference<Point> reference = getProcessObject();
+    StringProperty sp = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_POS_X);
+    sp.setText(properties.get(ElementPropKeys.POINT_POS_X));
 
-    synchronized (reference) {
-      try {
-        Point point = kernel().getTCSObject(Point.class, reference);
+    sp = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_Y);
+    sp.setText(properties.get(ElementPropKeys.POINT_POS_Y));
 
-        if (point == null) {
-          return;
-        }
-        // Name
-        StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-        pName.setText(point.getName());
+    sp = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_LABEL_OFFSET_X);
+    sp.setText(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X));
 
-        // Position in model
-        CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(AbstractFigureComponent.MODEL_X_POSITION);
-        cpx.setValueAndUnit(point.getPosition().getX(), LengthProperty.Unit.MM);
+    sp = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_LABEL_OFFSET_Y);
+    sp.setText(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y));
 
-        CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(AbstractFigureComponent.MODEL_Y_POSITION);
-        cpy.setValueAndUnit(point.getPosition().getY(), LengthProperty.Unit.MM);
-
-        AngleProperty pAngle = (AngleProperty) getModel().getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
-        pAngle.setValueAndUnit(point.getVehicleOrientationAngle(), AngleProperty.Unit.DEG);
-
-        updateModelType(point);
-        updateModelLayoutProperties();
-        updateMiscModelProperties(point);
-      }
-      catch (CredentialsException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
-  private void updateModelLayoutProperties() {
-    if (fLayoutElement != null) {
-      Map<String, String> properties = fLayoutElement.getProperties();
-      StringProperty sp = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_X);
-      sp.setText(properties.get(ElementPropKeys.POINT_POS_X));
-
-      sp = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_Y);
-      sp.setText(properties.get(ElementPropKeys.POINT_POS_Y));
-
-      sp = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
-      sp.setText(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X));
-
-      sp = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
-      sp.setText(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y));
-
-      sp = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
-      sp.setText(properties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE));
-    }
+    sp = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+    sp.setText(properties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE));
   }
 
   private void updateModelType(Point point) {
-    SelectionProperty pType = (SelectionProperty) getModel().getProperty(PointModel.TYPE);
     PointModel.PointType value;
 
     switch (point.getType()) {
@@ -182,83 +182,43 @@ public class PointAdapter
         value = PointModel.PointType.HALT;
     }
 
-    pType.setValue(value);
+    ((SelectionProperty) getModel().getProperty(PointModel.TYPE))
+        .setValue(value);
   }
 
-  @Override	// OpenTCSProcessAdapter
-  public void updateProcessProperties(boolean updateAllProperties) {
-    super.updateProcessProperties(updateAllProperties);
-    TCSObjectReference<Point> reference = getProcessObject();
-
-    if (isInTransition()) {
-      return;
-    }
-
-    synchronized (reference) {
-      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      String name = pName.getText();
-
-      try {
-        // Name
-        if (updateAllProperties || pName.hasChanged()) {
-          kernel().renameTCSObject(reference, name);
-        }
-        updateProcessPosition(updateAllProperties, reference);
-
-        // Write new position into the layout element
-        Set<VisualLayout> layouts = kernel().getTCSObjects(VisualLayout.class);
-
-        for (VisualLayout layout : layouts) {
-          updateLayoutElement(layout, updateAllProperties);
-        }
-        updateProcessAngle(updateAllProperties, reference);
-        updateProcessType(updateAllProperties, reference);
-        updateMiscProcessProperties(updateAllProperties);
-      }
-      catch (ObjectExistsException e) {
-        undo(name, e);
-      }
-      catch (ObjectUnknownException | CredentialsException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
-  private void updateProcessType(boolean updateAllProperties,
+  private void updateProcessType(Kernel kernel,
                                  TCSObjectReference<Point> reference)
-      throws CredentialsException, ObjectUnknownException {
-    SelectionProperty pType = (SelectionProperty) getModel().getProperty(PointModel.TYPE);
+      throws KernelRuntimeException {
+    SelectionProperty pType
+        = (SelectionProperty) getModel().getProperty(PointModel.TYPE);
 
-    if (updateAllProperties || pType.hasChanged()) {
-      PointModel.PointType type = (PointModel.PointType) pType.getValue();
-      kernel().setPointType(reference, convertPointType(type));
-      pType.unmarkChanged();
-    }
+    PointModel.PointType type = (PointModel.PointType) pType.getValue();
+    kernel.setPointType(reference, convertPointType(type));
+    pType.unmarkChanged();
   }
 
-  private void updateProcessAngle(boolean updateAllProperties,
+  private void updateProcessAngle(Kernel kernel,
                                   TCSObjectReference<Point> reference)
-      throws ObjectUnknownException, CredentialsException {
-    AngleProperty pAngle = (AngleProperty) getModel().getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
+      throws KernelRuntimeException {
+    AngleProperty pAngle = (AngleProperty) getModel().getProperty(
+        PointModel.VEHICLE_ORIENTATION_ANGLE);
 
-    if (updateAllProperties || pAngle.hasChanged()) {
-      double angle = pAngle.getValueByUnit(AngleProperty.Unit.DEG);
-      kernel().setPointVehicleOrientationAngle(reference, angle);
-      pAngle.unmarkChanged();
-    }
+    double angle = pAngle.getValueByUnit(AngleProperty.Unit.DEG);
+    kernel.setPointVehicleOrientationAngle(reference, angle);
+    pAngle.unmarkChanged();
   }
 
-  private void updateProcessPosition(boolean updateAllProperties,
+  private void updateProcessPosition(Kernel kernel,
                                      TCSObjectReference<Point> reference)
-      throws ObjectUnknownException, CredentialsException {
-    CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(PointModel.MODEL_X_POSITION);
-    CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(PointModel.MODEL_Y_POSITION);
+      throws KernelRuntimeException {
+    CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(
+        PointModel.MODEL_X_POSITION);
+    CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(
+        PointModel.MODEL_Y_POSITION);
 
-    if (updateAllProperties || cpx.hasChanged() || cpy.hasChanged()) {
-      kernel().setPointPosition(reference, convertToTriple(cpx, cpy));
-      cpx.unmarkChanged();
-      cpy.unmarkChanged();
-    }
+    kernel.setPointPosition(reference, convertToTriple(cpx, cpy));
+    cpx.unmarkChanged();
+    cpy.unmarkChanged();
   }
 
   private Point.Type convertPointType(PointModel.PointType type) {
@@ -289,56 +249,53 @@ public class PointAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(VisualLayout layout, boolean updateAllProperties) {
-    StringProperty spx = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_X);
-    StringProperty spy = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_Y);
-    StringProperty splox = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
-    StringProperty sploy = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
-    StringProperty sploa = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+  private void updateLayoutElement(Kernel kernel,
+                                   VisualLayout layout,
+                                   TCSObjectReference<?> ref) {
+    StringProperty spx
+        = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_X);
+    StringProperty spy
+        = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_Y);
+    StringProperty splox = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_LABEL_OFFSET_X);
+    StringProperty sploy = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_LABEL_OFFSET_Y);
+    StringProperty sploa = (StringProperty) getModel().getProperty(
+        ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
-    if (updateAllProperties || spx.hasChanged() || spy.hasChanged() || splox.hasChanged() || sploy.hasChanged() || sploa.hasChanged()) {
-      LabeledPointFigure lpf = getModel().getFigure();
-      PointFigure pf = (PointFigure) lpf.getPresentationFigure();
-      double scaleX = layout.getScaleX();
-      double scaleY = layout.getScaleY();
-      int xPos = (int) (pf.getZoomPoint().getX() * scaleX);
-      int yPos = (int) -(pf.getZoomPoint().getY() * scaleY);
-      TCSLabelFigure label = lpf.getLabel();
-      Point2D.Double offset = label.getOffset();
+    LabeledPointFigure lpf = getModel().getFigure();
+    PointFigure pf = lpf.getPresentationFigure();
+    double scaleX = layout.getScaleX();
+    double scaleY = layout.getScaleY();
+    int xPos = (int) (pf.getZoomPoint().getX() * scaleX);
+    int yPos = (int) -(pf.getZoomPoint().getY() * scaleY);
+    TCSLabelFigure label = lpf.getLabel();
+    Point2D.Double offset = label.getOffset();
 
-      if (fLayoutElement == null) {
-        fLayoutElement = new ModelLayoutElement(getProcessObject());
-      }
+    ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
 
-      Map<String, String> layoutProperties = fLayoutElement.getProperties();
-      layoutProperties.put(ElementPropKeys.POINT_POS_X, xPos + "");
-      layoutProperties.put(ElementPropKeys.POINT_POS_Y, yPos + "");
-      layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_X, (int) offset.x + "");
-      layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_Y, (int) offset.y + "");
-      // TODO:
+    Map<String, String> layoutProperties = layoutElement.getProperties();
+
+    layoutProperties.put(ElementPropKeys.POINT_POS_X, xPos + "");
+    layoutProperties.put(ElementPropKeys.POINT_POS_Y, yPos + "");
+    layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_X,
+                         (int) offset.x + "");
+    layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_Y,
+                         (int) offset.y + "");
+    // TODO:
 //		layoutProperties.put(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, ...);
-      fLayoutElement.setProperties(layoutProperties);
+    layoutElement.setProperties(layoutProperties);
 
-      Set<LayoutElement> layoutElements = layout.getLayoutElements();
-      Iterator<LayoutElement> iElements = layoutElements.iterator();
+    Set<LayoutElement> layoutElements = layout.getLayoutElements();
+    Iterables.removeIf(layoutElements, layoutElementFor(ref));
+    layoutElements.add(layoutElement);
 
-      while (iElements.hasNext()) {
-        ModelLayoutElement element = (ModelLayoutElement) iElements.next();
-        TCSObjectReference<?> visualizedObject = element.getVisualizedObject();
+    kernel.setVisualLayoutElements(layout.getReference(), layoutElements);
 
-        if (visualizedObject.getId() == fLayoutElement.getVisualizedObject().getId()) {
-          layoutElements.remove(element);
-          break;
-        }
-      }
-
-      layoutElements.add(fLayoutElement);
-      kernel().setVisualLayoutElements(layout.getReference(), layoutElements);
-      spx.unmarkChanged();
-      spy.unmarkChanged();
-      sploa.unmarkChanged();
-      splox.unmarkChanged();
-      sploy.unmarkChanged();
-    }
+    spx.unmarkChanged();
+    spy.unmarkChanged();
+    sploa.unmarkChanged();
+    splox.unmarkChanged();
+    sploy.unmarkChanged();
   }
 }

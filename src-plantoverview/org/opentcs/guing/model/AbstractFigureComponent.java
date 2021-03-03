@@ -1,34 +1,38 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.jhotdraw.draw.Figure;
-import org.opentcs.guing.components.tree.elements.FigureUserObject;
-import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.model.elements.AbstractConnection;
 
 /**
- * Verwaltet eine Referenz auf ein Figure. Ist so eine Art Adapter, da Figure
- * nicht zum ModelComponent-Interface passt. Jedoch erfolgt keine Delegation
- * durch FigureComponent an sein referenziertes Figure, weshalb es sich um keine
- * wirkliche Instanz des Adapter-Musters handelt.
- * <b>Entwurfsmuster:</b> Kompositum. FigureComponent ist eine Blattkomponente.
+ * A model component that may keep an associated figure.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractFigureComponent
     extends AbstractModelComponent
-    implements FigureComponent, Comparable<AbstractFigureComponent> {
+    implements FigureComponent,
+               Comparable<AbstractFigureComponent> {
 
   /**
-   * The cordinates of the associated Point / Location in the Kernel model.
+   * The X cordinate of the corresponding object on the kernel side.
    */
   public static final String MODEL_X_POSITION = "modelXPosition";
+  /**
+   * The X cordinate of the corresponding object on the kernel side.
+   */
   public static final String MODEL_Y_POSITION = "modelYPosition";
-
   /**
    * The referenced Figure.
    */
@@ -36,24 +40,18 @@ public abstract class AbstractFigureComponent
   /**
    * The Links and Paths connected with this Figure (Location or Point).
    */
-  private ArrayList<AbstractConnection> fConnections;
+  private List<AbstractConnection> fConnections = new ArrayList<>();
 
   /**
    * Creates a new instance.
    */
   public AbstractFigureComponent() {
-    super();
-    this.fConnections = new ArrayList<>();
+    // Do nada.
   }
 
-  /**
-   * Creates a new instance.
-   *
-   * @param figure The figure to be referenced.
-   */
-  public AbstractFigureComponent(Figure figure) {
-    this.fConnections = new ArrayList<>();
-    fFigure = figure;
+  @Override // Comparable
+  public int compareTo(AbstractFigureComponent o) {
+    return getName().compareTo(o.getName());
   }
 
   @Override // FigureComponent
@@ -67,45 +65,37 @@ public abstract class AbstractFigureComponent
   }
 
   @Override // FigureComponent
-  public ArrayList<AbstractConnection> getConnections() {
+  public List<AbstractConnection> getConnections() {
     return fConnections;
   }
 
   /**
-   * Prüft, ob bereits eine Verbindung zu einem anderen Knoten besteht.
+   * Checks whether there is a connection to the given component.
    *
-   * @param component der andere Knoten
-   * @return
-   * <code> true </code>, wenn zwischen den beiden Knoten bereits eine
-   * Verbindung besteht, ansonsten
-   * <code> false </code>
+   * @param component The component.
+   * @return <code>true</code> if, and only if, this component is connected to
+   * the given one.
    */
   public boolean hasConnectionTo(FigureComponent component) {
     return getConnectionTo(component) != null;
   }
 
   /**
-   * Liefert die Verbindung zu einem anderen Knoten.
+   * Returns the connection to the given component.
    *
-   * @param component der andere Knoten
-   * @return die gefundene Verbindung oder
-   * <code>null</code>, wenn zwischen den beiden keine Verbindung besteht
+   * @param component The component.
+   * @return The connection to the given component, or <code>null</code>, if
+   * there is none.
    */
   public AbstractConnection getConnectionTo(FigureComponent component) {
     for (AbstractConnection connection : fConnections) {
-      if (connection.getStartComponent() == this && connection.getEndComponent() == component) {
+      if (connection.getStartComponent() == this
+          && connection.getEndComponent() == component) {
         return connection;
       }
     }
 
     return null;
-  }
-
-  @Override // ModelComponent
-  public UserObject createUserObject() {
-    fUserObject = new FigureUserObject(this);
-
-    return fUserObject;
   }
 
   @Override // FigureComponent
@@ -119,7 +109,8 @@ public abstract class AbstractFigureComponent
   }
 
   @Override // AbstractModelComponent
-  public AbstractModelComponent clone() throws CloneNotSupportedException {
+  public AbstractModelComponent clone()
+      throws CloneNotSupportedException {
     AbstractFigureComponent clone = (AbstractFigureComponent) super.clone();
     clone.fConnections = new ArrayList<>();
 

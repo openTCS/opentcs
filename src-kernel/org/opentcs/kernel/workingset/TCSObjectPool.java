@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -41,8 +41,8 @@ public class TCSObjectPool {
   /**
    * This class's Logger.
    */
-  private static final Logger log =
-      Logger.getLogger(TCSObjectPool.class.getName());
+  private static final Logger log
+      = Logger.getLogger(TCSObjectPool.class.getName());
   /**
    * The objects contained in this pool, indexed by their IDs.
    * Note that this has to be an <code>AutoGrowingArrayList</code> because its
@@ -62,8 +62,8 @@ public class TCSObjectPool {
   /**
    * The generator providing unique names for objects in this pool.
    */
-  private final UniqueStringGenerator objectNameGenerator =
-      new UniqueStringGenerator();
+  private final UniqueStringGenerator<?> objectNameGenerator
+      = new UniqueStringGenerator<>();
   /**
    * A listener for events concerning the stored objects.
    */
@@ -75,7 +75,7 @@ public class TCSObjectPool {
   public TCSObjectPool() {
     this(new DummyEventListener<TCSEvent>());
   }
-  
+
   /**
    * Creates a new instance that uses the given event listener.
    *
@@ -83,9 +83,7 @@ public class TCSObjectPool {
    */
   @Inject
   public TCSObjectPool(@CentralEventHub EventListener<TCSEvent> eventListener) {
-    log.finer("method entry");
-    objectEventListener = Objects.requireNonNull(eventListener,
-                                                 "eventListener is null");
+    objectEventListener = requireNonNull(eventListener, "eventListener");
   }
 
   /**
@@ -97,10 +95,8 @@ public class TCSObjectPool {
    */
   public void addObject(TCSObject<?> newObject)
       throws ObjectExistsException {
-    log.finer("method entry");
-    if (newObject == null) {
-      throw new NullPointerException("newObject is null");
-    }
+    requireNonNull(newObject, "newObject");
+
     int newObjectId = newObject.getId();
     if (objectsById.get(newObjectId) != null) {
       throw new ObjectExistsException(
@@ -127,7 +123,8 @@ public class TCSObjectPool {
    * exists in this pool.
    */
   public TCSObject<?> getObject(TCSObjectReference<?> ref) {
-    log.finer("method entry");
+    requireNonNull(ref);
+
     return objectsById.get(ref.getId());
   }
 
@@ -143,8 +140,8 @@ public class TCSObjectPool {
    */
   public <T extends TCSObject<T>> T getObject(Class<T> clazz,
                                               TCSObjectReference<T> ref) {
-    Objects.requireNonNull(clazz, "clazz is null");
-    Objects.requireNonNull(ref, "ref is null");
+    requireNonNull(clazz, "clazz");
+    requireNonNull(ref, "ref");
 
     TCSObject<?> result = objectsById.get(ref.getId());
     if (clazz.isInstance(result)) {
@@ -163,10 +160,8 @@ public class TCSObjectPool {
    * object exists in this pool.
    */
   public TCSObject<?> getObject(String name) {
-    log.finer("method entry");
-    if (name == null) {
-      throw new NullPointerException("name is null");
-    }
+    requireNonNull(name, "name");
+
     return objectsByName.get(name);
   }
 
@@ -182,8 +177,8 @@ public class TCSObjectPool {
    */
   public <T extends TCSObject<T>> T getObject(Class<T> clazz,
                                               String name) {
-    Objects.requireNonNull(clazz, "clazz is null");
-    Objects.requireNonNull(name, "name is null");
+    requireNonNull(clazz, "clazz");
+    requireNonNull(name, "name");
 
     TCSObject<?> result = objectsByName.get(name);
     if (clazz.isInstance(result)) {
@@ -204,7 +199,6 @@ public class TCSObjectPool {
    * If no such objects exist, the returned set is empty.
    */
   public Set<TCSObject<?>> getObjects(Pattern regexp) {
-    log.finer("method entry");
     Set<TCSObject<?>> result = new HashSet<>();
     if (regexp == null) {
       result.addAll(objectsByName.values());
@@ -245,7 +239,8 @@ public class TCSObjectPool {
    */
   public <T extends TCSObject<T>> Set<T> getObjects(Class<T> clazz,
                                                     Pattern regexp) {
-    Objects.requireNonNull(clazz, "clazz is null");
+    requireNonNull(clazz, "clazz");
+
     Set<T> result = new HashSet<>();
     for (TCSObject<?> curObject : objectsByName.values()) {
       if (clazz.isInstance(curObject)
@@ -268,13 +263,9 @@ public class TCSObjectPool {
    */
   public void renameObject(TCSObjectReference<?> ref, String newName)
       throws ObjectUnknownException, ObjectExistsException {
-    log.finer("method entry");
-    if (ref == null) {
-      throw new NullPointerException("ref is null");
-    }
-    if (newName == null) {
-      throw new NullPointerException("newName is null");
-    }
+    requireNonNull(ref, "ref");
+    requireNonNull(newName, "newName");
+
     TCSObject<?> object = objectsById.get(ref.getId());
     if (object == null) {
       throw new ObjectUnknownException("No such object in this pool.");
@@ -310,10 +301,8 @@ public class TCSObjectPool {
    * with the given name.
    */
   public boolean contains(String objectName) {
-    log.finer("method entry");
-    if (objectName == null) {
-      throw new NullPointerException("objectName is null");
-    }
+    requireNonNull(objectName, "objectName");
+
     return objectsByName.containsKey(objectName);
   }
 
@@ -326,10 +315,8 @@ public class TCSObjectPool {
    */
   public TCSObject<?> removeObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
-    if (ref == null) {
-      throw new NullPointerException("ref is null");
-    }
+    requireNonNull(ref, "ref");
+
     TCSObject<?> rmObject = objectsById.get(ref.getId());
     if (rmObject == null) {
       throw new ObjectUnknownException(ref);
@@ -349,10 +336,8 @@ public class TCSObjectPool {
    * an empty set will be returned.
    */
   public Set<TCSObject<?>> removeObjects(Set<String> objectNames) {
-    log.finer("method entry");
-    if (objectNames == null) {
-      throw new NullPointerException("objectNames is null");
-    }
+    requireNonNull(objectNames, "objectNames");
+
     Set<TCSObject<?>> result = new HashSet<>();
     for (String curName : objectNames) {
       TCSObject<?> removedObject = objectsByName.remove(curName);
@@ -379,10 +364,8 @@ public class TCSObjectPool {
                                 String key,
                                 String value)
       throws ObjectUnknownException {
-    log.finer("method entry");
-    if (ref == null) {
-      throw new NullPointerException("ref is null");
-    }
+    requireNonNull(ref, "ref");
+
     final TCSObject<?> object = objectsById.get(ref.getId());
     if (object == null) {
       throw new ObjectUnknownException("No object with ID " + ref.getId());
@@ -403,10 +386,8 @@ public class TCSObjectPool {
    */
   public void clearObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
-    if (ref == null) {
-      throw new NullPointerException("ref is null");
-    }
+    requireNonNull(ref, "ref");
+
     final TCSObject<?> object = objectsById.get(ref.getId());
     if (object == null) {
       throw new ObjectUnknownException("No object with ID " + ref.getId());
@@ -424,7 +405,6 @@ public class TCSObjectPool {
    * @return The number of objects kept in this pool.
    */
   public int size() {
-    log.finer("method entry");
     return objectsByName.size();
   }
 
@@ -435,7 +415,6 @@ public class TCSObjectPool {
    * objects.
    */
   public boolean isEmpty() {
-    log.finer("method entry");
     return objectsByName.isEmpty();
   }
 
@@ -451,7 +430,6 @@ public class TCSObjectPool {
    * @return A name that is unique among all known objects.
    */
   public String getUniqueObjectName(String prefix, String suffixPattern) {
-    log.finer("method entry");
     return objectNameGenerator.getUniqueString(prefix, suffixPattern);
   }
 
@@ -462,7 +440,6 @@ public class TCSObjectPool {
    * @return An object ID that is unique among all known objects in this pool.
    */
   public int getUniqueObjectId() {
-    log.finer("method entry");
     return idBits.nextClearBit(0);
   }
 

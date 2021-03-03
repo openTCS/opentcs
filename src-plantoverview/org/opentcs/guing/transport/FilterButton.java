@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.transport;
 
 import java.awt.event.ActionEvent;
@@ -46,7 +52,7 @@ public class FilterButton
 			}
 		});
 		
-		setSelected(false);
+		setSelected(true);
 	}
 
 	/**
@@ -54,10 +60,10 @@ public class FilterButton
 	 */
 	private void changed() {
 		if (isSelected()) {
-			fTableModel.addFilter(fFilter);
+			fTableModel.removeFilter(fFilter);
 		}
 		else {
-			fTableModel.removeFilter(fFilter);
+			fTableModel.addFilter(fFilter);
 		}
 	}
 }

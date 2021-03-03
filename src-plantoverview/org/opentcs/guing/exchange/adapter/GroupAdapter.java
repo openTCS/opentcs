@@ -1,49 +1,65 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange.adapter;
 
+import com.google.inject.assistedinject.Assisted;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.GroupModel;
+import org.opentcs.guing.model.elements.LocationModel;
+import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.model.elements.PointModel;
 
 /**
  * An adapter for Groups.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class GroupAdapter
-    extends OpenTCSProcessAdapter {
+    extends AbstractProcessAdapter {
 
   /**
    * This class's logger.
    */
-  private static final Logger log = Logger.getLogger(GroupAdapter.class.getName());
+  private static final Logger log
+      = Logger.getLogger(GroupAdapter.class.getName());
 
   /**
    * Creates a new instance.
+   *
+   * @param model The corresponding model component.
+   * @param eventDispatcher The event dispatcher.
    */
-  public GroupAdapter() {
-    super();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public TCSObjectReference<Group> getProcessObject() {
-    return (TCSObjectReference<Group>) super.getProcessObject();
+  @Inject
+  public GroupAdapter(@Assisted GroupModel model,
+                      @Assisted EventDispatcher eventDispatcher) {
+    super(model, eventDispatcher);
   }
 
   @Override
@@ -51,118 +67,79 @@ public class GroupAdapter
     return (GroupModel) super.getModel();
   }
 
-  @Override
-  public void setModel(ModelComponent model) {
-    if (!GroupModel.class.isInstance(model)) {
-      throw new IllegalArgumentException(model + " is not a GroupModel");
-    }
-    super.setModel(model);
-  }
+  @Override	// OpenTCSProcessAdapter
+  public void updateModelProperties(Kernel kernel,
+                                    TCSObject<?> tcsObject,
+                                    @Nullable ModelLayoutElement layoutElement) {
+    Group group = requireNonNull((Group) tcsObject, "tcsObject");
 
-  @Override	// AbstractProcessAdapter
-  public Group createProcessObject() throws KernelRuntimeException {
-    Group group = kernel().createGroup();
-    setProcessObject(group.getReference());
-    nameToModel(group);
-    register();
-
-    return group;
-  }
-
-  @Override	// AbstractProcessAdapter
-  public void releaseProcessObject() {
     try {
-      kernel().removeTCSObject(getProcessObject());
-      super.releaseProcessObject(); // also delete the Adapter
+      StringProperty name
+          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+      name.setText(group.getName());
+
+      updateMiscModelProperties(group);
+    }
+    catch (CredentialsException e) {
+      log.log(Level.WARNING, null, e);
+    }
+  }
+
+  @Override	// OpenTCSProcessAdapter
+  public void updateProcessProperties(Kernel kernel) {
+    Group group = kernel.createGroup();
+    TCSObjectReference<Group> reference = group.getReference();
+
+    StringProperty pName
+        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    String name = pName.getText();
+
+    try {
+      // Neuer Name
+      kernel.renameTCSObject(reference, name);
+
+      updateProcessGroup(kernel, group);
+
+      updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
       log.log(Level.WARNING, null, e);
     }
   }
 
-  @Override	// OpenTCSProcessAdapter
-  public void propertiesChanged(AttributesChangeEvent event) {
-    if (event.getInitiator() != this) {
-      updateProcessProperties(false);
-    }
-  }
-
-  @Override	// OpenTCSProcessAdapter
-  public void updateModelProperties() {
-    TCSObjectReference<Group> reference = getProcessObject();
-
-    synchronized (reference) {
-      try {
-        Group group = kernel().getTCSObject(Group.class, reference);
-        if (group == null) {
-          return;
-        }
-
-        StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-        name.setText(group.getName());
-
-        updateMiscModelProperties(group);
-      }
-      catch (CredentialsException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
-  @Override	// OpenTCSProcessAdapter
-  public void updateProcessProperties(boolean updateAllProperties) {
-    super.updateProcessProperties(updateAllProperties);
-    TCSObjectReference<Group> reference = getProcessObject();
-
-    if (isInTransition()) {
-      return;
-    }
-
-    synchronized (reference) {
-      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      String name = pName.getText();
-
-      try {
-        // Neuer Name
-        if (updateAllProperties || pName.hasChanged()) {
-          kernel().renameTCSObject(reference, name);
-        }
-
-        Group group = kernel().getTCSObject(Group.class, reference);
-        updateProcessGroup(group, reference);
-
-        updateMiscProcessProperties(updateAllProperties);
-      }
-      catch (ObjectExistsException e) {
-        undo(name, e);
-      }
-      catch (CredentialsException | ObjectUnknownException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
-  private void updateProcessGroup(Group group,
-                                  TCSObjectReference<Group> reference)
+  private void updateProcessGroup(Kernel kernel, Group group)
       throws ObjectUnknownException, CredentialsException {
-    if (group == null) {
-      return;
-    }
     for (TCSObjectReference<?> resRef : group.getMembers()) {
-      kernel().removeGroupMember(reference, resRef);
+      kernel.removeGroupMember(group.getReference(), resRef);
     }
 
     for (ModelComponent model : getModel().getChildComponents()) {
+      TCSObjectReference<?> memberRef;
+      if (model instanceof PointModel) {
+        memberRef
+            = kernel.getTCSObject(Point.class, model.getName()).getReference();
+      }
+      else if (model instanceof PathModel) {
+        memberRef
+            = kernel.getTCSObject(Path.class, model.getName()).getReference();
+      }
+      else if (model instanceof LocationModel) {
+        memberRef = kernel.getTCSObject(Location.class, model.getName())
+            .getReference();
+      }
+      else {
+        throw new IllegalArgumentException("Unhandled model type "
+            + model.getClass().getName());
+      }
       ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(model);
 
-      if (adapter != null && adapter.getProcessObject() != null) {
-        kernel().addGroupMember(
-            reference, (TCSResourceReference) adapter.getProcessObject());
+      if (adapter != null) {
+        kernel.addGroupMember(group.getReference(), memberRef);
       }
     }
 
-    for (VisualLayout layout : kernel().getTCSObjects(VisualLayout.class)) {
-      updateLayoutElement(layout);
+    for (VisualLayout layout : kernel.getTCSObjects(VisualLayout.class)) {
+      updateLayoutElement(layout, group.getReference());
     }
   }
 
@@ -171,15 +148,13 @@ public class GroupAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(VisualLayout layout) {
-    // Beim ersten Aufruf ein neues Model-Layout-Element erzeugen
-    if (fLayoutElement == null) {
-      fLayoutElement = new ModelLayoutElement(getProcessObject());
-    }
+  private void updateLayoutElement(VisualLayout layout,
+                                   TCSObjectReference<?> ref) {
+    ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
+
     // TODO...
 ////    GroupModel model = (GroupModel) getModel();
 ////    Map<String, String> layoutProperties = fLayoutElement.getProperties();
-
 ////    ColorProperty pColor = (ColorProperty) model.getProperty(ElementPropKeys.BLOCK_COLOR);
 ////    int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;	// mask alpha bits
 ////    layoutProperties.put(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb));

@@ -22,15 +22,24 @@ import org.opentcs.data.order.Route;
 class RouteEvaluatorHops
     extends RouteEvaluator {
 
-  public RouteEvaluatorHops() {
-    super();
+  /**
+   * Creates a new instance.
+   *
+   * @param augmentingEvaluator An additional evaluator augmenting the computed
+   * costs of this one.
+   */
+  public RouteEvaluatorHops(RouteEvaluator augmentingEvaluator) {
+    super(augmentingEvaluator);
   }
 
   @Override
-  long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps) {
+  public long computeCosts(Vehicle vehicle,
+                           Point startPoint,
+                           List<Route.Step> steps) {
     requireNonNull(startPoint, "startPoint");
     requireNonNull(steps, "steps");
 
-    return steps.size();
+    return steps.size()
+        + augmentingEvaluator.computeCosts(vehicle, startPoint, steps);
   }
 }

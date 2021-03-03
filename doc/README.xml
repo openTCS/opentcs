@@ -3,7 +3,7 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <article>
   <articleinfo>
-    <title>openTCS version 2.7.1</title>
+    <title>openTCS version 3.0</title>
   </articleinfo>
 
   <section>
@@ -53,8 +53,8 @@
     <title>System requirements</title>
 
     <para>The openTCS source code is written in Java. To compile it, you need a
-    Java Development Kit (JDK) 1.7 or later. To run the resulting binaries, you
-    need a Java Runtime Environment (JRE) 1.7 or later. All other required
+    Java Development Kit (JDK) 1.8 or later. To run the resulting binaries, you
+    need a Java Runtime Environment (JRE) 1.8 or later. All other required
     libraries are included in the openTCS distribution.</para>
 
     <para>The openTCS build process is automated based on Apache Ant. To build
@@ -189,6 +189,86 @@
 
   <section>
     <title>Changelog</title>
+
+    <section>
+      <title>Version 3.0 (2014-11-25)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>The plant overview client can now be used for offline modelling,
+          i.e. without requiring a permanent connection to the kernel.</para>
+        </listitem>
+
+        <listitem>
+          <para>To further reflect these changes, the plant overview client now
+          maintains its operating mode independently from the kernel's state. If
+          the user sets the mode of the plant overview client to
+          <literal>OPERATING</literal> while the kernel is in modelling mode, an
+          empty model will be displayed and the actual model will be loaded as
+          soon as the connected kernel switches back to operating mode.
+          Furthermore, this allows to modify the driving course model in the
+          plant overview client while the kernel remains in operating mode. See
+          the manual for more information.</para>
+        </listitem>
+
+        <listitem>
+          <para>The management of course model files was moved to the plant
+          overview client. As of this version, the kernel stores only a single
+          driving course model which can be persisted by selecting the
+          corresponding menu item in the graphical user interface of the plant
+          overview client. Changes made to the model in the plant overview
+          client must be explicitly transferred to the kernel. To migrate all of
+          your existing models to this new version, please refer to the
+          manual.</para>
+        </listitem>
+
+        <listitem>
+          <para>Changes made to the <classname>Kernel</classname>
+          API:<itemizedlist>
+              <listitem>
+                <para>Method <code>Set&lt;String&gt; getModelNames()</code> was
+                changed to <code>String getModelName()</code>, as from now on
+                there exists only one model at a time.</para>
+              </listitem>
+
+              <listitem>
+                <para>Method <code>loadModel(String modelName)</code> no longer
+                requires/accepts a parameter.</para>
+              </listitem>
+
+              <listitem>
+                <para>Method <code>saveModel(String modelName, boolean
+                overwrite)</code> no longer accepts the <code>boolean</code>
+                parameter and overwrites the model automatically.</para>
+              </listitem>
+
+              <listitem>
+                <para>Method <code>removeModel(String rmName)</code> no longer
+                requires/accepts a parameter.</para>
+              </listitem>
+
+              <listitem>
+                <para>Methods <code>createLayout(byte[] layoutData)</code> and
+                <code>setLayoutData(TCSObjectReference&lt;Layout&gt; ref, byte[]
+                newData)</code> have been removed along with class
+                <classname>Layout</classname>.</para>
+              </listitem>
+            </itemizedlist></para>
+        </listitem>
+
+        <listitem>
+          <para>Updated library Google Guava to 17.0.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated library JAXB to 2.2.7.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated project to Java 8.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
 
     <section>
       <title>Version 2.7.1 (2014-06-30)</title>

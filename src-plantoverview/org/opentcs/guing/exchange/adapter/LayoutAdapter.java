@@ -1,19 +1,28 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.exchange.adapter;
 
+import com.google.inject.assistedinject.Assisted;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentcs.access.CredentialsException;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectPropConstants;
-import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
@@ -21,38 +30,55 @@ import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
+import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.plugins.themes.StandardLocationTheme;
 import org.opentcs.guing.plugins.themes.StandardVehicleTheme;
-import org.opentcs.guing.util.DefaultLocationThemeManager;
-import org.opentcs.guing.util.DefaultVehicleThemeManager;
+import org.opentcs.guing.util.LocationThemeManager;
+import org.opentcs.guing.util.VehicleThemeManager;
 
 /**
- * EventManager for Visual Layouts.
+ * An adapter for VisualLayout instances.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class LayoutAdapter
-    extends OpenTCSProcessAdapter {
+    extends AbstractProcessAdapter {
 
   /**
    * This class's logger.
    */
   private static final Logger log
       = Logger.getLogger(LayoutAdapter.class.getName());
+  /**
+   * Manages the location themes.
+   */
+  private final LocationThemeManager locationThemeManager;
+  /**
+   * Manages the vehicle themes.
+   */
+  private final VehicleThemeManager vehicleThemeManager;
 
   /**
-   * Creates a new instance of LayoutAdapter.
+   * Creates a new instance.
+   * 
+   * @param model The corresponding model comoponent.
+   * @param eventDispatcher The event dispatcher.
+   * @param locationThemeManager Manages the location themes.
+   * @param vehicleThemeManager Manages the vehicle themes.
    */
-  public LayoutAdapter() {
-    super();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public TCSObjectReference<VisualLayout> getProcessObject() {
-    return (TCSObjectReference<VisualLayout>) super.getProcessObject();
+  @Inject
+  public LayoutAdapter(@Assisted LayoutModel model,
+                       @Assisted EventDispatcher eventDispatcher,
+                       LocationThemeManager locationThemeManager,
+                       VehicleThemeManager vehicleThemeManager) {
+    super(model, eventDispatcher);
+    this.locationThemeManager = requireNonNull(locationThemeManager,
+                                               "locationThemeManager");
+    this.vehicleThemeManager = requireNonNull(vehicleThemeManager,
+                                              "vehicleThemeManager");
   }
 
   @Override
@@ -60,80 +86,51 @@ public class LayoutAdapter
     return (LayoutModel) super.getModel();
   }
 
-  @Override
-  public void setModel(ModelComponent model) {
-    if (!LayoutModel.class.isInstance(model)) {
-      throw new IllegalArgumentException(model + " is not a LayoutModel");
-    }
-    super.setModel(model);
-  }
+  @Override // OpenTCSProcessAdapter
+  public void updateModelProperties(Kernel kernel,
+                                    TCSObject<?> tcsObject,
+                                    @Nullable ModelLayoutElement layoutElement) {
+    VisualLayout layout = requireNonNull((VisualLayout) tcsObject, "tcsObject");
 
-  @Override // AbstractProcessAdapter
-  public void releaseProcessObject() {
     try {
-      kernel().removeTCSObject(getProcessObject());
-      super.releaseProcessObject(); // also delete the Adapter
+      StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+      name.setText(layout.getName());
+      name.markChanged();
+      updateModelLengthProperty(layout);
+      updateModelThemes(layout);
+
+      updateMiscModelProperties(layout);
     }
-    catch (KernelRuntimeException e) {
+    catch (Exception e) {
       log.log(Level.WARNING, null, e);
     }
   }
 
-  @Override // AbstractProcessAdapter
-  public VisualLayout createProcessObject() throws KernelRuntimeException {
-    if (!hasModelingState()) {
-      return null;
-    }
-
-    VisualLayout visualLayout = kernel().createVisualLayout();
-    setProcessObject(visualLayout.getReference());
+  @Override // OpenTCSProcessAdapter
+  public void updateProcessProperties(Kernel kernel) {
+    VisualLayout layout = kernel.createVisualLayout();
+    TCSObjectReference<VisualLayout> reference = layout.getReference();
 
     StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    pName.setText(visualLayout.getName());
-    pName.markChanged();
+    String name = pName.getText();
 
-    LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
-    pScale.setValueAndUnit(visualLayout.getScaleX(), LengthProperty.Unit.MM);
+    try {
+      kernel.renameTCSObject(reference, name);
+      LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
+      double scale = pScale.getValueByUnit(LengthProperty.Unit.MM);
 
-    pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
-    pScale.setValueAndUnit(visualLayout.getScaleY(), LengthProperty.Unit.MM);
+      kernel.setVisualLayoutScaleX(reference, scale);
 
-    getModel().propertiesChanged(this);
+      pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
+      scale = pScale.getValueByUnit(LengthProperty.Unit.MM);
 
-    register();
+      kernel.setVisualLayoutScaleY(reference, scale);
+      updateProcessThemes();
 
-    return visualLayout;
-  }
-
-  @Override // OpenTCSProcessAdapter
-  public void propertiesChanged(AttributesChangeEvent event) {
-    if (hasModelingState() && event.getInitiator() != this) {
-      updateProcessProperties(false);
+      updateMiscProcessProperties(kernel, reference);
     }
-  }
-
-  @Override // OpenTCSProcessAdapter
-  public void updateModelProperties() {
-    TCSObjectReference<VisualLayout> reference = getProcessObject();
-
-    if (reference != null) {
-      // Nur im Modelling Mode!
-      synchronized (reference) {
-        try {
-          VisualLayout layout = kernel().getTCSObject(VisualLayout.class, reference);
-
-          StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-          name.setText(layout.getName());
-          name.markChanged();
-          updateModelLengthProperty(layout);
-          updateModelThemes(layout);
-
-          updateMiscModelProperties(layout);
-        }
-        catch (Exception e) {
-          log.log(Level.WARNING, null, e);
-        }
-      }
+    catch (KernelRuntimeException e) {
+      log.log(Level.WARNING, null, e);
     }
   }
 
@@ -147,7 +144,7 @@ public class LayoutAdapter
 
     if (!themeName.equals(tp.getTheme())) {
       tp.setTheme(themeName);
-      DefaultLocationThemeManager.getInstance().setThemeProperty(tp);
+      locationThemeManager.setThemeProperty(tp);
       tp.markChanged();
     }
 
@@ -160,7 +157,7 @@ public class LayoutAdapter
 
     if (!themeName.equals(vtp.getTheme())) {
       vtp.setTheme(themeName);
-      DefaultVehicleThemeManager.getInstance().setThemeProperty(vtp);
+      vehicleThemeManager.setThemeProperty(vtp);
       vtp.markChanged();
     }
   }
@@ -177,78 +174,35 @@ public class LayoutAdapter
     lp.markChanged();
   }
 
-  @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(boolean updateAllProperties) {
-    super.updateProcessProperties(updateAllProperties);
-    TCSObjectReference<VisualLayout> reference = getProcessObject();
+  private void updateProcessThemes() {
 
-    if (isInTransition()) {
-      return;
+    KeyValueSetProperty misc
+        = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
+
+    LocationThemeProperty pLocationTheme
+        = (LocationThemeProperty) getModel().getProperty(LayoutModel.LOCATION_THEME);
+    if (misc != null) {
+      KeyValueProperty kvp
+          = new KeyValueProperty(getModel(),
+                                 ObjectPropConstants.LOCATION_THEME_CLASS,
+                                 pLocationTheme.getTheme());
+      misc.addItem(kvp);
+      kvp.setChangeState(ModelAttribute.ChangeState.CHANGED);
     }
 
-    if (reference != null) {
-      synchronized (reference) {
-        StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-        String name = pName.getText();
+    locationThemeManager.updateDefaultTheme();
 
-        try {
-          if (updateAllProperties || pName.hasChanged()) {
-            kernel().renameTCSObject(reference, name);
-          }
-          LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
-          double scale = pScale.getValueByUnit(LengthProperty.Unit.MM);
-
-          if (updateAllProperties || pScale.hasChanged()) {
-            kernel().setVisualLayoutScaleX(reference, scale);
-          }
-
-          pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
-          scale = pScale.getValueByUnit(LengthProperty.Unit.MM);
-
-          if (updateAllProperties || pScale.hasChanged()) {
-            kernel().setVisualLayoutScaleY(reference, scale);
-          }
-          updateProcessThemes(updateAllProperties);
-
-          updateMiscProcessProperties(updateAllProperties);
-        }
-        catch (ObjectExistsException e) {
-          undo(name, e);
-        }
-        catch (ObjectUnknownException | CredentialsException e) {
-          log.log(Level.WARNING, null, e);
-        }
-      }
-    }
-  }
-
-  private void updateProcessThemes(boolean updateAllProperties) {
-    LocationThemeProperty pLocationTheme = (LocationThemeProperty) getModel().getProperty(LayoutModel.LOCATION_THEME);
-
-    if (updateAllProperties || pLocationTheme.hasChanged()) {
-      KeyValueSetProperty misc = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
-
-      if (misc != null) {
-        KeyValueProperty kvp = new KeyValueProperty(getModel(), ObjectPropConstants.LOCATION_THEME_CLASS, pLocationTheme.getTheme());
-        misc.addItem(kvp);
-        kvp.setChangeState(ModelAttribute.ChangeState.CHANGED);
-      }
-
-      DefaultLocationThemeManager.getInstance().updateDefaultTheme();
+    VehicleThemeProperty pVehicleTheme
+        = (VehicleThemeProperty) getModel().getProperty(LayoutModel.VEHICLE_THEME);
+    if (misc != null) {
+      KeyValueProperty kvp
+          = new KeyValueProperty(getModel(),
+                                 ObjectPropConstants.VEHICLE_THEME_CLASS,
+                                 pVehicleTheme.getTheme());
+      misc.addItem(kvp);
+      kvp.setChangeState(ModelAttribute.ChangeState.CHANGED);
     }
 
-    VehicleThemeProperty pVehicleTheme = (VehicleThemeProperty) getModel().getProperty(LayoutModel.VEHICLE_THEME);
-
-    if (updateAllProperties || pVehicleTheme.hasChanged()) {
-      KeyValueSetProperty misc = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
-
-      if (misc != null) {
-        KeyValueProperty kvp = new KeyValueProperty(getModel(), ObjectPropConstants.VEHICLE_THEME_CLASS, pVehicleTheme.getTheme());
-        misc.addItem(kvp);
-        kvp.setChangeState(ModelAttribute.ChangeState.CHANGED);
-      }
-
-      DefaultVehicleThemeManager.getInstance().updateDefaultTheme();
-    }
+    vehicleThemeManager.updateDefaultTheme();
   }
 }

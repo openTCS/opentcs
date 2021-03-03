@@ -28,12 +28,18 @@ class RouteEvaluatorTravelTime
 
   /**
    * Creates a new instance.
+   *
+   * @param augmentingEvaluator An additional evaluator augmenting the computed
+   * costs of this one.
    */
-  public RouteEvaluatorTravelTime() {
+  public RouteEvaluatorTravelTime(RouteEvaluator augmentingEvaluator) {
+    super(augmentingEvaluator);
   }
 
   @Override
-  long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps) {
+  public long computeCosts(Vehicle vehicle,
+                           Point startPoint,
+                           List<Route.Step> steps) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(startPoint, "startPoint");
     requireNonNull(steps, "steps");
@@ -47,7 +53,7 @@ class RouteEvaluatorTravelTime
       }
       result += travelTime;
     }
-    return result;
+    return result + augmentingEvaluator.computeCosts(vehicle, startPoint, steps);
   }
 
   private long travelTime(Vehicle vehicle,

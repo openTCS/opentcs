@@ -1,22 +1,28 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.panel;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.util.DefaultLocationThemeManager;
-import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.gui.plugins.LocationTheme;
@@ -26,6 +32,7 @@ import org.opentcs.util.gui.plugins.LocationTheme;
  * grafisches Symbol repreäsentiert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class SymbolPropertyEditorPanel
     extends JPanel
@@ -51,17 +58,21 @@ public class SymbolPropertyEditorPanel
   /**
    * Die LocationThemeRegistry.
    */
-  private final LocationThemeManager locationThemeManager
-      = DefaultLocationThemeManager.getInstance();
+  private final LocationThemeManager locationThemeManager;
   /**
    * The factory used for the images.
    */
   private LocationTheme locationTheme;
 
   /**
-   * Creates new form SymbolPropertyEditorPanel
+   * Creates new instance.
+   *
+   * @param locationThemeManager Provides the available location themes.
    */
-  public SymbolPropertyEditorPanel() {
+  @Inject
+  public SymbolPropertyEditorPanel(LocationThemeManager locationThemeManager) {
+    this.locationThemeManager = requireNonNull(locationThemeManager,
+                                               "locationThemeManager");
     initComponents();
     init();
   }
@@ -99,21 +110,16 @@ public class SymbolPropertyEditorPanel
     return fProperty;
   }
 
-  @Override
-  public void setSystemModel(SystemModel systemModel) {
-    // Do nada.
-  }
-
   private void init() {
     Collections.addAll(fRepresentations, LocationRepresentation.values());
 
     locationTheme = locationThemeManager.getDefaultTheme();
 
     for (LocationRepresentation cur : LocationRepresentation.values()) {
-      String filename = locationTheme.getImagePathFor(cur);
+      Image image = locationTheme.getImageFor(cur);
 
-      if (filename != null) {
-        fSymbols.add(IconToolkit.instance().getImageIconByFullPath(filename));
+      if (image != null) {
+        fSymbols.add(new ImageIcon(image));
       }
       else {
         fRepresentations.remove(cur);
@@ -251,6 +257,7 @@ public class SymbolPropertyEditorPanel
 
   /**
    * Remove the symbol for the Location or LocationType
+   *
    * @param evt
    */
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed

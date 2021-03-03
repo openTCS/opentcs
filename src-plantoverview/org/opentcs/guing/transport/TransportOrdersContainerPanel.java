@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.transport;
 
@@ -10,25 +15,39 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.Vector;
-import javax.swing.*;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.swing.JButton;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
+import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.exchange.KernelProxyManager;
-import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
-import org.opentcs.guing.exchange.TransportOrderDispatcher;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.guing.event.TransportOrderEvent;
+import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -39,12 +58,24 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  *
  * @author Sven Liebing (ifak e.V. Magdeburg)
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrdersContainerPanel
-    extends JPanel
-    implements TransportOrderListener {
+    extends JPanel {
 
-  private final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
+  private static final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
+  /**
+   * Provides access to a kernel.
+   */
+  private final SharedKernelProvider kernelProvider;
+  /**
+   * A helper for creating transport orders with the kernel.
+   */
+  private final TransportOrderUtil orderUtil;
+  /**
+   * Provides panels for entering new transport orders.
+   */
+  private final Provider<CreateTransportOrderPanel> orderPanelProvider;
   /**
    * Die Tabelle, in der die Transportaufträge dargestellt werden.
    */
@@ -56,62 +87,61 @@ public class TransportOrdersContainerPanel
   /**
    * Die Liste der Filterbuttons.
    */
-  private Vector<FilterButton> fFilterButtons;
-  /**
-   * Die Anwendung.
-   */
-  private final OpenTCSView fOpenTCSView;
+  private List<FilterButton> fFilterButtons;
   /**
    * Die Transportaufträge.
    */
   private Vector<TransportOrder> fTransportOrders;
-  /**
-   * The proxy/connection handler to be used.
-   */
-  private final KernelProxyManager kernelProxyManager;
 
   /**
    * Creates a new instance of TransportOrdersView.
    *
-   * @param guiManager die Anwendung
+   * @param kernelProvider Provides a access to a kernel.
+   * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param orderPanelProvider Provides panels for entering new transport orders.
    */
-  public TransportOrdersContainerPanel(OpenTCSView openTCSView) {
-    fOpenTCSView = openTCSView;
-    this.kernelProxyManager = DefaultKernelProxyManager.instance();
+  @Inject
+  public TransportOrdersContainerPanel(SharedKernelProvider kernelProvider,
+                                       TransportOrderUtil orderUtil,
+                                       Provider<CreateTransportOrderPanel> orderPanelProvider) {
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    this.orderPanelProvider = requireNonNull(orderPanelProvider,
+                                             "orderPanelProvider");
     initComponents();
   }
 
-  /**
-   * Liefert den Dispatcher für Transportaufträge.
-   *
-   * @return den Dispatcher
-   */
-  private TransportOrderDispatcher getDispatcher() {
-    OpenTCSEventDispatcher d = (OpenTCSEventDispatcher) fOpenTCSView.getSystemModel().getEventDispatcher();
-    if (d == null) {
-      return null;
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        // XXX Clear panel?
+        break;
+      case LOADED:
+        initView();
+        break;
+      default:
+      // Do nada.
     }
-
-    return d.getTransportOrderDispatcher();
   }
 
-  /**
-   * Liefert die Leitsteuerung.
-   *
-   * @return die Leitsteuerung
-   */
   private Kernel getKernel() {
-    return kernelProxyManager.kernel();
+    return kernelProvider.getKernel();
   }
 
   /**
-   * Holt sich alle Transportaufträge aus der Leitsteuerung und stellt diese
-   * dar.
+   * Initializes this panel's contents.
    */
   public void initView() {
-    TransportOrderDispatcher dispatcher = getDispatcher();
-    if (dispatcher != null) {
-      setTransportOrders(dispatcher.getTransportOrders());
+    setTransportOrders(fetchOrdersIfOnline());
+  }
+
+  private Set<TransportOrder> fetchOrdersIfOnline() {
+    if (kernelProvider.kernelShared()) {
+      return kernelProvider.getKernel().getTCSObjects(TransportOrder.class);
+    }
+    else {
+      return new HashSet<>();
     }
   }
 
@@ -170,7 +200,11 @@ public class TransportOrdersContainerPanel
       if (transportOrder != null) {
         transportOrder = getKernel().getTCSObject(TransportOrder.class, transportOrder.getReference());
         DialogContent content = new TransportOrderView(transportOrder);
-        StandardContentDialog dialog = new StandardContentDialog(fOpenTCSView, content, true, StandardContentDialog.CLOSE);
+        StandardContentDialog dialog
+            = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
+                                        content,
+                                        true,
+                                        StandardContentDialog.CLOSE);
         dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.transportOrder"));
         dialog.setVisible(true);
       }
@@ -187,14 +221,16 @@ public class TransportOrdersContainerPanel
     TransportOrder to = getSelectedTransportOrder();
     if (to != null) {
       to = getKernel().getTCSObject(TransportOrder.class, to.getReference());
-      CreateTransportOrderPanel content = new CreateTransportOrderPanel(fOpenTCSView);
+      CreateTransportOrderPanel content = orderPanelProvider.get();
       content.setPattern(to);
-      StandardContentDialog dialog = new StandardContentDialog(fOpenTCSView, content);
+      StandardContentDialog dialog
+          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
+                                      content);
       dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.newTransportOrder"));
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-        getDispatcher().createTransportOrder(content.getLocations(), content.getActions(), content.getSelectedDeadline(), content.getSelectedVehicle());
+        orderUtil.createTransportOrder(content.getLocations(), content.getActions(), content.getSelectedDeadline(), content.getSelectedVehicle());
       }
     }
   }
@@ -203,7 +239,7 @@ public class TransportOrdersContainerPanel
    * Fertigt eine Kopie eines existierenden Transportauftrags an.
    */
   private void createTransportOrderCopy() {
-    getDispatcher().createTransportOrder(getSelectedTransportOrder());
+    orderUtil.createTransportOrder(getSelectedTransportOrder());
   }
 
   /**
@@ -334,14 +370,29 @@ public class TransportOrdersContainerPanel
     }
   }
 
-  @Override // TransportOrderListener
-  public void transportOrderAdded(TransportOrder t) {
+  @Handler
+  public void handleOrderEvent(TransportOrderEvent evt) {
+    switch (evt.getType()) {
+      case ORDER_CREATED:
+        transportOrderAdded(evt.getOrder());
+        break;
+      case ORDER_CHANGED:
+        transportOrderChanged(evt.getOrder());
+        break;
+      case ORDER_REMOVED:
+        transportOrderRemoved(evt.getOrder());
+        break;
+      default:
+      // Do nada.
+    }
+  }
+
+  private void transportOrderAdded(TransportOrder t) {
     fTransportOrders.insertElementAt(t, 0);
     fTableModel.insertRow(0, toTableRow(t));
   }
 
-  @Override // TransportOrderListener
-  public void transportOrderChanged(TransportOrder t) {
+  private void transportOrderChanged(TransportOrder t) {
     int rowIndex = fTransportOrders.indexOf(t);
     Vector<Object> values = toTableRow(t);
 
@@ -350,8 +401,7 @@ public class TransportOrdersContainerPanel
     }
   }
 
-  @Override // TransportOrderListener
-  public void transportOrderRemoved(final TransportOrder t) {
+  private void transportOrderRemoved(final TransportOrder t) {
     SwingUtilities.invokeLater(new Runnable() {
 
       @Override
@@ -402,34 +452,14 @@ public class TransportOrdersContainerPanel
   /**
    * Initialisiert die Toolleiste.
    */
-  private JToolBar createToolBar(Vector<FilterButton> filterButtons) {
+  private JToolBar createToolBar(List<FilterButton> filterButtons) {
     JToolBar toolBar = new JToolBar();
-    Enumeration<FilterButton> e = filterButtons.elements();
 
-    while (e.hasMoreElements()) {
-      FilterButton button = e.nextElement();
+    for (FilterButton button : filterButtons) {
       toolBar.add(button);
     }
 
     return toolBar;
-  }
-
-  /**
-   * Liefert die FilterButtons.
-   * 
-   * @deprecated Not used anywhere - remove it?
-   */
-  private Vector getFilterButtons() {
-    return fFilterButtons;
-  }
-
-  /**
-   * Liefert den Tabellenkopf.
-   * 
-   * @deprecated Not used anywhere - remove it?
-   */
-  private JTableHeader getTableHeader() {
-    return fTable.getTableHeader();
   }
 
   /**
@@ -503,32 +533,6 @@ public class TransportOrdersContainerPanel
     return row;
   }
 
-  /**
-   * Entfernt alle selektierten Transportaufträge.
-   * 
-   * @deprecated Not used anywhere - remove it?
-   */
-  private void deleteSelectedTransportOrders() {
-    int[] indices = fTable.getSelectedRows();
-    Vector<TransportOrder> toDelete = new Vector<>();
-
-    for (int i = 0; i < indices.length; i++) {
-      int realIndex = fTableModel.realRowIndex(indices[i]);
-      TransportOrder order = fTransportOrders.elementAt(realIndex);
-      toDelete.insertElementAt(order, 0);
-    }
-
-    Enumeration<TransportOrder> e = toDelete.elements();
-
-    while (e.hasMoreElements()) {
-      TransportOrder order = e.nextElement();
-      getDispatcher().requestRemoveTransportOrder(order);
-    }
-  }
-
-  /**
-   *
-   */
   private void withdrawTransportOrder() {
     int[] indices = fTable.getSelectedRows();
     Vector<TransportOrder> toWithdraw = new Vector<>();

@@ -1,19 +1,24 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange;
 
 import java.rmi.registry.Registry;
 import java.util.LinkedList;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.opentcs.guing.components.dialogs.CancelButton;
+import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.gui.Icons;
 
 /**
@@ -38,15 +43,6 @@ public class ConnectToServerDialog
    */
   private static final int connectionBookmarksMaxAmount = 5;
   /**
-   * Name of a connection bookmark.
-   */
-  private static final String connectionBookmarkName = "CONNECTION_BOOKMARK_";
-  /**
-   * This class's ConfigurationStore.
-   */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(ConnectToServerDialog.class.getName());
-  /**
    * The host to connect to.
    */
   private String host;
@@ -59,6 +55,10 @@ public class ConnectToServerDialog
    */
   private final LinkedList<ConnectionParamSet> bookmarks = new LinkedList<>();
   /**
+   * The application's configuration.
+   */
+  private final ApplicationConfiguration appConfig;
+  /**
    * This kernel proxy/connection manager to be used.
    */
   private final KernelProxyManager kernelProxyManager;
@@ -70,11 +70,16 @@ public class ConnectToServerDialog
   /**
    * Creates a new instance.
    *
+   * @param appConfig The application's configuration.
    * @param kernelProxyManager The kernel proxy manager to be used.
    */
-  public ConnectToServerDialog(KernelProxyManager kernelProxyManager) {
+  @Inject
+  public ConnectToServerDialog(ApplicationConfiguration appConfig,
+                               KernelProxyManager kernelProxyManager) {
     super((JFrame) null, true);
-    this.kernelProxyManager = Objects.requireNonNull(kernelProxyManager);
+    this.appConfig = requireNonNull(appConfig, "appConfig");
+    this.kernelProxyManager = requireNonNull(kernelProxyManager,
+                                             "kernelProxyManager");
 
     initComponents();
     initConnectionBookmarks();
@@ -136,19 +141,15 @@ public class ConnectToServerDialog
    * Initializes connection bookmarks from the config file.
    */
   private void initConnectionBookmarks() {
-    String curConnectionBookmark;
-    ConnectionParamSet cb;
     DefaultComboBoxModel<ConnectionParamSet> model
         = (DefaultComboBoxModel<ConnectionParamSet>) cbComboBox.getModel();
 
     for (int i = 0; i < connectionBookmarksMaxAmount; i++) {
-      curConnectionBookmark = configStore.getString(connectionBookmarkName + i, "");
+      ConnectionParamSet bookmark = appConfig.getConnectionParamSet(i);
 
-      if (!curConnectionBookmark.isEmpty()) {
-        String[] parts = curConnectionBookmark.split(":");
-        cb = new ConnectionParamSet(parts[0], parts[1]);
-        model.addElement(cb);
-        bookmarks.add(cb);
+      if (bookmark != null) {
+        model.addElement(bookmark);
+        bookmarks.add(bookmark);
       }
     }
   }
@@ -159,8 +160,8 @@ public class ConnectToServerDialog
   private void writeBookmarks() {
     int i = 0;
 
-    for (ConnectionParamSet cb : bookmarks) {
-      configStore.setString(connectionBookmarkName + i, cb.getHost() + ":" + cb.getPort());
+    for (ConnectionParamSet bookmark : bookmarks) {
+      appConfig.setConnectionParamSet(i, bookmark);
       i++;
     }
   }

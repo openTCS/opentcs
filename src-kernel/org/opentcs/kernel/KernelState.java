@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -33,7 +34,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.message.Message;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Layout;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -71,11 +71,6 @@ import org.opentcs.util.configuration.ConfigurationItem;
 abstract class KernelState {
 
   /**
-   * This class's Logger.
-   */
-  private static final Logger log
-      = Logger.getLogger(KernelState.class.getName());
-  /**
    * The kernel we're working for.
    */
   protected final StandardKernel kernel;
@@ -95,6 +90,11 @@ abstract class KernelState {
    * The buffer for all messages published.
    */
   protected final MessageBuffer messageBuffer;
+  /**
+   * This class's Logger.
+   */
+  private static final Logger log
+      = Logger.getLogger(KernelState.class.getName());
 
   /**
    * Creates a new state.
@@ -106,11 +106,10 @@ abstract class KernelState {
    * @param messageBuffer The message buffer to be used.
    */
   KernelState(StandardKernel kernel,
-              @GlobalKernelSync Object globalSyncObject,
+              Object globalSyncObject,
               TCSObjectPool objectPool,
               Model model,
               MessageBuffer messageBuffer) {
-    log.finer("method entry");
     this.kernel = Objects.requireNonNull(kernel, "kernel is null");
     this.globalSyncObject = Objects.requireNonNull(globalSyncObject,
                                                    "globalSyncObject is null");
@@ -135,13 +134,16 @@ abstract class KernelState {
 
   public abstract State getState();
 
-  public final Set<String> getModelNames() {
-    log.finer("method entry");
-    return kernel.modelPersister.getModelNames();
+  /**
+   * Returns the name of the currently saved model.
+   * @return The name of the model which is not present when there is no model.
+   * @throws IOException If reading the model name from the model file failed.
+   */
+  public final Optional<String> getModelName() throws IOException {
+    return kernel.modelPersister.getModelName();
   }
 
   public final String getCurrentModelName() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return model.getName();
     }
@@ -151,25 +153,23 @@ abstract class KernelState {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public void loadModel(String modelName)
+  public void loadModel()
       throws IOException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public void saveModel(String modelName,
-                        boolean overwrite)
+  public void saveModel(String modelName)
       throws IOException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public void removeModel(String rmName)
+  public void removeModel()
       throws IOException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   public final <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                        TCSObjectReference<T> ref) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       T result = globalObjectPool.getObject(clazz, ref);
       return result == null ? null : clazz.cast(result.clone());
@@ -178,7 +178,6 @@ abstract class KernelState {
 
   public final <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                        String name) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       T result = globalObjectPool.getObject(clazz, name);
       return result == null ? null : clazz.cast(result.clone());
@@ -186,7 +185,6 @@ abstract class KernelState {
   }
 
   public final <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Set<T> objects = globalObjectPool.getObjects(clazz);
       Set<T> copies = new HashSet<>();
@@ -199,7 +197,6 @@ abstract class KernelState {
 
   public final <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
                                                              Pattern regexp) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       Set<T> objects = globalObjectPool.getObjects(clazz, regexp);
       Set<T> copies = new HashSet<>();
@@ -213,7 +210,6 @@ abstract class KernelState {
   public final void renameTCSObject(TCSObjectReference<?> ref,
                                     String newName)
       throws ObjectUnknownException, ObjectExistsException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       globalObjectPool.renameObject(ref, newName);
     }
@@ -223,7 +219,6 @@ abstract class KernelState {
                                          String key,
                                          String value)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       globalObjectPool.setObjectProperty(ref, key, value);
     }
@@ -231,7 +226,6 @@ abstract class KernelState {
 
   public final void clearTCSObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       globalObjectPool.clearObjectProperties(ref);
     }
@@ -243,20 +237,9 @@ abstract class KernelState {
   }
 
   public Message publishMessage(String message, Message.Type type) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return messageBuffer.createMessage(message, type);
     }
-  }
-
-  public Layout createLayout(byte[] layoutData) {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  public void setLayoutData(TCSObjectReference<Layout> ref,
-                            byte[] newData)
-      throws ObjectUnknownException {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   public VisualLayout createVisualLayout() {
@@ -287,13 +270,10 @@ abstract class KernelState {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public final void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
+  public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                                  List<ViewBookmark> bookmarks)
       throws ObjectUnknownException {
-    log.finer("method entry");
-    synchronized (globalSyncObject) {
-      model.setVisualLayoutViewBookmarks(ref, bookmarks);
-    }
+    throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   public Point createPoint() {
@@ -366,7 +346,6 @@ abstract class KernelState {
   public final void setVehicleEnergyLevelCritical(TCSObjectReference<Vehicle> ref,
                                                   int energyLevel)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleEnergyLevelCritical(ref, energyLevel);
     }
@@ -375,7 +354,6 @@ abstract class KernelState {
   public final void setVehicleEnergyLevelGood(TCSObjectReference<Vehicle> ref,
                                               int energyLevel)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleEnergyLevelGood(ref, energyLevel);
     }
@@ -558,7 +536,6 @@ abstract class KernelState {
   }
 
   public Group createGroup() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       // Return a copy of the point
       return model.createGroup(null).clone();
@@ -568,7 +545,6 @@ abstract class KernelState {
   public void addGroupMember(TCSObjectReference<Group> ref,
                              TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.addGroupMember(ref, newMemberRef);
     }
@@ -577,7 +553,6 @@ abstract class KernelState {
   public void removeGroupMember(TCSObjectReference<Group> ref,
                                 TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.removeGroupMember(ref, rmMemberRef);
     }
@@ -835,7 +810,6 @@ abstract class KernelState {
   }
 
   public final Set<ConfigurationItemTO> getConfigurationItems() {
-    log.finer("method entry");
     Set<ConfigurationItemTO> result = new HashSet<>();
     Set<ConfigurationItem> allItems
         = Configuration.getInstance().getConfigurationItems();
@@ -852,35 +826,13 @@ abstract class KernelState {
   }
 
   public final void setConfigurationItem(ConfigurationItemTO itemTO) {
-    log.finer("method entry");
-    if (itemTO == null) {
-      throw new NullPointerException("itemTO is null");
-    }
+    requireNonNull(itemTO, "itemTO");
     ConfigurationItem item = new ConfigurationItem(itemTO.getNamespace(),
                                                    itemTO.getKey(),
                                                    itemTO.getDescription(),
                                                    itemTO.getConstraint(),
                                                    itemTO.getValue());
     Configuration.getInstance().setConfigurationItem(item);
-  }
-
-  /**
-   * Verifies that the given model name either does not exist, yet, or does not
-   * differ from an existing model name in spelling case only.
-   *
-   * @param modelName The model name to check.
-   * @throws IOException If a model exists with a name that differs from the
-   * given one only in spelling case.
-   */
-  protected void verifyModelNameCaseMatch(String modelName) throws IOException {
-    requireNonNull(modelName, "modelName");
-    for (String existingName : getModelNames()) {
-      if (existingName.equalsIgnoreCase(modelName)
-          && !existingName.equals(modelName)) {
-        throw new IOException("Model name " + modelName
-            + " differs in case from " + existingName);
-      }
-    }
   }
 
   private String unsupportedMsg() {

@@ -1,10 +1,16 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
-import org.jhotdraw.draw.Figure;
+import java.util.Arrays;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.properties.type.AngleProperty;
@@ -12,13 +18,11 @@ import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.tree.elements.PointUserObject;
 import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Basisimplementierung für einen Knoten.
+ * Basic implementation of a point.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -26,11 +30,11 @@ public class PointModel
     extends AbstractFigureComponent {
 
   /**
-   * Die bevorzugte Winkelausrichtung eines Fahrzeugs auf diesem Punkt.
+   * Key for the prefered angle of a vehicle on this point.
    */
   public static final String VEHICLE_ORIENTATION_ANGLE = "vehicleOrientationAngle";
   /**
-   * Der Schlüssel für den Typ.
+   * Key for the type.
    */
   public static final String TYPE = "Type";
 
@@ -40,38 +44,6 @@ public class PointModel
   public PointModel() {
     super();
     createProperties();
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param figure The point's figure.
-   */
-  public PointModel(Figure figure) {
-    super(figure);
-    createProperties();
-  }
-
-  /**
-   * Setzt den Namen des Knotens.
-   *
-   * @param name der neue Knotenname
-   */
-  public void setName(String name) {
-    StringProperty p = (StringProperty) getProperty(ModelComponent.NAME);
-    p.setText(name);
-  }
-
-  @Override // Comparable
-  public int compareTo(AbstractFigureComponent o) {
-    return getName().compareTo(o.getName());
-  }
-
-  @Override // AbstractFigureComponent
-  public PointUserObject createUserObject() {
-    fUserObject = new PointUserObject(this);
-
-    return (PointUserObject) fUserObject;
   }
 
   @Override // AbstractModelComponent
@@ -92,34 +64,32 @@ public class PointModel
     pName.setHelptext(bundle.getString("point.name.helptext"));
     setProperty(NAME, pName);
     // Model x position
-    CoordinateProperty pPosX = new CoordinateProperty(this, true);
+    CoordinateProperty pPosX = new CoordinateProperty(this);
     pPosX.setDescription(bundle.getString("point.x.text"));
     pPosX.setHelptext(bundle.getString("point.x.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
     // Model y position
-    CoordinateProperty pPosY = new CoordinateProperty(this, false);
+    CoordinateProperty pPosY = new CoordinateProperty(this);
     pPosY.setDescription(bundle.getString("point.y.text"));
     pPosY.setHelptext(bundle.getString("point.y.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
-    // Todo: Position z bzw. Layer
-    // Die bevorzugte Ausrichtung eines Fahrzeugs auf diesem Punkt
+    // Todo: Position z 
+    // Prefered angle of a vehicle on this point
     AngleProperty pPhi = new AngleProperty(this);
     pPhi.setDescription(bundle.getString("point.phi.text"));
     pPhi.setHelptext(bundle.getString("point.phi.helptext"));
     setProperty(VEHICLE_ORIENTATION_ANGLE, pPhi);
 
-    // Typ: Haltepunkt, Meldepunkt oder Parkposition
-    SelectionProperty pType = new SelectionProperty(this, PointType.values(), PointType.values()[0]);
+    // Type: Park, Report or Halt
+    SelectionProperty<PointType> pType = new SelectionProperty<>(this, Arrays.asList(PointType.values()), PointType.values()[0]);
     pType.setDescription(bundle.getString("point.type.text"));
     pType.setHelptext(bundle.getString("point.type.helptext"));
-    // Diese Property soll für mehrere Punkte gemeinsam editert werden können
     pType.setCollectiveEditable(true);
     setProperty(TYPE, pType);
     // Miscellaneous properties
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("point.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("point.miscellaneous.helptext"));
-    // Diese Property soll für mehrere Punkte gemeinsam editert werden können
     // HH 2014-02-17: Miscellaneous Properties vorerst nicht collective editable
 //  pMiscellaneous.setCollectiveEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);

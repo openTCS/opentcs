@@ -7,13 +7,13 @@ package org.opentcs.kernel.persistence;
 
 import java.util.ArrayList;
 import java.util.List;
+import static org.junit.Assert.assertTrue;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.opentcs.TestEnvironment;
-import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
 
 /**

@@ -202,7 +202,7 @@ public final class Path
   public void setLocked(boolean newLocked) {
     locked = newLocked;
   }
-  
+
   /**
    * Checks whether this path is navigable in forward direction.
    *
@@ -221,6 +221,30 @@ public final class Path
    */
   public boolean isNavigableReverse() {
     return !locked && maxReverseVelocity != 0;
+  }
+
+  /**
+   * Checks whether this path is navigable towards the given point.
+   *
+   * @param navPoint The point.
+   * @return If <code>navPoint</code> is this path's destination point, returns
+   * <code>isNavigableForward()</code>; if <code>navPoint</code> is this path's
+   * source point, returns <code>isNavigableReverse()</code>.
+   * @throws IllegalArgumentException If the given point is neither the source
+   * point nor the destination point of this path.
+   */
+  public boolean isNavigableTo(TCSObjectReference<Point> navPoint)
+      throws IllegalArgumentException {
+    if (Objects.equals(navPoint, destinationPoint)) {
+      return isNavigableForward();
+    }
+    else if (Objects.equals(navPoint, sourcePoint)) {
+      return isNavigableReverse();
+    }
+    else {
+      throw new IllegalArgumentException(
+          navPoint + " is not an end point of " + this);
+    }
   }
 
   @Override

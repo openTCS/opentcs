@@ -29,6 +29,10 @@ public final class Environment {
    */
   private static final String versionString;
   /**
+   * The build date as a string.
+   */
+  private static final String buildDate;
+  /**
    * This class's Logger.
    */
   private static final Logger log = Logger.getLogger(Environment.class.getName());
@@ -44,6 +48,7 @@ public final class Environment {
               exc);
     }
     versionString = props.getProperty("opentcs.version", "unknown version");
+    buildDate = props.getProperty("opentcs.builddate", "unknown build date");
   }
 
   /**
@@ -54,12 +59,21 @@ public final class Environment {
   }
 
   /**
-   * Returns the openTCS version as a string.
+   * Returns the version of openTCS (i.e. the base library) as a string.
    *
-   * @return The openTCS version as a string.
+   * @return The version of openTCS (i.e. the base library) as a string.
    */
   public static String getVersionString() {
     return versionString;
+  }
+
+  /**
+   * Returns the build date of openTCS (i.e. the base library) as a string.
+   *
+   * @return The build date of openTCS (i.e. the base library) as a string.
+   */
+  public static String getBuildDate() {
+    return buildDate;
   }
 
   /**
@@ -70,7 +84,9 @@ public final class Environment {
     String systemInfo = new StringBuilder()
         .append("OpenTCS: ")
         .append(versionString)
-        .append("; ")
+        .append(" (build date: ")
+        .append(buildDate)
+        .append("); ")
         .append("Java: ")
         .append(System.getProperty("java.version"))
         .append(", ")

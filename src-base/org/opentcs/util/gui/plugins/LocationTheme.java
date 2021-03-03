@@ -8,22 +8,24 @@
  */
 package org.opentcs.util.gui.plugins;
 
+import java.awt.Image;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * Provides a location theme.
  * 
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public interface LocationTheme {
 
   /**
-   * Returns the path to the image for the given location representation.
+   * Returns the image for the given location representation.
    * 
-   * @param representation The representation for which to return the path.
-   * @return The path to the image for the given location representation.
+   * @param representation The representation for which to return the image.
+   * @return The image for the given location representation.
    */
-  String getImagePathFor(LocationRepresentation representation);
+  Image getImageFor(LocationRepresentation representation);
 
   /**
    * Returns a name/short description of this theme.

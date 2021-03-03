@@ -1,11 +1,18 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.properties.table;
 
-import org.opentcs.guing.application.GuiManager;
-import org.opentcs.guing.application.GuiManager.OperationMode;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 
 /**
@@ -20,26 +27,18 @@ public class AttributesTableModel
     extends javax.swing.table.DefaultTableModel {
 
   /**
-   * The drawing view.
+   * Stores the application's current state.
    */
-  private final GuiManager fOpenTCSView;
+  private final ApplicationState appState;
 
   /**
    * Creates a new instance of AttributesTableModel
    *
-   * @param openTCSView
+   * @param appState Stores the application's current state.
    */
-  public AttributesTableModel(GuiManager openTCSView) {
-    super();
-    this.fOpenTCSView = openTCSView;
-  }
-
-  /**
-   *
-   * @return
-   */
-  public GuiManager getView() {
-    return fOpenTCSView;
+  @Inject
+  public AttributesTableModel(ApplicationState appState) {
+    this.appState = requireNonNull(appState, "appState");
   }
 
   /**
@@ -56,11 +55,10 @@ public class AttributesTableModel
     if (col == 0) {
       return false;
     }
-    else {	// col == 1
+    else { // col == 1
       ModelAttribute attribute = (ModelAttribute) getValueAt(row, col);
-      OperationMode operationMode = fOpenTCSView.getOperationMode();
 
-      if (operationMode == OperationMode.MODELLING) {
+      if (appState.hasOperationMode(OperationMode.MODELLING)) {
         return attribute.isModellingEditable();
       }
 

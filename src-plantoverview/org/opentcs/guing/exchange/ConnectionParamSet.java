@@ -1,6 +1,10 @@
-/**
- * (c): Fraunhofer IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange;
 
@@ -66,7 +70,7 @@ public class ConnectionParamSet {
    * valid port numbers.
    */
   public ConnectionParamSet(String host, String port)
-      throws NumberFormatException {
+      throws NumberFormatException, IllegalArgumentException {
     this(host, Integer.parseInt(port));
   }
 
@@ -94,7 +98,7 @@ public class ConnectionParamSet {
   public int getPort() {
     return port;
   }
-  
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof ConnectionParamSet)) {
@@ -111,10 +115,10 @@ public class ConnectionParamSet {
     hash = 23 * hash + this.port;
     return hash;
   }
-  
+
   @Override
   public String toString() {
-		return getHost() + " - " + getPort();
+    return getHost() + " - " + getPort();
   }
 
   /**

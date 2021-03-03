@@ -12,6 +12,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -36,6 +38,11 @@ public final class KernelStarter {
    */
   private static final Logger log
       = Logger.getLogger(KernelStarter.class.getName());
+  /**
+   * The ResourceBundle.
+   */
+  private static final ResourceBundle bundle =
+      ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/Bundle");
   /**
    * The kernel we're working with.
    */
@@ -64,6 +71,39 @@ public final class KernelStarter {
    * @param args The command line arguments.
    */
   private void startKernel(String[] args) {
+
+    // Parse the command line arguments
+    boolean chooseModel = false;
+    boolean loadModel = false;
+    boolean printUsage = false;
+    for (String arg:args) {
+      switch (arg) {
+        case "-loadmodel":
+          loadModel = true;
+          break;
+        case "-choosemodel":
+          chooseModel = true;
+          break;
+        case "-help":
+        case "-h":
+          printUsage = true;
+          break;
+        default:
+          log.warning("Unknown argument '" + arg +"' will be ingnored.");
+          printUsage = true;
+          break;
+      }
+    }
+    if(loadModel && chooseModel) {
+      log.warning(
+          "-loadmodel option is ignored because -choosemodel was given, too");
+      loadModel = false;
+    }
+    if(printUsage) {
+      printUsage();
+    }
+    log.fine("Finished parsing command line arguments.");
+
     // Register kernel extensions.
     for (KernelExtension extension : extensions) {
       kernel.addKernelExtension(extension);
@@ -72,62 +112,62 @@ public final class KernelStarter {
     // Start local kernel.
     kernel.initialize();
     log.fine("Kernel initialized.");
-    
-    // Parse the command line arguments, e.g. the name of the model to load
-    boolean chooseModel = false;
-    String modelName = null;
-    for (int i = 0; i < args.length; i++) {
-      String curArgument = args[i];
-      if (curArgument.equals("-loadmodel")) {
-        i++;
-        if (args.length > i) {
-          modelName = args[i];
-        }
-        else {
-          log.severe("No model name given for '-loadmodel'.");
-        }
-      }
-      else if (curArgument.equals("-loaddefaultmodel")) {
-        modelName = kernel.getDefaultModelName();
-        if ("".equals(modelName)) {
-          modelName = null;
-          log.severe("Default model not configured.");
-        }
-      }
-      else if (curArgument.equals("-choosemodel")) {
-        chooseModel = true;
-      }
+    Optional<String> savedModelName;
+    try {
+      savedModelName = Optional.ofNullable(kernel.getModelName());
     }
-    log.fine("Finished parsing command line arguments.");
-    if ((modelName != null) || chooseModel) {
-      boolean modelingMode = false;
-      if (chooseModel) {
-        ChooseModelDialog chooseModelWindow = new ChooseModelDialog(kernel);
-        chooseModelWindow.setVisible(true);
-        modelName = chooseModelWindow.getModelName();
-        modelingMode = chooseModelWindow.modelingSelected();
-        if (modelName == null) {
-          log.info("No model chosen by user, remaining in modelling mode.");
-        }
-      }
-      if (modelName != null) {
-        try {
-          log.fine("Loading model: " + modelName);
-          kernel.loadModel(modelName);
-          log.info("Loaded model: " + modelName);
-          if (!modelingMode) {
-            kernel.setState(Kernel.State.OPERATING);
-          }
-        }
-        catch (IOException exc) {
-          throw new IllegalStateException("Unhandled exception loading model",
-                                          exc);
-        }
+    catch (IOException exc) {
+        throw new IllegalStateException("Unhandled exception loading model",
+                                        exc);
+    }
+    boolean modelingMode = false;
+
+    // Show ChooseModelDialog and see if we should load a model
+    if (chooseModel) {
+      ChooseModelDialog chooseModelDialog;
+      chooseModelDialog =
+          new ChooseModelDialog(savedModelName);
+      chooseModelDialog.setVisible(true);
+      String modelName;
+      modelName = chooseModelDialog.savedModelSelected() ?
+          savedModelName.get() : null;
+      modelingMode = chooseModelDialog.modelingSelected();
+      if (modelName == null) {
+        loadModel = false;
       }
       else {
-        kernel.createModel(Kernel.DEFAULT_MODEL_NAME);
+        loadModel = true;
       }
     }
+    // Load the saved model if there is one
+    if(loadModel && savedModelName.isPresent()) {
+      try {
+        log.fine("Loading model: " + savedModelName.get());
+        kernel.loadModel();
+        log.info("Loaded model: " + savedModelName.get());
+        if (!modelingMode) {
+          kernel.setState(Kernel.State.OPERATING);
+        }
+      }
+      catch (IOException exc) {
+        throw new IllegalStateException("Unhandled exception loading model",
+                                        exc);
+      }
+    }
+    // Load an empty model in modelling mode
+    else {
+      kernel.createModel(Kernel.DEFAULT_MODEL_NAME);
+    }
+  }
+
+  /**
+   * Print a help message to the log.
+   */
+  private void printUsage() {
+    log.info("Usage: java org.opentcs.kernel.KernelStarter [-loadmodel|-choosemodel]");
+    log.info("\t-loadmodel\t\tIf there is a saved model, load it.");
+    log.info("\t-choosemodel\tShow a dialog for choosing between the saved and an empty model.");
+    log.info("\t-h -help\t\tPrint this help message to the log.");
   }
 
   /**

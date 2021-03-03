@@ -1,9 +1,15 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -16,9 +22,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.net.URL;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import javax.swing.Timer;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
@@ -27,11 +35,12 @@ import org.jhotdraw.geom.Geom;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.drawing.ZoomPoint;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.opentcs.guing.util.DefaultLocationThemeManager;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.util.gui.plugins.LocationTheme;
 
@@ -40,6 +49,7 @@ import org.opentcs.util.gui.plugins.LocationTheme;
  * Geräte (Aufzüge, Drehteller und so weiter).
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationFigure
     extends TCSFigure
@@ -50,13 +60,14 @@ public class LocationFigure
    */
   private static final Logger log
       = Logger.getLogger(LocationFigure.class.getName());
-  // Der Dateiname des Bildes
-  private String fImageFileName;
-  // Der Dateiname des alternativen Bildes zur Darstellung von "Blinken"
-  private String fFlashImageFileName;
-  // Das Bild
+  /**
+   * The image representing the location.
+   */
   private transient Image fImage;
-  // Alternatives Bild zur Darstellung von "Blinken"
+  /**
+   * An alternative image for a "blinking" representation.
+   * XXX Blinking is currently not implemented.
+   */
   private transient Image fFlashImage;
   // Die Ausdehnung der Figur
   private int fWidth, fHeight;
@@ -70,14 +81,25 @@ public class LocationFigure
   /**
    * Creates a new instance.
    *
-   * @param model The corresponding model object.
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param locationThemeManager A manager for location themes.
+   * @param model The model corresponding to this graphical object.
    */
-  public LocationFigure(LocationModel model) {
-    super(model);
-    fWidth = fHeight = 30;
+  @Inject
+  public LocationFigure(ComponentsTreeViewManager componentsTreeManager,
+                        SelectionPropertiesComponent propertiesComponent,
+                        LocationThemeManager locationThemeManager,
+                        @Assisted LocationModel model) {
+    super(componentsTreeManager, propertiesComponent, model);
+    this.locationThemeManager = requireNonNull(locationThemeManager,
+                                               "locationThemeManager");
+
+    fWidth = 30;
+    fHeight = 30;
     fDisplayBox = new Rectangle(fWidth, fHeight);
     fZoomPoint = new ZoomPoint(0.5 * fWidth, 0.5 * fHeight);
-    locationThemeManager = DefaultLocationThemeManager.getInstance();
   }
 
   @Override
@@ -147,18 +169,6 @@ public class LocationFigure
     Rectangle r = displayBox();
     g.fillRect(r.x, r.y, r.width, r.height);
 
-    if (fImage == null) {
-      if (fImageFileName != null) {
-        fImage = loadImage(fImageFileName);
-      }
-    }
-    // Alternatives Bild
-    if (fFlashImage == null) {
-      if (fFlashImageFileName != null) {
-        fFlashImage = loadImage(fFlashImageFileName);
-      }
-    }
-
     if (fImage != null) {
       if (showFlashImage && fFlashImage != null) {
         dx = (r.width - fFlashImage.getWidth(this)) / 2;
@@ -218,30 +228,31 @@ public class LocationFigure
         // ... das Default-Symbol des zugehörigen LocationTypes verwenden
         pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
         locationRepresentation = pSymbol.getLocationRepresentation();
-        fImageFileName = theme.getImagePathFor(locationRepresentation);
-        fImage = loadImage(fImageFileName);
+        fImage = theme.getImageFor(locationRepresentation);
       }
       else {
         // ... sonst das eigene Symbol verwenden
-        fImageFileName = theme.getImagePathFor(locationRepresentation);
-        fImage = loadImage(fImageFileName);
-        // Wenn das Symbol blinken soll: Abwechselnd das eigene Symbol ... 
-        if (theme.getImagePathFor(locationRepresentation) != null
-            && (theme.getImagePathFor(locationRepresentation)).contains("flash")) {
-          fImageFileName = theme.getImagePathFor(locationRepresentation);
-          fImage = loadImage(fImageFileName);
-          // ... und das des LocationTypes zeichnen
-          pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-          locationRepresentation = pSymbol.getLocationRepresentation();
-          fFlashImageFileName = theme.getImagePathFor(locationRepresentation);
-          fFlashImage = loadImage(fFlashImageFileName);
-          initTimer();
-        }
-        else {
-          fFlashImage = null;
-          fFlashImageFileName = null;
-          stopTimer();
-        }
+        fImage = theme.getImageFor(locationRepresentation);
+
+        // XXX Blinking should not depend on an image's file name. Maybe we
+        // XXX could make blinking an attribute of the representation enum?
+//        // Wenn das Symbol blinken soll: Abwechselnd das eigene Symbol ... 
+//        if (theme.getImagePathFor(locationRepresentation) != null
+//            && (theme.getImagePathFor(locationRepresentation)).contains("flash")) {
+//          fImageFileName = theme.getImagePathFor(locationRepresentation);
+//          fImage = loadImage(fImageFileName);
+//          // ... und das des LocationTypes zeichnen
+//          pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+//          locationRepresentation = pSymbol.getLocationRepresentation();
+//          fFlashImageFileName = theme.getImagePathFor(locationRepresentation);
+//          fFlashImage = loadImage(fFlashImageFileName);
+//          initTimer();
+//        }
+//        else {
+//          fFlashImage = null;
+//          fFlashImageFileName = null;
+//          stopTimer();
+//        }
       }
     }
 

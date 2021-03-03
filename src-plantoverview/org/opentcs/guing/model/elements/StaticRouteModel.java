@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.model.elements;
 
@@ -15,7 +20,7 @@ import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.tree.elements.StaticRouteUserObject;
+import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.event.StaticRouteChangeEvent;
 import org.opentcs.guing.event.StaticRouteChangeListener;
 import org.opentcs.guing.model.FiguresFolder;
@@ -23,7 +28,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Eine statische Route.
+ * A static route.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -31,8 +36,11 @@ public class StaticRouteModel
     extends FiguresFolder {
 
   /**
-   * Die registrierten Listener, die informiert werden, wenn sich an der
-   * statischen Route etwas ändert.
+   * Key for the elements.
+   */
+  public static final String ELEMENTS = "staticRouteElements";
+  /**
+   * The listeners that get informed on changes.
    */
   private List<StaticRouteChangeListener> fListeners = new ArrayList<>();
 
@@ -43,14 +51,8 @@ public class StaticRouteModel
     createProperties();
   }
 
-  @Override // FiguresFolder
-  public StaticRouteUserObject createUserObject() {
-    fUserObject = new StaticRouteUserObject(this);
-
-    return (StaticRouteUserObject) fUserObject;
-  }
-
   /**
+   * Returns the first point of this static route.
    *
    * @return The first Point of this route.
    */
@@ -62,6 +64,7 @@ public class StaticRouteModel
   }
 
   /**
+   * Returns the last point of this static route.
    *
    * @return The last Point of this route.
    */
@@ -72,17 +75,10 @@ public class StaticRouteModel
     return (PointModel) getChildComponents().get(getChildComponents().size() - 1);
   }
 
-  /**
-   * Returns an iterator of all figures representing the StaticRoute's Points
-   * and connecting Paths.
-   *
-   * @return An iterator of all figures representing the StaticRoute's Points
-   * and connecting Paths.
-   */
   @Override // FiguresFolder
   public Iterator<Figure> figures() {
     List<Figure> figures = new ArrayList<>();
-    
+
     Iterator<ModelComponent> ePoints = getChildComponents().iterator();
     if (ePoints.hasNext()) {
       PointModel startPoint = (PointModel) ePoints.next();
@@ -91,11 +87,9 @@ public class StaticRouteModel
       while (ePoints.hasNext()) {
         PointModel nextPoint = (PointModel) ePoints.next();
         AbstractConnection path = startPoint.getConnectionTo(nextPoint);
-        // Wenn eine Strecke nur "rückwärts" befahrbar ist
         if (path == null) {
           path = nextPoint.getConnectionTo(startPoint);
         }
-        // Sollte eigentlich nicht vorkommen
         if (path != null) {
           figures.add(path.getFigure());
         }
@@ -109,38 +103,47 @@ public class StaticRouteModel
   }
 
   /**
-   * Entfernt einen Knoten aus der statischen Route.
+   * Removes a point from this static route.
    *
-   * @param point der zu entfernende Knotenpunkt
+   * @param point The model to remove.
    */
   public void removePoint(PointModel point) {
     if (contains(point)) {
       remove(point);
+      StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+      pElements.getItems().remove(point.getName());
     }
   }
 
   /**
-   * Fügt der statischen Route einen Knoten hinzu.
+   * Adds a point to this static route.
    *
-   * @param point der hinzuzufügende Knotenpunkt
+   * @param point The model to add.
    */
   public void addPoint(PointModel point) {
     add(point);
+    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+    String addedModelName = point.getName();
+    if (!pElements.getItems().contains(addedModelName)) {
+      pElements.addItem(addedModelName);
+    }
   }
 
   /**
-   * Entfernt alle Knoten aus der statischen Route.
+   * Removes all points from this static route.
    */
   public void removeAllPoints() {
     for (Object o : new ArrayList<>(Lists.reverse(getChildComponents()))) {
       remove((ModelComponent) o);
     }
+    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+    pElements.getItems().clear();
   }
 
   /**
-   * Liefert die Farbe der statischen Route.
+   * Returns the color of this static route.
    *
-   * @return die Farbe der statischen Route
+   * @return The color.
    */
   public Color getColor() {
     ColorProperty property = (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
@@ -149,8 +152,7 @@ public class StaticRouteModel
   }
 
   /**
-   * Benachrichtigt alle registrierten Listener, dass sich die Farbe des
-   * Blockbereichs geändert hat.
+   * Informs all listeners that the color has changed.
    */
   public void colorChanged() {
     for (StaticRouteChangeListener listener : fListeners) {
@@ -180,20 +182,18 @@ public class StaticRouteModel
   }
 
   /**
-   * Entfernt einen Listener, der ab sofort nicht mehr informiert wird, wenn es
-   * Änderungen an den Fahrkurslementen gibt.
+   * Removes a listener.
    *
-   * @param listener der zu entfernende Listener
+   * @param listener The listener to remove.
    */
   public void removeStaticRouteChangeListener(StaticRouteChangeListener listener) {
     fListeners.remove(listener);
   }
 
   /**
-   * Registriert einen Listener, der fortan informiert wird, wenn sich die
-   * Fahrkurselemente ändern.
+   * Adds a listener.
    *
-   * @param listener der zu registrierende Listener
+   * @param listener The listener to add.
    */
   public void addStaticRouteChangeListener(StaticRouteChangeListener listener) {
     if (fListeners == null) {
@@ -206,9 +206,7 @@ public class StaticRouteModel
   }
 
   /**
-   * Benachrichtigt alle registrierten Listener, dass sich bei den
-   * Fahrkurselementen etwas geändert hat. Wird von einem Klienten aufgerufen,
-   * der Änderungen an den Fahrkurselementen vorgenommen hat.
+   * Informs all listeners that the points of this static route have changed.
    */
   public void pointsChanged() {
     for (StaticRouteChangeListener listener : fListeners) {
@@ -219,7 +217,7 @@ public class StaticRouteModel
   /**
    * The properties of a Static Route:
    * - The name shown in the "Components" tree
-   * - The color used to decorate the hop-points in the DrawingView
+   * - The color used to decorate the hop-points in the DrawingView.
    */
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
@@ -230,9 +228,14 @@ public class StaticRouteModel
     setProperty(NAME, pName);
     // Color
     ColorProperty pColor = new ColorProperty(this, Color.red);
-    pColor.setDescription(bundle.getString("element.blockColor.text"));
-    pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
+    pColor.setDescription(bundle.getString("element.staticRouteColor.text"));
+    pColor.setHelptext(bundle.getString("element.staticRouteColor.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
+    StringSetProperty pElements = new StringSetProperty(this);
+    pElements.setDescription(bundle.getString("staticroute.elements.text"));
+    pElements.setModellingEditable(false);
+    pElements.setOperatingEditable(false);
+    setProperty(ELEMENTS, pElements);
     // Miscellaneous properties
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("staticRoute.miscellaneous.text"));

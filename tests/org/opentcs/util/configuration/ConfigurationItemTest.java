@@ -8,8 +8,9 @@
  */
 package org.opentcs.util.configuration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  * Tests ConfigurationItem class.

@@ -30,7 +30,9 @@ import org.jdom2.output.XMLOutputter;
 /**
  * This class realizes configuration management in XML files.
  * <hr>
- * <h4>System properties</h4>
+ * <p>
+ * System properties:
+ * </p>
  * <dl>
  * <dt><b>
  * de.fraunhofer.iml.toolbox.configuration.xml.file:

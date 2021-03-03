@@ -1,14 +1,21 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 20.08.2013 11:56:11
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.plugins.themes;
 
+import java.awt.Image;
+import java.io.IOException;
+import java.net.URL;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import static java.util.Objects.requireNonNull;
+import javax.imageio.ImageIO;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.LoadHandlingDevice;
 import org.opentcs.util.gui.plugins.VehicleTheme;
@@ -17,6 +24,7 @@ import org.opentcs.util.gui.plugins.VehicleTheme;
  * Standard implementation of <code>VehicleTheme</code>.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class StandardVehicleTheme2
     implements VehicleTheme {
@@ -24,12 +32,12 @@ public class StandardVehicleTheme2
   /**
    * Map containing images for a specific vehicle state when it's unloaded.
    */
-  private final Map<Vehicle.State, String> stateMapUnloaded
+  private final Map<Vehicle.State, Image> stateMapUnloaded
       = new EnumMap<>(Vehicle.State.class);
   /**
    * Map containing images for a specific vehicle state when it's loaded.
    */
-  private final Map<Vehicle.State, String> stateMapLoaded
+  private final Map<Vehicle.State, Image> stateMapLoaded
       = new EnumMap<>(Vehicle.State.class);
   /**
    * The path containing the images.
@@ -42,24 +50,17 @@ public class StandardVehicleTheme2
   }
 
   @Override
-  public String getImagePathFor(Vehicle vehicle) {
-    Objects.requireNonNull(vehicle, "vehicle is null");
-    String relativePath = checkLoaded(vehicle)
+  public Image getImageFor(Vehicle vehicle) {
+    requireNonNull(vehicle, "vehicle is null");
+
+    return checkLoaded(vehicle)
         ? stateMapLoaded.get(vehicle.getState())
         : stateMapUnloaded.get(vehicle.getState());
-    return relativePath == null ? null : path + relativePath;
   }
 
   @Override
-  public Set<String> getAllImagePaths() {
-    Set<String> images = new HashSet<>();
-    for (String value : stateMapLoaded.values()) {
-      images.add(path + value);
-    }
-    for (String value : stateMapUnloaded.values()) {
-      images.add(path + value);
-    }
-    return images;
+  public Image getThemeImage() {
+    return stateMapUnloaded.get(Vehicle.State.IDLE);
   }
 
   @Override
@@ -71,19 +72,19 @@ public class StandardVehicleTheme2
    * Initializes the maps with values.
    */
   private void initMaps() {
-    stateMapUnloaded.put(Vehicle.State.CHARGING, "unloaded_charging.png");
-    stateMapUnloaded.put(Vehicle.State.ERROR, "unloaded_error.png");
-    stateMapUnloaded.put(Vehicle.State.EXECUTING, "unloaded_normal.png");
-    stateMapUnloaded.put(Vehicle.State.IDLE, "unloaded_normal.png");
-    stateMapUnloaded.put(Vehicle.State.UNAVAILABLE, "unloaded_normal.png");
-    stateMapUnloaded.put(Vehicle.State.UNKNOWN, "unloaded_normal.png");
+    stateMapUnloaded.put(Vehicle.State.CHARGING, loadImage(path + "unloaded_charging.png"));
+    stateMapUnloaded.put(Vehicle.State.ERROR, loadImage(path + "unloaded_error.png"));
+    stateMapUnloaded.put(Vehicle.State.EXECUTING, loadImage(path + "unloaded_normal.png"));
+    stateMapUnloaded.put(Vehicle.State.IDLE, loadImage(path + "unloaded_normal.png"));
+    stateMapUnloaded.put(Vehicle.State.UNAVAILABLE, loadImage(path + "unloaded_normal.png"));
+    stateMapUnloaded.put(Vehicle.State.UNKNOWN, loadImage(path + "unloaded_normal.png"));
 
-    stateMapLoaded.put(Vehicle.State.CHARGING, "loaded_charging.png");
-    stateMapLoaded.put(Vehicle.State.ERROR, "loaded_error.png");
-    stateMapLoaded.put(Vehicle.State.EXECUTING, "loaded_normal.png");
-    stateMapLoaded.put(Vehicle.State.IDLE, "loaded_normal.png");
-    stateMapLoaded.put(Vehicle.State.UNAVAILABLE, "loaded_normal.png");
-    stateMapLoaded.put(Vehicle.State.UNKNOWN, "loaded_normal.png");
+    stateMapLoaded.put(Vehicle.State.CHARGING, loadImage(path + "loaded_charging.png"));
+    stateMapLoaded.put(Vehicle.State.ERROR, loadImage(path + "loaded_error.png"));
+    stateMapLoaded.put(Vehicle.State.EXECUTING, loadImage(path + "loaded_normal.png"));
+    stateMapLoaded.put(Vehicle.State.IDLE, loadImage(path + "loaded_normal.png"));
+    stateMapLoaded.put(Vehicle.State.UNAVAILABLE, loadImage(path + "loaded_normal.png"));
+    stateMapLoaded.put(Vehicle.State.UNKNOWN, loadImage(path + "loaded_normal.png"));
   }
 
   /**
@@ -104,5 +105,26 @@ public class StandardVehicleTheme2
       }
     }
     return false;
+  }
+
+  /**
+   * Loads an image from the file with the given name.
+   *
+   * @param fileName The name of the file from which to load the image.
+   * @return The image.
+   */
+  private Image loadImage(String fileName) {
+    requireNonNull(fileName, "fileName");
+
+    URL url = getClass().getResource(fileName);
+    if (url == null) {
+      throw new IllegalArgumentException("Invalid image file name " + fileName);
+    }
+    try {
+      return ImageIO.read(url);
+    }
+    catch (IOException exc) {
+      throw new IllegalArgumentException("Exception loading image", exc);
+    }
   }
 }

@@ -1,15 +1,19 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import org.jhotdraw.draw.DefaultDrawing;
-import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
 
 /**
@@ -30,12 +34,6 @@ public class FiguresFolder
     extends CompositeModelComponent {
 
   /**
-   * Das Drawing, das die in den FigureComponents enthaltenen Figure-Objekte
-   * enthält.
-   */
-  private transient Drawing fDrawing;
-
-  /**
    * Creates a new instance of FiguresFolder
    */
   public FiguresFolder() {
@@ -50,7 +48,6 @@ public class FiguresFolder
    */
   public FiguresFolder(String name) {
     super(name);
-    initDrawing();
   }
 
   /**
@@ -101,30 +98,5 @@ public class FiguresFolder
     }
 
     return null;
-  }
-
-  /**
-   * Initialisiert das Drawing.
-   */
-  private void initDrawing() {
-    fDrawing = new DefaultDrawing();
-  }
-
-  /**
-   * Setzt das Drawing.
-   *
-   * @param drawing
-   */
-  public void setDrawing(Drawing drawing) {
-    fDrawing = drawing;
-  }
-
-  /**
-   * Liefert das Drawing.
-   *
-   * @return
-   */
-  public Drawing getDrawing() {
-    return fDrawing;
   }
 }

@@ -12,8 +12,9 @@ dist
 lib/openTCS-Base.jar
 lib/openTCS-Kernel.jar
 lib/openTCS-PlantOverview.jar
+lib/openTCS-extensions/*.jar
 log/*.log
+log/*.lck
 log/statistics/*.txt
 nbproject/private
 reports
-

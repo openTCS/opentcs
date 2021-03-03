@@ -1,13 +1,21 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,20 +45,24 @@ public abstract class AbstractTableContent
   /**
    * Die CellEditoren.
    */
-  protected List<TableCellEditor> fCellEditors;
+  protected List<TableCellEditor> fCellEditors = new ArrayList<>();
   /**
    * Zeigt an, ob Änderungen am Tabellenmodell ausgewertet, das heißt, an
    * ModelComponent weitergeleitet werden sollen.
    */
-  protected boolean fEvaluateTableChanges;
+  protected boolean fEvaluateTableChanges = true;
+  /**
+   * Provides attribute tables.
+   */
+  private final Provider<AttributesTable> tableProvider;
 
   /**
-   * Creates a new instance of AbstractTableContent
+   * Creates a new instance.
+   * 
+   * @param tableProvider Provides attribute tables.
    */
-  public AbstractTableContent() {
-    super();
-    fEvaluateTableChanges = true;
-    fCellEditors = new ArrayList<>();
+  public AbstractTableContent(Provider<AttributesTable> tableProvider) {
+    this.tableProvider = requireNonNull(tableProvider, "tableProvider");
   }
 
   @Override // AbstractAttributesContent
@@ -78,7 +90,7 @@ public abstract class AbstractTableContent
    * Schablonenmethode zur Erzeugung und Konfiguration der Tabelle.
    */
   protected void initTable() {
-    fTable = new AttributesTable();
+    fTable = tableProvider.get();
     setTableCellRenderers();
     setTableCellEditors();
     fTable.addTableChangeListener(this);

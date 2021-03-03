@@ -1,11 +1,21 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties;
 
 import java.awt.Component;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import javax.swing.JPanel;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
+import org.opentcs.guing.model.ComponentSelectionListener;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -46,28 +56,36 @@ import org.opentcs.guing.model.ModelComponent;
  * funktioniert aber.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class AttributesComponent
-    extends javax.swing.JPanel {
+    extends JPanel
+    implements ComponentSelectionListener {
 
   /**
    * Die Tabelle mit den Properties.
    */
-  protected AttributesContent fPropertiesContent;
-  protected Component fPropertiesComponent;
+  private AttributesContent fPropertiesContent;
+  private Component fPropertiesComponent;
   /**
    * Der Undo-Manager.
    */
-  protected UndoRedoManager fUndoRedoManager;
+  private final UndoRedoManager fUndoRedoManager;
 
   /**
    * Konstruktor mit Undo-Manager und Parent.
    *
    * @param undoManager
    */
+  @Inject
   public AttributesComponent(UndoRedoManager undoManager) {
-    fUndoRedoManager = undoManager;
+    fUndoRedoManager = requireNonNull(undoManager, "undoManager");
     initComponents();
+  }
+
+  @Override
+  public void componentSelected(ModelComponent model) {
+    setModel(model);
   }
 
   /**
@@ -115,14 +133,11 @@ public class AttributesComponent
     fPropertiesComponent.setVisible(false);
   }
 
-  /**
-   *
-   * @return
-   */
   public AttributesContent getPropertiesContent() {
     return fPropertiesContent;
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -143,4 +158,5 @@ public class AttributesComponent
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JLabel descriptionLabel;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

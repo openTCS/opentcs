@@ -1,13 +1,20 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.tree;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 /**
@@ -16,12 +23,12 @@ import javax.swing.tree.TreeNode;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SortableTreeNode
-    extends javax.swing.tree.DefaultMutableTreeNode {
+    extends DefaultMutableTreeNode {
 
   /**
    * True, wenn die Kindelemente dieses Knotens sortiert werden sollen.
    */
-  protected boolean fSorting;
+  private boolean fSorting;
 
   /**
    * Erzeugt ein neues Objekt von SortableTreeNode.

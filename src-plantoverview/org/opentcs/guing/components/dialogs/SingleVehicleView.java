@@ -1,9 +1,16 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,92 +21,102 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.application.action.course.VehicleAction;
+import org.opentcs.guing.application.menus.MenuFactory;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
+import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.util.CourseObjectFactory;
 
 /**
  * Ein Fahrzeug im {@link AllVehiclesPanel}.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class SingleVehicleView
-    extends javax.swing.JPanel
+    extends JPanel
     implements AttributesChangeListener, Comparable<SingleVehicleView> {
 
   /**
    * Das darzustellende Fahrzeug.
    */
-  protected VehicleModel fVehicleModel;
+  private final VehicleModel fVehicleModel;
+  /**
+   * The tree view's manager (for selecting the vehicle when it's clicked on).
+   */
+  private final TreeViewManager treeViewManager;
+  /**
+   * The properties component (for displaying properties of the vehicle when
+   * it's clicked on).
+   */
+  private final SelectionPropertiesComponent propertiesComponent;
+  /**
+   * The drawing editor (for accessing the currently active drawing view).
+   */
+  private final OpenTCSDrawingEditor drawingEditor;
+  /**
+   * A factory to create vehicle figures.
+   */
+  private final CourseObjectFactory crsObjFactory;
+  /**
+   * A factory for popup menus.
+   */
+  private final MenuFactory menuFactory;
   /**
    * Die Zeichenfläche im Dialog.
    */
-  protected JPanel fVehicleView;
+  private final JPanel fVehicleView;
 
   private VehicleFigure figure;
 
   /**
-   * Creates new form SingleVehicleView.
+   * Creates new instance.
    *
-   * @param vehicle das darzustellende Fahrzeug
+   * @param vehicle The vehicle to be displayed.
+   * @param treeViewManager The tree view's manager (for selecting the vehicle
+   * when it's clicked on).
+   * @param propertiesComponent The properties component (for displaying
+   * properties of the vehicle when it's clicked on).
+   * @param drawingEditor The drawing editor (for accessing the currently active
+   * drawing view).
+   * @param crsObjFactory A factory to create vehicle figures.
+   * @param menuFactory A factory for popup menus.
    */
-  public SingleVehicleView(VehicleModel vehicle) {
+  @Inject
+  public SingleVehicleView(@Assisted VehicleModel vehicle,
+                           ComponentsTreeViewManager treeViewManager,
+                           SelectionPropertiesComponent propertiesComponent,
+                           OpenTCSDrawingEditor drawingEditor,
+                           CourseObjectFactory crsObjFactory,
+                           MenuFactory menuFactory) {
+    this.fVehicleModel = requireNonNull(vehicle, "vehicle");
+    this.treeViewManager = requireNonNull(treeViewManager, "treeViewManager");
+    this.propertiesComponent = requireNonNull(propertiesComponent,
+                                              "propertiesComponent");
+    this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
+    this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
+    this.menuFactory = requireNonNull(menuFactory, "menuFactory");
+    this.fVehicleView = new VehicleView(fVehicleModel);
+
     initComponents();
-    fVehicleModel = vehicle;
-    fVehicleView = new JPanel() {
 
-      @Override
-      protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        drawVehicle((Graphics2D) g);
-      }
-    };
-
-    Rectangle2D.Double r2d;
-
-    if (vehicle.getFigure() != null) {
-      r2d = vehicle.getFigure().getBounds();
-    }
-    else {
-      r2d = new Rectangle2D.Double(0, 0, 30, 20);
-    }
-
-    Rectangle r = r2d.getBounds();
-    r.grow(10, 10);
-    fVehicleView.setPreferredSize(new Dimension(r.width, r.height));
-    fVehicleView.setBackground(Color.WHITE);
     vehiclePanel.add(fVehicleView, BorderLayout.CENTER);
-    fVehicleView.addMouseListener(new MouseAdapter() {
-
-      @Override
-      public void mouseClicked(MouseEvent evt) {
-        if (evt.getButton() == MouseEvent.BUTTON1) {
-          OpenTCSView.instance().getTreeViewManager().selectItem(fVehicleModel);
-          OpenTCSView.instance().getPropertiesComponent().setModel(fVehicleModel);
-        }
-
-        if (evt.getClickCount() == 2) {
-          OpenTCSView.instance().getDrawingView().scrollTo(fVehicleModel.getFigure());
-        }
-
-        if (evt.getButton() == MouseEvent.BUTTON3) {
-          showPopup(evt.getX(), evt.getY());
-        }
-      }
-    });
 
     vehicle.addAttributesChangeListener(this);
 
-    String name = vehicle.getName();
-    vehicleLabel.setText(name);
+    vehicleLabel.setText(vehicle.getName());
     updateVehicle();
   }
 
@@ -108,8 +125,8 @@ public class SingleVehicleView
    *
    * @param g2d der Grafikkontext
    */
-  protected void drawVehicle(Graphics2D g2d) {
-    figure = new VehicleFigure(fVehicleModel);
+  private void drawVehicle(Graphics2D g2d) {
+    figure = crsObjFactory.createVehicleFigure(fVehicleModel);
     figure.setIgnorePrecisePosition(true);
     // Figur im Dialog-Panel zentrieren
     // TODO: Maßstab berücksichtigen!
@@ -125,8 +142,8 @@ public class SingleVehicleView
    * @param x
    * @param y
    */
-  protected void showPopup(int x, int y) {
-    VehicleAction.createVehicleMenu(fVehicleModel).show(this, x, y);
+  private void showPopup(int x, int y) {
+    menuFactory.createVehiclePopupMenu(fVehicleModel).show(this, x, y);
   }
 
   private void updateVehicle() {
@@ -165,6 +182,7 @@ public class SingleVehicleView
     figure.propertiesChanged(e);
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -239,9 +257,61 @@ public class SingleVehicleView
     private javax.swing.JPanel vehiclePanel;
     private javax.swing.JLabel vehicleStatus;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 
   @Override
   public int compareTo(SingleVehicleView o) {
     return fVehicleModel.getName().compareTo(o.getVehicleModel().getName());
+  }
+
+  private class VehicleView
+      extends JPanel {
+
+    public VehicleView(VehicleModel vehicleModel) {
+      requireNonNull(vehicleModel, "vehicleModel");
+
+      setBackground(Color.WHITE);
+
+      Rectangle2D.Double r2d = vehicleModel.getFigure() == null
+          ? new Rectangle2D.Double(0, 0, 30, 20)
+          : vehicleModel.getFigure().getBounds();
+      Rectangle r = r2d.getBounds();
+      r.grow(10, 10);
+      setPreferredSize(new Dimension(r.width, r.height));
+
+      addMouseListener(new VehicleMouseAdapter(vehicleModel));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      drawVehicle((Graphics2D) g);
+    }
+  }
+
+  private class VehicleMouseAdapter
+      extends MouseAdapter {
+
+    private final VehicleModel vehicleModel;
+
+    public VehicleMouseAdapter(VehicleModel vehicleModel) {
+      this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent evt) {
+      if (evt.getButton() == MouseEvent.BUTTON1) {
+        treeViewManager.selectItem(vehicleModel);
+        propertiesComponent.setModel(vehicleModel);
+      }
+
+      if (evt.getClickCount() == 2) {
+        drawingEditor.getActiveView().scrollTo(vehicleModel.getFigure());
+      }
+
+      if (evt.getButton() == MouseEvent.BUTTON3) {
+        showPopup(evt.getX(), evt.getY());
+      }
+    }
   }
 }

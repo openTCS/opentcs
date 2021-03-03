@@ -1,3 +1,12 @@
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+
 package org.opentcs.guing.components.drawing;
 
 import java.awt.AlphaComposite;
@@ -9,8 +18,13 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import javax.inject.Inject;
+import net.engio.mbassy.bus.MBassador;
+import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import static org.opentcs.guing.components.drawing.OpenTCSDrawingView.setViewRenderingHints;
+import org.opentcs.guing.exchange.TransportOrderUtil;
+import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.util.CourseObjectFactory;
 
 /**
  * Draws the drawing using a BufferedImage.
@@ -26,9 +40,24 @@ public class OpenTCSDrawingViewBuffered
    */
   private BufferedImage drawingBuffer;
 
+  /**
+   * Creates new instance.
+   *
+   * @param appState Stores the application's current state.
+   * @param opentcsView The view to be used.
+   * @param modelManager Provides the current system model.
+   * @param crsObjFactory A factory for figure objects.
+   * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param eventBus The application's event bus.
+   */
   @Inject
-  public OpenTCSDrawingViewBuffered(OpenTCSView opentcsView) {
-    super(opentcsView);
+  public OpenTCSDrawingViewBuffered(ApplicationState appState,
+                                    OpenTCSView opentcsView,
+                                    ModelManager modelManager,
+                                    CourseObjectFactory crsObjFactory,
+                                    TransportOrderUtil orderUtil,
+                                    MBassador<Object> eventBus) {
+    super(appState, opentcsView, modelManager, crsObjFactory, orderUtil, eventBus);
   }
 
   @Override

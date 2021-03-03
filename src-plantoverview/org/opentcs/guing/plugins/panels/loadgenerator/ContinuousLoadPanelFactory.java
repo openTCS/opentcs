@@ -10,6 +10,7 @@ package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.ResourceBundle;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.util.gui.plugins.PanelFactory;
 import org.opentcs.util.gui.plugins.PluggablePanel;
 
@@ -24,12 +25,12 @@ public class ContinuousLoadPanelFactory
   /**
    * This classe's bundle.
    */
-  private final ResourceBundle bundle =
-      ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private final ResourceBundle bundle
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
   /**
-   * A reference to the kernel.
+   * A reference to the shared kernel provider.
    */
-  private Kernel kernel;
+  private SharedKernelProvider kernelProvider;
 
   /**
    * Creates a new instance.
@@ -39,8 +40,8 @@ public class ContinuousLoadPanelFactory
   }
 
   @Override
-  public void setKernel(Kernel kernel) {
-    this.kernel = kernel;
+  public void setKernelProvider(SharedKernelProvider kernelProvider) {
+    this.kernelProvider = kernelProvider;
   }
 
   @Override
@@ -49,17 +50,16 @@ public class ContinuousLoadPanelFactory
   }
 
   @Override
-  public PluggablePanel createPanel() {
-    if (kernel == null || !providesPanel(kernel.getState())) {
+  public PluggablePanel createPanel(Kernel.State state) {
+    if (!providesPanel(state)) {
       return null;
     }
-    else {
-      return new ContinuousLoadPanel(kernel);
-    }
+
+    return new ContinuousLoadPanel(kernelProvider);
   }
 
   @Override
   public boolean providesPanel(Kernel.State state) {
-    return Kernel.State.OPERATING.equals(state);
+    return kernelProvider != null && Kernel.State.OPERATING.equals(state);
   }
 }

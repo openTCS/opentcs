@@ -1,14 +1,22 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.tree.elements;
 
+import static java.util.Objects.requireNonNull;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.ModelManager;
 
 /**
  * Defaultimplementierung des UserObject-Interfaces. Ein UserObject ist das
@@ -30,17 +38,38 @@ public abstract class AbstractUserObject
    */
   private final ModelComponent fModelComponent;
   /**
+   * The view.
+   */
+  private final OpenTCSView view;
+  /**
+   * The drawing editor.
+   */
+  private final OpenTCSDrawingEditor editor;
+  /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
+  /**
    * The parent object.
    */
   private ModelComponent parent;
 
   /**
-   * Creates a new instance of AbstractUserObject
+   * Creates a new instance.
    *
-   * @param modelComponent
+   * @param modelComponent The corresponding model component.
+   * @param view The application's main view.
+   * @param editor The application's drawing editor.
+   * @param modelManager Provides access to the currently loaded system model.
    */
-  public AbstractUserObject(ModelComponent modelComponent) {
-    this.fModelComponent = modelComponent;
+  public AbstractUserObject(ModelComponent modelComponent,
+                            OpenTCSView view,
+                            OpenTCSDrawingEditor editor,
+                            ModelManager modelManager) {
+    this.fModelComponent = requireNonNull(modelComponent, "modelComponent");
+    this.view = requireNonNull(view, "view");
+    this.editor = requireNonNull(editor, "editor");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
   }
 
   @Override // Object
@@ -55,21 +84,18 @@ public abstract class AbstractUserObject
 
   @Override // UserObject
   public void selected() {
-    OpenTCSView.instance().selectModelComponent(getModelComponent());
+    getView().selectModelComponent(getModelComponent());
   }
 
   @Override // UserObject
   public boolean removed() {
-    return OpenTCSView.instance().treeComponentRemoved(fModelComponent);
+    return getView().treeComponentRemoved(fModelComponent);
   }
 
   @Override // UserObject
   public void rightClicked(JComponent component, int x, int y) {
     JPopupMenu popupMenu = getPopupMenu();
-
-    if (popupMenu != null) {
-      popupMenu.show(component, x, y);
-    }
+    popupMenu.show(component, x, y);
   }
 
   @Override // UserObject
@@ -78,7 +104,7 @@ public abstract class AbstractUserObject
 
   @Override // UserObject
   public JPopupMenu getPopupMenu() {
-    return null;
+    return new JPopupMenu();
   }
 
   @Override // UserObject
@@ -87,24 +113,10 @@ public abstract class AbstractUserObject
   }
 
   /**
-   * Called when an object in the tree view is right clicked. Additionally
-   * this method calls a seperate popup menu depending on if this object
-   * belongs to a group.
-   *
-   * @param component
-   * @param x
-   * @param y
-   * @param isGroupView
-   */
-  public void rightClicked(JComponent component, int x, int y, boolean isGroupView) {
-    rightClicked(component, x, y);
-  }
-
-  /**
    * Wird aufgerufen, wenn mehrere Objekte im Baum selektiert werden sollen.
    */
   public void selectMultipleObjects() {
-    OpenTCSView.instance().addSelectedModelComponent(getModelComponent());
+    getView().addSelectedModelComponent(getModelComponent());
   }
 
   @Override
@@ -115,5 +127,17 @@ public abstract class AbstractUserObject
   @Override
   public void setParent(ModelComponent parent) {
     this.parent = parent;
+  }
+
+  protected OpenTCSView getView() {
+    return view;
+  }
+
+  protected OpenTCSDrawingEditor getEditor() {
+    return editor;
+  }
+
+  protected ModelManager getModelManager() {
+    return modelManager;
   }
 }

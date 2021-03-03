@@ -1,15 +1,18 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.opentcs.guing.components.tree.TreeViewManager;
-import org.opentcs.guing.components.tree.elements.SimpleFolderUserObject;
-import org.opentcs.guing.components.tree.elements.UserObject;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Basisimplementierung für ein Kompositum im Systemmodell. Ein Kompositum
@@ -19,6 +22,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * CompositeModelComponent ist ein abstraktes Kompositum.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class CompositeModelComponent
     extends AbstractModelComponent {
@@ -45,12 +49,6 @@ public abstract class CompositeModelComponent
   }
 
   @Override // AbstractModelComponent
-  public UserObject createUserObject() {
-    fUserObject = new SimpleFolderUserObject(this);
-    return fUserObject;
-  }
-
-  @Override // AbstractModelComponent
   public void add(ModelComponent component) {
     getChildComponents().add(component);
     component.setParent(this);
@@ -72,10 +70,8 @@ public abstract class CompositeModelComponent
 
   @Override // AbstractModelComponent
   public void treeRestore(ModelComponent parent, TreeViewManager treeViewManager) {
-    if (getTreeViewName().equals(ResourceBundleUtil.getBundle().getString("tree.blocks.text"))) {
-      if (treeViewManager.isHideBlocks()) {
-        return;
-      }
+    if (!treeViewManager.accepts(this)) {
+      return;
     }
 
     super.treeRestore(parent, treeViewManager);

@@ -1,24 +1,27 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 20.08.2013 11:50:30
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.util;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentcs.guing.application.OpenTCSView;
+import javax.inject.Inject;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.gui.plugins.VehicleTheme;
 import org.opentcs.util.gui.plugins.VehicleThemeRegistry;
 
 /**
- * Provides utility for vehicle themes.
+ * Manages the registered vehicle themes.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultVehicleThemeManager
     implements VehicleThemeManager {
@@ -29,19 +32,9 @@ public class DefaultVehicleThemeManager
   private static final Logger logger
       = Logger.getLogger(DefaultVehicleThemeManager.class.getName());
   /**
-   * This class's configuration store.
+   * The application's configuration.
    */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(OpenTCSView.class.getName());
-  /**
-   * The manager instance.
-   */
-  private static final DefaultVehicleThemeManager instance
-      = new DefaultVehicleThemeManager();
-  /**
-   * Config store key.
-   */
-  private static final String CONFIGSTOREKEY = ConfigConstants.VEHICLE_THEME;
+  private final ApplicationConfiguration appConfig;
   /**
    * The available themes.
    */
@@ -61,19 +54,17 @@ public class DefaultVehicleThemeManager
 
   /**
    * Creates a new instance.
-   */
-  private DefaultVehicleThemeManager() {
-    this.themes = (new VehicleThemeRegistry()).getThemes();
-    evaluateClientDefaultTheme();
-  }
-
-  /**
-   * Returns the single instance of this theme manager.
    *
-   * @return The single instance of this theme manager.
+   * @param registry Provides the registered vehicle themes.
    */
-  public static VehicleThemeManager getInstance() {
-    return instance;
+  @Inject
+  private DefaultVehicleThemeManager(ApplicationConfiguration appConfig,
+                                     VehicleThemeRegistry registry) {
+    this.appConfig = requireNonNull(appConfig, "appConfig");
+    requireNonNull(registry, "registry");
+    this.themes = registry.getThemes();
+
+    evaluateClientDefaultTheme();
   }
 
   @Override
@@ -86,9 +77,9 @@ public class DefaultVehicleThemeManager
     defaultTheme = null;
     defaultConfigStoreTheme = null;
     themeProperty = property;
-    String configStoreValue = configStore.getString(CONFIGSTOREKEY, "undefined");
+    String configStoreValue = appConfig.getVehicleThemeName();
 
-    if (!configStoreValue.equals("undefined")) {
+    if (!configStoreValue.isEmpty()) {
       for (VehicleTheme theme : themes) {
         if (theme.getName().equals(configStoreValue)) {
           defaultTheme = theme;
@@ -98,7 +89,8 @@ public class DefaultVehicleThemeManager
     }
     else {
       for (VehicleTheme theme : themes) {
-        if (theme.getClass().getName().equals(themeProperty.getTheme())) {
+        if (themeProperty != null
+            && theme.getClass().getName().equals(themeProperty.getTheme())) {
           defaultTheme = theme;
         }
       }
@@ -107,7 +99,7 @@ public class DefaultVehicleThemeManager
     if (defaultTheme == null) {
       if (!themes.isEmpty()) {
         logger.log(Level.WARNING, "Theme with name {0} not found. Using {1}",
-                   new Object[] {themeProperty.getTheme(), themes.get(0).getClass().getName()});
+                   new Object[] {themeProperty == null ? null : themeProperty.getTheme(), themes.get(0).getClass().getName()});
         defaultTheme = themes.get(0);
       }
       else {
@@ -117,26 +109,13 @@ public class DefaultVehicleThemeManager
   }
 
   @Override
-  @Deprecated
-  public Set<String> getAllImagePaths() {
-    // XXX This method probably does not belong into this class.
-    Set<String> images = new HashSet<>();
-
-    for (VehicleTheme theme : getThemes()) {
-      images.addAll(theme.getAllImagePaths());
-    }
-
-    return images;
-  }
-
-  @Override
   public void updateDefaultTheme(VehicleTheme theme) {
     if (themes.contains(theme)) {
       defaultTheme = theme;
-      configStore.setString(CONFIGSTOREKEY, theme.getName());
+      appConfig.setVehicleThemeName(theme.getName());
     }
     else {
-      configStore.setString(CONFIGSTOREKEY, "undefined");
+      appConfig.setVehicleThemeName("");
       updateDefaultTheme();
     }
   }
@@ -157,16 +136,17 @@ public class DefaultVehicleThemeManager
   }
 
   private void evaluateClientDefaultTheme() {
-    String configStoreValue = configStore.getString(CONFIGSTOREKEY, "undefined");
-    if (configStoreValue.equals("undefined")) {
-      return;
-    }
-
-    for (VehicleTheme theme : themes) {
-      if (theme.getName().equals(configStoreValue)) {
-        defaultTheme = theme;
-        defaultConfigStoreTheme = theme;
+    String configStoreValue = appConfig.getVehicleThemeName();
+    if (!configStoreValue.isEmpty()) {
+      for (VehicleTheme theme : themes) {
+        if (theme.getName().equals(configStoreValue)) {
+          defaultTheme = theme;
+          defaultConfigStoreTheme = theme;
+        }
       }
+    }
+    else {
+      updateDefaultTheme();
     }
   }
 }

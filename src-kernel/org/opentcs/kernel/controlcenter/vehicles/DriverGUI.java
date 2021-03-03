@@ -26,19 +26,19 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.opentcs.access.Kernel;
+import org.opentcs.access.LocalKernel;
+import org.opentcs.algorithms.KernelExtension;
+import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.drivers.BasicCommunicationAdapter;
 import org.opentcs.drivers.CommunicationAdapterFactory;
 import org.opentcs.drivers.CommunicationAdapterRegistry;
 import org.opentcs.drivers.SimCommunicationAdapter;
 import org.opentcs.drivers.VehicleManager;
 import org.opentcs.drivers.VehicleModel;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.LocalKernel;
-import org.opentcs.algorithms.KernelExtension;
 import org.opentcs.util.configuration.ConfigurationStore;
 
 /**

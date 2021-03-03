@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
 import org.opentcs.data.ObjectPropConstants;
@@ -9,18 +15,19 @@ import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.components.tree.elements.LocationTypeUserObject;
 import org.opentcs.guing.model.AbstractModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
+ * Basic implementation of a location type.
+ * 
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationTypeModel
     extends AbstractModelComponent {
 
   /**
-   * Der Schlüssel für die möglichen Aktionen.
+   * The key for the possible actions on this type.
    */
   public static final String ALLOWED_OPERATIONS = "AllowedOperations";
 
@@ -42,13 +49,6 @@ public class LocationTypeModel
     String treeViewName = getDescription() + " " + getName();
 
     return treeViewName;
-  }
-
-  @Override
-  public LocationTypeUserObject createUserObject() {
-    fUserObject = new LocationTypeUserObject(this);
-
-    return (LocationTypeUserObject) fUserObject;
   }
 
   private void createProperties() {

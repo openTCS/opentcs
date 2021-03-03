@@ -4,10 +4,9 @@ package org.opentcs.access.rmi;
 
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
-import org.junit.After;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import org.junit.*;
 import org.opentcs.access.Kernel;
 
 /**

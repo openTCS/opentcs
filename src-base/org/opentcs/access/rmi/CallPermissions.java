@@ -29,7 +29,9 @@ import org.opentcs.data.user.UserPermission;
 public @interface CallPermissions {
   
   /**
-   * The permissions required to call the annotated method.
+   * Returns the permissions required to call the annotated method.
+   *
+   * @return the permissions required to call the annotated method.
    */
   UserPermission[] value();
 }

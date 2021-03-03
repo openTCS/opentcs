@@ -1,18 +1,24 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.model.SystemModel;
 
 /**
- * Interface for componentts to edit properties.
+ * Interface for components to edit properties.
  * Classes that implement this interface are generally embedded in a dialog.
  * The dialog then calls these methods.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public interface DetailsDialogContent {
 
@@ -42,12 +48,4 @@ public interface DetailsDialogContent {
    * @return The property.
    */
   Property getProperty();
-  
-  /**
-   * Sets the current system model, in case the implementation needs to acquire
-   * data from it.
-   *
-   * @param systemModel The current system model.
-   */
-  void setSystemModel(SystemModel systemModel);
 }

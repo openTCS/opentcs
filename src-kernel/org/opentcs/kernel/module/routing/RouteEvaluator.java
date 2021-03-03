@@ -22,6 +22,21 @@ import org.opentcs.data.order.Route;
 abstract class RouteEvaluator {
 
   /**
+   * An additional evaluator augmenting the computed costs of this one.
+   */
+  protected final RouteEvaluator augmentingEvaluator;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param augmentingEvaluator An additional evaluator augmenting the computed
+   * costs of this one.
+   */
+  public RouteEvaluator(RouteEvaluator augmentingEvaluator) {
+    this.augmentingEvaluator = augmentingEvaluator;
+  }
+
+  /**
    * Computes the costs for the given vehicle travelling from the given starting
    * position via the given list of route steps.
    *
@@ -31,5 +46,7 @@ abstract class RouteEvaluator {
    * @return The costs for the given vehicle travelling from the given starting
    * position via the given list of route steps.
    */
-  abstract long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps);
+  public abstract long computeCosts(Vehicle vehicle,
+                                    Point startPoint,
+                                    List<Route.Step> steps);
 }

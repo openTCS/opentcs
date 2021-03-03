@@ -1,16 +1,22 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.model.elements;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
@@ -20,32 +26,22 @@ import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
-import org.opentcs.guing.components.tree.elements.VehicleUserObject;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Standardausführung eines Fahrzeugs. Ein Fahrzeug besitzt eine eindeutige
- * Nummer. Ein Fahrzeug ist immer Kindkomponente eines Fahrzeugtyps.
- * <p>
- * <b>Entwurfsmuster:</b> Kompositum. Vehicle ist eine konkrete Blattkomponente.
+ * Basic implementation of a vehicle. A vehicle has an unique number.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleModel
     extends AbstractFigureComponent {
 
-  /**
-   * Diese Größen können in der Modellierung geändert werden.
-   */
   public static final String LENGTH = "Length";
   public static final String ENERGY_LEVEL_CRITICAL = "EnergyLevelCritical";
   public static final String ENERGY_LEVEL_GOOD = "EnergyLevelGood";
-  /**
-   * Diese Größen werden vom jeweiligen Fahrzeugtreiber gesetzt und in der GUI
-   * nur angezeigt.
-   */
   public static final String LOADED = "Loaded";
   public static final String STATE = "State";
   public static final String PROC_STATE = "ProcState";
@@ -55,59 +51,52 @@ public class VehicleModel
   public static final String INITIAL_POSITION = "InitialPosition";
   public static final String ORIENTATION_ANGLE = "OrientationAngle";
   public static final String ENERGY_LEVEL = "EnergyLevel";
-  /**
-   * Der Batterieladezustand wird aus dem aktuellen Energy-Level und den
-   * Schwellwerten bestimmmt.
-   */
   public static final String ENERGY_STATE = "EnergyState";
 
   /**
-   * Der Punkt, auf dem das Fahrzeug steht.
+   * The point the vehicle currently remains on.
    */
   private PointModel fPoint;
   /**
-   * Der Punkt, der als nächstes von dem Fahrzeug angefahren wird.
+   * The point the vehicle will drive to next.
    */
   private PointModel fNextPoint;
   /**
-   * Die aktuelle Position (x,y,z), die der Fahrzeugtreiber gemeldet hat.
+   * The current position (x,y,z) the vehicle driver reported.
    */
   private Triple fPrecisePosition;
   /**
-   * Die aktuelle Winkelausrichtung (-360 .. +360 deg).
+   * The current vehicle orientation.
    */
   private double fOrientationAngle;
   /**
-   * Der aktuelle Fahrauftrag des Fahrzeugs.
+   * The current drive order.
    */
   private List<FigureComponent> fDriveOrderComponents;
   /*
-   * Die Farbe, in welcher gegebenenfalls der aktuelle Fahrauftrag des Fahrzeugs
-   * dargestellt werden soll.
+   * The color the drive order will be painted in.
    */
   private Color fDriveOrderColor = Color.BLACK;
   /**
-   * Flag, ob Farben heller oder dunkler werden.
+   * Flag, whether the colors will get darker or brighter.
    */
   private boolean driveOrderColorDesc = false;
   /**
-   *
+   * The state of the drive order.
    */
   private TransportOrder.State fDriveOrderState;
   /**
-   * Bei
-   * <code>true</code> wird der jeweils aktuelle Fahrauftrag visualisiert.
+   * Flag whether the drive order will be displayed.
    */
   private boolean fDisplayDriveOrders;
   /**
-   * Bei
-   * <code>true</code> folgt die Fahrkursansicht dem Fahrzeug.
+   * Flag whether the view follows this vehicle as it drives.
    */
   private boolean fViewFollows;
   /**
    * A reference to the vehicle.
    */
-  private TCSObjectReference<Vehicle> reference;
+  private Vehicle vehicle;
 
   /**
    * Creates a new instance.
@@ -118,85 +107,95 @@ public class VehicleModel
   }
 
   /**
-   * Setzt den Namen des Fahrzeugs.
+   * Sets the point the vehicle currently remains on.
    *
-   * @param name der Name des Fahrzeugs
-   */
-  public void setName(String name) {
-    StringProperty p = (StringProperty) getProperty(NAME);
-    p.setText(name);
-  }
-
-  /**
-   * Setzt den Punkt, auf dem sich das Fahrzeug befindet.
-   *
-   * @param point der Punkt
+   * @param point The point.
    */
   public void placeOnPoint(PointModel point) {
     fPoint = point;
   }
 
+  @Override // AbstractFigureComponent
+  public VehicleFigure getFigure() {
+    return (VehicleFigure) super.getFigure();
+  }
+
   /**
-   * @return Der Punkt, auf dem sich das Fahrzeug befindet.
+   * Returns the point the vehicle currently remains on.
+   *
+   * @return The current point.
    */
   public PointModel getPoint() {
     return fPoint;
   }
 
   /**
-   * @return Der Punkt, den das Fahrzeug als nächstes anfährt.
+   * Returns the point the vehicle will drive to next.
+   *
+   * @return The next point.
    */
   public PointModel getNextPoint() {
     return fNextPoint;
   }
 
   /**
-   * Setzt den Punkt, den das Fahrzeug als nächstes anfährt.
+   * Sets the point the vehicle will drive to next.
    *
-   * @param point der Punkt
+   * @param point The next point.
    */
   public void setNextPoint(PointModel point) {
     fNextPoint = point;
   }
 
   /**
-   * @return Die aktuelle Position (x,y,z)
+   * Returns the current position.
+   *
+   * @return The position (x,y,z).
    */
   public Triple getPrecisePosition() {
     return fPrecisePosition;
   }
 
+  /**
+   * Sets the current position
+   *
+   * @param position A triple containing the position.
+   */
   public void setPrecisePosition(Triple position) {
     fPrecisePosition = position;
   }
 
   /**
+   * Returns the current orientation angle.
    *
-   * @return die aktuelle Winkelausrichtung (-360 .. +360 deg)
+   * @return The orientation angle.
    */
   public double getOrientationAngle() {
     return fOrientationAngle;
   }
 
+  /**
+   * Sets the orientation angle.
+   *
+   * @param angle The new angle.
+   */
   public void setOrientationAngle(double angle) {
     fOrientationAngle = angle;
   }
 
   /**
-   * Liefert die Liste der Komponenten entlang des aktuellen Fahrauftrags des
-   * Fahrzeugs.
+   * Returns a list with all drive order components.
    *
-   * @return den Fahrauftrag
+   * @return The drive order components.
    */
   public List<FigureComponent> getDriveOrderComponents() {
     return fDriveOrderComponents;
   }
 
   /**
-   * Setzt die Liste der Komponenten entlang des aktuellen Fahrauftrags des
-   * Fahrzeugs.
+   * Sets the drive order components.
    *
-   * @param driveOrderComponents den Fahrauftrag
+   * @param driveOrderComponents A list with the components.
    */
   public void setDriveOrderComponents(List<FigureComponent> driveOrderComponents) {
     if (fDriveOrderComponents == null && driveOrderComponents != null) {
@@ -206,7 +205,8 @@ public class VehicleModel
   }
 
   /**
-   * Macht fDriveOrderColor heller oder dunkler.
+   * Updates the drive order color by making it darker or brighter.
+   * It depends on the current color and the flag <code>driveOrderColorDesc</code>.
    */
   private void updateDriveOrderColor() {
     int red = fDriveOrderColor.getRed();
@@ -248,105 +248,117 @@ public class VehicleModel
   }
 
   /**
-   * Liefert die Farbe, in welcher gegebenenfalls der aktuelle Fahrauftrag des
-   * Fahrzeugs dargestellt werden soll.
+   * Returns the color the drive order is painted in.
    *
-   * @return die Farbe
+   * @return The color.
    */
   public Color getDriveOrderColor() {
     return fDriveOrderColor;
   }
 
   /**
-   * Setzt die Farbe, in welcher gegebenenfalls der aktuelle Fahrauftrag des
-   * Fahrzeugs dargestellt werden soll.
+   * Sets the drive order color.
    *
-   * @param color die Farbe
+   * @param color The color.
    */
   public void setDriveOrderColor(Color color) {
     fDriveOrderColor = Objects.requireNonNull(color, "color is null");
   }
 
   /**
+   * Returns the state of the drive order.
    *
-   * @return
+   * @return The state.
    */
   public TransportOrder.State getDriveOrderState() {
     return fDriveOrderState;
   }
 
+  /**
+   * Sets the drive order state.
+   *
+   * @param driveOrderState The new state.
+   */
   public void setDriveOrderState(TransportOrder.State driveOrderState) {
     fDriveOrderState = driveOrderState;
   }
 
   /**
-   * Teilt mit, ob der jeweils aktuelle Fahrauftrag angezeigt werden soll oder
-   * nicht.
+   * Sets whether the drive order shall be displayed or not.
    *
-   * @param state
-   * <code>true</code>, wenn der jeweils aktuelle Fahrauftrag visualisiert
-   * werden soll
+   * @param state <code>true</code> to display the drive order.
    */
   public void setDisplayDriveOrders(boolean state) {
     fDisplayDriveOrders = state;
   }
 
   /**
-   * Gibt Auskunft darüber, ob der jeweils aktuelle Fahrauftrag angezeigt wird.
+   * Returns whether the drive order is displayed.
    *
-   * @return <code>true</code>, wenn der jeweils aktuelle Fahrauftrag
-   * visualisiert wird
+   * @return <code>true</code>, if it displayed.
    */
   public boolean getDisplayDriveOrders() {
     return fDisplayDriveOrders;
   }
 
   /**
-   * @return
+   * Returns whether the view follows this vehicle as it drives.
+   *
+   * @return <code>true</code> if it follows.
    */
   public boolean isViewFollows() {
     return fViewFollows;
   }
 
+  /**
+   * Sets whether the view follows this vehicle as it drives.
+   *
+   * @param viewFollows <code>true</code> if it follows.
+   */
   public void setViewFollows(boolean viewFollows) {
     this.fViewFollows = viewFollows;
   }
 
-  public TCSObjectReference<Vehicle> getReference() {
-    return reference;
+  /**
+   * Returns the kernel object.
+   *
+   * @return The kernel object.
+   */
+  public Vehicle getVehicle() {
+    return vehicle;
   }
 
-  public void setReference(TCSObjectReference<Vehicle> reference) {
-    this.reference = reference;
+  /**
+   * Sets the kernel object.
+   *
+   * @param vehicle The kernel object.
+   */
+  public void setVehicle(Vehicle vehicle) {
+    this.vehicle = vehicle;
   }
 
-  @Override
-  public int compareTo(AbstractFigureComponent o) {
-    StringProperty property = (StringProperty) getProperty(NAME);
-    String name = property.getText();
-    property = (StringProperty) o.getProperty(NAME);
-    String otherName = property.getText();
-   
-    return name.compareTo(otherName);
+  /**
+   * Checks whether the last reported processing state of the vehicle would
+   * allow it to be assigned an order.
+   *
+   * @return <code>true</code> if, and only if, the vehicle's processing state
+   * is not UNAVAILABLE.
+   */
+  public boolean isAvailableForOrder() {
+    return vehicle != null
+        && !vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE);
   }
 
   @Override // AbstractModelComponent
   public String getTreeViewName() {
     String treeViewName = getDescription() + " " + getName();
-    
+
     return treeViewName;
   }
 
   @Override // AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("vehicle.description");
-  }
-
-  @Override // AbstractFigureComponent
-  public VehicleUserObject createUserObject() {
-    fUserObject = new VehicleUserObject(this);
-
-    return (VehicleUserObject) fUserObject;
   }
 
   private void createProperties() {
@@ -384,7 +396,8 @@ public class VehicleModel
     pEnergyLevel.setModellingEditable(false);
     setProperty(ENERGY_LEVEL, pEnergyLevel);
     // Bewertung: Gut, ausreichend, kritisch
-    SelectionProperty pEnergyState = new SelectionProperty(this, EnergyState.values(), EnergyState.CRITICAL);
+    SelectionProperty<EnergyState> pEnergyState = 
+        new SelectionProperty<>(this, Arrays.asList(EnergyState.values()), EnergyState.CRITICAL);
     pEnergyState.setDescription(bundle.getString("vehicle.energyState.text"));
     pEnergyState.setHelptext(bundle.getString("vehicle.energyState.helptext"));
     pEnergyState.setModellingEditable(false);
@@ -396,13 +409,15 @@ public class VehicleModel
     pLoaded.setModellingEditable(false);
     setProperty(LOADED, pLoaded);
     // State
-    SelectionProperty pState = new SelectionProperty(this, Vehicle.State.values(), Vehicle.State.UNKNOWN);
+    SelectionProperty<Vehicle.State> pState = 
+        new SelectionProperty<>(this, Arrays.asList(Vehicle.State.values()), Vehicle.State.UNKNOWN);
     pState.setDescription(bundle.getString("vehicle.state.text"));
     pState.setHelptext(bundle.getString("vehicle.state.helptext"));
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
     // Process state
-    SelectionProperty pProcState = new SelectionProperty(this, Vehicle.ProcState.values(), Vehicle.ProcState.UNAVAILABLE);
+    SelectionProperty<Vehicle.ProcState> pProcState = 
+        new SelectionProperty<>(this, Arrays.asList(Vehicle.ProcState.values()), Vehicle.ProcState.UNAVAILABLE);
     pProcState.setDescription(bundle.getString("vehicle.procState.text"));
     pProcState.setHelptext("vehicle.procState.helptext");
     pProcState.setModellingEditable(false);

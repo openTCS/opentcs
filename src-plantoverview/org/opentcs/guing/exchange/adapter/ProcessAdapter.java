@@ -1,51 +1,35 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange.adapter;
 
 import java.io.Serializable;
-import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.exchange.EventDispatcher;
+import javax.annotation.Nullable;
+import org.opentcs.access.Kernel;
+import org.opentcs.data.TCSObject;
+import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Receives messages from a
- * <code>ModelComponent</code> and its kernel equivalent and delegates them
- * to the respectively other one.
+ * Receives messages from a <code>ModelComponent</code> and its kernel
+ * equivalent and delegates them to the respective other one.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ProcessAdapter
-    extends AttributesChangeListener, Serializable {
+    extends Serializable {
 
   /**
    * Registers itself at the kernel and model object
    */
   void register();
-
-  /**
-   * Returns the <code>EventDispatcher</code>.
-   *
-   * @return The <code>EventDispatcher</code>.
-   */
-  EventDispatcher getEventDispatcher();
-
-  /**
-   * Sets the <code>EventDispatcher</code>. This is the central point where
-   * objects from the kernel are gathered.
-   *
-   * @param eventDispatcher The  <code>EventDispatcher</code>.
-   */
-  void setEventDispatcher(EventDispatcher eventDispatcher);
-
-  /**
-   * Sets the model component.
-   *
-   * @param model The model component.
-   */
-  void setModel(ModelComponent model);
 
   /**
    * Returns the model component.
@@ -55,35 +39,24 @@ public interface ProcessAdapter
   ModelComponent getModel();
 
   /**
-   * Creates the object in the kernel. If successful, a copy will be returned,
-   * <code>null</code> otherwise.
+   * Reads the current properties from the kernel and adopts these for
+   * the model object.
    *
-   * @return A copy of the created object. <code>null</code> if it failed.
-   * @throws KernelRuntimeException If the creation failed.
+   * @param kernel A reference to the kernel, in case the adapter needs to
+   * access data that is not contained in the given kernel object.
+   * @param tcsObject The kernel's object.
+   * @param layoutElement A nullable layout element. If present, the process
+   * adapter will update the model object's layout data, too.
    */
-  Object createProcessObject() throws KernelRuntimeException;
+  void updateModelProperties(Kernel kernel,
+                             TCSObject<?> tcsObject,
+                             @Nullable ModelLayoutElement layoutElement);
 
   /**
-   * Sets the kernel object.
+   * Reads the current properties from the model and adopts these for the
+   * kernel object.
    *
-   * @param processObject A reference to the kernel object.
+   * @param kernel The kernel to synchronize the local model data to.
    */
-  void setProcessObject(Object processObject);
-
-  /**
-   * Removes the kernel object and the layout elements.
-   */
-  void releaseProcessObject();
-
-  /**
-   * Removed the layout element.
-   */
-  void releaseLayoutElement();
-
-  /**
-   * Returns a reference to the kernel object.
-   *
-   * @return A reference to the kernel object.
-   */
-  Object getProcessObject();
+  void updateProcessProperties(Kernel kernel);
 }

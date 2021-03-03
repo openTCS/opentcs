@@ -1,16 +1,21 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 11.09.2013 11:59:48
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
-import org.opentcs.guing.components.properties.panel.VehicleThemePropertyEditorPanel;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
  * A property containing the name of the currently used theme.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleThemeProperty
     extends AbstractComplexProperty {
@@ -21,11 +26,12 @@ public class VehicleThemeProperty
   private String themeName = "";
 
   /**
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component this property belongs to.
    */
   public VehicleThemeProperty(ModelComponent model) {
-    super(model, VehicleThemePropertyEditorPanel.class);
+    super(model);
   }
 
   @Override

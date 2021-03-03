@@ -8,8 +8,13 @@
  */
 package org.opentcs.kernel;
 
+import com.google.inject.BindingAnnotation;
 import java.awt.Color;
 import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -22,7 +27,6 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Layout;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -42,8 +46,8 @@ import org.opentcs.kernel.workingset.TCSObjectPool;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-final class KernelStateModelling
-    extends KernelState {
+class KernelStateModelling
+    extends KernelStateOnline {
 
   /**
    * This class's Logger.
@@ -65,6 +69,8 @@ final class KernelStateModelling
    * @param kernel The kernel.
    * @param objectPool The object pool to be used.
    * @param messageBuffer The message buffer to be used.
+   * @param saveModelOnTerminate Whether to save the model when this state is
+   * terminated.
    */
   @Inject
   KernelStateModelling(StandardKernel kernel,
@@ -72,12 +78,10 @@ final class KernelStateModelling
                        TCSObjectPool objectPool,
                        Model model,
                        MessageBuffer messageBuffer,
+                       @SaveModelOnTerminate boolean saveModelOnTerminate,
                        @KernelExtension.Modelling Set<KernelExtension> extensions) {
-    super(kernel,
-          globalSyncObject,
-          objectPool,
-          model,
-          messageBuffer);
+    super(kernel, globalSyncObject, objectPool, model, messageBuffer,
+          saveModelOnTerminate);
     this.extensions = requireNonNull(extensions, "extensions");
   }
 
@@ -94,7 +98,7 @@ final class KernelStateModelling
     }
 
     initialized = true;
-    
+
     log.fine("Modelling state initialized.");
   }
 
@@ -104,6 +108,8 @@ final class KernelStateModelling
       throw new IllegalStateException("Not initialized, cannot terminate");
     }
     log.fine("Terminating modelling state...");
+    super.terminate();
+
     // Terminate everything that may still use resources.
     for (KernelExtension extension : extensions) {
       extension.plugOut();
@@ -121,7 +127,6 @@ final class KernelStateModelling
 
   @Override
   public void createModel(String modelName) {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       // Clear the model and set its name.
       model.clear();
@@ -130,38 +135,22 @@ final class KernelStateModelling
   }
 
   @Override
-  public void loadModel(String modelName)
+  public void loadModel()
       throws IOException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
-      kernel.modelPersister.loadModel(modelName, model);
+      kernel.modelPersister.loadModel(model);
     }
   }
 
   @Override
-  public void saveModel(String modelName, boolean overwrite)
+  public void removeModel()
       throws IOException {
-    log.finer("method entry");
-    synchronized (globalSyncObject) {
-      if (modelName != null) {
-        verifyModelNameCaseMatch(modelName);
-        model.setName(modelName);
-      }
-      kernel.modelPersister.saveModel(model, model.getName(), overwrite);
-    }
-  }
-
-  @Override
-  public void removeModel(String rmName)
-      throws IOException {
-    log.finer("method entry");
-    kernel.modelPersister.removeModel(rmName);
+    kernel.modelPersister.removeModel();
   }
 
   @Override
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       TCSObject<?> object = globalObjectPool.getObject(ref);
       if (object == null) {
@@ -173,9 +162,6 @@ final class KernelStateModelling
       }
       else if (object instanceof Group) {
         model.removeGroup(((Group) object).getReference());
-      }
-      else if (object instanceof Layout) {
-        model.removeLayout(((Layout) object).getReference());
       }
       else if (object instanceof Location) {
         model.removeLocation(((Location) object).getReference());
@@ -202,26 +188,7 @@ final class KernelStateModelling
   }
 
   @Override
-  public Layout createLayout(byte[] layoutData) {
-    log.finer("method entry");
-    synchronized (globalSyncObject) {
-      return model.createLayout(null, layoutData).clone();
-    }
-  }
-
-  @Override
-  public void setLayoutData(
-      TCSObjectReference<Layout> ref, byte[] newData)
-      throws ObjectUnknownException {
-    log.finer("method entry");
-    synchronized (globalSyncObject) {
-      model.setLayoutData(ref, newData);
-    }
-  }
-
-  @Override
   public VisualLayout createVisualLayout() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return model.createVisualLayout(null).clone();
     }
@@ -231,7 +198,6 @@ final class KernelStateModelling
   public void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                                     double scaleX)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVisualLayoutScaleX(ref, scaleX);
     }
@@ -241,7 +207,6 @@ final class KernelStateModelling
   public void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                                     double scaleY)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVisualLayoutScaleY(ref, scaleY);
     }
@@ -251,7 +216,6 @@ final class KernelStateModelling
   public void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                                     Map<String, Color> colors)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVisualLayoutColors(ref, colors);
     }
@@ -261,7 +225,6 @@ final class KernelStateModelling
   public void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                       Set<LayoutElement> elements)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVisualLayoutElements(ref, elements);
     }
@@ -269,7 +232,6 @@ final class KernelStateModelling
 
   @Override
   public Point createPoint() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       // Return a copy of the point
       return model.createPoint(null).clone();
@@ -280,7 +242,6 @@ final class KernelStateModelling
   public void setPointPosition(TCSObjectReference<Point> ref,
                                Triple position)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPointPosition(ref, position);
     }
@@ -290,7 +251,6 @@ final class KernelStateModelling
   public void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                               double angle)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPointVehicleOrientationAngle(ref, angle);
     }
@@ -300,7 +260,6 @@ final class KernelStateModelling
   public void setPointType(TCSObjectReference<Point> ref,
                            Point.Type newType)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPointType(ref, newType);
     }
@@ -310,37 +269,30 @@ final class KernelStateModelling
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return model.createPath(null, srcRef, destRef).clone();
     }
   }
 
   @Override
-  public void setPathLength(TCSObjectReference<Path> ref,
-                            long length)
+  public void setPathLength(TCSObjectReference<Path> ref, long length)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPathLength(ref, length);
     }
   }
 
   @Override
-  public void setPathRoutingCost(TCSObjectReference<Path> ref,
-                                 long cost)
+  public void setPathRoutingCost(TCSObjectReference<Path> ref, long cost)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPathRoutingCost(ref, cost);
     }
   }
 
   @Override
-  public void setPathMaxVelocity(TCSObjectReference<Path> ref,
-                                 int velocity)
+  public void setPathMaxVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPathMaxVelocity(ref, velocity);
     }
@@ -350,17 +302,14 @@ final class KernelStateModelling
   public void setPathMaxReverseVelocity(TCSObjectReference<Path> ref,
                                         int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPathMaxReverseVelocity(ref, velocity);
     }
   }
 
   @Override
-  public void setPathLocked(TCSObjectReference<Path> ref,
-                            boolean locked)
+  public void setPathLocked(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setPathLocked(ref, locked);
     }
@@ -368,7 +317,6 @@ final class KernelStateModelling
 
   @Override
   public Vehicle createVehicle() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return model.createVehicle(null).clone();
     }
@@ -377,7 +325,6 @@ final class KernelStateModelling
   @Override
   public void setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setVehicleLength(ref, length);
     }
@@ -385,7 +332,6 @@ final class KernelStateModelling
 
   @Override
   public LocationType createLocationType() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return model.createLocationType(null).clone();
     }
@@ -396,7 +342,6 @@ final class KernelStateModelling
       TCSObjectReference<LocationType> ref,
       String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.addLocationTypeAllowedOperation(ref, operation);
     }
@@ -406,7 +351,6 @@ final class KernelStateModelling
   public void removeLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.removeLocationTypeAllowedOperation(ref, operation);
     }
@@ -415,7 +359,6 @@ final class KernelStateModelling
   @Override
   public Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       return model.createLocation(null, typeRef).clone();
     }
@@ -425,7 +368,6 @@ final class KernelStateModelling
   public void setLocationPosition(TCSObjectReference<Location> ref,
                                   Triple position)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setLocationPosition(ref, position);
     }
@@ -435,7 +377,6 @@ final class KernelStateModelling
   public void setLocationType(TCSObjectReference<Location> ref,
                               TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.setLocationType(ref, typeRef);
     }
@@ -445,7 +386,6 @@ final class KernelStateModelling
   public void connectLocationToPoint(TCSObjectReference<Location> locRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.connectLocationToPoint(locRef, pointRef);
     }
@@ -455,7 +395,6 @@ final class KernelStateModelling
   public void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.disconnectLocationFromPoint(locRef, pointRef);
     }
@@ -466,7 +405,6 @@ final class KernelStateModelling
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.addLocationLinkAllowedOperation(locRef, pointRef, operation);
     }
@@ -477,7 +415,6 @@ final class KernelStateModelling
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.removeLocationLinkAllowedOperation(locRef, pointRef, operation);
     }
@@ -487,7 +424,6 @@ final class KernelStateModelling
   public void clearLocationLinkAllowedOperations(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.clearLocationLinkAllowedOperations(locRef, pointRef);
     }
@@ -495,7 +431,6 @@ final class KernelStateModelling
 
   @Override
   public Block createBlock() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       // Return a copy of the point
       return model.createBlock(null).clone();
@@ -506,7 +441,6 @@ final class KernelStateModelling
   public void addBlockMember(TCSObjectReference<Block> ref,
                              TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.addBlockMember(ref, newMemberRef);
     }
@@ -516,7 +450,6 @@ final class KernelStateModelling
   public void removeBlockMember(TCSObjectReference<Block> ref,
                                 TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.removeBlockMember(ref, rmMemberRef);
     }
@@ -524,7 +457,6 @@ final class KernelStateModelling
 
   @Override
   public StaticRoute createStaticRoute() {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       // Return a copy of the point
       return model.createStaticRoute(null).clone();
@@ -535,7 +467,6 @@ final class KernelStateModelling
   public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.addStaticRouteHop(ref, newHopRef);
     }
@@ -544,7 +475,6 @@ final class KernelStateModelling
   @Override
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.clearStaticRouteHops(ref);
     }
@@ -554,7 +484,6 @@ final class KernelStateModelling
   public void attachResource(TCSResourceReference<?> resource,
                              TCSResourceReference<?> newResource)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.attachResource(resource, newResource).clone();
     }
@@ -564,9 +493,18 @@ final class KernelStateModelling
   public void detachResource(TCSResourceReference<?> resource,
                              TCSResourceReference<?> rmResource)
       throws ObjectUnknownException {
-    log.finer("method entry");
     synchronized (globalSyncObject) {
       model.detachResource(resource, rmResource).clone();
     }
+  }
+
+  /**
+   * Annotation type for marking/binding the "save on terminate" parameter.
+   */
+  @BindingAnnotation
+  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface SaveModelOnTerminate {
+    // Nothing here.
   }
 }

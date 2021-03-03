@@ -93,6 +93,15 @@ abstract class RoutingTableBuilderAbstract {
     }
     Point startPoint = model.getPoint(staticRoute.getSourcePoint());
     List<Route.Step> steps = toRouteSteps(staticRoute);
+    // Ignore static routes that contain paths that are not navigable in the
+    // required direction.
+    for (Route.Step step : steps) {
+      if (!step.getPath().isNavigableTo(step.getDestinationPoint().getReference())) {
+        log.warning("Skipping static route " + staticRoute + " because path "
+            + step.getPath() + " is not navigable.");
+        return;
+      }
+    }
     long costs = routeEvaluator.computeCosts(vehicle, startPoint, steps);
     updateTableEntry(staticRoute.getSourcePoint(),
                      staticRoute.getDestinationPoint(),

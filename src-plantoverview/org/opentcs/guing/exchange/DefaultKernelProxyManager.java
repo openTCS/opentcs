@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.exchange;
 
 import java.util.Objects;
@@ -21,7 +27,7 @@ import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class DefaultKernelProxyManager
+class DefaultKernelProxyManager
     implements KernelProxyManager {
 
   /**
@@ -29,11 +35,6 @@ public class DefaultKernelProxyManager
    */
   private static final Logger log
       = Logger.getLogger(DefaultKernelProxyManager.class.getName());
-  /**
-   * The unique proxy manager.
-   */
-  private static final KernelProxyManager fInstance
-      = new DefaultKernelProxyManager();
   /**
    * A reference to the kernel connected to.
    * <code>null</code> if no connection is currently established.
@@ -53,17 +54,8 @@ public class DefaultKernelProxyManager
   /**
    * Creates a new instance of KernelProxy.
    */
-  private DefaultKernelProxyManager() {
+  DefaultKernelProxyManager() {
     // Do nada
-  }
-
-  /**
-   * Returns the single instance of this class.
-   *
-   * @return The single instance of this class.
-   */
-  public static KernelProxyManager instance() {
-    return fInstance;
   }
 
   @Override
@@ -91,6 +83,15 @@ public class DefaultKernelProxyManager
     Objects.requireNonNull(connParamSet);
 
     return connect(connParamSet.getHost(), connParamSet.getPort());
+  }
+
+  @Override
+  public void disconnect() {
+    if (kernelProxy != null) {
+      KernelProxy kp = kernelProxy;
+      kernelProxy = null;
+      kp.logout();
+    }
   }
 
   @Override

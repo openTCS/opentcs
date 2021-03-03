@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -258,31 +258,6 @@ public class KernelControlCenter
   private void updateModelName(String newModelName) {
     this.currentModel = newModelName;
     setWindowTitle();
-  }
-
-  /**
-   * Creates a GUI dialog for model selection.
-   *
-   * @param kernel The kernel from which to get the list of existing models.
-   * @return The name of the model that was selected by the user, or
-   * <code>null</code>, if no model was selected.
-   */
-  private static String getModelNameFromUser(Kernel kernel) {
-    String resultModelName;
-    Object[] models = new TreeSet<>(kernel.getModelNames()).toArray();
-    if (models.length == 0) {
-      log.info("No models available to choose from");
-      return null;
-    }
-
-    resultModelName
-        = (String) JOptionPane.showInputDialog(null,
-                                               bundle.getString("ChooseModel"),
-                                               bundle.getString("modelSelection"),
-                                               JOptionPane.PLAIN_MESSAGE,
-                                               null,
-                                               models, models[0]);
-    return resultModelName;
   }
 
   /**
@@ -693,20 +668,49 @@ public class KernelControlCenter
   }//GEN-LAST:event_menuAboutActionPerformed
 
   private void menuButtonModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonModelActionPerformed
-    String modelName = getModelNameFromUser(kernel);
-    if (modelName == null) {
-      log.info("No model chosen by user, keeping current model.");
+    Optional<String> modelName;
+    try {
+      modelName = Optional.ofNullable(kernel.getModelName());
     }
-    if (modelName != null) {
+    catch (IOException exc) {
+      throw new IllegalStateException("Unhandled exception loading model",
+                                      exc);
+    }
+    if (modelName.isPresent()) {
+      // Show confirmation dialog
+      String message = new StringBuilder()
+          .append(bundle.getString("loadModelMessagePart1"))
+          .append(" ")
+          .append(modelName.get())
+          .append(bundle.getString("loadModelMessagePart2"))
+          .toString();
+      int reply = JOptionPane.showConfirmDialog(
+          null,
+          message,
+          bundle.getString("loadModelConfirmTitle"),
+          JOptionPane.YES_NO_OPTION,
+          JOptionPane.QUESTION_MESSAGE);
+      if(reply != JOptionPane.YES_OPTION) {
+        return;
+      }
+      // Load model
       try {
-        log.info("Loading model: " + modelName);
-        kernel.loadModel(modelName);
+        log.info("Loading model: " + modelName.get());
+        kernel.loadModel();
         log.info("Finished loading the model.");
       }
       catch (IOException exc) {
         throw new IllegalStateException("Unhandled exception loading model",
                                         exc);
       }
+    }
+    else {
+      JOptionPane.showMessageDialog(
+          null,
+          bundle.getString("loadModelInfoMessage"),
+          bundle.getString("loadModelInfoTitle"),
+          JOptionPane.WARNING_MESSAGE);
+      log.info("No model available, keeping current model.");
     }
   }//GEN-LAST:event_menuButtonModelActionPerformed
 
@@ -730,7 +734,7 @@ public class KernelControlCenter
 
   private void menuItemSaveSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveSettingsActionPerformed
     try {
-      kernel.saveModel(null, true);
+      kernel.saveModel(null);
     }
     catch (IOException | CredentialsException ex) {
       log.log(Level.SEVERE, null, ex);

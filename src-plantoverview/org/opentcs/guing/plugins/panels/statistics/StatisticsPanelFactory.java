@@ -10,6 +10,7 @@ package org.opentcs.guing.plugins.panels.statistics;
 
 import java.util.ResourceBundle;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.util.gui.plugins.PanelFactory;
 import org.opentcs.util.gui.plugins.PluggablePanel;
 
@@ -35,7 +36,7 @@ public class StatisticsPanelFactory
   }
 
   @Override
-  public void setKernel(Kernel kernel) {
+  public void setKernelProvider(SharedKernelProvider kernelProvider) {
     // Do nada.
   }
 
@@ -45,7 +46,7 @@ public class StatisticsPanelFactory
   }
 
   @Override
-  public PluggablePanel createPanel() {
+  public PluggablePanel createPanel(Kernel.State state) {
     return new StatisticsPanel();
   }
 

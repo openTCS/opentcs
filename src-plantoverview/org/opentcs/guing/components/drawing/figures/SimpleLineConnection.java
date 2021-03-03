@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.drawing.figures;
 
@@ -9,65 +14,74 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.EventObject;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingView;
+import org.jhotdraw.draw.LineConnectionFigure;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.decoration.ArrowTip;
 import org.jhotdraw.geom.BezierPath;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
+import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class SimpleLineConnection
-    extends org.jhotdraw.draw.LineConnectionFigure
+    extends LineConnectionFigure
     implements AttributesChangeListener, OriginChangeListener {
 
-  private static final Logger logger
-      = Logger.getLogger(SimpleLineConnection.class.getName());
-  /**
-   * The attributes of a figure. Each figure can have an open ended set of
-   * attributes. Attributes are identified by name.
-   *
-   * @see #getAttribute
-   * @see #setAttribute
-   */
-  protected final static AttributeKey<Color> FILL_COLOR
+  protected static final AttributeKey<Color> FILL_COLOR
       = new AttributeKey<>("FillColor", Color.class);
-  protected final static AttributeKey<Color> STROKE_COLOR
+  protected static final AttributeKey<Color> STROKE_COLOR
       = new AttributeKey<>("StrokeColor", Color.class);
   // Pfeil für Vorwärtsfahrt: gefüllt mit Stroke Color
-  protected final static ArrowTip ARROW_FORWARD
+  protected static final ArrowTip ARROW_FORWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, true);
   // Pfeil für Rückwärtsfahrt: gefüllt mit Fill Color
-  protected final static ArrowTip ARROW_BACKWARD
+  protected static final ArrowTip ARROW_BACKWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, false);
+  private static final Logger logger
+      = Logger.getLogger(SimpleLineConnection.class.getName());
+
+  /**
+   * The manager for the components tree view.
+   */
+  private final TreeViewManager componentsTreeManager;
+  /**
+   * Displays properties of the currently selected model component(s).
+   */
+  private final SelectionPropertiesComponent propertiesComponent;
 
   /**
    * Creates a new instance.
    *
-   * @param figureComponent The model object.
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param model The model corresponding to this graphical object.
    */
-  public SimpleLineConnection(FigureComponent figureComponent) {
-    set(FigureConstants.MODEL, figureComponent);
+  public SimpleLineConnection(TreeViewManager componentsTreeManager,
+                              SelectionPropertiesComponent propertiesComponent,
+                              AbstractConnection model) {
+    this.componentsTreeManager = requireNonNull(componentsTreeManager,
+                                                "componentsTreeManager");
+    this.propertiesComponent = requireNonNull(propertiesComponent,
+                                              "propertiesComponent");
+
+    set(FigureConstants.MODEL, model);
     initConnectionFigure();
-  }
-  
-  /**
-   * Creates a new instance.
-   */
-  public SimpleLineConnection() {
   }
 
   /**
@@ -191,13 +205,8 @@ public abstract class SimpleLineConnection
     // 1. Das zugehörige Objekt im Tree markieren
     // 2. Die Eigenschaften dieses Objekts im Property Panel anzeigen
     AbstractConnection model = getModel();
-    OpenTCSView tcsView = ((OpenTCSDrawingView) drawingView).getTCSView();
-    tcsView.getTreeViewManager().selectItem(model);
-    tcsView.getPropertiesComponent().setModel(model);
-    // Wenn <Ctrl> gedrückt, 3. zusätzlich Popup-Dialog für Eigenschaften
-    if ((evt.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0) {
-      tcsView.showPropertiesDialog(model);
-    }
+    componentsTreeManager.selectItem(model);
+    propertiesComponent.setModel(model);
 
     return false;
   }
@@ -218,5 +227,19 @@ public abstract class SimpleLineConnection
   @Override // OriginChangeListener
   public void originScaleChanged(EventObject event) {
     updateModel();
+  }
+
+  @Override
+  public SimpleLineConnection clone() {
+    try {
+      SimpleLineConnection clone = (SimpleLineConnection) super.clone();
+      clone.set(FigureConstants.MODEL, getModel().clone());
+
+      return clone;
+    }
+    catch (CloneNotSupportedException exc) {
+      // XXX Do something.
+      throw new IllegalStateException("Unexpected exception encountered", exc);
+    }
   }
 }

@@ -1,10 +1,16 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.exchange;
 
-import java.util.Iterator;
+import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
@@ -15,6 +21,7 @@ import org.opentcs.guing.model.ModelComponent;
  * and the plant overview.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public interface EventDispatcher {
 
@@ -33,29 +40,14 @@ public interface EventDispatcher {
   void removeProcessAdapter(ProcessAdapter processAdapter);
 
   /**
-   * Returns an <code>Iterator</code> which contains all adapters
-   * to the kernel.
-   * 
-   * @return An <code>Iterator</code> with {@link ProcessAdapter}s.
-   */
-  Iterator<ProcessAdapter> getProcessAdapters();
-
-  /**
-   * Sets the kernel.
-   *
-   * @param server The kernel.
-   */
-  void setKernel(Kernel server);
-
-  /**
    * Returns the kernel.
-   * 
+   *
    * @return The kernel.
    */
   Kernel getKernel();
 
   /**
-   * Finds the process adapter to the given model
+   * Finds the process adapter to the given model.
    *
    * @param model The model you need the process adapter for.
    * @return The {@link ProcessAdapter} for the model.
@@ -64,11 +56,18 @@ public interface EventDispatcher {
 
   /**
    * Finds the {@link ProcessAdapter} to the given object reference.
-   * 
+   *
    * @param processObject A reference to a kernel object.
    * @return The {@link ProcessAdapter} for the reference.
    */
   ProcessAdapter findProcessAdapter(TCSObjectReference<?> processObject);
+
+  /**
+   * Returns all process adapters associated with models.
+   *
+   * @return All process adapters associated with models.
+   */
+  Set<ProcessAdapter> getProcessAdapters();
 
   /**
    * Registers as a listener at the kernel.
@@ -79,27 +78,4 @@ public interface EventDispatcher {
    * Removes this dispatcher as a listener from the kernel.
    */
   void release();
-
-  /**
-   * Returns the amount of {@link ProcessAdapter}s to kernel objects.
-   *
-   * @return The amount of {@link ProcessAdapter}s.
-   */
-  int countAdaptersByProcess();
-
-  /**
-   * Returns the amount of {@link ProcessAdapter}s to models.
-   *
-   * @return The amount of {@link ProcessAdapter}s.
-   */
-  int countAdaptersByModel();
-
-  /**
-   * Creates a {@link ProcessAdapter} for the given class of a model.
-   *
-   * @param model The class of a {@link ModelComponent} a {@link ProcessAdapter}
-   * shall be created for.
-   * @return The created {@link ProcessAdapter}.
-   */
-  ProcessAdapter createProcessAdapter(Class<? extends ModelComponent> model);
 }

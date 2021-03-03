@@ -108,7 +108,7 @@
  * placed in the subdirectory <code>lib/openTCS-extensions</code> of the openTCS
  * kernel application's installation directory <em>before</em> the kernel is
  * started.
- * <br/>
+ * <br>
  * (The openTCS start scripts include all JAR files in that directory in the
  * application's classpath.)
  * </li>

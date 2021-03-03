@@ -9,53 +9,62 @@
 package org.opentcs.guing.util;
 
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opentcs.guing.application.OpenTCSView;
+import javax.inject.Inject;
 import org.opentcs.guing.components.properties.type.LocationThemeProperty;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.gui.plugins.LocationTheme;
 import org.opentcs.util.gui.plugins.LocationThemeRegistry;
 
 /**
- * Provides utility for location themes.
+ * Manages the registered location themes.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultLocationThemeManager
     implements LocationThemeManager {
 
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(OpenTCSView.class.getName());
   /**
    * This class's Logger.
    */
   private static final Logger log
       = Logger.getLogger(DefaultLocationThemeManager.class.getName());
-  private static final DefaultLocationThemeManager instance
-      = new DefaultLocationThemeManager();
-  private static final String CONFIGSTOREKEY
-      = ConfigConstants.LOCATION_THEME;
-  private static LocationThemeProperty themeProperty;
+  /**
+   * The application's configuration.
+   */
+  private final ApplicationConfiguration appConfig;
+  /**
+   * The available themes.
+   */
   private final List<LocationTheme> themes;
+  /**
+   * ???
+   */
+  private LocationThemeProperty themeProperty;
   /**
    * The default factory.
    */
   private LocationTheme defaultTheme;
+  /**
+   * ???
+   */
   private LocationTheme defaultConfigStoreTheme;
 
-  private DefaultLocationThemeManager() {
-    this.themes = (new LocationThemeRegistry()).getThemes();
-    this.evaluateClientDefaultTheme();
-  }
-
   /**
-   * Returns the instance of this ThemeManager.
+   * Creates a new instance.
    *
-   * @return The ThemeManager.
+   * @param registry Provides all registered location themes.
    */
-  public static DefaultLocationThemeManager getInstance() {
-    return instance;
+  @Inject
+  private DefaultLocationThemeManager(ApplicationConfiguration appConfig,
+                                      LocationThemeRegistry registry) {
+    this.appConfig = requireNonNull(appConfig, "appConfig");
+    requireNonNull(registry, "registry");
+    this.themes = registry.getThemes();
+
+    evaluateClientDefaultTheme();
   }
 
   @Override
@@ -63,9 +72,9 @@ public class DefaultLocationThemeManager
     defaultTheme = null;
     defaultConfigStoreTheme = null;
     themeProperty = property;
-    String configStoreValue = configStore.getString(CONFIGSTOREKEY, "undefined");
+    String configStoreValue = appConfig.getLocationThemeName();
 
-    if (!configStoreValue.equals("undefined")) {
+    if (!configStoreValue.isEmpty()) {
       for (LocationTheme theme : themes) {
         if (theme.getName().equals(configStoreValue)) {
           defaultTheme = theme;
@@ -111,10 +120,10 @@ public class DefaultLocationThemeManager
   public void updateDefaultTheme(LocationTheme theme) {
     if (themes.contains(theme)) {
       defaultTheme = theme;
-      configStore.setString(CONFIGSTOREKEY, theme.getName());
+      appConfig.setLocationThemeName(theme.getName());
     }
     else {
-      configStore.setString(CONFIGSTOREKEY, "undefined");
+      appConfig.setLocationThemeName("");
       updateDefaultTheme();
     }
   }
@@ -125,9 +134,9 @@ public class DefaultLocationThemeManager
   }
 
   private void evaluateClientDefaultTheme() {
-    String configStoreValue = configStore.getString(CONFIGSTOREKEY, "undefined");
+    String configStoreValue = appConfig.getLocationThemeName();
 
-    if (!configStoreValue.equals("undefined")) {
+    if (!configStoreValue.isEmpty()) {
       for (LocationTheme theme : themes) {
         if (theme.getName().equals(configStoreValue)) {
           defaultTheme = theme;

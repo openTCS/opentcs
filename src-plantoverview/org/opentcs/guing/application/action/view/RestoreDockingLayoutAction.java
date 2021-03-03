@@ -1,7 +1,12 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 24.09.2013 10:42:26
-*/
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+
 package org.opentcs.guing.application.action.view;
 
 import java.awt.event.ActionEvent;
@@ -24,7 +29,7 @@ public class RestoreDockingLayoutAction extends AbstractAction {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    view.restoreDockingDefaultLayout();
+    view.resetWindowArrangement();
   }
 
 }

@@ -5,8 +5,8 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  * A test case for AutoGrowingArrayList.

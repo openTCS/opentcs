@@ -15,7 +15,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation type to mark an injectable application home directory.
+ * Annotation type to mark an injectable application frame.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

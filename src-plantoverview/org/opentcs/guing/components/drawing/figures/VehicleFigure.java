@@ -1,9 +1,15 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -12,56 +18,51 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import static java.awt.image.ImageObserver.ABORT;
 import static java.awt.image.ImageObserver.ALLBITS;
 import static java.awt.image.ImageObserver.FRAMEBITS;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.logging.Level;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
-import javax.swing.JPopupMenu;
+import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.geom.BezierPath;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.application.action.course.VehicleAction;
+import org.opentcs.guing.application.menus.MenuFactory;
+import org.opentcs.guing.application.menus.VehiclePopupMenu;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.figures.decoration.VehicleOutlineHandle;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLiner;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.model.FigureComponent;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.ConfigConstants;
-import org.opentcs.guing.util.DefaultVehicleThemeManager;
+import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.guing.util.VehicleThemeManager;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * Die graphische Repräsentation eines Fahrzeugs.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleFigure
     extends TCSFigure
@@ -90,17 +91,13 @@ public class VehicleFigure
    */
   private final VehicleThemeManager vehicleThemeManager;
   /**
-   * The kernel object associated with this Figure.
+   * A factory for popup menus.
    */
-  private final Vehicle fVehicle;
+  private final MenuFactory menuFactory;
   /**
    * The angle at which the image is to be drawn.
    */
   private double fAngle;
-  /**
-   * The image's file name.
-   */
-  private String fImageFileName;
   /**
    * The image.
    */
@@ -117,34 +114,33 @@ public class VehicleFigure
   /**
    * Creates a new instance.
    *
-   * @param model The model.
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param vehicleThemeManager A manager for vehicle themes.
+   * @param menuFactory A factory for popup menus.
+   * @param appConfig The application's configuration.
+   * @param model The model corresponding to this graphical object.
    */
-  public VehicleFigure(FigureComponent model) {
-    super(model);
-    // XXX Should be injected instead.
-    this.vehicleThemeManager = DefaultVehicleThemeManager.getInstance();
+  @Inject
+  public VehicleFigure(ComponentsTreeViewManager componentsTreeManager,
+                       SelectionPropertiesComponent propertiesComponent,
+                       VehicleThemeManager vehicleThemeManager,
+                       MenuFactory menuFactory,
+                       ApplicationConfiguration appConfig,
+                       @Assisted VehicleModel model) {
+    super(componentsTreeManager, propertiesComponent, model);
+    this.vehicleThemeManager = requireNonNull(vehicleThemeManager,
+                                              "vehicleThemeManager");
+    this.menuFactory = requireNonNull(menuFactory, "menuFactory");
+
     fDisplayBox = new Rectangle((int) fLength, (int) fWidth);
     fZoomPoint = new ZoomPoint(0.5 * fLength, 0.5 * fWidth);
 
-    ConfigurationStore configStore = ConfigurationStore.getStore(OpenTCSView.class.getName());
-    setIgnorePrecisePosition(configStore.getBoolean(ConfigConstants.IGNORE_VEHICLE_PRECISE_POSITION, false));
-    setIgnoreOrientationAngle(configStore.getBoolean(ConfigConstants.IGNORE_VEHICLE_ORIENTATION_ANGLE, false));
+    setIgnorePrecisePosition(appConfig.getIgnoreVehiclePrecisePosition());
+    setIgnoreOrientationAngle(appConfig.getIgnoreVehicleOrientationAngle());
 
-    VehicleTheme theme = vehicleThemeManager.getDefaultTheme();
-    TCSObjectReference<Vehicle> reference = ((VehicleModel) model).getReference();
-
-    if (reference != null) {
-      fVehicle = DefaultKernelProxyManager.instance().kernel().getTCSObject(Vehicle.class, reference);
-
-      if (fImageFileName == null || !fImageFileName.equals(theme.getImagePathFor(fVehicle))) {
-        fImageFileName = theme.getImagePathFor(fVehicle);
-        fImage = loadImage(fImageFileName);
-      }
-    }
-    else {
-      fVehicle = null;
-      log.log(Level.SEVERE, "Reference to Vehicle is null!");
-    }
+    fImage = vehicleThemeManager.getDefaultTheme().getThemeImage();
   }
 
   @Override
@@ -226,12 +222,12 @@ public class VehicleFigure
   }
 
   /**
-   * Toggles the ignorance of the orientation angle.
+   * Sets the ignore flag for the vehicle's reported orientation angle.
    *
-   * @param selected
+   * @param doIgnore Whether to ignore the reported orientation angle.
    */
-  public final void setIgnoreOrientationAngle(boolean selected) {
-    ignoreOrientationAngle = selected;
+  public final void setIgnoreOrientationAngle(boolean doIgnore) {
+    ignoreOrientationAngle = doIgnore;
     PointModel point = getModel().getPoint();
 
     if (point == null) {
@@ -248,12 +244,13 @@ public class VehicleFigure
   }
 
   /**
-   * Toggles the ignorance of the precise position.
+   * Sets the ignore flag for the vehicle's precise position.
    *
-   * @param selected
+   * @param doIgnore Whether to ignore the reported precise position of the
+   * vehicle.
    */
-  public void setIgnorePrecisePosition(boolean selected) {
-    ignorePrecisePosition = selected;
+  public void setIgnorePrecisePosition(boolean doIgnore) {
+    ignorePrecisePosition = doIgnore;
     PointModel point = getModel().getPoint();
 
     if (point == null) {
@@ -337,15 +334,10 @@ public class VehicleFigure
             // Wenn für diesen Punkt keine Winkelausrichtung spezifiziert ist,
             // Winkel zum nächsten Zielpunkt bestimmen
             PointModel nextPoint = model.getNextPoint();
-            AbstractConnection connection;
 
             if (nextPoint == null) {
               // Wenn es keinen Zielpunkt gibt, einen beliebigen (?) Nachbarpunkt zum aktuellen Punkt suchen
-              Iterator<AbstractConnection> iConnections = currentPoint.getConnections().iterator();
-
-              while (iConnections.hasNext()) {
-                connection = iConnections.next();
-
+              for (AbstractConnection connection : currentPoint.getConnections()) {
                 if (connection.getStartComponent().equals(currentPoint)) {
                   ModelComponent destinationPoint = connection.getEndComponent();
                   // Die Links (zu Locations) gehören auch zu den Connections
@@ -358,15 +350,14 @@ public class VehicleFigure
             }
 
             if (nextPoint != null) {
-              connection = currentPoint.getConnectionTo(nextPoint);
+              AbstractConnection connection = currentPoint.getConnectionTo(nextPoint);
 
               if (connection == null) {
                 return;
               }
 
               PathConnection pathFigure = (PathConnection) connection.getFigure();
-              PointFigure cpf
-                  = (PointFigure) currentPoint.getFigure().getPresentationFigure();
+              PointFigure cpf = currentPoint.getFigure().getPresentationFigure();
 
               if (pathFigure.getLiner() instanceof BezierLiner) {
                 BezierPath bezierPath = pathFigure.getBezierPath();
@@ -377,8 +368,7 @@ public class VehicleFigure
                 fAngle = Math.toDegrees(Math.atan2(-dy, dx));
               }
               else {
-                PointFigure npf
-                    = (PointFigure) nextPoint.getFigure().getPresentationFigure();
+                PointFigure npf = nextPoint.getFigure().getPresentationFigure();
                 double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
                 double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
                 // Nach dem direkten Winkel ausrichten
@@ -420,12 +410,6 @@ public class VehicleFigure
 
     int dx, dy;
     Rectangle r = displayBox();
-
-    if (fImage == null) {
-      if (fImageFileName != null) {
-        fImage = loadImage(fImageFileName);
-      }
-    }
 
     if (fImage != null) {
       dx = (r.width - fImage.getWidth(this)) / 2;
@@ -489,10 +473,10 @@ public class VehicleFigure
                                   MouseEvent evt,
                                   DrawingView drawingView) {
     VehicleModel model = getModel();
-    OpenTCSView.instance().getTreeViewManager().selectItem(model);
-    OpenTCSView.instance().getPropertiesComponent().setModel(model);
+    getComponentsTreeManager().selectItem(model);
+    getPropertiesComponent().setModel(model);
 
-    JPopupMenu menu = VehicleAction.createVehicleMenu(model);
+    VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(model);
     menu.show((OpenTCSDrawingView) drawingView, evt.getX(), evt.getY());
 
     return false;
@@ -505,16 +489,14 @@ public class VehicleFigure
     }
     VehicleModel model = (VehicleModel) e.getModel();
 
-    if (model == null || fVehicle == null) {
+    if (model == null) {
       return;
     }
 
     VehicleTheme theme = vehicleThemeManager.getDefaultTheme();
 
-    if (fImageFileName == null || !fImageFileName.equals(theme.getImagePathFor(fVehicle))) {
-      fImageFileName = theme.getImagePathFor(fVehicle);
-      fImage = loadImage(fImageFileName);
-    }
+    Vehicle vehicle = model.getVehicle();
+    fImage = vehicle == null ? null : theme.getImageFor(model.getVehicle());
 
     PointModel point = model.getPoint();
     Triple precisePosition = model.getPrecisePosition();
@@ -548,6 +530,30 @@ public class VehicleFigure
     }
   }
 
+  /**
+   * A dummy image to be used if no images/themes are available.
+   */
+  private static class DummyImage
+      extends BufferedImage {
+
+    /**
+     * Creates a new instance.
+     *
+     * @param width
+     * @param height
+     * @param imageType
+     */
+    public DummyImage(int width, int height) {
+      super(width, height, TYPE_INT_RGB);
+
+      for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+          setRGB(x, y, Color.GREEN.getRGB());
+        }
+      }
+    }
+  }
+
   @Override
   public boolean imageUpdate(Image img, int infoflags,
                              int x, int y,
@@ -557,29 +563,5 @@ public class VehicleFigure
     }
 
     return (infoflags & (ALLBITS | ABORT)) == 0;
-  }
-
-  /**
-   * Loads an image from the file with the given name.
-   *
-   * @param fileName The name of the file from which to load the image.
-   * @return The image, or <code>null</code>, if it could not be loaded.
-   */
-  private Image loadImage(String fileName) {
-    if (fileName == null) {
-      return null;
-    }
-    URL url = getClass().getResource(fileName);
-    if (url == null) {
-      log.warning("Invalid image file name " + fileName);
-      return null;
-    }
-    try {
-      return ImageIO.read(url);
-    }
-    catch (IOException exc) {
-      log.log(Level.WARNING, "Exception loading image", exc);
-      return null;
-    }
   }
 }

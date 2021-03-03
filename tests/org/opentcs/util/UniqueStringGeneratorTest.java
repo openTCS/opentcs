@@ -1,9 +1,7 @@
 package org.opentcs.util;
 
-import org.junit.After;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * A test case for class UniqueStringGenerator.
@@ -11,23 +9,18 @@ import org.junit.Test;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class UniqueStringGeneratorTest {
-  
+
   private static final String PREFIX = "TestPrefix";
-  
+
   private static final String PATTERN_ONE_DIGIT = "0";
-  
+
   private static final String PATTERN_TWO_DIGITS = "00";
-  
-  private UniqueStringGenerator generator;
+
+  private UniqueStringGenerator<Object> generator;
 
   @Before
   public void setUp() {
-    generator = new UniqueStringGenerator();
-  }
-
-  @After
-  public void tearDown() {
-    generator = null;
+    generator = new UniqueStringGenerator<>();
   }
 
   @Test
@@ -40,6 +33,22 @@ public class UniqueStringGeneratorTest {
   }
 
   @Test
+  public void shouldProvideConfiguredPatterns() {
+    final String NAME_PATTERN_PREFIX = "SomePrefix";
+    final String NAME_PATTERN_PREFIX2 = "AnotherPrefix";
+    final Object selector = new Object();
+    final Object selector2 = new Object();
+    
+    generator.registerNamePattern(selector, NAME_PATTERN_PREFIX, "0000");
+    generator.registerNamePattern(selector2, NAME_PATTERN_PREFIX2, "0000");
+
+    assertEquals(NAME_PATTERN_PREFIX + "0001",
+                 generator.getUniqueString(selector));
+    assertEquals(NAME_PATTERN_PREFIX2 + "0001",
+                 generator.getUniqueString(selector2));
+  }
+
+  @Test
   public void testRepeatedGenerationWithAddition() {
     String generatedString = generator.getUniqueString(PREFIX,
                                                        PATTERN_TWO_DIGITS);
@@ -48,11 +57,12 @@ public class UniqueStringGeneratorTest {
     generatedString = generator.getUniqueString(PREFIX, PATTERN_TWO_DIGITS);
     assertEquals(PREFIX + "02", generatedString);
   }
-  
+
   @Test
   public void testNullPrefix() {
     String generatedString = generator.getUniqueString(null,
                                                        PATTERN_ONE_DIGIT);
     assertEquals("1", generatedString);
   }
+
 }

@@ -1,9 +1,20 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.tree.elements;
 
+import com.google.inject.assistedinject.Assisted;
+import javax.inject.Inject;
+import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.GroupModel;
 
 /**
@@ -19,8 +30,12 @@ public class GroupUserObject
    *
    * @param model The corresponding model object.
    */
-  public GroupUserObject(GroupModel model) {
-    super(model);
+  @Inject
+  public GroupUserObject(@Assisted GroupModel model,
+                         OpenTCSView view,
+                         OpenTCSDrawingEditor editor,
+                         ModelManager modelManager) {
+    super(model, view, editor, modelManager);
   }
 
   @Override

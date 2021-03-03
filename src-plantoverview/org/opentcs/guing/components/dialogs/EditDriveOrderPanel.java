@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
 import java.util.ArrayList;
@@ -142,6 +148,7 @@ public class EditDriveOrderPanel
 		}
 	}
 
+  // CHECKSTYLE:OFF
 	/**
 	 * This method is called from within the constructor to initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is always
@@ -203,6 +210,7 @@ public class EditDriveOrderPanel
         gridBagConstraints.weightx = 0.5;
         add(actionComboBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
 	/**
 	 * Aktualisiert den Inhalt der ComboBox mit den Aktionen. Wird aufgerufen,
@@ -232,10 +240,13 @@ public class EditDriveOrderPanel
 				}
 			}
     }//GEN-LAST:event_locationComboBoxActionPerformed
+
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox actionComboBox;
     private javax.swing.JLabel actionLabel;
     private javax.swing.JComboBox locationComboBox;
     private javax.swing.JLabel stationLabel;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

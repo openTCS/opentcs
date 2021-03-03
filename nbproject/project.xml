@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
-            <name>openTCS-2.7</name>
+            <name>openTCS</name>
         </general-data>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
             <!-- Do not use Project Properties customizer when editing this file manually. -->
-            <name>openTCS-2.7</name>
+            <name>openTCS</name>
             <properties/>
             <folders>
                 <source-folder>
@@ -37,6 +37,12 @@
                     <label>tests</label>
                     <type>java</type>
                     <location>tests</location>
+                    <encoding>ISO-8859-15</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>tests-integration</label>
+                    <type>java</type>
+                    <location>tests-integration</location>
                     <encoding>ISO-8859-15</encoding>
                 </source-folder>
             </folders>
@@ -137,6 +143,10 @@
                         <label>tests</label>
                         <location>tests</location>
                     </source-folder>
+                    <source-folder style="packages">
+                        <label>tests-integration</label>
+                        <location>tests-integration</location>
+                    </source-folder>
                     <source-file>
                         <location>build.xml</location>
                     </source-file>
@@ -151,30 +161,36 @@
             </view>
             <subprojects/>
         </general-data>
-        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src-base</package-root>
-                <classpath mode="compile">lib/guava-16.0.1.jar;lib/guice-3.0.jar;lib/guice-assistedinject-3.0.jar;lib/guice-multibindings-3.0.jar;lib/hamcrest-all-1.3.jar;lib/javax.inject.jar;lib/jdom-2.0.5.jar</classpath>
+                <classpath mode="compile">lib/guice-3.0.jar;lib/guice-assistedinject-3.0.jar;lib/guice-multibindings-3.0.jar;lib/hamcrest-all-1.3.jar;lib/javax.inject.jar;lib/jdom-2.0.5.jar;lib/guava-17.0.jar;lib/jsr305.jar</classpath>
                 <built-to>lib/openTCS-Base.jar</built-to>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>src-kernel</package-root>
-                <classpath mode="compile">src-base;lib/guava-16.0.1.jar;lib/guice-3.0.jar;lib/guice-assistedinject-3.0.jar;lib/guice-multibindings-3.0.jar;lib/hamcrest-all-1.3.jar;lib/javax.inject.jar;lib/jcommon-1.0.21.jar;lib/jdom-2.0.5.jar;lib/jfreechart-1.0.17.jar</classpath>
+                <classpath mode="compile">src-base;lib/guice-3.0.jar;lib/guice-assistedinject-3.0.jar;lib/guice-multibindings-3.0.jar;lib/hamcrest-all-1.3.jar;lib/javax.inject.jar;lib/jcommon-1.0.21.jar;lib/jdom-2.0.5.jar;lib/jfreechart-1.0.17.jar;lib/guava-17.0.jar;lib/jsr305.jar;lib/mbassador-1.1.10.jar</classpath>
                 <built-to>lib/openTCS-Kernel.jar</built-to>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>src-plantoverview</package-root>
-                <classpath mode="compile">src-base;lib/docking-frames-common-1.1.2p11.jar;lib/docking-frames-core-1.1.2p11.jar;lib/guava-16.0.1.jar;lib/guice-3.0.jar;lib/guice-assistedinject-3.0.jar;lib/guice-multibindings-3.0.jar;lib/hamcrest-all-1.3.jar;lib/javax.inject.jar;lib/jcommon-1.0.21.jar;lib/jdom-2.0.5.jar;lib/jfreechart-1.0.17.jar;lib/jhotdraw-7.6.jar</classpath>
+                <classpath mode="compile">src-base;lib/docking-frames-common-1.1.2p11.jar;lib/docking-frames-core-1.1.2p11.jar;lib/guice-3.0.jar;lib/guice-assistedinject-3.0.jar;lib/guice-multibindings-3.0.jar;lib/hamcrest-all-1.3.jar;lib/javax.inject.jar;lib/jcommon-1.0.21.jar;lib/jdom-2.0.5.jar;lib/jfreechart-1.0.17.jar;lib/jhotdraw-7.6.jar;lib/guava-17.0.jar;lib/jsr305.jar;lib/mbassador-1.1.10.jar</classpath>
                 <built-to>lib/openTCS-PlantOverview.jar</built-to>
-                <source-level>1.7</source-level>
+                <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>tests</package-root>
                 <unit-tests/>
-                <classpath mode="compile">src-base;src-kernel;src-plantoverview;lib/guava-16.0.1.jar;lib/guice-3.0.jar;lib/hamcrest-all-1.3.jar;lib/junit-4.11.jar;lib/mockito-all-1.9.5.jar</classpath>
-                <source-level>1.7</source-level>
+                <classpath mode="compile">src-base;src-kernel;src-plantoverview;lib/guice-3.0.jar;lib/hamcrest-all-1.3.jar;lib/junit-4.11.jar;lib/mockito-all-1.9.5.jar;lib/guava-17.0.jar;lib/jsr305.jar;lib/javax.inject.jar</classpath>
+                <source-level>1.8</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>tests-integration</package-root>
+                <unit-tests/>
+                <classpath mode="compile">lib/guava-17.0.jar;lib/guice-3.0.jar;lib/hamcrest-all-1.3.jar;lib/junit-4.11.jar;lib/mockito-all-1.9.5.jar;src-base;src-kernel;src-plantoverview;lib/jbehave/commons-collections-3.2.1.jar;lib/jbehave/commons-io-2.4.jar;lib/jbehave/commons-lang-2.6.jar;lib/jbehave/freemarker-2.3.19.jar;lib/jbehave/jbehave-ant-3.9.3.jar;lib/jbehave/jbehave-core-3.9.3-resources.zip;lib/jbehave/jbehave-core-3.9.3.jar;lib/jbehave/paranamer-2.4.jar;lib/jbehave/plexus-utils-3.0.10.jar;lib/jbehave/xmlpull-1.1.3.1.jar;lib/jbehave/xpp3_min-1.1.4c.jar;lib/jbehave/xstream-1.4.5.jar;lib/jhotdraw-7.6.jar</classpath>
+                <source-level>1.8</source-level>
             </compilation-unit>
         </java-data>
         <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">

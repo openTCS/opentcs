@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
 import java.util.Collections;
@@ -70,6 +76,7 @@ public class BookmarkSelectionPanel
     // wird nicht benötigt
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -121,6 +128,7 @@ public class BookmarkSelectionPanel
     private javax.swing.JComboBox comboBoxItems;
     private javax.swing.JLabel labelItems;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 
   /**
    * Compares ViewBookmarks by their names.

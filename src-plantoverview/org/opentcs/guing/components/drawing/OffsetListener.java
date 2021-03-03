@@ -23,21 +23,31 @@ class OffsetListener
   /**
    * The drawing view we're working with.
    */
-  private final OpenTCSDrawingView drawingView;
+  private final OpenTCSDrawingEditor drawingEditor;
+  /**
+   * Initiales the offset figures once the view is resized (normally
+   * done when the window becomes visible). But the listener shouldn't
+   * listen to further resizing events. 
+   * XXX get rid of this listener?
+   */
+  private boolean initialized = false;
 
   /**
    * Creates a new instance.
    *
-   * @param drawingView The drawing view to call for (re-)initialization of its
+   * @param drawingEditor The drawing editor to call for (re-)initialization of its
    * offset figures.
    */
-  OffsetListener(final OpenTCSDrawingView drawingView) {
-    this.drawingView = drawingView;
+  OffsetListener(OpenTCSDrawingEditor drawingEditor) {
+    this.drawingEditor = drawingEditor;
   }
 
   @Override
   public void componentResized(ComponentEvent e) {
-    drawingView.initializeOffsetFigures();
+    if (!initialized) {
+      drawingEditor.initializeViewport();
+      initialized = true;
+    }
   }
 
   @Override

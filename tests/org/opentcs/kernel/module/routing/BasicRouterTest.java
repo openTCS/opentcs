@@ -5,8 +5,8 @@
 package org.opentcs.kernel.module.routing;
 
 import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.opentcs.algorithms.Router;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -39,12 +39,12 @@ public class BasicRouterTest {
   public void testRouteInRingModel() {
     Model model = ModelGenerator.getRingModel(20, 5);
     Vehicle vehicle = model.createVehicle(null);
-    Router router
-        = new BasicRouter(model,
-                          new RoutingTableBuilderDfs(new RouteEvaluatorDistance(),
-                                                     Integer.MAX_VALUE,
-                                                     true),
-                          false);
+    Router router = new BasicRouter(
+        model,
+        new RoutingTableBuilderDfs(new RouteEvaluatorDistance(new RouteEvaluatorNull()),
+                                   Integer.MAX_VALUE,
+                                   true),
+        false);
     router.updateRoutingTables();
     Point point1 = model.getPoint("Point-0");
     Point point2 = model.getPoint("Point-19");

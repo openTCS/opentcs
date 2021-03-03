@@ -1,7 +1,12 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.util;
 
 /**
@@ -11,21 +16,6 @@ package org.opentcs.guing.util;
  */
 public interface ConfigConstants {
   
-  /**
-   * A configuration key for ignoring precise positions of vehicles.
-   * <p>
-   * Type: boolean (true: precise positions will be ignored,
-   * false: vehicles will be set on precise positions if available).
-   * </p>
-   */
-  String IGNORE_VEHICLE_PRECISE_POSITION = "IGNORE_PRECISE_POSITION";
-  /**
-   * A configuration key for ignoring orientation angles of vehicles.
-   * <p>
-   * Type: boolean (true: orientation angles will be ignored,
-   * false: orientation angle will be considered if set).
-   */
-  String IGNORE_VEHICLE_ORIENTATION_ANGLE = "IGNORE_ORIENTATION_ANGLE";
   /**
    * A configuration key for the client value of the location theme.
    */

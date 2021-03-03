@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
 import java.awt.Component;
@@ -103,6 +109,7 @@ public class StandardDetailsDialog
     return returnStatus;
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -154,6 +161,7 @@ public class StandardDetailsDialog
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   /**
    * Wird aufgerufen, wenn der Nutzer den Cancel-Button drückt.
@@ -206,10 +214,13 @@ public class StandardDetailsDialog
   public DetailsDialogContent getDialogContent() {
     return fContent;
   }
+
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel buttonPanel;
   private javax.swing.JButton cancelButton;
   private javax.swing.JPanel controlPanel;
   private javax.swing.JButton okButton;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

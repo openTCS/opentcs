@@ -1,7 +1,12 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
 import java.util.logging.Level;
@@ -21,7 +26,7 @@ public class TripleProperty
   /**
    * Der Punkt.
    */
-  protected Triple fTriple;
+  private Triple fTriple;
 
   /**
    * Creates a new instance of PointProperty.
@@ -29,18 +34,7 @@ public class TripleProperty
    * @param model
    */
   public TripleProperty(ModelComponent model) {
-    this(model, null);
-  }
-
-  /**
-   * Konstruktor, dem ein 3D-Punkt übergeben wird.
-   *
-   * @param model
-   * @param triple
-   */
-  public TripleProperty(ModelComponent model, Triple triple) {
     super(model);
-    fTriple = triple;
   }
 
   @Override

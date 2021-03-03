@@ -1,15 +1,15 @@
 /**
  * (c): IML, JHotDraw.
- * 
+ *
  * Changed by IML to allow access to ResourceBundle.
  *
- * 
+ *
  * @(#)MoveAction.java
  *
  * Copyright (c) 1996-2010 by the original authors of JHotDraw and all its
  * contributors. All rights reserved.
  *
- * You may not use, copy or modify this file, except in compliance with the 
+ * You may not use, copy or modify this file, except in compliance with the
  * license agreement you entered into with the copyright holders. For details
  * see accompanying license terms.
  */
@@ -18,6 +18,7 @@ package org.opentcs.guing.application.action.draw;
 import java.awt.event.ActionEvent;
 import java.awt.geom.AffineTransform;
 import java.util.HashSet;
+import java.util.Set;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
@@ -32,10 +33,21 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public abstract class MoveAction
     extends AbstractSelectedAction {
 
-  private final int dx, dy;
+  /**
+   * The X offset by which to move.
+   */
+  private final int dx;
+  /**
+   * The Y offset by which to move.
+   */
+  private final int dy;
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The application's drawing editor.
+   * @param dx The X offset by which to move.
+   * @param dy The Y offset by which to move.
    */
   public MoveAction(DrawingEditor editor, int dx, int dy) {
     super(editor);
@@ -48,7 +60,7 @@ public abstract class MoveAction
   public void actionPerformed(java.awt.event.ActionEvent e) {
     AffineTransform tx = new AffineTransform();
 
-    // TODO: Die Faktoren konfigurierbar machen?
+    // TODO: Make these factors configurable?
     if ((e.getModifiers() & ActionEvent.CTRL_MASK) > 0) {
       tx.translate(dx * 10, dy * 10);
     }
@@ -59,7 +71,7 @@ public abstract class MoveAction
       tx.translate(dx * 5, dy * 5);
     }
 
-    HashSet<Figure> transformedFigures = new HashSet<>();
+    Set<Figure> transformedFigures = new HashSet<>();
 
     for (Figure f : getView().getSelectedFigures()) {
       if (f.isTransformable()) {
@@ -73,11 +85,22 @@ public abstract class MoveAction
     fireUndoableEditHappened(new TransformEdit(transformedFigures, tx));
   }
 
+  /**
+   * Moves the selected figures to the right.
+   */
   public static class East
       extends MoveAction {
 
+    /**
+     * This action's ID.
+     */
     public final static String ID = "edit.moveEast";
 
+    /**
+     * Creates a new instance.
+     *
+     * @param editor The application's drawing editor.
+     */
     public East(DrawingEditor editor) {
       super(editor, 1, 0);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
@@ -85,11 +108,22 @@ public abstract class MoveAction
     }
   }
 
+  /**
+   * Moves the selected figures to the right.
+   */
   public static class West
       extends MoveAction {
 
+    /**
+     * This action's ID.
+     */
     public final static String ID = "edit.moveWest";
 
+    /**
+     * Creates a new instance.
+     *
+     * @param editor The application's drawing editor.
+     */
     public West(DrawingEditor editor) {
       super(editor, -1, 0);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
@@ -97,11 +131,22 @@ public abstract class MoveAction
     }
   }
 
+  /**
+   * Moves the selected figures upwards.
+   */
   public static class North
       extends MoveAction {
 
+    /**
+     * This action's ID.
+     */
     public final static String ID = "edit.moveNorth";
 
+    /**
+     * Creates a new instance.
+     *
+     * @param editor The application's drawing editor.
+     */
     public North(DrawingEditor editor) {
       super(editor, 0, -1);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
@@ -109,11 +154,22 @@ public abstract class MoveAction
     }
   }
 
+  /**
+   * Moves the selected figures downwards.
+   */
   public static class South
       extends MoveAction {
 
+    /**
+     * This action's ID.
+     */
     public final static String ID = "edit.moveSouth";
 
+    /**
+     * Creates a new instance.
+     *
+     * @param editor The application's drawing editor.
+     */
     public South(DrawingEditor editor) {
       super(editor, 0, 1);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();

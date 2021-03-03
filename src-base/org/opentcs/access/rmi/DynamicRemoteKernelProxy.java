@@ -8,10 +8,9 @@
  */
 package org.opentcs.access.rmi;
 
-import java.lang.reflect.Proxy;
+import com.google.common.reflect.Reflection;
 import java.rmi.registry.Registry;
 import org.opentcs.access.CredentialsException;
-import org.opentcs.access.Kernel;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.TCSEvent;
 
@@ -23,10 +22,12 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * <p>
  * If the kernel you want to connect to is running on the same system as your
  * client, you usually only have to do the following:
+ * </p>
  * <pre>
  * Kernel kernel = DynamicRemoteKernelProxy.getProxy("localhost",
  *                                                   AllOrNothingTCSEventFilter.acceptingInstance);
  * </pre>
+ * <p>
  * You can then use <code>kernel</code> to call methods on the proxy, which
  * will be wrapped by RMI calls internally and forwarded to the kernel you
  * connected to. This interface to the kernel can e.g. be used to create
@@ -107,12 +108,8 @@ public final class DynamicRemoteKernelProxy {
                                    eventFilter,
                                    eventPollInterval,
                                    eventPollTimeout);
-    // Create a proxy instance with the handler and return it.
-    KernelProxy proxy =
-        (KernelProxy) Proxy.newProxyInstance(Kernel.class.getClassLoader(),
-                                             new Class[] {KernelProxy.class},
-                                             handler);
-    return proxy;
+    // Return a proxy instance with the created handler.
+    return Reflection.newProxy(KernelProxy.class, handler);
   }
 
   /**

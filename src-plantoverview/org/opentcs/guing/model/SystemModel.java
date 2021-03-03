@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model;
 
 import java.util.List;
@@ -18,6 +24,7 @@ import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.course.DrawingMethod;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.elements.BlockModel;
+import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
@@ -39,48 +46,12 @@ public interface SystemModel
     extends ModelComponent {
 
   /**
-   * Schlüssel für die Fahrzeugflotte.
-   */
-  String VEHICLES = "Vehicles";
-  /**
-   * Schüssel für den Fahrkurs insgesamt.
-   */
-  String LAYOUT = "Layout";
-  /**
-   * Schlüssel für die Fahrkurselemente.
-   */
-  String POINTS = "Points";
-  String LOCATIONS = "Locations";
-  String PATHS = "Paths";
-  String LINKS = "Links";
-  /**
-   * Schlüssel für die Stationstypen.
-   */
-  String LOCATION_TYPES = "LocationTypes";
-  /**
-   * Schlüssel für die Blockbereiche.
-   */
-  String BLOCKS = "Blocks";
-  /**
-   * Key for groups.
-   */
-  String GROUPS = "Groups";
-  /**
-   * Schlüssel für die statischen Routen.
-   */
-  String STATIC_ROUTES = "StaticRoutes";
-  /**
-   * Schlüssel für andere grafische Objekte.
-   */
-  String OTHER_GRAPHICAL_ELEMENTS = "OtherGraphicalElements";
-
-  /**
    * Fügt dem Systemmodell eine Hauptkomponente hinzu.
    *
    * @param key
    * @param component
    */
-  void addMainFolder(String key, ModelComponent component);
+  void addMainFolder(FolderKey key, ModelComponent component);
 
   /**
    * Liefert die zum Schlüssel passende Hauptkomponente.
@@ -88,7 +59,7 @@ public interface SystemModel
    * @param key
    * @return
    */
-  ModelComponent getMainFolder(String key);
+  ModelComponent getMainFolder(FolderKey key);
 
   /**
    * Liefert das Elternobjekt zu einem ModelComponent-Objekt. Die Zuordnung wird
@@ -106,7 +77,7 @@ public interface SystemModel
    * @param classType die Klasse, von der die Objekte sein müssen
    * @return alle Objekte einer Klasse
    */
-  <T> List<T> getAll(String foldername, Class<T> classType);
+  <T> List<T> getAll(FolderKey foldername, Class<T> classType);
 
   /**
    * Liefert die Zuordnungstabelle.
@@ -114,23 +85,6 @@ public interface SystemModel
    * @return
    */
   EventDispatcher getEventDispatcher();
-
-  /**
-   * Setzt die Zuordnungstabelle zwischen Leitsteuerung und Modellierung /
-   * Visualisierung.
-   *
-   * @param eventDispatcher
-   */
-  void setEventDispatcher(EventDispatcher eventDispatcher);
-
-  /**
-   * Erstellt eine neue leere Zeichnung.
-   * <p>
-   * Entwurfsmuster: Fabrikmethode
-   *
-   * @return die neu erzeugte Zeichnung
-   */
-  Drawing createDrawing();
 
   /**
    * Liefert die Zeichnung.
@@ -271,6 +225,8 @@ public interface SystemModel
    * @return eine Liste aller Blockbereiche
    */
   List<BlockModel> getBlockModels();
+  
+  List<GroupModel> getGroupModels();
 
   /**
    * Liefert alle statischen Routen.
@@ -287,7 +243,7 @@ public interface SystemModel
    * direkt nichts zu tun haben
    */
   List<OtherGraphicalElement> getOtherGraphicalElements();
-  
+
   /**
    * Adds a reference to a ModelLayoutElement to every object in the pool.
    *
@@ -298,15 +254,33 @@ public interface SystemModel
    * @param blocks
    */
   void createLayoutMap(VisualLayout layout,
-                              Set<Point> points,
-                              Set<Path> paths,
-                              Set<Location> locations,
-                              Set<Block> blocks);
-  
+                       Set<Point> points,
+                       Set<Path> paths,
+                       Set<Location> locations,
+                       Set<Block> blocks);
+
   /**
    * Returns the LayoutMap.
-   * 
+   *
    * @return The layout map.
    */
   Map<TCSObjectReference<?>, ModelLayoutElement> getLayoutMap();
+
+  /**
+   * Keys for the folders in a SystemModel.
+   */
+  public static enum FolderKey {
+
+    VEHICLES,
+    LAYOUT,
+    POINTS,
+    LOCATIONS,
+    PATHS,
+    LINKS,
+    LOCATION_TYPES,
+    BLOCKS,
+    GROUPS,
+    STATIC_ROUTES,
+    OTHER_GRAPHICAL_ELEMENTS
+  }
 }

@@ -1,9 +1,16 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -13,6 +20,8 @@ import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import net.engio.mbassy.bus.MBassador;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.DrawingView;
@@ -29,11 +38,14 @@ import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerControlPointHandle;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
+import org.opentcs.guing.event.PathLockedEvent;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PathModel;
 
@@ -41,6 +53,7 @@ import org.opentcs.guing.model.elements.PathModel;
  * Eine Verbindung zwischen zwei Punkten.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class PathConnection
     extends SimpleLineConnection {
@@ -51,29 +64,34 @@ public class PathConnection
   private static final Logger logger
       = Logger.getLogger(PathConnection.class.getName());
   /**
+   * The application's event bus.
+   */
+  private final MBassador<Object> eventBus;
+  /**
    * Control point 1.
    */
   private Point2D.Double cp1;
   /**
    * Control point 2.
    */
-  private Point2D.Double cp2;
+  private Point2D.Double cp2;  
 
   /**
    * Creates a new instance.
    *
-   * @param model The corresponding model object.
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param eventBus The application's event bus.
+   * @param model The model corresponding to this graphical object.
    */
-  public PathConnection(PathModel model) {
-    super(model);
-    resetPath();
-  }
-
-  /**
-   * DOM Support. (Called when copying a path).
-   */
-  public PathConnection() {
-    super(new PathModel());
+  @Inject
+  public PathConnection(ComponentsTreeViewManager componentsTreeManager,
+                        SelectionPropertiesComponent propertiesComponent,
+                        MBassador<Object> eventBus,
+                        @Assisted PathModel model) {
+    super(componentsTreeManager, propertiesComponent, model);
+    this.eventBus = requireNonNull(eventBus, "eventBus");
     resetPath();
   }
 
@@ -287,8 +305,8 @@ public class PathConnection
         double length = (double) property.getValue();
         // Tbd: Wann soll die Länge aus dem Abstand der verbundenen Punkte neu berechnet werden?
         if (length <= 0.0) {
-          PointFigure start = (PointFigure) ((LabeledPointFigure) getStartFigure()).getPresentationFigure();
-          PointFigure end = (PointFigure) ((LabeledPointFigure) getEndFigure()).getPresentationFigure();
+          PointFigure start = ((LabeledPointFigure) getStartFigure()).getPresentationFigure();
+          PointFigure end = ((LabeledPointFigure) getEndFigure()).getPresentationFigure();
           length = distance(start.getZoomPoint(), end.getZoomPoint());
           LengthProperty.Unit unit = property.getUnit();
           property.setValueAndUnit(length, LengthProperty.Unit.MM);
@@ -433,6 +451,9 @@ public class PathConnection
       set(AttributeKeys.END_DECORATION, endDecoration);
       // Gesperrte Strecken markieren
       BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
+      if (pLocked.hasChanged()) {
+        eventBus.publish(new PathLockedEvent(this));
+      }
 
       if (pLocked.getValue() instanceof Boolean) {
         boolean locked = (boolean) (pLocked).getValue();
@@ -463,38 +484,23 @@ public class PathConnection
     getModel().propertiesChanged(this);
   }
 
-  /**
-   * Klont das Figure und ruft die Methode #initFigure() auf, um dem geklonten
-   * Figure die Gelegenheit zu geben, Initialisierungen durchzuführen. Dabei
-   * wird auch das zugehörige Modell ge-"cloned".
-   *
-   * @return das geklonte Figure
-   */
   @Override // LineConnectionFigure
   public PathConnection clone() {
-    try {
-      PathModel model = (PathModel) getModel().clone();
-      PathConnection clone = (PathConnection) super.clone();
-      clone.set(FigureConstants.MODEL, model);
-      SelectionProperty pConnType = (SelectionProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+    PathConnection clone = (PathConnection) super.clone();
+    SelectionProperty pConnType = (SelectionProperty) clone.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
 
-      if (getLiner() instanceof BezierLiner) {
-        pConnType.setValue(PathModel.LinerType.BEZIER);
-      }
-      else if (getLiner() instanceof ElbowLiner) {
-        pConnType.setValue(PathModel.LinerType.ELBOW);
-      }
-      else if (getLiner() instanceof SlantedLiner) {
-        pConnType.setValue(PathModel.LinerType.SLANTED);
-      }
-
-      model.setFigure(clone);
-
-      return clone;
+    if (getLiner() instanceof BezierLiner) {
+      pConnType.setValue(PathModel.LinerType.BEZIER);
     }
-    catch (CloneNotSupportedException ex) {
-      logger.log(Level.SEVERE, "Clone not supported: {0}", getModel().getName());
-      return null;
+    else if (getLiner() instanceof ElbowLiner) {
+      pConnType.setValue(PathModel.LinerType.ELBOW);
     }
+    else if (getLiner() instanceof SlantedLiner) {
+      pConnType.setValue(PathModel.LinerType.SLANTED);
+    }
+
+    clone.getModel().setFigure(clone);
+
+    return clone;
   }
 }

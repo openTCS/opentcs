@@ -24,10 +24,7 @@ import org.opentcs.algorithms.KernelExtension;
 import org.opentcs.kernel.OrderCleanerTask.OrderSweepType;
 import org.opentcs.kernel.controlcenter.KernelControlCenter;
 import org.opentcs.kernel.module.ModuleInjectionModule;
-import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.persistence.OrderPersister;
-import org.opentcs.kernel.persistence.XMLFileModelPersister;
-import org.opentcs.kernel.persistence.XMLFileOrderPersister;
+import org.opentcs.kernel.persistence.PersistenceInjectionModule;
 import org.opentcs.kernel.workingset.MessageBuffer;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.TCSObjectPool;
@@ -86,10 +83,8 @@ public class KernelInjectionModule
         .annotatedWith(CentralEventHub.class)
         .toInstance(kernelEventHub);
 
-    bind(ModelPersister.class).to(XMLFileModelPersister.class);
-    bind(OrderPersister.class).to(XMLFileOrderPersister.class);
-
     install(new ModuleInjectionModule());
+    install(new PersistenceInjectionModule());
 
     bind(LocalKernel.class)
         .to(StandardKernel.class)
@@ -101,6 +96,17 @@ public class KernelInjectionModule
   }
 
   private void configureKernelStates() {
+    ConfigurationStore modellingConfigStore
+        = ConfigurationStore.getStore(KernelStateModelling.class.getName());
+    bindConstant()
+        .annotatedWith(KernelStateModelling.SaveModelOnTerminate.class)
+        .to(modellingConfigStore.getBoolean("saveModelOnTerminate", false));
+    ConfigurationStore operatingConfigStore
+        = ConfigurationStore.getStore(KernelStateOperating.class.getName());
+    bindConstant()
+        .annotatedWith(KernelStateOperating.SaveModelOnTerminate.class)
+        .to(operatingConfigStore.getBoolean("saveModelOnTerminate", false));
+
     // A map for KernelState instances to be provided at runtime.
     MapBinder<Kernel.State, KernelState> stateMapBinder
         = MapBinder.newMapBinder(binder(), Kernel.State.class, KernelState.class);

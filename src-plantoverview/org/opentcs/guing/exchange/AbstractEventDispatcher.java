@@ -1,19 +1,25 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.exchange;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Logger;
+import java.util.Set;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.guing.exchange.adapter.LinkAdapter;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
-import org.opentcs.guing.exchange.adapter.ProcessAdapterFactory;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -26,11 +32,6 @@ public abstract class AbstractEventDispatcher
     implements EventDispatcher {
 
   /**
-   * This class's logger.
-   */
-  private static final Logger logger
-      = Logger.getLogger(AbstractEventDispatcher.class.getName());
-  /**
    * Assignment of a model to its {@link ProcessAdapter}.
    * Often it is the case that a model is known and we have to look for
    * its ProcessAdapter. Furthermore there can be models with ProcessAdapters,
@@ -39,46 +40,22 @@ public abstract class AbstractEventDispatcher
   protected final Map<ModelComponent, ProcessAdapter> fAdaptersByModel
       = new HashMap<>();
   /**
-   * Assignment of a kernel object reference to a {@link ProcessAdapter}.
+   * Provides access to a kernel.
    */
-  private final Map<TCSObjectReference<?>, ProcessAdapter> fAdaptersByProcess
-      = new HashMap<>();
-  /**
-   * The process adapter factory to be used.
-   */
-  private final ProcessAdapterFactory procAdapterFactory;
-  /**
-   * The Kernel.
-   */
-  private Kernel fServer;
+  private final SharedKernelProvider kernelProvider;
 
   /**
    * Creates a new instance.
    *
-   * @param procAdapterFactory The process adapter factory to be used.
+   * @param kernelProvider Provides a access to a kernel.
    */
-  protected AbstractEventDispatcher(ProcessAdapterFactory procAdapterFactory) {
-    this.procAdapterFactory = requireNonNull(procAdapterFactory,
-                                             "procAdapterFactory");
+  protected AbstractEventDispatcher(SharedKernelProvider kernelProvider) {
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
   }
 
   @Override // EventDispatcher
   public void addProcessAdapter(ProcessAdapter adapter) {
     requireNonNull(adapter, "adapter");
-
-    adapter.setEventDispatcher(this);
-
-    if (adapter.getProcessObject() == null) {
-      if (!(adapter instanceof LinkAdapter)) {
-        // For a LinkModel there is no process object
-        logger.fine("Adapter without ProcessObject: "
-            + adapter.getClass().getName());
-      }
-    }
-    else {
-      fAdaptersByProcess.put((TCSObjectReference<?>) adapter.getProcessObject(),
-                             adapter);
-    }
 
     fAdaptersByModel.put(adapter.getModel(), adapter);
   }
@@ -87,23 +64,12 @@ public abstract class AbstractEventDispatcher
   public void removeProcessAdapter(ProcessAdapter adapter) {
     requireNonNull(adapter, "adapter");
 
-    if (adapter.getProcessObject() != null) {
-      TCSObjectReference<?> processObject
-          = (TCSObjectReference<?>) adapter.getProcessObject();
-      fAdaptersByProcess.remove(processObject);
-    }
-
     fAdaptersByModel.remove(adapter.getModel());
   }
 
   @Override // EventDispatcher
-  public void setKernel(Kernel server) {
-    fServer = server;
-  }
-
-  @Override // EventDispatcher
   public Kernel getKernel() {
-    return fServer;
+    return kernelProvider.kernelShared() ? kernelProvider.getKernel() : null;
   }
 
   @Override // EventDispatcher
@@ -115,9 +81,12 @@ public abstract class AbstractEventDispatcher
   public ProcessAdapter findProcessAdapter(TCSObjectReference<?> processObject) {
     requireNonNull(processObject, "processObject");
 
-    for (Map.Entry<TCSObjectReference<?>, ProcessAdapter> entry
-         : fAdaptersByProcess.entrySet()) {
-      if (entry.getKey().getId() == processObject.getId()) {
+    // XXX We look up the object by its name here, assuming that the name does
+    // XXX not change during runtime. This is true for model objects in
+    // XXX operating mode now, but the assumption may not hold forever.
+    for (Map.Entry<ModelComponent, ProcessAdapter> entry
+         : fAdaptersByModel.entrySet()) {
+      if (Objects.equals(entry.getKey().getName(), processObject.getName())) {
         return entry.getValue();
       }
     }
@@ -126,27 +95,7 @@ public abstract class AbstractEventDispatcher
   }
 
   @Override // EventDispatcher
-  public void release() {
-  }
-
-  @Override // EventDispatcher
-  public Iterator<ProcessAdapter> getProcessAdapters() {
-    return fAdaptersByModel.values().iterator();
-  }
-
-  @Override // EventDispatcher
-  public int countAdaptersByModel() {
-    return fAdaptersByModel.size();
-  }
-
-  @Override // EventDispatcher
-  public int countAdaptersByProcess() {
-    return fAdaptersByProcess.size();
-  }
-
-  @Override // EventDispatcher
-  public ProcessAdapter createProcessAdapter(
-      Class<? extends ModelComponent> model) {
-    return procAdapterFactory.createAdapter(model);
+  public Set<ProcessAdapter> getProcessAdapters() {
+    return new HashSet<>(fAdaptersByModel.values());
   }
 }

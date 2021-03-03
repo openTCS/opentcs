@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
 import org.opentcs.guing.model.ModelComponent;
@@ -21,28 +27,28 @@ public abstract class AbstractModelAttribute
   /**
    * Zeigt an, ob sich das Attribut geändert hat.
    */
-  protected ChangeState fChangeState;
+  private ChangeState fChangeState = ChangeState.NOT_CHANGED;
   /**
    * Die Bezeichnung des Attributs.
    */
-  protected String fDescription;
+  private String fDescription = "";
   /**
    * Der Hilfetext.
    */
-  protected String fHelptext;
+  private String fHelptext = "";
   /**
    * Zeigt an, ob das Attribut gemeinsam mit gleichnamigen Attributen anderer
    * ModelComponent-Objekte bearbeitet werden kann.
    */
-  protected boolean fCollectiveEditable;
+  private boolean fCollectiveEditable;
   /**
    * Zeigt an, ob das Attribut im Modus "Modelling" verändert werden kann.
    */
-  protected boolean fModellingEditable;
+  private boolean fModellingEditable = true;
   /**
    * Zeigt an, ob das Attribut im Modus "Operating" verändert werden kann.
    */
-  protected boolean fOperatingEditable;
+  private boolean fOperatingEditable;
 
   /**
    * Creates a new instance of AbstractModelAttribute
@@ -51,12 +57,6 @@ public abstract class AbstractModelAttribute
    */
   public AbstractModelAttribute(ModelComponent model) {
     fModel = model;
-    fChangeState = ChangeState.NOT_CHANGED;
-    fDescription = "";
-    fHelptext = "";
-    fCollectiveEditable = false;
-    fModellingEditable = true;
-    fOperatingEditable = false;
   }
 
   @Override // ModelAttribute

@@ -1,11 +1,19 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.table;
 
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -14,7 +22,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import org.opentcs.guing.application.GuiManager.OperationMode;
+import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.properties.event.TableChangeListener;
 import org.opentcs.guing.components.properties.event.TableSelectionChangeEvent;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
@@ -35,10 +44,15 @@ import org.opentcs.guing.components.properties.type.ModelAttribute;
  * Veränderung informiert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class AttributesTable
     extends JTable {
 
+  /**
+   * Stores the application's current state.
+   */
+  private final ApplicationState appState;
   /**
    * Eine Liste von Objekten, die daran interessiert sind, welche Tabellenzeile
    * gerade selektiert ist.
@@ -48,21 +62,14 @@ public class AttributesTable
 
   /**
    * Creates a new instance.
+   * 
+   * @param appState Stores the application's current state.
    */
-  public AttributesTable() {
-    super();
+  @Inject
+  public AttributesTable(ApplicationState appState) {
+    this.appState = requireNonNull(appState, "appState");
     setStyle();
     putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-  }
-
-  /**
-   * Konstruktor für ein TableModel.
-   *
-   * @param tableModel
-   */
-  public AttributesTable(TableModel tableModel) {
-    super(tableModel);
-    setStyle();
   }
 
   /**
@@ -154,12 +161,11 @@ public class AttributesTable
    * @param row
    * @return
    */
-  public boolean isEditable(int row) {
+  public boolean isEditable(int row) { 
     AttributesTableModel tableModel = (AttributesTableModel) getModel();
     ModelAttribute attribute = (ModelAttribute) tableModel.getValueAt(row, 1);
-    OperationMode operationMode = tableModel.getView().getOperationMode();
 
-    if (operationMode == OperationMode.MODELLING) {
+    if (appState.hasOperationMode(OperationMode.MODELLING)) {
       return attribute.isModellingEditable();
     }
 

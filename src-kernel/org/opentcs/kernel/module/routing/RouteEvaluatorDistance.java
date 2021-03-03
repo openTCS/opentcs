@@ -22,12 +22,20 @@ import org.opentcs.data.order.Route;
 class RouteEvaluatorDistance
     extends RouteEvaluator {
 
-  public RouteEvaluatorDistance() {
-    super();
+  /**
+   * Creates a new instance.
+   *
+   * @param augmentingEvaluator An additional evaluator augmenting the computed
+   * costs of this one.
+   */
+  public RouteEvaluatorDistance(RouteEvaluator augmentingEvaluator) {
+    super(augmentingEvaluator);
   }
 
   @Override
-  long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps) {
+  public long computeCosts(Vehicle vehicle,
+                           Point startPoint,
+                           List<Route.Step> steps) {
     requireNonNull(startPoint, "startPoint");
     requireNonNull(steps, "steps");
 
@@ -35,6 +43,6 @@ class RouteEvaluatorDistance
     for (Route.Step step : steps) {
       result += step.getPath().getLength();
     }
-    return result;
+    return result + augmentingEvaluator.computeCosts(vehicle, startPoint, steps);
   }
 }

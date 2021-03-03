@@ -9,7 +9,6 @@
 package org.opentcs.access.rmi;
 
 import java.awt.Color;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -30,7 +29,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.message.Message;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Layout;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -98,6 +96,7 @@ public interface RemoteKernel
    * calls.
    * @throws CredentialsException If authentication with the given username and
    * password failed.
+   * @throws RemoteException If there was an RMI-related problem.
    */
   @CallPermissions({})
   ClientID login(String userName, String password)
@@ -109,6 +108,7 @@ public interface RemoteKernel
    * allowed to call methods on this <code>RemoteKernel</code> any more.
    *
    * @param clientID The client's ID.
+   * @throws RemoteException If there was an RMI-related problem.
    */
   @CallPermissions({})
   void logout(ClientID clientID)
@@ -120,6 +120,7 @@ public interface RemoteKernel
    * @param clientID The calling client's identification object.
    * @return A set of permissions the client is granted; if the given ID is
    * invalid, the returned Set will be empty.
+   * @throws RemoteException If there was an RMI-related problem.
    */
   @CallPermissions({})
   Set<UserPermission> getUserPermissions(ClientID clientID)
@@ -158,6 +159,7 @@ public interface RemoteKernel
    * @param clientID The identification object of the client calling the method.
    * @param timeout A timeout (in ms) for which to wait for events to arrive.
    * @return A list of events (in the order they arrived).
+   * @throws RemoteException If there was an RMI-related problem.
    */
   @CallPermissions({UserPermission.READ_DATA})
   List<TCSEvent> pollEvents(ClientID clientID, long timeout)
@@ -172,8 +174,8 @@ public interface RemoteKernel
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.READ_DATA})
-  Set<String> getModelNames(ClientID clientID)
-      throws CredentialsException, RemoteException;
+  String getModelName(ClientID clientID)
+      throws CredentialsException, IOException, RemoteException;
 
   @CallPermissions({UserPermission.READ_DATA})
   String getCurrentModelName(ClientID clientID)
@@ -184,16 +186,16 @@ public interface RemoteKernel
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.LOAD_MODEL})
-  void loadModel(ClientID clientID, String modelName)
+  void loadModel(ClientID clientID)
       throws CredentialsException, IOException, RemoteException;
 
   @CallPermissions({UserPermission.SAVE_MODEL})
-  void saveModel(ClientID clientID, String modelName, boolean overwrite)
+  void saveModel(ClientID clientID, String modelName)
       throws CredentialsException, IOException, RemoteException;
 
   @CallPermissions({UserPermission.SAVE_MODEL})
-  void removeModel(ClientID clientID, String name)
-      throws CredentialsException, FileNotFoundException, IOException,
+  void removeModel(ClientID clientID)
+      throws CredentialsException, IOException,
              RemoteException;
 
   @CallPermissions({UserPermission.READ_DATA})
@@ -245,45 +247,36 @@ public interface RemoteKernel
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
-  Layout createLayout(ClientID clientID, byte[] layoutData)
-      throws CredentialsException, RemoteException;
-
-  @CallPermissions({UserPermission.MODIFY_MODEL})
-  void setLayoutData(ClientID clientID, TCSObjectReference<Layout> ref,
-                     byte[] newData)
-      throws CredentialsException, ObjectUnknownException, RemoteException;
-
-  @CallPermissions({UserPermission.MODIFY_MODEL})
   VisualLayout createVisualLayout(ClientID clientID)
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void setVisualLayoutScaleX(ClientID clientID,
-                             TCSObjectReference<Layout> ref,
+                             TCSObjectReference<VisualLayout> ref,
                              double scaleX)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void setVisualLayoutScaleY(ClientID clientID,
-                             TCSObjectReference<Layout> ref,
+                             TCSObjectReference<VisualLayout> ref,
                              double scaleY)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void setVisualLayoutColors(ClientID clientID,
-                             TCSObjectReference<Layout> ref,
+                             TCSObjectReference<VisualLayout> ref,
                              Map<String, Color> colors)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void setVisualLayoutElements(ClientID clientID,
-                               TCSObjectReference<Layout> ref,
+                               TCSObjectReference<VisualLayout> ref,
                                Set<LayoutElement> elements)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void setVisualLayoutViewBookmarks(ClientID clientID,
-                                    TCSObjectReference<Layout> ref,
+                                    TCSObjectReference<VisualLayout> ref,
                                     List<ViewBookmark> bookmarks)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 

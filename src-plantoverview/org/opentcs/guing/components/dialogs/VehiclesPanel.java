@@ -1,15 +1,25 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 27.05.2013 10:24:11
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.dialogs;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.Collection;
+import static java.util.Objects.requireNonNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.inject.Inject;
 import javax.swing.JPanel;
+import net.engio.mbassy.listener.Handler;
+import org.opentcs.guing.event.OperationModeChangeEvent;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -21,19 +31,52 @@ public class VehiclesPanel
     extends JPanel {
 
   /**
+   * Provides the current system model.
+   */
+  private final ModelManager modelManager;
+  /**
+   * A factory for vehicle views.
+   */
+  private final SingleVehicleViewFactory vehicleViewFactory;
+  /**
    * The vehicle views sorted.
    */
-  private final SortedSet<SingleVehicleView> vehicleViewsSorted
-      = new TreeSet<>();
+  private final SortedSet<SingleVehicleView> vehicleViews = new TreeSet<>();
 
   /**
    * Creates a new instance.
+   *
+   * @param modelManager Provides the current system model.
+   * @param vehicleViewFactory A factory for vehicle views.
    */
-  public VehiclesPanel() {
+  @Inject
+  VehiclesPanel(ModelManager modelManager,
+                SingleVehicleViewFactory vehicleViewFactory) {
+    this.modelManager = requireNonNull(modelManager, "modelManager");
+    this.vehicleViewFactory = requireNonNull(vehicleViewFactory,
+                                             "vehicleViewFactory");
+
     initComponents();
     setPreferredSize(new Dimension(0, 97));
     setMinimumSize(new Dimension(140, 120));
     panelVehicles.setLayout(new ModifiedFlowLayout(FlowLayout.LEFT, 10, 10));
+  }
+
+  /**
+   * Handles changes of the application's operation mode.
+   *
+   * @param evt The mode change event.
+   */
+  @Handler
+  public void handleModeChange(OperationModeChangeEvent evt) {
+    switch (evt.getNewMode()) {
+      case OPERATING:
+        setVehicleModels(modelManager.getModel().getVehicleModels());
+        break;
+      case MODELLING:
+      default:
+        clearVehicles();
+    }
   }
 
   /**
@@ -43,19 +86,19 @@ public class VehiclesPanel
    */
   public void setVehicleModels(Collection<VehicleModel> vehicleModels) {
     // Remove vehicles of the previous model from panel
-    for (SingleVehicleView vehicleView : vehicleViewsSorted) {
+    for (SingleVehicleView vehicleView : vehicleViews) {
       panelVehicles.remove(vehicleView);
     }
 
     // Remove vehicles of the previous model from list
-    vehicleViewsSorted.clear();
+    vehicleViews.clear();
     // Add vehicles of actual model to list
     for (VehicleModel vehicle : vehicleModels) {
-      vehicleViewsSorted.add(new SingleVehicleView(vehicle));
+      vehicleViews.add(vehicleViewFactory.createSingleVehicleView(vehicle));
     }
 
     // Add vehicles of actual model to panel, sorted by name
-    for (SingleVehicleView vehicleView : vehicleViewsSorted) {
+    for (SingleVehicleView vehicleView : vehicleViews) {
       panelVehicles.add(vehicleView);
     }
 
@@ -66,23 +109,39 @@ public class VehiclesPanel
    * Clears the vehicles in this panel.
    */
   public void clearVehicles() {
-    for (SingleVehicleView vehicleView : vehicleViewsSorted) {
+    for (SingleVehicleView vehicleView : vehicleViews) {
       panelVehicles.remove(vehicleView);
     }
-    vehicleViewsSorted.clear();
+    vehicleViews.clear();
+    repaint();
   }
 
   @Override
   public void repaint() {
     super.repaint();
 
-    if (vehicleViewsSorted != null) {
-      for (SingleVehicleView view : vehicleViewsSorted) {
+    if (vehicleViews != null) {
+      for (SingleVehicleView view : vehicleViews) {
         view.repaint();
       }
     }
   }
 
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        clearVehicles();
+        break;
+      case LOADED:
+        setVehicleModels(modelManager.getModel().getVehicleModels());
+        break;
+      default:
+      // Do nada.
+    }
+  }
+
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
    * initialize the form.
@@ -108,4 +167,5 @@ public class VehiclesPanel
   private javax.swing.JPanel panelVehicles;
   private javax.swing.JScrollPane scrollPaneVehicles;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

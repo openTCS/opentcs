@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
 import org.opentcs.access.ConfigurationItemTO;
 import org.opentcs.access.Kernel;
 

@@ -1,17 +1,26 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
+import com.google.inject.assistedinject.Assisted;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
@@ -21,10 +30,15 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * Benutzeroberfläche zum Bearbeiten einer statischen Route.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class EditStaticRoutePanel
     extends DialogContent {
 
+  /**
+   * A factory for dialog-related components.
+   */
+  private final DialogsFactory dialogsFactory;
   /**
    * Die zu bearbeitende statische Route.
    */
@@ -39,22 +53,31 @@ public class EditStaticRoutePanel
   private final List<PointModel> fAllPoints;
 
   /**
-   * Creates new form EditStaticRoutePanel.
+   * Creates new instance.
    *
+   * @param guiManager The GUI manager.
+   * @param dialogsFactory A factory for dialogs-related components.
    * @param staticRoute die zu bearbeitende statische Route
    * @param allPoints alle Knoten des Fahrkurses
    */
-  public EditStaticRoutePanel(StaticRouteModel staticRoute, List<PointModel> allPoints) {
+  @Inject
+  public EditStaticRoutePanel(final GuiManager guiManager,
+                              DialogsFactory dialogsFactory,
+                              @Assisted StaticRouteModel staticRoute,
+                              @Assisted List<PointModel> allPoints) {
+    requireNonNull(guiManager, "guiManager");
+    this.dialogsFactory = requireNonNull(dialogsFactory, "dialogsFactory");
+    this.fStaticRoute = requireNonNull(staticRoute, "staticRoute");
+    this.fAllPoints = requireNonNull(allPoints, "allPoints");
+    
     initComponents();
     buttonRemove.setEnabled(false);
 
-    fStaticRoute = staticRoute;
     for (ModelComponent routeChildComp : fStaticRoute.getChildComponents()) {
       fPoints.add((PointModel) routeChildComp);
     }
     // Nur die Liste aller Punkte sortieren
-    Collections.sort(allPoints);
-    fAllPoints = allPoints;
+    Collections.sort(fAllPoints);
     
     setDialogTitle(ResourceBundleUtil.getBundle().getString("staticRoute.edit.text") + " " + staticRoute.getName());
 
@@ -77,7 +100,7 @@ public class EditStaticRoutePanel
             PointModel point = e.next();
 
             if (point.getName().equals(entry)) {
-              OpenTCSView.instance().figureSelected(point);
+              guiManager.figureSelected(point);
             }
           }
         }
@@ -116,6 +139,7 @@ public class EditStaticRoutePanel
     listPoints.setModel(listModel);
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -183,6 +207,7 @@ public class EditStaticRoutePanel
     gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
     add(controlPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   /**
    * Fügt Knoten ab dem letzten Knoten hinzu.
@@ -196,7 +221,8 @@ public class EditStaticRoutePanel
         point = fPoints.getLast();
       }
 
-      AddNodesToStaticRoutePanel p = new AddNodesToStaticRoutePanel(point, fAllPoints);
+      AddNodesToStaticRoutePanel p
+          = dialogsFactory.createAddNodesToStaticRoutePanel(point, fAllPoints);
       StandardContentDialog d = new StandardContentDialog(controlPanel, p);
       d.setVisible(true);
 
@@ -225,6 +251,8 @@ public class EditStaticRoutePanel
         listModel.removeElementAt(i);
       }
     }//GEN-LAST:event_buttonRemoveActionPerformed
+
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonEdit;
   private javax.swing.JButton buttonRemove;
@@ -232,4 +260,5 @@ public class EditStaticRoutePanel
   private javax.swing.JList listPoints;
   private javax.swing.JScrollPane scrollPanePoints;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

@@ -9,7 +9,7 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /**
  * A Guice module for process adapters.
@@ -21,8 +21,6 @@ public class ProcessAdapterInjectionModule
 
   @Override
   protected void configure() {
-//    bind(ProcessAdapterFactory.class)
-//        .toInstance(ProcessAdapterFactory.instance());
-    bind(ProcessAdapterFactory.class).in(Singleton.class);
+    install(new FactoryModuleBuilder().build(ProcessAdapterFactory.class));
   }
 }

@@ -1,69 +1,53 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2014 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange.adapter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.opentcs.guing.exchange.EventDispatcher;
+import org.opentcs.guing.model.elements.BlockModel;
+import org.opentcs.guing.model.elements.GroupModel;
+import org.opentcs.guing.model.elements.LayoutModel;
+import org.opentcs.guing.model.elements.LinkModel;
+import org.opentcs.guing.model.elements.LocationModel;
+import org.opentcs.guing.model.elements.LocationTypeModel;
+import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.model.elements.StaticRouteModel;
+import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
- * A factory for <code>ProcessAdapters</code>.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
-public class ProcessAdapterFactory {
+public interface ProcessAdapterFactory {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger log
-      = Logger.getLogger(ProcessAdapterFactory.class.getName());
-  /**
-   * Maps model component classes to prototypes of <code>ProcessAdapters</code>.
-   */
-  private final Map<Class, ProcessAdapter> fAdapters = new HashMap<>();
+  PointAdapter createPointAdapter(PointModel model, EventDispatcher dispatcher);
 
-  /**
-   * Creates a new instance of ProcessAdapterFactory.
-   */
-  ProcessAdapterFactory() {
-  }
+  PathAdapter createPathAdapter(PathModel model, EventDispatcher dispatcher);
 
-  /**
-   * Creates for the given class of a <code>ModelComponent</code> an adapter.
-   *
-   * @param model The class an adapter is needed for.
-   * @return The created adapter.
-   */
-  public ProcessAdapter createAdapter(Class model) {
-    if (model == null) {
-      return null;
-    }
+  LocationTypeAdapter createLocTypeAdapter(LocationTypeModel model,
+                                           EventDispatcher dispatcher);
 
-    ProcessAdapter prototype = fAdapters.get(model);
-    if (prototype == null) {
-      return createAdapter(model.getSuperclass());
-    }
+  LocationAdapter createLocationAdapter(LocationModel model,
+                                        EventDispatcher dispatcher);
 
-    try {
-      return prototype.getClass().newInstance();
-    }
-    catch (InstantiationException | IllegalAccessException ex) {
-      log.log(Level.WARNING, null, ex);
-      return null;
-    }
-  }
+  LinkAdapter createLinkAdapter(LinkModel model, EventDispatcher dispatcher);
 
-  /**
-   * Adds a new mapping of a model component class to an adapter.
-   *
-   * @param model The class of a <code>ModelComponent</code>.
-   * @param adapter A prototype of an adapter that shall be created then.
-   */
-  public void add(Class model, ProcessAdapter adapter) {
-    fAdapters.put(model, adapter);
-  }
+  VehicleAdapter createVehicleAdapter(VehicleModel model,
+                                      EventDispatcher dispatcher);
+
+  BlockAdapter createBlockAdapter(BlockModel model, EventDispatcher dispatcher);
+
+  GroupAdapter createGroupAdapter(GroupModel model, EventDispatcher dispatcher);
+
+  StaticRouteAdapter createStaticRouteAdapter(StaticRouteModel model,
+                                              EventDispatcher dispatcher);
+
+  LayoutAdapter createLayoutAdapter(LayoutModel model,
+                                    EventDispatcher dispatcher);
 }

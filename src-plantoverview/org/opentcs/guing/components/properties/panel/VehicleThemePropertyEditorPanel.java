@@ -1,11 +1,20 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 11.09.2013 12:00:45
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.panel;
 
 import java.awt.Component;
+import java.awt.Image;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -14,46 +23,47 @@ import javax.swing.table.DefaultTableModel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
-import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.util.DefaultVehicleThemeManager;
-import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.VehicleThemeManager;
 import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
- *
+ * A panel that shows all images of a specific vehicle theme.
+ * 
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleThemePropertyEditorPanel
     extends JPanel
     implements DetailsDialogContent {
 
   /**
-   * Das Attribut.
+   * The property.
    */
   private VehicleThemeProperty fProperty;
   /**
-   * Der Index des angezeigten Themes.
+   * The current theme index.
    */
   private int fThemeIndex;
   /**
-   * Die Themes.
+   * The available themes.
    */
   private final List<VehicleTheme> themes;
   /**
-   * Der DefaultVehicleThemeManager
+   * A manager for vehicle themes.
    */
   private final VehicleThemeManager themeManager;
 
   /**
-   * Creates new form VehicleThemePropertyEditorPanel
+   * Creates new instance.
    */
-  public VehicleThemePropertyEditorPanel() {
+  @Inject
+  public VehicleThemePropertyEditorPanel(VehicleThemeManager themeManager) {
+    this.themeManager = requireNonNull(themeManager, "themeManager");
+    
     initComponents();
     reprTable.setDefaultRenderer(Object.class, new ThemeTableCellRenderer());
 
-    themeManager = DefaultVehicleThemeManager.getInstance();
     themes = themeManager.getThemes();
     fThemeIndex = themes.indexOf(themeManager.getDefaultTheme());
 
@@ -88,11 +98,6 @@ public class VehicleThemePropertyEditorPanel
     return fProperty;
   }
 
-  @Override
-  public void setSystemModel(SystemModel systemModel) {
-    // Do nada.
-  }
-
   private void updateView() {
     labelTheme.setText(themes.get(fThemeIndex).getName());
     initTable();
@@ -104,11 +109,9 @@ public class VehicleThemePropertyEditorPanel
     model.addColumn("File");
     model.addColumn("Symbol");
     VehicleTheme curTheme = themes.get(fThemeIndex);
-    for (String path : curTheme.getAllImagePaths()) {
-      String[] parts = path.split("/");
-      Object[] row = {parts[parts.length - 1], path};
-      model.addRow(row);
-    }
+    
+    model.addRow(new Object[] {curTheme.getName(), curTheme.getThemeImage()});
+    
     updateRowHeights();
     reprTable.revalidate();
   }
@@ -265,9 +268,9 @@ public class VehicleThemePropertyEditorPanel
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
                                                    int row, int column) {
-      if (value instanceof String && column == 1) {
+      if (value instanceof Image && column == 1) {
         JLabel label = new JLabel();
-        label.setIcon(IconToolkit.instance().getImageIconByFullPath((String) value));
+        label.setIcon(new ImageIcon((Image) value));
         return label;
       }
       return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

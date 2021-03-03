@@ -17,7 +17,6 @@ package org.opentcs.guing.components.drawing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -67,10 +66,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import net.engio.mbassy.bus.MBassador;
+import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.AbstractFigure;
 import org.jhotdraw.draw.AttributeKey;
 import static org.jhotdraw.draw.AttributeKeys.CANVAS_FILL_COLOR;
@@ -100,9 +100,11 @@ import org.jhotdraw.draw.event.HandleListener;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.gui.datatransfer.ClipboardUtil;
 import org.jhotdraw.util.ReversedList;
+import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.guing.application.GuiManager;
+import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.EditableComponent;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
@@ -111,23 +113,22 @@ import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.LinkConnection;
-import org.opentcs.guing.components.drawing.figures.OffsetFigure;
 import org.opentcs.guing.components.drawing.figures.OriginFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
-import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.event.BlockChangeEvent;
 import org.opentcs.guing.event.BlockChangeListener;
 import org.opentcs.guing.event.StaticRouteChangeEvent;
 import org.opentcs.guing.event.StaticRouteChangeListener;
-import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.FiguresFolder;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.BlockModel;
@@ -136,7 +137,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.util.ObjectListCycler;
 
 /**
@@ -147,20 +148,12 @@ public abstract class OpenTCSDrawingView
     extends JComponent
     implements DrawingView,
                EditableComponent,
-               BlockChangeListener,
-               StaticRouteChangeListener,
-               PropertyChangeListener,
-               FocusListener {
+               PropertyChangeListener {
 
-  /**
-   * This constant is used to identify the blocks visible property of the
-   * DrawingView.
-   */
-  public static final String RULERS_VISIBLE_PROPERTY = "rulersVisible";
-  public static final String LABELS_VISIBLE_PROPERTY = "labelsVisible";
-  public static final String BLOCKS_VISIBLE_PROPERTY = "blocksVisible";
-  public static final String STATIC_ROUTES_VISIBLE_PROPERTY = "staticRoutesVisible";
   public static final String FOCUS_GAINED = "focusGained";
+  /**
+   * This class's logger.
+   */
   private static final Logger logger
       = Logger.getLogger(OpenTCSDrawingView.class.getName());
   /**
@@ -189,10 +182,8 @@ public abstract class OpenTCSDrawingView
                         WITHDRAWN_PATH_DASH,
                         0.0f);
   /**
-   * Width on the screen edge.
+   * The actual drawing.
    */
-  private static final int MARGIN = 20;
-  //
   private Drawing drawing;
   /**
    * Holds the selected figures in an ordered put. The ordering reflects the
@@ -203,9 +194,8 @@ public abstract class OpenTCSDrawingView
   private boolean isConstrainerVisible = true;
   private Constrainer visibleConstrainer = new GridConstrainer(10, 10);
   private Constrainer invisibleConstrainer = new GridConstrainer();
-  private Handle secondaryHandleOwner;
   private Handle activeHandle;
-  private final LinkedList<Handle> secondaryHandles = new LinkedList<>();
+  private final List<Handle> secondaryHandles = new LinkedList<>();
   private boolean handlesAreValid = true;
   private transient Dimension cachedPreferredSize;
   private double zoomX = 1.0;
@@ -214,20 +204,8 @@ public abstract class OpenTCSDrawingView
   private int detailLevel;
   private OpenTCSDrawingEditor editor;
   private BufferedImage backgroundTile;
-  private final FigureListener handleInvalidator = new FigureAdapter() {
-    @Override
-    public void figureHandlesChanged(FigureEvent e) {
-      invalidateHandles();
-    }
-  };
+  private final FigureListener handleInvalidator = new HandleInvalidator();
   private transient Rectangle2D.Double cachedDrawingArea;
-  /**
-   * These invisible figures are dragged as the user drags the view.
-   */
-  private OffsetFigure topOffsetFigure;
-  private OffsetFigure bottomOffsetFigure;
-  private OffsetFigure rightOffsetFigure;
-  private OffsetFigure leftOffsetFigure;
   /**
    * Holds the drawing area (in view coordinates) which is in the drawing
    * buffer.
@@ -242,13 +220,29 @@ public abstract class OpenTCSDrawingView
    * This listener sets the position of the invisible offsetFigure after the
    * frame was resized.
    */
-  private final ComponentListener offsetListener = new OffsetListener(this);
+  private ComponentListener offsetListener;
   private boolean paintEnabled = true;
 
+  /**
+   * Stores the application's current state.
+   */
+  private final ApplicationState appState;
   /**
    * The view we're working with.
    */
   private final OpenTCSView fOpenTCSView;
+  /**
+   * The manager keeping/providing the currently loaded model.
+   */
+  private final ModelManager modelManager;
+  /**
+   * A factory for creating figure objects.
+   */
+  private final CourseObjectFactory crsObjFactory;
+  /**
+   * A helper for creating transport orders with the kernel.
+   */
+  private final TransportOrderUtil orderUtil;
   /**
    * The block areas.
    */
@@ -257,10 +251,6 @@ public abstract class OpenTCSDrawingView
    * The static routes.
    */
   private ModelComponent fStaticRoutes;
-  /**
-   * Flag whether the rulers shall be drawn.
-   */
-  private boolean rulersVisible = true;
   /**
    * Flag whether the labels shall be drawn.
    */
@@ -307,7 +297,19 @@ public abstract class OpenTCSDrawingView
    * DrawingView.
    */
   private final List<AbstractFigure> invisibleFigures = new ArrayList<>();
-  private final EventHandler eventHandler = new EventHandler();
+  /**
+   * An event handler for CompositeFigureEvents.
+   */
+  private final CompositeFigureEventHandler cmpFigureEvtHandler
+      = new CompositeFigureEventHandler();
+  /**
+   * An event handler for FigureEvents.
+   */
+  private final FigureEventHandler figureEventHandler = new FigureEventHandler();
+  /**
+   * An event handler for HandleEvents.
+   */
+  private final HandleEventHandler handleEventHandler = new HandleEventHandler();
 
   /**
    * Contains figures currently in the buffer (eg when copying or cutting figures).
@@ -318,21 +320,51 @@ public abstract class OpenTCSDrawingView
    */
   private final BezierLinerEditHandler bezierLinerEditHandler
       = new BezierLinerEditHandler();
+  /**
+   * Handles events for blocks.
+   */
+  private final BlockChangeHandler blockChangeHandler = new BlockChangeHandler();
+  /**
+   * Handles events for static routes.
+   */
+  private final StaticRouteChangeHandler routeChangeHandler
+      = new StaticRouteChangeHandler();
+  /**
+   * The application's event bus.
+   */
+  private final MBassador<Object> eventBus;
 
   /**
    * Creates new instance.
    *
+   * @param appState Stores the application's current state.
    * @param opentcsView The view to be used.
+   * @param modelManager Provides the current system model.
+   * @param crsObjFactory A factory for figure objects.
+   * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param eventBus The application's event bus.
    */
-  public OpenTCSDrawingView(OpenTCSView opentcsView) {
-    this.fOpenTCSView = requireNonNull(opentcsView);
+  public OpenTCSDrawingView(ApplicationState appState,
+                            OpenTCSView opentcsView,
+                            ModelManager modelManager,
+                            CourseObjectFactory crsObjFactory,
+                            TransportOrderUtil orderUtil,
+                            MBassador<Object> eventBus) {
+    this.appState = requireNonNull(appState, "appState");
+    this.fOpenTCSView = requireNonNull(opentcsView, "opentcsView");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
+    this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    this.eventBus = requireNonNull(eventBus, "eventBus");
+
     // Set a dummy tool tip text to turn tooltips on
     setToolTipText(" ");
     setFocusable(true);
-    addFocusListener(this);
+    addFocusListener(new FocusHandler());
     setTransferHandler(new DefaultDrawingViewTransferHandler());
     setBackground(Color.LIGHT_GRAY);
     setOpaque(true);
+    setAutoscrolls(true);
 
     orderColorCycler = new ObjectListCycler<>(Color.GRAY, Color.MAGENTA,
                                               Color.BLUE, Color.CYAN,
@@ -347,169 +379,6 @@ public abstract class OpenTCSDrawingView
     super.removeAll();
   }
 
-  /**
-   * Creates the figures and sets their position to the current bounds of the
-   * view.
-   */
-  public void initializeOffsetFigures() {
-    removeOffsetFigures();
-    topOffsetFigure = new OffsetFigure();
-    bottomOffsetFigure = new OffsetFigure();
-    leftOffsetFigure = new OffsetFigure();
-    rightOffsetFigure = new OffsetFigure();
-
-    // Rectangle that contains all figures
-    Rectangle2D.Double drawingArea = getDrawing().getDrawingArea();
-    // The visible rectangle
-    Rectangle visibleRect = getComponent().getVisibleRect();
-    // Die size of the invisible offset figures
-    double wFigure = topOffsetFigure.getBounds().width;
-    double hFigure = leftOffsetFigure.getBounds().height;
-
-    // When the drawing already contains figures
-    double xLeft = drawingArea.x;
-    double xRight = drawingArea.x + drawingArea.width;
-    double yTop = drawingArea.y;
-    double yBottom = drawingArea.y + drawingArea.height;
-
-    // An empty drawing only contains the origin figure, which shall be
-    // on the bottom left 
-    if (drawingArea.width <= 25 && drawingArea.height <= 25) {
-      xLeft = -drawingArea.width / 2 - MARGIN;
-      xRight = visibleRect.width + xLeft - (MARGIN + wFigure / 2);
-      yBottom = -(-drawingArea.height / 2 - MARGIN);
-      yTop = -(visibleRect.height - yBottom - (MARGIN + hFigure / 2));
-    }
-
-    double xCenter = (xLeft + xRight) / 2;
-    double yCenter = (yBottom + yTop) / 2;
-
-    topOffsetFigure.setBounds(new Point2D.Double(xCenter, yTop), null);
-    bottomOffsetFigure.setBounds(new Point2D.Double(xCenter, yBottom), null);
-    leftOffsetFigure.setBounds(new Point2D.Double(xLeft, yCenter), null);
-    rightOffsetFigure.setBounds(new Point2D.Double(xRight, yCenter), null);
-
-    drawing.add(topOffsetFigure);
-    drawing.add(bottomOffsetFigure);
-    drawing.add(leftOffsetFigure);
-    drawing.add(rightOffsetFigure);
-
-    enableOffsetListener();
-    validateViewTranslation();
-  }
-
-  /**
-   * Updates the positions of the <code>OffsetFigure</code>s. When the user
-   * drags the view this method checks if the user wants the view to become
-   * larger (when the view is at a edge) and replaces the figures, so the view
-   * is drawn larger.
-   *
-   * @param offsetX The x-distance the user dragged the view.
-   * @param offsetY The y-distance the user dragged the view.
-   */
-  public void updateOffsetFigures(int offsetX, int offsetY) {
-    if (drawing == null) {
-      return;
-    }
-
-    JViewport viewport = (JViewport) getParent();
-    Rectangle2D.Double viewRect = viewToDrawing(viewport.getViewRect());
-
-    if (topOffsetFigure == null) {
-      initializeOffsetFigures();
-    }
-
-    removeOffsetFigures();
-
-    Point2D.Double topPos = null;
-    Point2D.Double bottomPos = null;
-    boolean bottomBarToMax = false;
-
-    // calculate new positons
-    if (offsetY < 0) {
-      // upwards
-      topPos = new Point2D.Double(
-          topOffsetFigure.getZoomPoint().getX(),
-          (topOffsetFigure.getZoomPoint().getY() + offsetY));
-    }
-    else if (offsetY > 0) {
-      // downwards
-      bottomPos = new Point2D.Double(
-          bottomOffsetFigure.getZoomPoint().getX(),
-          (bottomOffsetFigure.getZoomPoint().getY() + offsetY));
-    }
-
-    // set the new position if the view is at a y-edge
-    if (topPos != null
-        && (viewRect.contains(
-            new Point2D.Double(viewRect.x, (topPos.y - offsetY))) || //
-            viewRect.contains(
-            new Point2D.Double(
-            viewRect.x,
-            (topPos.y - translation.y - offsetY) / getScaleFactor())))) {
-      topOffsetFigure.setBounds(topPos, null);
-    }
-
-    if (bottomPos != null
-        && (viewRect.contains(
-            new Point2D.Double(viewRect.x, (bottomPos.y - offsetY))))) {
-      bottomOffsetFigure.setBounds(bottomPos, null);
-      bottomBarToMax = true;
-    }
-
-    Point2D.Double rightPos = null;
-    Point2D.Double leftPos = null;
-    boolean rightBarToMax = false;
-
-    // calculate new positions
-    if (offsetX > 0) {
-      // right
-      rightPos = new Point2D.Double(
-          (rightOffsetFigure.getZoomPoint().getX() + offsetX),
-          rightOffsetFigure.getZoomPoint().getY());
-    }
-    else if (offsetX < 0) {
-      // left
-      leftPos = new Point2D.Double(
-          (leftOffsetFigure.getZoomPoint().getX() + offsetX),
-          leftOffsetFigure.getZoomPoint().getY());
-    }
-
-    // set new positions if the view is at a x-edge
-    if (rightPos != null
-        && (viewRect.contains(
-            new Point2D.Double((rightPos.x - offsetX), viewRect.y)))) {
-      rightOffsetFigure.setBounds(rightPos, null);
-      rightBarToMax = true;
-    }
-
-    if (leftPos != null
-        && (viewRect.contains(
-            new Point2D.Double((leftPos.x - offsetX), viewRect.y)) || //
-            viewRect.contains(
-            new Point2D.Double((leftPos.x - translation.x - offsetX) / getScaleFactor(),
-                               viewRect.y)))) {
-      leftOffsetFigure.setBounds(leftPos, null);
-    }
-
-    drawing.add(topOffsetFigure);
-    drawing.add(bottomOffsetFigure);
-    drawing.add(leftOffsetFigure);
-    drawing.add(rightOffsetFigure);
-    enableOffsetListener();
-
-    // Adjust scroll bars
-    JScrollPane pane = (JScrollPane) viewport.getParent();
-
-    if (rightBarToMax) {
-      pane.getHorizontalScrollBar().setValue(pane.getHorizontalScrollBar().getMaximum());
-    }
-
-    if (bottomBarToMax) {
-      pane.getVerticalScrollBar().setValue(pane.getVerticalScrollBar().getMaximum());
-    }
-  }
-
   @Override
   public void processKeyEvent(KeyEvent e) {
     if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
@@ -518,7 +387,7 @@ public abstract class OpenTCSDrawingView
           || e.getKeyCode() == KeyEvent.VK_V // Paste
           || e.getKeyCode() == KeyEvent.VK_D) // Duplicate
       {
-        if (fOpenTCSView.getOperationMode() != GuiManager.OperationMode.MODELLING) {
+        if (!appState.hasOperationMode(OperationMode.MODELLING)) {
           return;
         }
         processCutPasteKeyEvent();
@@ -526,6 +395,17 @@ public abstract class OpenTCSDrawingView
     }
 
     super.processKeyEvent(e);
+  }
+
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        removeAll();
+        break;
+      default:
+      // Do nada.
+    }
   }
 
   private void processCutPasteKeyEvent() {
@@ -576,56 +456,6 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
-   * Removes the <code>OffsetFigure</code>s off the drawing.
-   */
-  private void removeOffsetFigures() {
-    if (drawing == null) {
-      return;
-    }
-
-    drawing.remove(topOffsetFigure);
-    drawing.remove(bottomOffsetFigure);
-    drawing.remove(leftOffsetFigure);
-    drawing.remove(rightOffsetFigure);
-    disableOffsetListener();
-  }
-
-  /**
-   * Moves the offset figures when an other figure is moved beyond the current
-   * bounds.
-   *
-   * @param figure The figure.
-   */
-  public void validateOffsets(Figure figure) {
-    Rectangle2D.Double figBounds = figure.getBounds();
-
-    if (figure instanceof LabeledFigure) {
-      TCSLabelFigure label = ((LabeledFigure) figure).getLabel();
-      figBounds.add(label.getBounds());
-    }
-
-    // Move top offset figure up
-    if (topOffsetFigure != null && figBounds.y < topOffsetFigure.getZoomPoint().getY()) {
-      topOffsetFigure.setBounds(new Point2D.Double(topOffsetFigure.getZoomPoint().getX(), figBounds.y), null);
-    }
-
-    // Move bottom figure down
-    if (bottomOffsetFigure != null && (figBounds.y + figBounds.height) > bottomOffsetFigure.getZoomPoint().getY()) {
-      bottomOffsetFigure.setBounds(new Point2D.Double(bottomOffsetFigure.getZoomPoint().getX(), (figBounds.y + figBounds.height)), null);
-    }
-
-    // Move left figure left
-    if (leftOffsetFigure != null && figBounds.x < leftOffsetFigure.getZoomPoint().getX()) {
-      leftOffsetFigure.setBounds(new Point2D.Double(figBounds.x, leftOffsetFigure.getZoomPoint().getY()), null);
-    }
-
-    // Move right figure right
-    if (rightOffsetFigure != null && (figBounds.x + figBounds.width) > (rightOffsetFigure.getZoomPoint().getX())) {
-      rightOffsetFigure.setBounds(new Point2D.Double((figBounds.x + figBounds.width), rightOffsetFigure.getZoomPoint().getY()), null);
-    }
-  }
-
-  /**
    * Returns the OpenTCSView.
    *
    * @return The OpenTCSView.
@@ -639,9 +469,7 @@ public abstract class OpenTCSDrawingView
   }
 
   public void setBlocksVisible(boolean newValue) {
-    boolean oldValue = blocksVisible;
     blocksVisible = newValue;
-    firePropertyChange(BLOCKS_VISIBLE_PROPERTY, oldValue, newValue);
     // Repaint the whole layout.
     dirtyArea.add(getVisibleRect());
     repaint();
@@ -683,40 +511,12 @@ public abstract class OpenTCSDrawingView
     repaint();
   }
 
-  /**
-   *
-   * @return
-   */
-  public boolean isRulersVisible() {
-    return rulersVisible;
-  }
-
-  public void setRulersVisible(boolean newValue) {
-    boolean oldValue = rulersVisible;
-    rulersVisible = newValue;
-    firePropertyChange(RULERS_VISIBLE_PROPERTY, oldValue, newValue);
-    if (newValue) {
-      fOpenTCSView.getHorizontalRuler().setVisible(true);
-      fOpenTCSView.getHorizontalRuler().setPreferredWidth(getWidth());
-      fOpenTCSView.getVerticalRuler().setVisible(true);
-      fOpenTCSView.getVerticalRuler().setPreferredHeight(getHeight());
-    }
-    else {
-      fOpenTCSView.getHorizontalRuler().setVisible(false);
-      fOpenTCSView.getHorizontalRuler().setPreferredSize(new Dimension(0, 0));
-      fOpenTCSView.getVerticalRuler().setVisible(false);
-      fOpenTCSView.getVerticalRuler().setPreferredSize(new Dimension(0, 0));
-    }
-  }
-
   public boolean isLabelsVisible() {
     return labelsVisible;
   }
 
   public void setLabelsVisible(boolean newValue) {
-    boolean oldValue = labelsVisible;
     labelsVisible = newValue;
-    firePropertyChange(LABELS_VISIBLE_PROPERTY, oldValue, newValue);
 
     if (drawing == null) {
       return;
@@ -738,9 +538,7 @@ public abstract class OpenTCSDrawingView
   }
 
   public void setStaticRoutesVisible(boolean newValue) {
-    boolean oldValue = staticRoutesVisible;
     staticRoutesVisible = newValue;
-    firePropertyChange(STATIC_ROUTES_VISIBLE_PROPERTY, oldValue, newValue);
     // Repaint the whole layout.
     dirtyArea.add(getVisibleRect());
     repaint();
@@ -835,45 +633,6 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
-   * Handles the situation this drawing view got focused. Momentarily it just
-   * removes the background images that are not set in this drawing view, as the
-   * background images are saved as figures in the drawing
-   * and hides the invisible figures of this drawing view. Although there can
-   * exist multiple drawing views, there can only be one drawing.
-   */
-  public void handleFocusGained() {
-    List<BitmapFigure> figuresToRemove = new ArrayList<>();
-
-    for (Figure fig : drawing.getFiguresFrontToBack()) {
-      if (fig instanceof BitmapFigure) {
-        figuresToRemove.add((BitmapFigure) fig);
-      }
-      if (!(fig instanceof VehicleFigure) && !(fig instanceof OriginFigure)) {
-        ((AbstractFigure) fig).setVisible(true);
-      }
-    }
-
-    for (BitmapFigure figure : figuresToRemove) {
-      figure.setTemporarilyRemoved(true);
-      drawing.remove(figure);
-    }
-
-    for (BitmapFigure bmFigure : bitmapFigures) {
-      bmFigure.setTemporarilyRemoved(false);
-      drawing.add(bmFigure);
-      drawing.sendToBack(bmFigure);
-    }
-
-    for (AbstractFigure figure : invisibleFigures) {
-      figure.setVisible(false);
-    }
-
-    if (!invisibleFigures.isEmpty()) {
-      repaint();
-    }
-  }
-
-  /**
    * Scrolls to the given figure. Normally called when the user clicks on
    * a model component in the TreeView and wants to see the corresponding
    * figure.
@@ -955,15 +714,26 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
+   * Scales and positions the drawing according to the given bookmark.
+   *
+   * @param bookmark The bookmark.
+   */
+  public void scaleAndScrollTo(ViewBookmark bookmark) {
+    scaleAndScrollTo(bookmark.getViewScaleX(),
+                     bookmark.getCenterX(),
+                     bookmark.getCenterY());
+  }
+
+  /**
    * Scales the drawing and moves to the given point afterwards.
    *
    * @param newScale The new scale factor.
    * @param xCenter The x coord that shall be in the middle.
    * @param yCenter The y coord that shall be in the middle.
    */
-  public void scaleAndScrollTo(final double newScale,
-                               final int xCenter,
-                               final int yCenter) {
+  private void scaleAndScrollTo(final double newScale,
+                                final int xCenter,
+                                final int yCenter) {
     final Runnable doScroll = new Runnable() {
       @Override
       public void run() {
@@ -1086,34 +856,6 @@ public abstract class OpenTCSDrawingView
     g.dispose();
   }
 
-  /**
-   * Draws a rectangle at the bounds of the view.
-   *
-   * @param gr
-   */
-  private void drawOffsetRectangle(Graphics2D g2d) {
-    if (topOffsetFigure == null) {
-      return;
-    }
-
-    AffineTransform tx = getDrawingToViewTransform();
-    double yTop = topOffsetFigure.getZoomPoint().getY();
-    double yBottom = bottomOffsetFigure.getZoomPoint().getY();
-    double xLeft = leftOffsetFigure.getZoomPoint().getX();
-    double xRight = rightOffsetFigure.getZoomPoint().getX();
-    Point2D.Double topLeft = new Point2D.Double(xLeft, yTop);
-    tx.transform(topLeft, topLeft);
-    Point2D.Double bottomRight = new Point2D.Double(xRight, yBottom);
-    tx.transform(bottomRight, bottomRight);
-
-    double width = bottomRight.x - topLeft.x;
-    double height = bottomRight.y - topLeft.y;
-
-    Rectangle2D rFrame = new Rectangle2D.Double(topLeft.x, topLeft.y, width, height);
-    g2d.setColor(new Color(0x40C0C0C0, true));
-    g2d.fill(rFrame);
-  }
-
   private void drawConstrainer(Graphics2D g) {
     getConstrainer().draw(g, this);
   }
@@ -1142,7 +884,7 @@ public abstract class OpenTCSDrawingView
     }
     catch (ConcurrentModificationException e) {
       logger.log(Level.WARNING, "Exception from JHotDraw caught while calling DefaultDrawing.draw(). "
-          + "Continuing drawing the course.");
+                 + "Continuing drawing the course.");
       // TODO What to do when it is catched?
     }
 
@@ -1542,17 +1284,19 @@ public abstract class OpenTCSDrawingView
         Color driveOrderColor = vehicle.getDriveOrderColor();
         TransportOrder.State driveOrderState = vehicle.getDriveOrderState();
 
-        if (driveOrderState == TransportOrder.State.WITHDRAWN) {
-          drawPathDecoration(g2d,
-                             (new LinkedList<>(figures)).iterator(),
-                             Color.GRAY,
-                             WITHDRAWN_PATH_STROKE);
-        }
-        else {
-          drawPathDecoration(g2d,
-                             (new LinkedList<>(figures)).iterator(),
-                             driveOrderColor,
-                             PATH_STROKE);
+        if (!appState.hasOperationMode(OperationMode.MODELLING)) {
+          if (driveOrderState == TransportOrder.State.WITHDRAWN) {
+            drawPathDecoration(g2d,
+                               (new LinkedList<>(figures)).iterator(),
+                               Color.GRAY,
+                               WITHDRAWN_PATH_STROKE);
+          }
+          else {
+            drawPathDecoration(g2d,
+                               (new LinkedList<>(figures)).iterator(),
+                               driveOrderColor,
+                               PATH_STROKE);
+          }
         }
       }
     }
@@ -1639,7 +1383,7 @@ public abstract class OpenTCSDrawingView
     Rectangle invalidatedArea = null;
 
     for (Handle handle : selectionHandles) {
-      handle.removeHandleListener(eventHandler);
+      handle.removeHandleListener(handleEventHandler);
 
       if (invalidatedArea == null) {
         invalidatedArea = handle.getDrawingArea();
@@ -1652,7 +1396,7 @@ public abstract class OpenTCSDrawingView
     }
 
     for (Handle handle : secondaryHandles) {
-      handle.removeHandleListener(eventHandler);
+      handle.removeHandleListener(handleEventHandler);
 
       if (invalidatedArea == null) {
         invalidatedArea = handle.getDrawingArea();
@@ -1692,7 +1436,7 @@ public abstract class OpenTCSDrawingView
         for (Handle handle : figure.createHandles(detailLevel)) {
           handle.setView(this);
           selectionHandles.add(handle);
-          handle.addHandleListener(eventHandler);
+          handle.addHandleListener(handleEventHandler);
 
           if (invalidatedArea == null) {
             invalidatedArea = handle.getDrawingArea();
@@ -1778,7 +1522,7 @@ public abstract class OpenTCSDrawingView
    * Updates the view translation taking into account the current dimension of
    * the view JComponent, the size of the drawing, and the scale factor.
    */
-  private void validateViewTranslation() {
+  public void validateViewTranslation() {
     if (getDrawing() == null) {
       translation.x = 0;
       translation.y = 0;
@@ -1898,11 +1642,11 @@ public abstract class OpenTCSDrawingView
    */
   public void setBlocks(ModelComponent blocks) {
     fBlocks = blocks;
-    
+
     synchronized (fBlocks) {
       for (ModelComponent blockComp : fBlocks.getChildComponents()) {
         BlockModel block = (BlockModel) blockComp;
-        block.addBlockChangeListener(this);
+        block.addBlockChangeListener(blockChangeHandler);
       }
     }
   }
@@ -1917,38 +1661,8 @@ public abstract class OpenTCSDrawingView
     fStaticRoutes = staticRoutes;
     for (ModelComponent routeComp : staticRoutes.getChildComponents()) {
       StaticRouteModel route = (StaticRouteModel) routeComp;
-      route.addStaticRouteChangeListener(this);
+      route.addStaticRouteChangeListener(routeChangeHandler);
     }
-  }
-
-  /**
-   * Adds the vehicles of the <code>SystemModel</code> to the drawing.
-   *
-   * @param systemModel The <code>SystemModel</code>.
-   */
-  public void setVehicles(SystemModel systemModel) {
-    ModelComponent vehiclesFolder = systemModel.getMainFolder(SystemModel.VEHICLES);
-    for (ModelComponent vehicleComp : vehiclesFolder.getChildComponents()) {
-      addVehicle((VehicleModel) vehicleComp);
-    }
-  }
-
-  /**
-   * Adds a vehicle to the drawing.
-   *
-   * @param vehicleModel The vehicle model to add.
-   */
-  public void addVehicle(VehicleModel vehicleModel) {
-    // create a new figure and add it to the drawing
-    VehicleFigure vehicleFigure = new VehicleFigure(vehicleModel);
-    getDrawing().add(vehicleFigure);
-
-    vehicleModel.addAttributesChangeListener(vehicleFigure);
-    ((FigureComponent) vehicleModel).setFigure(vehicleFigure);
-
-    vehicleModel.setDisplayDriveOrders(true);
-    displayDriveOrders(vehicleModel, true);
-    vehicleFigure.propertiesChanged(new AttributesChangeEvent(new NullAttributesChangeListener(), vehicleModel));
   }
 
   /**
@@ -1986,7 +1700,7 @@ public abstract class OpenTCSDrawingView
    * @param block The newly created block.
    */
   public void blockAdded(BlockModel block) {
-    block.addBlockChangeListener(this);
+    block.addBlockChangeListener(blockChangeHandler);
   }
 
   /**
@@ -1995,7 +1709,9 @@ public abstract class OpenTCSDrawingView
    * @param vehicle The vehicle
    * @param visible <code>true</code> to set it to visible, <code>false</code> otherwise.
    */
-  private void displayDriveOrders(VehicleModel vehicle, boolean visible) {
+  void displayDriveOrders(VehicleModel vehicle, boolean visible) {
+    requireNonNull(vehicle, "vehicle");
+
     if (visible) {
       Color color;
       if (vehicle.getName().toLowerCase().contains("green")) {
@@ -2132,7 +1848,7 @@ public abstract class OpenTCSDrawingView
             (int) Math.ceil(
                 (Math.max(0, r.x) + r.width) * zoomX) + insets.left + insets.right,
             (int) Math.ceil(
-            (Math.max(0, r.y) + r.height) * zoomY) + insets.top + insets.bottom);
+                (Math.max(0, r.y) + r.height) * zoomY) + insets.top + insets.bottom);
       }
       else {
         cachedPreferredSize = new Dimension(
@@ -2141,8 +1857,8 @@ public abstract class OpenTCSDrawingView
                  Math.max(0, r.x) + r.width + Math.min(0, r.x), cw)) * zoomX)
             + insets.left + insets.right,
             (int) Math.ceil(
-            (-Math.min(0, r.y) + Math.max(
-             Math.max(0, r.y) + r.height + Math.min(0, r.y), ch)) * zoomY)
+                (-Math.min(0, r.y) + Math.max(
+                 Math.max(0, r.y) + r.height + Math.min(0, r.y), ch)) * zoomY)
             + insets.top + insets.bottom);
       }
     }
@@ -2185,17 +1901,17 @@ public abstract class OpenTCSDrawingView
 
   @Override // DrawingView
   public void setDrawing(Drawing newValue) {
-    Drawing oldValue = drawing;
+    Drawing oldValue = this.drawing;
 
     if (this.drawing != null) {
-      this.drawing.removeCompositeFigureListener(eventHandler);
-      this.drawing.removeFigureListener(eventHandler);
+      this.drawing.removeCompositeFigureListener(cmpFigureEvtHandler);
+      this.drawing.removeFigureListener(figureEventHandler);
       this.drawing.removeUndoableEditListener(bezierLinerEditHandler);
       clearSelection();
     }
 
     this.drawing = newValue;
-    SystemModel model = fOpenTCSView.getSystemModel();
+    SystemModel model = modelManager.getModel();
 
     if (this.drawing != null) {
       if (model != null) {
@@ -2207,8 +1923,8 @@ public abstract class OpenTCSDrawingView
         }
       }
 
-      this.drawing.addCompositeFigureListener(eventHandler);
-      this.drawing.addFigureListener(eventHandler);
+      this.drawing.addCompositeFigureListener(cmpFigureEvtHandler);
+      this.drawing.addFigureListener(figureEventHandler);
       this.drawing.addUndoableEditListener(bezierLinerEditHandler);
     }
 
@@ -2247,8 +1963,7 @@ public abstract class OpenTCSDrawingView
 
         if (vehicleModel != null
             && vehicleModel.getDriveOrderComponents() == null) {
-          OpenTCSEventDispatcher ed = (OpenTCSEventDispatcher) fOpenTCSView.getSystemModel().getEventDispatcher();
-          ed.getTransportOrderDispatcher().createTransportOrder(model, vehicleModel);
+          orderUtil.createTransportOrder(model, vehicleModel);
         }
       }
     }
@@ -2284,7 +1999,7 @@ public abstract class OpenTCSDrawingView
         for (Handle h : figure.createHandles(detailLevel)) {
           h.setView(this);
           selectionHandles.add(h);
-          h.addHandleListener(eventHandler);
+          h.addHandleListener(handleEventHandler);
 
           if (invalidatedArea == null) {
             invalidatedArea = h.getDrawingArea();
@@ -2321,7 +2036,7 @@ public abstract class OpenTCSDrawingView
           for (Handle h : figure.createHandles(detailLevel)) {
             h.setView(this);
             selectionHandles.add(h);
-            h.addHandleListener(eventHandler);
+            h.addHandleListener(handleEventHandler);
 
             if (invalidatedArea == null) {
               invalidatedArea = h.getDrawingArea();
@@ -2384,8 +2099,7 @@ public abstract class OpenTCSDrawingView
 
     for (Figure figure : drawing.getChildren()) {
       if (figure.isSelectable()) {
-        if (!(fOpenTCSView.getKernelState()
-              .equals(ResourceBundleUtil.getBundle().getString("kernel.stateModelling"))
+        if (!(appState.hasOperationMode(OperationMode.MODELLING)
               && figure instanceof VehicleFigure)) {
           selectedFigures.add(figure);
         }
@@ -2559,25 +2273,45 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
+   * Returns a newly created bookmark for this view's current position and zoom
+   * factor.
+   *
+   * @return A newly created bookmark for this view's current position and zoom
+   * factor.
+   */
+  public ViewBookmark bookmark() {
+    ViewBookmark bookmark = new ViewBookmark();
+
+    // Currently visible part of the drawing in drawing coordinates.
+    Rectangle2D.Double visibleViewRect = viewToDrawing(getVisibleRect());
+
+    int centerX = (int) visibleViewRect.getCenterX();
+    int centerY = (int) -visibleViewRect.getCenterY();	// signum!
+    bookmark.setCenterX(centerX);
+    bookmark.setCenterY(centerY);
+    double zoomFactor = getScaleFactor();
+    bookmark.setViewScaleX(zoomFactor);
+    bookmark.setViewScaleY(zoomFactor);	// TODO: discriminate x/y
+    bookmark.setViewRotation(0);	// TODO    
+    bookmark.setLabel("");
+
+    return bookmark;
+  }
+
+  /**
    * Scales the view to a value so the whole model fits.
    */
   public void zoomViewToWindow() {
     // 1. Zoom to 100%
     setScaleFactor(1.0);
-    // 2. Remove the offset figures
-    removeOffsetFigures();
-    topOffsetFigure = null;
-    bottomOffsetFigure = null;
-    leftOffsetFigure = null;
-    rightOffsetFigure = null;
-    // 3. Zoom delayed
+    // 2. Zoom delayed
     Runnable doScaling = new Runnable() {
       @Override
       public void run() {
         // Rectangle that contains all figures
         Rectangle2D.Double drawingArea = getDrawing().getDrawingArea();
-        double wDrawing = drawingArea.width + 2 * MARGIN;
-        double hDrawing = drawingArea.height + 2 * MARGIN;
+        double wDrawing = drawingArea.width + 2 * 20;
+        double hDrawing = drawingArea.height + 2 * 20;
         // The currently visible rectangle
         Rectangle visibleRect = getComponent().getVisibleRect();
 
@@ -2597,7 +2331,6 @@ public abstract class OpenTCSDrawingView
         setScaleFactor(newZoom);
         // TODO: Center drawing with MARGIN at all sides
         // Add the offset figures
-        initializeOffsetFigures();
       }
     };
 
@@ -2673,8 +2406,9 @@ public abstract class OpenTCSDrawingView
 
   @Override // DrawingView
   public void addNotify(DrawingEditor editor) {
-    DrawingEditor oldValue = editor;
+    DrawingEditor oldValue = this.editor;
     this.editor = (OpenTCSDrawingEditor) editor;
+    addOffsetListener();
     firePropertyChange("editor", oldValue, editor);
     invalidateHandles();
     repaint();
@@ -2683,6 +2417,7 @@ public abstract class OpenTCSDrawingView
   @Override // DrawingView
   public void removeNotify(DrawingEditor editor) {
     this.editor = null;
+    invalidateHandles();
     repaint();
   }
 
@@ -2788,7 +2523,7 @@ public abstract class OpenTCSDrawingView
   @Override // EditableComponent
   public void delete() {
     // Delete only in modelling mode
-    if (fOpenTCSView.getOperationMode() != GuiManager.OperationMode.MODELLING) {
+    if (!appState.hasOperationMode(OperationMode.MODELLING)) {
       return;
     }
 
@@ -2861,49 +2596,6 @@ public abstract class OpenTCSDrawingView
     getDrawing().fireUndoableEditHappened(new PasteEdit(this, duplicates));
   }
 
-  @Override // BlockChangeListener
-  public void courseElementsChanged(BlockChangeEvent e) {
-    BlockModel block = (BlockModel) e.getSource();
-    Iterator<Figure> figures = block.figures();
-
-    while (figures.hasNext()) {
-      Figure figure = figures.next();
-
-      if (figure instanceof AbstractFigure) {
-        ((AbstractFigure) figure).fireFigureChanged();
-      }
-    }
-  }
-
-  @Override // BlockChangeListener
-  public void colorChanged(BlockChangeEvent e) {
-    updateBlock((BlockModel) e.getSource());
-  }
-
-  @Override // BlockChangeListener
-  public void blockRemoved(BlockChangeEvent e) {
-    BlockModel block = (BlockModel) e.getSource();
-    block.removeBlockChangeListener(this);
-    updateBlock(block);
-  }
-
-  @Override // StaticRouteChangeListener
-  public void pointsChanged(StaticRouteChangeEvent e) {
-    updateStaticRoute((StaticRouteModel) e.getSource());
-  }
-
-  @Override // StaticRouteChangeListener
-  public void colorChanged(StaticRouteChangeEvent e) {
-    updateStaticRoute((StaticRouteModel) e.getSource());
-  }
-
-  @Override // StaticRouteChangeListener
-  public void staticRouteRemoved(StaticRouteChangeEvent e) {
-    StaticRouteModel route = (StaticRouteModel) e.getSource();
-    route.removeStaticRouteChangeListener(this);
-    updateStaticRoute(route);
-  }
-
   /**
    * Refreshes the display of a static route.
    *
@@ -2920,81 +2612,154 @@ public abstract class OpenTCSDrawingView
   /**
    * Enables the listener for updating the offset figures.
    */
-  private void enableOffsetListener() {
-    Component root = SwingUtilities.getRoot(this);
-
-    if (root != null) {
-      root.addComponentListener(offsetListener);
-    }
+  private void addOffsetListener() {
+    offsetListener = new OffsetListener((OpenTCSDrawingEditor) getEditor());
+    addComponentListener(offsetListener);
   }
 
-  /**
-   * Disables the listener for updating the offset figures.
-   */
-  private void disableOffsetListener() {
-    Component root = SwingUtilities.getRoot(this);
-
-    if (root != null) {
-      root.removeComponentListener(offsetListener);
-    }
-  }
-
-  @Override
-  public void focusGained(FocusEvent e) {
-    //   repaintHandles();
-    if (editor != null) {
-      editor.setActiveView(this);
-    }
-  }
-
-  @Override
-  public void focusLost(FocusEvent e) {
-    //   repaintHandles();
-  }
-
-  /**
-   *
-   */
-  private class EventHandler
-      implements CompositeFigureListener,
-                 FigureListener,
-                 HandleListener {
+  private class BlockChangeHandler
+      implements BlockChangeListener {
 
     /**
      * Creates a new instance.
      */
-    EventHandler() {
+    public BlockChangeHandler() {
+    }
+
+    @Override // BlockChangeListener
+    public void courseElementsChanged(BlockChangeEvent e) {
+      BlockModel block = (BlockModel) e.getSource();
+      Iterator<Figure> figures = block.figures();
+
+      while (figures.hasNext()) {
+        Figure figure = figures.next();
+
+        if (figure instanceof AbstractFigure) {
+          ((AbstractFigure) figure).fireFigureChanged();
+        }
+      }
+    }
+
+    @Override // BlockChangeListener
+    public void colorChanged(BlockChangeEvent e) {
+      updateBlock((BlockModel) e.getSource());
+    }
+
+    @Override // BlockChangeListener
+    public void blockRemoved(BlockChangeEvent e) {
+      BlockModel block = (BlockModel) e.getSource();
+      block.removeBlockChangeListener(this);
+      updateBlock(block);
+    }
+  }
+
+  private class StaticRouteChangeHandler
+      implements StaticRouteChangeListener {
+
+    /**
+     * Creates a new instance.
+     */
+    public StaticRouteChangeHandler() {
+    }
+
+    @Override // StaticRouteChangeListener
+    public void pointsChanged(StaticRouteChangeEvent e) {
+      updateStaticRoute((StaticRouteModel) e.getSource());
+    }
+
+    @Override // StaticRouteChangeListener
+    public void colorChanged(StaticRouteChangeEvent e) {
+      updateStaticRoute((StaticRouteModel) e.getSource());
+    }
+
+    @Override // StaticRouteChangeListener
+    public void staticRouteRemoved(StaticRouteChangeEvent e) {
+      StaticRouteModel route = (StaticRouteModel) e.getSource();
+      route.removeStaticRouteChangeListener(this);
+      updateStaticRoute(route);
+    }
+  }
+
+  private class FocusHandler
+      implements FocusListener {
+
+    /**
+     * Creates a new instance.
+     */
+    public FocusHandler() {
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+      //   repaintHandles();
+      if (editor != null) {
+        editor.setActiveView(OpenTCSDrawingView.this);
+        List<BitmapFigure> figuresToRemove = new ArrayList<>();
+
+        for (Figure fig : drawing.getFiguresFrontToBack()) {
+          if (fig instanceof BitmapFigure) {
+            figuresToRemove.add((BitmapFigure) fig);
+          }
+          if (!(fig instanceof VehicleFigure) && !(fig instanceof OriginFigure)) {
+            ((AbstractFigure) fig).setVisible(true);
+          }
+        }
+
+        for (BitmapFigure figure : figuresToRemove) {
+          figure.setTemporarilyRemoved(true);
+          drawing.remove(figure);
+        }
+
+        for (BitmapFigure bmFigure : bitmapFigures) {
+          bmFigure.setTemporarilyRemoved(false);
+          drawing.add(bmFigure);
+          drawing.sendToBack(bmFigure);
+        }
+
+        for (AbstractFigure figure : invisibleFigures) {
+          figure.setVisible(false);
+        }
+
+        if (!invisibleFigures.isEmpty()) {
+          repaint();
+        }
+      }
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      //   repaintHandles();
+    }
+  }
+
+  private class HandleInvalidator
+      extends FigureAdapter {
+
+    /**
+     * Creates a new instance.
+     */
+    public HandleInvalidator() {
+    }
+
+    @Override
+    public void figureHandlesChanged(FigureEvent e) {
+      invalidateHandles();
+    }
+  }
+
+  private class CompositeFigureEventHandler
+      implements CompositeFigureListener {
+
+    /**
+     * Creates a new instance.
+     */
+    public CompositeFigureEventHandler() {
       // Do nada.
     }
 
     @Override // CompositeFigureListener
     public void figureAdded(CompositeFigureEvent evt) {
       repaintDrawingArea(evt.getInvalidatedArea());
-
-      // Create the data model to a new point or location figure and show
-      // the name in the label
-      if (evt.getChildFigure() instanceof LabeledFigure) {
-        LabeledFigure figure = (LabeledFigure) evt.getChildFigure();
-
-        if (figure.getLabel() == null) {
-          // Create the label and add the figure to the data model
-          TCSLabelFigure label = new TCSLabelFigure();
-          Point2D.Double pos = figure.getStartPoint();
-          pos.x += label.getOffset().x;
-          pos.y += label.getOffset().y;
-          label.setBounds(pos, pos);
-          figure.setLabel(label);
-        }
-
-        if (editor != null) {
-          editor.figureAdded(figure);
-        }
-      }
-      else if (evt.getChildFigure() instanceof LinkConnection
-          || evt.getChildFigure() instanceof PathConnection) {
-        editor.figureAdded(evt.getChildFigure());
-      }
-
       invalidateCachedDimensions();
     }
 
@@ -3013,45 +2778,24 @@ public abstract class OpenTCSDrawingView
 
       removeFromSelection(evt.getChildFigure());
 
-      if (editor != null) {
-        editor.figureRemoved(evt.getChildFigure());
-      }
-
       invalidateCachedDimensions();
+    }
+  }
+
+  private class FigureEventHandler
+      extends FigureAdapter {
+
+    /**
+     * Creates a new instance.
+     */
+    FigureEventHandler() {
+      // Do nada.
     }
 
     @Override // FigureListener
     public void areaInvalidated(FigureEvent evt) {
       repaintDrawingArea(evt.getInvalidatedArea());
       invalidateCachedDimensions();
-    }
-
-    @Override // HandleListener
-    public void areaInvalidated(HandleEvent evt) {
-      repaint(evt.getInvalidatedArea());
-      invalidateCachedDimensions();
-    }
-
-    @Override // HandleListener
-    public void handleRequestSecondaryHandles(HandleEvent e) {
-      secondaryHandleOwner = e.getHandle();
-      secondaryHandles.clear();
-      secondaryHandles.addAll(secondaryHandleOwner.createSecondaryHandles());
-
-      for (Handle h : secondaryHandles) {
-        h.setView(OpenTCSDrawingView.this);
-        h.addHandleListener(eventHandler);
-      }
-
-      repaint();
-    }
-
-    @Override // HandleListener
-    public void handleRequestRemove(HandleEvent e) {
-      selectionHandles.remove(e.getHandle());
-      e.getHandle().dispose();
-      invalidateHandles();
-      repaint(e.getInvalidatedArea());
     }
 
     @Override // FigureListener
@@ -3079,20 +2823,8 @@ public abstract class OpenTCSDrawingView
     }
 
     @Override // FigureListener
-    public void figureHandlesChanged(FigureEvent e) {
-    }
-
-    @Override // FigureListener
     public void figureChanged(FigureEvent e) {
       repaintDrawingArea(e.getInvalidatedArea());
-    }
-
-    @Override // FigureListener
-    public void figureAdded(FigureEvent e) {
-    }
-
-    @Override // FigureListener
-    public void figureRemoved(FigureEvent e) {
     }
 
     @Override // FigureListener
@@ -3107,4 +2839,46 @@ public abstract class OpenTCSDrawingView
       }
     }
   }
+
+  private class HandleEventHandler
+      implements HandleListener {
+
+    private Handle secondaryHandleOwner;
+
+    /**
+     * Creates a new instance.
+     */
+    public HandleEventHandler() {
+      // Do nada.
+    }
+
+    @Override // HandleListener
+    public void areaInvalidated(HandleEvent evt) {
+      repaint(evt.getInvalidatedArea());
+      invalidateCachedDimensions();
+    }
+
+    @Override // HandleListener
+    public void handleRequestSecondaryHandles(HandleEvent e) {
+      secondaryHandleOwner = e.getHandle();
+      secondaryHandles.clear();
+      secondaryHandles.addAll(secondaryHandleOwner.createSecondaryHandles());
+
+      for (Handle h : secondaryHandles) {
+        h.setView(OpenTCSDrawingView.this);
+        h.addHandleListener(this);
+      }
+
+      repaint();
+    }
+
+    @Override // HandleListener
+    public void handleRequestRemove(HandleEvent e) {
+      selectionHandles.remove(e.getHandle());
+      e.getHandle().dispose();
+      invalidateHandles();
+      repaint(e.getInvalidatedArea());
+    }
+  }
+
 }

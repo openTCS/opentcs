@@ -16,21 +16,27 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.tool.DefaultSelectAreaTracker;
-import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
+import org.opentcs.guing.application.ApplicationState;
 
 /**
  * Utility to track area selections made by the user.
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSSelectAreaTracker
     extends DefaultSelectAreaTracker {
 
+  /**
+   * Stores the application's current state.
+   */
+  private final ApplicationState appState;
   /**
    * The bounds of the rubberband.
    */
@@ -56,9 +62,12 @@ public class OpenTCSSelectAreaTracker
 
   /**
    * Creates a new instance.
+   *
+   * @param appState Stores the application's current state.
    */
-  public OpenTCSSelectAreaTracker() {
-    // Do nada.
+  @Inject
+  public OpenTCSSelectAreaTracker(ApplicationState appState) {
+    this.appState = requireNonNull(appState, "appState");
   }
 
   @Override	// DefaultSelectAreaTracker
@@ -103,7 +112,7 @@ public class OpenTCSSelectAreaTracker
       clearHoverHandles();
     }
     else {
-			// Search first, if one of the selected figures contains
+      // Search first, if one of the selected figures contains
       // the current mouse location, and is selectable. 
       // Only then search for other
       // figures. This search sequence is consistent with the
@@ -186,9 +195,7 @@ public class OpenTCSSelectAreaTracker
       hoverFigure = figure;
 
       if (hoverFigure != null && figure.isSelectable()) {
-        OpenTCSView view = ((OpenTCSDrawingView) drawingView).getTCSView();
-
-        switch (view.getOperationMode()) {
+        switch (appState.getOperationMode()) {
           case MODELLING:
           case OPERATING:
             hoverHandles.addAll(hoverFigure.createHandles(-1));
@@ -206,7 +213,7 @@ public class OpenTCSSelectAreaTracker
 
             break;
           default:
-            // Do nada.
+          // Do nada.
         }
       }
 

@@ -1,10 +1,17 @@
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
 package org.opentcs.guing.application;
 
 import bibliothek.gui.Dockable;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.intern.DefaultCommonDockable;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,22 +25,13 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.swing.BorderFactory;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JViewport;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
-import org.jhotdraw.gui.PlacardScrollPaneLayout;
+import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.components.dockable.CStackDockStation;
 import org.opentcs.guing.components.dockable.DockableTitleComparator;
 import org.opentcs.guing.components.dockable.DockingManager;
-import org.opentcs.guing.components.drawing.OpenTCSDockableUtil;
-import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+import org.opentcs.guing.components.drawing.DrawingViewScrollPane;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
-import org.opentcs.guing.components.drawing.Ruler;
-import org.opentcs.guing.model.SystemModel;
+import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.transport.OrderSequencesContainerPanel;
 import org.opentcs.guing.transport.TransportOrdersContainerPanel;
@@ -41,15 +39,19 @@ import org.opentcs.guing.transport.TransportOrdersContainerPanel;
 /**
  * Manages the mapping of dockables to drawing views, transport order views and
  * order sequence views.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class ViewManager {
 
   /**
+   * Manages the application's docking frames.
+   */
+  private final DockingManager dockingManager;
+  /**
    * Map for Dockable -> DrawingView + Rulers.
    */
-  private final Map<DefaultSingleCDockable, OpenTCSDockableUtil> drawingViewMap;
+  private final Map<DefaultSingleCDockable, DrawingViewScrollPane> drawingViewMap;
   /**
    * Map for transport order dockable -> transport order container panel.
    */
@@ -59,38 +61,21 @@ public class ViewManager {
    */
   private final Map<DefaultSingleCDockable, OrderSequencesContainerPanel> orderSequenceViews;
   /**
-   * A factory for drawing views.
-   */
-  private final Provider<OpenTCSDrawingView> drawingViewProvider;
-  /**
-   * Depending on the type of an application, there may be one editor per view,
-   * or a single shared editor for all views.
-   */
-  private final OpenTCSDrawingEditor fDrawingEditor;
-  /**
    * The default modelling dockable.
    */
   private DefaultSingleCDockable drawingViewModellingDockable;
-  
+
   /**
    * Creates a new instance.
    *
-   * @param fDrawingEditor The drawing editor to be used.
-   * @param drawingViewProvider A provider for creating drawing views on demand.
+   * @param dockingManager Manages the application's docking frames.
    */
   @Inject
-  public ViewManager(OpenTCSDrawingEditor fDrawingEditor,
-                     Provider<OpenTCSDrawingView> drawingViewProvider) {
+  public ViewManager(DockingManager dockingManager) {
+    this.dockingManager = requireNonNull(dockingManager, "dockingManager");
     drawingViewMap = new TreeMap<>(new DockableTitleComparator());
     transportOrderViews = new TreeMap<>(new DockableTitleComparator());
     orderSequenceViews = new TreeMap<>(new DockableTitleComparator());
-    this.fDrawingEditor = requireNonNull(fDrawingEditor, "fDrawingEditor");
-    this.drawingViewProvider = requireNonNull(drawingViewProvider,
-                                              "drawingViewProvider");
-    
-    for (OpenTCSDockableUtil util : drawingViewMap.values()) {
-      fDrawingEditor.add(util.getDrawingView());
-    }
   }
 
   /**
@@ -118,102 +103,31 @@ public class ViewManager {
       }
     }
   }
-  
-  public Map<DefaultSingleCDockable, OpenTCSDockableUtil> getDrawingViewMap() {
+
+  public Map<DefaultSingleCDockable, DrawingViewScrollPane> getDrawingViewMap() {
     return drawingViewMap;
   }
-  
+
   public Map<DefaultSingleCDockable, TransportOrdersContainerPanel> getTransportOrderMap() {
     return transportOrderViews;
   }
-  
+
   public Map<DefaultSingleCDockable, OrderSequencesContainerPanel> getOrderSequenceMap() {
     return orderSequenceViews;
   }
-
-  /**
-   * Sets visibility states of all dockables to modelling.
-   *
-   * @param dockingManager The DockingManager.
-   */
-  public void setKernelStateModelling(DockingManager dockingManager) {
-    CStackDockStation station
-        = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).getStation();
-    List<DefaultSingleCDockable> drawingViews = new ArrayList<>(drawingViewMap.keySet());
-    for (int i = 0; i < drawingViews.size(); i++) {
-      DefaultSingleCDockable dock = drawingViews.get(i);
-      if (dock != drawingViewModellingDockable) {
-        // Setting it to closeable = false, so the ClosingListener
-        // doesn't remove the dockable when it's closed
-        dock.setCloseable(false);
-        dockingManager.setDockableVisibility(dock.getUniqueId(), false);
-      }
+  
+  @Handler
+  public void handleModeChange(OperationModeChangeEvent evt) {
+    switch (evt.getNewMode()) {
+      case MODELLING:
+        setPlantOverviewStateModelling();
+        break;
+      case OPERATING:
+        setPlantOverviewStateOperating();
+        break;
+      default:
+        // XXX Unhandled mode. Do anything?
     }
-    
-    for (DefaultSingleCDockable dock : new ArrayList<>(transportOrderViews.keySet())) {
-      dockingManager.hideDockable(station, dock);
-      transportOrderViews.get(dock).clearTransportOrders();
-    }
-    
-    for (DefaultSingleCDockable dock : new ArrayList<>(orderSequenceViews.keySet())) {
-      dockingManager.hideDockable(station, dock);
-      orderSequenceViews.get(dock).clearOrderSequences();
-    }
-    
-    dockingManager.setDockableVisibility(DockingManager.VEHICLES_DOCKABLE_ID, false);
-    dockingManager.showDockable(station, drawingViewModellingDockable, 0);
-    drawingViewMap.get(drawingViewModellingDockable).getDrawingView().handleFocusGained();
-  }
-
-  /**
-   * Sets visibility states of all dockables to operating.
-   *
-   * @param dockingManager The DockingManager.
-   */
-  public void setKernelStateOperating(DockingManager dockingManager) {
-    CStackDockStation station
-        = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).getStation();
-    Dockable frontDock = station.getFrontDockable();
-    dockingManager.hideDockable(station, drawingViewModellingDockable);
-    int i = 0;
-    for (DefaultSingleCDockable dock : new ArrayList<>(drawingViewMap.keySet())) {
-      if (dock != drawingViewModellingDockable) {
-        // Restore to default
-        dock.setCloseable(true);
-        dockingManager.showDockable(station, dock, i);
-        i++;
-      }
-    }
-    i = drawingViewMap.size();
-    for (DefaultSingleCDockable dock : new ArrayList<>(drawingViewMap.keySet())) {
-      // OpenTCSDrawingViews can be undocked when switching states, so
-      // we make sure they aren't counted as docked
-      if (dockingManager.isDockableDocked(station, dock)) {
-        i--;
-      }
-    }
-    
-    int dockedDrawingViews = i;
-    
-    for (DefaultSingleCDockable dock : new ArrayList<>(transportOrderViews.keySet())) {
-      dockingManager.showDockable(station, dock, i);
-      i++;
-    }
-    
-    i = dockedDrawingViews + transportOrderViews.size();
-    
-    for (DefaultSingleCDockable dock : new ArrayList<>(orderSequenceViews.keySet())) {
-      dockingManager.showDockable(station, dock, i);
-      i++;
-    }
-    
-    if (frontDock != null && frontDock.isDockableShowing()) {
-      station.setFrontDockable(frontDock);
-    }
-    else {
-      station.setFrontDockable(station.getDockable(0));
-    }
-    dockingManager.setDockableVisibility(DockingManager.VEHICLES_DOCKABLE_ID, true);
   }
 
   /**
@@ -224,19 +138,19 @@ public class ViewManager {
    */
   public List<OpenTCSDrawingView> getOperatingDrawingViews() {
     List<OpenTCSDrawingView> views = new ArrayList<>();
-    
-    for (OpenTCSDockableUtil util : drawingViewMap.values()) {
-      if (drawingViewMap.get(drawingViewModellingDockable) != util) {
-        views.add(util.getDrawingView());
+
+    for (DrawingViewScrollPane scrollPane : drawingViewMap.values()) {
+      if (drawingViewMap.get(drawingViewModellingDockable) != scrollPane) {
+        views.add(scrollPane.getDrawingView());
       }
     }
-    
+
     return views;
   }
-  
+
   /**
    * Returns the title texts of all drawing views.
-   * 
+   *
    * @return List of strings containing the names.
    */
   public List<String> getDrawingViewNames() {
@@ -247,13 +161,13 @@ public class ViewManager {
       }
     }
     Collections.sort(names);
-    
+
     return names;
   }
-  
+
   /**
    * Initializes the unique modelling dockable.
-   * 
+   *
    * @param dockable The dockable that will be the modelling dockable.
    * @param title The title of this dockable.
    */
@@ -262,24 +176,24 @@ public class ViewManager {
     drawingViewModellingDockable.setTitleText(Objects.requireNonNull(title, "title is null"));
     drawingViewModellingDockable.setCloseable(false);
   }
-  
+
   public void setBitmapToModellingView(File file) {
     drawingViewMap.get(drawingViewModellingDockable).getDrawingView().addBackgroundBitmap(file);
   }
-  
+
   public int getNextDrawingViewIndex() {
     return (drawingViewMap.isEmpty() && drawingViewModellingDockable == null)
         ? 0 : nextAvailableIndex(drawingViewMap.keySet());
   }
-  
+
   public int getNextTransportOrderViewIndex() {
     return nextAvailableIndex(transportOrderViews.keySet());
   }
-  
+
   public int getNextOrderSequenceViewIndex() {
     return nextAvailableIndex(orderSequenceViews.keySet());
   }
-  
+
   public DefaultSingleCDockable getLastTransportOrderView() {
     int biggestIndex = getNextTransportOrderViewIndex();
     DefaultSingleCDockable lastTOView = null;
@@ -290,10 +204,10 @@ public class ViewManager {
         lastTOView = tranportOrderViewIterator.next();
       }
     }
-    
+
     return lastTOView;
   }
-  
+
   public DefaultSingleCDockable getLastOrderSequenceView() {
     int biggestIndex = getNextOrderSequenceViewIndex();
     DefaultSingleCDockable lastOSView = null;
@@ -304,81 +218,8 @@ public class ViewManager {
         lastOSView = orderSequencesViewIterator.next();
       }
     }
-    
+
     return lastOSView;
-  }
-
-  /**
-   * Creates a new <code>OpenTCSDrawingView</code>, wraps it in a
-   * <code>JScrollPane</code> and return this.
-   *
-   * @param fSystemModel The SystemModel.
-   * @return A ScrollPane containing a new drawing view.
-   */
-  public JScrollPane getNewDrawingView(SystemModel fSystemModel) {
-    Objects.requireNonNull(fSystemModel, "fSystemModel is null");
-    
-    OpenTCSDrawingView newDrawingView = drawingViewProvider.get();
-    fDrawingEditor.add(newDrawingView);
-    fDrawingEditor.setActiveView(newDrawingView);
-    newDrawingView.setBlocks(fSystemModel.getMainFolder(SystemModel.BLOCKS));
-    newDrawingView.setStaticRoutes(fSystemModel.getMainFolder(SystemModel.STATIC_ROUTES));
-    newDrawingView.setVehicles(fSystemModel);
-    JScrollPane newScrollPane = new JScrollPane();
-    newScrollPane.setViewport(new JViewport());
-    newScrollPane.getViewport().setView(newDrawingView);
-    // Ruler
-    newScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-    newScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-    newScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-    newScrollPane.setHorizontalScrollBar(new PlacardScrollbar());
-    newScrollPane.setLayout(new PlacardScrollPaneLayout());
-    newScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-    
-    Ruler newHorizontalRuler = new Ruler(Ruler.Orientation.HORIZONTAL, newDrawingView);
-    newDrawingView.addPropertyChangeListener(newHorizontalRuler);
-    newHorizontalRuler.setPreferredWidth(newDrawingView.getWidth());
-    Ruler newVerticalRuler = new Ruler(Ruler.Orientation.VERTICAL, newDrawingView);
-    newDrawingView.addPropertyChangeListener(newVerticalRuler);
-    newVerticalRuler.setPreferredHeight(newDrawingView.getHeight());
-    newScrollPane.setColumnHeaderView(newHorizontalRuler);
-    newScrollPane.setRowHeaderView(newVerticalRuler);
-    
-    return newScrollPane;
-  }
-
-  /**
-   * Returns the horizontal ruler of the active view.
-   *
-   * @return A Ruler.
-   */
-  public Ruler getHorizontalRuler() {
-    OpenTCSDrawingView activeView = fDrawingEditor.getActiveView();
-    
-    for (OpenTCSDockableUtil util : drawingViewMap.values()) {
-      if (activeView == util.getDrawingView()) {
-        return util.getHorizontalRuler();
-      }
-    }
-    
-    return null;
-  }
-
-  /**
-   * Returns the vertical ruler of the active view.
-   *
-   * @return A Ruler.
-   */
-  public Ruler getVerticalRuler() {
-    OpenTCSDrawingView activeView = fDrawingEditor.getActiveView();
-    
-    for (OpenTCSDockableUtil util : drawingViewMap.values()) {
-      if (activeView == util.getDrawingView()) {
-        return util.getVerticalRuler();
-      }
-    }
-    
-    return null;
   }
 
   /**
@@ -387,23 +228,13 @@ public class ViewManager {
    *
    * @param dockable The dockable the scrollPane is wrapped into. Used as the key.
    * @param scrollPane The scroll pane containing the drawing view and rulers.
-   * @return The extracted <code>OpenTCSDrawingView</code>.
    */
-  public OpenTCSDrawingView putDrawingView(DefaultSingleCDockable dockable,
-                                           JScrollPane scrollPane) {
+  public void putDrawingView(DefaultSingleCDockable dockable,
+                             DrawingViewScrollPane scrollPane) {
     Objects.requireNonNull(dockable, "dockable is null");
     Objects.requireNonNull(scrollPane, "scrollPane is null");
-    if (!(scrollPane.getViewport().getView() instanceof OpenTCSDrawingView)
-        || !(scrollPane.getColumnHeader().getView() instanceof Ruler)
-        || !(scrollPane.getRowHeader().getView() instanceof Ruler)) {
-      return null;
-    }
-    OpenTCSDrawingView drawingView = (OpenTCSDrawingView) scrollPane.getViewport().getView();
-    Ruler horizontalRuler = (Ruler) scrollPane.getColumnHeader().getView();
-    Ruler verticalRuler = (Ruler) scrollPane.getRowHeader().getView();
-    drawingViewMap.put(dockable, new OpenTCSDockableUtil(drawingView, horizontalRuler, verticalRuler));
-    
-    return drawingView;
+
+    drawingViewMap.put(dockable, scrollPane);
   }
 
   /**
@@ -428,6 +259,17 @@ public class ViewManager {
   public void putOrderSequenceView(DefaultSingleCDockable dockable,
                                    OrderSequencesContainerPanel panel) {
     orderSequenceViews.put(dockable, panel);
+  }
+  
+  /**
+   * Forgets the given dockable.
+   *
+   * @param dockable The dockable.
+   */
+  public void removeDockable(DefaultSingleCDockable dockable) {
+    drawingViewMap.remove(dockable);
+    transportOrderViews.remove(dockable);
+    orderSequenceViews.remove(dockable);
   }
 
   /**
@@ -461,28 +303,102 @@ public class ViewManager {
     Pattern p = Pattern.compile("\\d");
     Matcher m;
     int biggestIndex = 0;
-    
+
     for (DefaultSingleCDockable dock : setToIterate) {
       m = p.matcher(dock.getTitleText());
-      
+
       if (m.find()) {
         int index = Integer.parseInt(m.group(0));
-        
+
         if (index > biggestIndex) {
           biggestIndex = index;
         }
       }
     }
-    
+
     return biggestIndex + 1;
   }
-  
-  private class PlacardScrollbar
-      extends JScrollBar {
-    
-    public PlacardScrollbar() {
-      super(JScrollBar.HORIZONTAL);
-      setPreferredSize(new Dimension(100, 18));
+
+  /**
+   * Sets visibility states of all dockables to modelling.
+   */
+  private void setPlantOverviewStateModelling() {
+    CStackDockStation station
+        = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).getStation();
+    List<DefaultSingleCDockable> drawingViews = new ArrayList<>(drawingViewMap.keySet());
+    for (int i = 0; i < drawingViews.size(); i++) {
+      DefaultSingleCDockable dock = drawingViews.get(i);
+      if (dock != drawingViewModellingDockable) {
+        // Setting it to closeable = false, so the ClosingListener
+        // doesn't remove the dockable when it's closed
+        dock.setCloseable(false);
+        dockingManager.setDockableVisibility(dock.getUniqueId(), false);
+      }
     }
+
+    for (DefaultSingleCDockable dock : new ArrayList<>(transportOrderViews.keySet())) {
+      dockingManager.hideDockable(station, dock);
+      transportOrderViews.get(dock).clearTransportOrders();
+    }
+
+    for (DefaultSingleCDockable dock : new ArrayList<>(orderSequenceViews.keySet())) {
+      dockingManager.hideDockable(station, dock);
+      orderSequenceViews.get(dock).clearOrderSequences();
+    }
+
+    dockingManager.setDockableVisibility(DockingManager.VEHICLES_DOCKABLE_ID, false);
+    dockingManager.showDockable(station, drawingViewModellingDockable, 0);
+    OpenTCSDrawingView view = drawingViewMap.get(drawingViewModellingDockable).getDrawingView();
+    view.dispatchEvent(new FocusEvent(view, FocusEvent.FOCUS_GAINED));
   }
+
+  /**
+   * Sets visibility states of all dockables to operating.
+   */
+  private void setPlantOverviewStateOperating() {
+    CStackDockStation station
+        = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).getStation();
+    Dockable frontDock = station.getFrontDockable();
+    dockingManager.hideDockable(station, drawingViewModellingDockable);
+    int i = 0;
+    for (DefaultSingleCDockable dock : new ArrayList<>(drawingViewMap.keySet())) {
+      if (dock != drawingViewModellingDockable) {
+        // Restore to default
+        dock.setCloseable(true);
+        dockingManager.showDockable(station, dock, i);
+        i++;
+      }
+    }
+    i = drawingViewMap.size();
+    for (DefaultSingleCDockable dock : new ArrayList<>(drawingViewMap.keySet())) {
+      // OpenTCSDrawingViews can be undocked when switching states, so
+      // we make sure they aren't counted as docked
+      if (dockingManager.isDockableDocked(station, dock)) {
+        i--;
+      }
+    }
+
+    int dockedDrawingViews = i;
+
+    for (DefaultSingleCDockable dock : new ArrayList<>(transportOrderViews.keySet())) {
+      dockingManager.showDockable(station, dock, i);
+      i++;
+    }
+
+    i = dockedDrawingViews + transportOrderViews.size();
+
+    for (DefaultSingleCDockable dock : new ArrayList<>(orderSequenceViews.keySet())) {
+      dockingManager.showDockable(station, dock, i);
+      i++;
+    }
+
+    if (frontDock != null && frontDock.isDockableShowing()) {
+      station.setFrontDockable(frontDock);
+    }
+    else {
+      station.setFrontDockable(station.getDockable(0));
+    }
+    dockingManager.setDockableVisibility(DockingManager.VEHICLES_DOCKABLE_ID, true);
+  }
+
 }

@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
 import java.util.Arrays;
@@ -168,10 +174,26 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   public double getValueByUnit(U unit) {
     try {
       AbstractQuantity<U> property = (AbstractQuantity<U>) clone();
-      property.setValueAndUnit((double) getValue(), getUnit());
+      // PercentProperty threw
+      // java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.Double
+      // this is a workaround 12.09.14
+      double value;
+      if (isInteger()) {
+        value = ((Integer) getValue()).doubleValue();
+      }
+      else {
+        value = (double) getValue();
+      }
+      property.setValueAndUnit(value, getUnit());
       property.convertTo(unit);
+      if (isInteger()) {
+        value = ((Integer) property.getValue()).doubleValue();
+      }
+      else {
+        value = (double) property.getValue();
+      }
 
-      return (double) property.getValue();
+      return value;
     }
     catch (IllegalArgumentException e) {
       log.log(Level.SEVERE, "Exception: ", e);

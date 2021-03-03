@@ -12,11 +12,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import static java.util.Objects.requireNonNull;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
 import org.opentcs.data.message.Message;
+import org.opentcs.guing.util.MessageDisplay;
 
 /**
  * A panel that displays kernel messages.
@@ -25,7 +27,8 @@ import org.opentcs.data.message.Message;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStatusPanel
-    extends JScrollPane {
+    extends JScrollPane
+    implements MessageDisplay {
 
   /**
    * Formats time stamps for messages.
@@ -49,10 +52,9 @@ public class KernelStatusPanel
    *
    * @param message The message to log.
    */
-  public void log(Message message) {
-    if (message == null) {
-      return;
-    }
+  @Override
+  public void display(Message message) {
+    requireNonNull(message, "message");
 
     statusTextArea.append(format.format(message.getTimestamp()) + " "
         + message.getType() + ": " + message.getMessage() + "\n");

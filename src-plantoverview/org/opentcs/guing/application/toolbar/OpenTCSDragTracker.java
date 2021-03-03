@@ -12,12 +12,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.event.TransformEdit;
 import org.jhotdraw.draw.tool.DefaultDragTracker;
-import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.figures.BitmapFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
@@ -27,10 +29,18 @@ import org.opentcs.guing.components.drawing.figures.liner.BezierLinerEdit;
  * Utility to follow the drags made by the user.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSDragTracker
     extends DefaultDragTracker {
 
+  /**
+   * Stores the application's current state.
+   */
+  private final ApplicationState appState;
+  /**
+   * The affected figures.
+   */
   private Set<Figure> transformedFigures;
   /**
    * Indicates whether the user is dragging the mouse or not.
@@ -39,9 +49,12 @@ public class OpenTCSDragTracker
 
   /**
    * Creates a new instance.
+   * 
+   * @param appState Stores the application's current state.
    */
-  public OpenTCSDragTracker() {
-    // Do nada.
+  @Inject
+  public OpenTCSDragTracker(ApplicationState appState) {
+    this.appState = requireNonNull(appState, "appState");
   }
 
   @Override
@@ -94,9 +107,8 @@ public class OpenTCSDragTracker
   @Override
   public void mouseDragged(MouseEvent evt) {
     OpenTCSDrawingView drawingView = (OpenTCSDrawingView) getView();
-    OpenTCSView view = ((OpenTCSDrawingView) drawingView).getTCSView();
 
-    switch (view.getOperationMode()) {
+    switch (appState.getOperationMode()) {
       case MODELLING:
         if (!transformedFigures.isEmpty()) {
           if (!isDragging) {
@@ -105,8 +117,10 @@ public class OpenTCSDragTracker
           }
 
           Point2D.Double currentPoint = drawingView.viewToDrawing(new Point(evt.getX(), evt.getY()));
-          dragRect.x += currentPoint.x - previousPoint.x;
-          dragRect.y += currentPoint.y - previousPoint.y;
+          double offsetX = currentPoint.x - previousPoint.x;
+          double offsetY = currentPoint.y - previousPoint.y;
+          dragRect.x += offsetX;
+          dragRect.y += offsetY;
           Rectangle2D.Double constrainedRect = (Rectangle2D.Double) dragRect.clone();
 
           if (drawingView.getConstrainer() != null) {

@@ -1,6 +1,11 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.model.elements;
 
@@ -14,7 +19,7 @@ import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.tree.elements.BlockUserObject;
+import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.event.BlockChangeEvent;
 import org.opentcs.guing.event.BlockChangeListener;
 import org.opentcs.guing.model.FigureComponent;
@@ -23,21 +28,19 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Eine Blockstrecke. Eine Blockstrecke besitzt eine Menge von
- * FigureComponent-Objekten. Ein FigureComponent-Objekt verweist jeweils auf
- * genau ein Figure-Objekt. Somit besitzt eine Blockstrecke eine Menge von
- * Figures (allerdings handelt es sich nur um Verweise auf Figures; die
- * Verwaltung erfolgt in einem FiguresFolder bzw. in einem Drawing.
- * <p>
- * <b>Entwurfsmuster:</b> Kompositum. Blockline ist ein Kompositum.
+ * A block area. Contains figure components that are part of this block
+ * area.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @see BlocklineUserObject
  * @see FigureComponent
  */
 public class BlockModel
     extends FiguresFolder {
 
+  /**
+   * Key for the elements property.
+   */
+  public static final String ELEMENTS = "blockElements";
   /**
    * A list of change listeners for this object.
    */
@@ -47,24 +50,8 @@ public class BlockModel
    * Creates a new instance.
    */
   public BlockModel() {
-    this("");
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param name The name of the block.
-   */
-  public BlockModel(String name) {
-    super(name);
+    super("");
     createProperties();
-  }
-
-  @Override	// FiguresFolder
-  public BlockUserObject createUserObject() {
-    fUserObject = new BlockUserObject(this);
-
-    return (BlockUserObject) fUserObject;
   }
 
   @Override	// AbstractModelComponent
@@ -89,9 +76,9 @@ public class BlockModel
   }
 
   /**
-   * Liefert die Farbe des Blockbereichs.
+   * Returns the color of this block area.
    *
-   * @return
+   * @return The color.
    */
   public Color getColor() {
     ColorProperty property = (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
@@ -100,30 +87,37 @@ public class BlockModel
   }
 
   /**
-   * Fügt dem Blockbereich ein Fahrkurselement hinzu.
+   * Adds an element to this block area.
    *
-   * @param model das hinzuzufügende Fahrkurselement
+   * @param model The component to add.
    */
   public void addCourseElement(ModelComponent model) {
     if (!contains(model)) {
       getChildComponents().add(model);
-      // _nicht_ den parent ändern!
+      StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+      String addedModelName = model.getName();
+      if (!pElements.getItems().contains(addedModelName)) {
+        pElements.addItem(addedModelName);
+      }
     }
   }
 
   /**
-   * Entfernt ein Fahrkurselement aus dem Blockbereich.
+   * Removes an element from this block area.
    *
-   * @param model das zu entfernende Fahrkurselement
+   * @param model The component to remove.
    */
   public void removeCourseElement(ModelComponent model) {
     if (contains(model)) {
       remove(model);
+      StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
+      String removedModelName = model.getName();
+      pElements.getItems().remove(removedModelName);
     }
   }
 
   /**
-   * Entfernt alle Fahrkurselemente aus dem Blockbereich.
+   * Removes all elements in this block area.
    */
   public void removeAllCourseElements() {
     for (Object o : new ArrayList<>(Lists.reverse(getChildComponents()))) {
@@ -132,10 +126,9 @@ public class BlockModel
   }
 
   /**
-   * Registriert einen Listener, der fortan informiert wird, wenn sich die
-   * Fahrkurselemente ändern.
+   * Adds a listeners that gets informed when this block members change.
    *
-   * @param listener
+   * @param listener The new listener.
    */
   public void addBlockChangeListener(BlockChangeListener listener) {
     if (fListeners == null) {
@@ -148,19 +141,16 @@ public class BlockModel
   }
 
   /**
-   * Entfernt einen Listener, der ab sofort nicht mehr informiert wird, wenn es
-   * Änderungen an den Fahrkurslementen gibt.
+   * Removes a listener.
    *
-   * @param listener
+   * @param listener The listener to remove.
    */
   public void removeBlockChangeListener(BlockChangeListener listener) {
     fListeners.remove(listener);
   }
 
   /**
-   * Benachrichtigt alle registrierten Listener, dass sich bei den
-   * Fahrkurselementen etwas geändert hat. Wird von einem Klienten aufgerufen,
-   * der Änderungen an den Fahrkurselementen vorgenommen hat.
+   * Informs all listeners that the block elements have changed.
    */
   public void courseElementsChanged() {
     for (BlockChangeListener listener : fListeners) {
@@ -169,8 +159,7 @@ public class BlockModel
   }
 
   /**
-   * Benachrichtigt alle registrierten Listener, dass sich die Farbe des
-   * Blockbereichs geändert hat.
+   * Informs all listeners that the color of this block has changed.
    */
   public void colorChanged() {
     for (BlockChangeListener listener : fListeners) {
@@ -179,9 +168,7 @@ public class BlockModel
   }
 
   /**
-   * Benachrichtigt alle registrierten Listener, dass der Blockbereich entfernt
-   * wurde. Wird von einem Klienten aufgerufen, der den Blockbereich entfernt
-   * hat.
+   * Informs all listeners that this block was removed.
    */
   public void blockRemoved() {
     for (BlockChangeListener listener : new ArrayList<>(fListeners)) {
@@ -201,6 +188,13 @@ public class BlockModel
     pColor.setDescription(bundle.getString("element.blockColor.text"));
     pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
+    // Block elements
+    StringSetProperty pElements = new StringSetProperty(this);
+    pElements.setDescription(bundle.getString("block.elements.text"));
+    pElements.setHelptext(bundle.getString("block.elements.helptext"));
+    pElements.setModellingEditable(false);
+    pElements.setOperatingEditable(false);
+    setProperty(ELEMENTS, pElements);
     // Miscellaneous
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("block.miscellaneous.text"));

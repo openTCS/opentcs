@@ -1,14 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 
 package org.opentcs.guing.application.action.actions;
 
 import java.awt.event.ActionEvent;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.AbstractAction;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.dialogs.CreateGroupPanel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -24,23 +30,24 @@ public class CreateGroupAction extends AbstractAction {
    */
   public static final String ID = "openTCS.createGroup";
   /**
-   * The GUI manager instance we're working with.
+   * Provides panels for creating groups.
    */
-  private final OpenTCSView openTCSView;
+  private final Provider<CreateGroupPanel> panelProvider;
 
   /**
    * Creates a new instance.
    *
-   * @param openTCSView The GUI manager instance we're working with.
+   * @param panelProvider Provides panels for creating groups
    */
-  public CreateGroupAction(OpenTCSView openTCSView) {
-    this.openTCSView = openTCSView;
+  @Inject
+  public CreateGroupAction(Provider<CreateGroupPanel> panelProvider) {
+    this.panelProvider = requireNonNull(panelProvider, "panelProvider");
     ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    CreateGroupPanel panel = new CreateGroupPanel(openTCSView);
+    CreateGroupPanel panel = panelProvider.get();
     panel.setLocationRelativeTo(null);
     panel.setVisible(true);
   }

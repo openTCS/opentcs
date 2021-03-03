@@ -1,16 +1,21 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 21.08.2013 09:44:24
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
-import org.opentcs.guing.components.properties.panel.CoursePointPropertyEditorPanel;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Property, das einen Punkt enthält.
+ * Property containing a point in the driving course.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class CoursePointProperty
     extends AbstractComplexProperty {
@@ -20,10 +25,10 @@ public class CoursePointProperty
   /**
    * Creates a new instance.
    *
-   * @param model
+   * @param model The model component this property belongs to.
    */
   public CoursePointProperty(ModelComponent model) {
-    super(model, CoursePointPropertyEditorPanel.class);
+    super(model);
   }
 
   @Override

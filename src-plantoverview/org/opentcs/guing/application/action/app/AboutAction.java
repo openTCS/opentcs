@@ -1,17 +1,24 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.application.action.app;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.guing.application.ApplicationFrame;
+import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.exchange.KernelProxyManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.Environment;
 
@@ -19,6 +26,7 @@ import org.opentcs.util.Environment;
  * Displays a dialog showing information about the application.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class AboutAction
     extends AbstractAction {
@@ -28,29 +36,40 @@ public class AboutAction
    */
   public final static String ID = "application.about";
   /**
-   * The application's view.
+   * Stores the application's current state.
    */
-  private final OpenTCSView view;
+  private final ApplicationState appState;
   /**
-   * The kernel proxy/connection manager to be used.
+   * Provides access to a kernel.
    */
-  private final KernelProxyManager kernelProxyManager;
+  private final SharedKernelProvider kernelProvider;
+  /**
+   * The parent component for dialogs shown by this action.
+   */
+  private final Component dialogParent;
 
   /**
    * Creates a new instance.
    *
-   * @param view The application's view.
+   * @param appState Stores the application's current state.
+   * @param kernelProvider Provides access to a kernel.
+   * @param dialogParent The parent component for dialogs shown by this action.
    */
-  public AboutAction(OpenTCSView view) {
-    this.view = Objects.requireNonNull(view, "view is null");
-    this.kernelProxyManager = DefaultKernelProxyManager.instance();
+  @Inject
+  public AboutAction(ApplicationState appState,
+                     SharedKernelProvider kernelProvider,
+                     @ApplicationFrame Component dialogParent) {
+    this.appState = requireNonNull(appState, "appState");
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+
     ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
     JOptionPane.showMessageDialog(
-        view,
+        dialogParent,
         "<html><p><b>" + OpenTCSView.NAME + " - " + Environment.getVersionString() + "</b><br>"
         + OpenTCSView.COPYRIGHT + "<br>"
         + "Running on<br>"
@@ -58,8 +77,8 @@ public class AboutAction
         + "JVM: " + System.getProperty("java.vm.version") + ", " + System.getProperty("java.vm.vendor") + "<br>"
         + "OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + "<br>"
         + "<b>Kernel</b><br>"
-        + kernelProxyManager.getHost() + ":" + kernelProxyManager.getPort()
-        + "<br>Mode: " + view.getOperationMode()
+        + kernelProvider.getKernelDescription()
+        + "<br>Mode: " + appState.getOperationMode()
         + "</p></html>",
         "About",
         JOptionPane.PLAIN_MESSAGE,

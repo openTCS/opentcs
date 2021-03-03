@@ -1,18 +1,25 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
@@ -24,6 +31,7 @@ import org.opentcs.guing.model.elements.PointModel;
  * Pfeilspitzen.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class LinkConnection
     extends SimpleLineConnection {
@@ -31,10 +39,16 @@ public class LinkConnection
   /**
    * Creates a new instance.
    *
-   * @param model The corresponding model object.
+   * @param componentsTreeManager The manager for the components tree view.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param model The model corresponding to this graphical object.
    */
-  public LinkConnection(LinkModel model) {
-    super(model);
+  @Inject
+  public LinkConnection(ComponentsTreeViewManager componentsTreeManager,
+                        SelectionPropertiesComponent propertiesComponent,
+                        @Assisted LinkModel model) {
+    super(componentsTreeManager, propertiesComponent, model);
     double dash[] = {5.0, 5.0};
     set(AttributeKeys.START_DECORATION, null);
     set(AttributeKeys.END_DECORATION, null);
@@ -44,10 +58,6 @@ public class LinkConnection
     set(AttributeKeys.STROKE_MITER_LIMIT, 1.0);
     set(AttributeKeys.STROKE_DASHES, dash);
     set(AttributeKeys.STROKE_DASH_PHASE, 0.0);
-  }
-
-  public LinkConnection() {
-    this(new LinkModel());
   }
 
   @Override
@@ -131,16 +141,9 @@ public class LinkConnection
 
   @Override // LineConnectionFigure
   public LinkConnection clone() {
-    try {
-      LinkModel linkModel = (LinkModel) getModel().clone();
-      LinkConnection clone = new LinkConnection(linkModel);
-      clone.initConnectionFigure();
-      
-      return clone;
-    }
-    catch (CloneNotSupportedException ex) {
-      Logger.getLogger(LinkConnection.class.getName()).log(Level.SEVERE, "Clone not supported: {0}", getModel().getName());
-      return null;
-    }
+    LinkConnection clone = (LinkConnection) super.clone();
+    clone.initConnectionFigure();
+
+    return clone;
   }
 }

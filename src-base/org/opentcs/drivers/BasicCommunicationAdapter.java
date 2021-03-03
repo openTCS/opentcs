@@ -26,13 +26,13 @@ import org.opentcs.util.CyclicTask;
 /**
  * The base class that all communication adapters must extend.
  *
- * <h4>Synchronization:</h4>
  * <p>
+ * Synchronization:
+ * </p>
  * <ul>
  * <li>Accessing the command queue/sent queue from outside should always be
  * protected by synchronization on the BasicCommunicationAdapter instance.</li>
  * </ul>
- * </p>
  *
  * @author Iryna Felko (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)

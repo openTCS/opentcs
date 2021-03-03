@@ -28,8 +28,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.opentcs.data.user.UserPermission;
 import org.opentcs.data.user.UserAccount;
+import org.opentcs.data.user.UserPermission;
 
 /**
  * An implementation of <code>UserAccountPersister</code> that stores user

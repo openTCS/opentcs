@@ -2,13 +2,14 @@
 <project default="usage" name="openTCS">
   <!-- use a timestamp for versioning for now -->
   <tstamp>
-    <format property="opentcs.timestamp" pattern="yyyyMMdd" timezone=""/>
+    <format property="opentcs.builddate" pattern="yyyyMMdd" timezone=""/>
   </tstamp>
-  <property name="opentcs.version" value="2.7.1"/>
+  <property name="opentcs.version" value="3.0"/>
   <property name="src.base" value="${basedir}/src-base"/>
   <property name="src.kernel" value="${basedir}/src-kernel"/>
   <property name="src.plantoverview" value="${basedir}/src-plantoverview"/>
   <property name="tests" value="${basedir}/tests"/>
+  <property name="tests.integration" value="${basedir}/tests-integration"/>
   <property name="lib" value="${basedir}/lib"/>
   <property name="config" value="${basedir}/config"/>
   <property name="reports" value="${basedir}/reports"/>
@@ -22,6 +23,7 @@
   <property name="build.base.properties.file" value="${build.base}/opentcs.properties"/>
   <property name="build.plantoverview" value="${build}/plantoverview"/>
   <property name="build.tests" value="${build}/tests"/>
+  <property name="build.tests.integration" value="${build}/tests-integration"/>
   <property name="build.apidocs" value="${build}/apidocs"/>
   <property name="build.apidocs-base" value="${build}/apidocs-base"/>
   <property name="build.manual" value="${build}/manual"/>
@@ -35,28 +37,26 @@
   <property name="manifest.kernel" value="${build.kernel}/manifest"/>
   <property name="manifest.base" value="${build.base}/manifest"/>
   <property name="manifest.plantoverview" value="${build.plantoverview}/manifest"/>
-  <property name="schemadir.hostorder" value="${build}/schema-hostorder"/>
-  <property name="schemadir.hostresponse" value="${build}/schema-hostresponse"/>
-  <property name="schemadir.orderscript" value="${build}/schema-orderscript"/>
-  <property name="schemadir.statuschannel" value="${build}/schema-statuschannel"/>
+  <property name="schemadir" value="${build}/schemas"/>
   <property name="srcencoding" value="iso-8859-1"/>
   <property name="debug.symbols" value="on"/>
 
   <!-- third party libraries needed by the base library -->
   <path id="opentcs.baselib.thirdparty.classpath">
     <pathelement location="${lib}/aopalliance.jar"/>
-    <pathelement location="${lib}/guava-16.0.1.jar"/>
+    <pathelement location="${lib}/guava-17.0.jar"/>
     <pathelement location="${lib}/guice-3.0.jar"/>
     <pathelement location="${lib}/guice-assistedinject-3.0.jar"/>
     <pathelement location="${lib}/javax.inject.jar"/>
     <pathelement location="${lib}/jdom-2.0.5.jar"/>
+    <pathelement location="${lib}/jsr305.jar"/>
   </path>
 
   <!-- third party libraries needed by the kernel -->
   <path id="opentcs.kernel.thirdparty.classpath">
     <pathelement location="${lib.base}"/>
     <pathelement location="${lib}/aopalliance.jar"/>
-    <pathelement location="${lib}/guava-16.0.1.jar"/>
+    <pathelement location="${lib}/guava-17.0.jar"/>
     <pathelement location="${lib}/guice-3.0.jar"/>
     <pathelement location="${lib}/guice-assistedinject-3.0.jar"/>
     <pathelement location="${lib}/guice-multibindings-3.0.jar"/>
@@ -64,6 +64,8 @@
     <pathelement location="${lib}/jcommon-1.0.21.jar"/>
     <pathelement location="${lib}/jdom-2.0.5.jar"/>
     <pathelement location="${lib}/jfreechart-1.0.17.jar"/>
+    <pathelement location="${lib}/jsr305.jar"/>
+    <pathelement location="${lib}/mbassador-1.1.10.jar"/>
   </path>
 
   <!-- third party libraries needed by the plantoverview application -->
@@ -72,13 +74,15 @@
     <pathelement location="${lib}/aopalliance.jar"/>
     <pathelement location="${lib}/docking-frames-common-1.1.2p11.jar"/>
     <pathelement location="${lib}/docking-frames-core-1.1.2p11.jar"/>
-    <pathelement location="${lib}/guava-16.0.1.jar"/>
+    <pathelement location="${lib}/guava-17.0.jar"/>
     <pathelement location="${lib}/guice-3.0.jar"/>
     <pathelement location="${lib}/guice-assistedinject-3.0.jar"/>
     <pathelement location="${lib}/guice-multibindings-3.0.jar"/>
     <pathelement location="${lib}/javax.inject.jar"/>
     <pathelement location="${lib}/jdom-2.0.5.jar"/>
     <pathelement location="${lib}/jhotdraw-7.6.jar"/>
+    <pathelement location="${lib}/jsr305.jar"/>
+    <pathelement location="${lib}/mbassador-1.1.10.jar"/>
   </path>
   
   <!-- all third party libraries needed by any part of the system -->
@@ -105,10 +109,18 @@
     <path refid="opentcs.all.classpath"/>
   </path>
 
-  <!-- models to be included with the kernel -->
+  <!-- class path for jbehave tests -->
+  <path id="opentcs.testtime.jbehave.classpath">
+    <fileset dir="${lib}/jbehave">
+      <include name="**/*.jar"/>
+    </fileset>
+    <pathelement path="${build.tests.integration}"/>
+  </path>
+
+  <!-- models to be included with the plant overview -->
   <fileset dir="${basedir}/data" id="modelfiles">
     <or>
-      <filename name="Demo-01/*"/>
+      <filename name="Demo-01.opentcs"/>
     </or>
   </fileset>
 
@@ -137,12 +149,21 @@
   <taskdef resource="checkstyletask.properties"
            classpath="${lib}/checkstyle-5.6-all.jar"/>
 
-  <!-- task declaration for schemagen (JAXB) -->
-  <taskdef name="schemagen" classname="com.sun.tools.jxc.SchemaGenTask">
-    <classpath>
-      <fileset dir="${lib}/JAXB-2.2.4" includes="*.jar" />
-    </classpath>
-  </taskdef>
+  <!-- macro definition for generating XML Schema files for JAXB classes -->  
+  <macrodef name="generateschema">
+    <attribute name="outfile"/>
+    <element name="args" implicit="yes"/>
+    <sequential>
+      <java classname="org.opentcs.util.JAXBSchemaGenerator">
+        <classpath>
+          <path refid="opentcs.all.classpath"/>
+          <fileset dir="${lib}/jaxb-2.2.7" includes="*.jar" />
+        </classpath>
+        <arg value="@{outfile}"/>
+        <args/>
+      </java>
+    </sequential>
+  </macrodef>
 
   <!-- default task/usage message -->
   <target name="usage">
@@ -169,7 +190,7 @@
     <zip destfile="${dist}/${dist.src.zip}"
          basedir="${basedir}"
          includes="**"
-         excludes="build/**, config/docbook/unpacked/**, config/openTCS-*config.xml, config/plantoverview-docking-layout.xml, config/docbook/custom/opentcs-fo-titlepage.xsl, data/accounts.xml, data/backups/**, dist/**, lib/openTCS-*.jar, log/openTCS*, nbproject/private/**"/>
+         excludes="build/**, config/docbook/unpacked/**, config/openTCS-*config.xml, config/plantoverview-docking-layout.xml, config/docbook/custom/opentcs-fo-titlepage.xsl, data/accounts.xml, data/Demo-01, data/backups/**, dist/**, lib/openTCS-*.jar, log/openTCS*, nbproject/private/**"/>
   </target>
   
   <!-- cleaning of dist/ -->
@@ -180,7 +201,7 @@
   
   <!-- cleaning of sources and JAR file -->
   <target name="cleanall"
-          depends="cleandocs,cleankernel,cleanbaselib,cleanplantoverview,cleantests,cleanreports,cleandist"
+          depends="cleandocs,cleankernel,cleanbaselib,cleanplantoverview,cleantests,cleantests-integration,cleanreports,cleandist"
           description="remove generated class and JAR files"/>
 
   <target name="buildkernel">
@@ -265,9 +286,6 @@
     <mkdir dir="${dist}/${dist.kernel.dir}/lib/openTCS-extensions"/>
     <mkdir dir="${dist}/${dist.kernel.dir}/log"/>
     <mkdir dir="${dist}/${dist.kernel.dir}/data"/>
-    <copy todir="${dist}/${dist.kernel.dir}/data">
-      <fileset refid="modelfiles"/>
-    </copy>
     <copy file="${readme.file}" todir="${dist}/${dist.kernel.dir}"/>
     <mkdir dir="${dist}/${dist.kernel.dir}/scripts"/>
     <copy todir="${dist}/${dist.kernel.dir}/scripts">
@@ -313,6 +331,7 @@
     <!-- Create a properties file with the openTCS version for inclusion. -->
     <propertyfile file="${build.base.properties.file}">
       <entry key="opentcs.version" value="${opentcs.version}"/>
+      <entry key="opentcs.builddate" value="${opentcs.builddate}"/>
     </propertyfile>
     <jar jarfile="${lib.base}" basedir="${build.base}"/>
   </target>
@@ -408,38 +427,15 @@
       <fileset file="${lib.plantoverview}"/>
       <path refid="opentcs.plantoverview.thirdparty.classpath"/>
     </copy>
+    <mkdir dir="${dist}/${dist.plantoverview.dir}/data"/>
+    <copy todir="${dist}/${dist.plantoverview.dir}/data">
+      <fileset refid="modelfiles"/>
+    </copy>
     <mkdir dir="${dist}/${dist.plantoverview.dir}/lib/openTCS-extensions"/>
     <mkdir dir="${dist}/${dist.plantoverview.dir}/log"/>
     <copy file="${readme.file}" todir="${dist}/${dist.plantoverview.dir}"/>
   </target>
    
-  <!-- compilation of tests -->
-  <target name="buildtests"
-          depends="buildall">
-    <mkdir dir="${build.tests}"/>
-    <javac debug="on"
-           includes="**"
-           destdir="${build.tests}"
-           encoding="${srcencoding}"
-           includeantruntime="false">
-      <compilerarg value="-Xlint:deprecation"/>
-      <compilerarg value="-Xlint:unchecked"/>
-      <!--compilerarg value="-Xlint:path"/-->
-      <!--compilerarg value="-Xlint:serial"/-->
-      <compilerarg value="-Xlint:finally"/>
-      <compilerarg value="-Xlint:fallthrough"/>
-      <src path="${tests}"/>
-      <classpath>
-        <path refid="opentcs.testtime.classpath"/>
-      </classpath>
-    </javac>
-  </target>
-
-  <!-- cleaning of tests -->
-  <target name="cleantests">
-    <delete dir="${build.tests}" quiet="true"/>
-  </target>
-
   <!-- generation of API documentation -->
   <target name="builddocs-api"
           depends="cleandocs-api"
@@ -590,56 +586,41 @@
     <delete dir="${build.readme}"/>
   </target>
   
-  <!-- generate XML schemas for classes using JAXB -->
-  <target name="builddocs-xmlschemas">
-    <mkdir dir="${schemadir.hostorder}"/>
-    <schemagen destdir="${schemadir.hostorder}" includeantruntime="false">
-      <src path="${src.base}"/>
-      <classpath>
-        <path refid="opentcs.all.classpath"/>
-      </classpath>
-      <include name="org/opentcs/access/xmlorders/TCSOrderSet.java"/>
-      <include name="org/opentcs/access/xmlorders/Transport.java"/>
-      <include name="org/opentcs/access/xmlorders/TransportScript.java"/>
-    </schemagen>
-    <mkdir dir="${schemadir.orderscript}"/>
-    <schemagen destdir="${schemadir.orderscript}" includeantruntime="false">
-      <src path="${src.base}"/>
-      <classpath>
-        <path refid="opentcs.all.classpath"/>
-      </classpath>
-      <include name="org/opentcs/access/xmlorders/TCSScriptFile.java"/>
-      <include name="org/opentcs/access/xmlorders/Transport.java"/>
-      <include name="org/opentcs/access/xmlorders/TransportScript.java"/>
-    </schemagen>
-    <mkdir dir="${schemadir.hostresponse}"/>
-    <schemagen destdir="${schemadir.hostresponse}" includeantruntime="false">
-      <src path="${src.base}"/>
-      <classpath>
-        <path refid="opentcs.all.classpath"/>
-      </classpath>
-      <include name="org/opentcs/access/xmlorders/TCSResponseSet.java"/>
-      <include name="org/opentcs/access/xmlorders/TransportResponse.java"/>
-      <include name="org/opentcs/access/xmlorders/ScriptResponse.java"/>
-    </schemagen>
-    <mkdir dir="${schemadir.statuschannel}"/>
-    <schemagen destdir="${schemadir.statuschannel}" includeantruntime="false">
-      <src path="${src.base}"/>
-      <classpath>
-        <path refid="opentcs.all.classpath"/>
-      </classpath>
-      <include name="org/opentcs/access/xmlstatus/TCSStatusMessageSet.java"/>
-      <include name="org/opentcs/access/xmlstatus/OrderStatusMessage.java"/>
-      <include name="org/opentcs/access/xmlstatus/VehicleStatusMessage.java"/>
-    </schemagen>
+  <!-- generate XML schemas for classes using JAXB/XML binding -->
+  <target name="builddocs-xmlschemas"
+          depends="buildbaselib,buildplantoverview">
+    <mkdir dir="${schemadir}"/>
+    <generateschema outfile="${schemadir}/openTCS-host-order.xsd">
+      <arg value="org.opentcs.access.xmlorders.TCSOrderSet"/>
+      <arg value="org.opentcs.access.xmlorders.Transport"/>
+      <arg value="org.opentcs.access.xmlorders.TransportScript"/>
+    </generateschema>
+    <generateschema outfile="${schemadir}/openTCS-host-orderscript.xsd">
+      <arg value="org.opentcs.access.xmlorders.TCSScriptFile"/>
+      <arg value="org.opentcs.access.xmlorders.Transport"/>
+      <arg value="org.opentcs.access.xmlorders.TransportScript"/>
+    </generateschema>
+    <generateschema outfile="${schemadir}/openTCS-host-response.xsd">
+      <arg value="org.opentcs.access.xmlorders.TCSResponseSet"/>
+      <arg value="org.opentcs.access.xmlorders.TransportResponse"/>
+      <arg value="org.opentcs.access.xmlorders.ScriptResponse"/>
+    </generateschema>
+    <generateschema outfile="${schemadir}/openTCS-host-statuschannel.xsd">
+      <arg value="org.opentcs.access.xmlstatus.TCSStatusMessageSet"/>
+      <arg value="org.opentcs.access.xmlstatus.OrderStatusMessage"/>
+      <arg value="org.opentcs.access.xmlstatus.VehicleStatusMessage"/>
+    </generateschema>
+    <generateschema outfile="${schemadir}/openTCS-plantOverview-persistence.xsd">
+      <arg value="org.opentcs.guing.persistence.CourseModel"/>
+      <arg value="org.opentcs.guing.persistence.CourseElement"/>
+      <arg value="org.opentcs.guing.persistence.CourseObjectProperty"/>
+      <arg value="org.opentcs.guing.persistence.KeyValueSetListWrapper"/>
+    </generateschema>
   </target>
 
   <!-- Remove generated schemas -->
   <target name="cleandocs-xmlschemas">
-    <delete dir="${schemadir.hostorder}"/>
-    <delete dir="${schemadir.orderscript}"/>
-    <delete dir="${schemadir.hostresponse}"/>
-    <delete dir="${schemadir.statuschannel}"/>
+    <delete dir="${schemadir}"/>
   </target>
   
   <target name="builddocs"
@@ -657,18 +638,32 @@
     <copy todir="${dist}/${dist.documentation.dir}/openTCS-Manual">
       <fileset dir="${build.manual}/final"/>
     </copy>
-    <copy tofile="${dist}/${dist.documentation.dir}/openTCS-XML-Schemas/openTCS-host-order.xsd"
-          file="${schemadir.hostorder}/schema1.xsd"/>
-    <copy tofile="${dist}/${dist.documentation.dir}/openTCS-XML-Schemas/openTCS-host-orderscript.xsd"
-          file="${schemadir.orderscript}/schema1.xsd"/>
-    <copy tofile="${dist}/${dist.documentation.dir}/openTCS-XML-Schemas/openTCS-host-response.xsd"
-          file="${schemadir.hostresponse}/schema1.xsd"/>
-    <copy tofile="${dist}/${dist.documentation.dir}/openTCS-XML-Schemas/openTCS-host-statuschannel.xsd"
-          file="${schemadir.statuschannel}/schema1.xsd"/>
+    <copy todir="${dist}/${dist.documentation.dir}/openTCS-XML-Schemas">
+      <fileset dir="${schemadir}">
+        <include name="*.xsd" />
+      </fileset>
+    </copy>
   </target>
   
   <!-- run JUnit tests -->
-  <target name="runtests" depends="buildtests">
+  <target name="runtests" depends="cleantests">
+    <mkdir dir="${build.tests}"/>
+    <javac debug="on"
+           includes="**"
+           destdir="${build.tests}"
+           encoding="${srcencoding}"
+           includeantruntime="false">
+      <compilerarg value="-Xlint:deprecation"/>
+      <compilerarg value="-Xlint:unchecked"/>
+      <!--compilerarg value="-Xlint:path"/-->
+      <!--compilerarg value="-Xlint:serial"/-->
+      <compilerarg value="-Xlint:finally"/>
+      <compilerarg value="-Xlint:fallthrough"/>
+      <src path="${tests}"/>
+      <classpath>
+        <path refid="opentcs.testtime.classpath"/>
+      </classpath>
+    </javac>
     <mkdir dir="${reports}/junit"/>
     <java classname="org.opentcs.TestEnvironment">
       <classpath refid="opentcs.testtime.classpath"/>
@@ -695,6 +690,73 @@
       <!--jvmarg value="-Xrunjmp"/-->
     </junit>
     <fail message="At least one test failed." if="test.failed" />
+  </target>
+
+  <!-- run JBehave tests -->
+  <target name="runtests-integration" depends="cleantests-integration">
+    <mkdir dir="${build.tests.integration}"/>
+    <javac debug="on"
+           includes="**"
+           destdir="${build.tests.integration}"
+           encoding="${srcencoding}"
+           includeantruntime="false">
+      <compilerarg value="-Xlint:deprecation"/>
+      <compilerarg value="-Xlint:unchecked"/>
+      <!--compilerarg value="-Xlint:path"/-->
+      <!--compilerarg value="-Xlint:serial"/-->
+      <compilerarg value="-Xlint:finally"/>
+      <compilerarg value="-Xlint:fallthrough"/>
+      <src path="${tests.integration}"/>
+      <classpath>
+        <path refid="opentcs.testtime.classpath"/>
+        <path refid="opentcs.testtime.jbehave.classpath"/>
+      </classpath>
+    </javac>
+    <copy todir="${build.tests.integration}">
+      <fileset dir="${tests.integration}">
+        <include name="**/*.story" />
+      </fileset>
+    </copy>
+    <unzip src="${lib}/jbehave/jbehave-core-3.9.3-resources.zip" dest="${reports}/jbehave/view/" />
+    <mkdir dir="${reports}/jbehave"/>
+    <junit fork="on" forkmode="once"
+           printsummary="withOutAndErr"
+           showoutput="true"
+           errorProperty="test.failed" 
+           failureProperty="test.failed"
+           filtertrace="false"
+           haltonfailure="false">
+      <formatter type="xml" />
+      <formatter usefile="false" type="brief" />
+      <classpath>
+        <path refid="opentcs.testtime.classpath"/>
+        <path refid="opentcs.testtime.jbehave.classpath"/>
+      </classpath>
+      <batchtest todir="${reports}/jbehave">
+        <fileset dir="${build.tests.integration}">
+          <include name="**/*Test.class"/>
+          <include name="**/*Maps.class"/>
+        </fileset>
+      </batchtest>
+      <jvmarg
+        value="-Djava.util.logging.config.file=${config}/logging-tests.config"/>
+      <jvmarg value="-Dopentcs.reports=${reports}"/>
+      <jvmarg value="-Dopentcs.base=${basedir}"/>
+      <jvmarg value="-Dopentcs.home=${basedir}"/>
+      <!--jvmarg value="-Xrunjmp"/-->
+    </junit>
+    <!--<fail message="At least one test failed." if="test.failed" />-->
+  </target>
+
+
+  <!-- cleaning of tests -->
+  <target name="cleantests">
+    <delete dir="${build.tests}" quiet="true"/>
+  </target>
+
+  <!-- cleaning of jbehave tests -->
+  <target name="cleantests-integration">
+    <delete dir="${build.tests.integration}" quiet="true"/>
   </target>
 
   <!-- run Checkstyle to analyze the openTCS source -->

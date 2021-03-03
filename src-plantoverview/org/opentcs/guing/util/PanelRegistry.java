@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import org.opentcs.guing.exchange.KernelProxyManager;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.util.gui.plugins.PanelFactory;
 
 /**
@@ -37,15 +37,15 @@ public class PanelRegistry {
   /**
    * Creates a new instance.
    *
-   * @param kernelProxyManager The proxy/connection manager to be used.
+   * @param kernelProvider The shared kernel provider to be used.
    */
   @Inject
-  public PanelRegistry(KernelProxyManager kernelProxyManager) {
-    requireNonNull(kernelProxyManager, "kernelProxyManager");
+  public PanelRegistry(SharedKernelProvider kernelProvider) {
+    requireNonNull(kernelProvider, "kernelProvider");
 
     // Auto-detect generic client panel factories.
     for (PanelFactory factory : ServiceLoader.load(PanelFactory.class)) {
-      factory.setKernel(kernelProxyManager.kernel());
+      factory.setKernelProvider(kernelProvider);
       factories.add(factory);
       log.info("Found plugin panel factory: " + factory.getClass().getName());
     }

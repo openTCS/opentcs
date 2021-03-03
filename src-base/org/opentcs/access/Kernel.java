@@ -9,7 +9,6 @@
 package org.opentcs.access;
 
 import java.awt.Color;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.message.Message;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Layout;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -156,15 +154,15 @@ public interface Kernel
       throws IllegalArgumentException, CredentialsException;
 
   /**
-   * Returns a set of names of models that are available.
+   * Returns the name of the model that is saved in the kernel.
    *
-   * @return A set of names of available models. If no models are available, the
-   * returned set is empty.
+   * @return The name of the model or <code>null</code> if there is no model.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @throws IOException If getting the model name was not possible.
    */
-  Set<String> getModelNames()
-      throws CredentialsException;
+  String getModelName()
+      throws CredentialsException, IOException;
 
   /**
    * Returns the name of the currently loaded model.
@@ -187,51 +185,40 @@ public interface Kernel
       throws CredentialsException;
 
   /**
-   * Loads the model with the specified name into the kernel.
+   * Loads the saved model into the kernel.
+   * If there is no saved model, a new empty model will be loaded.
    *
-   * @param modelName The name of the model to be loaded.
-   * @throws IOException If a model with the given name could not be found or
-   * loaded.
+   * @throws IOException If the model cannot be loaded.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    */
-  void loadModel(String modelName)
+  void loadModel()
       throws IOException, CredentialsException;
 
   /**
    * Saves the current model under the given name.
    *
+   * If there is a saved model, it will be overwritten.
+   *
    * @param modelName The name under which the current model is to be saved. If
    * <code>null</code>, the model's current name will be used, otherwise the
    * model will be renamed accordingly.
-   * @param overwrite If <code>true</code>, any existing model with the same
-   * name will be overwritten.
-   * @throws IOException If a model with the given name exists and
-   * <code>overwrite</code> is <code>false</code> or if the model could not be
-   * persisted for some reason. Note that for consistency reasons and to avoid
-   * confusion and possible data loss with case insensitive file systems,
-   * implementations of this method also throw an exception if a model with the
-   * given name exists but the name differs in case. This effectively means that
-   * the model's name must either not exist at all, yet, or must match an
-   * existing name exactly, including the case of the spelling.
+   * @throws IOException If the model could not be persisted for some reason.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    */
-  void saveModel(String modelName, boolean overwrite)
+  void saveModel(String modelName)
       throws IOException, CredentialsException;
 
   /**
-   * Removes a saved model.
+   * Removes the saved model if there is one.
    *
-   * @param rmName The name of the model to be removed.
-   * @throws FileNotFoundException If a model with the given name does not
-   * exist.
    * @throws IOException If deleting the model was not possible for some reason.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    */
-  void removeModel(String rmName)
-      throws FileNotFoundException, IOException, CredentialsException;
+  void removeModel()
+      throws IOException, CredentialsException;
 
   /**
    * Returns a single TCSObject of the given class.
@@ -356,35 +343,6 @@ public interface Kernel
    */
   Message publishMessage(String message, Message.Type type)
       throws CredentialsException;
-
-  /**
-   * Adds a layout to the current model.
-   * A new layout is created with a unique ID and name and all other attributes
-   * set to default values. A copy of the newly created layout is then returned.
-   *
-   * @param layoutData The layout's actual data.
-   * @return A copy of the newly created layout.
-   * @throws CredentialsException If the calling client is not allowed to
-   * execute this method.
-   * @deprecated Don't use {@link Layout} any more. Use {@link VisualLayout}
-   * instead.
-   */
-  Layout createLayout(byte[] layoutData)
-      throws CredentialsException;
-
-  /**
-   * Sets the layout data of a layout.
-   *
-   * @param ref A reference to the layout to be modified.
-   * @param newData The layout's new data.
-   * @throws ObjectUnknownException If the referenced layout does not exist.
-   * @throws CredentialsException If the calling client is not allowed to
-   * execute this method.
-   * @deprecated Don't use {@link Layout} any more. Use {@link VisualLayout}
-   * instead.
-   */
-  void setLayoutData(TCSObjectReference<Layout> ref, byte[] newData)
-      throws ObjectUnknownException, CredentialsException;
 
   /**
    * Adds a visual layout to the current model.

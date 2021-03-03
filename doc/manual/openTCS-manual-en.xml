@@ -3,11 +3,11 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book lang="en">
   <bookinfo>
-    <title>openTCS 2.7</title>
+    <title>openTCS 3.0</title>
 
     <subtitle>User manual</subtitle>
 
-    <pubdate>June 2014</pubdate>
+    <pubdate>November 2014</pubdate>
 
     <copyright>
       <year>2009-2014</year>
@@ -56,9 +56,9 @@
         </listitem>
 
         <listitem>
-          <para>Java Runtime Environment (JRE), at least version 1.7 (The
+          <para>Java Runtime Environment (JRE), at least version 1.8 (The
           directory <filename>bin</filename> of the installed JRE, for example
-          <filename>C:/Program Files/Java/jre1.7.0/bin</filename>, should be
+          <filename>C:/Program Files/Java/jre1.8.0/bin</filename>, should be
           included in the enviroment variable <varname>PATH</varname> to be able
           to use the included start scripts.)</para>
         </listitem>
@@ -100,7 +100,7 @@
 
         <listitem>
           <para>The driving course model you are working with, contained in the
-          subdirectory <filename>data/</filename> of the kernel
+          subdirectory <filename>data/</filename> of the plant overview
           application</para>
         </listitem>
       </itemizedlist>
@@ -170,8 +170,8 @@
       simultaneously by a single openTCS instance.</para>
 
       <para>The plant overview client that is part of the openTCS distribution
-      allows editing of driving course models while the kernel is running in
-      modelling mode. This includes, for instance, the definition of load-change
+      allows editing of driving course models, which can be loaded into the
+      kernel. This includes, for instance, the definition of load-change
       stations, driving tracks and vehicles. In the kernel's plant operation
       mode, the plant overview client is used to display the transportation
       system's general state and any active transport processes, and to create
@@ -193,14 +193,35 @@
       <itemizedlist>
         <listitem>
           <para><firstterm>Points</firstterm> are logical mappings of discrete
-          positions (reporting points) reported by a vehicle. In plant operation
-          mode, vehicles move from reporting point to reporting point in the
-          model.</para>
+          positions reported by a vehicle. In plant operation mode, vehicles
+          move from one point to another in the model. A point can have one of
+          the following types:<itemizedlist>
+              <listitem>
+                <para>Reporting position: Indicates a position at which a
+                vehicle is expected to report in. Halting or even parking at
+                such a position is not allowed.</para>
+              </listitem>
+
+              <listitem>
+                <para>Halt position: Indicates a position at which a vehicle may
+                halt temporarily, e.g. for executing an operation. The vehicle
+                is also expected to report in when it arrives at such a
+                position. It may not park here for longer than necessary,
+                though.</para>
+              </listitem>
+
+              <listitem>
+                <para>Park position: Indicates a position at which a vehicle may
+                halt for longer periods of time when it is not processing
+                orders. The vehicle is also expected to report in when it
+                arrives at such a position.</para>
+              </listitem>
+            </itemizedlist></para>
         </listitem>
 
         <listitem>
-          <para><firstterm>Paths</firstterm> are connections between reporting
-          points that are navigable for vehicles.</para>
+          <para><firstterm>Paths</firstterm> are connections between points that
+          are navigable for vehicles.</para>
         </listitem>
 
         <listitem>
@@ -229,13 +250,52 @@
 
       <para>The attributes of these elements that are relevant for the driving
       course model, e.g. the coordinates of a reporting point or the length of a
-      path, can be edited using the plant overview client. Furthermore, it is
-      possible to define arbitrary additional attributes as key-value pairs for
-      all driving course elements, which for example can be read and evaluated
-      by vehicle drivers or client software. Both the key and the value can be
-      arbitrary character strings.</para>
+      path, can be edited using the plant overview client.</para>
 
-      <para>For example, a key-value pair <literal>"IP
+      <note>
+        <para>A point has two sets of coordinates: layout coordinates and model
+        coordinates. The layout coordinates are merely intended for the
+        graphical presentation in the plant overview client, while the model
+        coordinates are data that a vehicle driver could potentially use or send
+        to the vehicle it communicates with (e.g. if the vehicle needs the exact
+        coordinates of a destination point for navigation). Both coordinate sets
+        are not tied to each other per se, i.e. they may differ. This is to
+        allow coordinates that the system works with internally to be different
+        from the presentation; for example, you may want to provide a distorted
+        view on the driving course simply because some paths in your plant are
+        very long and you mainly want to view all points/locations closely
+        together.</para>
+
+        <para>To synchronize layout with model coordinates or the other way
+        around you have two options:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Select <menuchoice>
+                <guimenu>Actions</guimenu>
+
+                <guimenuitem>Copy model values to layout</guimenuitem>
+              </menuchoice> or <menuchoice>
+                <guimenu>Actions</guimenu>
+
+                <guimenuitem>Copy layout values to model</guimenuitem>
+              </menuchoice> to synchronize them globally.</para>
+          </listitem>
+
+          <listitem>
+            <para>Select a single layout element, right click it and select
+            <guimenuitem>Copy model values to layout</guimenuitem> or
+            <guimenuitem>Copy layout values to model</guimenuitem> to
+            synchronize them separately.</para>
+          </listitem>
+        </itemizedlist>
+      </note>
+
+      <para>Furthermore, it is possible to define arbitrary additional
+      attributes as key-value pairs for all driving course elements, which for
+      example can be read and evaluated by vehicle drivers or client software.
+      Both the key and the value can be arbitrary character strings. For
+      example, a key-value pair <literal>"IP
       address"</literal>:<literal>"192.168.23.42"</literal> could be defined for
       a vehicle in the model, stating which IP address is to be used to
       communicate with the vehicle; a vehicle driver could now check during
@@ -257,34 +317,39 @@
     <sect1>
       <title>Starting the system</title>
 
-      <para>To create or to edit the model of a transport system, openTCS has to
-      be started in modelling mode. To use it as a transportation control system
-      based on an existing plant model, it has to be started in plant operation
-      mode. Starting a component is done by executing the respective shell
-      script (Unix) or batch file (Windows).</para>
+      <para>To create or to edit the model of a transport system, the openTCS
+      Plant Overview has to be started in modelling mode. To use it as a
+      transportation control system based on an existing plant model, it has to
+      be started in plant operation mode. Starting a component is done by
+      executing the respective shell script (Unix, <filename>.sh</filename>) or
+      batch file (Windows, <filename>.bat</filename>). By manipulating the
+      script and adding <code>-Dopentcs.initialmode=</code> followed by
+      <code>operating</code> or <code>modelling</code> you can automatically
+      start in the specific mode.</para>
 
       <sect2>
         <title>Starting in modelling mode</title>
 
         <orderedlist>
           <listitem>
-            <para>Start the kernel
-            (<filename>startKernel.bat</filename>).</para>
-
-            <orderedlist>
-              <listitem>
-                <para>Select existing model (that should be edited) from the
-                list in the dialog window shown, select modelling mode and click
-                <guibutton>OK</guibutton>, or click
-                <guibutton>Cancel</guibutton> to work with a new, empty
-                model.</para>
-              </listitem>
-            </orderedlist>
+            <para>Start the plant overview client
+            (<filename>startPlantOverview.bat/.sh</filename>) and select
+            'Modelling mode'.</para>
           </listitem>
 
           <listitem>
-            <para>Start the plant overview client
-            (<filename>startPlantOverview.bat</filename>).</para>
+            <para>The plant overview will start with a new, empty model, but you
+            can also load a model from a file (<menuchoice>
+                <guimenu>File</guimenu>
+
+                <guimenuitem>Load Model</guimenuitem>
+              </menuchoice>) or the current kernel model (<menuchoice>
+                <guimenu>File</guimenu>
+
+                <guimenuitem>Load current kernel model</guimenuitem>
+              </menuchoice>). The latter option requires a running kernel that
+            the Plant Overview client is connected to. The kernel also requires
+            a persisted model.</para>
           </listitem>
 
           <listitem>
@@ -316,20 +381,29 @@
         <orderedlist>
           <listitem>
             <para>Start the kernel
-            (<filename>startKernel.bat</filename>).</para>
+            (<filename>startKernel.bat/.sh</filename>).</para>
 
             <orderedlist>
               <listitem>
-                <para>Select an existing model from the list in the dialog
-                window shown, select plant operation mode and click
-                <guibutton>OK</guibutton>.</para>
+                <para>Select the saved model and plant operation mode in the
+                dialog window shown and click <guibutton>OK</guibutton>.</para>
+
+                <para>If this is your first time running the kernel you need to
+                persist the current plant model first. Start the kernel with an
+                empty model instead and select <menuchoice>
+                    <guimenu>File</guimenu>
+
+                    <guimenuitem>Persist model in the kernel</guimenuitem>
+                  </menuchoice> in the plant overview (also see <xref
+                linkend="section.saving_models"/>).</para>
               </listitem>
             </orderedlist>
           </listitem>
 
           <listitem>
             <para>Start the plant overview client
-            (<filename>startPlantOverview.bat</filename>).</para>
+            (<filename>startPlantOverview.bat/.sh</filename>) and select
+            'Operating mode'.</para>
           </listitem>
 
           <listitem>
@@ -399,29 +473,23 @@
 
         <para><orderedlist>
             <listitem>
-              <para>Start the kernel
-              (<filename>startKernel.bat</filename>).</para>
-            </listitem>
-
-            <listitem>
-              <para>Wait until a dialog for selecting a driving course model is
-              shown.</para>
-            </listitem>
-
-            <listitem>
-              <para>Click <guibutton>Cancel</guibutton> to open a new, empty
-              model instead of loading an existing one, and to leave the kernel
-              running in modelling mode.</para>
-            </listitem>
-
-            <listitem>
               <para>Start the plant overview client
-              (<filename>startPlantOverview.bat</filename>).</para>
+              (<filename>startPlantOverview.bat/.sh</filename>) and select
+              'Modelling mode'.</para>
             </listitem>
 
             <listitem>
               <para>Wait until the graphical user interface of the plant
               overview client is shown.</para>
+            </listitem>
+
+            <listitem>
+              <para>You can now add driving course components to the empty
+              model. Whenever you want to start over, select <menuchoice>
+                  <guimenu>File</guimenu>
+
+                  <guimenuitem>New Model</guimenuitem>
+                </menuchoice> from the main menu.</para>
             </listitem>
           </orderedlist></para>
       </sect2>
@@ -535,37 +603,50 @@
       </sect2>
 
       <sect2>
-        <title>Saving the driving course model</title>
+        <title id="section.saving_models">Saving the driving course
+        model</title>
 
-        <orderedlist>
-          <listitem>
-            <para>Select the menu entry <menuchoice>
-                <guimenu>File</guimenu>
+        <para>You have two options to save the model: on your local hard drive
+        or in a running kernel instance the plant overview is connected
+        to.</para>
 
-                <guimenuitem>Save Model As...</guimenuitem>
-              </menuchoice> and enter an arbitrary name for the model.</para>
-          </listitem>
+        <sect3>
+          <title>Saving the model locally</title>
 
-          <listitem>
-            <para>Close the plant overview client.</para>
-          </listitem>
+          <para>Select <menuchoice>
+              <guimenu>File</guimenu>
 
-          <listitem>
-            <para>Shut down the kernel.</para>
-          </listitem>
-        </orderedlist>
+              <guimenuitem>Save Model</guimenuitem>
+            </menuchoice> or <menuchoice>
+              <guimenu>File</guimenu>
 
-        <para>The newly created driving course model now contains a minimum of
-        elements and can be used in operation mode.</para>
+              <guimenuitem>Save Model As...</guimenuitem>
+            </menuchoice> and enter an arbitrary name for the model.</para>
+        </sect3>
+
+        <sect3>
+          <title>Persisting the model in a running kernel</title>
+
+          <para>Select <menuchoice>
+              <guimenu>File</guimenu>
+
+              <guimenuitem>Persist model in the kernel</guimenuitem>
+            </menuchoice> and your model will be persisted in the kernel and let
+          you switch to the operating mode. This, though, requires you to save
+          it locally first. Note that the model that was previously persisted in
+          the kernel will be replaced, as the kernel can only have a single
+          model at a time.</para>
+        </sect3>
       </sect2>
     </sect1>
 
     <sect1>
       <title>Operating the system</title>
 
-      <para>These instructions explain how the newly created model can be used
-      in plant operation mode, how vehicle drivers are used and how transport
-      orders can be created and processed by a vehicle.</para>
+      <para>These instructions explain how the newly created model that was
+      persisted in the kernel can be used in plant operation mode, how vehicle
+      drivers are used and how transport orders can be created and processed by
+      a vehicle.</para>
 
       <sect2>
         <title>Starting components for system operation</title>
@@ -573,7 +654,7 @@
         <para><orderedlist>
             <listitem>
               <para>Start the kernel
-              (<filename>startKernel.bat</filename>).</para>
+              (<filename>startKernel.bat/.sh</filename>).</para>
             </listitem>
 
             <listitem>
@@ -582,14 +663,15 @@
             </listitem>
 
             <listitem>
-              <para>Select the model you created, select plant operation mode,
-              and click <guibutton>OK</guibutton>.</para>
+              <para>Select the saved model you created, select plant operation
+              mode, and click <guibutton>OK</guibutton>.</para>
             </listitem>
 
             <listitem>
               <para>Start the plant overview client
-              (<filename>startPlantOverview.bat</filename>) and wait until its
-              graphical user interface is shown.</para>
+              (<filename>startPlantOverview.bat/.sh</filename>), select
+              'Operating mode' and wait until its graphical user interface is
+              shown.</para>
             </listitem>
           </orderedlist></para>
       </sect2>
@@ -1008,13 +1090,13 @@
       information.</para>
 
       <note>
-        <para>For your key-value pairs, you may specify arbitrary keys. openTCS
-        itself will not make any use of this data; it will merely store it and
-        provide it for custom vehicle drivers and/or other extensions. You
-        should, however, not use any keys starting with
-        <literal>"tcs:"</literal>. Any keys with this prefix are reserved for
-        official openTCS features, and using them could lead to
-        collisions.</para>
+        <para>For your project-specific key-value pairs, you may specify
+        arbitrary keys. openTCS itself will not make any use of this data; it
+        will merely store it and provide it for custom vehicle drivers and/or
+        other extensions. You should, however, not use any keys starting with
+        <literal>"tcs:"</literal> for storing project-specific data. Any keys
+        with this prefix are reserved for official openTCS features, and using
+        them could lead to collisions.</para>
       </note>
     </sect1>
 
@@ -1025,59 +1107,82 @@
       e.g. the routing or parking strategies, can be manipulated.</para>
 
       <sect2>
-        <title>Selecting the cost function used for routing</title>
+        <title>Selecting the cost factors used for routing</title>
 
-        <para><orderedlist>
-            <listitem>
-              <para>Switch to the kernel control center's
-              <guilabel>Configuration</guilabel> tab.</para>
-            </listitem>
+        <orderedlist>
+          <listitem>
+            <para>Switch to the kernel control center's
+            <guilabel>Configuration</guilabel> tab.</para>
+          </listitem>
 
-            <listitem>
-              <para>Find and select the configuration entry
-              <literal>org.opentcs.kernel.module.routing​.BasicRouter.costType</literal>
-              and click the <guibutton>Configure</guibutton> button.</para>
-            </listitem>
+          <listitem>
+            <para>Find and select the configuration entry
+            <literal>org.opentcs.kernel.module.routing​.BasicRouter.routingCostFactors</literal>
+            and click the <guibutton>Configure</guibutton> button.</para>
+          </listitem>
 
-            <listitem>
-              <para>In the dialog shown, set the configuration item's value to
-              one of the following:</para>
+          <listitem>
+            <para>In the dialog shown, set the configuration item's value to one
+            or more (separated by blanks and/or commas) of the following key
+            words:</para>
 
-              <itemizedlist>
-                <listitem>
-                  <para><literal>LENGTH_BASED</literal> (default): Routing costs
-                  are based on the lengths of paths travelled.</para>
-                </listitem>
+            <itemizedlist>
+              <listitem>
+                <para><literal>hops</literal>: Routing costs are measured by the
+                number of hops/paths travelled along the route.</para>
+              </listitem>
 
-                <listitem>
-                  <para><literal>TIME_BASED</literal>: Routing costs are based
-                  on the time required for travelling. The time is computed
-                  using the length of a path and the maximum speed with which a
-                  vehicle may move on it.</para>
-                </listitem>
+              <listitem>
+                <para><literal>distance</literal>: Routing costs are measured by
+                the sum of the lengths of paths travelled.</para>
+              </listitem>
 
-                <listitem>
-                  <para><literal>HOP_BASED</literal>: Routing costs are measured
-                  based on the number of hops/paths travelled along the
-                  route.</para>
-                </listitem>
+              <listitem>
+                <para><literal>traveltime</literal>: Routing costs are measured
+                by the sum of the times required for travelling each path on a
+                route. The travel times are computed using the length of the
+                respective path and the maximum speed with which a vehicle may
+                move on it.</para>
+              </listitem>
 
-                <listitem>
-                  <para><literal>EXPLICIT</literal>: Routing costs are
-                  explicitly specified by the modelling user. They can be
-                  specified for every single path in the model using the plant
-                  overview client. (Select a path and set its
-                  <guilabel>Costs</guilabel> property to an arbitrary integer
-                  value.)</para>
-                </listitem>
-              </itemizedlist>
-            </listitem>
+              <listitem>
+                <para><literal>turns</literal>: Routing costs are measured by
+                the number of changes of the vehicle's orientation on a route.
+                To specify an orientation for a vehicle on a path, set a
+                property on that path with a key of
+                <literal>"tcs:travelOrientation"</literal> and an arbitrary
+                string as the value. If, and only if, the values of subsequent
+                paths on a route differ, a penalty is added to the costs of that
+                route. This penalty can be configured by setting the
+                configuration entry
+                <literal>org.opentcs.kernel.module.routing.RouteEvaluatorTurns.penaltyPerTurn</literal>
+                to an integer value (default: 5000).</para>
+              </listitem>
 
-            <listitem>
-              <para>Shut down and restart the kernel for the changes to take
-              effect.</para>
-            </listitem>
-          </orderedlist></para>
+              <listitem>
+                <para><literal>explicit</literal>: Routing costs are measured by
+                the sum of the costs explicitly specified by the modelling user.
+                Explicit costs can be specified for every single path in the
+                model using the plant overview client. (Select a path and set
+                its <guilabel>Costs</guilabel> property to an arbitrary integer
+                value.)</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+
+          <listitem>
+            <para>Shut down and restart the kernel for the changes to take
+            effect.</para>
+          </listitem>
+        </orderedlist>
+
+        <para><note>
+            <para>When specifying more than one of these key words, the
+            respective costs computed are added up. For example, when set to
+            <literal>"distance, turns"</literal> (which is the default value),
+            costs for routes are computed as the sum of the paths' lengths and
+            the penalties for orientation changes.</para>
+          </note></para>
       </sect2>
 
       <sect2>
@@ -1701,4 +1806,98 @@
       </orderedlist>
     </sect1>
   </chapter>
+
+  <appendix>
+    <title>Questions and Answers</title>
+
+    <qandaset>
+      <qandadiv>
+        <qandaentry>
+          <question>
+            <para>How can I migrate driving course models created with openTCS
+            before version 3.0?</para>
+          </question>
+
+          <answer>
+            <orderedlist>
+              <listitem>
+                <para>Backup the contents of the kernel directory's
+                <filename><filename>data/</filename></filename> subdirectory. It
+                contains subdirectories with a driving course model in a
+                <filename>model.xml</filename> file each.</para>
+              </listitem>
+
+              <listitem>
+                <para>Clear the kernel's <filename>data/</filename> directory by
+                removing all its subdirectories.</para>
+              </listitem>
+
+              <listitem>
+                <para>Copy one of the <filename>model.xml</filename> files from
+                the backup directories back to the <filename>data/</filename>
+                directory, so that it contains only this single driving course
+                model.</para>
+
+                <para><emphasis>Example: Assuming your
+                <filename>data/</filename> directory contains three model
+                subdirectories <filename>modelA</filename>,
+                <filename>modelB</filename> and <filename>modelC</filename>.
+                After step one, the three model directories should have been
+                copied to another location. After step two, the
+                <filename>data/</filename> directory should be empty and after
+                step three, it should contain only the
+                <filename>model.xml</filename> from directory
+                <filename>modelA</filename>.</emphasis></para>
+              </listitem>
+
+              <listitem>
+                <para>Start the kernel and have it load your model. Then start
+                the plant overview client in modelling mode and select
+                <menuchoice>
+                    <guimenu>File</guimenu>
+
+                    <guimenuitem>Load current kernel model</guimenuitem>
+                  </menuchoice> from its menu to read the model data from the
+                kernel.</para>
+              </listitem>
+
+              <listitem>
+                <para>In the plant overview client, select <menuchoice>
+                    <guimenu>File</guimenu>
+
+                    <guimenuitem>Save Model</guimenuitem>
+                  </menuchoice> or <menuchoice>
+                    <guimenu>File</guimenu>
+
+                    <guimenuitem>Save Model As</guimenuitem>
+                  </menuchoice> from the menu. The plant overview client will
+                persist the model data in a file with the given name and the
+                extension <filename>.opentcs</filename>.</para>
+
+                <para><emphasis>Example: Following the previous example a file
+                with the name <filename>modelA.opentcs</filename> should exist
+                now.</emphasis></para>
+              </listitem>
+
+              <listitem>
+                <para>Delete the <filename>model.xml</filename> file you just
+                moved to the <filename>data/</filename> directory of the kernel.
+                The migration of this driving course model is finished.</para>
+              </listitem>
+
+              <listitem>
+                <para>Shut down the kernel, go back to step three and repeat the
+                procedure for the remaining models that you want to
+                migrate.</para>
+
+                <para><emphasis>Example: Follow steps 3 - 7 with
+                <filename>modelB</filename> and <filename>modelC</filename>
+                instead of <filename>modelA</filename>.</emphasis></para>
+              </listitem>
+            </orderedlist>
+          </answer>
+        </qandaentry>
+      </qandadiv>
+    </qandaset>
+  </appendix>
 </book>

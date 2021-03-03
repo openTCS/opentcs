@@ -1,20 +1,28 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.exchange.adapter;
 
+import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectPropConstants;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -22,11 +30,12 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.LoadHandlingDevice;
-import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
+import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
@@ -37,6 +46,7 @@ import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
+import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
@@ -47,9 +57,10 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * An adapter for vehicles.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleAdapter
-    extends OpenTCSProcessAdapter {
+    extends AbstractProcessAdapter {
 
   /**
    * This class's logger.
@@ -59,15 +70,14 @@ public class VehicleAdapter
 
   /**
    * Creates a new instance.
+   *
+   * @param model The corresponding model component.
+   * @param eventDispatcher The event dispatcher.
    */
-  public VehicleAdapter() {
-    super();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public TCSObjectReference<Vehicle> getProcessObject() {
-    return (TCSObjectReference<Vehicle>) super.getProcessObject();
+  @Inject
+  public VehicleAdapter(@Assisted VehicleModel model,
+                        @Assisted EventDispatcher eventDispatcher) {
+    super(model, eventDispatcher);
   }
 
   @Override
@@ -75,109 +85,64 @@ public class VehicleAdapter
     return (VehicleModel) super.getModel();
   }
 
-  @Override
-  public void setModel(ModelComponent model) {
-    if (!VehicleModel.class.isInstance(model)) {
-      throw new IllegalArgumentException(model + " is not a VehicleModel");
-    }
-    super.setModel(model);
-  }
+  @Override // OpenTCSProcessAdapter
+  public void updateModelProperties(Kernel kernel,
+                                    TCSObject<?> tcsObject,
+                                    @Nullable ModelLayoutElement layoutElement) {
+    requireNonNull(kernel, "kernel");
+    Vehicle vehicle = requireNonNull((Vehicle) tcsObject, "tcsObject");
 
-  /**
-   * Returns if the vehicle is currently available.
-   *
-   * @return True if it is available, false otherwise.
-   */
-  @SuppressWarnings("unchecked")
-  public boolean isVehicleAvailable() {
-    Vehicle vehicle = kernel().getTCSObject(Vehicle.class, getProcessObject());
-    return vehicle.getProcState() != Vehicle.ProcState.UNAVAILABLE;
-  }
-
-  @Override // AbstractProcessAdapter
-  public void releaseProcessObject() {
     try {
-      kernel().removeTCSObject(getProcessObject());
-      super.releaseProcessObject(); // also delete the Adapter
+      VehicleModel vehicleModel = getModel();
+      updateModelName(vehicleModel, vehicle);
+      updateModelLength(vehicle, vehicleModel);
+      updateModelEnergy(vehicle, vehicleModel);
+      updateModelEnergyState(vehicleModel, vehicle);
+      updateModelLoadedState(vehicleModel, vehicle);
+      updateModelState(vehicle, vehicleModel);
+      updateModelCurrentPoint(vehicleModel, vehicle);
+      updateModelNextPoint(vehicleModel, vehicle);
+      updateModelPrecisePosition(vehicle, vehicleModel);
+      updateModelOrientationAngle(vehicle, vehicleModel);
+
+      vehicleModel.setVehicle(vehicle);
+
+      updateMiscModelProperties(vehicle);
+      updateModelDriveOrder(kernel, vehicle, vehicleModel);
+
+      vehicleModel.propertiesChanged(new NullAttributesChangeListener());
+    }
+    catch (CredentialsException e) {
+      log.log(Level.WARNING, null, e);
+    }
+  }
+
+  @Override // OpenTCSProcessAdapter
+  public void updateProcessProperties(Kernel kernel) {
+    Vehicle vehicle = kernel.createVehicle();
+    TCSObjectReference<Vehicle> reference = vehicle.getReference();
+
+    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    String name = pName.getText();
+
+    try {
+      updateDefaultProcessProperties(kernel, reference, name);
+      updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
       log.log(Level.WARNING, null, e);
     }
   }
 
-  @Override // AbstractProcessAdapter
-  public Vehicle createProcessObject() throws KernelRuntimeException {
-    if (!hasModelingState()) {
-      return null;
-    }
-    Vehicle vehicle = kernel().createVehicle();
-    setProcessObject(vehicle.getReference());
-
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    LengthProperty pLength = (LengthProperty) getModel().getProperty(VehicleModel.LENGTH);
-    // At creation name and length are empty
-    if (pName.getText().isEmpty() && pLength.getValueByUnit(LengthProperty.Unit.MM) == 0.0) {
-      updateModelProperties();
-    }
-    else {
-        // if an "old" object was restored by undo() save the properties
-      // in the kernel
-      pName.setText(vehicle.getName());
-      updateProcessProperties(true);
-    }
-    nameToModel(vehicle);
-    getModel().setReference(vehicle.getReference());
-
-    register();
-
-    return vehicle;
-  }
-
-  @Override // OpenTCSProcessAdapter
-  public void propertiesChanged(AttributesChangeEvent event) {
-    if (hasModelingState() && event.getInitiator() != this) {
-      updateProcessProperties(false);
-    }
-  }
-
-  @Override // OpenTCSProcessAdapter
-  @SuppressWarnings("unchecked")
-  public void updateModelProperties() {
-    TCSObjectReference<Vehicle> reference = getProcessObject();
-
-    synchronized (reference) {
-      try {
-        Vehicle vehicle = kernel().getTCSObject(Vehicle.class, reference);
-        VehicleModel vehicleModel = getModel();
-        updateModelName(vehicleModel, vehicle);
-        updateModelLength(vehicle, vehicleModel);
-        updateModelEnergy(vehicle, vehicleModel);
-        updateModelEnergyState(vehicleModel, vehicle);
-        updateModelLoadedState(vehicleModel, vehicle);
-        updateModelState(vehicle, vehicleModel);
-        updateModelCurrentPoint(vehicleModel, vehicle);
-        updateModelNextPoint(vehicleModel, vehicle);
-        updateModelPrecisePosition(vehicle, vehicleModel);
-        updateModelOrientationAngle(vehicle, vehicleModel);
-
-        vehicleModel.setReference(reference);
-
-        updateMiscModelProperties(vehicle);
-        updateModelDriveOrder(vehicle, vehicleModel);
-
-        vehicleModel.propertiesChanged(this);
-      }
-      catch (CredentialsException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
-  private void updateModelDriveOrder(Vehicle vehicle, VehicleModel vehicleModel) throws CredentialsException {
+  private void updateModelDriveOrder(Kernel kernel,
+                                     Vehicle vehicle,
+                                     VehicleModel vehicleModel)
+      throws CredentialsException {
     TCSObjectReference<TransportOrder> rTransportOrder = vehicle.getTransportOrder();
 
     if (rTransportOrder != null) {
-      TransportOrder transportOrder = kernel().getTCSObject(TransportOrder.class, rTransportOrder);
+      TransportOrder transportOrder
+          = kernel.getTCSObject(TransportOrder.class, rTransportOrder);
       DriveOrder driveOrder = transportOrder.getCurrentDriveOrder();
       List<FigureComponent> c
           = composeDriveOrderComponents(driveOrder, vehicle.getRouteProgressIndex());
@@ -197,7 +162,8 @@ public class VehicleAdapter
     vehicleModel.setOrientationAngle(orientationAngle);
   }
 
-  private void updateModelPrecisePosition(Vehicle vehicle, VehicleModel vehicleModel) {
+  private void updateModelPrecisePosition(Vehicle vehicle,
+                                          VehicleModel vehicleModel) {
     Triple precisePosition = vehicle.getPrecisePosition();
     TripleProperty pPosition = (TripleProperty) vehicleModel.getProperty(VehicleModel.PRECISE_POSITION);
     pPosition.setValue(precisePosition);
@@ -221,7 +187,8 @@ public class VehicleAdapter
     }
   }
 
-  private void updateModelCurrentPoint(VehicleModel vehicleModel, Vehicle vehicle) {
+  private void updateModelCurrentPoint(VehicleModel vehicleModel,
+                                       Vehicle vehicle) {
     StringProperty pPoint = (StringProperty) vehicleModel.getProperty(VehicleModel.POINT);
     TCSObjectReference<Point> rCurrentPosition = vehicle.getCurrentPosition();
 
@@ -308,62 +275,27 @@ public class VehicleAdapter
     pLength.setValueAndUnit(length, LengthProperty.Unit.MM);
   }
 
-  @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(boolean updateAllProperties) {
-    super.updateProcessProperties(updateAllProperties);
-    TCSObjectReference<Vehicle> reference = getProcessObject();
-
-    if (isInTransition()) {
-      return;
-    }
-
-    synchronized (reference) {
-      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      String name = pName.getText();
-
-      try {
-        updateDefaultProcessProperties(updateAllProperties, pName, reference, name);
-        updateMiscProcessProperties(updateAllProperties);
-      }
-      catch (ObjectExistsException e) {
-        undo(name, e);
-      }
-      catch (ObjectUnknownException | CredentialsException e) {
-        log.log(Level.WARNING, null, e);
-      }
-    }
-  }
-
   @SuppressWarnings("unchecked")
-  private void updateDefaultProcessProperties(boolean updateAllProperties,
-                                              StringProperty pName,
-                                              TCSObjectReference<?> reference,
+  private void updateDefaultProcessProperties(Kernel kernel,
+                                              TCSObjectReference<Vehicle> reference,
                                               String name)
-      throws CredentialsException, ObjectExistsException, ObjectUnknownException {
-    if (updateAllProperties || pName.hasChanged()) {
-      kernel().renameTCSObject(reference, name);
-    }
+      throws KernelRuntimeException {
+    kernel.renameTCSObject(reference, name);
 
     LengthProperty pLength = (LengthProperty) getModel().getProperty(VehicleModel.LENGTH);
 
-    if (updateAllProperties || pLength.hasChanged()) {
-      kernel().setVehicleLength((TCSObjectReference<Vehicle>) reference,
-                                ((Double) pLength.getValueByUnit(LengthProperty.Unit.MM)).intValue());
-    }
+    kernel.setVehicleLength(reference,
+                            ((Double) pLength.getValueByUnit(LengthProperty.Unit.MM)).intValue());
 
     PercentProperty pEnergy = (PercentProperty) getModel().getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
 
-    if (updateAllProperties || pEnergy.hasChanged()) {
-      kernel().setVehicleEnergyLevelCritical((TCSObjectReference<Vehicle>) reference,
-                                             (Integer) pEnergy.getValue());
-    }
+    kernel.setVehicleEnergyLevelCritical(reference,
+                                         (Integer) pEnergy.getValue());
 
     pEnergy = (PercentProperty) getModel().getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
 
-    if (updateAllProperties || pEnergy.hasChanged()) {
-      kernel().setVehicleEnergyLevelGood((TCSObjectReference<Vehicle>) reference,
-                                         (Integer) pEnergy.getValue());
-    }
+    kernel.setVehicleEnergyLevelGood(reference,
+                                     (Integer) pEnergy.getValue());
   }
 
   /**
@@ -433,21 +365,22 @@ public class VehicleAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  protected void updateMiscProcessProperties(boolean updateAllProperties)
-      throws ObjectUnknownException, CredentialsException {
+  protected void updateMiscProcessProperties(Kernel kernel,
+                                             TCSObjectReference<?> ref)
+      throws KernelRuntimeException {
 
-    kernel().clearTCSObjectProperties(getProcessObject());
+    kernel.clearTCSObjectProperties(ref);
     KeyValueSetProperty pMisc = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
 
     if (pMisc != null) {
       for (KeyValueProperty kvp : pMisc.getItems()) {
-        kernel().setTCSObjectProperty(getProcessObject(), kvp.getKey(), kvp.getValue());
+        kernel.setTCSObjectProperty(ref, kvp.getKey(), kvp.getValue());
       }
     }
 
     CoursePointProperty property = (CoursePointProperty) getModel().getProperty(VehicleModel.INITIAL_POSITION);
-    kernel().setTCSObjectProperty(getProcessObject(),
-                                  ObjectPropConstants.VEHICLE_INITIAL_POSITION,
-                                  property.getPointName());
+    kernel.setTCSObjectProperty(ref,
+                                ObjectPropConstants.VEHICLE_INITIAL_POSITION,
+                                property.getPointName());
   }
 }

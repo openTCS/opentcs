@@ -9,6 +9,7 @@
 package org.opentcs.util.gui.plugins;
 
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 
 /**
  * Produces plugin panels to extend an openTCS user interface.
@@ -28,11 +29,11 @@ public interface PanelFactory {
   boolean providesPanel(Kernel.State state);
 
   /**
-   * Sets a reference to the kernel.
+   * Sets a reference to the shared kernel provider to be used.
    *
-   * @param kernel The kernel.
+   * @param kernelProvider The kernel provider.
    */
-  void setKernel(Kernel kernel);
+  void setKernelProvider(SharedKernelProvider kernelProvider);
 
   /**
    * Returns a string describing the factory/the panels provided.
@@ -45,10 +46,11 @@ public interface PanelFactory {
 
   /**
    * Returns a newly created panel.
-   * If a reference to the kernel has not been set, yet, or has been set to
-   * <code>null</code>, this method returns <code>null</code>.
+   * If a reference to the kernel provider has not been set, yet, or has been
+   * set to <code>null</code>, this method returns <code>null</code>.
    *
+   * @param state The kernel state for which to create the panel.
    * @return A newly created panel.
    */
-  PluggablePanel createPanel();
+  PluggablePanel createPanel(Kernel.State state);
 }

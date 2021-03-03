@@ -1,20 +1,26 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.properties.table;
 
+import com.google.inject.Provider;
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.type.AbstractComplexProperty;
@@ -36,38 +42,34 @@ public class ComplexPropertyCellEditor
     implements javax.swing.table.TableCellEditor {
 
   /**
-   * This class's Logger.
+   * The button for showing the details dialog.
    */
-  private static final Logger log
-      = Logger.getLogger(ComplexPropertyCellEditor.class.getName());
+  private final JButton fButton = new JButton();
   /**
-   * The Property.
+   * Provides the appropriate dialog content for a given property.
    */
-  private AbstractComplexProperty fProperty;
-  /**
-   * Der Button, bei dessen Anklicken sich der DetailsDialog öffnet. Der Button
-   * füllt die gesamte Zelle aus.
-   */
-  private final JButton fButton;
-  /**
-   * Der Besitzer des DetailsDialog (Panel).
-   */
-  private final GuiManager guiManager;
+  private final Map<Class<? extends AbstractComplexProperty>, Provider<DetailsDialogContent>> contentMap;
   /**
    * A parent for dialogs created by this instance.
    */
   private final JPanel dialogParent;
+  /**
+   * The property being edited.
+   */
+  private AbstractComplexProperty fProperty;
 
   /**
    * Creates a new instance.
    *
-   * @param guiManager Used as a provider for the SystemModel.
+   * @param contentMap Provides the appropriate content for a given property.
    * @param dialogParent A parent for dialogs created by this instance.
    */
-  public ComplexPropertyCellEditor(GuiManager guiManager, JPanel dialogParent) {
-    this.guiManager = requireNonNull(guiManager, "guiManager");
+  @Inject
+  public ComplexPropertyCellEditor(Map<Class<? extends AbstractComplexProperty>, Provider<DetailsDialogContent>> contentMap,
+                                   @Assisted JPanel dialogParent) {
+    this.contentMap = requireNonNull(contentMap, "contentMap");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
-    fButton = new JButton();
+
     fButton.setFont(new Font("Dialog", Font.PLAIN, 12));
     fButton.setBorder(null);
     fButton.setHorizontalAlignment(JButton.LEFT);
@@ -96,25 +98,10 @@ public class ComplexPropertyCellEditor
   }
 
   /**
-   * Öffnet den Dialog, mit dessen Hilfe die Eigenschaften eines Attributs
-   * komfortabler eingestellt werden können.
+   * Shows the dialog for editing the property.
    */
   private void showDialog() {
-    Class<? extends JPanel> editorPanel = fProperty.getPropertyEditorPanel();
-    if (editorPanel == null) {
-      return;
-    }
-
-    DetailsDialogContent content;
-    try {
-      content = (DetailsDialogContent) editorPanel.newInstance();
-      // Give it a reference to the SystemModel
-      content.setSystemModel(guiManager.getSystemModel());
-    }
-    catch (InstantiationException | IllegalAccessException e) {
-      log.log(Level.SEVERE, "Exception creating property editor panel: ", e);
-      return;
-    }
+    DetailsDialogContent content = contentMap.get(fProperty.getClass()).get();
 
     StandardDetailsDialog detailsDialog
         = new StandardDetailsDialog(dialogParent, true, content);

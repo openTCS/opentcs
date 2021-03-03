@@ -5,9 +5,9 @@
 package org.opentcs.kernel.workingset;
 
 import java.util.List;
+import static org.junit.Assert.assertEquals;
 import org.junit.*;
 import org.opentcs.data.message.Message;
-import static org.junit.Assert.*;
 
 /**
  * A test class for MessageBuffer.

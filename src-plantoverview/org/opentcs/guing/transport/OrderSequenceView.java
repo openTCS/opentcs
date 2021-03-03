@@ -1,45 +1,56 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.transport;
 
-import java.util.Objects;
+import com.google.inject.assistedinject.Assisted;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.exchange.KernelProxyManager;
 
 /**
- * Die Ansicht einer Transportauftragskette.
- * 
+ * Displays an order sequence.
+ *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequenceView
     extends DialogContent {
 
   /**
-   * Die anzuzeigende Transportauftragskette.
+   * The order sequence to be shown.
    */
   private final OrderSequence fOrderSequence;
   /**
    * The proxy/connection manager to be used.
    */
-  private final KernelProxyManager kernelProxyManager;
+  private final SharedKernelProvider kernelProvider;
 
   /**
    * Creates new instance.
    *
-   * @param sequence The order sequence
+   * @param sequence The order sequence.
+   * @param kernelProvider Provides access to a kernel.
    */
-  public OrderSequenceView(OrderSequence sequence) {
-    fOrderSequence = Objects.requireNonNull(sequence, "sequence is null");
-    this.kernelProxyManager = DefaultKernelProxyManager.instance();
+  @Inject
+  public OrderSequenceView(@Assisted OrderSequence sequence,
+                           SharedKernelProvider kernelProvider) {
+    this.fOrderSequence = requireNonNull(sequence, "sequence");
+    this.kernelProvider = requireNonNull(kernelProvider,
+                                         "kernelProvider");
     initComponents();
     initFields();
     setDialogTitle("Transportauftragskette Detailansicht");
@@ -329,7 +340,7 @@ public class OrderSequenceView
                                           JOptionPane.YES_NO_OPTION);
 
     if (n == JOptionPane.OK_OPTION) {
-      kernelProxyManager.kernel().setOrderSequenceComplete(fOrderSequence.getReference());
+      kernelProvider.getKernel().setOrderSequenceComplete(fOrderSequence.getReference());
       checkBoxComplete.setEnabled(false);
     }
     else {

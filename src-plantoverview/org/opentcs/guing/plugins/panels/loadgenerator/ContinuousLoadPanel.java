@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -33,6 +33,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -54,26 +55,26 @@ class ContinuousLoadPanel
    * The unique string generator, that can be useful for creating of
    * transport order names.
    */
-  private static final UniqueStringGenerator nameGenerator =
-      new UniqueStringGenerator();
+  private static final UniqueStringGenerator<?> nameGenerator
+      = new UniqueStringGenerator<>();
   /**
    * This class' logger.
    */
-  private static final Logger log =
-      Logger.getLogger(ContinuousLoadPanel.class.getName());
+  private static final Logger log
+      = Logger.getLogger(ContinuousLoadPanel.class.getName());
   /**
    * This classe's bundle.
    */
-  private final ResourceBundle bundle =
-      ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private final ResourceBundle bundle
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  /**
+   * Provides access to a kernel.
+   */
+  private final SharedKernelProvider kernelProvider;
   /**
    * The kernel we talk to.
    */
-  private final Kernel kernel;
-  /**
-   * The vehicles existing in the model.
-   */
-  private final Set<Vehicle> vehicles = new TreeSet<>(TCSObject.nameComparator);
+  private Kernel kernel;
   /**
    * The instance trigger creation of new orders.
    */
@@ -85,13 +86,13 @@ class ContinuousLoadPanel
 
   /**
    * Creates a new ContinuousLoadPanel.
-   * 
+   *
    * @param kernel The kernel.
    */
-  public ContinuousLoadPanel(final Kernel kernel) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
+  public ContinuousLoadPanel(SharedKernelProvider kernelProvider) {
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
     initComponents();
-    
+
     JComboBox<TransportOrderData.Deadline> deadlineComboBox = new JComboBox<>();
     deadlineComboBox.addItem(null);
     for (TransportOrderData.Deadline i : TransportOrderData.Deadline.values()) {
@@ -99,7 +100,19 @@ class ContinuousLoadPanel
     }
     DefaultCellEditor deadlineEditor = new DefaultCellEditor(deadlineComboBox);
     toTable.setDefaultEditor(TransportOrderData.Deadline.class, deadlineEditor);
-    
+
+    toTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    doTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+  }
+
+  @Override
+  public void plugIn() {
+    // Get a kernel reference.
+    kernelProvider.register(this);
+    // XXX Check if the kernel is actually available. If not...do something.
+    kernel = kernelProvider.getKernel();
+
+    Set<Vehicle> vehicles = new TreeSet<>(TCSObject.nameComparator);
     vehicles.addAll(kernel.getTCSObjects(Vehicle.class));
     JComboBox<TCSObjectReference<Vehicle>> vehiclesComboBox = new JComboBox<>();
     vehiclesComboBox.addItem(null);
@@ -108,23 +121,21 @@ class ContinuousLoadPanel
     }
     DefaultCellEditor vehicleEditor = new DefaultCellEditor(vehiclesComboBox);
     toTable.setDefaultEditor(TCSObjectReference.class, vehicleEditor);
-    toTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-    doTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-  }
-
-  @Override
-  public void plugIn() {
-    // Do nada.
   }
 
   @Override
   public void plugOut() {
     // Disable order generation
     orderGenChkBox.setSelected(false);
+
+    // Free kernel reference.
+    kernel = null;
+    kernelProvider.unregister(this);
   }
 
   /**
-   * Enables or disables GUI elements for random orders. 
+   * Enables or disables GUI elements for random orders.
+   *
    * @param enabled true to enable, false to disable
    */
   private void setRandomOrdersEnabled(boolean enabled) {
@@ -133,9 +144,10 @@ class ContinuousLoadPanel
     randomOrderSizeSpinner.setEnabled(enabled);
     randomOrderSizeLbl.setEnabled(enabled);
   }
-  
+
   /**
    * Enables or disables GUI elements for explicit orders.
+   *
    * @param enabled true to enable, false to disable
    */
   private void setExplicitOrdersEnabled(boolean enabled) {
@@ -165,9 +177,10 @@ class ContinuousLoadPanel
     openButton.setEnabled(enabled);
     saveButton.setEnabled(enabled);
   }
-  
+
   /**
    * Enables or disables all GUI elements.
+   *
    * @param enabled true to enable, false to disable
    */
   private void setEditingEnabled(boolean enabled) {
@@ -178,7 +191,7 @@ class ContinuousLoadPanel
     timerSpinner.setEnabled(enabled);
     timerSecondsLbl.setEnabled(enabled);
     singleTriggerRadioButton.setEnabled(enabled);
-    
+
     randomOrderSpecButton.setEnabled(enabled);
     randomOrderCountSpinner.setEnabled(enabled);
     randomOrderCountLbl.setEnabled(enabled);
@@ -201,8 +214,8 @@ class ContinuousLoadPanel
     }
     else if (explicitOrderSpecButton.isSelected()) {
       saveCurrentTableData();
-      TransportOrderTableModel tableModel =
-          (TransportOrderTableModel) toTable.getModel();
+      TransportOrderTableModel tableModel
+          = (TransportOrderTableModel) toTable.getModel();
       for (TransportOrderData curData : tableModel.getList()) {
         if (curData.getDriveOrders().isEmpty()) {
           JOptionPane.showMessageDialog(this, "Every transport order must "
@@ -228,7 +241,7 @@ class ContinuousLoadPanel
       throw new UnsupportedOperationException("Unsupported order spec.");
     }
   }
-  
+
   /**
    * Creates a new order generation trigger.
    *
@@ -263,7 +276,7 @@ class ContinuousLoadPanel
   private void saveCurrentTableData() {
     PropertyTableModel propTableModel;
     DriveOrderTableModel doTableModel;
-    
+
     if (selectedTrOrder != null) {
       // Save the local properties before clearing the table
       propTableModel = (PropertyTableModel) propertyTable.getModel();
@@ -284,6 +297,7 @@ class ContinuousLoadPanel
 
   /**
    * Builds the tables when a transport order was selected.
+   *
    * @param row Indicating which transport order was selected.
    */
   private void buildTableModels(int row) {
@@ -291,21 +305,21 @@ class ContinuousLoadPanel
     DriveOrderTableModel doTableModel;
     if (row >= 0) {
       saveCurrentTableData();
-      
+
       selectedTrOrder = ((TransportOrderTableModel) toTable.getModel()).getDataAt(row);
       if (selectedTrOrder != null) {
         // Drive orders
         doTableModel = new DriveOrderTableModel(selectedTrOrder.getDriveOrders());
         locationsComboBox.removeAllItems();
         operationTypesComboBox.removeAllItems();
-        SortedSet<Location> sortedLocationSet =
-            new TreeSet<>(TCSObject.nameComparator);
+        SortedSet<Location> sortedLocationSet
+            = new TreeSet<>(TCSObject.nameComparator);
         sortedLocationSet.addAll(kernel.getTCSObjects(Location.class));
         for (Location i : sortedLocationSet) {
           locationsComboBox.addItem(i.getReference());
         }
         locationsComboBox.addItemListener(new ItemListener() {
-          
+
           @Override
           public void itemStateChanged(ItemEvent e) {
             locationsComboBoxItemStateChanged(e);
@@ -327,7 +341,8 @@ class ContinuousLoadPanel
   }
 
   // CHECKSTYLE:OFF
-  /** This method is called from within the constructor to
+  /**
+   * This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
    * always regenerated by the Form Editor.
@@ -822,12 +837,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     setRandomOrdersEnabled(true);
     setExplicitOrdersEnabled(false);
   }//GEN-LAST:event_randomOrderSpecButtonActionPerformed
-  
+
   private void explicitOrderSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_explicitOrderSpecButtonActionPerformed
     setRandomOrdersEnabled(false);
     setExplicitOrdersEnabled(true);
   }//GEN-LAST:event_explicitOrderSpecButtonActionPerformed
-  
+
   private void orderGenChkBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_orderGenChkBoxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
       if (kernel.getState().equals(Kernel.State.OPERATING)) {
@@ -849,25 +864,25 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       setEditingEnabled(true);
     }
   }//GEN-LAST:event_orderGenChkBoxItemStateChanged
-  
+
   private void addToTOTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToTOTableButtonActionPerformed
     String name = nameGenerator.getUniqueString(bundle.getString("TransportOrder-"), "00");
     nameGenerator.addString(name);
     TransportOrderData telegram = new TransportOrderData();
     telegram.setName(name);
-    TransportOrderTableModel model =
-        (TransportOrderTableModel) toTable.getModel();
+    TransportOrderTableModel model
+        = (TransportOrderTableModel) toTable.getModel();
     model.addData(telegram);
   }//GEN-LAST:event_addToTOTableButtonActionPerformed
-  
+
   private void deleteFromTOTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteFromTOTableButtonActionPerformed
     if (toTable.getSelectedRowCount() == 0) {
       return;
     }
-    TransportOrderTableModel model =
-        (TransportOrderTableModel) toTable.getModel();
-    TransportOrderData selectedOrder =
-        model.getDataAt(toTable.getSelectedRow());
+    TransportOrderTableModel model
+        = (TransportOrderTableModel) toTable.getModel();
+    TransportOrderData selectedOrder
+        = model.getDataAt(toTable.getSelectedRow());
     nameGenerator.removeString(selectedOrder.getName());
     // Removes the selected row from the table.
     int selectedIndex = toTable.getSelectedRow();
@@ -886,12 +901,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     removePropertyButton.setEnabled(false);
     propertyTable.setModel(new PropertyTableModel(new HashMap<String, String>()));
   }//GEN-LAST:event_deleteFromTOTableButtonActionPerformed
-    
+
   private void deleteFromDOTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteFromDOTableButtonActionPerformed
     if (doTable.getSelectedRow() != -1) {
       int selectedRow = doTable.getSelectedRow();
-      DriveOrderTableModel doTableModel =
-          (DriveOrderTableModel) doTable.getModel();
+      DriveOrderTableModel doTableModel
+          = (DriveOrderTableModel) doTable.getModel();
       doTableModel.removeData(selectedRow);
       int indexToBeSelected = Math.min(selectedRow, doTableModel.getRowCount() - 1);
       doTable.changeSelection(indexToBeSelected, 0, true, false);
@@ -903,7 +918,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       }
     }
   }//GEN-LAST:event_deleteFromDOTableButtonActionPerformed
-  
+
   private void addDOButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addDOButtonActionPerformed
     DriveOrderTableModel model = null;
     boolean modelFailure = false;
@@ -922,7 +937,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     deleteFromDOTableButton.setEnabled(true);
     model.fireTableDataChanged();
   }//GEN-LAST:event_addDOButtonActionPerformed
-  
+
   @SuppressWarnings("unchecked")
   private void locationsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationsComboBoxItemStateChanged
     operationTypesComboBox.removeAllItems();
@@ -932,12 +947,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       TCSObjectReference<LocationType> locationRef = location.getType();
       LocationType locationType = kernel.getTCSObject(LocationType.class,
                                                       locationRef);
-      Set<String> operationTypes =
-          new TreeSet<>(locationType.getAllowedOperations());
+      Set<String> operationTypes
+          = new TreeSet<>(locationType.getAllowedOperations());
       for (String j : operationTypes) {
         operationTypesComboBox.addItem(j);
       }
-      
+
       // When selecting an item in the locationsComboBox we have
       // to update the vehicle operation in the DriveOrderTable manually,
       // otherwise the old value will persist and that could be a value
@@ -970,14 +985,14 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       }
     }
   }//GEN-LAST:event_locationsComboBoxItemStateChanged
-  
+
   private void addPropertyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPropertyButtonActionPerformed
     PropertyTableModel model = (PropertyTableModel) propertyTable.getModel();
     model.getList().add(new PropEntry());
     model.fireTableDataChanged();
     removePropertyButton.setEnabled(true);
   }//GEN-LAST:event_addPropertyButtonActionPerformed
-  
+
   private void removePropertyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removePropertyButtonActionPerformed
     if (propertyTable.getSelectedRow() != -1) {
       PropertyTableModel model = (PropertyTableModel) propertyTable.getModel();
@@ -989,7 +1004,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       }
     }
   }//GEN-LAST:event_removePropertyButtonActionPerformed
-  
+
   private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
     saveCurrentTableData();
     int dialogResult = fileChooser.showSaveDialog(this);
@@ -1018,7 +1033,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       }
     }
   }//GEN-LAST:event_saveButtonActionPerformed
-  
+
   private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
     nameGenerator.clear();
     int dialogResult = fileChooser.showOpenDialog(this);
@@ -1067,10 +1082,10 @@ toTable.getSelectionModel().addListSelectionListener(listener);
             data.addProperty(curEntry.key, curEntry.value);
           }
           for (DriveOrderXMLStructure curDOXMLS : curStruc.getDriveOrders()) {
-            DriveOrderStructure newDOS =
-                new DriveOrderStructure(kernel.getTCSObject(
-                Location.class, curDOXMLS.getDriveOrderLocation()).getReference(),
-                                        curDOXMLS.getDriveOrderVehicleOperation());
+            DriveOrderStructure newDOS
+                = new DriveOrderStructure(kernel.getTCSObject(
+                        Location.class, curDOXMLS.getDriveOrderLocation()).getReference(),
+                                          curDOXMLS.getDriveOrderVehicleOperation());
             data.addDriveOrder(newDOS);
           }
           newOrders.add(data);
@@ -1157,24 +1172,24 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
   /**
    * Creates a new selection listener for the transport order table.
-   */  
+   */
   private class TOTableSelectionListener
       implements ListSelectionListener {
-    
+
     /**
      * The transport order table.
      */
     private final JTable table;
-    
+
     /**
      * Creates a new TOTableSelectionListener.
-     * 
+     *
      * @param table The transport order table
      */
     public TOTableSelectionListener(JTable table) {
       this.table = table;
     }
-    
+
     @Override
     public void valueChanged(ListSelectionEvent e) {
       if (e.getSource() == table.getSelectionModel()

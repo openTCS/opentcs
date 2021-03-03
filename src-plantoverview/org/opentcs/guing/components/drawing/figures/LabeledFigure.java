@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.drawing.figures;
 
 import java.awt.Shape;
@@ -34,7 +40,7 @@ public abstract class LabeledFigure
   /**
    * The figure of the label of this labeled figure.
    */
-  protected TCSLabelFigure fLabel;
+  private TCSLabelFigure fLabel;
 
   /**
    * Creates a new instance.
@@ -63,14 +69,11 @@ public abstract class LabeledFigure
     fLabel.setLabelVisible(visible);
   }
 
-  public Shape getShape() {
-    Figure presentationFigure = getPresentationFigure();
+  public abstract Shape getShape();
 
-    if (presentationFigure instanceof PointFigure) {
-      return ((PointFigure) presentationFigure).getShape();
-    }
-
-    return getPresentationFigure().getDrawingArea();
+  @Override
+  public TCSFigure getPresentationFigure() {
+    return (TCSFigure) super.getPresentationFigure();
   }
 
   @Override
@@ -151,4 +154,11 @@ public abstract class LabeledFigure
   }
 
   public abstract void updateModel();
+
+  @Override
+  public LabeledFigure clone() {
+    LabeledFigure clone = (LabeledFigure) super.clone();
+    clone.fLabel = null;
+    return clone;
+  }
 }

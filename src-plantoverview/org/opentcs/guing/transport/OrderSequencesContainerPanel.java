@@ -1,114 +1,151 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.transport;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.Vector;
-import javax.swing.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
-import org.opentcs.guing.exchange.DefaultKernelProxyManager;
-import org.opentcs.guing.exchange.KernelProxyManager;
-import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
-import org.opentcs.guing.exchange.OrderSequenceDispatcher;
+import org.opentcs.guing.event.OrderSequenceEvent;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Eine Ansicht für Transportauftragsketten. Teil dieser Ansicht ist die
  * Tabelle, in der die Transportauftragsketten dargestellt sind.
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequencesContainerPanel
-    extends JPanel
-    implements OrderSequenceListener {
+    extends JPanel {
 
-  private final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
+  /**
+   * The path to the icons.
+   */
+  private static final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
+  /**
+   * This class's logger.
+   */
+  private static final Logger log
+      = Logger.getLogger(OrderSequencesContainerPanel.class.getName());
+  /**
+   * Provides access to a kernel.
+   */
+  private final SharedKernelProvider kernelProvider;
+  /**
+   * A factory for order sequence views.
+   */
+  private final TransportViewFactory transportViewFactory;
+  /**
+   * The parent component for dialogs shown by this instance.
+   */
+  private final Component dialogParent;
   /**
    * Die Tabelle, in der die Transportauftragsketten dargestellt werden.
    */
-  protected JTable fTable;
+  private JTable fTable;
   /**
    * Das TableModel.
    */
-  protected FilterTableModel fTableModel;
+  private FilterTableModel fTableModel;
   /**
    * Die Liste der Filterbuttons.
    */
-  protected Vector<FilterButton> fFilterButtons;
-  /**
-   * Die Anwendung.
-   */
-  protected OpenTCSView fOpenTCSView;
+  private List<FilterButton> fFilterButtons;
   /**
    * Die Transportauftragsketten
    */
-  protected Vector<OrderSequence> fOrderSequences;
-  /**
-   * The proxy/connection manager to be used.
-   */
-  private final KernelProxyManager kernelProxyManager;
+  private Vector<OrderSequence> fOrderSequences;
 
   /**
    * Creates a new instance.
    *
-   * @param openTCSView The view to work with.
+   * @param kernelProvider Provides a access to a kernel.
+   * @param transportViewFactory A factory for order sequence views.
+   * @param dialogParent The parent component for dialogs shown by this
+   * instance.
    */
-  public OrderSequencesContainerPanel(OpenTCSView openTCSView) {
-    fOpenTCSView = openTCSView;
-    this.kernelProxyManager = DefaultKernelProxyManager.instance();
+  @Inject
+  public OrderSequencesContainerPanel(SharedKernelProvider kernelProvider,
+                                      TransportViewFactory transportViewFactory,
+                                      @ApplicationFrame Component dialogParent) {
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.transportViewFactory = requireNonNull(transportViewFactory,
+                                               "transportViewFactory");
+    this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     initComponents();
   }
 
-  /**
-   * Liefert den Dispatcher für Transportauftragsketten.
-   *
-   * @return den Dispatcher
-   */
-  protected OrderSequenceDispatcher getDispatcher() {
-    OpenTCSEventDispatcher d = (OpenTCSEventDispatcher) fOpenTCSView.getSystemModel().getEventDispatcher();
-    if (d == null) {
-      return null;
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        // XXX Clear panel?
+        break;
+      case LOADED:
+        initView();
+        break;
+      default:
+      // Do nada.
     }
-
-    return d.getOrderSequenceDispatcher();
   }
 
-  /**
-   * Liefert die Leitsteuerung.
-   *
-   * @return die Leitsteuerung
-   */
   private Kernel getKernel() {
-    return kernelProxyManager.kernel();
+    return kernelProvider.getKernel();
   }
 
   /**
-   * Holt sich alle Transportauftragsketten aus der Leitsteuerung und stellt
-   * diese dar.
+   * Initializes this panel's contents.
    */
   public void initView() {
-    OrderSequenceDispatcher dispatcher = getDispatcher();
-    if (dispatcher != null) {
-      setOrderSequences(dispatcher.getOrderSequences());
+    setOrderSequences(fetchSequencesIfOnline());
+  }
+
+  private Set<OrderSequence> fetchSequencesIfOnline() {
+    if (kernelProvider.kernelShared()) {
+      return kernelProvider.getKernel().getTCSObjects(OrderSequence.class);
+    }
+    else {
+      return new HashSet<>();
     }
   }
 
@@ -126,10 +163,7 @@ public class OrderSequencesContainerPanel
     }
   }
 
-  /**
-   * Initialisiert die verschiedenen Komponenten.
-   */
-  protected final void initComponents() {
+  private void initComponents() {
     setLayout(new BorderLayout());
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 
@@ -169,38 +203,23 @@ public class OrderSequencesContainerPanel
     });
   }
 
-  /**
-   * Zeigt Details zur ausgewählten Transportauftragskette.
-   */
-  protected void showOrderSequence() {
+  private void showOrderSequence() {
     try {
-      OrderSequence os = getSelectedOrderSequence();
-      os = getKernel().getTCSObject(OrderSequence.class, os.getReference());
-      DialogContent content = new OrderSequenceView(os);
-      StandardContentDialog dialog = new StandardContentDialog(fOpenTCSView, content, true, StandardContentDialog.CLOSE);
+      OrderSequence os = getKernel().getTCSObject(OrderSequence.class, getSelectedOrderSequence().getReference());
+      DialogContent content = transportViewFactory.createOrderSequenceView(os);
+      StandardContentDialog dialog
+          = new StandardContentDialog(dialogParent, content, true, StandardContentDialog.CLOSE);
       dialog.setTitle(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.orderSequence"));
       dialog.setVisible(true);
     }
     catch (CredentialsException e) {
+      log.log(Level.WARNING, "Exception fetching order sequences from kernel", e);
     }
   }
 
-  /**
-   * Zeigt ein Kontextmenü zu dem angewählten Transportauftrag.
-   *
-   * @param x die x-Position des auslösenden Mausklicks
-   * @param y die y-Position des auslösenden Mausklicks
-   */
-  protected void showPopupMenu(int x, int y) {
+  private void showPopupMenu(int x, int y) {
     int row = fTable.rowAtPoint(new Point(x, y));
     fTable.setRowSelectionInterval(row, row);
-    OrderSequence os = getSelectedOrderSequence();
-
-    try {
-      os = getKernel().getTCSObject(OrderSequence.class, os.getReference());
-    }
-    catch (CredentialsException e) {
-    }
 
     JPopupMenu menu = new JPopupMenu();
     JMenuItem item = menu.add(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.popup.showDetails"));
@@ -215,10 +234,7 @@ public class OrderSequencesContainerPanel
     menu.show(fTable, x, y);
   }
 
-  /**
-   * Liefert die selektierte Transportauftragskette.
-   */
-  protected OrderSequence getSelectedOrderSequence() {
+  private OrderSequence getSelectedOrderSequence() {
     int row = fTable.getSelectedRow();
 
     if (row == -1) {
@@ -230,11 +246,6 @@ public class OrderSequencesContainerPanel
     return fOrderSequences.elementAt(index);
   }
 
-  /**
-   * Setzt die Liste der Transportauftragsketten.
-   *
-   * @param orderSequences
-   */
   private void setOrderSequences(Set<OrderSequence> orderSequences) {
     if (orderSequences == null) {
       return;
@@ -250,14 +261,29 @@ public class OrderSequencesContainerPanel
     }
   }
 
-  @Override // OrderSequenceListener
-  public void orderSequenceAdded(OrderSequence os) {
+  @Handler
+  public void handleOrderSequenceEvent(OrderSequenceEvent evt) {
+    switch (evt.getType()) {
+      case SEQ_CREATED:
+        orderSequenceAdded(evt.getSequence());
+        break;
+      case SEQ_CHANGED:
+        orderSequenceChanged(evt.getSequence());
+        break;
+      case SEQ_REMOVED:
+        orderSequenceRemoved(evt.getSequence());
+        break;
+      default:
+      // Do nada.
+    }
+  }
+
+  private void orderSequenceAdded(OrderSequence os) {
     fOrderSequences.insertElementAt(os, 0);
     fTableModel.insertRow(0, toTableRow(os));
   }
 
-  @Override // OrderSequenceListener
-  public void orderSequenceChanged(OrderSequence os) {
+  private void orderSequenceChanged(OrderSequence os) {
     int rowIndex = fOrderSequences.indexOf(os);
     Vector<Object> values = toTableRow(os);
 
@@ -266,37 +292,7 @@ public class OrderSequencesContainerPanel
     }
   }
 
-  /**
-   * Erzeugt die Filterbuttons.
-   */
-  protected Vector<FilterButton> createFilterButtons() {
-    Vector<FilterButton> buttons = new Vector<>();
-    IconToolkit iconkit = IconToolkit.instance();
-
-    FilterButton b1 = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFinished.16x16.gif"), fTableModel, Boolean.FALSE);
-    buttons.add(b1);
-    b1.setToolTipText(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.filterOrderSequences"));
-
-    return buttons;
-  }
-
-  /**
-   * Initialisiert die Toolleiste.
-   */
-  protected JToolBar createToolBar(Vector<FilterButton> filterButtons) {
-    JToolBar toolBar = new JToolBar();
-    Enumeration<FilterButton> e = filterButtons.elements();
-
-    while (e.hasMoreElements()) {
-      FilterButton button = e.nextElement();
-      toolBar.add(button);
-    }
-
-    return toolBar;
-  }
-
-  @Override
-  public void orderSequenceRemoved(final OrderSequence os) {
+  private void orderSequenceRemoved(final OrderSequence os) {
     SwingUtilities.invokeLater(new Runnable() {
 
       @Override
@@ -306,6 +302,27 @@ public class OrderSequencesContainerPanel
         fOrderSequences.removeElementAt(i);
       }
     });
+  }
+
+  private List<FilterButton> createFilterButtons() {
+    List<FilterButton> buttons = new LinkedList<>();
+    IconToolkit iconkit = IconToolkit.instance();
+
+    FilterButton b1 = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFinished.16x16.gif"), fTableModel, Boolean.FALSE);
+    buttons.add(b1);
+    b1.setToolTipText(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.filterOrderSequences"));
+
+    return buttons;
+  }
+
+  private JToolBar createToolBar(List<FilterButton> filterButtons) {
+    JToolBar toolBar = new JToolBar();
+
+    for (FilterButton button : filterButtons) {
+      toolBar.add(button);
+    }
+
+    return toolBar;
   }
 
   /**

@@ -64,7 +64,7 @@
  * placed in the subdirectory <code>lib/openTCS-extensions</code> of the openTCS
  * plant overview application's installation directory <em>before</em> the
  * application is started.
- * <br/>
+ * <br>
  * (The openTCS start scripts include all JAR files in that directory in the
  * application's classpath.)
  * </li>

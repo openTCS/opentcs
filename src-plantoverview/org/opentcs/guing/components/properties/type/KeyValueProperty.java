@@ -1,16 +1,22 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
-import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut, welches ein beliebiges Key-Value-Paar enthält.
+ * A property containing a key-value pair.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class KeyValueProperty
     extends AbstractComplexProperty {
@@ -36,7 +42,7 @@ public class KeyValueProperty
    * @param value der Wert
    */
   public KeyValueProperty(ModelComponent model, String key, String value) {
-    super(model, KeyValuePropertyEditorPanel.class);
+    super(model);
     fKey = key;
     fValue = value;
   }

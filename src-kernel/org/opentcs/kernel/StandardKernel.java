@@ -9,7 +9,6 @@
 package org.opentcs.kernel;
 
 import com.google.inject.Provider;
-import org.opentcs.util.eventsystem.CentralEventHub;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -42,7 +41,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.message.Message;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Layout;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -69,6 +67,7 @@ import org.opentcs.drivers.VehicleManagerPool;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.OrderPersister;
 import org.opentcs.util.configuration.ConfigurationStore;
+import org.opentcs.util.eventsystem.CentralEventHub;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventHub;
 import org.opentcs.util.eventsystem.EventListener;
@@ -330,9 +329,9 @@ final class StandardKernel
   }
 
   @Override
-  public Set<String> getModelNames() {
+  public String getModelName() throws IOException {
     log.finer("method entry");
-    return kernelState.getModelNames();
+    return kernelState.getModelName().orElse(null);
   }
 
   @Override
@@ -352,15 +351,18 @@ final class StandardKernel
   }
 
   @Override
-  public void loadModel(String newModelName)
+  public void loadModel()
       throws IOException {
     log.finer("method entry");
     final String oldModelName;
     oldModelName = kernelState.getCurrentModelName();
+    final String newModelName;
+    newModelName = kernelState.getModelName().isPresent() ?
+        kernelState.getModelName().get() : "";
     // Let listeners know we're in transition.
     emitModelEvent(oldModelName, newModelName, true, false);
     // Load the new model
-    kernelState.loadModel(newModelName);
+    kernelState.loadModel();
     // If loading the model was successful, remember it as the new default.
     configStore.setString("defaultModel", newModelName);
     // Let listeners know we're done with the transition.
@@ -369,24 +371,24 @@ final class StandardKernel
   }
 
   @Override
-  public void saveModel(String modelName, boolean overwrite)
+  public void saveModel(String modelName)
       throws IOException {
     log.finer("method entry");
     final String oldModelName = kernelState.getCurrentModelName();
     final String newModelName = (modelName == null) ? oldModelName : modelName;
     // Let listeners know we're in transition.
     emitModelEvent(oldModelName, newModelName, false, false);
-    kernelState.saveModel(modelName, overwrite);
+    kernelState.saveModel(newModelName);
     // Let listeners know we're done with the transition.
     emitModelEvent(oldModelName, newModelName, false, true);
     publishMessage("Kernel saved model " + newModelName, Message.Type.INFO);
   }
 
   @Override
-  public void removeModel(String rmName)
+  public void removeModel()
       throws IOException {
     log.finer("method entry");
-    kernelState.removeModel(rmName);
+    kernelState.removeModel();
   }
 
   @Override
@@ -452,21 +454,6 @@ final class StandardKernel
   public Message publishMessage(String message, Message.Type type) {
     log.finer("method entry");
     return kernelState.publishMessage(message, type);
-  }
-
-  @Override
-  @Deprecated
-  public Layout createLayout(byte[] layoutData) {
-    log.finer("method entry");
-    return kernelState.createLayout(layoutData);
-  }
-
-  @Override
-  @Deprecated
-  public void setLayoutData(TCSObjectReference<Layout> ref, byte[] newData)
-      throws ObjectUnknownException {
-    log.finer("method entry");
-    kernelState.setLayoutData(ref, newData);
   }
 
   @Override

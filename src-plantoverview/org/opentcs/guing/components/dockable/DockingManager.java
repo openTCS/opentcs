@@ -1,3 +1,12 @@
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+
 package org.opentcs.guing.components.dockable;
 
 import bibliothek.gui.dock.common.CContentArea;
@@ -22,8 +31,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import org.opentcs.guing.components.tree.TreeView;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -46,6 +57,11 @@ public class DockingManager {
    * ID for the dockable, that contains the VehiclePanel.
    */
   public static final String VEHICLES_DOCKABLE_ID = "vehicles_dock";
+  public static final String COMPONENTS_ID = "comp_dock";
+  public static final String BLOCKS_ID = "block_dock";
+  public static final String GROUPS_ID = "groups_id";
+  public static final String PROPERTIES_ID = "properties_id";
+  public static final String STATUS_ID = "status_id";
   /**
    * PropertyChangeEvent when a floating dockable closes.
    */
@@ -80,6 +96,7 @@ public class DockingManager {
   /**
    * Creates a new instance.
    */
+  @Inject
   public DockingManager() {
 
   }
@@ -217,6 +234,19 @@ public class DockingManager {
       control.removeDockable(dockable);
     }
   }
+  
+  /**
+   * Removes a dockable with the given id.
+   * 
+   * @param id The id of the dockable to remove.
+   */
+  public void removeDockable(String id) {
+    Objects.requireNonNull(id);
+    SingleCDockable dock = control.getSingleDockable(id);
+    if(dock != null) {
+      removeDockable(dock);
+    }
+  }
 
   /**
    * Returns the CControl.
@@ -256,6 +286,17 @@ public class DockingManager {
     }
   }
 
+  public void reset() {
+    removeDockable(VEHICLES_DOCKABLE_ID);
+    removeDockable(BLOCKS_ID);
+    removeDockable(COMPONENTS_ID);
+    removeDockable(GROUPS_ID);
+    removeDockable(PROPERTIES_ID);
+    removeDockable(STATUS_ID);
+    control.removeStation(getTabPane(COURSE_TAB_PANE_ID));
+    control.removeStation(getTabPane(TREE_TAB_PANE_ID));
+  }
+
   /**
    * Wraps all given JComponents into a dockable and deploys them on the CControl.
    *
@@ -269,9 +310,9 @@ public class DockingManager {
    */
   public void initializeDockables(JFrame frame,
                                   JComponent vehiclesPanel,
-                                  JComponent fTreeView,
-                                  JComponent fBlocksView,
-                                  JComponent fGroupsView,
+                                  TreeView fTreeView,
+                                  TreeView fBlocksView,
+                                  TreeView fGroupsView,
                                   JComponent fPropertiesComponent,
                                   JComponent statusScrollPane) {
     Objects.requireNonNull(frame, "frame is null");
@@ -303,26 +344,26 @@ public class DockingManager {
     treeTabPane = new CStack(TREE_TAB_PANE_ID);
     tabPanes.put(TREE_TAB_PANE_ID, treeTabPane);
     DefaultSingleCDockable treeViewDock
-        = createDockable("treeView",
+        = createDockable(COMPONENTS_ID,
                          bundle.getString("dockable.treeView"),
-                         fTreeView,
+                         (JComponent) fTreeView,
                          false);
     DefaultSingleCDockable treeBlocks
-        = createDockable("blocksView",
+        = createDockable(BLOCKS_ID,
                          bundle.getString("tree.blocks.text"),
-                         fBlocksView,
+                         (JComponent) fBlocksView,
                          false);
     DefaultSingleCDockable treeGroups
-        = createDockable("groupsView",
+        = createDockable(GROUPS_ID,
                          bundle.getString("tree.groups.text"),
-                         fGroupsView,
+                         (JComponent) fGroupsView,
                          false);
     grid.add(0, 0, 1, 150, treeTabPane);
-    grid.add(0, 150, 1, 100, createDockable("properties",
+    grid.add(0, 150, 1, 100, createDockable(PROPERTIES_ID,
                                             bundle.getString("dockable.properties"),
                                             fPropertiesComponent,
                                             false));
-    grid.add(0, 250, 1, 50, createDockable("status",
+    grid.add(0, 250, 1, 50, createDockable(STATUS_ID,
                                            bundle.getString("dockable.status"),
                                            statusScrollPane,
                                            false));

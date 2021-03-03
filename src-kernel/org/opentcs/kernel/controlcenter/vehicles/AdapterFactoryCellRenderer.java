@@ -9,7 +9,6 @@
 package org.opentcs.kernel.controlcenter.vehicles;
 
 import java.awt.Component;
-import java.awt.Font;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;

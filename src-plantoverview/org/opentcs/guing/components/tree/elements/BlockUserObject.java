@@ -1,31 +1,26 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.tree.elements;
 
-import com.google.common.collect.Lists;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.inject.assistedinject.Assisted;
+import java.util.Objects;
+import javax.inject.Inject;
 import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.jhotdraw.draw.DrawingView;
-import org.jhotdraw.draw.Figure;
 import org.opentcs.data.model.Block;
-import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.components.drawing.figures.FigureConstants;
-import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.BlockModel;
-import org.opentcs.guing.model.elements.LinkModel;
-import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.model.elements.PathModel;
-import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.IconToolkit;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * A Block object in the tree view.
@@ -35,82 +30,28 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @see Block
  */
 public class BlockUserObject
-    extends AbstractUserObject {
-
-  /**
-   * The affected models.
-   */
-  private List<ModelComponent> fAffectedModels;
+    extends AbstractUserObject implements ContextObject{
+  
+  private final UserObjectContext context;
 
   /**
    * Creates a new instance.
    *
    * @param dataObject The corresponding model component.
    */
-  public BlockUserObject(ModelComponent dataObject) {
-    super(dataObject);
-  }
-
-  /**
-   * Checks whether the given model can be added to a block.
-   *
-   * @param model The model to be checked.
-   * @return <code>true</code> if, and only if, the given model can be added to
-   * a block.
-   */
-  private static boolean isModelOk(ModelComponent model) {
-    return (model != null
-            && (model instanceof PointModel
-                || model instanceof LocationModel
-                || model instanceof PathModel
-                || model instanceof LinkModel));
+  @Inject
+  public BlockUserObject(@Assisted BlockModel dataObject,
+                         @Assisted UserObjectContext context,
+                         OpenTCSView view,
+                         OpenTCSDrawingEditor editor,
+                         ModelManager modelManager) {
+    super(dataObject, view, editor, modelManager);
+    this.context = Objects.requireNonNull(context, "context");
   }
 
   @Override
   public JPopupMenu getPopupMenu() {
-    JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-
-    JMenuItem item = new JMenuItem(labels.getString("blockUserObject.addSelection"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        execute();
-        addToBlock();
-      }
-    });
-
-    item.setEnabled(OpenTCSView.instance().hasOperationMode(
-        GuiManager.OperationMode.MODELLING));
-    menu.add(item);
-
-    item = new JMenuItem(labels.getString("blockUserObject.removeSelection"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        execute();
-        removeFromBlock();
-      }
-    });
-
-    item.setEnabled(OpenTCSView.instance().hasOperationMode(
-        GuiManager.OperationMode.MODELLING));
-    menu.add(item);
-
-    menu.addSeparator();
-
-    item = new JMenuItem(labels.getString("blockUserObject.selectAll"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        OpenTCSView.instance().blockSelected(getModelComponent());
-      }
-    });
-
-    menu.add(item);
+    JPopupMenu menu = context.getPopupMenu(null);
 
     return menu;
   }
@@ -122,7 +63,7 @@ public class BlockUserObject
 
   @Override
   public void doubleClicked() {
-    OpenTCSView.instance().blockSelected(getModelComponent());
+    getView().blockSelected(getModelComponent());
   }
 
   @Override
@@ -130,44 +71,8 @@ public class BlockUserObject
     return IconToolkit.instance().createImageIcon("tree/block.18x18.png");
   }
 
-  private void execute() {
-    fAffectedModels = new ArrayList<>();
-    DrawingView view = OpenTCSView.instance().getEditor().getActiveView();
-
-    for (Figure figure : view.getSelectedFigures()) {
-      fAffectedModels.add(figure.get(FigureConstants.MODEL));
-    }
-
-    List<ModelComponent> suitableModels = new ArrayList<>();
-    for (ModelComponent model : fAffectedModels) {
-      if (isModelOk(model)) {
-        suitableModels.add(model);
-      }
-    }
-    fAffectedModels = suitableModels;
-  }
-
-  /**
-   * Adds all affected models to the block.
-   */
-  private void addToBlock() {
-    for (ModelComponent model : fAffectedModels) {
-      if (!getModelComponent().contains(model) && !(model instanceof LinkModel)) {
-        getModelComponent().addCourseElement(model);
-      }
-    }
-
-    getModelComponent().courseElementsChanged();
-  }
-
-  /**
-   * Removes all affected models from the block.
-   */
-  private void removeFromBlock() {
-    for (ModelComponent cmp : new ArrayList<>(Lists.reverse(fAffectedModels))) {
-      getModelComponent().removeCourseElement(cmp);
-    }
-
-    getModelComponent().courseElementsChanged();
+  @Override
+  public UserObjectContext.CONTEXT_TYPE getContextType() {
+    return context.getType();
   }
 }

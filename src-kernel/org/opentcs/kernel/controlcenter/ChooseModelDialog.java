@@ -1,16 +1,17 @@
 package org.opentcs.kernel.controlcenter;
 
-import java.util.Objects;
-import java.util.TreeSet;
+import java.awt.event.ItemEvent;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
-import org.opentcs.access.Kernel;
 
 /**
  * A dialog for the user to choose a model to load and the mode the kernel
  * should be set to.
  * 
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Tobais Marquardt (Fraunhofer IML)
  */
 public class ChooseModelDialog
     extends JDialog {
@@ -21,41 +22,50 @@ public class ChooseModelDialog
   private static final Logger log =
       Logger.getLogger(ChooseModelDialog.class.getName());
   /**
-   * The name of the model the user has chosen.
-   */
-  private String modelName;
-  /**
    * Flag whether user wants to stay in modeling mode or not.
    */
   private boolean modelingMode = true;
+  /**
+   * Flag whether user has selected the saved model instead of a new one.
+   */
+  private boolean savedModel = true;
+  /**
+   * Name of the saved model that can be selected in the dialog.
+   */
+  private final Optional<String> model;
+  /**
+   * The ResourceBundle.
+   */
+  private static final ResourceBundle bundle =
+      ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/Bundle");
 
   /**
    * Creates new ChooseModelDialog.
    * 
-   * @param kernel The kernel providing the model list.
+   * @param model Optional name of the saved model. If there is no model,
+   * the option to load a saved model will be disabled.
    */
-  public ChooseModelDialog(Kernel kernel) {
+  public ChooseModelDialog(Optional<String> model) {
+    this.model = model;
     initComponents();
     setLocationRelativeTo(null);
 
-    Objects.requireNonNull(kernel);
-    Object[] models = new TreeSet<>(kernel.getModelNames()).toArray();
-    for (Object object : models) {
-      modelsComboBox.addItem(object);
-    }
-    if (models.length == 0) {
-      log.warning("No models available to choose from.");
-      dispose();
-    }
+    boolean modelPresent = model.isPresent();
+    savedModelButton.setEnabled(modelPresent);
+    savedModelButton.setSelected(modelPresent);
+    kernelModePanel.setEnabled(modelPresent);
+    modellingRadioButton.setEnabled(modelPresent);
+    operatingRadioButton.setEnabled(modelPresent);
+    operatingRadioButton.setSelected(modelPresent);
   }
 
   /**
-   * Returns the name of the model the user has chosen.
+   * Returns if the user has selected the saved model.
    * 
-   * @return modelName The name of the model.
+   * @return boolean True if yes.
    */
-  public String getModelName() {
-    return modelName;
+  public boolean savedModelSelected() {
+    return savedModel;
   }
 
   /**
@@ -78,57 +88,71 @@ public class ChooseModelDialog
   private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    buttonGroup1 = new javax.swing.ButtonGroup();
-    jPanel1 = new javax.swing.JPanel();
-    jPanel2 = new javax.swing.JPanel();
-    modelsComboBox = new javax.swing.JComboBox<Object>();
-    radioButtonPanel = new javax.swing.JPanel();
+    kernelModeButtonGroup = new javax.swing.ButtonGroup();
+    modelButtonGroup = new javax.swing.ButtonGroup();
+    modelPanel = new javax.swing.JPanel();
+    newModelButton = new javax.swing.JRadioButton();
+    savedModelButton = new javax.swing.JRadioButton();
+    kernelModePanel = new javax.swing.JPanel();
     modellingRadioButton = new javax.swing.JRadioButton();
     operatingRadioButton = new javax.swing.JRadioButton();
-    jPanel3 = new javax.swing.JPanel();
-    jLabel1 = new javax.swing.JLabel();
     buttonPanel = new javax.swing.JPanel();
     okButton = new javax.swing.JButton();
-    cancelButton = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/Bundle"); // NOI18N
     setTitle(bundle.getString("ChooseModelTitle")); // NOI18N
+    setMaximumSize(null);
+    setMinimumSize(null);
     setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+    setPreferredSize(null);
     setResizable(false);
 
-    jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.PAGE_AXIS));
+    modelPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChooseModel"))); // NOI18N
+    modelPanel.setMaximumSize(null);
+    modelPanel.setMinimumSize(null);
+    modelPanel.setPreferredSize(null);
+    modelPanel.setLayout(new javax.swing.BoxLayout(modelPanel, javax.swing.BoxLayout.Y_AXIS));
 
-    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChooseModel"))); // NOI18N
-    jPanel2.setLayout(new java.awt.BorderLayout());
+    modelButtonGroup.add(newModelButton);
+    newModelButton.setSelected(true);
+    newModelButton.setText(bundle.getString("newEmptyModel")); // NOI18N
+    newModelButton.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        newModelButtonItemStateChanged(evt);
+      }
+    });
+    modelPanel.add(newModelButton);
 
-    modelsComboBox.setPreferredSize(new java.awt.Dimension(53, 22));
-    jPanel2.add(modelsComboBox, java.awt.BorderLayout.CENTER);
+    modelButtonGroup.add(savedModelButton);
+    savedModelButton.setText(bundle.getString("savedModel")); // NOI18N
+    savedModelButton.setEnabled(false);
+    if(this.model.isPresent()) {
+      String buttonText = new StringBuilder().append(bundle.getString("savedModel")).append(" (").append(model.get()).append(")").toString();
+      savedModelButton.setText(buttonText);
+    }
+    modelPanel.add(savedModelButton);
 
-    jPanel1.add(jPanel2);
+    getContentPane().add(modelPanel, java.awt.BorderLayout.NORTH);
 
-    radioButtonPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChooseKernelMode"))); // NOI18N
-    radioButtonPanel.setLayout(new java.awt.GridBagLayout());
+    kernelModePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChooseKernelMode"))); // NOI18N
+    kernelModePanel.setEnabled(false);
+    kernelModePanel.setLayout(new javax.swing.BoxLayout(kernelModePanel, javax.swing.BoxLayout.Y_AXIS));
 
-    buttonGroup1.add(modellingRadioButton);
+    kernelModeButtonGroup.add(modellingRadioButton);
+    modellingRadioButton.setSelected(true);
     modellingRadioButton.setText(bundle.getString("Modelling")); // NOI18N
-    radioButtonPanel.add(modellingRadioButton, new java.awt.GridBagConstraints());
+    modellingRadioButton.setEnabled(false);
+    modellingRadioButton.setFocusCycleRoot(true);
+    kernelModePanel.add(modellingRadioButton);
 
-    buttonGroup1.add(operatingRadioButton);
-    operatingRadioButton.setSelected(true);
+    kernelModeButtonGroup.add(operatingRadioButton);
     operatingRadioButton.setText(bundle.getString("Operating")); // NOI18N
-    radioButtonPanel.add(operatingRadioButton, new java.awt.GridBagConstraints());
+    operatingRadioButton.setEnabled(false);
+    operatingRadioButton.setFocusCycleRoot(true);
+    kernelModePanel.add(operatingRadioButton);
 
-    jPanel1.add(radioButtonPanel);
-
-    jPanel3.setLayout(new java.awt.BorderLayout());
-
-    jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()-1f));
-    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel1.setText(bundle.getString("NOTE_PRESSING_CANCEL")); // NOI18N
-    jPanel3.add(jLabel1, java.awt.BorderLayout.CENTER);
-
-    jPanel1.add(jPanel3);
+    getContentPane().add(kernelModePanel, java.awt.BorderLayout.CENTER);
 
     buttonPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -141,49 +165,45 @@ public class ChooseModelDialog
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
-    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     buttonPanel.add(okButton, gridBagConstraints);
 
-    cancelButton.setText(bundle.getString("Cancel")); // NOI18N
-    cancelButton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        cancelButtonActionPerformed(evt);
-      }
-    });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    buttonPanel.add(cancelButton, gridBagConstraints);
-
-    jPanel1.add(buttonPanel);
-
-    getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+    getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-    modelName = modelsComboBox.getSelectedItem().toString();
+    savedModel = savedModelButton.isSelected();
     modelingMode = modellingRadioButton.isSelected();
     dispose();
   }//GEN-LAST:event_okButtonActionPerformed
 
-  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-    dispose();
-  }//GEN-LAST:event_cancelButtonActionPerformed
+  private void newModelButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_newModelButtonItemStateChanged
+    if(evt.getStateChange() == ItemEvent.SELECTED) {
+      modellingRadioButton.setSelected(true);
+      kernelModePanel.setEnabled(false);
+      modellingRadioButton.setEnabled(false);
+      operatingRadioButton.setEnabled(false);
+    }
+    else {
+      kernelModePanel.setEnabled(true);
+      modellingRadioButton.setEnabled(true);
+      operatingRadioButton.setEnabled(true);
+    }
+  }//GEN-LAST:event_newModelButtonItemStateChanged
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.ButtonGroup buttonGroup1;
   private javax.swing.JPanel buttonPanel;
-  private javax.swing.JButton cancelButton;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
-  private javax.swing.JPanel jPanel3;
+  private javax.swing.ButtonGroup kernelModeButtonGroup;
+  private javax.swing.JPanel kernelModePanel;
+  private javax.swing.ButtonGroup modelButtonGroup;
+  private javax.swing.JPanel modelPanel;
   private javax.swing.JRadioButton modellingRadioButton;
-  private javax.swing.JComboBox<Object> modelsComboBox;
+  private javax.swing.JRadioButton newModelButton;
   private javax.swing.JButton okButton;
   private javax.swing.JRadioButton operatingRadioButton;
-  private javax.swing.JPanel radioButtonPanel;
+  private javax.swing.JRadioButton savedModelButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
 }

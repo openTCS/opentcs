@@ -1,12 +1,17 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.components.properties.type;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -17,14 +22,16 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * Nord aus der Menge {Nord, Süd, Ost, West}
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @param <E> The type of the enum.
  */
-public class SelectionProperty
-    extends AbstractProperty {
+public class SelectionProperty<E extends Enum<E>>
+    extends AbstractProperty
+    implements Selectable<E> {
 
   /**
    * Die möglichen Werte.
    */
-  private ArrayList fPossibleValues;
+  private List<E> fPossibleValues;
 
   /**
    * Standardkonstruktor.
@@ -32,7 +39,7 @@ public class SelectionProperty
    * @param model
    */
   public SelectionProperty(ModelComponent model) {
-    this(model, new String[] {}, "");
+    this(model, new ArrayList<>(), "");
   }
 
   /**
@@ -43,7 +50,8 @@ public class SelectionProperty
    * @param possibleValues
    * @param value
    */
-  public SelectionProperty(ModelComponent model, Object[] possibleValues, Object value) {
+  public SelectionProperty(ModelComponent model, List<E> possibleValues,
+                           Object value) {
     super(model);
     setPossibleValues(possibleValues);
     fValue = value;
@@ -59,9 +67,9 @@ public class SelectionProperty
    *
    * @param possibleValues Ein Array mit den möglichen Werte.
    */
-  public final void setPossibleValues(Object[] possibleValues) {
-    fPossibleValues = new ArrayList();
-    fPossibleValues.addAll(Arrays.asList(possibleValues));
+  @Override
+  public void setPossibleValues(List<E> possibleValues) {
+    fPossibleValues = Objects.requireNonNull(possibleValues, "possibleValues is null");
   }
 
   @Override
@@ -77,11 +85,7 @@ public class SelectionProperty
     return getValue().toString();
   }
 
-  /**
-   * Liefert die Menge der möglichen Werte.
-   *
-   * @return
-   */
+  @Override
   public List getPossibleValues() {
     return fPossibleValues;
   }

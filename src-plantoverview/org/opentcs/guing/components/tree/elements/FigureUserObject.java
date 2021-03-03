@@ -1,18 +1,27 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.tree.elements;
 
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
@@ -39,8 +48,11 @@ public class FigureUserObject
    *
    * @param modelComponent
    */
-  public FigureUserObject(ModelComponent modelComponent) {
-    super(modelComponent);
+  public FigureUserObject(ModelComponent modelComponent,
+                          OpenTCSView view,
+                          OpenTCSDrawingEditor editor,
+                          ModelManager modelManager) {
+    super(modelComponent, view, editor, modelManager);
   }
 
   @Override // AbstractUserObject
@@ -51,12 +63,18 @@ public class FigureUserObject
 
   @Override // AbstractUserObject
   public void doubleClicked() {
-    OpenTCSView.instance().figureSelected(getModelComponent());
+    getView().figureSelected(getModelComponent());
   }
 
   @Override // AbstractUserObject
   public ImageIcon getIcon() {
     return IconToolkit.instance().createImageIcon("tree/figure.18x18.png");
+  }
+  
+  @Override // UserObject
+  public void rightClicked(JComponent component, int x, int y) {
+    userObjectItems = getSelectedUserObjects(((JTree) component));
+    super.rightClicked(component, x, y);
   }
 
   /**
@@ -65,7 +83,7 @@ public class FigureUserObject
    * @param objectTree The tree to find the selected items.
    * @return All selected user objects.
    */
-  protected Set<UserObject> getSelectedUserObjects(JTree objectTree) {
+  private Set<UserObject> getSelectedUserObjects(JTree objectTree) {
     Set<UserObject> objects = new HashSet<>();
     TreePath[] selectionPaths = objectTree.getSelectionPaths();
 

@@ -27,7 +27,9 @@ import java.util.logging.Logger;
  * descriptions.
  * </p>
  * <hr>
- * <h4>System properties</h4>
+ * <p>
+ * System properties:
+ * </p>
  * <dl>
  * <dt><b>
  * de.fraunhofer.iml.toolbox.configuration.properties.file:

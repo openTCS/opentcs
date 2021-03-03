@@ -9,41 +9,32 @@
 package org.opentcs.kernel.persistence;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.opentcs.access.ApplicationHome;
-import org.opentcs.data.model.Layout;
 import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.util.FileSystems;
-import org.opentcs.util.Streams;
 
 /**
  * A ModelPersister implementation realizing persistence of models with XML
  * files.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class XMLFileModelPersister
     implements ModelPersister {
@@ -51,44 +42,41 @@ public class XMLFileModelPersister
   /**
    * This class's Logger.
    */
-  private static final Logger log =
-      Logger.getLogger(XMLFileModelPersister.class.getName());
+  private static final Logger log
+      = Logger.getLogger(XMLFileModelPersister.class.getName());
   /**
    * The name of the model file in the model directory.
    */
   private static final String modelFileName = "model.xml";
   /**
-   * The prefix of all layout file names.
-   */
-  private static final String layoutFileNamePrefix = "layout_";
-  /**
-   * The suffix of all layout file names.
-   */
-  private static final String layoutFileNameSuffix = ".xml";
-  /**
-   * A <code>FileFilter</code> that only accepts directories which contain a
-   * model file.
-   */
-  private static final FileFilter modelDirectoryFileFilter =
-      new ModelDirectoryFileFilter();
-  /**
-   * A <code>FileFilter</code> that only accepts files with layout file
-   * characteristics.
-   */
-  private static final FileFilter layoutFileFilter = new LayoutFileFilter();
-  /**
-   * The parent directory for all persistent models.
+   * The directory path for the persisted model.
    */
   private final File dataDirectory;
+  /**
+   * Provider for an XMLModelReader, used to instanciate a new reader every time
+   * a model is read from file.
+   */
+  private final Provider<XMLModelReader> readerProvider;
+  /**
+   * Provider for an XMLModelWriter, used to instanciate a new writer every time
+   * a model is written to file.
+   */
+  private final Provider<XMLModelWriter> writerProvider;
 
   /**
    * Creates a new XMLFileModelPersister.
    *
    * @param directory The application's home directory.
+   * @param readerProvider Provider for XMLModelReaders.
+   * @param writerProvider Porivder for XMLModelWriters.
    */
   @Inject
-  public XMLFileModelPersister(@ApplicationHome File directory) {
+  public XMLFileModelPersister(@ApplicationHome File directory,
+                               Provider<XMLModelReader> readerProvider,
+                               Provider<XMLModelWriter> writerProvider) {
     log.finer("method entry");
+    this.readerProvider = Objects.requireNonNull(readerProvider);
+    this.writerProvider = Objects.requireNonNull(writerProvider);
     Objects.requireNonNull(directory, "directory is null");
     dataDirectory = new File(directory, "data");
     if (!dataDirectory.isDirectory() && !dataDirectory.mkdirs()) {
@@ -98,138 +86,104 @@ public class XMLFileModelPersister
   }
 
   @Override
-  public Set<String> getModelNames() {
+  public Optional<String> getModelName()
+      throws IOException {
     log.finer("method entry");
-    File[] dataDirContents = dataDirectory.listFiles(modelDirectoryFileFilter);
-    Set<String> result = new HashSet<>(dataDirContents.length);
-    for (File dataDirContent : dataDirContents) {
-      result.add(dataDirContent.getName());
+    if (!hasSavedModel()) {
+      return Optional.empty();
     }
-    return result;
+    File modelFile = new File(dataDirectory, modelFileName);
+    Model model = new Model(new TCSObjectPool());
+    readXMLModel(modelFile, model);
+    return Optional.of(model.getName());
   }
 
   @Override
-  public void saveModel(Model model, String modelName, boolean overwrite)
+  public void saveModel(Model model, Optional<String> modelName)
       throws IOException {
     log.finer("method entry");
     Objects.requireNonNull(model, "model is null");
     Objects.requireNonNull(modelName, "modelName is null");
-    log.fine("Saving model '" + modelName + "'");
-    // Clean the model's name from all occurrences of name separators.
-    String modelDirName = modelName.replace(File.separatorChar, '_');
-    File modelDirectory = new File(dataDirectory, modelDirName);
-    File modelFile = new File(modelDirectory, modelFileName);
-    // Check if writing the model is possible.
-    if (modelDirectory.exists()) {
-      if (!overwrite) {
-        throw new IOException(
-            modelDirectory.getPath() + " exists and overwriting is not allowed");
-      }
-      if (!modelDirectory.isDirectory()) {
-        throw new IOException(
-            modelDirectory.getPath() + " exists, but is not a directory");
-      }
-      if (modelFile.exists() && !modelFile.isFile()) {
-        throw new IOException(
-            modelFile.getPath() + " exists, but is not a regular file");
-      }
-      if (modelFile.exists()) {
-        createBackup(modelName, modelDirectory);
-      }
+    StringBuilder message = new StringBuilder();
+    message.append("Saving model '").append(model.getName()).append("'");
+    if(modelName.isPresent()) {
+      message.append(" as ").append(modelName.get());
     }
-    else {
-      FileSystems.deleteRecursively(modelDirectory);
-      if (!modelDirectory.mkdir()) {
-        throw new IOException(
-            "Could not create model directory " + modelDirectory.getPath());
-      }
+    log.fine(message.toString());
+
+    File modelFile = new File(dataDirectory, modelFileName);
+    // Check if writing the model is possible.
+    if (!dataDirectory.exists()) {
+      throw new IOException(dataDirectory.getPath() + " does not exist");
+    }
+    if (!dataDirectory.isDirectory()) {
+      throw new IOException(
+          dataDirectory.getPath() + " exists, but is not a directory");
+    }
+    if (modelFile.exists() && !modelFile.isFile()) {
+      throw new IOException(
+          modelFile.getPath() + " exists, but is not a regular file");
+    }
+    if (modelFile.exists()) {
+      createBackup();
     }
     try (OutputStream outStream = new FileOutputStream(modelFile)) {
-      XMLModelWriter writer = new XMLModel002Builder();
-      writer.writeXMLModel(model, outStream);
+      XMLModelWriter writer = writerProvider.get();
+      writer.writeXMLModel(model, modelName, outStream);
     }
-
-    // XXX Layouts are part of the model. This code should be moved to
-    // XMLModel001Builder.
-//    // Persist the layouts contained in the model.
-//    for (Layout curLayout : model.getLayouts(null)) {
-//      // XXX Sanitize layout name before using it as a file name!
-//      String layoutFileName =
-//          layoutFileNamePrefix + curLayout.getName() + layoutFileNameSuffix;
-//      File layoutFile = new File(modelDirectory, layoutFileName);
-//      outStream = new FileOutputStream(layoutFile);
-//      outStream.write(curLayout.getData());
-//      outStream.close();
-//    }
   }
 
   @Override
-  public void loadModel(String modelName, Model model)
+  public void loadModel(Model model)
       throws IOException {
     log.finer("method entry");
-    Objects.requireNonNull(modelName, "modelName is null");
     Objects.requireNonNull(model, "model is null");
-    log.fine("Loading model '" + modelName + "'");
-    // Clean the model's name from all occurrences of name separators.
-    String modelDirName = modelName.replace(File.separatorChar, '_');
-    File modelDirectory = new File(dataDirectory, modelDirName);
-    File modelFile = new File(modelDirectory, modelFileName);
-    // Check if reading the given model is possible.
-    if (modelDirectory.exists()) {
-      if (!modelDirectory.isDirectory()) {
-        throw new IOException(
-            modelDirectory.getPath() + " exists, but is not a directory");
-      }
-      if (modelFile.exists()) {
-        if (!modelFile.isFile()) {
-          throw new IOException(
-              modelFile.getPath() + " exists, but is not a regular file");
-        }
-      }
-      else {
-        throw new IOException(modelFile.getPath() + " does not exist");
-      }
+    // Return empty model if there is no saved model
+    if (!hasSavedModel()) {
+      model.clear();
+      return;
     }
-    else {
-      throw new IOException(modelDirectory.getPath() + " does not exist");
-    }
+    log.fine("Loading model. '" + getModelName() + "'");
+    checkIfModelFileExists();
     // Read the model from the file.
+    File modelFile = new File(dataDirectory, modelFileName);
     readXMLModel(modelFile, model);
-    // Read layouts.
-    File[] layoutFiles = modelDirectory.listFiles(layoutFileFilter);
-    for (File layoutFile : layoutFiles) {
-      // XXX Maybe we should not extract the layout name from the file name.
-      String layoutName = layoutFile.getName().substring(
-          layoutFileNamePrefix.length(),
-          layoutFile.getName().length() - layoutFileNameSuffix.length());
-      InputStream inStream = new FileInputStream(layoutFile);
-      byte[] layoutData = Streams.getCompleteInputStream(inStream);
-      Layout layout = model.createLayout(null, layoutData);
-      model.getObjectPool().renameObject(layout.getReference(), layoutName);
+    log.fine("Successfully loaded model '" + model.getName() + "'");
+  }
+
+  @Override
+  public boolean hasSavedModel() {
+    try {
+      checkIfModelFileExists();
     }
-    model.setName(modelName);
-    log.fine("Successfully loaded model '" + modelName + "'");
+    catch (IOException ex) {
+      return false;
+    }
+    return true;
   }
 
   /**
-   * Creates a backup.
-   * 
-   * @param modelName The model name
-   * @param modelDirectory The model directory
-   * @throws IOException 
+   * Creates a backup of the currently saved model file by copying it to the
+   * "backups" subdirectory.
+   *
+   * Assumes that the model file exists.
+   *
+   * @throws IOException If the backup directory is not accessible or copying
+   * the file fails.
    */
-  private void createBackup(String modelName, File modelDirectory)
+  private void createBackup()
       throws IOException {
+    // Generate backup file name
     Calendar cal = Calendar.getInstance();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS");
     String time = sdf.format(cal.getTime());
-    String modelBackupName = modelName + "_backup_" + time;
-
-    File modelBackupDirectory = new File(modelDirectory.getParent(), "backups");
+    String modelBackupName = modelFileName + "_backup_" + time;
+    // Make sure backup directory exists
+    File modelBackupDirectory = new File(dataDirectory, "backups");
     if (modelBackupDirectory.exists()) {
       if (!modelBackupDirectory.isDirectory()) {
         throw new IOException(
-            modelDirectory.getPath() + " exists, but is not a directory");
+            modelBackupDirectory.getPath() + " exists, but is not a directory");
       }
     }
     else {
@@ -238,53 +192,59 @@ public class XMLFileModelPersister
             "Could not create model directory " + modelBackupDirectory.getPath());
       }
     }
+    // Backup the model file
+    Files.copy(new File(dataDirectory, modelFileName).toPath(),
+               new File(modelBackupDirectory, modelBackupName).toPath());
+  }
 
-    File curModelBackupDirectory = new File(modelBackupDirectory, modelBackupName);
-    if (!curModelBackupDirectory.mkdir()) {
+  /**
+   * Test if the data directory with a model file exist. If not, throw an
+   * exception.
+   *
+   * @throws IOException If check failed.
+   */
+  private void checkIfModelFileExists()
+      throws IOException {
+    log.finer("method entry");
+    File modelFile = new File(dataDirectory, modelFileName);
+    if (!dataDirectory.exists()) {
+      throw new IOException(dataDirectory.getPath() + " does not exist");
+    }
+    if (!dataDirectory.isDirectory()) {
       throw new IOException(
-          "Could not create model directory " + curModelBackupDirectory.getPath());
+          dataDirectory.getPath() + " exists, but is not a directory");
     }
-
-
-    DirectoryStream<Path> dirStream = Files.newDirectoryStream(modelDirectory.toPath());
-    List<Path> paths = new ArrayList<>();
-    Iterator<Path> it = dirStream.iterator();
-    while (it.hasNext()) {
-      paths.add(it.next());
+    if (!modelFile.exists()) {
+      throw new IOException(modelFile.getPath() + " does not exist.");
     }
-
-    for (Path curPath : paths) {
-      Files.copy(curPath, curModelBackupDirectory.toPath().resolve(curPath.getFileName()));
+    if (modelFile.exists() && !modelFile.isFile()) {
+      throw new IOException(
+          modelFile.getPath() + " exists, but is not a regular file");
     }
   }
 
   @Override
-  public void removeModel(String modelName)
+  public void removeModel()
       throws IOException {
     log.finer("method entry");
-    if (modelName == null) {
-      throw new NullPointerException("modelName is null");
+    log.fine("Removing model.");
+    File modelFile = new File(dataDirectory, modelFileName);
+    // If the model file does not exist, don't do anything
+    try {
+      checkIfModelFileExists();
     }
-    log.fine("Removing model '" + modelName + "'");
-    // Clean the model's name from all occurrences of name separators.
-    String modelDirName = modelName.replace(File.separatorChar, '_');
-    File modelDirectory = new File(dataDirectory, modelDirName);
-    if (modelDirectory.exists()) {
-      if (!modelDirectory.isDirectory()) {
-        throw new IOException(
-            modelDirectory.getPath() + " exists, but is not a directory");
-      }
+    catch (IOException exc) {
+      return;
     }
-    else {
-      throw new IOException(modelDirectory.getPath() + " does not exist");
+    createBackup();
+    if (!FileSystems.deleteRecursively(modelFile)) {
+      throw new IOException("Cannot delete " + modelFile.getPath());
     }
-    // Delete the model directory.
-    FileSystems.deleteRecursively(modelDirectory);
   }
 
   /**
    * Reads a model from a given InputStream.
-   * 
+   *
    * @param modelFile The file containing the model.
    * @param model The model to be built.
    * @throws IOException If an exception occured while loading
@@ -294,100 +254,15 @@ public class XMLFileModelPersister
     log.finer("method entry");
     Document document;
     try {
-      // Check which parser version is appropriate, and choose it.
-      InputStream inStream;
-      inStream = new FileInputStream(modelFile);
-      SAXBuilder builder = new SAXBuilder();
-      document = builder.build(inStream);
-      XMLModelReader reader = getModelReader(document);
-      inStream.close();
-
-      // Now use the actual chosen parser to read the model.
-      inStream = new FileInputStream(modelFile);
+      XMLModelReader reader = readerProvider.get();
+      InputStream inStream = new FileInputStream(modelFile);
       reader.readXMLModel(inStream, model);
       inStream.close();
     }
-    catch (JDOMException | InvalidModelException exc) {
+    catch (InvalidModelException exc) {
       log.log(Level.SEVERE, "Exception parsing input", exc);
       throw new IOException("Exception parsing input: " + exc.getMessage());
     }
   }
 
-  /**
-   * Returns a fitting reader/interpreter for a given XML model.
-   * 
-   * @param xmlModel The model
-   * @return A fitting reader/interpreter
-   * @throws IOException If an exception occured while reading
-   */
-  private XMLModelReader getModelReader(Document xmlModel)
-      throws IOException {
-    log.finer("method entry");
-    // Find out which model version is used so we can use the correct builder
-    // for it.
-    Element rootElement = xmlModel.getRootElement();
-    String modelVersion = rootElement.getAttributeValue("version");
-    if (modelVersion.equals(XMLModel001Builder.versionString)) {
-      return new XMLModel001Builder();
-    }
-    else if (modelVersion.equals(XMLModel002Builder.versionString)) {
-      return new XMLModel002Builder();
-    }
-    throw new IllegalArgumentException(
-        "Unknown model version: " + modelVersion);
-  }
-
-  // Private classes start here.
-  /**
-   * A <code>FileFilter</code> that only accepts directories which contain a
-   * model file.
-   */
-  private static final class ModelDirectoryFileFilter
-      implements FileFilter {
-
-    /**
-     * Creates a new instance.
-     */
-    private ModelDirectoryFileFilter() {
-      // Do nada.
-    }
-
-    @Override
-    public boolean accept(File pathname) {
-      boolean result = false;
-      if (pathname.isDirectory()) {
-        File[] contents = pathname.listFiles();
-        for (File curEntry : contents) {
-          if (curEntry.isFile() && curEntry.getName().equals(modelFileName)) {
-            result = true;
-            break;
-          }
-        }
-      }
-      return result;
-    }
-  }
-
-  /**
-   * A <code>FileFilter</code> that only accepts files with layout file
-   * characteristics.
-   */
-  private static final class LayoutFileFilter
-      implements FileFilter {
-
-    /**
-     * Creates a new instance.
-     */
-    private LayoutFileFilter() {
-      // Do nada.
-    }
-
-    @Override
-    public boolean accept(File pathname) {
-      String fileName = pathname.getName();
-      return pathname.isFile()
-          && fileName.startsWith(layoutFileNamePrefix)
-          && fileName.endsWith(layoutFileNameSuffix);
-    }
-  }
 }

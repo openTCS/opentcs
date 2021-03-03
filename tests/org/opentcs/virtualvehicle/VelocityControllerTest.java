@@ -8,10 +8,16 @@
  */
 package org.opentcs.virtualvehicle;
 
-import static org.junit.Assert.*;
-import org.junit.Ignore;
-import org.junit.Test;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import org.junit.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.VelocityListener;
 

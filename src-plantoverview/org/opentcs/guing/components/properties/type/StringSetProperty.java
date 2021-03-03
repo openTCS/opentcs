@@ -1,14 +1,18 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.properties.type;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.JPanel;
-import org.opentcs.guing.components.properties.panel.StringSetPropertyEditorPanel;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -27,21 +31,12 @@ public class StringSetProperty
   /**
    * Creates a new instance.
    * 
-   * @param model
-   * @param editorPanel The panel class to be used for editing the property.
-   */
-  public StringSetProperty(ModelComponent model, Class<? extends JPanel> editorPanel) {
-    super(model, editorPanel);
-  }
-  
-  /**
-   * Creates a new instance.
-   * @param model
+   * @param model The model component this property belongs to.
    */
   public StringSetProperty(ModelComponent model) {
-    this(model, StringSetPropertyEditorPanel.class);
+    super(model);
   }
-
+  
   @Override
   public Object getComparableValue() {
     StringBuilder sb = new StringBuilder();

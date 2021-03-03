@@ -1,26 +1,28 @@
-/**
- * (c): IML, IFAK, JHotDraw.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.application;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.event.CVetoClosingEvent;
 import bibliothek.gui.dock.common.event.CVetoClosingListener;
-import bibliothek.gui.dock.common.intern.CDockable;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +32,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,29 +44,27 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreeSelectionModel;
+import net.engio.mbassy.bus.MBassador;
+import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.app.AbstractView;
-import org.jhotdraw.app.View;
 import org.jhotdraw.app.action.window.ToggleVisibleAction;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.DrawingView;
-import static org.jhotdraw.draw.DrawingView.CONSTRAINER_VISIBLE_PROPERTY;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.QuadTreeDrawing;
 import org.jhotdraw.draw.connector.Connector;
@@ -75,36 +74,24 @@ import org.jhotdraw.gui.URIChooser;
 import org.jhotdraw.util.ReversedList;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.UnsupportedKernelOpException;
-import org.opentcs.access.rmi.KernelUnavailableException;
-import org.opentcs.access.rmi.RemoteKernelConnection;
-import org.opentcs.data.TCSObjectReference;
+import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.message.Message;
-import org.opentcs.data.model.Group;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ViewBookmark;
-import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.drivers.messages.LimitSpeed;
-import org.opentcs.guing.application.action.ActionManager;
+import org.opentcs.guing.application.action.ToolBarManager;
+import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.application.action.file.CloseFileAction;
+import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.application.toolbar.PaletteToolBarBorder;
-import org.opentcs.guing.components.dialogs.AllVehiclesPanel;
-import org.opentcs.guing.components.dialogs.BookmarkSelectionPanel;
-import org.opentcs.guing.components.dialogs.CloseDialog;
-import org.opentcs.guing.components.dialogs.FindVehiclePanel;
-import org.opentcs.guing.components.dialogs.StandardContentDialog;
-import org.opentcs.guing.components.dialogs.StandardDialog;
 import org.opentcs.guing.components.dialogs.VehiclesPanel;
+import org.opentcs.guing.components.dockable.DockableHandlerFactory;
 import org.opentcs.guing.components.dockable.DockingManager;
-import org.opentcs.guing.components.drawing.OpenTCSDockableUtil;
+import org.opentcs.guing.components.dockable.DrawingViewFocusHandler;
+import org.opentcs.guing.components.drawing.DrawingViewFactory;
+import org.opentcs.guing.components.drawing.DrawingViewScrollPane;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
-import static org.opentcs.guing.components.drawing.OpenTCSDrawingView.BLOCKS_VISIBLE_PROPERTY;
-import static org.opentcs.guing.components.drawing.OpenTCSDrawingView.LABELS_VISIBLE_PROPERTY;
-import static org.opentcs.guing.components.drawing.OpenTCSDrawingView.STATIC_ROUTES_VISIBLE_PROPERTY;
-import org.opentcs.guing.components.drawing.Ruler;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
 import org.opentcs.guing.components.drawing.figures.BitmapFigure;
@@ -112,39 +99,47 @@ import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
-import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.components.drawing.figures.TCSFigure;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
-import org.opentcs.guing.components.properties.AttributesComponent;
+import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.properties.panel.PropertiesTableContent;
+import org.opentcs.guing.components.properties.panel.PropertiesPanelFactory;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
-import org.opentcs.guing.components.tree.StandardTreeViewPanel;
+import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.components.tree.BlockFolderFilter;
+import org.opentcs.guing.components.tree.BlocksTreeViewManager;
+import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
+import org.opentcs.guing.components.tree.GroupsTreeViewManager;
 import org.opentcs.guing.components.tree.TreeViewManager;
+import org.opentcs.guing.components.tree.elements.ContextObject;
 import org.opentcs.guing.components.tree.elements.UserObject;
+import org.opentcs.guing.components.tree.elements.UserObjectContext;
+import org.opentcs.guing.components.tree.elements.UserObjectContext.CONTEXT_TYPE;
+import org.opentcs.guing.components.tree.elements.UserObjectUtil;
 import org.opentcs.guing.components.tree.elements.VehicleUserObject;
 import org.opentcs.guing.event.BlockChangeEvent;
 import org.opentcs.guing.event.BlockChangeListener;
 import org.opentcs.guing.event.DrawingEditorEvent;
 import org.opentcs.guing.event.DrawingEditorListener;
+import org.opentcs.guing.event.KernelStateChangeEvent;
+import org.opentcs.guing.event.ModelModificationEvent;
+import org.opentcs.guing.event.ModelNameChangeEvent;
+import org.opentcs.guing.event.OperationModeChangeEvent;
+import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.event.StaticRouteChangeEvent;
 import org.opentcs.guing.event.StaticRouteChangeListener;
-import org.opentcs.guing.exchange.KernelProxyManager;
-import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
-import org.opentcs.guing.exchange.adapter.GroupAdapter;
-import org.opentcs.guing.exchange.adapter.LinkAdapter;
-import org.opentcs.guing.exchange.adapter.OpenTCSProcessAdapter;
-import org.opentcs.guing.exchange.adapter.PathAdapter;
-import org.opentcs.guing.exchange.adapter.ProcessAdapter;
-import org.opentcs.guing.exchange.adapter.ProcessAdapterFactory;
+import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.guing.exchange.ApplicationKernelClient;
+import org.opentcs.guing.exchange.TransportOrderUtil;
+import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.FiguresFolder;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
@@ -159,19 +154,17 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.storage.OpenTCSFactory;
-import org.opentcs.guing.storage.OpenTCSModelManager;
-import org.opentcs.guing.storage.ViewBookmarkNameChooser;
-import org.opentcs.guing.transport.CreateTransportOrderPanel;
 import org.opentcs.guing.transport.OrderSequencesContainerPanel;
 import org.opentcs.guing.transport.TransportOrdersContainerPanel;
+import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.guing.util.Colors;
-import org.opentcs.guing.util.ConfigConstants;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.Cursors;
-import org.opentcs.guing.util.OpenTCSDOMStorableInputOutputFormat;
+import org.opentcs.guing.util.DefaultInputOutputFormat;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.configuration.ConfigurationStore;
+import org.opentcs.guing.util.UserMessageHelper;
+import org.opentcs.util.UniqueStringGenerator;
 import org.opentcs.util.gui.plugins.PanelFactory;
 import org.opentcs.util.gui.plugins.PluggablePanel;
 
@@ -186,11 +179,7 @@ import org.opentcs.util.gui.plugins.PluggablePanel;
  */
 public class OpenTCSView
     extends AbstractView
-    implements GuiManager,
-               AttributesChangeListener,
-               BlockChangeListener,
-               DrawingEditorListener,
-               StaticRouteChangeListener {
+    implements GuiManager {
 
   /**
    * The name/title of this application.
@@ -215,47 +204,29 @@ public class OpenTCSView
    */
   public static final String toolBarActionsProperty = "toolBarActions";
   /**
-   * This class' configuration store.
-   */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(OpenTCSView.class.getName());
-  /**
    * This class's logger.
    */
   private static final Logger log
       = Logger.getLogger(OpenTCSView.class.getName());
-  private static final String NUMBER_OF_DRAWING_VIEWS
-      = "NUMBER_OF_DRAWING_VIEWS";
-  private static final String NUMBER_OF_TRANSPORT_ORDER_VIEWS
-      = "NUMBER_OF_TRANSPORT_ORDER_VIEWS";
-  private static final String NUMBER_OF_ORDER_SEQUENCE_VIEWS
-      = "NUMBER_OF_ORDER_SEQUENCE_VIEWS";
   /**
    * A single central instance (singleton) of this class.
-   * XXX This should go away.
+   * XXX This should be removed as soon as instance() isn't called by other
+   * classes any more and the singleton is only injected via Guice.
    */
   private static OpenTCSView instance;
   /**
-   * The manager for all actions.
+   * Provides/manages the application's current state.
    */
-  private final ActionManager fActionManager;
-  private String sModelName = "";
-  private String sOperationMode = "";
-  private List<JToolBar> fToolBars;
-  private JMenuBar fMenuBar;
+  private final ApplicationState appState;
   /**
    * Allows for undoing and redoing actions.
    */
-  private final UndoRedoManager fUndoRedoManager = new UndoRedoManager();
+  private final UndoRedoManager fUndoRedoManager;
   /**
    * Depending on the type of an application, there may be one editor per view,
    * or a single shared editor for all views.
    */
   private final OpenTCSDrawingEditor fDrawingEditor;
-  // Koordinaten für das Mess-Werkzeug
-  private Point2D.Double fCurrentMousePoint = new Point2D.Double();
-  private Point2D.Double fMouseEndPoint = new Point2D.Double();
-  private Point2D.Double fMouseStartPoint = new Point2D.Double();
   /**
    * The JFrame.
    */
@@ -264,125 +235,152 @@ public class OpenTCSView
    * Utility to manage the views.
    */
   private final ViewManager viewManager;
-  // === openTCS ===
-  // Tree for Vehicles and Layout components: Points, Paths, etc.
-  private final StandardTreeViewPanel fComponentsTreeView = new StandardTreeViewPanel(fUndoRedoManager);
-  // Der TreeViewManager, der Anfragen an den TreeView weiterleitet
+  /**
+   * A manager for the components tree view.
+   */
   private final TreeViewManager fComponentsTreeManager;
-  // Tree for the blocks
-  private final StandardTreeViewPanel fBlocksTreeView = new StandardTreeViewPanel(fUndoRedoManager);
+  /**
+   * A manager for the blocks tree view.
+   */
   private final TreeViewManager fBlocksTreeManager;
-  // Tree for point groups
-  private final StandardTreeViewPanel fGroupsTreeView = new StandardTreeViewPanel(fUndoRedoManager, StandardTreeViewPanel.GROUP_VIEW);
+  /**
+   * A manager for the groups tree view.
+   */
   private final TreeViewManager fGroupsTreeManager;
-  // Die Ansicht der Properties
-  private final AttributesComponent fPropertiesComponent = new AttributesComponent(fUndoRedoManager);
-  // Verwaltet verschiedene Fahrkursmodelle
-  private final OpenTCSModelManager fModelManager;
-  // Splash - wird nur für Stand-Alone Applikation angezeigt
+  /**
+   * Displays properties of the currently selected model component(s).
+   */
+  private final SelectionPropertiesComponent fPropertiesComponent;
+  /**
+   * Manages driving course models.
+   */
+  private final ModelManager fModelManager;
+  /**
+   * Indicates the progress for lengthy operations.
+   */
   private final ProgressIndicator progressIndicator;
-  // Das gesamte Datenmodell
-  private SystemModel fSystemModel;
-  // Der Dialog zum Anzeigen der Eigenschaften eines Fahrkurselements.
-  private JDialog fPropertiesDialog;
-  private final DockingManager dockingManager = new DockingManager();
+  /**
+   * Manages docking frames.
+   */
+  private final DockingManager dockingManager;
   /**
    * Registry for plugin panels.
    */
   private final PanelRegistry panelRegistry;
   /**
-   * The proxy/connection manager to be used.
+   * Provides access to a kernel.
    */
-  private final KernelProxyManager kernelProxyManager;
+  private final SharedKernelProvider kernelProvider;
   /**
-   * Whether the system/the vehicles are currently paused or not.
+   * The kernel client object to be used.
    */
-  private boolean vehiclesPaused;
-  private final KernelStatusPanel statusScrollPane = new KernelStatusPanel();
+  private final Object kernelClient;
+  /**
+   * A panel that displays kernel messages.
+   */
+  private final KernelStatusPanel kernelStatusPanel;
+  /**
+   * A panel for mouse position/status.
+   */
   private final StatusPanel statusPanel;
-  private final VehiclesPanel vehiclesPanel = new VehiclesPanel();
+  /**
+   * A panel showing all vehicles in the system model.
+   */
+  private final VehiclesPanel vehiclesPanel;
+  /**
+   * A factory for system model objects.
+   */
   private final CourseObjectFactory crsObjFactory;
   /**
-   * The process adapter factory to be used.
+   * A factory for process adapters.
    */
-  private final ProcessAdapterFactory procAdapterFactory;
-
+  private final ProcessAdapterUtil procAdapterUtil;
   /**
-   * Creates a new view.
-   *
-   * @param fFrame The <code>JFrame</code> this view is wrapped in.
-   * @param progressIndicator The progress indicator to be used.
-   * @param kernelProxyManager The proxy/connection manager to be used.
-   * @param viewManager The view manager to be used.
-   * @param tcsDrawingEditor The drawing editor to be used.
-   * @param modelManager The model manager to be used.
-   * @param statusPanel The status panel to be used.
-   * @param panelRegistry The plugin panel registry to be used.
-   * @param crsObjFactory The course object factory to be used.
-   * @param procAdapterFactory The process adapter factory to be used.
-   * @param systemModel The system model to be used.
+   * Shows messages to the user.
    */
-  @Inject
-  public OpenTCSView(@ApplicationFrame JFrame fFrame,
-                     ProgressIndicator progressIndicator,
-                     KernelProxyManager kernelProxyManager,
-                     ViewManager viewManager,
-                     OpenTCSDrawingEditor tcsDrawingEditor,
-                     OpenTCSModelManager modelManager,
-                     StatusPanel statusPanel,
-                     PanelRegistry panelRegistry,
-                     CourseObjectFactory crsObjFactory,
-                     ProcessAdapterFactory procAdapterFactory,
-                     SystemModel systemModel) {
-    this.progressIndicator = requireNonNull(progressIndicator,
-                                            "progressIndicator");
-    this.kernelProxyManager = requireNonNull(kernelProxyManager,
-                                             "kernelProxyManager");
-    this.viewManager = requireNonNull(viewManager, "viewManager");
-    this.fDrawingEditor = requireNonNull(tcsDrawingEditor, "tcsDrawingEditor");
-    this.fModelManager = requireNonNull(modelManager, "modelManager");
-    this.statusPanel = requireNonNull(statusPanel, "statusPanel");
-    this.panelRegistry = requireNonNull(panelRegistry, "panelRegistry");
-    this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
-    this.procAdapterFactory = requireNonNull(procAdapterFactory,
-                                             "procAdapterFactory");
-    this.fFrame = fFrame;
-    
-    this.fSystemModel = requireNonNull(systemModel, "systemModel is null");
-
-    progressIndicator.setProgress(10, "openTCS view initialized");
-
-    fDrawingEditor.setDrawingEditorListener(this);
-
-    fActionManager = new ActionManager(this, kernelProxyManager, panelRegistry,
-                                       crsObjFactory);
-
-    // --- Tree View im Panel links oben ---
-    fComponentsTreeManager = new TreeViewManager(fComponentsTreeView);
-    fComponentsTreeView.getTree().getSelectionModel().setSelectionMode(
-        TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-    fComponentsTreeManager.setHideBlocks(true);
-
-    fBlocksTreeManager = new TreeViewManager(fBlocksTreeView);
-
-    fGroupsTreeManager = new TreeViewManager(fGroupsTreeView);
-
-    progressIndicator.setProgress(15, "Initialize system model");
-    setSystemModel(fSystemModel);
-
-    // --- Properties View im Panel links unten ---
-    fPropertiesComponent.setPropertiesContent(new PropertiesTableContent(this, this));
-    fPropertiesComponent.setMinimumSize(new Dimension(100, 300));
-
-    // --- MouseListener --- 
-    VehicleDragHandler listener
-        = new VehicleDragHandler(Cursors.getDragVehicleCursor());
-    fComponentsTreeView.getTree().addMouseListener(listener);
-    fComponentsTreeView.getTree().addMouseMotionListener(listener);
-
-    createActions();
-    initializeFrame();
-  }
+  private final UserMessageHelper userMessageHelper;
+  /**
+   * A factory for drawing views.
+   */
+  private final DrawingViewFactory drawingViewFactory;
+  /**
+   * Handles static route events.
+   */
+  private final StaticRouteChangeListener staticRouteEventHandler
+      = new StaticRouteEventHandler();
+  /**
+   * Handles block events.
+   */
+  private final BlockChangeListener blockEventHandler = new BlockEventHandler();
+  /**
+   * Handles events for changes of properties.
+   */
+  private final AttributesChangeListener attributesEventHandler
+      = new AttributesEventHandler();
+  /**
+   * Generates names for model objects.
+   */
+  private final UniqueStringGenerator<Class<? extends ModelComponent>> modelCompNameGen;
+  /**
+   * A factory for UserObject instances.
+   */
+  private final UserObjectUtil userObjectUtil;
+  /**
+   * A provider for ActionMaps.
+   */
+  private final Provider<ViewActionMap> actionMapProvider;
+  /**
+   * A provider for the menu bar.
+   */
+  private final Provider<ApplicationMenuBar> menuBarProvider;
+  /**
+   * A provider for the tool bar manager.
+   */
+  private final Provider<ToolBarManager> toolBarManagerProvider;
+  /**
+   * A factory for properties-related panels.
+   */
+  private final PropertiesPanelFactory propertiesPanelFactory;
+  /**
+   * A provider for panels showing the transport orders.
+   */
+  private final Provider<TransportOrdersContainerPanel> toContainerPanelProvider;
+  /**
+   * A provider for panels showing the order sequences.
+   */
+  private final Provider<OrderSequencesContainerPanel> osContainerPanelProvider;
+  /**
+   * A helper for creating transport orders with the kernel.
+   */
+  private final TransportOrderUtil orderUtil;
+  /**
+   * The application's event bus.
+   */
+  private final MBassador<Object> eventBus;
+  /**
+   * Handles focussing of dockables.
+   */
+  private final DrawingViewFocusHandler drawingViewFocusHandler;
+  /**
+   * A factory for handlers related to dockables.
+   */
+  private final DockableHandlerFactory dockableHandlerFactory;
+  /**
+   * The application's configuration.
+   */
+  private final ApplicationConfiguration appConfig;
+  /**
+   * The application frame's menu bar.
+   */
+  private ApplicationMenuBar fMenuBar;
+  /**
+   * Provides the application's tool bars.
+   */
+  private ToolBarManager toolBarManager;
+  /**
+   * A string representation for the current mode of operation.
+   */
+  private String sOperationMode = "";
 
   public static OpenTCSView instance() {
     return instance;
@@ -393,989 +391,180 @@ public class OpenTCSView
   }
 
   /**
-   * Shows or hides the specific <code>PanelFactory</code>.
+   * Creates a new view.
    *
-   * @param factory The factory resp. panel that shall be shown / hidden.
-   * @param visible True to set it visible, false otherwise.
+   * @param appConfig The application's configuration.
+   * @param appState Provides/manages the application's current state.
+   * @param fFrame The <code>JFrame</code> this view is wrapped in.
+   * @param progressIndicator The progress indicator to be used.
+   * @param kernelProvider Provides a access to a kernel.
+   * @param kernelClient The kernel client object to be used.
+   * @param viewManager The view manager to be used.
+   * @param tcsDrawingEditor The drawing editor to be used.
+   * @param modelManager The model manager to be used.
+   * @param statusPanel The status panel to be used.
+   * @param panelRegistry The plugin panel registry to be used.
+   * @param crsObjFactory The course object factory to be used.
+   * @param procAdapterUtil A factory for process adapters.
+   * @param userMessageHelper An UserMessageHelper
+   * @param drawingViewFactory A factory for drawing views.
+   * @param modelCompNameGen A generator for model components' names.
+   * @param undoRedoManager Allows for undoing and redoing actions.
+   * @param componentsTreeManager Manages the components tree view.
+   * @param blocksTreeManager Manages the blocks tree view.
+   * @param groupsTreeManager Manages the groups tree view.
+   * @param kernelStatusPanel A panel that displays kernel messages.
+   * @param propertiesComponent Displays properties of the currently selected
+   * model component(s).
+   * @param vehiclesPanel A panel showing all the vehicles in the system model.
+   * @param userObjectUtil A factory for UserObject instances.
+   * @param actionMapProvider A provider for ActionMaps.
+   * @param menuBarProvider A provider for the menu bar.
+   * @param toolBarManagerProvider A provider for the tool bar manager.
+   * @param propertiesPanelFactory A factory for properties-related panels.
+   * @param toContainerPanelProvider A provider for panels showing the transport
+   * orders.
+   * @param osContainerPanelProvider A provider for panels showing the order
+   * sequences.
+   * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param eventBus The application's event bus.
+   * @param dockingManager Manages docking frames.
+   * @param drawingViewFocusHandler Handles focussing of dockables.
+   * @param dockableHandlerFactory A factory for handlers related to dockables.
    */
-  public void showPluginPanel(PanelFactory factory, boolean visible) {
-    String id = factory.getClass().getName();
-    SingleCDockable dockable
-        = dockingManager.getCControl().getSingleDockable(id);
-    if (dockable != null) {
-      // dockable is not null at this point when the user hides the plugin 
-      // panel by clicking on its menu entry
-      PluggablePanel panel = (PluggablePanel) dockable.getFocusComponent();
-      panel.plugOut();
-      if (!dockingManager.getCControl().removeDockable(dockable)) {
-        log.warning("Couldn't remove dockable for plugin panel '"
-            + factory.getPanelDescription() + "'");
-        return;
-      }
-    }
-    if (!visible) {
-      return;
-    }
-    final PluggablePanel panel = factory.createPanel();
-    if (factory.providesPanel(kernel().getState())) {
-      final DefaultSingleCDockable factoryDockable = dockingManager.createFloatingDockable(
-          factory.getClass().getName(),
-          factory.getPanelDescription(),
-          panel);
-      factoryDockable.addVetoClosingListener(new CVetoClosingListener() {
-
-        @Override
-        public void closing(CVetoClosingEvent event) {
-        }
-
-        @Override
-        public void closed(CVetoClosingEvent event) {
-          panel.plugOut();
-          dockingManager.getCControl().removeDockable(factoryDockable);
-        }
-      });
-      panel.plugIn();
-    }
+  @Inject
+  public OpenTCSView(ApplicationConfiguration appConfig,
+                     ApplicationState appState,
+                     @ApplicationFrame JFrame fFrame,
+                     ProgressIndicator progressIndicator,
+                     SharedKernelProvider kernelProvider,
+                     @ApplicationKernelClient Object kernelClient,
+                     ViewManager viewManager,
+                     OpenTCSDrawingEditor tcsDrawingEditor,
+                     ModelManager modelManager,
+                     StatusPanel statusPanel,
+                     PanelRegistry panelRegistry,
+                     CourseObjectFactory crsObjFactory,
+                     ProcessAdapterUtil procAdapterUtil,
+                     UserMessageHelper userMessageHelper,
+                     DrawingViewFactory drawingViewFactory,
+                     UniqueStringGenerator<Class<? extends ModelComponent>> modelCompNameGen,
+                     UndoRedoManager undoRedoManager,
+                     ComponentsTreeViewManager componentsTreeManager,
+                     BlocksTreeViewManager blocksTreeManager,
+                     GroupsTreeViewManager groupsTreeManager,
+                     KernelStatusPanel kernelStatusPanel,
+                     SelectionPropertiesComponent propertiesComponent,
+                     VehiclesPanel vehiclesPanel,
+                     UserObjectUtil userObjectUtil,
+                     Provider<ViewActionMap> actionMapProvider,
+                     Provider<ApplicationMenuBar> menuBarProvider,
+                     Provider<ToolBarManager> toolBarManagerProvider,
+                     PropertiesPanelFactory propertiesPanelFactory,
+                     Provider<TransportOrdersContainerPanel> toContainerPanelProvider,
+                     Provider<OrderSequencesContainerPanel> osContainerPanelProvider,
+                     TransportOrderUtil orderUtil,
+                     MBassador<Object> eventBus,
+                     DockingManager dockingManager,
+                     DrawingViewFocusHandler drawingViewFocusHandler,
+                     DockableHandlerFactory dockableHandlerFactory) {
+    this.appConfig = requireNonNull(appConfig, "appConfig");
+    this.appState = requireNonNull(appState, "appState");
+    // XXX Check that this frame may actually be null when embedding the plant
+    // XXX overview into another application.
+    this.fFrame = fFrame;
+    this.progressIndicator = requireNonNull(progressIndicator,
+                                            "progressIndicator");
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.kernelClient = requireNonNull(kernelClient, "kernelClient");
+    this.viewManager = requireNonNull(viewManager, "viewManager");
+    this.fDrawingEditor = requireNonNull(tcsDrawingEditor, "tcsDrawingEditor");
+    this.fModelManager = requireNonNull(modelManager, "modelManager");
+    this.statusPanel = requireNonNull(statusPanel, "statusPanel");
+    this.panelRegistry = requireNonNull(panelRegistry, "panelRegistry");
+    this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
+    this.procAdapterUtil = requireNonNull(procAdapterUtil,
+                                          "procAdapterUtil");
+    this.userMessageHelper = requireNonNull(userMessageHelper,
+                                            "userMessageHelper");
+    this.drawingViewFactory = requireNonNull(drawingViewFactory,
+                                             "drawingViewFactory");
+    this.modelCompNameGen = requireNonNull(modelCompNameGen, "modelCompNameGen");
+    this.fUndoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
+    this.fComponentsTreeManager = requireNonNull(componentsTreeManager,
+                                                 "componentsTreeManager");
+    this.fBlocksTreeManager = requireNonNull(blocksTreeManager,
+                                             "blocksTreeManager");
+    this.fGroupsTreeManager = requireNonNull(groupsTreeManager,
+                                             "groupsTreeManager");
+    this.kernelStatusPanel = requireNonNull(kernelStatusPanel,
+                                            "kernelStatusPanel");
+    this.fPropertiesComponent = requireNonNull(propertiesComponent,
+                                               "propertiesComponent");
+    this.vehiclesPanel = requireNonNull(vehiclesPanel, "vehiclesPanel");
+    this.userObjectUtil = requireNonNull(userObjectUtil, "userObjectUtil");
+    this.actionMapProvider = requireNonNull(actionMapProvider,
+                                            "actionMapProvider");
+    this.menuBarProvider = requireNonNull(menuBarProvider, "menuBarProvider");
+    this.toolBarManagerProvider = requireNonNull(toolBarManagerProvider,
+                                                 "toolBarManagerProvider");
+    this.propertiesPanelFactory = requireNonNull(propertiesPanelFactory,
+                                                 "propertiesPanelFactory");
+    this.toContainerPanelProvider = requireNonNull(toContainerPanelProvider,
+                                                   "toContainerPanelProvider");
+    this.osContainerPanelProvider = requireNonNull(osContainerPanelProvider,
+                                                   "osContainerPanelProvider");
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    this.eventBus = requireNonNull(eventBus, "eventBus");
+    this.dockingManager = requireNonNull(dockingManager, "dockingManager");
+    this.drawingViewFocusHandler = requireNonNull(drawingViewFocusHandler,
+                                                  "drawingViewFocusHandler");
+    this.dockableHandlerFactory = requireNonNull(dockableHandlerFactory,
+                                                 "dockableHandlerFactory");
   }
 
-  /**
-   * Returns the DockingManager.
-   *
-   * @return The DockingManager.
-   */
-  public DockingManager getDockingManager() {
-    return dockingManager;
-  }
+  @Override // AbstractView
+  public void init() {
+    progressIndicator.setProgress(10, "openTCS view initialized");
 
-  /**
-   * Adds a new drawing view to the tabbed wrappingPanel.
-   *
-   * @return The newly created Dockable.
-   */
-  public DefaultSingleCDockable addDrawingView() {
-    JScrollPane newScrollPane = viewManager.getNewDrawingView(fSystemModel);
+    fDrawingEditor.setDrawingEditorListener(
+        new DrawingEditorEventHandler(fModelManager));
 
-    int drawingViewIndex = viewManager.getNextDrawingViewIndex();
+    // Hide the block folder in the generic components tree.
+    fComponentsTreeManager.setComponentFilter(new BlockFolderFilter());
 
-    String title = ResourceBundleUtil.getBundle().getString(
-        "OpenTCSView.tab.drivingCourse") + " " + drawingViewIndex;
-    DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("drivingCourse" + drawingViewIndex,
-                                        title,
-                                        newScrollPane,
-                                        true);
-    OpenTCSDrawingView drawingView
-        = viewManager.putDrawingView(newDockable, newScrollPane);
-    // Panel mit Buttons für Zoom-Faktor und Grid on/off wird links unten 
-    // neben dem Scrollbalken der ScrollPane gezeichnetdrawingView
-    JPanel placardPanel = fActionManager.createPlacardPanel(drawingView);
-    newScrollPane.add(placardPanel, JScrollPane.LOWER_LEFT_CORNER);
+    progressIndicator.setProgress(15, "Initialize system model");
+    setSystemModel(fModelManager.getModel());
 
-    // Add to group pop ups
-    if (drawingViewIndex > 0) { //don't add to modelling view
-      ModelComponent groups = getSystemModel().getMainFolder(SystemModel.GROUPS);
+    // --- Properties View im Panel links unten ---
+    fPropertiesComponent.setPropertiesContent(
+        propertiesPanelFactory.createPropertiesTableContent(this));
+    fPropertiesComponent.setMinimumSize(new Dimension(100, 300));
 
-      for (Object o : groups.getChildComponents()) {
-        if (o instanceof GroupModel) {
-          GroupModel gf = (GroupModel) o;
-          gf.setDrawingViewVisible(title, true);
-        }
-      }
-    }
+    // --- MouseListener --- 
+    VehicleDragHandler listener
+        = new VehicleDragHandler(Cursors.getDragVehicleCursor());
+    fComponentsTreeManager.addMouseListener(listener);
+    fComponentsTreeManager.addMouseMotionListener(listener);
 
-    int lastIndex = Math.max(0, drawingViewIndex - 1);
-    dockingManager.addTabTo(newDockable, DockingManager.COURSE_TAB_PANE_ID, lastIndex);
-
-    newDockable.addVetoClosingListener(new DrawingViewClosingListener(newDockable));
-    newDockable.addFocusListener(new DockableFocusListener());
-
-    drawingView.handleFocusGained();
-    firePropertyChange(OpenTCSDrawingView.FOCUS_GAINED, null, newDockable);
-
-    return newDockable;
-  }
-
-  /**
-   * Adds a new transport order view.
-   *
-   * @param shouldInitView If the newly created view should initialize itself
-   * with current transport orders. It should be false when there isn't set up
-   * an event dispatcher yet.
-   */
-  public void addTransportOrderView(boolean shouldInitView) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    int biggestIndex = viewManager.getNextTransportOrderViewIndex();
-    DefaultSingleCDockable lastTOView = viewManager.getLastTransportOrderView();
-    TransportOrdersContainerPanel panel
-        = new TransportOrdersContainerPanel(this);
-    DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("transportOrders" + biggestIndex,
-                                        bundle.getString("OpenTCSView.tab.transportOrders")
-            + " " + biggestIndex, panel, true);
-    viewManager.putTransportOrderView(newDockable, panel);
-
-    if (shouldInitView) {
-      panel.initView();
-      OpenTCSEventDispatcher eventDispatcher
-          = (OpenTCSEventDispatcher) getSystemModel().getEventDispatcher();
-
-      if (eventDispatcher != null) {
-        eventDispatcher.getTransportOrderDispatcher().addListener(panel);
-      }
-    }
-
-    newDockable.addVetoClosingListener(new TransportOrderClosingListener(newDockable));
-
-    final int indexToInsert;
-
-    if (lastTOView != null) {
-      indexToInsert = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).
-          getStation().indexOf(lastTOView.intern()) + 1;
-    }
-    else {
-      indexToInsert = viewManager.getDrawingViewMap().size();
-    }
-
-    dockingManager.addTabTo(newDockable, DockingManager.COURSE_TAB_PANE_ID, indexToInsert);
-  }
-
-  /**
-   * Adds a new order sequence view.
-   *
-   * @param shouldInitView If the newly created view should initialize itself
-   * with current transport orders. It should be false when there isn't set up
-   * an event dispatcher yet.
-   */
-  public void addTransportOrderSequenceView(boolean shouldInitView) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    int biggestIndex = viewManager.getNextOrderSequenceViewIndex();
-    DefaultSingleCDockable lastOSView = viewManager.getLastOrderSequenceView();
-
-    OrderSequencesContainerPanel panel = new OrderSequencesContainerPanel(this);
-    DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("orderSequences" + biggestIndex,
-                                        bundle.getString("OpenTCSView.tab.transportOrderSequences") + " " + biggestIndex, panel, true);
-    viewManager.putOrderSequenceView(newDockable, panel);
-
-    if (shouldInitView) {
-      panel.initView();
-
-      OpenTCSEventDispatcher eventDispatcher
-          = (OpenTCSEventDispatcher) getSystemModel().getEventDispatcher();
-      if (eventDispatcher != null) {
-        eventDispatcher.getOrderSequenceDispatcher().addListener(panel);
-      }
-    }
-
-    newDockable.addVetoClosingListener(new OrderSequenceClosingListener(newDockable));
-
-    final int indexToInsert;
-    if (lastOSView != null) {
-      indexToInsert = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).
-          getStation().indexOf(lastOSView.intern()) + 1;
-    }
-    else {
-      indexToInsert = viewManager.getTransportOrderMap().size()
-          + viewManager.getDrawingViewMap().size();
-    }
-    dockingManager.addTabTo(newDockable, DockingManager.COURSE_TAB_PANE_ID, indexToInsert);
-  }
-
-  /**
-   * Restores the layout to default.
-   */
-  public void restoreDockingDefaultLayout() {
-    List<DefaultSingleCDockable> drawingViewKeys
-        = new ArrayList<>(viewManager.getDrawingViewMap().keySet());
-    for (DefaultSingleCDockable dock : drawingViewKeys) {
-      removeDrawingView(dock);
-    }
-    closeOpenedPluginPanels();
-    dockingManager.removeDockable(dockingManager.getCControl().
-        getSingleDockable(DockingManager.VEHICLES_DOCKABLE_ID));
-    viewManager.reset();
-    configStore.removeItem(NUMBER_OF_DRAWING_VIEWS);
-    configStore.removeItem(NUMBER_OF_TRANSPORT_ORDER_VIEWS);
-    configStore.removeItem(NUMBER_OF_ORDER_SEQUENCE_VIEWS);
-
+    setActionMap(actionMapProvider.get());
+    this.fMenuBar = menuBarProvider.get();
+    this.toolBarManager = toolBarManagerProvider.get();
     initializeFrame();
-
-    // Depending on the current kernel state there may exist panels, now, that
-    // shouldn't be visible.
-    Thread t = new Thread(new Runnable() {
-
-      @Override
-      public void run() {
-        setKernelState(kernel().getState());
-      }
-    });
-    t.start();
+    createEmptyModel();
   }
 
-  /**
-   * Creates a new group of elements.
-   * The elements are selected from a CreateGroupPanel or from the context menu
-   * of a Point / Location / Path
-   *
-   * @param components The components that will form that group.
-   */
-  public void createGroup(Set<ModelComponent> components) {
-    Objects.requireNonNull(components, "components is null");
-    if (components.isEmpty()) {
-      return;
-    }
-    GroupAdapter groupAdapter
-        = (GroupAdapter) procAdapterFactory.createAdapter(GroupModel.class);
-
-    if (groupAdapter == null) {
-      return;
-    }
-
-    try {
-      groupAdapter.setEventDispatcher(getSystemModel().getEventDispatcher());
-      GroupModel groupModel = new GroupModel();
-      groupAdapter.setModel(groupModel);
-      Group group = groupAdapter.createProcessObject();
-      fSystemModel.getEventDispatcher().addProcessAdapter(groupAdapter);
-
-      groupModel.createUserObject();
-
-      for (String name : getDrawingViewNames()) {
-        groupModel.setDrawingViewVisible(name, true);
-      }
-
-      ModelComponent folder = getSystemModel().getMainFolder(SystemModel.GROUPS);
-      folder.add(groupModel);
-      fGroupsTreeManager.addItem(folder, groupModel);
-
-      for (ModelComponent component : components) {
-        ProcessAdapter adapter = fSystemModel.getEventDispatcher().findProcessAdapter(component);
-        TCSObjectReference<?> ref = (TCSObjectReference<?>) adapter.getProcessObject();
-        kernel().addGroupMember(group.getReference(), ref);
-        groupModel.add(component);
-        fGroupsTreeManager.addItem(groupModel, component);
-      }
-
-      ((StandardTreeViewPanel) fGroupsTreeManager.getTreeView()).sortChildren();
-      setHasUnsavedChanges(true);
-    }
-    catch (KernelRuntimeException ex) {
-      log.log(Level.SEVERE, null, ex);
-    }
-  }
-
-  /**
-   * Deletes a group.
-   *
-   * @param gm The folder that contains the elements of the group.
-   */
-  public void deleteGroup(GroupModel gm) {
-    for (OpenTCSDrawingView drawingView : getDrawingViews()) {
-      drawingView.setGroupVisible(gm.getChildComponents(), true);
-    }
-    removeModelComponent(getSystemModel().getMainFolder(SystemModel.GROUPS), gm);
-  }
-
-  /**
-   * Removes members from a group.
-   *
-   * @param userObjects The items that should be removed.
-   */
-  public void removeGroupMembers(Set<UserObject> userObjects) {
-    if (!userObjects.isEmpty()) {
-      List<ModelComponent> items = new ArrayList<>();
-      Iterator<UserObject> it = userObjects.iterator();
-
-      while (it.hasNext()) {
-        UserObject next = it.next();
-        ModelComponent dataObject = next.getModelComponent();
-        items.add(dataObject);
-        Group group = kernel().getTCSObject(Group.class, next.getParent().getName());
-
-        if (group != null) {
-          ProcessAdapter adapter;
-          fGroupsTreeManager.removeItem(next);
-          adapter = fSystemModel.getEventDispatcher().findProcessAdapter(dataObject);
-
-          if (adapter != null) {
-            TCSObjectReference<?> ref
-                = (TCSObjectReference<?>) adapter.getProcessObject();
-            kernel().removeGroupMember(group.getReference(), ref);
-          }
-        }
-      }
-
-      for (OpenTCSDrawingView drawingView : getDrawingViews()) {
-        drawingView.setGroupVisible(new ArrayList<>(items), true);
-      }
-
-      setHasUnsavedChanges(true);
-    }
-  }
-
-  /**
-   * Adds the currently selected items on the drawing view to the given group.
-   *
-   * @param groupModel GroupFolder referencing the group.
-   */
-  public void addSelectedItemsToGroup(GroupModel groupModel) {
-    Set<Figure> selectedFigures = fDrawingEditor.getActiveView().getSelectedFigures();
-    Group group = kernel().getTCSObject(Group.class, groupModel.getName());
-
-    if (group != null) {
-      for (Figure next : selectedFigures) {
-        FigureComponent model = next.get(FigureConstants.MODEL);
-
-        if (model instanceof LinkModel) {
-          // LinkModels are automatically set in/visible
-          continue;
-        }
-
-        if (groupModel.contains(model)) {
-          continue;
-        }
-
-        groupModel.add(model);
-        fGroupsTreeManager.addItem(groupModel, model);
-        ProcessAdapter adapter = fSystemModel.getEventDispatcher().findProcessAdapter(model);
-        TCSObjectReference<?> ref
-            = (TCSObjectReference<?>) adapter.getProcessObject();
-        kernel().addGroupMember(group.getReference(), ref);
-      }
-
-      ((StandardTreeViewPanel) fGroupsTreeManager.getTreeView()).sortChildren();
-      setHasUnsavedChanges(true);
-    }
-    else {
-      log.log(Level.WARNING, "Group not found: {0}", groupModel.getName());
-    }
-  }
-
-  /**
-   * Toggles the visibility of the group members.
-   *
-   * @param gm The folder that contains the elements of the group.
-   * @param visible Visible or not.
-   */
-  public void setGroupVisibilityInAllDrawingViews(GroupModel gm, boolean visible) {
-    gm.setGroupVisible(visible);
-
-    for (OpenTCSDrawingView drawingView : getDrawingViews()) {
-      drawingView.setGroupVisible(gm.getChildComponents(), gm.isGroupVisible());
-    }
-  }
-
-  /**
-   * Toggles the visibility of the group members for a specific
-   * <code>OpenTCSDrawingView</code>.
-   *
-   * @param title The title of the drawing view.
-   * @param sf The group folder containing the elements to hide.
-   * @param visible Visible or not.
-   */
-  public void setGroupVisibilityInDrawingView(String title, GroupModel sf, boolean visible) {
-    sf.setDrawingViewVisible(title, visible);
-    viewManager.setGroupVisibilityInDrawingView(title, sf, visible);
-  }
-
-  public JMenuBar getMenuBar() {
-    return fMenuBar;
-  }
-
-  /**
-   * Returns the horizontal ruler of the active view.
-   *
-   * @return A Ruler.
-   */
-  public Ruler getHorizontalRuler() {
-    return viewManager.getHorizontalRuler();
-  }
-
-  /**
-   * Returns the vertical ruler of the active view.
-   *
-   * @return A Ruler.
-   */
-  public Ruler getVerticalRuler() {
-    return viewManager.getVerticalRuler();
-  }
-
-  /**
-   * Creates a path that exists in the kernel but not in the plant overview, yet.
-   * This method is currently needed for the plugin-panel
-   * <code>PointConnectorFactory</code>.
-   *
-   * @param start A reference to the start point.
-   * @param end A reference to the end point.
-   */
-  public void insertPath(TCSObjectReference<org.opentcs.data.model.Point> start,
-                         TCSObjectReference<org.opentcs.data.model.Point> end) {
-    if (hasOperationMode(GuiManager.OperationMode.MODELLING)) {
-      OpenTCSProcessAdapter adapterP1
-          = (OpenTCSProcessAdapter) getSystemModel().getEventDispatcher().findProcessAdapter(start);
-      OpenTCSProcessAdapter adapterP2
-          = (OpenTCSProcessAdapter) getSystemModel().getEventDispatcher().findProcessAdapter(end);
-      PointModel modelP1 = (PointModel) adapterP1.getModel();
-      PointModel modelP2 = (PointModel) adapterP2.getModel();
-      LabeledPointFigure figureP1 = modelP1.getFigure();
-      LabeledPointFigure figureP2 = modelP2.getFigure();
-
-      for (Figure figure : getDrawingView().getDrawing().getFiguresFrontToBack()) {
-        if (figure instanceof PathConnection) {
-          PathConnection pc = (PathConnection) figure;
-          if (pc.getStartFigure() == figureP1 && pc.getEndFigure() == figureP2) {
-            return;
-          }
-        }
-      }
-
-      PathConnection pc = new PathConnection();
-      pc.connect(figureP1, figureP2);
-      getDrawingView().getDrawing().add(pc);
-    }
-  }
-
-  public AttributesComponent getPropertiesComponent() {
-    return fPropertiesComponent;
-  }
-
-  public TreeViewManager getTreeViewManager() {
-    return fComponentsTreeManager;
-  }
-
-  public UndoRedoManager getUndoRedoManager() {
-    return fUndoRedoManager;
-  }
-
-  /**
-   * Informs all locations the theme has changed and they have to repaint.
-   */
-  public void updateLocationThemes() {
-    for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-      for (Figure figure : drawView.getDrawing().getChildren()) {
-        if (figure instanceof LabeledLocationFigure) {
-          LabeledLocationFigure locFigure = (LabeledLocationFigure) figure;
-          locFigure.propertiesChanged(new AttributesChangeEvent(this, locFigure.getLocationFigure().getModel()));
-        }
-      }
-    }
-  }
-
-  /**
-   * Informs all vehicles the theme has changed and they have to repaint.
-   */
-  public void updateVehicleThemes() {
-    for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-      for (Figure figure : drawView.getDrawing().getChildren()) {
-        if (figure instanceof VehicleFigure) {
-          VehicleFigure vehicleFigure = (VehicleFigure) figure;
-          vehicleFigure.propertiesChanged(new AttributesChangeEvent(this, vehicleFigure.getModel()));
-        }
-      }
-    }
-    vehiclesPanel.repaint();
-  }
-
-  /**
-   * Logs a message to the status text area.
-   *
-   * @param message The message to log.
-   */
-  public void log(Message message) {
-    statusScrollPane.log(message);
-  }
-
-  /**
-   * Loads the current kernel model.
-   */
-  public void loadCurrentKernelModel() {
-    progressIndicator.initialize();
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    progressIndicator.setProgress(0, bundle.getString("loadCurrentKernelModel.cleanup"));
-    // Delete all figure of the old model
-    for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-      ((OpenTCSDrawingView) drawView).removeAll();
-    }
-    // If there was a model before unregister the EventDispatcher
-    try {
-      getSystemModel().getEventDispatcher().release();
-    }
-    catch (Exception e) {
-      log.log(Level.WARNING, "Could not release model: {0}", getSystemModel().getName());
-    }
-    vehiclesPanel.clearVehicles();
-
-    // Start loading the new model
-    progressIndicator.setProgress(50, bundle.getString("loadCurrentKernelModel.startLoading"));
-    SystemModel restoredModel = fModelManager.restoreModel();
-
-    if (restoredModel == null) {
-      if (kernel().getState() == Kernel.State.MODELLING) {
-        createEmptyModel();
-      }
-    }
-    else {
-      setSystemModel(restoredModel);
-      // Sort the tree
-      Enumeration<TreeNode> eTreeNodes
-          = ((TreeNode) fComponentsTreeView.getTree().getModel().getRoot()).children();
-
-      while (eTreeNodes.hasMoreElements()) {
-        TreeNode node = eTreeNodes.nextElement();
-        fComponentsTreeView.sortItems(node);
-      }
-
-      progressIndicator.setProgress(90, bundle.getString("loadCurrentKernelModel.setUpWorkingArea"));
-      ModelComponent layoutComponent = fSystemModel.getMainFolder(SystemModel.LAYOUT);
-      layoutComponent.addAttributesChangeListener(this);
-
-      // Show model name in title
-      if (fModelManager.getModelName().isEmpty()) {
-        setModelNameProperty(Kernel.DEFAULT_MODEL_NAME);
-      }
-      else {
-        setModelNameProperty(fModelManager.getModelName());
-      }
-
-      setupEventDispatcher(getSystemModel());
-      OpenTCSEventDispatcher eventDispatcher = (OpenTCSEventDispatcher) getSystemModel().getEventDispatcher();
-
-      for (TransportOrdersContainerPanel panel : viewManager.getTransportOrderMap().values()) {
-        eventDispatcher.getTransportOrderDispatcher().addListener(panel);
-      }
-
-      for (OrderSequencesContainerPanel panel : viewManager.getOrderSequenceMap().values()) {
-        eventDispatcher.getOrderSequenceDispatcher().addListener(panel);
-      }
-
-      eventDispatcher.updateModelProperties();
-      eventDispatcher.register();
-
-      // --- Operating mode ---
-      // Initialize vehicles
-      for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-        ((OpenTCSDrawingView) drawView).setVehicles(fSystemModel);
-      }
-      // Initialize transport order and -sequences panels
-      for (TransportOrdersContainerPanel panel : viewManager.getTransportOrderMap().values()) {
-        panel.initView();
-      }
-
-      for (OrderSequencesContainerPanel panel : viewManager.getOrderSequenceMap().values()) {
-        panel.initView();
-      }
-
-      showStatus(Level.INFO, "Layout \"" + fModelManager.getModelName() + "\" loaded from kernel");
-
-      if (restoredModel.getPointModels().isEmpty()) {
-        for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-          ((OpenTCSDrawingView) drawView).initializeOffsetFigures();
-        }
-      }
-
-      setHasUnsavedChanges(false);
-
-      getUndoRedoManager().discardAllEdits();
-    }
-    progressIndicator.terminate();
-  }
-
-  /**
-   *
-   * @param oldState
-   * @param newState
-   */
-  public void switchKernelState(Kernel.State oldState, Kernel.State newState) {
-    if (newState != oldState) {
-      if (newState == Kernel.State.SHUTDOWN) {
-        stop();
-      }
-      else {
-        setKernelState(newState);
-        closeOpenedPluginPanels();
-      }
-    }
-  }
-
-  public void switchKernelState(RemoteKernelConnection.State newState) {
-    if (newState == RemoteKernelConnection.State.DISCONNECTED) {
-      stop();
-    }
-  }
-
-  public void setKernelStateProperty(String kernelState) {
-    String oldKernelState = sOperationMode;
-    sOperationMode = kernelState;
-    firePropertyChange(OPERATIONMODE_PROPERTY, oldKernelState, kernelState);
-  }
-
-  public void setModelNameProperty(String modelName) {
-    String oldModelName = sModelName;
-    sModelName = modelName;
-    firePropertyChange(MODELNAME_PROPERTY, oldModelName, modelName);
-  }
-
-  public void updateModelName() {
-    // Model has changed -> add "*" to the model's name
-    if (hasUnsavedChanges()) {
-      if (!sModelName.endsWith("*")) {
-        sModelName += "*";
-      }
-    }
-    // Changes have been saved -> remove "*"
-    else {
-      if (sModelName.endsWith("*")) {
-        sModelName = sModelName.substring(0, sModelName.length() - 1);
-      }
-    }
-
-    fComponentsTreeView.updateText(sModelName + " - " + sOperationMode);
-  }
-
-  /**
-   * Adds a background image to the currently active drawing view.
-   *
-   * @param file The file with the image.
-   */
-  public void addBackgroundBitmap(File file) {
-    if (hasOperationMode(GuiManager.OperationMode.MODELLING)) {
-      viewManager.setBitmapToModellingView(file);
-    }
-    else {
-      getDrawingView().addBackgroundBitmap(file);
-    }
-  }
-
-  public String getModelName() {
-    return sModelName;
-  }
-
-  public void setCurrentMousePoint(Point2D.Double currentPoint) {
-    fCurrentMousePoint = currentPoint;
-  }
-
-  public void setMouseEndPoint(Point2D.Double endPoint) {
-    fMouseEndPoint = endPoint;
-  }
-
-  public void setMouseStartPoint(Point2D.Double startPoint) {
-    fMouseStartPoint = startPoint;
-  }
-
-  /**
-   * Anzeige der aktuellen Mausposition im Statusfeld unten rechts
-   *
-   * @param showXY
-   * @param showWH
-   */
-  public final void showPosition(boolean showXY, boolean showWH) {
-    if (showXY) {
-      double x = fCurrentMousePoint.x;
-      double y = -fCurrentMousePoint.y;
-
-      if (showWH) {
-        double w = Math.abs(fMouseEndPoint.x - fMouseStartPoint.x);
-        double h = Math.abs(fMouseEndPoint.y - fMouseStartPoint.y);
-        statusPanel.setPositionText(
-            String.format("X %.0f Y %.0f W %.0f H %.0f", x, y, w, h));
-      }
-      else {
-        // TODO
-        Iterator<LayoutModel> iLayouts = fSystemModel.getLayoutModels().iterator();
-
-        if (iLayouts.hasNext()) {
-          LayoutModel layout = iLayouts.next();
-          LengthProperty lpx
-              = (LengthProperty) layout.getProperty(LayoutModel.SCALE_X);
-          LengthProperty lpy
-              = (LengthProperty) layout.getProperty(LayoutModel.SCALE_Y);
-          double scaleX = (double) lpx.getValue();
-          double scaleY = (double) lpy.getValue();
-          double xmm = x * scaleX;
-          double ymm = y * scaleY;
-          statusPanel.setPositionText(
-              String.format("X %.0f (%.0fmm) Y %.0f (%.0fmm)", x, xmm, y, ymm));
-        }
-        else {
-          statusPanel.setPositionText(String.format("X %.0f Y %.0f", x, y));
-        }
-      }
-    }
-    else {
-      statusPanel.setPositionText("");
-    }
-  }
-
-  /**
-   * get und set für DrawingView property "scaleFactor" - beeinflusst den
-   * Zoom-Faktor
-   *
-   * @return
-   */
-  public double getScaleFactor() {
-    OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-    return drawingView == null ? 1.0 : drawingView.getScaleFactor();
-  }
-
-  public void setScaleFactor(double newValue) {
-    double oldValue = fDrawingEditor.getActiveView().getScaleFactor();
-    fDrawingEditor.getActiveView().setScaleFactor(newValue);
-    firePropertyChange("scaleFactor", oldValue, newValue);
-  }
-
-  public void scaleAndScrollTo(OpenTCSDrawingView drawView,
-                               double newScale,
-                               int xCenter,
-                               int yCenter) {
-    double oldValue = fDrawingEditor.getActiveView().getScaleFactor();
-    drawView.scaleAndScrollTo(newScale, xCenter, yCenter);
-    firePropertyChange("scaleFactor", oldValue, newScale);
-  }
-
-  /**
-   * Setter- und Getter-Methoden, die implizit aus ToggleViewPropertyAction
-   * aufgerufen werden.
-   *
-   * @return
-   */
-  public boolean isConstrainerVisible() {
-    OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-    return drawingView == null ? true : drawingView.isConstrainerVisible();
-  }
-
-  public void setConstrainerVisible(boolean newValue) {
-    boolean oldValue = fDrawingEditor.getActiveView().isConstrainerVisible();
-    fDrawingEditor.getActiveView().setConstrainerVisible(newValue);
-    firePropertyChange(CONSTRAINER_VISIBLE_PROPERTY, oldValue, newValue);
-  }
-
-  public boolean isRulersVisible() {
-    OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-    return drawingView == null ? true : drawingView.isRulersVisible();
-  }
-
-  public void setRulersVisible(boolean newValue) {
-    boolean oldValue = fDrawingEditor.getActiveView().isRulersVisible();
-    fDrawingEditor.getActiveView().setRulersVisible(newValue);
-    firePropertyChange(OpenTCSDrawingView.RULERS_VISIBLE_PROPERTY,
-                       oldValue,
-                       newValue);
-  }
-
-  public boolean isLabelsVisible() {
-    OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-    return drawingView == null ? true : drawingView.isLabelsVisible();
-  }
-
-  public void setLabelsVisible(boolean newValue) {
-    boolean oldValue = fDrawingEditor.getActiveView().isLabelsVisible();
-    fDrawingEditor.getActiveView().setLabelsVisible(newValue);
-    firePropertyChange(LABELS_VISIBLE_PROPERTY, oldValue, newValue);
-  }
-
-  public boolean isBlocksVisible() {
-    OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-    return drawingView == null ? true : drawingView.isBlocksVisible();
-  }
-
-  public void setBlocksVisible(boolean newValue) {
-    boolean oldValue = fDrawingEditor.getActiveView().isBlocksVisible();
-    fDrawingEditor.getActiveView().setBlocksVisible(newValue);
-    firePropertyChange(BLOCKS_VISIBLE_PROPERTY, oldValue, newValue);
-  }
-
-  public boolean isStaticRoutesVisible() {
-    OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-    return drawingView == null ? true : drawingView.isStaticRoutesVisible();
-  }
-
-  public void setStaticRoutesVisible(boolean newValue) {
-    boolean oldValue = fDrawingEditor.getActiveView().isStaticRoutesVisible();
-    fDrawingEditor.getActiveView().setStaticRoutesVisible(newValue);
-    firePropertyChange(STATIC_ROUTES_VISIBLE_PROPERTY, oldValue, newValue);
-  }
-
-  /**
-   * Adds the given model components to the data model. E.g. when pasting.
-   *
-   * @param userObjects
-   * @return
-   */
-  public List<UserObject> restoreModelComponents(List<UserObject> userObjects) {
-    List<UserObject> restoredUserObjects = new ArrayList<>();
-
-    for (UserObject userObject : userObjects) {
-      ModelComponent modelComponent = userObject.getModelComponent();
-      ModelComponent folder = getSystemModel().getFolder(modelComponent);
-
-      if (folder == null) {
-        // Workaround: Eigentlich sollten im Tree keine Folder selektiert sein!
-        return null;
-      }
-
-      if (folder.contains(modelComponent)) {
-        try {
-          // Paste after Copy: Create clones of tree components (and figures)
-          if (modelComponent instanceof FigureComponent) {
-            Figure figure = ((FigureComponent) modelComponent).getFigure();
-
-            if (figure instanceof LabeledFigure) {
-              // Point, Location
-              // Create new Figure with a "cloned" model
-              final LabeledFigure clonedFigure = (LabeledFigure) figure.clone();
-              // Place the figure relative to the position of the prototype
-              AffineTransform tx = new AffineTransform();
-              // TODO: Abstand des Duplikats konfigurierbar!
-              // TODO: Bei mehrfachem Aufruf von Paste den Offset jeweils relativ zum Vorgänger, nicht zum Original
-              tx.translate(50, 50);
-              clonedFigure.transform(tx);
-              getDrawingView().getDrawing().add(clonedFigure);
-              // The new tree component will be created by "figureAdded()"
-              modelComponent = clonedFigure.get(FigureConstants.MODEL);
-            }
-            else if (figure instanceof TCSFigure) {
-              // Vehicle, ...
-              TCSFigure clonedFigure = (TCSFigure) figure.clone();
-              modelComponent = clonedFigure.getModel();
-            }
-          }
-          else {
-            // LocationType, Block, StaticRoute, Group
-            modelComponent = modelComponent.clone();
-          }
-        }
-        catch (CloneNotSupportedException ex) {
-          log.log(Level.WARNING, "clone() not supported for {0}", modelComponent.getName());
-        }
-      }
-
-      if (modelComponent instanceof FigureComponent) {
-        if (!getDrawingView().getDrawing().contains(((FigureComponent) modelComponent).getFigure())) {
-          getDrawingView().getDrawing().add(((FigureComponent) modelComponent).getFigure());
-        }
-      }
-
-      userObject = addModelComponent(folder, modelComponent);
-      restoredUserObjects.add(userObject);
-    }
-
-    return restoredUserObjects;
-  }
-
-  /**
-   * @param figuresToClone
-   * @return
-   */
-  public List<Figure> cloneFigures(List<Figure> figuresToClone) {
-    // Buffer for Links and Paths associated with the cloned Points and Locations
-    TreeSet<AbstractConnection> bufferedConnections = new TreeSet<>();
-    // References the prototype Points and Locations to their clones
-    Map<FigureComponent, FigureComponent> mClones = new HashMap<>();
-    List<Figure> clonedFigures = new ArrayList<>();
-
-    for (Figure figure : figuresToClone) {
-      if (figure instanceof LabeledFigure) {
-        // Location or Point
-        FigureComponent model = figure.get(FigureConstants.MODEL);
-
-        if (model != null) {
-          bufferedConnections.addAll(model.getConnections());
-        }
-
-        LabeledFigure clonedFigure = (LabeledFigure) figure.clone();
-        FigureComponent clonedModel = clonedFigure.get(FigureConstants.MODEL);
-
-        if (model != null) {
-          mClones.put(model, clonedModel);
-        }
-        // Paste cloned figure to the drawing
-        AffineTransform tx = new AffineTransform();
-        // TODO: Abstand des Duplikats konfigurierbar!
-        // TODO: Bei mehrfachem Aufruf von Paste den Offset jeweils relativ zum Vorgänger, nicht zum Original
-        tx.translate(50, 50);
-        clonedFigure.transform(tx);
-        getDrawingView().getDrawing().add(clonedFigure);
-        // The new tree component will be created by "figureAdded()"
-        clonedFigures.add(clonedFigure);
-      }
-      else if (figure instanceof BitmapFigure) {
-        BitmapFigure clonedFigure = new BitmapFigure(
-            new File(((BitmapFigure) figure).getImagePath()));
-        AffineTransform tx = new AffineTransform();
-        // TODO: Abstand des Duplikats konfigurierbar!
-        // TODO: Bei mehrfachem Aufruf von Paste den Offset jeweils relativ zum Vorgänger, nicht zum Original
-        tx.translate(50, 50);
-        clonedFigure.transform(tx);
-        getDrawingView().addBackgroundBitmap(clonedFigure);
-      }
-    }
-
-    for (Figure figure : figuresToClone) {
-      if (figure instanceof SimpleLineConnection) {
-        // Link or Path
-        SimpleLineConnection clonedFigure = (SimpleLineConnection) figure.clone();
-        AbstractConnection model = (AbstractConnection) figure.get(FigureConstants.MODEL);
-        AbstractConnection clonedModel = (AbstractConnection) clonedFigure.get(FigureConstants.MODEL);
-
-        if (bufferedConnections.contains(model)) {
-          if (model != null) {
-            FigureComponent sourcePoint = (FigureComponent) model.getStartComponent();
-            FigureComponent clonedSource = mClones.get(sourcePoint);  // The clone of the original source point
-            Iterator<Connector> iConnectors = clonedSource.getFigure().getConnectors(null).iterator();
-            clonedFigure.setStartConnector(iConnectors.next());
-
-            FigureComponent destinationPoint = (FigureComponent) model.getEndComponent();
-            FigureComponent clonedDestination = mClones.get(destinationPoint);
-            iConnectors = clonedDestination.getFigure().getConnectors(null).iterator();
-            clonedFigure.setEndConnector(iConnectors.next());
-
-            clonedModel.setConnectedComponents(clonedSource, clonedDestination);
-          }
-        }
-
-        getDrawingView().getDrawing().add(clonedFigure);
-        // The new tree component will be created by "figureAdded()"
-        clonedFigures.add(clonedFigure);
-      }
-    }
-
-    return clonedFigures;
-  }
-
-  @Override	// View
-  public void write(URI f, URIChooser chooser) throws IOException {
-    log.severe("method entry");
-    Drawing drawing = fDrawingEditor.getDrawing();
-    OutputFormat outputFormat = drawing.getOutputFormats().get(0);
-    outputFormat.write(f, drawing);
-  }
-
-  @Override	// View
-  public void read(URI f, URIChooser chooser) throws IOException {
-    log.severe("method entry");
-    try {
-      final Drawing drawing = createDrawing();
-      InputFormat inputFormat = drawing.getInputFormats().get(0);
-      inputFormat.read(f, drawing, true);
-
-      SwingUtilities.invokeAndWait(new Runnable() {
-        @Override
-        public void run() {
-          for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-            OpenTCSDrawingView tcsDrawView = (OpenTCSDrawingView) drawView;
-            tcsDrawView.getDrawing().removeUndoableEditListener(fUndoRedoManager);
-            tcsDrawView.setDrawing(drawing);
-            tcsDrawView.getDrawing().addUndoableEditListener(fUndoRedoManager);
-          }
-          fUndoRedoManager.discardAllEdits();
-        }
-      });
-    }
-    catch (InterruptedException | InvocationTargetException e) {
-      InternalError error = new InternalError();
-      e.initCause(e);
-      throw error;
-    }
+  @Override	// AbstractView
+  public void stop() {
+    log.info("GUI terminating...");
+    // Exclude the modelling view here.
+    appConfig.setDrawingViewCount(viewManager.getDrawingViewMap().size() - 1);
+    appConfig.setOrderViewCount(viewManager.getTransportOrderMap().size());
+    appConfig
+        .setOrderSequenceViewCount(viewManager.getOrderSequenceMap().size());
+    dockingManager.saveLayout();
+
+    System.exit(0);
   }
 
   /**
@@ -1404,53 +593,898 @@ public class OpenTCSView
 //		}
   }
 
-  @Override	// AbstractView
-  public void start() {
-    // Load current model from the kernel
-    progressIndicator.setProgress(40, "Load system model from openTCS kernel");
-
-    if (kernel() == null) {
-      showStatus(Level.WARNING, "Kernel not connected");
+  @Handler
+  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case LOADED:
+        setHasUnsavedChanges(false);
+        // Update model name in title
+        setModelNameProperty(fModelManager.getModel().getName());
+        break;
+      default:
+      // Do nada.
     }
-    else {
-      setKernelState(kernel().getState());
-      loadCurrentKernelModel();
+  }
 
-      for (OpenTCSDockableUtil util : viewManager.getDrawingViewMap().values()) {
-        util.getDrawingView().handleFocusGained();
-      }
-
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          vehiclesPanel.setVehicleModels(fSystemModel.getVehicleModels());
-        }
-      });
-    }
-
-    progressIndicator.setProgress(100, "Model loaded from openTCS kernel.");
+  @Handler
+  public void handleModelModificationEvent(ModelModificationEvent event) {
+    setHasUnsavedChanges(true);
   }
 
   /**
-   * Informs the view that a model component has changed.
+   * Shows or hides the specific <code>PanelFactory</code>.
+   *
+   * @param factory The factory resp. panel that shall be shown / hidden.
+   * @param visible True to set it visible, false otherwise.
    */
-  public void modelComponentChanged() {
-    setHasUnsavedChanges(true);
-    firePropertyChange(View.HAS_UNSAVED_CHANGES_PROPERTY, null, null);
+  public void showPluginPanel(PanelFactory factory, boolean visible) {
+    String id = factory.getClass().getName();
+    SingleCDockable dockable
+        = dockingManager.getCControl().getSingleDockable(id);
+    if (dockable != null) {
+      // dockable is not null at this point when the user hides the plugin 
+      // panel by clicking on its menu entry
+      PluggablePanel panel = (PluggablePanel) dockable.getFocusComponent();
+      panel.plugOut();
+      if (!dockingManager.getCControl().removeDockable(dockable)) {
+        log.warning("Couldn't remove dockable for plugin panel '"
+            + factory.getPanelDescription() + "'");
+        return;
+      }
+    }
+    if (!visible) {
+      return;
+    }
+    if (factory.providesPanel(OperationMode.equivalent(appState
+        .getOperationMode()))) {
+      final PluggablePanel panel = factory.createPanel(OperationMode.equivalent(
+          appState.getOperationMode()));
+      final DefaultSingleCDockable factoryDockable = dockingManager
+          .createFloatingDockable(
+              factory.getClass().getName(),
+              factory.getPanelDescription(),
+              panel);
+      factoryDockable.addVetoClosingListener(new CVetoClosingListener() {
+
+        @Override
+        public void closing(CVetoClosingEvent event) {
+        }
+
+        @Override
+        public void closed(CVetoClosingEvent event) {
+          panel.plugOut();
+          dockingManager.getCControl().removeDockable(factoryDockable);
+        }
+      });
+      panel.plugIn();
+    }
   }
 
-  @Override	// AbstractView
-  public void stop() {
-    log.info("GUI terminating...");
-    // don't save the modelling view
-    configStore.setInt(NUMBER_OF_DRAWING_VIEWS, viewManager.getDrawingViewMap().size() - 1);
-    configStore.setInt(NUMBER_OF_TRANSPORT_ORDER_VIEWS,
-                       viewManager.getTransportOrderMap().size());
-    configStore.setInt(NUMBER_OF_ORDER_SEQUENCE_VIEWS,
-                       viewManager.getOrderSequenceMap().size());
-    dockingManager.saveLayout();
+  /**
+   * Adds a new drawing view to the tabbed wrappingPanel.
+   *
+   * @return The newly created Dockable.
+   */
+  public DefaultSingleCDockable addDrawingView() {
+    DrawingViewScrollPane newScrollPane
+        = drawingViewFactory.createDrawingView(
+            fModelManager.getModel(),
+            toolBarManager.getSelectionToolButton(),
+            toolBarManager.getDragToolButton(),
+            this);
 
-    System.exit(0);
+    int drawingViewIndex = viewManager.getNextDrawingViewIndex();
+
+    String title = ResourceBundleUtil.getBundle().getString(
+        "OpenTCSView.tab.drivingCourse") + " " + drawingViewIndex;
+    DefaultSingleCDockable newDockable
+        = dockingManager.createDockable("drivingCourse" + drawingViewIndex,
+                                        title,
+                                        newScrollPane,
+                                        true);
+    viewManager.putDrawingView(newDockable, newScrollPane);
+
+    // Add to group pop ups
+    if (drawingViewIndex > 0) { //don't add to modelling view
+      ModelComponent groups
+          = fModelManager.getModel().getMainFolder(SystemModel.FolderKey.GROUPS);
+
+      for (Object o : groups.getChildComponents()) {
+        if (o instanceof GroupModel) {
+          GroupModel gf = (GroupModel) o;
+          gf.setDrawingViewVisible(title, true);
+        }
+      }
+    }
+
+    int lastIndex = Math.max(0, drawingViewIndex - 1);
+    dockingManager.addTabTo(newDockable, DockingManager.COURSE_TAB_PANE_ID,
+                            lastIndex);
+
+    newDockable.addVetoClosingListener(new DrawingViewClosingListener(
+        newDockable));
+    newDockable.addFocusListener(drawingViewFocusHandler);
+
+    newScrollPane.getDrawingView().dispatchEvent(new FocusEvent(this,
+                                                                FocusEvent.FOCUS_GAINED));
+    firePropertyChange(OpenTCSDrawingView.FOCUS_GAINED, null, newDockable);
+
+    return newDockable;
+  }
+
+  /**
+   * Adds a new transport order view.
+   *
+   * @param shouldInitView If the newly created view should initialize itself
+   * with current transport orders. It should be false when there isn't set up
+   * an event dispatcher yet.
+   */
+  public void addTransportOrderView(boolean shouldInitView) {
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    int biggestIndex = viewManager.getNextTransportOrderViewIndex();
+    DefaultSingleCDockable lastTOView = viewManager.getLastTransportOrderView();
+    TransportOrdersContainerPanel panel = toContainerPanelProvider.get();
+    DefaultSingleCDockable newDockable
+        = dockingManager.createDockable("transportOrders" + biggestIndex,
+                                        bundle.getString(
+                                            "OpenTCSView.tab.transportOrders")
+                                        + " " + biggestIndex, panel, true);
+    viewManager.putTransportOrderView(newDockable, panel);
+
+    if (shouldInitView) {
+      panel.initView();
+    }
+
+    newDockable.addVetoClosingListener(
+        dockableHandlerFactory.createDockableClosingHandler(newDockable));
+
+    final int indexToInsert;
+
+    if (lastTOView != null) {
+      indexToInsert = dockingManager.getTabPane(
+          DockingManager.COURSE_TAB_PANE_ID).
+          getStation().indexOf(lastTOView.intern()) + 1;
+    }
+    else {
+      indexToInsert = viewManager.getDrawingViewMap().size();
+    }
+
+    dockingManager.addTabTo(newDockable, DockingManager.COURSE_TAB_PANE_ID,
+                            indexToInsert);
+  }
+
+  /**
+   * Adds a new order sequence view.
+   *
+   * @param shouldInitView If the newly created view should initialize itself
+   * with current transport orders. It should be false when there isn't set up
+   * an event dispatcher yet.
+   */
+  public void addTransportOrderSequenceView(boolean shouldInitView) {
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    int biggestIndex = viewManager.getNextOrderSequenceViewIndex();
+    DefaultSingleCDockable lastOSView = viewManager.getLastOrderSequenceView();
+
+    OrderSequencesContainerPanel panel = osContainerPanelProvider.get();
+    DefaultSingleCDockable newDockable
+        = dockingManager.createDockable("orderSequences" + biggestIndex,
+                                        bundle.getString(
+                                            "OpenTCSView.tab.transportOrderSequences") + " " + biggestIndex,
+                                        panel, true);
+    viewManager.putOrderSequenceView(newDockable, panel);
+
+    if (shouldInitView) {
+      panel.initView();
+    }
+
+    newDockable.addVetoClosingListener(
+        dockableHandlerFactory.createDockableClosingHandler(newDockable));
+
+    final int indexToInsert;
+    if (lastOSView != null) {
+      indexToInsert = dockingManager.getTabPane(
+          DockingManager.COURSE_TAB_PANE_ID).
+          getStation().indexOf(lastOSView.intern()) + 1;
+    }
+    else {
+      indexToInsert = viewManager.getTransportOrderMap().size()
+          + viewManager.getDrawingViewMap().size();
+    }
+    dockingManager.addTabTo(newDockable, DockingManager.COURSE_TAB_PANE_ID,
+                            indexToInsert);
+  }
+
+  /**
+   * Restores the layout to default.
+   */
+  public void resetWindowArrangement() {
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getDrawingViewMap().keySet())) {
+      removeDrawingView(dock);
+    }
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getTransportOrderMap().keySet())) {
+      dockingManager.removeDockable(dock);
+    }
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getOrderSequenceMap().keySet())) {
+      dockingManager.removeDockable(dock);
+    }
+    dockingManager.reset();
+    closeOpenedPluginPanels();
+    viewManager.reset();
+
+    appConfig.setDrawingViewCount(1);
+    appConfig.setOrderViewCount(1);
+    appConfig.setOrderSequenceViewCount(1);
+
+    initializeFrame();
+
+    // Depending on the current kernel state there may exist panels, now, that
+    // shouldn't be visible.
+    Thread t = new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+        setPlantOverviewState(appState.getOperationMode());
+      }
+    });
+    t.start();
+  }
+
+  /**
+   * Creates a new group of elements.
+   * The elements are selected from a CreateGroupPanel or from the context menu
+   * of a Point / Location / Path
+   *
+   * @param members The components that will form that group.
+   */
+  public void createGroup(Set<ModelComponent> members) {
+    requireNonNull(members, "components is null");
+    if (members.isEmpty()) {
+      return;
+    }
+
+    GroupModel groupModel = crsObjFactory.createGroupModel();
+    for (ModelComponent member : members) {
+      groupModel.add(member);
+    }
+
+    for (String name : getDrawingViewNames()) {
+      groupModel.setDrawingViewVisible(name, true);
+    }
+
+    addModelComponent(
+        fModelManager.getModel().getMainFolder(SystemModel.FolderKey.GROUPS),
+        groupModel);
+  }
+
+  /**
+   * Deletes a group.
+   *
+   * @param gm The folder that contains the elements of the group.
+   */
+  public void deleteGroup(GroupModel gm) {
+    for (OpenTCSDrawingView drawingView : getDrawingViews()) {
+      drawingView.setGroupVisible(gm.getChildComponents(), true);
+    }
+    removeModelComponent(fModelManager.getModel().getMainFolder(
+        SystemModel.FolderKey.GROUPS), gm);
+  }
+
+  /**
+   * Removes members from a group.
+   *
+   * @param userObjects The items that should be removed.
+   * @return <code>true</code> if the UserObject was successfully removed.
+   */
+  public boolean removeGroupMembers(Set<UserObject> userObjects) {
+    if (userObjects.isEmpty()) {
+      return false;
+    }
+
+    List<ModelComponent> items = new ArrayList<>();
+    for (UserObject userObject : userObjects) {
+      ModelComponent dataObject = userObject.getModelComponent();
+      items.add(dataObject);
+      fGroupsTreeManager.removeItem(userObject);
+    }
+
+    for (OpenTCSDrawingView drawingView : getDrawingViews()) {
+      drawingView.setGroupVisible(new ArrayList<>(items), true);
+    }
+
+    setHasUnsavedChanges(true);
+    return true;
+  }
+
+  /**
+   * Adds the currently selected items on the drawing view to the given group.
+   *
+   * @param groupModel GroupFolder referencing the group.
+   */
+  public void addSelectedItemsToGroup(GroupModel groupModel) {
+    requireNonNull(groupModel, "groupModel");
+
+    for (Figure figure : fDrawingEditor.getActiveView().getSelectedFigures()) {
+      FigureComponent model = figure.get(FigureConstants.MODEL);
+
+      if (model instanceof LinkModel) {
+        // LinkModels are automatically set in/visible
+        continue;
+      }
+
+      if (groupModel.contains(model)) {
+        continue;
+      }
+
+      groupModel.add(model);
+      fGroupsTreeManager.addItem(groupModel, model);
+    }
+
+    fGroupsTreeManager.getTreeView().sortChildren();
+    setHasUnsavedChanges(true);
+  }
+
+  /**
+   * Toggles the visibility of the group members.
+   *
+   * @param gm The folder that contains the elements of the group.
+   * @param visible Visible or not.
+   */
+  public void setGroupVisibilityInAllDrawingViews(GroupModel gm, boolean visible) {
+    gm.setGroupVisible(visible);
+
+    for (OpenTCSDrawingView drawingView : getDrawingViews()) {
+      drawingView.setGroupVisible(gm.getChildComponents(), gm.isGroupVisible());
+    }
+  }
+
+  /**
+   * Toggles the visibility of the group members for a specific
+   * <code>OpenTCSDrawingView</code>.
+   *
+   * @param title The title of the drawing view.
+   * @param sf The group folder containing the elements to hide.
+   * @param visible Visible or not.
+   */
+  public void setGroupVisibilityInDrawingView(String title, GroupModel sf,
+                                              boolean visible) {
+    sf.setDrawingViewVisible(title, visible);
+    viewManager.setGroupVisibilityInDrawingView(title, sf, visible);
+  }
+
+  public JMenuBar getMenuBar() {
+    return fMenuBar;
+  }
+
+  /**
+   * Informs all locations the theme has changed and they have to repaint.
+   */
+  public void updateLocationThemes() {
+    for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
+      for (Figure figure : drawView.getDrawing().getChildren()) {
+        if (figure instanceof LabeledLocationFigure) {
+          LabeledLocationFigure locFigure = (LabeledLocationFigure) figure;
+          locFigure.propertiesChanged(
+              new AttributesChangeEvent(attributesEventHandler,
+                                        locFigure.getPresentationFigure()
+                                        .getModel()));
+        }
+      }
+    }
+  }
+
+  /**
+   * Informs all vehicles the theme has changed and they have to repaint.
+   */
+  public void updateVehicleThemes() {
+    for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
+      for (Figure figure : drawView.getDrawing().getChildren()) {
+        if (figure instanceof VehicleFigure) {
+          VehicleFigure vehicleFigure = (VehicleFigure) figure;
+          vehicleFigure.propertiesChanged(
+              new AttributesChangeEvent(attributesEventHandler,
+                                        vehicleFigure.getModel()));
+        }
+      }
+    }
+    vehiclesPanel.repaint();
+  }
+
+  /**
+   * Logs a message to the status text area.
+   *
+   * @param message The message to log.
+   */
+  private void log(Message message) {
+    kernelStatusPanel.display(message);
+  }
+
+  @Override	// GuiManager
+  public void createEmptyModel() {
+    CloseFileAction action
+        = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
+    if (action != null) {
+      action.actionPerformed(new ActionEvent(this,
+                                             ActionEvent.ACTION_PERFORMED,
+                                             CloseFileAction.ID_MODEL_CLOSING));
+      if (action.getFileSavedStatus() == JOptionPane.CANCEL_OPTION) {
+        return;
+      }
+    }
+
+    // Clean up first...
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.UNLOADING));
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.UNLOADED));
+
+    // Create the new, empty model.
+    log.fine("Creating new driving course model...");
+    fModelManager.createEmptyModel();
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.LOADING));
+
+    // Now let components set themselves up for the new model.
+    setSystemModel(fModelManager.getModel());
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.LOADED));
+
+    // makes sure the origin is on the lower left side and the ruler
+    // are correctly drawn
+    fDrawingEditor.initializeViewport();
+  }
+
+  public void loadCurrentKernelModel() {
+    final Object localKernelClient = new Object();
+    try {
+      kernelProvider.register(localKernelClient);
+      if (!kernelProvider.kernelShared()) {
+        log.info("Kernel unavailable, aborting.");
+        return;
+      }
+      loadCurrentKernelModel(kernelProvider.getKernel());
+    }
+    finally {
+      kernelProvider.unregister(localKernelClient);
+    }
+  }
+
+  /**
+   * Loads the current kernel model.
+   */
+  private void loadCurrentKernelModel(Kernel kernel) {
+    if (hasUnsavedChanges()) {
+      if (!showUnsavedChangesDialog()) {
+        return;
+      }
+    }
+
+    if (appState.hasOperationMode(OperationMode.OPERATING)
+        && kernelProvider.getKernel().getState().equals(Kernel.State.MODELLING)) {
+      handleKernelInModellingMode();
+      return;
+    }
+    restoreModel(kernel);
+  }
+
+  private void restoreModel(@Nullable Kernel kernel) {
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    if (kernel == null) {
+      if (!fModelManager.loadModel(null)) {
+        return;
+      }
+    }
+    progressIndicator.initialize();
+
+    // Step 1: Clean up currently loaded model data.
+    progressIndicator.setProgress(0, bundle.getString(
+                                  "loadCurrentKernelModel.cleanup"));
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.UNLOADING));
+
+    // Step 2: Load the model data from the kernel or create an empty model.
+    progressIndicator.setProgress(50, bundle.getString(
+                                  "loadCurrentKernelModel.startLoading"));
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.UNLOADED));
+
+    if (kernel == null) {
+      fModelManager.restoreModel();
+    }
+    else {
+      fModelManager.restoreModel(kernel);
+      String modelName = fModelManager.getModel().getName();
+      String loadMsg = bundle.getFormatted("kernelPeristence.modelLoaded", modelName);
+      statusPanel.setLogMessage(Level.INFO, loadMsg);
+    }
+    SystemModel restoredModel = fModelManager.getModel();
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.LOADING));
+
+    // Step 3: Let components set themselves up for the new model.
+    setSystemModel(restoredModel);
+    // Sort the tree
+    fComponentsTreeManager.sortItems();
+
+    progressIndicator.setProgress(90, bundle.getString(
+                                  "loadCurrentKernelModel.setUpWorkingArea"));
+    ModelComponent layoutComponent
+        = fModelManager.getModel().getMainFolder(SystemModel.FolderKey.LAYOUT);
+    layoutComponent.addAttributesChangeListener(attributesEventHandler);
+
+    eventBus.publish(new SystemModelTransitionEvent(
+        this, SystemModelTransitionEvent.Stage.LOADED));
+    updateModelName();
+
+    progressIndicator.terminate();
+  }
+
+  /**
+   * Shows a dialog telling the user the plant overview state can't be switched
+   * as long as it has unsaved changes.
+   *
+   * @return <code>true</code> if the user saved the model or
+   * discarded the changes (the program can
+   * continue normally), <code>false</code> if the user pressed cancel.
+   */
+  private boolean showSwitchStateUnsavedChangesDialog() {
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    String title = labels.getString(
+        "switchPlantOverviewState.unsavedChangesTitle");
+    String text = labels
+        .getString("switchPlantOverviewState.unsavedChangesText");
+    String[] options = {labels.getString("switchPlantOverviewState.kernel"),
+                        labels.getString("switchPlantOverviewState.discard"),
+                        labels.getString("dialog.buttonCancel.text")};
+    switch (userMessageHelper.showOptionsDialog(title, text,
+                                                UserMessageHelper.Type.ERROR,
+                                                options)) {
+      case 0:
+        return persistModel();
+      case 1:
+        setHasUnsavedChanges(false);
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Handler
+  public void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
+    switch (event.getNewState()) {
+      case MODELLING:
+        if (appState.hasOperationMode(OperationMode.OPERATING)) {
+          handleKernelInModellingMode();
+        }
+        break;
+      case OPERATING:
+        if (appState.hasOperationMode(OperationMode.OPERATING)) {
+          if (hasUnsavedChanges()) {
+            if (!showSwitchStateUnsavedChangesDialog()) {
+              return;
+            }
+          }
+          loadCurrentKernelModel();
+        }
+        break;
+      case DISCONNECTED:
+        if (kernelProvider.kernelShared()
+            || appState.hasOperationMode(OperationMode.OPERATING)) {
+          setPlantOverviewState(OperationMode.MODELLING);
+          kernelProvider.unregister(kernelClient);
+        }
+        break;
+      case SHUTDOWN:
+        if (kernelProvider.kernelShared()
+            || appState.hasOperationMode(OperationMode.OPERATING)) {
+          setPlantOverviewState(OperationMode.MODELLING);
+          kernelProvider.unregister(kernelClient);
+          ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+          String text = labels.getFormatted("mode.status.kernelConnectionLost",
+                                            labels.getString(
+                                                "kernel.stateModelling"));
+          log(new Message(text, Message.Type.WARNING));
+        }
+        break;
+      default:
+    }
+  }
+
+  /**
+   * Switches the plant overview state.
+   *
+   * @param newMode The mode to switch to.
+   */
+  public void switchPlantOverviewState(OperationMode newMode) {
+    if (!appState.hasOperationMode(newMode)) {
+      closeOpenedPluginPanels();
+    }
+    switch (newMode) {
+      case MODELLING:
+        setPlantOverviewState(newMode);
+        kernelProvider.unregister(kernelClient);
+        break;
+      case OPERATING:
+        if (hasUnsavedChanges()) {
+          if (!showSwitchStateUnsavedChangesDialog()) {
+            return;
+          }
+        }
+        kernelProvider.register(kernelClient);
+        if (kernelProvider.kernelShared()) {
+          if (!kernelProvider.getKernel().getState().equals(
+              Kernel.State.OPERATING)) {
+            handleKernelInModellingMode();
+          }
+          setPlantOverviewState(newMode);
+          loadCurrentKernelModel();
+        }
+        else {
+          // If a kernel is not available, switch (back) to modelling mode.
+          switchPlantOverviewState(OperationMode.MODELLING);
+        }
+
+        break;
+      default:
+      // Do nada.
+    }
+  }
+
+  private void handleKernelInModellingMode() {
+    createEmptyModel();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    String text = labels.
+        getFormatted("mode.status.kernelInModelling",
+                     labels.getString("kernel.stateModelling"),
+                     labels.getString("kernel.stateOperating"));
+    log(new Message(text, Message.Type.INFO));
+  }
+
+  private void setPlantOverviewStateProperty(String kernelState) {
+    String oldKernelState = sOperationMode;
+    sOperationMode = kernelState;
+    firePropertyChange(OPERATIONMODE_PROPERTY, oldKernelState, kernelState);
+  }
+
+  private void setModelNameProperty(String modelName) {
+    fModelManager.getModel().setName(modelName);
+    eventBus.publish(new ModelNameChangeEvent(this, modelName));
+  }
+
+  public void updateModelName() {
+    String newName = fModelManager.getModel().getName();
+    eventBus.publish(new ModelNameChangeEvent(this, newName));
+  }
+
+  /**
+   * Adds a background image to the currently active drawing view.
+   *
+   * @param file The file with the image.
+   */
+  public void addBackgroundBitmap(File file) {
+    if (appState.hasOperationMode(OperationMode.MODELLING)) {
+      viewManager.setBitmapToModellingView(file);
+    }
+    else {
+      getActiveDrawingView().addBackgroundBitmap(file);
+    }
+  }
+
+  public void scaleAndScrollTo(OpenTCSDrawingView drawView,
+                               ViewBookmark bookmark) {
+    double oldScaleFactor = fDrawingEditor.getActiveView().getScaleFactor();
+    drawView.scaleAndScrollTo(bookmark);
+    firePropertyChange("scaleFactor", oldScaleFactor, bookmark.getViewScaleX());
+  }
+
+  /**
+   * Adds the given model components to the data model. E.g. when pasting.
+   *
+   * @param userObjects
+   * @return
+   */
+  public List<UserObject> restoreModelComponents(List<UserObject> userObjects) {
+    List<UserObject> restoredUserObjects = new ArrayList<>();
+
+    for (UserObject userObject : userObjects) {
+      ModelComponent modelComponent = userObject.getModelComponent();
+      ModelComponent folder = fModelManager.getModel().getFolder(modelComponent);
+
+      if (folder == null) {
+        // Workaround: Eigentlich sollten im Tree keine Folder selektiert sein!
+        return null;
+      }
+
+      if (folder.contains(modelComponent)) {
+        try {
+          // Paste after Copy: Create clones of tree components (and figures)
+          if (modelComponent instanceof FigureComponent) {
+            Figure figure = ((FigureComponent) modelComponent).getFigure();
+
+            if (figure instanceof LabeledFigure) {
+              // Point, Location
+              // Create new Figure with a "cloned" model
+              final LabeledFigure clonedFigure = (LabeledFigure) figure.clone();
+              // Place the figure relative to the position of the prototype
+              AffineTransform tx = new AffineTransform();
+              // TODO: Make the duplicate's distance configurable.
+              // TODO: With multiple pastes, place the inserted figure relative
+              // to the predecessor, not the original.
+              tx.translate(50, 50);
+              clonedFigure.transform(tx);
+              getActiveDrawingView().getDrawing().add(clonedFigure);
+              // The new tree component will be created by "figureAdded()"
+              modelComponent = clonedFigure.get(FigureConstants.MODEL);
+            }
+            else if (figure instanceof TCSFigure) {
+              // Vehicle, ...
+              TCSFigure clonedFigure = (TCSFigure) figure.clone();
+              modelComponent = clonedFigure.getModel();
+            }
+          }
+          else {
+            // LocationType, Block, StaticRoute, Group
+            modelComponent = modelComponent.clone();
+          }
+        }
+        catch (CloneNotSupportedException ex) {
+          log.log(Level.WARNING, "clone() not supported for {0}", modelComponent
+                  .getName());
+        }
+      }
+
+      if (modelComponent instanceof FigureComponent) {
+        if (!getActiveDrawingView().getDrawing().contains(
+            ((FigureComponent) modelComponent).getFigure())) {
+          getActiveDrawingView().getDrawing().add(
+              ((FigureComponent) modelComponent).getFigure());
+        }
+      }
+
+      addModelComponent(folder, modelComponent);
+      CONTEXT_TYPE type = null;
+      if (userObject instanceof ContextObject) {
+        ContextObject co = (ContextObject) userObject;
+        type = co.getContextType();
+      }
+      UserObjectContext context = userObjectUtil.createContext(type);
+      userObject = userObjectUtil.createUserObject(modelComponent, context);
+      restoredUserObjects.add(userObject);
+    }
+
+    return restoredUserObjects;
+  }
+
+  public List<Figure> cloneFigures(List<Figure> figuresToClone) {
+    // Buffer for Links and Paths associated with the cloned Points and Locations
+    TreeSet<AbstractConnection> bufferedConnections = new TreeSet<>();
+    // References the prototype Points and Locations to their clones
+    Map<FigureComponent, FigureComponent> mClones = new HashMap<>();
+    List<Figure> clonedFigures = new ArrayList<>();
+
+    for (Figure figure : figuresToClone) {
+      if (figure instanceof LabeledFigure) {
+        // Location or Point
+        FigureComponent model = figure.get(FigureConstants.MODEL);
+
+        if (model != null) {
+          bufferedConnections.addAll(model.getConnections());
+        }
+
+        LabeledFigure clonedFigure = (LabeledFigure) figure.clone();
+        FigureComponent clonedModel = clonedFigure.get(FigureConstants.MODEL);
+
+        if (model != null) {
+          mClones.put(model, clonedModel);
+        }
+        // Paste cloned figure to the drawing
+        AffineTransform tx = new AffineTransform();
+        // TODO: Make the duplicate's distance configurable.
+        // TODO: With multiple pastes, place the inserted figure relative to
+        // the predecessor, not the original.
+        tx.translate(50, 50);
+        clonedFigure.transform(tx);
+        getActiveDrawingView().getDrawing().add(clonedFigure);
+        // The new tree component will be created by "figureAdded()"
+        clonedFigures.add(clonedFigure);
+      }
+      else if (figure instanceof BitmapFigure) {
+        BitmapFigure clonedFigure = new BitmapFigure(
+            new File(((BitmapFigure) figure).getImagePath()));
+        AffineTransform tx = new AffineTransform();
+        // TODO: Make the duplicate's distance configurable.
+        // TODO: With multiple pastes, place the inserted figure relative to
+        // the predecessor, not the original.
+        tx.translate(50, 50);
+        clonedFigure.transform(tx);
+        getActiveDrawingView().addBackgroundBitmap(clonedFigure);
+      }
+    }
+
+    for (Figure figure : figuresToClone) {
+      if (figure instanceof SimpleLineConnection) {
+        // Link or Path
+        SimpleLineConnection clonedFigure = (SimpleLineConnection) figure
+            .clone();
+        AbstractConnection model = (AbstractConnection) figure.get(
+            FigureConstants.MODEL);
+        AbstractConnection clonedModel = (AbstractConnection) clonedFigure.get(
+            FigureConstants.MODEL);
+
+        if (bufferedConnections.contains(model)) {
+          if (model != null) {
+            FigureComponent sourcePoint = (FigureComponent) model
+                .getStartComponent();
+            FigureComponent clonedSource = mClones.get(sourcePoint);  // The clone of the original source point
+            Iterator<Connector> iConnectors = clonedSource.getFigure()
+                .getConnectors(null).iterator();
+            clonedFigure.setStartConnector(iConnectors.next());
+
+            FigureComponent destinationPoint = (FigureComponent) model
+                .getEndComponent();
+            FigureComponent clonedDestination = mClones.get(destinationPoint);
+            iConnectors = clonedDestination.getFigure().getConnectors(null)
+                .iterator();
+            clonedFigure.setEndConnector(iConnectors.next());
+
+            clonedModel.setConnectedComponents(clonedSource, clonedDestination);
+          }
+        }
+
+        getActiveDrawingView().getDrawing().add(clonedFigure);
+        // The new tree component will be created by "figureAdded()"
+        clonedFigures.add(clonedFigure);
+      }
+    }
+
+    return clonedFigures;
+  }
+
+  @Override	// View
+  public void write(URI f, URIChooser chooser)
+      throws IOException {
+    log.severe("method entry");
+    Drawing drawing = fDrawingEditor.getDrawing();
+    OutputFormat outputFormat = drawing.getOutputFormats().get(0);
+    outputFormat.write(f, drawing);
+  }
+
+  @Override	// View
+  public void read(URI f, URIChooser chooser)
+      throws IOException {
+    log.severe("method entry");
+    try {
+      final Drawing drawing = createDrawing();
+      InputFormat inputFormat = drawing.getInputFormats().get(0);
+      inputFormat.read(f, drawing, true);
+
+      SwingUtilities.invokeAndWait(new Runnable() {
+        @Override
+        public void run() {
+          for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
+            OpenTCSDrawingView tcsDrawView = (OpenTCSDrawingView) drawView;
+            tcsDrawView.getDrawing()
+                .removeUndoableEditListener(fUndoRedoManager);
+            tcsDrawView.setDrawing(drawing);
+            tcsDrawView.getDrawing().addUndoableEditListener(fUndoRedoManager);
+          }
+          fUndoRedoManager.discardAllEdits();
+        }
+      });
+    }
+    catch (InterruptedException | InvocationTargetException e) {
+      InternalError error = new InternalError();
+      e.initCause(e);
+      throw error;
+    }
   }
 
   @Override	// AbstractView
@@ -1460,7 +1494,7 @@ public class OpenTCSView
 
   @Override	// AbstractView
   public URI getURI() {
-    String modelName = fModelManager.getModelName();
+    String modelName = fModelManager.getModel().getName();
 
     try {
       uri = new URI(modelName);
@@ -1474,11 +1508,6 @@ public class OpenTCSView
     return uri;
   }
 
-  @Override	// GuiManager
-  public OpenTCSDrawingView getDrawingView() {
-    return fDrawingEditor.getActiveView();
-  }
-
   /**
    * Returns all drawing views (including the modelling view)
    *
@@ -1487,8 +1516,9 @@ public class OpenTCSView
   public List<OpenTCSDrawingView> getDrawingViews() {
     List<OpenTCSDrawingView> views = new ArrayList<>();
 
-    for (OpenTCSDockableUtil util : viewManager.getDrawingViewMap().values()) {
-      views.add(util.getDrawingView());
+    for (DrawingViewScrollPane scrollPane : viewManager.getDrawingViewMap()
+        .values()) {
+      views.add(scrollPane.getDrawingView());
     }
 
     return views;
@@ -1508,21 +1538,6 @@ public class OpenTCSView
     return viewManager.getDrawingViewNames();
   }
 
-  @Override	// GuiManager
-  public OpenTCSDrawingEditor getEditor() {
-    return fDrawingEditor;
-  }
-
-  @Override	// GuiManager
-  public GuiManager.OperationMode getOperationMode() {
-    return fActionManager.getOperationMode();
-  }
-
-  @Override// GuiManager
-  public boolean hasOperationMode(GuiManager.OperationMode mode) {
-    return getOperationMode().equals(mode);
-  }
-
   @Override
   public void selectModelComponent(ModelComponent modelComponent) {
     fPropertiesComponent.setModel(modelComponent);
@@ -1534,9 +1549,7 @@ public class OpenTCSView
       drawingView.toggleSelection(figure);
     }
     else {
-      Set<ModelComponent> comps = new HashSet<>(1);
-      comps.add(modelComponent);
-      editingOptions(comps);
+      editingOptions(Collections.singleton(modelComponent));
     }
   }
 
@@ -1562,10 +1575,11 @@ public class OpenTCSView
       drawingView.addToSelection(figures);
 
       fPropertiesComponent.setModel(new PropertiesCollection(components));
-      // Wieder alle ursprünglich "angeklickten" Objekte im Tree markieren
+      // Re-select all originally selected objects in the tree.
       fComponentsTreeManager.selectItems(components);
     }
-    else {  // Im Operating Mode kann nur eine Komponente ausgewählt werden
+    else {
+      // In operating mode, only one component can be selected.
       selectModelComponent(modelComponent);
     }
   }
@@ -1574,39 +1588,40 @@ public class OpenTCSView
   public boolean treeComponentRemoved(ModelComponent model) {
     boolean componentRemoved = false;
     boolean componentRemovedFromFolder = false;
-    // Das Löschen ist nur im MODELLING Mode erlaubt
-    if (kernel().getState() == Kernel.State.MODELLING) {
-      // Point: zugehörige PointFigure löschen
-      // Location: zugehörige LocationFigure löschen
+    // Removal is only allowed in modelling mode.
+    if (appState.hasOperationMode(OperationMode.MODELLING)) {
+      // Point/Location: Remove corresponding Figure.
       if (model instanceof PointModel || model instanceof LocationModel) {
         LabeledFigure lf = (LabeledFigure) ((FigureComponent) model).getFigure();
-        // Die Drawing löscht auch ggf. mit dem Point verbundene PathConnections
+        // Die Drawing lï¿½scht auch ggf. mit dem Point verbundene PathConnections
         // bzw. eine mit der Location verbundenen LinkConnection
-        getEditor().getActiveView().getDrawing().remove(lf);
+        fDrawingEditor.getActiveView().getDrawing().remove(lf);
         componentRemoved = true;
       }
+      // Link/Path: Remove corresponding Figure.
       else if ((model instanceof LinkModel || model instanceof PathModel)
           && !(model.getParent() instanceof BlockModel)) {
-        // Link: zugehörige LinkConnection löschen
-        // Path: zugehörige PathConnection löschen
-        SimpleLineConnection figure = (SimpleLineConnection) ((FigureComponent) model).getFigure();
-        getEditor().getActiveView().getDrawing().remove(figure);
+        SimpleLineConnection figure = (SimpleLineConnection) ((FigureComponent) model)
+            .getFigure();
+        fDrawingEditor.getActiveView().getDrawing().remove(figure);
         componentRemoved = true;
       }
+      // Vehicle: Remove corresponding Figure.
       else if (model instanceof VehicleModel) {
         VehicleFigure vf = (VehicleFigure) ((FigureComponent) model).getFigure();
-        // Zugehörige VehicleFigure löschen
-        getEditor().getActiveView().getDrawing().remove(vf);
+        fDrawingEditor.getActiveView().getDrawing().remove(vf);
         componentRemoved = true;
       }
       else if (model instanceof LocationTypeModel) {
         // Search if any Locations of this type exist
-        for (LocationModel lm : fSystemModel.getLocationModels()) {
+        for (LocationModel lm : fModelManager.getModel().getLocationModels()) {
           if (lm.getLocationType() == model) {
             JOptionPane.showMessageDialog(
                 this,
-                ResourceBundleUtil.getBundle().getString("message.cannotDeleteLocationType.text"),
-                ResourceBundleUtil.getBundle().getString("message.cannotDeleteLocationType.title"),
+                ResourceBundleUtil.getBundle().getString(
+                    "message.cannotDeleteLocationType.text"),
+                ResourceBundleUtil.getBundle().getString(
+                    "message.cannotDeleteLocationType.title"),
                 JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -1616,7 +1631,7 @@ public class OpenTCSView
         componentRemoved = true;
       }
 
-      ModelComponent folder = getSystemModel().getFolder(model);
+      ModelComponent folder = fModelManager.getModel().getFolder(model);
 
       if (folder != null) {
         componentRemovedFromFolder = removeModelComponent(folder, model);
@@ -1628,7 +1643,7 @@ public class OpenTCSView
 
   @Override	// GuiManager
   public void figureSelected(ModelComponent modelComponent) {
-    modelComponent.addAttributesChangeListener(this);
+    modelComponent.addAttributesChangeListener(attributesEventHandler);
     fPropertiesComponent.setModel(modelComponent);
 
     Figure figure = findFigure(modelComponent);
@@ -1637,24 +1652,8 @@ public class OpenTCSView
     if (figure != null) {
       drawingView.clearSelection();
       drawingView.addToSelection(figure);
-      // Ansicht zu dieser Figur scrollen
+      // Scroll view to this figure.
       drawingView.scrollTo(figure);
-    }
-  }
-
-  @Override	// GuiManager
-  public void showPropertiesDialog(ModelComponent modelComponent) {
-    AttributesComponent dialogComponent
-        = new AttributesComponent(fUndoRedoManager);
-    dialogComponent.setPropertiesContent(new PropertiesTableContent(this, this));
-    dialogComponent.setModel(modelComponent);
-
-    if (fPropertiesDialog == null) {
-      fPropertiesDialog = createPropertiesDialog(dialogComponent);
-    }
-
-    if (!fPropertiesDialog.isVisible()) {
-      fPropertiesDialog.setVisible(true);
     }
   }
 
@@ -1690,232 +1689,127 @@ public class OpenTCSView
   }
 
   @Override	// GuiManager
-  public void createEmptyModel() {
-    CloseFileAction action
-        = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
-    action.actionPerformed(new ActionEvent(this,
-                                           ActionEvent.ACTION_PERFORMED,
-                                           CloseFileAction.ID_MODEL_CLOSING));
-
-    if (action.getFileSavedStatus() == JOptionPane.CANCEL_OPTION) {
-      return;
+  public void loadModel() {
+    if (hasUnsavedChanges()) {
+      if (!showUnsavedChangesDialog()) {
+        return;
+      }
     }
-
-    fPropertiesComponent.getPropertiesContent().reset();
-
-    try {
-      log.fine("Creating new driving course model...");
-      kernel().createModel(Kernel.DEFAULT_MODEL_NAME);
-    }
-    catch (CredentialsException exc) {
-      throw new IllegalStateException(exc);
-    }
+    restoreModel(null);
+    setHasUnsavedChanges(false);
   }
 
-  @Override	// GuiManager
-  public void loadModel() {
-    CloseFileAction action = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
+  /**
+   * Shows a dialog to save unsaved changes.
+   *
+   * @return <code>true</code> if the user pressed yes or no, <code>false</code>
+   * if the user pressed cancel.
+   */
+  private boolean showUnsavedChangesDialog() {
+    CloseFileAction action = (CloseFileAction) getActionMap().get(
+        CloseFileAction.ID);
     action.actionPerformed(new ActionEvent(this,
                                            ActionEvent.ACTION_PERFORMED,
                                            CloseFileAction.ID_MODEL_CLOSING));
-
     switch (action.getFileSavedStatus()) {
       case JOptionPane.YES_OPTION:
         super.setHasUnsavedChanges(false);
-        break;
-
+        return true;
       case JOptionPane.NO_OPTION:
-        break;
-
+        return true;
       case JOptionPane.CANCEL_OPTION:
-        return;
+        return false;
+      default:
+        return false;
     }
+  }
 
-    if (fModelManager.selectModel()) {
-      if (fModelManager.loadModel()) {
-        loadCurrentKernelModel();
+  /**
+   * Persists the current (local) model in the kernel.
+   *
+   * @return Whether the model was actually saved.
+   */
+  public boolean persistModel() {
+    final Object localKernelClient = new Object();
+    try {
+      kernelProvider.register(localKernelClient);
+      if (!kernelProvider.kernelShared()) {
+        return false;
       }
+      return persistModel(kernelProvider.getKernel());
+    }
+    finally {
+      kernelProvider.unregister(localKernelClient);
+    }
+  }
+
+  private boolean persistModel(Kernel kernel) {
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    if (hasUnsavedChanges()) {
+      JOptionPane.showMessageDialog(null, labels.getString("openTCSView.modelNotSaved"));
+      if (fModelManager.persistModel(true)) {
+        setHasUnsavedChanges(false);
+        String modelName = fModelManager.getModel().getName();
+        setModelNameProperty(modelName);
+        return persistModel(kernel);
+      }
+      return false;
+    }
+    try {
+      boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
+      if (!kernelInOperating) {
+        if (userMessageHelper.showConfirmDialog(
+            labels.getString("saveModel.kernelNotInOperating.title"),
+            labels.getString("saveModel.kernelNotInOperating.text"),
+            UserMessageHelper.Type.QUESTION)
+            != UserMessageHelper.RET_TYPE.OK) {
+          return false;
+        }
+      }
+      else {
+        kernel.setState(Kernel.State.MODELLING);
+      }
+      boolean didSave = fModelManager.persistModel(kernel);
+      if (didSave) {
+        String modelName = fModelManager.getModel().getName();
+        setModelNameProperty(modelName);
+        setHasUnsavedChanges(false);
+        String persistMsg = labels.getFormatted("kernelPeristence.modelSaved", modelName);
+        statusPanel.setLogMessage(Level.INFO, persistMsg);
+      }
+      if (kernelInOperating) {
+        kernel.setState(Kernel.State.OPERATING);
+      }
+      return didSave;
+    }
+    catch (CredentialsException e) {
+      log.log(Level.WARNING, "Exception persisting model " + fModelManager
+              .getModel().getName(), e);
+      statusPanel.setLogMessage(Level.WARNING, e.getMessage());
+      return false;
     }
   }
 
   @Override
   public boolean saveModel() {
-    if (fModelManager.saveModel(false)) {
+    boolean saved = fModelManager.persistModel(false);
+    if (saved) {
+      String modelName = fModelManager.getModel().getName();
+      setModelNameProperty(modelName);
       setHasUnsavedChanges(false);
-      setModelNameProperty(fModelManager.getModelName());
-      return true;
     }
-
-    return false;
+    return saved;
   }
 
   @Override	// GuiManager
-  public void saveModelAs() {
-    if (fModelManager.saveModel(true)) {
+  public boolean saveModelAs() {
+    boolean saved = fModelManager.persistModel(true);
+    if (saved) {
+      String modelName = fModelManager.getModel().getName();
+      setModelNameProperty(modelName);
       setHasUnsavedChanges(false);
-      setModelNameProperty(fModelManager.getModelName());
     }
-  }
-
-  @Override	// GuiManager
-  public void zoomViewToWindow() {
-    fDrawingEditor.getActiveView().zoomViewToWindow();
-  }
-
-  @Override
-  public void loadViewBookmark() {
-    // Das Kernel-Objekt für das aktuelle VisualLayout
-    // Beim starten der Visualisierung im Operating-Mode wird kein VisualLayout erzeugt!
-    Set<VisualLayout> sLayouts = kernel().getTCSObjects(VisualLayout.class);
-
-    if (sLayouts
-        != null && sLayouts.size()
-        > 0) {
-      Iterator<VisualLayout> iLayouts = sLayouts.iterator();
-
-      if (iLayouts.hasNext()) {
-        VisualLayout layout = iLayouts.next();	// Es sollte genau 1 Layout geben!
-
-        if (layout != null) {
-          OpenTCSDrawingView currentView = fDrawingEditor.getActiveView();
-
-          BookmarkSelectionPanel contentPanel
-              = new BookmarkSelectionPanel(layout.getViewBookmarks(), false);
-          StandardContentDialog dialog = new StandardContentDialog(this,
-                                                                   contentPanel);
-          ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-          dialog.setTitle(bundle.getString("view.loadViewBookmark.text"));
-          dialog.setVisible(true);
-
-          if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-            ViewBookmark selectedBookmark = contentPanel.getSelectedItem();
-
-            if (selectedBookmark != null) {
-              String label = selectedBookmark.getLabel();
-              int centerX = selectedBookmark.getCenterX();
-              int centerY = selectedBookmark.getCenterY();
-//						int viewRotation = selectedBookmark.getViewRotation();
-              double viewScaleX = selectedBookmark.getViewScaleX();
-//						double viewScaleY = selectedBookmark.getViewScaleY();
-              // Ansicht verschieben und zoomen...
-              currentView.scaleAndScrollTo(viewScaleX, centerX, centerY);
-              // TODO: String from ResourceBundle
-              showStatus(Level.INFO, "Ansicht \"" + label + "\" geladen.");
-            }
-          }
-        }
-      }
-    }
-    else {
-      // TODO: String from ResourceBundle
-      JOptionPane.showMessageDialog(this, "Es gibt noch kein VisualLayout!\nBitte das Modell im aktuellen Format speichern.");
-    }
-  }
-
-  @Override	// GuiManager
-  public void saveViewBookmark() {
-    // Das Kernel-Objekt für das aktuelle VisualLayout
-    // Beim starten der Visualisierung im Operating-Mode wird kein VisualLayout erzeugt!
-    Set<VisualLayout> sLayouts = kernel().getTCSObjects(VisualLayout.class);
-
-    if (sLayouts != null && sLayouts.size() > 0) {
-      Iterator<VisualLayout> iLayouts = sLayouts.iterator();
-
-      if (iLayouts.hasNext()) {
-        VisualLayout layout = iLayouts.next();	// Es sollte genau 1 Layout geben!
-
-        if (layout != null) {
-          // Die View Bookmarks für dieses Layout
-          List<ViewBookmark> bookmarks = new ArrayList<>();
-          Iterator<ViewBookmark> iBookmarks = layout.getViewBookmarks().iterator();
-
-          while (iBookmarks.hasNext()) {
-            ViewBookmark next = iBookmarks.next();
-            bookmarks.add(next);
-          }
-
-          ViewBookmarkNameChooser content
-              = new ViewBookmarkNameChooser(bookmarks);
-          ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-          String title = bundle.getString("view.saveViewBookmark.text");
-          StandardDialog dialog = new StandardDialog(this, true, content, title);
-          dialog.setLocationRelativeTo(this);
-          dialog.setVisible(true);
-
-          if (dialog.getReturnStatus() == StandardDialog.RET_OK) {
-            String name = content.getChosenName();
-            String nameInvalid = bundle.getString("message.nameExists");
-
-            if (name.isEmpty()) {
-              String enterName = bundle.getString("message.enterName");
-              JOptionPane.showMessageDialog(this,
-                                            enterName,
-                                            nameInvalid,
-                                            JOptionPane.ERROR_MESSAGE);
-              return;
-            }
-            else {
-              String nameAlreadyInUse
-                  = bundle.getString("message.bookmark.nameExists");
-              ViewBookmark bookmarkToRemove = null;
-
-              for (ViewBookmark bm : bookmarks) {
-                if (bm.getLabel().equals(name)) {
-                  int result
-                      = JOptionPane.showConfirmDialog(this,
-                                                      nameAlreadyInUse,
-                                                      nameInvalid,
-                                                      JOptionPane.ERROR_MESSAGE);
-
-                  if (result == JOptionPane.YES_OPTION) {
-                    bookmarkToRemove = bm;
-                  }
-                  else {
-                    return;
-                  }
-                }
-              }
-
-              bookmarks.remove(bookmarkToRemove);
-              ViewBookmark bookmark = new ViewBookmark();
-              bookmark.setLabel(name);
-              OpenTCSDrawingView currentView = fDrawingEditor.getActiveView();
-              // Aktuell sichtbarer Bildauschnitt in Pixel-Koordinaten
-              Rectangle visibleRect = currentView.getVisibleRect();
-              // Umrechnung in Zeichnungs-Koordinaten
-              Rectangle2D.Double visibleViewRect = currentView.viewToDrawing(visibleRect);
-              int centerX = (int) visibleViewRect.getCenterX();
-              int centerY = (int) -visibleViewRect.getCenterY();	// Vorzeichen!
-              bookmark.setCenterX(centerX);
-              bookmark.setCenterY(centerY);
-              double zoomFactor = currentView.getScaleFactor();
-              bookmark.setViewScaleX(zoomFactor);
-              bookmark.setViewScaleY(zoomFactor);	// TODO: x/y unterscheiden
-              bookmark.setViewRotation(0);	// TODO
-              // Die neue Bookmark der Liste zufügen
-              bookmarks.add(bookmark);
-
-              try {
-                kernel().setVisualLayoutViewBookmarks(layout.getReference(),
-                                                      bookmarks);
-                // TODO: String from ResourceBundle
-                showStatus(Level.INFO, "Ansicht \"" + name + "\" gespeichert.");
-                setHasUnsavedChanges(true);
-              }
-              catch (UnsupportedKernelOpException ex) {
-                // TODO: String from ResourceBundle
-                showStatus(Level.WARNING,
-                           "Operation \"Ansicht speichern\" nicht erlaubt!");
-              }
-            }
-          }
-        }
-      }
-    }
-    else {
-      // TODO: String from ResourceBundle
-      JOptionPane.showMessageDialog(this, "Es gibt noch kein VisualLayout!\nBitte das Modell im aktuellen Format speichern.");
-    }
+    return saved;
   }
 
   @Override	// GuiManager
@@ -1932,9 +1826,10 @@ public class OpenTCSView
     }
     else if (clazz == BlockModel.class) {
       model = crsObjFactory.createBlockModel();
-      List<BlockModel> blocks = getSystemModel().getBlockModels();
+      List<BlockModel> blocks = fModelManager.getModel().getBlockModels();
 
-      ColorProperty p = (ColorProperty) model.getProperty(ElementPropKeys.BLOCK_COLOR);
+      ColorProperty p = (ColorProperty) model.getProperty(
+          ElementPropKeys.BLOCK_COLOR);
       p.setColor(Colors.unusedBlockColor(blocks));
     }
     else if (clazz == StaticRouteModel.class) {
@@ -1944,7 +1839,7 @@ public class OpenTCSView
       throw new IllegalArgumentException("Unhandled component class: " + clazz);
     }
 
-    addModelComponent(getSystemModel().getFolder(model), model);
+    addModelComponent(fModelManager.getModel().getFolder(model), model);
 
     return model;
   }
@@ -1956,330 +1851,25 @@ public class OpenTCSView
    */
   public void editingOptions(Set<ModelComponent> dataObjects) {
     if (dataObjects == null || dataObjects.isEmpty()) {
-      if (kernel().getState() == Kernel.State.MODELLING
-          && (getDrawingView().hasBufferedFigures()
-              || fComponentsTreeView.hasBufferedObjects())) {
-        fActionManager.changeEditMenuEnablePaste();
+      if (appState.hasOperationMode(OperationMode.MODELLING)
+          && (getActiveDrawingView().hasBufferedFigures()
+              || fComponentsTreeManager.hasBufferedObjects())) {
+//        fActionManager.changeEditMenuEnablePaste();
       }
       else {
-        fActionManager.changeEditMenu(false);
+//        fActionManager.changeEditMenu(false);
       }
     }
     else {
-      fActionManager.changeEditMenu(false);
-      Iterator<ModelComponent> it = dataObjects.iterator();
-      while (it.hasNext()) {
-        ModelComponent dataObject = it.next();
+//      fActionManager.changeEditMenu(false);
+      for (ModelComponent dataObject : dataObjects) {
         if (dataObject instanceof PointModel
             || dataObject instanceof LocationModel
             || dataObject instanceof LocationTypeModel
             || dataObject instanceof VehicleModel) {
-          fActionManager.changeEditMenu(true);
+//          fActionManager.changeEditMenu(true);
         }
       }
-    }
-  }
-
-  @Override	// GuiManager
-  public void createTransportOrder() {
-    CreateTransportOrderPanel contentPanel = new CreateTransportOrderPanel(this);
-    StandardContentDialog dialog = new StandardContentDialog(this, contentPanel);
-    dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.newTransportOrder"));
-    dialog.setVisible(true);
-
-    if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-      OpenTCSEventDispatcher ed
-          = (OpenTCSEventDispatcher) fSystemModel.getEventDispatcher();
-      ed.getTransportOrderDispatcher().createTransportOrder(
-          contentPanel.getLocations(),
-          contentPanel.getActions(),
-          contentPanel.getSelectedDeadline(),
-          contentPanel.getSelectedVehicle());
-    }
-  }
-
-  @Override	// GuiManager
-  public void resetSelectionTool() {
-    ResourceBundleUtil drawLabels = ResourceBundleUtil.getBundle();
-
-    for (JToolBar bar : fToolBars) {
-      if (bar.getName() != null
-          && bar.getName().equals(drawLabels.getString("toolBarCreation.title"))) {
-        // At index 1 should be the default selection tool
-        JToggleButton button = (JToggleButton) bar.getComponentAtIndex(1);
-        button.setSelected(true);
-        return;
-      }
-    }
-  }
-
-  @Override	// GuiManager
-  public void findVehicle() {
-    List<VehicleModel> vehicles = new ArrayList<>(fSystemModel.getVehicleModels());
-
-    if (!vehicles.isEmpty()) {
-      Collections.sort(vehicles);
-      FindVehiclePanel content = new FindVehiclePanel(vehicles, fDrawingEditor.getActiveView());
-      String title = ResourceBundleUtil.getBundle().getString("findVehiclePanel.title");
-      CloseDialog dialog = new CloseDialog(this, true, content, title);
-      dialog.setLocationRelativeTo(this);
-      dialog.setVisible(true);
-    }
-  }
-
-  @Override	// GuiManager
-  public void showVehicles() {
-    AllVehiclesPanel fContent = new AllVehiclesPanel();
-    StandardContentDialog fDialog
-        = new StandardContentDialog(this, fContent, false, StandardContentDialog.CLOSE);
-    fDialog.setTitle(ResourceBundleUtil.getBundle().getString("actions.showVehicles.text"));
-    fDialog.setVisible(true);
-  }
-
-  @Override	// AttributesChangeListener
-  public void propertiesChanged(AttributesChangeEvent event) {
-    if (event.getInitiator() == this) {
-      return;
-    }
-
-    ModelComponent model = event.getModel();
-    Property pName = model.getProperty(ModelComponent.NAME);
-
-    if (pName != null && pName.hasChanged()) {
-      fComponentsTreeManager.itemChanged(model);
-    }
-
-    if (model instanceof LayoutModel) {
-      // Maßstabsänderung behandeln
-      LengthProperty pScaleX
-          = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
-      LengthProperty pScaleY
-          = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
-      updateLocationThemes();
-
-      if (pScaleX.hasChanged() || pScaleY.hasChanged()) {
-        double scaleX = (double) pScaleX.getValue();
-        double scaleY = (double) pScaleY.getValue();
-
-        if (scaleX != 0.0 && scaleY != 0.0) {
-          fSystemModel.getDrawingMethod().getOrigin().setScale(scaleX, scaleY);
-//					fModelManager.restoreModel();	// ???
-        }
-      }
-    }
-
-    if (model instanceof LocationModel) {
-      if (model.getProperty(LocationModel.TYPE).hasChanged()) {
-        SelectionProperty p
-            = (SelectionProperty) model.getProperty(LocationModel.TYPE);
-        LocationTypeModel type
-            = fSystemModel.getLocationTypeModel((String) p.getValue());
-        ((LocationModel) model).setLocationType(type);
-        if (!(model == event.getInitiator())) {
-          model.propertiesChanged(this);
-        }
-      }
-    }
-
-    if (model instanceof LocationTypeModel) {
-      for (LocationModel locModel : fSystemModel.getLocationModels()) {
-        locModel.updateTypeProperty(fSystemModel.getLocationTypeModels());
-      }
-    }
-
-//	resetSelectionTool(); ???
-  }
-
-  @Override	// BlockChangeListener
-  public void courseElementsChanged(BlockChangeEvent event) {
-    BlockModel block = (BlockModel) event.getSource();
-    // Remove all children from the block and re-add those that are still there.
-    fBlocksTreeManager.removeChildren(block);
-    for (ModelComponent component : block.getChildComponents()) {
-      fBlocksTreeManager.addItem(block, component);
-    }
-
-    setHasUnsavedChanges(true);
-    firePropertyChange(View.HAS_UNSAVED_CHANGES_PROPERTY, null, null);
-  }
-
-  @Override
-  public void colorChanged(BlockChangeEvent event) {
-  }
-
-  @Override	// BlockChangeListener
-  public void blockRemoved(BlockChangeEvent event) {
-  }
-
-  @Override	// StaticRouteChangeListener
-  public void pointsChanged(StaticRouteChangeEvent event) {
-    StaticRouteModel staticRoute = (StaticRouteModel) event.getSource();
-    // Remove all elements from the static route and re-add the ones left.
-    fComponentsTreeManager.removeChildren(staticRoute);
-    for (ModelComponent component : staticRoute.getChildComponents()) {
-      fComponentsTreeManager.addItem(staticRoute, component);
-    }
-
-    setHasUnsavedChanges(true);
-    firePropertyChange(View.HAS_UNSAVED_CHANGES_PROPERTY, null, null);
-  }
-
-  @Override// DrawingEditorListener
-  public void colorChanged(StaticRouteChangeEvent event) {
-  }
-
-  @Override
-  public void staticRouteRemoved(StaticRouteChangeEvent event) {
-  }
-
-  @Override	// DrawingEditorListener
-  public ModelComponent figureAdded(DrawingEditorEvent event) {
-    Figure figure = event.getFigure();
-    FigureComponent model = figure.get(FigureConstants.MODEL);
-
-    if (model == null) {
-      return null;
-    }
-
-    if (figure instanceof AttributesChangeListener) {
-      model.addAttributesChangeListener((AttributesChangeListener) figure);
-    }
-
-    // Die zugefügte Figur soll auf Maßstabsänderungen des Layout reagieren
-    if (figure instanceof OriginChangeListener) {
-      Origin ref = fSystemModel.getDrawingMethod().getOrigin();
-
-      if (ref != null) {
-        ref.addListener((OriginChangeListener) figure);
-        figure.set(FigureConstants.ORIGIN, ref);
-      }
-    }
-
-    if (model instanceof FigureComponent) {
-      model.setFigure(figure);
-    }
-
-    ModelComponent folder = getSystemModel().getFolder(model);
-    addModelComponent(folder, model);
-
-    if (figure instanceof LabeledFigure) {
-      ((LabeledFigure) figure).updateModel();
-    }
-
-    return model;
-  }
-
-  @Override// DrawingEditorListener
-  public ModelComponent figureRemoved(DrawingEditorEvent e) {
-    Figure figure = e.getFigure();
-
-    if (figure == null) {
-      return null;
-    }
-
-    FigureComponent model = figure.get(FigureConstants.MODEL);
-
-    if (model == null) {
-      return null;
-    }
-
-    synchronized (model) {
-      // Die gelöschte Figur soll nicht mehr auf Verschieben des Referenzpunktes reagieren
-      if (figure instanceof OriginChangeListener) {
-        Origin ref = figure.get(FigureConstants.ORIGIN);
-
-        if (ref != null) {
-          ref.removeListener((OriginChangeListener) figure);
-          figure.set(FigureConstants.ORIGIN, null);
-        }
-      }
-      // Zunächst die Zuordnung zu Blocks, Groups, Static Routes im Kernel aufheben
-      removeFromAllBlocks(model);
-      removeFromAllStaticRoutes(model);
-      removeFromAllGroups(model);
-      // ... dann das Objekt selbst im Kernel löschen
-      ModelComponent folder = getSystemModel().getFolder(model);
-
-      synchronized (folder) {
-        removeModelComponent(folder, model);
-      }
-
-      return model;
-    }
-  }
-
-  @Override
-  public void figureSelected(DrawingEditorEvent event) {
-    if (event.getCount() == 0) {
-      fComponentsTreeManager.selectItems(null);
-      fBlocksTreeManager.selectItems(null);
-      fGroupsTreeManager.selectItems(null);
-    }
-    else if (event.getCount() == 1) {
-      // Einzelne Figur selektiert
-      Figure figure = event.getFigure();
-
-      if (figure != null) {
-        FigureComponent model = figure.get(FigureConstants.MODEL);
-
-        if (model != null) {
-          model.addAttributesChangeListener(this);
-          fPropertiesComponent.setModel(model);
-          fComponentsTreeManager.selectItem(model);
-          fBlocksTreeManager.selectItem(model);
-          fGroupsTreeManager.selectItem(model);
-        }
-      }
-    }
-    else {
-      // Mehrere Figuren selektiert
-      List<ModelComponent> models = new LinkedList<>();
-      Set<ModelComponent> components = new HashSet<>();
-
-      for (Figure figure : event.getFigures()) {
-        FigureComponent model = figure.get(FigureConstants.MODEL);
-        if (model != null) {
-          models.add(model);
-          components.add(model);
-        }
-      }
-
-      // Gemeinsame Properties der selektierten Figuren anzeigen
-      ModelComponent model = new PropertiesCollection(models);
-      fComponentsTreeManager.selectItems(components);
-      fBlocksTreeManager.selectItems(components);
-      fGroupsTreeManager.selectItems(components);
-      fPropertiesComponent.setModel(model);
-    }
-  }
-
-  /**
-   * Sends messages to pauseVehicles() to start or pause vehicles.
-   */
-  public void pauseAllVehicles() {
-    if (!vehiclesPaused) {
-      pauseVehicles(0);
-      vehiclesPaused = true;
-    }
-    else {
-      pauseVehicles(100);
-      vehiclesPaused = false;
-    }
-  }
-
-  /**
-   * Sends messages to the kernel to pause all vehicles.
-   *
-   * @param speed
-   */
-  private void pauseVehicles(int speed) {
-    ModelComponent folder = getSystemModel().getMainFolder(SystemModel.VEHICLES);
-
-    for (ModelComponent component : folder.getChildComponents()) {
-      VehicleModel vModel = (VehicleModel) component;
-      kernel().sendCommAdapterMessage(vModel.getReference(),
-                                      new LimitSpeed(LimitSpeed.Type.ABSOLUTE,
-                                                     speed));
     }
   }
 
@@ -2289,7 +1879,7 @@ public class OpenTCSView
    * @param selected
    */
   public void ignorePrecisePosition(boolean selected) {
-    configStore.setBoolean(ConfigConstants.IGNORE_VEHICLE_PRECISE_POSITION, selected);
+    appConfig.setIgnoreVehiclePrecisePosition(selected);
 
     for (Figure figure : fDrawingEditor.getDrawing().getChildren()) {
       if (figure instanceof VehicleFigure) {
@@ -2304,7 +1894,7 @@ public class OpenTCSView
    * @param selected
    */
   public void ignoreOrientationAngle(boolean selected) {
-    configStore.setBoolean(ConfigConstants.IGNORE_VEHICLE_ORIENTATION_ANGLE, selected);
+    appConfig.setIgnoreVehicleOrientationAngle(selected);
 
     for (Figure figure : fDrawingEditor.getDrawing().getChildren()) {
       if (figure instanceof VehicleFigure) {
@@ -2313,29 +1903,8 @@ public class OpenTCSView
     }
   }
 
-  @Override	// GuiManager
-  protected void setHasUnsavedChanges(boolean newValue) {
-    super.setHasUnsavedChanges(newValue);
-//////    fUndoRedoManager.setHasSignificantEdits(newValue);
-  }
-
-  private void dockableGainedFocus(CDockable dockable) {
-    OpenTCSDockableUtil util = viewManager.getDrawingViewMap().get(dockable);
-
-    if (util == null) {
-      return;
-    }
-
-    OpenTCSDrawingView drawView = util.getDrawingView();
-    fDrawingEditor.setActiveView(drawView);
-    // XXX Looks suspicious: Why are the same values set again here?
-    drawView.setConstrainerVisible(drawView.isConstrainerVisible());
-    drawView.setLabelsVisible(drawView.isLabelsVisible());
-    drawView.setRulersVisible(drawView.isRulersVisible());
-    drawView.setStaticRoutesVisible(drawView.isStaticRoutesVisible());
-    drawView.setBlocksVisible(drawView.isBlocksVisible());
-    drawView.handleFocusGained();
-    firePropertyChange(OpenTCSDrawingView.FOCUS_GAINED, null, dockable);
+  private OpenTCSDrawingView getActiveDrawingView() {
+    return fDrawingEditor.getActiveView();
   }
 
   /**
@@ -2344,24 +1913,26 @@ public class OpenTCSView
   private void removeDrawingView(DefaultSingleCDockable dock) {
     if (viewManager.getDrawingViewMap().containsKey(dock)) {
       // Remove from group pop ups
-      ModelComponent groups = getSystemModel().getMainFolder(SystemModel.GROUPS);
+      ModelComponent groups
+          = fModelManager.getModel().getMainFolder(SystemModel.FolderKey.GROUPS);
       for (Object o : groups.getChildComponents()) {
         if (o instanceof GroupModel) {
           GroupModel gf = (GroupModel) o;
           gf.removeDrawingView(dock.getTitleText());
         }
       }
-      fDrawingEditor.remove(viewManager.getDrawingViewMap().get(dock).getDrawingView());
+      fDrawingEditor.remove(viewManager.getDrawingViewMap().get(dock)
+          .getDrawingView());
       viewManager.getDrawingViewMap().remove(dock);
       dockingManager.removeDockable(dock);
     }
   }
 
   /**
-   * Hier wird aus dem OpenTCSView-Panel und dem Panel für die ToolBars ein
-   * neues Panel zusammengesetzt.
+   * Combines the OpenTCSView panel and the panel for the tool bars to a new
+   * panel.
    *
-   * @return
+   * @return The resulting panel.
    */
   private JPanel wrapViewComponent() {
     // Add a dummy toolbar for dragging.
@@ -2388,10 +1959,11 @@ public class OpenTCSView
     LinkedList<Action> toolBarActions = new LinkedList<>();
 
     // XXX Why is this list iterated in *reverse* order?
-    for (JToolBar curToolBar : new ReversedList<>(fToolBars)) {
+    for (JToolBar curToolBar : new ReversedList<>(toolBarManager.getToolBars())) {
       // A panel that wraps the toolbar.
       final JPanel curToolBarPanel = new JPanel();
-      curToolBarPanel.setLayout(new BoxLayout(curToolBarPanel, BoxLayout.LINE_AXIS));
+      curToolBarPanel.setLayout(new BoxLayout(curToolBarPanel,
+                                              BoxLayout.LINE_AXIS));
       // A panel that wraps the (wrapped) toolbar and the previous component
       // (the whole view and the nested/wrapped toolbars).
       JPanel wrappingPanel = new JPanel(new BorderLayout());
@@ -2404,7 +1976,8 @@ public class OpenTCSView
       toolBarPanels.add(curToolBarPanel);
       lToolBars.add(curToolBar);
       viewComponent = wrappingPanel;
-      toolBarActions.addFirst(new ToggleVisibleAction(curToolBar, curToolBar.getName()));
+      toolBarActions.addFirst(new ToggleVisibleAction(curToolBar, curToolBar
+                                                      .getName()));
     }
 
     for (JToolBar bar : lToolBars) {
@@ -2428,19 +2001,6 @@ public class OpenTCSView
     }
   }
 
-  /**
-   * Teilt dem EventDispatcher das Leitsteuerungsobjekt und das
-   * Hauptanwendungsobjekt mit. Ist beispielsweise nach dem Laden eines
-   * Fahrkursmodells notwendig, da diese beiden Objekte nicht mit abgespeichert
-   * werden.
-   */
-  private void setupEventDispatcher(SystemModel systemModel) {
-    OpenTCSEventDispatcher dispatcher
-        = (OpenTCSEventDispatcher) systemModel.getEventDispatcher();
-    dispatcher.setKernel(kernel());
-    dispatcher.setView(this);
-  }
-
   private void closeOpenedPluginPanels() {
     for (PanelFactory factory : panelRegistry.getFactories()) {
       showPluginPanel(factory, false);
@@ -2448,75 +2008,57 @@ public class OpenTCSView
   }
 
   /**
-   * Sets the kernel state.
+   * Sets the plant overview state.
    *
-   * @param state The new state.
+   * @param newMode The new state.
    */
-  private void setKernelState(final Kernel.State state) {
-    try {
-      SwingUtilities.invokeAndWait(new Runnable() {
+  private void setPlantOverviewState(final OperationMode newMode) {
+    final OperationMode oldMode = appState.getOperationMode();
+    appState.setOperationMode(newMode);
+    Runnable run = new Runnable() {
 
-        @Override
-        public void run() {
-          String kernelState = "?";
-          ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+      @Override
+      public void run() {
+        String plantOverviewState;
+        ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 
-          switch (state) {
-            case MODELLING:
-              viewManager.setKernelStateModelling(dockingManager);
-
-              kernelState = bundle.getString("kernel.stateModelling");
-              fActionManager.setOperationMode(GuiManager.OperationMode.MODELLING);
-              break;
-
-            case OPERATING:
-              viewManager.setKernelStateOperating(dockingManager);
-              vehiclesPanel.setVehicleModels(fSystemModel.getVehicleModels());
-
-              kernelState = bundle.getString("kernel.stateOperating");
-              fActionManager.setOperationMode(GuiManager.OperationMode.OPERATING);
-              break;
-          }
-          // Show new state in the title
-          setKernelStateProperty(kernelState);
+        switch (newMode) {
+          case MODELLING:
+            plantOverviewState = bundle.getString("kernel.stateModelling");
+            break;
+          case OPERATING:
+            plantOverviewState = bundle.getString("kernel.stateOperating");
+            break;
+          default:
+            plantOverviewState = "?";
         }
-      });
+        // XXX The event should probably be emitted in ApplicationState now.
+        eventBus.publish(new OperationModeChangeEvent(this, oldMode, newMode));
+        // Show new state in the title
+        setPlantOverviewStateProperty(plantOverviewState);
+      }
+    };
+
+    if (SwingUtilities.isEventDispatchThread()) {
+      // Called from File -> Mode
+      SwingUtilities.invokeLater(run);
     }
-    catch (CredentialsException | IllegalArgumentException |
-        KernelUnavailableException | InterruptedException |
-        InvocationTargetException ex) {
-      showStatus(Level.SEVERE,
-                 "Exception in Kernel.setState(): " + ex);
-      log.log(Level.SEVERE, "Unexpected exception", ex);
+    else {
+      try {
+        // Called from Main.connectKernel()
+        SwingUtilities.invokeAndWait(run);
+      }
+      catch (InterruptedException | InvocationTargetException ex) {
+        log.log(Level.SEVERE, "Unexpected exception ", ex);
+      }
     }
 
-    // Auf Selection Tool umschalten
-    resetSelectionTool();
-    // Properties-Tabelle zurücksetzen
-    fPropertiesComponent.reset();
+    // Switch to selection tool.
+    eventBus.publish(new ResetInteractionToolCommand(this));
   }
 
-  public String getKernelState() {
+  public String getPlantOverviewState() {
     return sOperationMode;
-  }
-
-  /**
-   * Text-Anzeige in der Statuszeile (am unteren Bildrand).
-   *
-   * @param level Log-Level, bestimmt die Textfarbe
-   * @param text Angezeigter Text
-   */
-  private void showStatus(Level level, String text) {
-    statusPanel.setLogMessage(level, text);
-  }
-
-  /**
-   * Returns a reference to the remote kernel.
-   *
-   * @return A reference to the remote kernel.
-   */
-  private Kernel kernel() {
-    return kernelProxyManager.kernel();
   }
 
   /**
@@ -2524,9 +2066,9 @@ public class OpenTCSView
    */
   private Drawing createDrawing() {
     QuadTreeDrawing drawing = new QuadTreeDrawing();
-    // TODO: Drawing nicht direkt in XML Datei speichern, sondern über Kernel
-    OpenTCSDOMStorableInputOutputFormat ioFormat
-        = new OpenTCSDOMStorableInputOutputFormat(new OpenTCSFactory());
+    // TODO: Don't save drawing in XML file but via the kernel.
+    DefaultInputOutputFormat ioFormat
+        = new DefaultInputOutputFormat(new OpenTCSFactory());
     drawing.addInputFormat(ioFormat);
     drawing.addOutputFormat(ioFormat);
 
@@ -2534,279 +2076,141 @@ public class OpenTCSView
   }
 
   /**
-   * Hookmethode zur Erzeugung des ProcessAdapters. Zunächst wird geprüft, ob
-   * nicht doch schon ein Adapter für das Model vorhanden ist. Dies kann während
-   * der Synchronisation mit der Leitsteuerung der Fall sein.
+   * Adds the given model component to the given folder.
    *
-   * @param model
-   * @return
-   * @throws Exception
+   * @param folder The folder.
+   * @param modelComponent The model component to be added.
    */
-  private ProcessAdapter createProcessAdapter(ModelComponent model) throws Exception {
-    OpenTCSProcessAdapter adapter = (OpenTCSProcessAdapter) getSystemModel().getEventDispatcher().findProcessAdapter(model);
-
-    if (adapter != null) {
-      adapter.updateProcessProperties(true);
-      return adapter;
-    }
-
-    adapter = (OpenTCSProcessAdapter) procAdapterFactory.createAdapter(model.getClass());
-
-    if (adapter != null) {
-      adapter.setModel(model);
-      adapter.setEventDispatcher(getSystemModel().getEventDispatcher());
-      adapter.createProcessObject();
-      fSystemModel.getEventDispatcher().addProcessAdapter(adapter);
-
-      if (adapter instanceof PathAdapter) {
-        // Handle paths explicitly, because they need to inform
-        // also the two associated points
-        PathAdapter pathAdapter = (PathAdapter) adapter;
-        pathAdapter.connectionChanged(null);
-      }
-      else if (adapter instanceof LinkAdapter) {
-        // Handle links explicitly, because they need to inform
-        // also the associated point and location
-        LinkAdapter linkAdapter = (LinkAdapter) adapter;
-        linkAdapter.connectionChanged(null);
-      }
-    }
-
-    return adapter;
-  }
-
-  /**
-   * Entfernt einen Knoten (oder eine Strecke?) aus allen Blockbereichen.
-   *
-   * @param model Das gelöschte Objekt
-   */
-  private void removeFromAllBlocks(ModelComponent model) {
-    // The (invisible?) root folder of the "Blocks" tree...
-    ModelComponent mainFolder = getSystemModel().getMainFolder(SystemModel.BLOCKS);
-
-    synchronized (mainFolder) {
-      // ... contains one folder for each Block
-
-      for (ModelComponent blockModelComp : mainFolder.getChildComponents()) {
-        BlockModel block = (BlockModel) blockModelComp;
-
-        List<ModelComponent> elementsToRemove = new ArrayList<>();
-        // All child components (Points, Paths) of one Block
-        for (ModelComponent blockChildComp : block.getChildComponents()) {
-          if (model == blockChildComp) {
-            elementsToRemove.add(blockChildComp);
-          }
-        }
-
-        if (!elementsToRemove.isEmpty()) {
-          // At least one component found
-          for (ModelComponent mc : elementsToRemove) {
-            block.removeCourseElement(mc);
-          }
-
-          block.courseElementsChanged();
-        }
-      }
-    }
-  }
-
-  /**
-   * Removes a Point/Path/... from all Groups
-   *
-   * @param model The deleted object
-   */
-  private void removeFromAllGroups(ModelComponent model) {
-    // The (invisible?) root folder of the "Groups" tree...
-    ModelComponent mainFolder = getSystemModel().getMainFolder(SystemModel.GROUPS);
-
-    synchronized (mainFolder) {
-      // ... contains one folder for each Group
-      for (ModelComponent groupFolder : mainFolder.getChildComponents()) {
-        Group group = kernel().getTCSObject(Group.class, groupFolder.getName());
-
-        if (group != null) {
-          ProcessAdapter adapter = fSystemModel.getEventDispatcher().findProcessAdapter(model);
-
-          if (adapter != null) {
-            TCSObjectReference<?> ref
-                = (TCSObjectReference<?>) adapter.getProcessObject();
-
-            if (ref != null) {
-              kernel().removeGroupMember(group.getReference(), ref);
-              groupFolder.remove(model);
-              fGroupsTreeManager.removeItem(model);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Entfernt einen Knoten aus allen statischen Routen.
-   *
-   * @param models die Knotenobjekte
-   */
-  private void removeFromAllStaticRoutes(ModelComponent model) {
-    // The "Static Routes" folder of the "Components" tree...
-    ModelComponent mainFolder = getSystemModel().getMainFolder(SystemModel.STATIC_ROUTES);
-
-    synchronized (mainFolder) {
-      // ... contains one folder for each StaticRoute
-
-      for (ModelComponent routeFolderComp : mainFolder.getChildComponents()) {
-        StaticRouteModel staticRoute = (StaticRouteModel) routeFolderComp;
-        List<ModelComponent> elementsToRemove = new ArrayList<>();
-        // All child components (Points, Paths) of one Block
-        for (ModelComponent routeChildComp : staticRoute.getChildComponents()) {
-          if (model == routeChildComp) {
-            elementsToRemove.add(routeChildComp);
-          }
-        }
-
-        if (!elementsToRemove.isEmpty()) {
-          // At least one component found
-          for (ModelComponent mc : elementsToRemove) {
-            if (mc instanceof PointModel) {
-              staticRoute.removePoint((PointModel) mc);
-            }
-          }
-          staticRoute.pointsChanged();
-        }
-      }
-    }
-  }
-
-  /**
-   * Erzeugt den Dialog zum Anzeigen der Eigenschaften eines Fahrkurselements.
-   * <p>
-   * Entwurfsmuster: Fabrikmethode
-   *
-   * @param attributesComponent die Komponente zur Darstellung der Eigenschaften
-   * eines Fahrkurselementes
-   * @return der Dialog
-   */
-  private JDialog createPropertiesDialog(AttributesComponent attributesComponent) {
-    String title
-        = ResourceBundleUtil.getBundle().getString("dialog.properties.title");
-    CloseDialog dialog
-        = new CloseDialog(this, false, attributesComponent, title);
-    dialog.setSize(250, 300);
-    dialog.setLocationRelativeTo(this);
-    dialog.setAlwaysOnTop(true);
-
-    return dialog;
-  }
-
-  /**
-   * Fügt dem übergebenen Elternobjekt ein Kindelement hinzu. Diese Methode wird
-   * von Befehlsobjekten aufgerufen, die Undo/Redo verwenden. Daher hier keinen
-   * Befehl für Undo/Redo aufrufen.
-   *
-   * @param folder
-   * @param modelComponent
-   */
-  private UserObject addModelComponent(ModelComponent folder, ModelComponent modelComponent) {
+  private void addModelComponent(ModelComponent folder,
+                                 ModelComponent modelComponent) {
     if (folder.contains(modelComponent)) {
-      return modelComponent.getUserObject();
+      return;
+    }
+
+    // This method is being called by command objects that use undo/redo, so
+    // avoid calling commands via undo/redo here.
+    if (requiresName(modelComponent) && modelComponent.getName().isEmpty()) {
+      String name = modelCompNameGen.getUniqueString(modelComponent.getClass());
+      modelComponent.setName(name);
+      modelCompNameGen.addString(name);
     }
 
     if (modelComponent instanceof LocationModel) {
       LocationModel location = (LocationModel) modelComponent;
-      // Zu einer neu erzeugten Location zunächst den Default-Typ zuweisen
+      // Zu einer neu erzeugten Location zunï¿½chst den Default-Typ zuweisen
       if (location.getLocationType() == null) {
-        List<LocationTypeModel> types = getSystemModel().getLocationTypeModels();
+        List<LocationTypeModel> types = fModelManager.getModel()
+            .getLocationTypeModels();
         LocationTypeModel type;
 
         if (types.isEmpty()) {
-          type = (LocationTypeModel) createModelComponent(LocationTypeModel.class);
+          type = (LocationTypeModel) createModelComponent(
+              LocationTypeModel.class);
         }
         else {
           type = types.get(0);
         }
 
         location.setLocationType(type);
-        location.updateTypeProperty(getSystemModel().getLocationTypeModels());
+        location.updateTypeProperty(fModelManager.getModel()
+            .getLocationTypeModels());
       }
     }
 
     folder.add(modelComponent);
 
-    // Erst mit dem ProcessAdapter wird das ProcessObject erzeugt und vom Kernel ein Name generiert
-    try {
-      createProcessAdapter(modelComponent);
-    }
-    catch (Exception e) {
-      log.log(Level.WARNING, null, e);
-    }
+    procAdapterUtil.createProcessAdapter(modelComponent,
+                                         fModelManager.getModel()
+                                         .getEventDispatcher());
+
     // Knoten "Modell"
     fComponentsTreeManager.addItem(folder, modelComponent);
-    modelComponent.addAttributesChangeListener(this);
+    modelComponent.addAttributesChangeListener(attributesEventHandler);
     // Neuer LocationType: allen existierenden Locations bekannt machen
     if (modelComponent instanceof LocationTypeModel) {
-      List<LocationTypeModel> types = fSystemModel.getLocationTypeModels();
+      List<LocationTypeModel> types = fModelManager.getModel()
+          .getLocationTypeModels();
 
-      for (LocationModel location : fSystemModel.getLocationModels()) {
+      for (LocationModel location : fModelManager.getModel().getLocationModels()) {
         location.updateTypeProperty(types);
       }
     }
 
     if (modelComponent instanceof BlockModel) {
+      BlockModel blockModel = (BlockModel) modelComponent;
       fBlocksTreeManager.addItem(folder, modelComponent);
-      ((BlockModel) modelComponent).addBlockChangeListener(this);
+      blockModel.addBlockChangeListener(blockEventHandler);
 
       for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-        ((OpenTCSDrawingView) drawView).blockAdded((BlockModel) modelComponent);
+        ((OpenTCSDrawingView) drawView).blockAdded(blockModel);
       }
     }
     else if (modelComponent instanceof GroupModel) {
       fGroupsTreeManager.addItem(folder, modelComponent);
-      Group group = kernel().getTCSObject(Group.class, modelComponent.getName());
       for (ModelComponent member : modelComponent.getChildComponents()) {
         fGroupsTreeManager.addItem(modelComponent, member);
-        ProcessAdapter adapter = fSystemModel.getEventDispatcher().findProcessAdapter(member);
-        TCSObjectReference<?> ref
-            = (TCSObjectReference<?>) adapter.getProcessObject();
-        kernel().addGroupMember(group.getReference(), ref);
       }
+      fGroupsTreeManager.getTreeView().sortChildren();
     }
     else if (modelComponent instanceof StaticRouteModel) {
-      ((StaticRouteModel) modelComponent).addStaticRouteChangeListener(this);
+      StaticRouteModel routeModel = (StaticRouteModel) modelComponent;
+      routeModel.addStaticRouteChangeListener(staticRouteEventHandler);
       // Add hops (Points) to StaticRoute
-      if (modelComponent instanceof StaticRouteModel) {
-        pointsChanged(new StaticRouteChangeEvent((StaticRouteModel) modelComponent));
-      }
+      staticRouteEventHandler.pointsChanged(
+          new StaticRouteChangeEvent(routeModel));
     }
     else if (modelComponent instanceof VehicleModel) {
-      for (OpenTCSDrawingView drawingView : getDrawingViews()) {
-        drawingView.addVehicle((VehicleModel) modelComponent);
-      }
+      VehicleModel vehicleModel = (VehicleModel) modelComponent;
+      fDrawingEditor.addVehicle(vehicleModel);
     }
 
     selectModelComponent(modelComponent);
-    // Objekt zugefügt -> Änderung im Modell anzeigen
-    setHasUnsavedChanges(true);
-    firePropertyChange(View.HAS_UNSAVED_CHANGES_PROPERTY, null, null);
 
-    return modelComponent.getUserObject();
+    setHasUnsavedChanges(true);
   }
 
   /**
-   * Entfernt das übergebene Model. Achtung: diese Methode wird von
-   * Befehlsobjekten aufgerufen, die Undo/Redo verwenden. Daher hier keinen
-   * Befehl für Undo/Redo aufrufen.
+   * Checks whether the given model component should get a (generated) name if
+   * it doesn't have any, yet.
    *
-   * @param parent
-   * @param model
+   * @param model The model component to be checked.
+   * @return <code>true</code> if, and only if, a name should be generated for
+   * the given component.
    */
-  private boolean removeModelComponent(ModelComponent folder, ModelComponent model) {
+  private boolean requiresName(ModelComponent model) {
+    if (model instanceof PointModel
+        || model instanceof PathModel
+        || model instanceof LocationTypeModel
+        || model instanceof LocationModel
+        || model instanceof BlockModel
+        || model instanceof GroupModel
+        || model instanceof StaticRouteModel
+        || model instanceof LayoutModel
+        || model instanceof VehicleModel) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Removes the given model component from the given folder.
+   *
+   * @param folder The folder.
+   * @param model The component to be removed.
+   */
+  private boolean removeModelComponent(ModelComponent folder,
+                                       ModelComponent model) {
     if (!folder.contains(model)) {
       return false;
     }
 
+    // This method is being called by command objects that use undo/redo, so
+    // avoid calling commands via undo/redo here.
     boolean componentRemoved = false;
 
     synchronized (model) {
+      procAdapterUtil.removeProcessAdapter(model, fModelManager.getModel()
+                                           .getEventDispatcher());
       if (!BlockModel.class.isInstance(folder)
           && !StaticRouteModel.class.isInstance(folder)) {
         // don't delete objects from a Blocks or StaticRoutes folder
@@ -2814,17 +2218,18 @@ public class OpenTCSView
           folder.remove(model);
         }
 
-        model.removeAttributesChangeListener(this);
+        model.removeAttributesChangeListener(attributesEventHandler);
         componentRemoved = true;
       }
 
       fPropertiesComponent.reset();
 
       if (model instanceof BlockModel) {
+        BlockModel blockModel = (BlockModel) model;
         // Remove Blocks from the Blocks tree
-        fBlocksTreeManager.removeItem(model);
-        ((BlockModel) model).blockRemoved();
-        ((BlockModel) model).removeBlockChangeListener(this);
+        fBlocksTreeManager.removeItem(blockModel);
+        blockModel.blockRemoved();
+        blockModel.removeBlockChangeListener(blockEventHandler);
       }
       else if (model instanceof GroupModel) {
         fGroupsTreeManager.removeItem(model);
@@ -2834,158 +2239,152 @@ public class OpenTCSView
       }
 
       if (model instanceof StaticRouteModel) {
-        ((StaticRouteModel) model).removeStaticRouteChangeListener(this);
+        ((StaticRouteModel) model).removeStaticRouteChangeListener(
+            staticRouteEventHandler);
       }
       else if (model instanceof LocationTypeModel) {
-        for (LocationModel location : fSystemModel.getLocationModels()) {
-          location.updateTypeProperty(fSystemModel.getLocationTypeModels());
+        for (LocationModel location : fModelManager.getModel()
+            .getLocationModels()) {
+          location.updateTypeProperty(fModelManager.getModel()
+              .getLocationTypeModels());
         }
       }
 
-      if (!BlockModel.class.isInstance(folder)
-          && !StaticRouteModel.class.isInstance(folder)) {
-        ProcessAdapter adapter = fSystemModel.getEventDispatcher().findProcessAdapter(model);
+      modelCompNameGen.removeString(model.getName());
 
-        if (adapter != null) {
-          adapter.releaseProcessObject();
-        }
-      }
-
-      // Objekt gelöscht -> Änderung im Modell anzeigen
       setHasUnsavedChanges(true);
-      firePropertyChange(View.HAS_UNSAVED_CHANGES_PROPERTY, null, null);
     }
 
     return componentRemoved;
   }
 
   /**
-   * Findet zu der Modellkomponente das passende Figure.
+   * Returns the figure that belongs to the given model component.
    *
-   * @param model
-   * @return
+   * @param model The model component.
+   * @return The figure that belongs to the given model component, or
+   * <code>null</code>, if there isn't any.
    */
   private Figure findFigure(ModelComponent model) {
     if (model instanceof FigureComponent) {
-      FigureComponent figureComponent = (FigureComponent) model;
-
-      if (figureComponent.getFigure() != null) {
-        return figureComponent.getFigure();
-      }
+      return ((FigureComponent) model).getFigure();
     }
-
-////		FigureEnumeration e = ((StandardDrawingEditor) drawingEditor()).drawing().figures();
-////
-////		while (e.hasMoreElements()) {
-////			Figure figure = e.nextFigure();
-////
-////			if (figure.getAttribute(FigureConstants.MODEL) == model) {
-////				return figure;
-////			}
-////		}
     return null;
   }
 
   private void setSystemModel(SystemModel systemModel) {
-    fSystemModel = Objects.requireNonNull(systemModel, "systemModel is null");
-    getEditor().setSystemModel(systemModel);
-    // Dies erzeugt eine neue Drawing in der DrawingView
+    requireNonNull(systemModel, "systemModel is null");
+
+    // Clear the name generator
+    modelCompNameGen.clear();
+    fDrawingEditor.setSystemModel(systemModel);
+
     // --- Undo, Redo, Clipboard ---
     Drawing drawing = fDrawingEditor.getDrawing();
     drawing.addUndoableEditListener(fUndoRedoManager);
-    // TODO: Drawing nicht direkt in XML Datei speichern, sondern über Kernel
-    OpenTCSDOMStorableInputOutputFormat ioFormat
-        = new OpenTCSDOMStorableInputOutputFormat(new OpenTCSFactory());
+    // TODO: Do not save drawing directly to an XML file, but via the kernel.
+    DefaultInputOutputFormat ioFormat
+        = new DefaultInputOutputFormat(new OpenTCSFactory());
     drawing.addInputFormat(ioFormat);
     drawing.addOutputFormat(ioFormat);
 
     fComponentsTreeManager.restoreTreeView(systemModel);
-    fBlocksTreeManager.restoreTreeView(systemModel.getMainFolder(SystemModel.BLOCKS));
+    fBlocksTreeManager.restoreTreeView(
+        systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
     fBlocksTreeManager.getTreeView().sortRoot();
-    fGroupsTreeManager.restoreTreeView(systemModel.getMainFolder(SystemModel.GROUPS));
+    fGroupsTreeManager.restoreTreeView(
+        systemModel.getMainFolder(SystemModel.FolderKey.GROUPS));
     fGroupsTreeManager.getTreeView().sortRoot();
     fGroupsTreeManager.getTreeView().sortChildren();
 
     // Add Attribute Change Listeners to all objects
-    for (VehicleModel vehicle : fSystemModel.getVehicleModels()) {
-      vehicle.addAttributesChangeListener(this);
+    for (VehicleModel vehicle : systemModel.getVehicleModels()) {
+      vehicle.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(vehicle.getName());
     }
 
-    for (LayoutModel layout : fSystemModel.getLayoutModels()) {
-      layout.addAttributesChangeListener(this);
+    for (LayoutModel layout : systemModel.getLayoutModels()) {
+      layout.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(layout.getName());
     }
 
-    for (PointModel point : fSystemModel.getPointModels()) {
-      point.addAttributesChangeListener(this);
+    for (PointModel point : systemModel.getPointModels()) {
+      point.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(point.getName());
     }
 
-    for (PathModel path : fSystemModel.getPathModels()) {
-      path.addAttributesChangeListener(this);
+    for (PathModel path : systemModel.getPathModels()) {
+      path.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(path.getName());
     }
 
-    for (LocationTypeModel locationType : fSystemModel.getLocationTypeModels()) {
-      locationType.addAttributesChangeListener(this);
+    for (LocationTypeModel locationType : systemModel.getLocationTypeModels()) {
+      locationType.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(locationType.getName());
     }
 
-    for (LocationModel location : fSystemModel.getLocationModels()) {
-      location.addAttributesChangeListener(this);
+    for (LocationModel location : systemModel.getLocationModels()) {
+      location.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(location.getName());
     }
 
-    for (LinkModel link : fSystemModel.getLinkModels()) {
-      link.addAttributesChangeListener(this);
+    for (LinkModel link : systemModel.getLinkModels()) {
+      link.addAttributesChangeListener(attributesEventHandler);
+      modelCompNameGen.addString(link.getName());
     }
 
-    for (BlockModel block : fSystemModel.getBlockModels()) {
-      block.addAttributesChangeListener(this);
-      block.addBlockChangeListener(this);
+    for (BlockModel block : systemModel.getBlockModels()) {
+      block.addAttributesChangeListener(attributesEventHandler);
+      block.addBlockChangeListener(blockEventHandler);
+      modelCompNameGen.addString(block.getName());
     }
 
-    for (StaticRouteModel staticRoute : fSystemModel.getStaticRouteModels()) {
-      staticRoute.addStaticRouteChangeListener(this);
+    for (StaticRouteModel staticRoute : systemModel.getStaticRouteModels()) {
+      staticRoute.addStaticRouteChangeListener(staticRouteEventHandler);
+      modelCompNameGen.addString(staticRoute.getName());
     }
-  }
-
-  @Override	// GuiManager
-  public SystemModel getSystemModel() {
-    return fSystemModel;
-  }
-
-  /**
-   * Actions können erst initialisiert werden, nachdem die View mit einer
-   * JHotDraw "Application" verknüpft wurde.
-   *
-   */
-  private void createActions() {
-    setActionMap(fActionManager.createActionMap());
-    fToolBars = fActionManager.createToolBars();
-    wrapViewComponent();
-    fMenuBar = fActionManager.createMenuBar();
   }
 
   /**
-   * Initiales the frame with the toolbars and the dockable elements.
+   * Initializes the frame with the toolbars and the dockable elements.
    */
   private void initializeFrame() {
-    SwingUtilities.invokeLater(new Runnable() {
+    if (!SwingUtilities.isEventDispatchThread()) {
+      try {
+        SwingUtilities.invokeAndWait(new Runnable() {
 
-      @Override
-      public void run() {
-        fFrame.getContentPane().removeAll();
-        dockingManager.initializeDockables(fFrame,
-                                           vehiclesPanel,
-                                           fComponentsTreeView,
-                                           fBlocksTreeView,
-                                           fGroupsTreeView,
-                                           fPropertiesComponent,
-                                           statusScrollPane);
-        // Frame
-        fFrame.setLayout(new BorderLayout());
-        fFrame.add(wrapViewComponent(), BorderLayout.NORTH);
-        fFrame.add(dockingManager.getCControl().getContentArea());
-        fFrame.add(statusPanel, BorderLayout.SOUTH);
-        restoreSavedDockables();
+          @Override
+          public void run() {
+            initializeFrame();
+          }
+        });
       }
-    });
+      catch (InterruptedException | InvocationTargetException e) {
+        log.log(Level.WARNING, "Exception initializing frame", e);
+      }
+      return;
+    }
+
+    fFrame.getContentPane().removeAll();
+    dockingManager.initializeDockables(fFrame,
+                                       vehiclesPanel,
+                                       fComponentsTreeManager.getTreeView(),
+                                       fBlocksTreeManager.getTreeView(),
+                                       fGroupsTreeManager.getTreeView(),
+                                       fPropertiesComponent,
+                                       kernelStatusPanel);
+    // Frame
+    fFrame.setLayout(new BorderLayout());
+    fFrame.add(wrapViewComponent(), BorderLayout.NORTH);
+    fFrame.add(dockingManager.getCControl().getContentArea());
+    fFrame.add(statusPanel, BorderLayout.SOUTH);
+    restoreSavedDockables();
+    // Ensure that, after initialization, the selection tool is active.
+    // This needs to be done after the initial drawing views have been set
+    // up so they reflect the behaviour of the selected tool.
+    // XXX Maybe there is a better way to ensure this...
+    toolBarManager.getDragToolButton().doClick();
+    toolBarManager.getSelectionToolButton().doClick();
   }
 
   /**
@@ -2995,26 +2394,397 @@ public class OpenTCSView
     // --- DrawingView for modelling ---
     DefaultSingleCDockable modellingDockable = addDrawingView();
     viewManager.initModellingDockable(modellingDockable,
-                                      ResourceBundleUtil.getBundle().getString("modellingDrawingView.name"));
-    int n = configStore.getInt(NUMBER_OF_DRAWING_VIEWS, 1);
-    for (int i = 0; i < n; i++) {
+                                      ResourceBundleUtil.getBundle().getString(
+                                          "modellingDrawingView.name"));
+    for (int i = 0; i < appConfig.getDrawingViewCount(); i++) {
       addDrawingView();
     }
 
-    n = configStore.getInt(NUMBER_OF_TRANSPORT_ORDER_VIEWS, 1);
-    boolean shouldInit = getSystemModel().getEventDispatcher() != null;
-    for (int i = 0; i < n; i++) {
+    boolean shouldInit = fModelManager.getModel().getEventDispatcher() != null;
+    for (int i = 0; i < appConfig.getOrderViewCount(); i++) {
       addTransportOrderView(shouldInit);
     }
 
-    n = configStore.getInt(NUMBER_OF_ORDER_SEQUENCE_VIEWS, 1);
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < appConfig.getOrderSequenceViewCount(); i++) {
       addTransportOrderSequenceView(shouldInit);
     }
 
     dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID)
         .getStation().setFrontDockable(viewManager.evaluateFrontDockable());
     dockingManager.loadLayout();
+  }
+
+  private class AttributesEventHandler
+      implements AttributesChangeListener {
+
+    /**
+     * Creates a new instance.
+     */
+    public AttributesEventHandler() {
+    }
+
+    @Override	// AttributesChangeListener
+    public void propertiesChanged(AttributesChangeEvent event) {
+      if (event.getInitiator() == this) {
+        return;
+      }
+
+      ModelComponent model = event.getModel();
+      StringProperty pName = (StringProperty) model.getProperty(
+          ModelComponent.NAME);
+
+      if (pName != null && pName.hasChanged()) {
+        fComponentsTreeManager.itemChanged(model);
+      }
+
+      if (model instanceof SystemModel) {
+        ((SystemModel) model).setName(pName.getText());
+      }
+
+      if (model instanceof LayoutModel) {
+        // Maï¿½stabsï¿½nderung behandeln
+        LengthProperty pScaleX
+            = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
+        LengthProperty pScaleY
+            = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
+        updateLocationThemes();
+
+        if (pScaleX.hasChanged() || pScaleY.hasChanged()) {
+          double scaleX = (double) pScaleX.getValue();
+          double scaleY = (double) pScaleY.getValue();
+
+          if (scaleX != 0.0 && scaleY != 0.0) {
+            fModelManager.getModel().getDrawingMethod().getOrigin().setScale(
+                scaleX, scaleY);
+//					fModelManager.restoreModel();	// ???
+          }
+        }
+      }
+
+      if (model instanceof LocationModel) {
+        if (model.getProperty(LocationModel.TYPE).hasChanged()) {
+          AbstractProperty p
+              = (AbstractProperty) model.getProperty(LocationModel.TYPE);
+          LocationTypeModel type
+              = fModelManager.getModel().getLocationTypeModel((String) p
+                  .getValue());
+          ((LocationModel) model).setLocationType(type);
+          if (!(model == event.getInitiator())) {
+            model.propertiesChanged(this);
+          }
+        }
+      }
+
+      if (model instanceof LocationTypeModel) {
+        for (LocationModel locModel : fModelManager.getModel()
+            .getLocationModels()) {
+          locModel.updateTypeProperty(fModelManager.getModel()
+              .getLocationTypeModels());
+        }
+      }
+//	resetSelectionTool(); ???
+    }
+  }
+
+  /**
+   * Handles events emitted for changes of blocks.
+   */
+  private class BlockEventHandler
+      implements BlockChangeListener {
+
+    /**
+     * Creates a new instance.
+     */
+    public BlockEventHandler() {
+    }
+
+    @Override	// BlockChangeListener
+    public void courseElementsChanged(BlockChangeEvent event) {
+      BlockModel block = (BlockModel) event.getSource();
+      // Remove all children from the block and re-add those that are still there.
+      fBlocksTreeManager.removeChildren(block);
+      for (ModelComponent component : block.getChildComponents()) {
+        fBlocksTreeManager.addItem(block, component);
+      }
+
+      setHasUnsavedChanges(true);
+    }
+
+    @Override
+    public void colorChanged(BlockChangeEvent event) {
+    }
+
+    @Override	// BlockChangeListener
+    public void blockRemoved(BlockChangeEvent event) {
+    }
+  }
+
+  /**
+   * Handles events emitted for changes of static routes.
+   */
+  private class StaticRouteEventHandler
+      implements StaticRouteChangeListener {
+
+    /**
+     * Creates a new instance.
+     */
+    public StaticRouteEventHandler() {
+    }
+
+    @Override	// StaticRouteChangeListener
+    public void pointsChanged(StaticRouteChangeEvent event) {
+      StaticRouteModel staticRoute = (StaticRouteModel) event.getSource();
+      // Remove all elements from the static route and re-add the ones left.
+      fComponentsTreeManager.removeChildren(staticRoute);
+      for (ModelComponent component : staticRoute.getChildComponents()) {
+        fComponentsTreeManager.addItem(staticRoute, component);
+      }
+
+      setHasUnsavedChanges(true);
+    }
+
+    @Override// DrawingEditorListener
+    public void colorChanged(StaticRouteChangeEvent event) {
+    }
+
+    @Override
+    public void staticRouteRemoved(StaticRouteChangeEvent event) {
+    }
+  }
+
+  /**
+   * Handles events emitted by the drawing editor.
+   */
+  private class DrawingEditorEventHandler
+      implements DrawingEditorListener {
+
+    /**
+     * Provides access to the current system model.
+     */
+    private final ModelManager modelManager;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param modelManager Provides access to the current system model.
+     */
+    public DrawingEditorEventHandler(ModelManager modelManager) {
+      this.modelManager = requireNonNull(modelManager, "modelManager");
+    }
+
+    @Override	// DrawingEditorListener
+    public ModelComponent figureAdded(DrawingEditorEvent event) {
+      Figure figure = event.getFigure();
+      FigureComponent model = figure.get(FigureConstants.MODEL);
+
+      // Some figures do not have a model - OriginFigure, for instance.
+      // XXX Check if we can't unify all figures to have a model.
+      if (model == null) {
+        return null;
+      }
+
+      if (figure instanceof AttributesChangeListener) {
+        model.addAttributesChangeListener((AttributesChangeListener) figure);
+      }
+
+      // The added figure shall react on changes of the layout's scale.
+      if (figure instanceof OriginChangeListener) {
+        Origin ref = modelManager.getModel().getDrawingMethod().getOrigin();
+
+        if (ref != null) {
+          ref.addListener((OriginChangeListener) figure);
+          figure.set(FigureConstants.ORIGIN, ref);
+        }
+      }
+
+      if (model instanceof FigureComponent) {
+        model.setFigure(figure);
+      }
+
+      ModelComponent folder = modelManager.getModel().getFolder(model);
+      addModelComponent(folder, model);
+
+      if (figure instanceof LabeledFigure) {
+        ((LabeledFigure) figure).updateModel();
+      }
+
+      return model;
+    }
+
+    @Override// DrawingEditorListener
+    public ModelComponent figureRemoved(DrawingEditorEvent e) {
+      Figure figure = e.getFigure();
+
+      if (figure == null) {
+        return null;
+      }
+
+      FigureComponent model = figure.get(FigureConstants.MODEL);
+
+      if (model == null) {
+        return null;
+      }
+
+      synchronized (model) {
+        // The removed figure shouldn't react on changes of the origin any more.
+        if (figure instanceof OriginChangeListener) {
+          Origin ref = figure.get(FigureConstants.ORIGIN);
+
+          if (ref != null) {
+            ref.removeListener((OriginChangeListener) figure);
+            figure.set(FigureConstants.ORIGIN, null);
+          }
+        }
+        // Disassociate from blocks, static routes and groups...
+        removeFromAllBlocks(model);
+        removeFromAllStaticRoutes(model);
+        removeFromAllGroups(model);
+        // ...and remove the object itself.
+        ModelComponent folder = modelManager.getModel().getFolder(model);
+        synchronized (folder) {
+          removeModelComponent(folder, model);
+        }
+
+        return model;
+      }
+    }
+
+    @Override
+    public void figureSelected(DrawingEditorEvent event) {
+      if (event.getCount() == 0) {
+        fComponentsTreeManager.selectItems(null);
+        fBlocksTreeManager.selectItems(null);
+        fGroupsTreeManager.selectItems(null);
+      }
+      else if (event.getCount() == 1) {
+        // Single figure selected.
+        Figure figure = event.getFigure();
+
+        if (figure != null) {
+          FigureComponent model = figure.get(FigureConstants.MODEL);
+
+          if (model != null) {
+            model.addAttributesChangeListener(attributesEventHandler);
+            fPropertiesComponent.setModel(model);
+            fComponentsTreeManager.selectItem(model);
+            fBlocksTreeManager.selectItem(model);
+            fGroupsTreeManager.selectItem(model);
+          }
+        }
+      }
+      else {
+        // Multiple figures selected.
+        List<ModelComponent> models = new LinkedList<>();
+        Set<ModelComponent> components = new HashSet<>();
+
+        for (Figure figure : event.getFigures()) {
+          FigureComponent model = figure.get(FigureConstants.MODEL);
+          if (model != null) {
+            models.add(model);
+            components.add(model);
+          }
+        }
+
+        // Display shared properties of the selected figures.
+        ModelComponent model = new PropertiesCollection(models);
+        fComponentsTreeManager.selectItems(components);
+        fBlocksTreeManager.selectItems(components);
+        fGroupsTreeManager.selectItems(components);
+        fPropertiesComponent.setModel(model);
+      }
+    }
+
+    /**
+     * Removes a component from all blocks in the model.
+     *
+     * @param model The component to be removed.
+     */
+    private void removeFromAllBlocks(ModelComponent model) {
+      // The (invisible?) root folder of the "Blocks" tree...
+      ModelComponent mainFolder
+          = modelManager.getModel().getMainFolder(SystemModel.FolderKey.BLOCKS);
+
+      synchronized (mainFolder) {
+        // ... contains one folder for each Block
+
+        for (ModelComponent blockModelComp : mainFolder.getChildComponents()) {
+          BlockModel block = (BlockModel) blockModelComp;
+
+          List<ModelComponent> elementsToRemove = new ArrayList<>();
+          // All child components (Points, Paths) of one Block
+          for (ModelComponent blockChildComp : block.getChildComponents()) {
+            if (model == blockChildComp) {
+              elementsToRemove.add(blockChildComp);
+            }
+          }
+
+          if (!elementsToRemove.isEmpty()) {
+            // At least one component found
+            for (ModelComponent mc : elementsToRemove) {
+              block.removeCourseElement(mc);
+            }
+
+            block.courseElementsChanged();
+          }
+        }
+      }
+    }
+
+    /**
+     * Removes a component from all groups in the model.
+     *
+     * @param model The component to be removed.
+     */
+    private void removeFromAllGroups(ModelComponent model) {
+      // The (invisible?) root folder of the "Groups" tree...
+      ModelComponent mainFolder
+          = modelManager.getModel().getMainFolder(SystemModel.FolderKey.GROUPS);
+
+      synchronized (mainFolder) {
+        // ... contains one folder for each Group
+        for (ModelComponent groupFolder : mainFolder.getChildComponents()) {
+          groupFolder.remove(model);
+          fGroupsTreeManager.removeItem(model);
+        }
+      }
+    }
+
+    /**
+     * Removes a component from all static routes in the model.
+     *
+     * @param model The component to be removed.
+     */
+    private void removeFromAllStaticRoutes(ModelComponent model) {
+      // The "Static Routes" folder of the "Components" tree...
+      ModelComponent mainFolder
+          = modelManager.getModel().getMainFolder(
+              SystemModel.FolderKey.STATIC_ROUTES);
+
+      synchronized (mainFolder) {
+        // ... contains one folder for each StaticRoute
+
+        for (ModelComponent routeFolderComp : mainFolder.getChildComponents()) {
+          StaticRouteModel staticRoute = (StaticRouteModel) routeFolderComp;
+          List<ModelComponent> elementsToRemove = new ArrayList<>();
+          // All child components (Points, Paths) of one Block
+          for (ModelComponent routeChildComp : staticRoute.getChildComponents()) {
+            if (model == routeChildComp) {
+              elementsToRemove.add(routeChildComp);
+            }
+          }
+
+          if (!elementsToRemove.isEmpty()) {
+            // At least one component found
+            for (ModelComponent mc : elementsToRemove) {
+              if (mc instanceof PointModel) {
+                staticRoute.removePoint((PointModel) mc);
+              }
+            }
+            staticRoute.pointsChanged();
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -3043,12 +2813,11 @@ public class OpenTCSView
 
     @Override
     public void mousePressed(MouseEvent e) {
-      UserObject object = fComponentsTreeView.getDraggedUserObject(e);
+      UserObject object = fComponentsTreeManager.getDraggedUserObject(e);
 
       if (object instanceof VehicleUserObject
-          && kernel().getState() == Kernel.State.OPERATING) {
-        VehicleUserObject vehicleUserObject = (VehicleUserObject) object;
-        vehicleModel = vehicleUserObject.getModelComponent();
+          && appState.hasOperationMode(OperationMode.OPERATING)) {
+        vehicleModel = ((VehicleUserObject) object).getModelComponent();
       }
       else {
         vehicleModel = null;
@@ -3069,14 +2838,14 @@ public class OpenTCSView
         }
       }
 
-      fComponentsTreeView.setCursor(dragCursor);
+      fComponentsTreeManager.setCursor(dragCursor);
       setCursor(dragCursor);
     }
 
     @Override
     public void mouseReleased(MouseEvent event) {
       // Reset cursors to the default ones.
-      fComponentsTreeView.setCursor(Cursor.getDefaultCursor());
+      fComponentsTreeManager.setCursor(Cursor.getDefaultCursor());
       setCursor(Cursor.getDefaultCursor());
       vehicleModel = null;
 
@@ -3111,53 +2880,7 @@ public class OpenTCSView
 
     private void createOrderToPointFigure(LabeledPointFigure figure) {
       PointModel model = (PointModel) figure.get(FigureConstants.MODEL);
-      OpenTCSEventDispatcher ed
-          = (OpenTCSEventDispatcher) fSystemModel.getEventDispatcher();
-      ed.getTransportOrderDispatcher().createTransportOrder(model, vehicleModel);
-    }
-  }
-
-  private class OrderSequenceClosingListener
-      implements CVetoClosingListener {
-
-    private final DefaultSingleCDockable newDockable;
-
-    public OrderSequenceClosingListener(DefaultSingleCDockable newDockable) {
-      this.newDockable = newDockable;
-    }
-
-    @Override
-    public void closing(CVetoClosingEvent event) {
-    }
-
-    @Override
-    public void closed(CVetoClosingEvent event) {
-      if (event.isExpected()) {
-        dockingManager.getCControl().removeDockable(newDockable);
-        viewManager.getOrderSequenceMap().remove(newDockable);
-      }
-    }
-  }
-
-  private class TransportOrderClosingListener
-      implements CVetoClosingListener {
-
-    private final DefaultSingleCDockable newDockable;
-
-    public TransportOrderClosingListener(DefaultSingleCDockable newDockable) {
-      this.newDockable = newDockable;
-    }
-
-    @Override
-    public void closing(CVetoClosingEvent event) {
-    }
-
-    @Override
-    public void closed(CVetoClosingEvent event) {
-      if (event.isExpected()) {
-        dockingManager.getCControl().removeDockable(newDockable);
-        viewManager.getTransportOrderMap().remove(newDockable);
-      }
+      orderUtil.createTransportOrder(model, vehicleModel);
     }
   }
 
@@ -3181,23 +2904,6 @@ public class OpenTCSView
       if (newDockable.isCloseable()) {
         removeDrawingView(newDockable);
       }
-    }
-  }
-
-  private class DockableFocusListener
-      implements CFocusListener {
-
-    public DockableFocusListener() {
-      // Do nada.
-    }
-
-    @Override
-    public void focusGained(CDockable dockable) {
-      dockableGainedFocus(dockable);
-    }
-
-    @Override
-    public void focusLost(CDockable dockable) {
     }
   }
 }

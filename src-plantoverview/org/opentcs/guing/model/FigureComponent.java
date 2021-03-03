@@ -1,10 +1,16 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model;
 
-import java.util.ArrayList;
+import java.util.List;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.model.elements.AbstractConnection;
 
@@ -41,7 +47,7 @@ public interface FigureComponent
   /**
    * @return All connected Paths and Links
    */
-  ArrayList<AbstractConnection> getConnections();
+  List<AbstractConnection> getConnections();
 
   /**
    * Removes a connection which is no longer connected to this figure.

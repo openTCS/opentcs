@@ -1,17 +1,22 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
-import org.opentcs.guing.components.properties.panel.LinkActionsEditorPanel;
+import org.opentcs.guing.components.properties.type.LinkActionsProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.components.tree.elements.LinkUserObject;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Standardausführung für Link. Verfügt über keine Attribute.
+ * Basic implementation of link between a point and a location.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -19,8 +24,7 @@ public class LinkModel
     extends AbstractConnection {
 
   /**
-   * Der Schlüssel für die möglichen Aktionen an der Station in Abhängigkeit vom
-   * Meldepunkt.
+   * The key for the possible actions on the location.
    */
   public static final String ALLOWED_OPERATIONS = "AllowedOperations";
 
@@ -33,8 +37,9 @@ public class LinkModel
   }
 
   /**
-   *
-   * @return The model of the connected Point
+   * Returns the connected point.
+   * 
+   * @return The model of the connected Point.
    */
   public PointModel getPoint() {
     if (getStartComponent() instanceof PointModel) {
@@ -49,8 +54,9 @@ public class LinkModel
   }
 
   /**
+   * Returns the connected location.
    *
-   * @return The model of the connected Location
+   * @return The model of the connected Location.
    */
   public LocationModel getLocation() {
     if (getStartComponent() instanceof LocationModel) {
@@ -62,13 +68,6 @@ public class LinkModel
     }
 
     return null;
-  }
-
-  @Override // AbstractFigureComponent
-  public LinkUserObject createUserObject() {
-    fUserObject = new LinkUserObject(this);
-
-    return (LinkUserObject) fUserObject;
   }
 
   @Override // AbstractModelComponent
@@ -88,10 +87,21 @@ public class LinkModel
 
     setProperty(NAME, pName);
     // Allowed operations
-    StringSetProperty pOperations = new StringSetProperty(this);
-    pOperations.setPropertyEditor(LinkActionsEditorPanel.class);
+    StringSetProperty pOperations = new LinkActionsProperty(this);
     pOperations.setDescription(bundle.getString("link.action.text"));
     pOperations.setHelptext(bundle.getString("link.action.helptext"));
     setProperty(ALLOWED_OPERATIONS, pOperations);
+    
+    // Components
+    StringProperty startComponent = new StringProperty(this);
+    startComponent.setDescription(bundle.getString("element.startComponent.text"));
+    startComponent.setModellingEditable(false);
+    startComponent.setOperatingEditable(false);
+    setProperty(START_COMPONENT, startComponent);
+    StringProperty endComponent = new StringProperty(this);
+    endComponent.setDescription(bundle.getString("element.endComponent.text"));
+    endComponent.setModellingEditable(false);
+    endComponent.setOperatingEditable(false);
+    setProperty(END_COMPONENT, endComponent);
   }
 }

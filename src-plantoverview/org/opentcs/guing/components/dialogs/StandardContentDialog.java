@@ -1,16 +1,22 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.components.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -57,13 +63,10 @@ public class StandardContentDialog
   private int returnStatus = RET_CANCEL;
 
   /**
-   * Creates new form StandardDialog.
-   *
-   * @param panel
-   * @param content
+   * Creates new instance.
    */
-  public StandardContentDialog(JPanel panel, DialogContent content) {
-    this(panel, content, true, OK_CANCEL);
+  public StandardContentDialog(Component parent, DialogContent content) {
+    this(parent, content, true, OK_CANCEL);
   }
 
   /**
@@ -74,7 +77,10 @@ public class StandardContentDialog
    * @param modal ob der Dialog modal sein soll
    * @param options welche Schaltflächen angezeigt werden sollen
    */
-  public StandardContentDialog(JPanel parent, DialogContent content, boolean modal, int options) {
+  public StandardContentDialog(Component parent,
+                               DialogContent content,
+                               boolean modal,
+                               int options) {
     super(JOptionPane.getFrameForComponent(parent), modal);
 
     initComponents();
@@ -162,6 +168,7 @@ public class StandardContentDialog
     doClose(RET_CANCEL);
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -226,6 +233,7 @@ public class StandardContentDialog
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   /**
    * Button "Schließen" gedrückt.
@@ -284,6 +292,8 @@ public class StandardContentDialog
     setVisible(false);
     dispose();
   }
+
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyButton;
     private javax.swing.JPanel buttonPanel;
@@ -291,4 +301,5 @@ public class StandardContentDialog
     private javax.swing.JButton closeButton;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

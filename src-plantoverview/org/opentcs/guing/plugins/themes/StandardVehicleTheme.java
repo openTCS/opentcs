@@ -1,65 +1,55 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
- * Created on 20.08.2013 11:56:11
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.plugins.themes;
 
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.awt.Image;
+import java.io.IOException;
+import java.net.URL;
+import static java.util.Objects.requireNonNull;
+import javax.imageio.ImageIO;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.LoadHandlingDevice;
 import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * Standard implementation of <code>VehicleTheme</code>.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class StandardVehicleTheme
     implements VehicleTheme {
 
   /**
-   * Map containing images for a specific vehicle state when it's unloaded.
+   * The single image used for representing vehicles, regardless of their state.
    */
-  private final Map<Vehicle.State, String> stateMapUnloaded
-      = new EnumMap<>(Vehicle.State.class);
-  /**
-   * Map containing images for a specific vehicle state when it's loaded.
-   */
-  private final Map<Vehicle.State, String> stateMapLoaded
-      = new EnumMap<>(Vehicle.State.class);
+  private final Image image;
   /**
    * The path containing the images.
    */
   private static final String path
-      = "/org/opentcs/guing/res/symbols/vehicle/";
+      = "/org/opentcs/guing/res/symbols/vehicle/Vehicle24.png";
 
   public StandardVehicleTheme() {
-    initMaps();
+    this.image = loadImage(path);
   }
 
   @Override
-  public String getImagePathFor(Vehicle vehicle) {
-    Objects.requireNonNull(vehicle, "vehicle is null");
-    String relativePath = checkLoaded(vehicle)
-        ? stateMapLoaded.get(vehicle.getState())
-        : stateMapUnloaded.get(vehicle.getState());
-    return relativePath == null ? null : path + relativePath;
+  public Image getImageFor(Vehicle vehicle) {
+    requireNonNull(vehicle, "vehicle is null");
+
+    return image;
   }
 
   @Override
-  public Set<String> getAllImagePaths() {
-    Set<String> images = new HashSet<>();
-    for (String value : stateMapLoaded.values()) {
-      images.add(path + value);
-    }
-    for (String value : stateMapUnloaded.values()) {
-      images.add(path + value);
-    }
-    return images;
+  public Image getThemeImage() {
+    return image;
   }
 
   @Override
@@ -68,41 +58,23 @@ public class StandardVehicleTheme
   }
 
   /**
-   * Initializes the maps with values.
-   */
-  private void initMaps() {
-    stateMapUnloaded.put(Vehicle.State.CHARGING, "Vehicle24.png");
-    stateMapUnloaded.put(Vehicle.State.ERROR, "Vehicle24.png");
-    stateMapUnloaded.put(Vehicle.State.EXECUTING, "Vehicle24.png");
-    stateMapUnloaded.put(Vehicle.State.IDLE, "Vehicle24.png");
-    stateMapUnloaded.put(Vehicle.State.UNAVAILABLE, "Vehicle24.png");
-    stateMapUnloaded.put(Vehicle.State.UNKNOWN, "Vehicle24.png");
-
-    stateMapLoaded.put(Vehicle.State.CHARGING, "Vehicle24.png");
-    stateMapLoaded.put(Vehicle.State.ERROR, "Vehicle24.png");
-    stateMapLoaded.put(Vehicle.State.EXECUTING, "Vehicle24.png");
-    stateMapLoaded.put(Vehicle.State.IDLE, "Vehicle24.png");
-    stateMapLoaded.put(Vehicle.State.UNAVAILABLE, "Vehicle24.png");
-    stateMapLoaded.put(Vehicle.State.UNKNOWN, "Vehicle24.png");
-  }
-
-  /**
-   * Checks if a given vehicle is loaded.
+   * Loads an image from the file with the given name.
    *
-   * @param vehicle The vehicle.
-   * @return Flag indicating if it is loaded.
+   * @param fileName The name of the file from which to load the image.
+   * @return The image.
    */
-  private boolean checkLoaded(Vehicle vehicle) {
-    if (vehicle.getLoadHandlingDevices().isEmpty()) {
-      return false;
+  private Image loadImage(String fileName) {
+    requireNonNull(fileName, "fileName");
+
+    URL url = getClass().getResource(fileName);
+    if (url == null) {
+      throw new IllegalArgumentException("Invalid image file name " + fileName);
     }
-    else {
-      for (LoadHandlingDevice device : vehicle.getLoadHandlingDevices()) {
-        if (device.isFull()) {
-          return true;
-        }
-      }
+    try {
+      return ImageIO.read(url);
     }
-    return false;
+    catch (IOException exc) {
+      throw new IllegalArgumentException("Exception loading image", exc);
+    }
   }
 }

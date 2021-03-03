@@ -1,7 +1,13 @@
-/**
- * (c): IML, IFAK.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2005-2011 ifak e.V.
+ * Copyright (c) 2012 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.model.elements;
 
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
@@ -9,12 +15,11 @@ import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
-import org.opentcs.guing.components.tree.elements.LayoutUserObject;
 import org.opentcs.guing.model.CompositeModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Basisimplementierung für ein Layout.
+ * Basic implementation of a layout.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Philipp Seifert (Fraunhofer IML)
@@ -31,27 +36,15 @@ public class LayoutModel
    * Creates a new instance.
    */
   public LayoutModel() {
-    super();
+    super(ResourceBundleUtil.getBundle().getString("tree.layout.text"));
     createProperties();
   }
 
-  /**
-   * Creates a new instance.
-   *
-   * @param name The name of the model.
-   */
-  public LayoutModel(String name) {
-    super(name);
-    createProperties();
+  @Override // AbstractModelComponent
+  public String getDescription() {
+    return ResourceBundleUtil.getBundle().getString("layout.description");
   }
-
-  @Override
-  public LayoutUserObject createUserObject() {
-    fUserObject = new LayoutUserObject(this);
-
-    return (LayoutUserObject) fUserObject;
-  }
-
+  
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     // Name

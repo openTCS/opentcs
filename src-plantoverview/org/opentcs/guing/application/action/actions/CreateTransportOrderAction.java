@@ -1,18 +1,30 @@
-/**
- * (c): IML.
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
  *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.guing.application.action.actions;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.AbstractAction;
-import org.opentcs.guing.application.GuiManager;
+import org.opentcs.guing.application.ApplicationFrame;
+import org.opentcs.guing.components.dialogs.StandardContentDialog;
+import org.opentcs.guing.exchange.TransportOrderUtil;
+import org.opentcs.guing.transport.CreateTransportOrderPanel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * An action to trigger the creation of a transport order.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class CreateTransportOrderAction
     extends AbstractAction {
@@ -22,22 +34,54 @@ public class CreateTransportOrderAction
    */
   public static final String ID = "actions.createTransportOrder";
   /**
-   * The GUI manager instance we're working with.
+   * A helper for creating transport orders with the kernel.
    */
-  private final GuiManager guiManager;
+  private final TransportOrderUtil orderUtil;
+  /**
+   * The parent component for dialogs shown by this action.
+   */
+  private final Component dialogParent;
+  /**
+   * Provides panels for entering new transport orders.
+   */
+  private final Provider<CreateTransportOrderPanel> orderPanelProvider;
 
   /**
    * Creates a new instance.
    *
-   * @param guiManager The GUI manager instance we're working with.
+   * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param dialogParent The parent component for dialogs shown by this action.
+   * @param orderPanelProvider Provides panels for entering new transport orders.
    */
-  public CreateTransportOrderAction(GuiManager guiManager) {
-    this.guiManager = guiManager;
+  @Inject
+  public CreateTransportOrderAction(TransportOrderUtil orderUtil,
+                                    @ApplicationFrame Component dialogParent,
+                                    Provider<CreateTransportOrderPanel> orderPanelProvider) {
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+    this.orderPanelProvider = requireNonNull(orderPanelProvider,
+                                             "orderPanelProvider");
+
     ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    guiManager.createTransportOrder();
+    createTransportOrder();
+  }
+
+  public void createTransportOrder() {
+    CreateTransportOrderPanel contentPanel = orderPanelProvider.get();
+    StandardContentDialog dialog = new StandardContentDialog(dialogParent, contentPanel);
+    dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.newTransportOrder"));
+    dialog.setVisible(true);
+
+    if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
+      return;
+    }
+    orderUtil.createTransportOrder(contentPanel.getLocations(),
+                                   contentPanel.getActions(),
+                                   contentPanel.getSelectedDeadline(),
+                                   contentPanel.getSelectedVehicle());
   }
 }

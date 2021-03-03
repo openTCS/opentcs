@@ -1,7 +1,12 @@
 /*
+ * openTCS copyright information:
+ * Copyright (c) 2012 Fraunhofer IML
  *
- * Created on 06.08.2012 12:48:59
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
+
 package org.opentcs.guing.application.toolbar;
 
 import java.awt.event.MouseEvent;

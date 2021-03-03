@@ -1,3 +1,11 @@
+/*
+ * openTCS copyright information:
+ * Copyright (c) 2013 Fraunhofer IML
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
 package org.opentcs.guing.components.dialogs;
 
 import java.awt.Component;
@@ -6,8 +14,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -15,6 +24,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PathModel;
@@ -30,7 +40,14 @@ import org.opentcs.util.gui.Icons;
 public class CreateGroupPanel
     extends javax.swing.JDialog {
 
+  /**
+   * The application's main view.
+   */
   private final OpenTCSView view;
+  /**
+   * Provides the current system model.
+   */
+  private final ModelManager modelManager;
   private List<PointModel> points;
   private List<PathModel> paths;
   private List<LocationModel> locations;
@@ -38,15 +55,18 @@ public class CreateGroupPanel
   /**
    * Creates new form CreateGroupPanel.
    *
-   * @param view The OpenTCSView.
+   * @param view The application's main view.
+   * @param modelManager Provides the current system model.
    */
-  public CreateGroupPanel(OpenTCSView view) {
+  @Inject
+  public CreateGroupPanel(OpenTCSView view, ModelManager modelManager) {
+    this.view = requireNonNull(view, "view");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
+
     initComponents();
 
     setIconImages(Icons.getOpenTCSIcons());
     setTitle(ResourceBundleUtil.getBundle().getString("CreateGroupPanel.title"));
-    Objects.requireNonNull(view, "view is null");
-    this.view = view;
     initLists();
   }
 
@@ -54,7 +74,7 @@ public class CreateGroupPanel
    * Initializes all lists with values.
    */
   private void initLists() {
-    SystemModel systemModel = view.getSystemModel();
+    SystemModel systemModel = modelManager.getModel();
 
     points = systemModel.getPointModels();
     Collections.sort(points);
@@ -117,6 +137,7 @@ public class CreateGroupPanel
     }
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
    * initialize the form.
@@ -334,6 +355,7 @@ public class CreateGroupPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 1, 0);
     getContentPane().add(buttonPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
     DefaultListModel listModel = new DefaultListModel();
@@ -430,7 +452,7 @@ public class CreateGroupPanel
     evaluateAddButtonStatus();
   }//GEN-LAST:event_locationListValueChanged
 
-
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JPanel buttonPanel;
@@ -452,6 +474,7 @@ public class CreateGroupPanel
   private javax.swing.JLabel selectLabel;
   private javax.swing.JLabel selectedLabel;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 
   private class ModelCellRenderer
       extends DefaultListCellRenderer {
