@@ -72,7 +72,7 @@ public class BlockUserObject
   }
 
   @Override
-  public UserObjectContext.CONTEXT_TYPE getContextType() {
+  public UserObjectContext.ContextType getContextType() {
     return context.getType();
   }
 }

@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import org.opentcs.components.plantoverview.LocationTheme;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.action.actions.CreateBlockAction;
 import org.opentcs.guing.application.action.actions.CreateGroupAction;
@@ -48,8 +50,6 @@ import org.opentcs.guing.application.action.view.SaveViewBookmarkAction;
 import org.opentcs.guing.application.action.view.VehicleThemeAction;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.VehicleThemeManager;
-import org.opentcs.util.gui.plugins.LocationTheme;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * A custom ActionMap for the plant overview application.

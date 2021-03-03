@@ -13,8 +13,8 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
+import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.util.gui.plugins.PanelFactory;
 
 /**
  * An action to add a plugin panel.
@@ -25,10 +25,10 @@ public class AddPluginPanelAction
     extends AbstractAction {
 
   public final static String ID = "view.addPluginPanel";
-  private final PanelFactory factory;
+  private final PluggablePanelFactory factory;
   private final OpenTCSView view;
 
-  public AddPluginPanelAction(OpenTCSView view, PanelFactory factory) {
+  public AddPluginPanelAction(OpenTCSView view, PluggablePanelFactory factory) {
     this.view = Objects.requireNonNull(view, "view is null");
     this.factory = Objects.requireNonNull(factory, "panelID is null");
   }

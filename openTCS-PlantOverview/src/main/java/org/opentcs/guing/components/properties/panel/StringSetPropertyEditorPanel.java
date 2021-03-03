@@ -248,7 +248,7 @@ public class StringSetPropertyEditorPanel
   /**
    * Bewegt den aktuellen Eintrag nach unten.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
       int index = itemsList.getSelectedIndex();

@@ -9,15 +9,18 @@ title Kernel (openTCS)
 rem Don't export variables to the parent shell
 setlocal
 
-rem Set openTCS base and home directory
+rem Set base directory names.
 set OPENTCS_BASE=.
 set OPENTCS_HOME=.
-
-call %OPENTCS_HOME%\bin\initOpenTCSEnvironment.bat
+set OPENTCS_CONFIGDIR=%OPENTCS_HOME%\config
+set OPENTCS_LIBDIR=%OPENTCS_BASE%\lib
 
 rem Set the class path
 set OPENTCS_CP=%OPENTCS_LIBDIR%\*;
 set OPENTCS_CP=%OPENTCS_CP%;%OPENTCS_LIBDIR%\openTCS-extensions\*;
+
+rem XXX Be a bit more clever to find out the name of the JVM runtime.
+set JAVA=javaw
 
 rem Start kernel
 start /b %JAVA% -enableassertions ^

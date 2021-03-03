@@ -15,7 +15,7 @@ import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierung für Inhalte zur Darstellung von Eigenschaften eines
+ * Basisimplementierung fÃ¼r Inhalte zur Darstellung von Eigenschaften eines
  * ModelComponent-Objekts.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)

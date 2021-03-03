@@ -44,7 +44,7 @@ public class StringPropertyEditorPanel
 
   /**
    * Richtet die Dialogelemente entsprechend den Eigenschaftswerten ein. Diese
-   * Methode wird aufgerufen, wenn der Dialog geöffnet wird.
+   * Methode wird aufgerufen, wenn der Dialog geÃ¶ffnet wird.
    */
   public void initFields() {
     textArea.setText(fProperty.getText());

@@ -22,7 +22,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repr‰sentation einer Station in der Baumansicht.
+ * Die Repr√§sentation einer Station in der Baumansicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -69,7 +69,7 @@ public class LocationUserObject
   }
 
   @Override
-  public UserObjectContext.CONTEXT_TYPE getContextType() {
+  public UserObjectContext.ContextType getContextType() {
     return context.getType();
   }
 }

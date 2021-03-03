@@ -10,8 +10,6 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -27,6 +25,8 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for <code>Links</code>.
@@ -41,7 +41,7 @@ public class LinkAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(LinkAdapter.class.getName());
+      = LoggerFactory.getLogger(LinkAdapter.class);
 
   /**
    * Creates a new instance.
@@ -88,7 +88,7 @@ public class LinkAdapter
       }
     }
     catch (ObjectUnknownException | CredentialsException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 }

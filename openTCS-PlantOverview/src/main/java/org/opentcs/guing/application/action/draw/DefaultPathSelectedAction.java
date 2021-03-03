@@ -106,9 +106,9 @@ public class DefaultPathSelectedAction
     if (pathType != null) {
       OpenTCSConnectionTool connectionTool = (OpenTCSConnectionTool) tool;
       PathConnection pathConnection = (PathConnection) connectionTool.getPrototype();
-      // Typ explizit setzen, sodass die ausgew‰hlte Kurve grafisch dargestellt wird
+      // Typ explizit setzen, sodass die ausgew√§hlte Kurve grafisch dargestellt wird
       pathConnection.setLinerByType(pathType);
-      // Im Property muss die Kurve auch noch ge‰ndert werden
+      // Im Property muss die Kurve auch noch ge√§ndert werden
       SelectionProperty pType = (SelectionProperty) pathConnection.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
       pType.setValue(pathType);
 

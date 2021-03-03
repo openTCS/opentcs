@@ -45,15 +45,18 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
+import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.event.TransportOrderEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Eine Ansicht für Transportaufträge. Teil dieser Ansicht ist die Tabelle, in
- * der die Transportaufträge dargestellt sind. Noch zu tun: diese beiden
+ * Eine Ansicht fÃ¼r TransportauftrÃ¤ge. Teil dieser Ansicht ist die Tabelle, in
+ * der die TransportauftrÃ¤ge dargestellt sind. Noch zu tun: diese beiden
  * zusammenlegen.
  *
  * @author Sven Liebing (ifak e.V. Magdeburg)
@@ -62,6 +65,8 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  */
 public class TransportOrdersContainerPanel
     extends JPanel {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TransportOrdersContainerPanel.class);
 
   private static final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
   /**
@@ -77,7 +82,7 @@ public class TransportOrdersContainerPanel
    */
   private final Provider<CreateTransportOrderPanel> orderPanelProvider;
   /**
-   * Die Tabelle, in der die Transportaufträge dargestellt werden.
+   * Die Tabelle, in der die TransportauftrÃ¤ge dargestellt werden.
    */
   private JTable fTable;
   /**
@@ -89,7 +94,7 @@ public class TransportOrdersContainerPanel
    */
   private List<FilterButton> fFilterButtons;
   /**
-   * Die Transportaufträge.
+   * Die TransportauftrÃ¤ge.
    */
   private Vector<TransportOrder> fTransportOrders;
 
@@ -122,6 +127,14 @@ public class TransportOrdersContainerPanel
         break;
       default:
       // Do nada.
+    }
+  }
+
+  @Handler
+  public void processEvent(KernelStateChangeEvent event) {
+    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
+      fTableModel.setRowCount(0);
+      fTableModel.fireTableDataChanged();
     }
   }
 
@@ -191,7 +204,7 @@ public class TransportOrdersContainerPanel
   }
 
   /**
-   * Zeigt Details zum ausgewählten Transportauftrag.
+   * Zeigt Details zum ausgewÃ¤hlten Transportauftrag.
    */
   private void showTransportOrder() {
     try {
@@ -230,7 +243,7 @@ public class TransportOrdersContainerPanel
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-        orderUtil.createTransportOrder(content.getLocations(), content.getActions(), content.getSelectedDeadline(), content.getSelectedVehicle());
+        orderUtil.createTransportOrder(content.getDestinationModels(), content.getActions(), content.getPropertiesList(), content.getSelectedDeadline(), content.getSelectedVehicle());
       }
     }
   }
@@ -239,14 +252,17 @@ public class TransportOrdersContainerPanel
    * Fertigt eine Kopie eines existierenden Transportauftrags an.
    */
   private void createTransportOrderCopy() {
-    orderUtil.createTransportOrder(getSelectedTransportOrder());
+    TransportOrder original = getSelectedTransportOrder();
+    if (original != null) {
+      orderUtil.createTransportOrder(original);
+    }
   }
 
   /**
-   * Zeigt ein Kontextmenü zu dem angewählten Transportauftrag.
+   * Zeigt ein KontextmenÃ¼ zu dem angewÃ¤hlten Transportauftrag.
    *
-   * @param x die x-Position des auslösenden Mausklicks
-   * @param y die y-Position des auslösenden Mausklicks
+   * @param x die x-Position des auslÃ¶senden Mausklicks
+   * @param y die y-Position des auslÃ¶senden Mausklicks
    */
   private void showPopupMenu(int x, int y) {
     boolean singleRowSelected = fTable.getSelectedRowCount() <= 1;
@@ -288,8 +304,8 @@ public class TransportOrdersContainerPanel
   }
 
   /**
-   * Fügt die Buttons hinzu, mit denen die Transportaufträge gesteuert werden
-   * können.
+   * FÃ¼gt die Buttons hinzu, mit denen die TransportauftrÃ¤ge gesteuert werden
+   * kÃ¶nnen.
    */
   private void addControlButtons(JToolBar toolBar) {
     JButton button;
@@ -298,17 +314,17 @@ public class TransportOrdersContainerPanel
 
     toolBar.add(new JToolBar.Separator());
 
-    // 2012-11-19 HH: Funktion "Auftrag löschen" im Client _nicht_ anbieten
-//		button = new JButton(iconkit.getImageIconByFullPath(fIconPath + "delete.16x16.gif"));
-//		button.addActionListener(new ActionListener() {
+    // 2012-11-19 HH: Funktion "Auftrag lÃ¶schen" im Client _nicht_ anbieten
+//    button = new JButton(iconkit.getImageIconByFullPath(fIconPath + "delete.16x16.gif"));
+//    button.addActionListener(new ActionListener() {
 //
-//			public void actionPerformed(ActionEvent e) {
-//				deleteSelectedTransportOrders();
-//			}
-//		});
+//      public void actionPerformed(ActionEvent e) {
+//        deleteSelectedTransportOrders();
+//      }
+//    });
 //
-//		button.setToolTipText("Löscht die markierten Transportaufträge.");
-//		toolBar.add(button);
+//    button.setToolTipText("LÃ¶scht die markierten TransportauftrÃ¤ge.");
+//    toolBar.add(button);
     button = new JButton(iconkit.getImageIconByFullPath(fIconPath + "table-row-delete-2.16x16.png"));
     button.addActionListener(new ActionListener() {
 
@@ -341,7 +357,7 @@ public class TransportOrdersContainerPanel
   }
 
   /**
-   * Setzt die Liste der Transportaufträge.
+   * Setzt die Liste der TransportauftrÃ¤ge.
    */
   private void setTransportOrders(Set<TransportOrder> transportOrders) {
     if (transportOrders == null) {
@@ -399,6 +415,7 @@ public class TransportOrdersContainerPanel
     for (int i = 0; i < values.size(); i++) {
       fTableModel.setValueAt(values.elementAt(i), rowIndex, i);
     }
+    fTransportOrders.setElementAt(t, rowIndex);
   }
 
   private void transportOrderRemoved(final TransportOrder t) {
@@ -421,7 +438,7 @@ public class TransportOrdersContainerPanel
     FilterButton button;
     Vector<FilterButton> buttons = new Vector<>();
     IconToolkit iconkit = IconToolkit.instance();
-    // Mögliche States einer Transport Order:
+    // MÃ¶gliche States einer Transport Order:
     // RAW: A transport order's initial state. A transport order remains in this state until its parameters have been set up completely.
     button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterRaw.16x16.gif"), fTableModel, "RAW");
     button.setToolTipText(bundle.getString("TransportOrdersContainerPanel.bar.filterRAW"));
@@ -473,7 +490,7 @@ public class TransportOrdersContainerPanel
     // Spalte 0: Name
     row.addElement(t.getName());
 
-    // Alle Einzel-Fahraufträge
+    // Alle Einzel-FahrauftrÃ¤ge
     Vector<DriveOrder> driveOrders = new Vector<>();
     driveOrders.addAll(t.getPastDriveOrders());
 
@@ -497,7 +514,7 @@ public class TransportOrdersContainerPanel
     ref = driveOrders.lastElement().getDestination().getLocation();
     row.addElement(ref.getName());
 
-    // Spalte 3: Gewünschtes Fahrzeug
+    // Spalte 3: GewÃ¼nschtes Fahrzeug
     ref = t.getIntendedVehicle();
 
     if (ref != null) {
@@ -507,7 +524,7 @@ public class TransportOrdersContainerPanel
       row.addElement(bundle.getString("TransportOrdersContainerPanel.table.determineAutomatic"));
     }
 
-    // Spalte 4: Ausführendes Fahrzeug
+    // Spalte 4: AusfÃ¼hrendes Fahrzeug
     ref = t.getProcessingVehicle();
 
     if (ref != null) {

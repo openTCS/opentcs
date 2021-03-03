@@ -37,7 +37,7 @@ public class ViewToolBarsMenu
       add(checkBoxMenuItem);
 
       if (checkBoxMenuItem.getText().equals(labels.getString("toolBarCreation.title"))) {
-        checkBoxMenuItem.setEnabled(false);	// "Draw"-Toolbar musn't be disabled.
+        checkBoxMenuItem.setEnabled(false); // "Draw"-Toolbar musn't be disabled.
       }
     }
 

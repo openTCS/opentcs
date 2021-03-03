@@ -1,0 +1,10 @@
+dependencies {
+  compile project(':openTCS-API-Base')
+  compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
+  compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.1.0'
+  compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '4.1.0'
+}
+
+task release {
+  dependsOn build
+}

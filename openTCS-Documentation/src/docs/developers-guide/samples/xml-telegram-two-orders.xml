@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tcsOrderSet>
+    <order xsi:type="transport" deadline="2016-11-24T11:18:39.124+01:00" intendedVehicle="Vehicle-01" id="TransportOrder-01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <destination locationName="Storage 01" operation="Load cargo"/>
+        <destination locationName="Storage 02" operation="Unoad cargo"/>
+        <property key="waitBefore" value="Unload"/>
+    </order>
+    <order xsi:type="transport" id="TransportOrder-02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <destination locationName="Working station 01" operation="Drill">
+            <property key="drillSize" value="3"/>
+        </destination>
+        <destination locationName="Working station 02" operation="Drill">
+            <property key="drillSize" value="8"/>
+        </destination>
+        <destination locationName="Working station 03" operation="Cut"/>
+    </order>
+</tcsOrderSet>

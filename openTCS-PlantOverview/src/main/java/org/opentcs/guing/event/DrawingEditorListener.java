@@ -24,16 +24,16 @@ public interface DrawingEditorListener {
 
   /**
    * Listener-Methode, die aufgerufen wird, wenn ein Figure-Objekt im
-   * OpenTCSDrawingEditor durch eine Aktion des Benutzers hinzugefügt wurde.
+   * OpenTCSDrawingEditor durch eine Aktion des Benutzers hinzugefÃ¼gt wurde.
    * Gets called when a figure is added in the <code>OpenTCSDrawingEditor</code>
    * by an action of the user.
    *
    * TODO: Kommentar aktualisieren! HH 2014-02-27
-   * Hier können verschiedene Konstellationen auftreten:
-   * 1. das hinzugefügte Figure hat bereits einen ModelSwitcher
+   * Hier kÃ¶nnen verschiedene Konstellationen auftreten:
+   * 1. das hinzugefÃ¼gte Figure hat bereits einen ModelSwitcher
    * (das ist bei einem Paste-Befehl der Fall)
-   * 2. das hinzugefügte Figure hat nur ein Model-Prototyp (Normalfall)
-   * 3. das hinzugefügte Figure hat gar nichts (z.B. TextFigure, OriginFigure)
+   * 2. das hinzugefÃ¼gte Figure hat nur ein Model-Prototyp (Normalfall)
+   * 3. das hinzugefÃ¼gte Figure hat gar nichts (z.B. TextFigure, OriginFigure)
    *
    * @param e
    * @return

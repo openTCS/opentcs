@@ -23,25 +23,25 @@ import org.opentcs.guing.components.drawing.course.Origin;
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class OffsetFigure
-		extends OriginFigure {
-	
-	public OffsetFigure() {
-		super();
-		setModel(new Origin()); // The figure needs a model to work
-		set(AttributeKeys.STROKE_COLOR, Color.darkGray);
-		setVisible(false);			// only visible for test
-	}
-	
-	@Override
-	protected void drawStroke(Graphics2D g) {
+    extends OriginFigure {
+  
+  public OffsetFigure() {
+    super();
+    setModel(new Origin()); // The figure needs a model to work
+    set(AttributeKeys.STROKE_COLOR, Color.darkGray);
+    setVisible(false);      // only visible for test
+  }
+  
+  @Override
+  protected void drawStroke(Graphics2D g) {
     // Shape: "Crosshair" with square
-		Rectangle r = (Rectangle) fDisplayBox.clone();
+    Rectangle r = (Rectangle) fDisplayBox.clone();
 
-		if (r.width > 0 && r.height > 0) {
-			g.drawLine(r.x + r.width / 2, r.y, r.x + r.width / 2, r.y + r.height);
-			g.drawLine(r.x, r.y + r.height / 2, r.x + r.width, r.y + r.height / 2);
-			r.grow(-4, -4);
-			g.drawRect(r.x, r.y, r.width, r.height);
-		}
-	}
+    if (r.width > 0 && r.height > 0) {
+      g.drawLine(r.x + r.width / 2, r.y, r.x + r.width / 2, r.y + r.height);
+      g.drawLine(r.x, r.y + r.height / 2, r.x + r.width, r.y + r.height / 2);
+      r.grow(-4, -4);
+      g.drawRect(r.x, r.y, r.width, r.height);
+    }
+  }
 }

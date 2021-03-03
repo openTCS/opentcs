@@ -29,13 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.opentcs.guing.components.tree.TreeView;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for working with dockables.
@@ -188,7 +187,7 @@ public class DockingManager {
 //      }
 //    }
 //    catch (IOException ex) {
-//      Logger.getLogger(DockingManager.class.getName()).log(Level.WARNING, null, ex);
+//      LoggerFactory.getLogger(DockingManager.class).log(Level.WARNING, null, ex);
 //    }
   }
 
@@ -200,7 +199,7 @@ public class DockingManager {
       control.writeXML(new File(DOCKING_CONFIG));
     }
     catch (IOException ex) {
-      Logger.getLogger(DockingManager.class.getName()).log(Level.WARNING, null, ex);
+      LoggerFactory.getLogger(DockingManager.class).warn("", ex);
     }
   }
 

@@ -44,9 +44,9 @@ public interface UserObjectContext {
    * 
    * @return One of CONTEXT_TYPE.
    */
-  CONTEXT_TYPE getType();
+  ContextType getType();
 
-  public enum CONTEXT_TYPE {
+  public enum ContextType {
 
     COMPONENT, BLOCK, GROUP, NULL;
   }

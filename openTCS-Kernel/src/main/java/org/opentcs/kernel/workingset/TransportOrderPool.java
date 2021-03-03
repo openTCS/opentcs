@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.opentcs.data.ObjectExistsException;
@@ -26,6 +25,8 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.UniqueTimestampGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@code TransportOrderPool} keeps all {@code TransportOrder}s for an openTCS
@@ -43,7 +44,7 @@ public class TransportOrderPool {
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(TransportOrderPool.class.getName());
+      = LoggerFactory.getLogger(TransportOrderPool.class);
   /**
    * The system's global object pool.
    */
@@ -73,7 +74,7 @@ public class TransportOrderPool {
    * order pool's data.
    */
   public TCSObjectPool getObjectPool() {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool;
   }
 
@@ -81,7 +82,7 @@ public class TransportOrderPool {
    * Removes all transport orders from this pool.
    */
   public void clear() {
-    log.finer("method entry");
+    log.debug("method entry");
     Set<TCSObject<?>> objects = objectPool.getObjects((Pattern) null);
     Set<String> removableNames = new HashSet<>();
     for (TCSObject<?> curObject : objects) {
@@ -102,7 +103,7 @@ public class TransportOrderPool {
    */
   public TransportOrder createTransportOrder(
       List<DriveOrder.Destination> destinations) {
-    log.finer("method entry");
+    log.debug("method entry");
     // Get a unique ID and name for the new point and create an instance.
     int orderID = objectPool.getUniqueObjectId();
     String orderName = objectPool.getUniqueObjectName("TOrder-", "0000");
@@ -135,7 +136,7 @@ public class TransportOrderPool {
    */
   public TransportOrder getTransportOrder(
       TCSObjectReference<TransportOrder> ref) {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool.getObject(TransportOrder.class, ref);
   }
 
@@ -147,7 +148,7 @@ public class TransportOrderPool {
    * no such order exists.
    */
   public TransportOrder getTransportOrder(String orderName) {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool.getObject(TransportOrder.class, orderName);
   }
 
@@ -162,7 +163,7 @@ public class TransportOrderPool {
    * expression. If no such transport orders exist, the returned set is empty.
    */
   public Set<TransportOrder> getTransportOrders(Pattern regexp) {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool.getObjects(TransportOrder.class, regexp);
   }
 
@@ -174,7 +175,7 @@ public class TransportOrderPool {
    * transport orders exist, the returned set is empty.
    */
   public Set<TransportOrder> getTransportOrders(TransportOrder.State state) {
-    log.finer("method entry");
+    log.debug("method entry");
     if (state == null) {
       throw new NullPointerException("state is null");
     }
@@ -199,7 +200,7 @@ public class TransportOrderPool {
   public TransportOrder setTransportOrderDeadline(
       TCSObjectReference<TransportOrder> ref, long deadline)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -224,7 +225,7 @@ public class TransportOrderPool {
   public TransportOrder setTransportOrderState(
       TCSObjectReference<TransportOrder> ref, TransportOrder.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -250,7 +251,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -285,7 +286,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -325,7 +326,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
       throws ObjectUnknownException, IllegalArgumentException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -354,7 +355,7 @@ public class TransportOrderPool {
   public TransportOrder setTransportOrderInitialDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -383,7 +384,7 @@ public class TransportOrderPool {
   public TransportOrder setTransportOrderNextDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -434,7 +435,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> newDepRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -467,7 +468,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -498,7 +499,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       Rejection newRejection)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -524,7 +525,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -560,7 +561,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       boolean dispensable)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -584,7 +585,7 @@ public class TransportOrderPool {
   public TransportOrder removeTransportOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -611,7 +612,7 @@ public class TransportOrderPool {
    * @return The newly created order sequence.
    */
   public OrderSequence createOrderSequence() {
-    log.finer("method entry");
+    log.debug("method entry");
     // Get a unique ID and name for the new point and create an instance.
     int orderID = objectPool.getUniqueObjectId();
     String orderName = objectPool.getUniqueObjectName("OrderSeq-", "0000");
@@ -639,7 +640,7 @@ public class TransportOrderPool {
    * sequence exists.
    */
   public OrderSequence getOrderSequence(TCSObjectReference<OrderSequence> ref) {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool.getObject(OrderSequence.class, ref);
   }
 
@@ -651,7 +652,7 @@ public class TransportOrderPool {
    * no such sequence exists.
    */
   public OrderSequence getOrderSequence(String seqName) {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool.getObject(OrderSequence.class, seqName);
   }
 
@@ -665,7 +666,7 @@ public class TransportOrderPool {
    * expression. If no such sequences exist, the returned set is empty.
    */
   public Set<OrderSequence> getOrderSequences(Pattern regexp) {
-    log.finer("method entry");
+    log.debug("method entry");
     return objectPool.getObjects(OrderSequence.class, regexp);
   }
 
@@ -685,7 +686,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException, IllegalArgumentException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -735,7 +736,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -765,7 +766,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       int index)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -789,7 +790,7 @@ public class TransportOrderPool {
   public OrderSequence setOrderSequenceComplete(
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -813,7 +814,7 @@ public class TransportOrderPool {
   public OrderSequence setOrderSequenceFinished(
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -839,7 +840,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       boolean fatal)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -866,7 +867,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -901,7 +902,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -934,7 +935,7 @@ public class TransportOrderPool {
   public OrderSequence removeOrderSequence(
       TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    log.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, ref);
     if (sequence == null) {
       throw new ObjectUnknownException(ref);

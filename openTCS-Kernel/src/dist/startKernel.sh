@@ -3,16 +3,22 @@
 # Start the openTCS kernel.
 #
 
-# Set openTCS base and home directory
+# Set base directory names.
 export OPENTCS_BASE=.
 export OPENTCS_HOME=.
-
-# Initialize environment
-. ${OPENTCS_HOME}/bin/initOpenTCSEnvironment.sh
+export OPENTCS_CONFIGDIR="${OPENTCS_HOME}/config"
+export OPENTCS_LIBDIR="${OPENTCS_BASE}/lib"
 
 # Set the class path
 export OPENTCS_CP="${OPENTCS_LIBDIR}/*"
 export OPENTCS_CP="${OPENTCS_CP}:${OPENTCS_LIBDIR}/openTCS-extensions/*"
+
+if [ -n "${OPENTCS_JAVAVM}" ]; then
+    export JAVA="${OPENTCS_JAVAVM}"
+else
+    # XXX Be a bit more clever to find out the name of the JVM runtime.
+    export JAVA="java"
+fi
 
 # Start kernel
 ${JAVA} -enableassertions \

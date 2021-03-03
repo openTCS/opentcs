@@ -1,10 +1,13 @@
 /.gradle/
 /.nb-gradle/
 /openTCS-Base/build/
+/openTCS-CommAdapter-Loopback/build/
+/openTCS-Strategies-Default/build/
 /openTCS-Kernel/build/
 /openTCS-PlantOverview/build/
 /openTCS-Documentation/build/
-/openTCS-IntegrationTests/build/
 /build/
 *~
-/openTCS-Strategies-Basic/build/
+/openTCS-Common/build/
+/openTCS-API-Injection/build/
+/openTCS-API-Base/build/

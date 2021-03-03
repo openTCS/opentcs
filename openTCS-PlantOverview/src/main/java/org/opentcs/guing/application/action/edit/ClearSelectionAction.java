@@ -22,55 +22,55 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Werner Randelshofer.
  */
 public class ClearSelectionAction
-		extends org.jhotdraw.app.action.edit.AbstractSelectionAction {
+    extends org.jhotdraw.app.action.edit.AbstractSelectionAction {
 
-	public final static String ID = "edit.clearSelection";
+  public final static String ID = "edit.clearSelection";
 
-	/**
-	 * Creates a new instance which acts on the currently focused component.
-	 */
-	public ClearSelectionAction() {
-		this(null);
-	}
+  /**
+   * Creates a new instance which acts on the currently focused component.
+   */
+  public ClearSelectionAction() {
+    this(null);
+  }
 
-	/**
-	 * Creates a new instance which acts on the specified component.
-	 *
-	 * @param target The target of the action. Specify null for the currently
-	 * focused component.
-	 */
-	public ClearSelectionAction(JComponent target) {
-		super(target);
-		ResourceBundleUtil.getBundle().configureAction(this, ID, false);
-	}
+  /**
+   * Creates a new instance which acts on the specified component.
+   *
+   * @param target The target of the action. Specify null for the currently
+   * focused component.
+   */
+  public ClearSelectionAction(JComponent target) {
+    super(target);
+    ResourceBundleUtil.getBundle().configureAction(this, ID, false);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-		JComponent cTarget = target;
-		Component cFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    JComponent cTarget = target;
+    Component cFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
 
-		if (cTarget == null && (cFocusOwner instanceof JComponent)) {
-			cTarget = (JComponent) cFocusOwner;
-		}
+    if (cTarget == null && (cFocusOwner instanceof JComponent)) {
+      cTarget = (JComponent) cFocusOwner;
+    }
 
-		if (cTarget != null && cTarget.isEnabled()) {
-			if (cTarget instanceof EditableComponent) {
-				((EditableComponent) cTarget).clearSelection();
-			}
-			else if (cTarget instanceof JTextComponent) {
-				JTextComponent tc = ((JTextComponent) cTarget);
-				tc.select(tc.getSelectionStart(), tc.getSelectionStart());
-			}
-			else {
-				cTarget.getToolkit().beep();
-			}
-		}
-	}
+    if (cTarget != null && cTarget.isEnabled()) {
+      if (cTarget instanceof EditableComponent) {
+        ((EditableComponent) cTarget).clearSelection();
+      }
+      else if (cTarget instanceof JTextComponent) {
+        JTextComponent tc = ((JTextComponent) cTarget);
+        tc.select(tc.getSelectionStart(), tc.getSelectionStart());
+      }
+      else {
+        cTarget.getToolkit().beep();
+      }
+    }
+  }
 
-	@Override
-	protected void updateEnabled() {
-		if (target != null) {
-			setEnabled(target.isEnabled());
-		}
-	}
+  @Override
+  protected void updateEnabled() {
+    if (target != null) {
+      setEnabled(target.isEnabled());
+    }
+  }
 }

@@ -8,12 +8,13 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import javax.swing.JComponent;
+import org.jhotdraw.app.action.edit.AbstractSelectionAction;
 import org.opentcs.guing.components.EditableComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Cuts the selected region and places its contents into the system clipboard.
- * This action acts on the last EditableComponent / {@code JTextComponent} 
+ * This action acts on the last EditableComponent / {@code JTextComponent}
  * which had the focus when the {@code ActionEvent} was generated.
  * This action is called when the user selects the "Cut" item in
  * the Edit menu. The menu item is automatically created by the application.
@@ -21,7 +22,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class CutAction
-    extends org.jhotdraw.app.action.edit.AbstractSelectionAction {
+    extends AbstractSelectionAction {
 
   public final static String ID = "edit.cut";
 
@@ -55,16 +56,16 @@ public class CutAction
         }
       }
     }
-    
+
     // "Old" version with JHotDraw clipboard
 //    JComponent cTarget = target;
 //
-//		if (cTarget == null && (cFocusOwner instanceof JComponent)) {
-//			cTarget = (JComponent) cFocusOwner;
-//		}
+//    if (cTarget == null && (cFocusOwner instanceof JComponent)) {
+//      cTarget = (JComponent) cFocusOwner;
+//    }
 //
-//		if (cTarget != null && cTarget.isEnabled() && cTarget.getTransferHandler() != null) {
-//			cTarget.getTransferHandler().exportToClipboard(cTarget, ClipboardUtil.getClipboard(), TransferHandler.MOVE);
-//		}
+//    if (cTarget != null && cTarget.isEnabled() && cTarget.getTransferHandler() != null) {
+//      cTarget.getTransferHandler().exportToClipboard(cTarget, ClipboardUtil.getClipboard(), TransferHandler.MOVE);
+//    }
   }
 }

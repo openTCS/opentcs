@@ -21,7 +21,7 @@ import org.opentcs.guing.components.properties.PropertyUndoActivity;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Ein Undo-Umwickler für CellEditoren.
+ * Ein Undo-Umwickler fÃ¼r CellEditoren.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

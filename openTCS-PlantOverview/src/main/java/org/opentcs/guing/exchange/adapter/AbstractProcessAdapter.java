@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Logger;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObject;
@@ -26,6 +25,8 @@ import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic implementation of a <code>ProcessAdapter</code>.
@@ -42,7 +43,7 @@ public abstract class AbstractProcessAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(AbstractProcessAdapter.class.getName());
+      = LoggerFactory.getLogger(AbstractProcessAdapter.class);
 
   /**
    * The <code>ModelComponent</code>.

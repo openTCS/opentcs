@@ -15,8 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -34,7 +32,7 @@ import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.drivers.LoadHandlingDevice;
+import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
@@ -52,6 +50,8 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for vehicles.
@@ -66,7 +66,7 @@ public class VehicleAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(VehicleAdapter.class.getName());
+      = LoggerFactory.getLogger(VehicleAdapter.class);
 
   /**
    * Creates a new instance.
@@ -113,7 +113,7 @@ public class VehicleAdapter
       vehicleModel.propertiesChanged(new NullAttributesChangeListener());
     }
     catch (CredentialsException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
@@ -130,7 +130,7 @@ public class VehicleAdapter
       updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
@@ -196,7 +196,7 @@ public class VehicleAdapter
       ProcessAdapter pointAdapter = getEventDispatcher().findProcessAdapter(rCurrentPosition);
 
       if (pointAdapter == null) {
-        log.severe("Error: Point " + rCurrentPosition.getName() + "not found.");
+        log.error("Error: Point " + rCurrentPosition.getName() + "not found.");
       }
       else {
         PointModel pointModel = (PointModel) pointAdapter.getModel();

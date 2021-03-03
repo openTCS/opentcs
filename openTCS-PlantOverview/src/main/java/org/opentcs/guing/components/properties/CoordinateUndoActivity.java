@@ -26,7 +26,7 @@ import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Ein Undo für die Änderung eines Attributs.
+ * Ein Undo fÃ¼r die Ã„nderung eines Attributs.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
@@ -87,7 +87,7 @@ public class CoordinateUndoActivity
   }
 
   /**
-   * Erstellt eine Momentaufnahme vor der Änderung des Attributs.
+   * Erstellt eine Momentaufnahme vor der Ã„nderung des Attributs.
    */
   public void snapShotBeforeModification() {
     pxBeforeModification = (CoordinateProperty) pxModel.clone();
@@ -95,7 +95,7 @@ public class CoordinateUndoActivity
   }
 
   /**
-   * Erstellt eine Momentaufnahme nach der Änderung des Attributs.
+   * Erstellt eine Momentaufnahme nach der Ã„nderung des Attributs.
    */
   public void snapShotAfterModification() {
     pxAfterModification = (CoordinateProperty) pxModel.clone();

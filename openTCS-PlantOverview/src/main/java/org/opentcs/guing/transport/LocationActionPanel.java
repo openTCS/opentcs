@@ -26,122 +26,122 @@ import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Eine Benutzerschnittstelle zum Auswählen einer Station oder eines
- * Meldepunktes als direktes Fahrtziel für ein Fahrzeug.
+ * Eine Benutzerschnittstelle zum AuswÃ¤hlen einer Station oder eines
+ * Meldepunktes als direktes Fahrtziel fÃ¼r ein Fahrzeug.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationActionPanel
-		extends DialogContent {
+    extends DialogContent {
 
-	/**
-	 * Die zur Auswahl stehenden Stationen.
-	 */
-	protected List<LocationModel> fLocations;
-	/**
-	 * Die zur Auswahl stehenden Aktionen.
-	 */
-	protected List<String> fActions;
+  /**
+   * Die zur Auswahl stehenden Stationen.
+   */
+  protected List<LocationModel> fLocations;
+  /**
+   * Die zur Auswahl stehenden Aktionen.
+   */
+  protected List<String> fActions;
 
-	/**
-	 * Creates new form PointPanel
-	 */
-	public LocationActionPanel(List<LocationModel> locations) {
-		initComponents();
-		fLocations = locations;
-		setDialogTitle(ResourceBundleUtil.getBundle().getString("LocationActionPanel.title"));
-	
-		Collections.sort(fLocations, getComparator());
-		
-		List<String> names = new ArrayList<>();
-		Iterator<LocationModel> e = fLocations.iterator();
-	
-		while (e.hasNext()) {
-			names.add(e.next().getName());
-		}
+  /**
+   * Creates new form PointPanel
+   */
+  public LocationActionPanel(List<LocationModel> locations) {
+    initComponents();
+    fLocations = locations;
+    setDialogTitle(ResourceBundleUtil.getBundle().getString("LocationActionPanel.title"));
+  
+    Collections.sort(fLocations, getComparator());
+    
+    List<String> names = new ArrayList<>();
+    Iterator<LocationModel> e = fLocations.iterator();
+  
+    while (e.hasNext()) {
+      names.add(e.next().getName());
+    }
 
-		locationsComboBox.setModel(new DefaultComboBoxModel(new Vector(names)));
-		
-		updateActions();
-	}
+    locationsComboBox.setModel(new DefaultComboBoxModel(new Vector(names)));
+    
+    updateActions();
+  }
 
-	/**
-	 * Liefert einen Comparator zum Sortieren der Elemente.
-	 *
-	 * @return den Comparator
-	 */
-	protected final Comparator<ModelComponent> getComparator() {
-		return new Comparator<ModelComponent>() {
+  /**
+   * Liefert einen Comparator zum Sortieren der Elemente.
+   *
+   * @return den Comparator
+   */
+  protected final Comparator<ModelComponent> getComparator() {
+    return new Comparator<ModelComponent>() {
 
       @Override
-			public int compare(ModelComponent item1, ModelComponent item2) {
-				String s1 = item1.getName();
-				String s2 = item2.getName();
-				s1 = s1.toLowerCase();
-				s2 = s2.toLowerCase();
-	
-				return s1.compareTo(s2);
-			}
-		};
-	}
+      public int compare(ModelComponent item1, ModelComponent item2) {
+        String s1 = item1.getName();
+        String s2 = item2.getName();
+        s1 = s1.toLowerCase();
+        s2 = s2.toLowerCase();
+  
+        return s1.compareTo(s2);
+      }
+    };
+  }
 
-	/**
-	 * Liefert das ausgewählte Ziel, zu dem das Fahrzeug hinbeordert werden soll.
-	 *
-	 * @return das Ziel oder
-	 * <code>null</code>, falls kein Ziel ausgewählt wurde
-	 */
-	public LocationModel getSelectedLocation() {
-		int index = locationsComboBox.getSelectedIndex();
-	
-		if (index == -1) {
-			return null;
-		}
+  /**
+   * Liefert das ausgewÃ¤hlte Ziel, zu dem das Fahrzeug hinbeordert werden soll.
+   *
+   * @return das Ziel oder
+   * <code>null</code>, falls kein Ziel ausgewÃ¤hlt wurde
+   */
+  public LocationModel getSelectedLocation() {
+    int index = locationsComboBox.getSelectedIndex();
+  
+    if (index == -1) {
+      return null;
+    }
 
-		return fLocations.get(index);
-	}
+    return fLocations.get(index);
+  }
 
-	public String getSelectedAction() {
-		int index = actionsComboBox.getSelectedIndex();
-	
-		if (index == -1) {
-			return null;
-		}
+  public String getSelectedAction() {
+    int index = actionsComboBox.getSelectedIndex();
+  
+    if (index == -1) {
+      return null;
+    }
 
-		return fActions.get(index);
-	}
+    return fActions.get(index);
+  }
 
-	/**
-	 * Zu der selektierten Location die passenden Actions anzeigen
-	 */
-	private void updateActions() {
-		LocationModel selectedLocation = getSelectedLocation();
-		LocationTypeModel locationType = selectedLocation.getLocationType();
-		StringSetProperty actionProperties = (StringSetProperty) locationType.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
-		List<String> actions = actionProperties.getItems();
-		Collections.sort(actions);
-		// "No Operation" immer als erste Aktion anzeigen
-		fActions = new ArrayList<>();
-		fActions.add(DriveOrder.Destination.OP_NOP);
-		fActions.addAll(actions);
-		actionsComboBox.setModel(new DefaultComboBoxModel(new Vector(fActions)));
-	}
-	
+  /**
+   * Zu der selektierten Location die passenden Actions anzeigen
+   */
+  private void updateActions() {
+    LocationModel selectedLocation = getSelectedLocation();
+    LocationTypeModel locationType = selectedLocation.getLocationType();
+    StringSetProperty actionProperties = (StringSetProperty) locationType.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
+    List<String> actions = actionProperties.getItems();
+    Collections.sort(actions);
+    // "No Operation" immer als erste Aktion anzeigen
+    fActions = new ArrayList<>();
+    fActions.add(DriveOrder.Destination.OP_NOP);
+    fActions.addAll(actions);
+    actionsComboBox.setModel(new DefaultComboBoxModel(new Vector(fActions)));
+  }
+  
   @Override
-	public void update() {
-		// wird nicht benötigt
-	}
+  public void update() {
+    // wird nicht benÃ¶tigt
+  }
 
   @Override
-	public void initFields() {
-		// wird nicht benötigt
-	}
+  public void initFields() {
+    // wird nicht benÃ¶tigt
+  }
 
-	/**
-	 * This method is called from within the constructor to initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is always
-	 * regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -190,9 +190,9 @@ public class LocationActionPanel
         add(actionsComboBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-	private void locationsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationsComboBoxItemStateChanged
-		updateActions();
-	}//GEN-LAST:event_locationsComboBoxItemStateChanged
+  private void locationsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationsComboBoxItemStateChanged
+    updateActions();
+  }//GEN-LAST:event_locationsComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox actionsComboBox;

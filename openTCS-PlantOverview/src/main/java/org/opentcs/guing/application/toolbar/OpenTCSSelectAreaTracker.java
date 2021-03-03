@@ -70,7 +70,7 @@ public class OpenTCSSelectAreaTracker
     this.appState = requireNonNull(appState, "appState");
   }
 
-  @Override	// DefaultSelectAreaTracker
+  @Override // DefaultSelectAreaTracker
   public void mousePressed(MouseEvent evt) {
     super.mousePressed(evt);
     clearRubberBand();

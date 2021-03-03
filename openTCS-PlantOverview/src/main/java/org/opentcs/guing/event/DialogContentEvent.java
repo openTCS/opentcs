@@ -19,14 +19,14 @@ import java.util.EventObject;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class DialogContentEvent
-		extends EventObject {
+    extends EventObject {
 
-	/**
-	 * Creates a new instance of DialogContentEvent.
+  /**
+   * Creates a new instance of DialogContentEvent.
    * 
    * @param dialogContent The dialog content.
-	 */
-	public DialogContentEvent(Object dialogContent) {
-		super(dialogContent);
-	}
+   */
+  public DialogContentEvent(Object dialogContent) {
+    super(dialogContent);
+  }
 }

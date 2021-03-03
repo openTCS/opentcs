@@ -26,7 +26,7 @@ import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierung für Figures, die mit den Standardfunktionen von JHotDraw
+ * Basisimplementierung fÃ¼r Figures, die mit den Standardfunktionen von JHotDraw
  * nicht auskommen.
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -47,7 +47,7 @@ public abstract class TCSFigure
    */
   protected Rectangle fDisplayBox;
   /**
-   * Enthält die exakte Position des Mittelpunkts der Figur
+   * EnthÃ¤lt die exakte Position des Mittelpunkts der Figur
    */
   protected ZoomPoint fZoomPoint;
 
@@ -80,7 +80,7 @@ public abstract class TCSFigure
   /**
    * Setzt den ZoomPunkt.
    *
-   * @param zoomPoint Der Zoompunkt	*
+   * @param zoomPoint Der Zoompunkt  *
    */
   public void setZoomPoint(ZoomPoint zoomPoint) {
     fZoomPoint = zoomPoint;
@@ -88,11 +88,11 @@ public abstract class TCSFigure
 
   /**
    * Wird beim Erzeugen eines neuen Grafik-Objekts mit dem Creation Tool
-   * aufgerufen. Dabei wird auch das zugehörige Modell ge-"cloned".
+   * aufgerufen. Dabei wird auch das zugehÃ¶rige Modell ge-"cloned".
    *
    * @return
    */
-  @Override	// AbstractAttributedDecoratedFigure
+  @Override  // AbstractAttributedDecoratedFigure
   public TCSFigure clone() {
     try {
       TCSFigure that = (TCSFigure) super.clone();
@@ -153,7 +153,7 @@ public abstract class TCSFigure
   @Override
   public boolean handleMouseClick(Double p, MouseEvent evt, DrawingView drawingView) {
     // Bei Doppelclick auf eine Figur:
-    // 1. Das zugehörige Objekt im Tree markieren
+    // 1. Das zugehÃ¶rige Objekt im Tree markieren
     // 2. Die Eigenschaften dieses Objekts im Property Panel anzeigen
     ModelComponent model = getModel();
     componentsTreeManager.selectItem(model);

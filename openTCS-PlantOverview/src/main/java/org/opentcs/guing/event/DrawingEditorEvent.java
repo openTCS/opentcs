@@ -25,83 +25,83 @@ import org.jhotdraw.draw.Figure;
  * @see DrawingEditorListener
  */
 public class DrawingEditorEvent
-		extends EventObject {
+    extends EventObject {
 
-	/**
-	 * The affected Figure objects.
-	 */
-	private final List<Figure> fFigures;
+  /**
+   * The affected Figure objects.
+   */
+  private final List<Figure> fFigures;
 
-	/**
-	 * Creates a new instance.
+  /**
+   * Creates a new instance.
    * 
    * @param editor The event source.
    * @param figures The affected figures.
-	 */
-	public DrawingEditorEvent(DrawingEditor editor, List<Figure> figures) {
-		super(editor);
-		fFigures = Objects.requireNonNull(figures);
-	}
+   */
+  public DrawingEditorEvent(DrawingEditor editor, List<Figure> figures) {
+    super(editor);
+    fFigures = Objects.requireNonNull(figures);
+  }
 
-	/**
-	 * Creates a new instance for a single figure.
+  /**
+   * Creates a new instance for a single figure.
    * 
    * @param editor The event source.
    * @param figure The affected figure.
-	 */
-	public DrawingEditorEvent(DrawingEditor editor, Figure figure) {
-		super(editor);
-		fFigures = new LinkedList<>();
-		fFigures.add(figure);
-	}
+   */
+  public DrawingEditorEvent(DrawingEditor editor, Figure figure) {
+    super(editor);
+    fFigures = new LinkedList<>();
+    fFigures.add(figure);
+  }
 
-	/**
+  /**
    * Checks whether this event references at least one figure.
    * 
    * @return <code>true</code> if, and only if, this event references at least
    * one figure.
-	 */
-	public boolean hasFigure() {
-		return !fFigures.isEmpty();
-	}
+   */
+  public boolean hasFigure() {
+    return !fFigures.isEmpty();
+  }
 
-	/**
+  /**
    * Returns the originating DrawingEditor.
    * 
    * @return The originating DrawingEditor.
-	 */
-	public DrawingEditor getDrawingEditor() {
-		return (DrawingEditor) getSource();
-	}
+   */
+  public DrawingEditor getDrawingEditor() {
+    return (DrawingEditor) getSource();
+  }
 
-	/**
+  /**
    * Returns the affected Figure objects.
    * 
    * @return The affected Figure objects.
-	 */
-	public List<Figure> getFigures() {
-		return fFigures;
-	}
+   */
+  public List<Figure> getFigures() {
+    return fFigures;
+  }
 
-	/**
+  /**
    * Returns the first affected figure.
-	 * @return The first affected figure.
-	 */
-	public Figure getFigure() {
-		if (!fFigures.isEmpty()) {
-			return fFigures.get(0);
-		}
-		else {
-			return null;
-		}
-	}
+   * @return The first affected figure.
+   */
+  public Figure getFigure() {
+    if (!fFigures.isEmpty()) {
+      return fFigures.get(0);
+    }
+    else {
+      return null;
+    }
+  }
 
-	/**
+  /**
    * Returns the number of affected figures.
    *
-	 * @return The number of affected figures.
-	 */
-	public int getCount() {
-		return fFigures.size();
-	}
+   * @return The number of affected figures.
+   */
+  public int getCount() {
+    return fFigures.size();
+  }
 }

@@ -12,7 +12,7 @@ package org.opentcs.guing.model;
 
 /**
  * Ist die einfachste Form einer konkreten Komponente im Systemmodell, die
- * Kindelemente enthält. SimpleFolder wird für schlichte Ordner verwendet.
+ * Kindelemente enthÃ¤lt. SimpleFolder wird fÃ¼r schlichte Ordner verwendet.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -20,7 +20,7 @@ public class SimpleFolder
     extends CompositeModelComponent {
 
   /**
-   * Erzeugt von SimpleFolder einen neues Exemplar mit dem übergebenen Namen.
+   * Erzeugt von SimpleFolder einen neues Exemplar mit dem Ã¼bergebenen Namen.
    *
    * @param name
    */

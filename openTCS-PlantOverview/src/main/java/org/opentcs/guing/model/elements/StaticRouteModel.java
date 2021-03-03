@@ -160,7 +160,7 @@ public class StaticRouteModel
     }
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public void propertiesChanged(AttributesChangeListener l) {
     if (getProperty(ElementPropKeys.BLOCK_COLOR).hasChanged()) {
       colorChanged();
@@ -169,14 +169,14 @@ public class StaticRouteModel
     super.propertiesChanged(l);
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public String getTreeViewName() {
     String treeViewName = getName();
 
     return treeViewName;
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("staticRoute.description.text");
   }

@@ -15,8 +15,8 @@ import java.util.EnumMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.imageio.ImageIO;
+import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.util.gui.plugins.LocationTheme;
 
 /**
  * Standard implementation of <code>LocationTheme</code>.

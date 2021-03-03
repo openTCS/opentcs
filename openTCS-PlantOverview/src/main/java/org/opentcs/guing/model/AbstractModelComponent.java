@@ -23,7 +23,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.TreeViewManager;
 
 /**
- * Standardimplementierung für eine Blatt-Komponente des Systemmodells.
+ * Standardimplementierung fÃ¼r eine Blatt-Komponente des Systemmodells.
  * <p>
  * <b>Entwurfsmuster:</b> Kompositum. AbstractModelComponent ist die Komponente.
  *
@@ -47,7 +47,7 @@ public abstract class AbstractModelComponent
    */
   private transient ModelComponent fParent;
   /**
-   * Die Objekte, die an Änderungen der Attribute interessiert sind.
+   * Die Objekte, die an Ã„nderungen der Attribute interessiert sind.
    */
   private transient List<AttributesChangeListener> fAttributesChangeListeners
       = new CopyOnWriteArrayList<>();

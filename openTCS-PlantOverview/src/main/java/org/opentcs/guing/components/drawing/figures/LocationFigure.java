@@ -23,8 +23,6 @@ import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.net.URL;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.swing.Timer;
@@ -32,6 +30,7 @@ import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.geom.Geom;
+import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.drawing.ZoomPoint;
@@ -42,11 +41,12 @@ import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.util.LocationThemeManager;
-import org.opentcs.util.gui.plugins.LocationTheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Ein Figure f�r Stationen (�bergabestationen, Batterieladestationen) und
- * Ger�te (Aufz�ge, Drehteller und so weiter).
+ * Ein Figure fï¿½r Stationen (ï¿½bergabestationen, Batterieladestationen) und
+ * Gerï¿½te (Aufzï¿½ge, Drehteller und so weiter).
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -58,8 +58,7 @@ public class LocationFigure
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(LocationFigure.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(LocationFigure.class);
   /**
    * The image representing the location.
    */
@@ -70,12 +69,13 @@ public class LocationFigure
    */
   private transient Image fFlashImage;
   // Die Ausdehnung der Figur
-  private int fWidth, fHeight;
+  private int fWidth;
+  private int fHeight;
   // Timer zur Darstellung eines "blinkenden" Bildes
   private boolean showFlashImage;
   private Timer flashTimer;
-////	// Label
-////	protected String fLabel;
+////  // Label
+////  protected String fLabel;
   private final LocationThemeManager locationThemeManager;
 
   /**
@@ -120,12 +120,12 @@ public class LocationFigure
     return r2d;
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public Object getTransformRestoreData() {
     return fDisplayBox.clone();
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public void restoreTransformTo(Object restoreData) {
     Rectangle r = (Rectangle) restoreData;
     fDisplayBox.x = r.x;
@@ -136,14 +136,14 @@ public class LocationFigure
     fZoomPoint.setY(r.y + 0.5 * r.height);
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public void transform(AffineTransform tx) {
     // TODO: Beim Draggen soll der Zoompoint immer auf das Raster des Gridconstrainers einrasten
     Point2D center = getZoomPoint().getPixelLocationExactly();
     setBounds((Point2D.Double) tx.transform(center, center), null);
   }
 
-  @Override	// AbstractFigure
+  @Override  // AbstractFigure
   public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
     fZoomPoint.setX(anchor.x);
     fZoomPoint.setY(anchor.y);
@@ -163,9 +163,10 @@ public class LocationFigure
     return new ChopEllipseConnector(this);
   }
 
-  @Override	// AbstractAttributedFigure
+  @Override  // AbstractAttributedFigure
   protected void drawFill(Graphics2D g) {
-    int dx, dy;
+    int dx;
+    int dy;
     Rectangle r = displayBox();
     g.fillRect(r.x, r.y, r.width, r.height);
 
@@ -182,17 +183,17 @@ public class LocationFigure
       }
     }
 
-////		// Text
-////		g.setPaint(new Color(1.0f, 0.2f, 0.4f, 0.7f));
-////		Font font = new Font("Dialog", Font.PLAIN, 16);
-////		FontMetrics fontMetrics = g.getFontMetrics(font);
-////		dx = -fontMetrics.stringWidth(fLabel) / 2 - 1;
-////		dy = fontMetrics.getHeight() / 4;
-////		g.setFont(font);
-////		g.drawString(fLabel, (int) (r.getCenterX() + dx), (int) (r.getCenterY() + dy));
+////    // Text
+////    g.setPaint(new Color(1.0f, 0.2f, 0.4f, 0.7f));
+////    Font font = new Font("Dialog", Font.PLAIN, 16);
+////    FontMetrics fontMetrics = g.getFontMetrics(font);
+////    dx = -fontMetrics.stringWidth(fLabel) / 2 - 1;
+////    dy = fontMetrics.getHeight() / 4;
+////    g.setFont(font);
+////    g.drawString(fLabel, (int) (r.getCenterX() + dx), (int) (r.getCenterY() + dy));
   }
 
-  @Override	// AbstractAttributedFigure
+  @Override  // AbstractAttributedFigure
   protected void drawStroke(Graphics2D g) {
     Rectangle r = displayBox();
     g.drawRect(r.x, r.y, r.width - 1, r.height - 1);
@@ -208,24 +209,24 @@ public class LocationFigure
 
   /**
    * Wird aus LabeledLocationFigure.propertiesChanged() aufgerufen wenn das
-   * Symbol f�r die Station ge�ndert wird.
+   * Symbol fï¿½r die Station geï¿½ndert wird.
    *
    * @param e
    */
   public void propertiesChanged(AttributesChangeEvent e) {
     LocationTypeModel locationType = getModel().getLocationType();
     LocationTheme theme = locationThemeManager.getDefaultTheme();
-//	// Ein Text, der im Bild dargestellt wird
-//	StringProperty pLabel = (StringProperty) model.getProperty(LocationModel.LABEL);
-//	fLabel = pLabel.getText();
+//  // Ein Text, der im Bild dargestellt wird
+//  StringProperty pLabel = (StringProperty) model.getProperty(LocationModel.LABEL);
+//  fLabel = pLabel.getText();
 
     if (locationType != null) {
-      // Ein Symbol f�r diese Location 
+      // Ein Symbol fï¿½r diese Location 
       SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
       LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
-      // Wenn f�r diese Location kein eigenes Symbol spezifiziert ist, ...
+      // Wenn fï¿½r diese Location kein eigenes Symbol spezifiziert ist, ...
       if (locationRepresentation == null) {
-        // ... das Default-Symbol des zugeh�rigen LocationTypes verwenden
+        // ... das Default-Symbol des zugehï¿½rigen LocationTypes verwenden
         pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
         locationRepresentation = pSymbol.getLocationRepresentation();
         fImage = theme.getImageFor(locationRepresentation);
@@ -263,7 +264,7 @@ public class LocationFigure
     }
   }
 
-  @Override	// ImageObserver
+  @Override  // ImageObserver
   public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
     if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
       invalidate();
@@ -275,12 +276,12 @@ public class LocationFigure
   private void initTimer() {
     if (flashTimer == null) {
       flashTimer = new Timer(1000, new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          showFlashImage = !showFlashImage;
-          fireFigureChanged();
-        }
-      });
+                           @Override
+                           public void actionPerformed(ActionEvent e) {
+                             showFlashImage = !showFlashImage;
+                             fireFigureChanged();
+                           }
+                         });
     }
 
     flashTimer.restart();
@@ -306,14 +307,14 @@ public class LocationFigure
     }
     URL url = getClass().getResource(fileName);
     if (url == null) {
-      log.warning("Invalid image file name " + fileName);
+      LOG.warn("Invalid image file name " + fileName);
       return null;
     }
     try {
       return ImageIO.read(url);
     }
     catch (IOException exc) {
-      log.log(Level.WARNING, "Exception loading image", exc);
+      LOG.warn("Exception loading image", exc);
       return null;
     }
   }

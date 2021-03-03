@@ -26,13 +26,13 @@ import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.util.Collection;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.geom.BezierPath;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.menus.MenuFactory;
@@ -56,10 +56,9 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.guing.util.VehicleThemeManager;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
- * Die graphische Repr�sentation eines Fahrzeugs.
+ * Die graphische Reprï¿½sentation eines Fahrzeugs.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -74,18 +73,13 @@ public class VehicleFigure
    */
   public static final String POSITION_CHANGED = "position_changed";
   /**
-   * This class's logger.
-   */
-  private static final Logger log
-      = Logger.getLogger(LocationFigure.class.getName());
-  /**
    * The figure's length in drawing units.
    */
-  private static final double fLength = 30.0;
+  private static final double LENGTH = 30.0;
   /**
    * The figure's width in drawing units.
    */
-  private static final double fWidth = 20.0;
+  private static final double WIDTH = 20.0;
   /**
    * A manager vor vehicle themes.
    */
@@ -134,8 +128,8 @@ public class VehicleFigure
                                               "vehicleThemeManager");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
 
-    fDisplayBox = new Rectangle((int) fLength, (int) fWidth);
-    fZoomPoint = new ZoomPoint(0.5 * fLength, 0.5 * fWidth);
+    fDisplayBox = new Rectangle((int) LENGTH, (int) WIDTH);
+    fZoomPoint = new ZoomPoint(0.5 * LENGTH, 0.5 * WIDTH);
 
     setIgnorePrecisePosition(appConfig.getIgnoreVehiclePrecisePosition());
     setIgnoreOrientationAngle(appConfig.getIgnoreVehicleOrientationAngle());
@@ -197,10 +191,10 @@ public class VehicleFigure
     sb.append("<br>State: ").append(sp.getValue().toString());
     sp = (SelectionProperty) model.getProperty(VehicleModel.PROC_STATE);
     sb.append("<br>Proc State: ").append(sp.getValue().toString());
-    String sColor = "black";
     SelectionProperty pEnergyState = (SelectionProperty) model.getProperty(VehicleModel.ENERGY_STATE);
     VehicleModel.EnergyState state = (VehicleModel.EnergyState) pEnergyState.getValue();
 
+    String sColor;
     switch (state) {
       case CRITICAL:
         sColor = "red";
@@ -213,6 +207,9 @@ public class VehicleFigure
       case GOOD:
         sColor = "green";
         break;
+
+      default:
+        sColor = "black";
     }
 
     sb.append("<br>Energy: <font color=").append(sColor).append(">").append(((PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL)).getValue()).append("%</font>");
@@ -299,14 +296,14 @@ public class VehicleFigure
 
     fZoomPoint.setX(anchor.x);
     fZoomPoint.setY(anchor.y);
-    fDisplayBox.x = (int) (anchor.x - 0.5 * fLength);
-    fDisplayBox.y = (int) (anchor.y - 0.5 * fWidth);
+    fDisplayBox.x = (int) (anchor.x - 0.5 * LENGTH);
+    fDisplayBox.y = (int) (anchor.y - 0.5 * WIDTH);
     firePropertyChange(POSITION_CHANGED, oldBounds, getBounds());
 
     // Winkelausrichtung:
     // 1. Exakte Pose vom Fahrzeugtreiber gemeldet oder
     // 2. Property des aktuellen Punktes oder
-    // 3. Zielrichtung zum n�chsten Punkt oder
+    // 3. Zielrichtung zum nï¿½chsten Punkt oder
     // 4. letzte Ausrichtung beibehalten
     // ... oder beliebigen Nachbarpunkt suchen???
     double angle = model.getOrientationAngle();
@@ -319,61 +316,59 @@ public class VehicleFigure
     if (!Double.isNaN(angle) && !ignoreOrientationAngle) {
       fAngle = angle;
     }
-    else {
-      if (currentPoint != null) {
-        // Winkelausrichtung aus Property des aktuellen Punktes bestimmen
-        AngleProperty ap = (AngleProperty) currentPoint.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
+    else if (currentPoint != null) {
+      // Winkelausrichtung aus Property des aktuellen Punktes bestimmen
+      AngleProperty ap = (AngleProperty) currentPoint.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
 
-        if (ap != null) {
-          angle = (double) ap.getValue();
+      if (ap != null) {
+        angle = (double) ap.getValue();
 
-          if (!Double.isNaN(angle)) {
-            fAngle = angle;
-          }
-          else {
-            // Wenn f�r diesen Punkt keine Winkelausrichtung spezifiziert ist,
-            // Winkel zum n�chsten Zielpunkt bestimmen
-            PointModel nextPoint = model.getNextPoint();
+        if (!Double.isNaN(angle)) {
+          fAngle = angle;
+        }
+        else {
+          // Wenn fï¿½r diesen Punkt keine Winkelausrichtung spezifiziert ist,
+          // Winkel zum nï¿½chsten Zielpunkt bestimmen
+          PointModel nextPoint = model.getNextPoint();
 
-            if (nextPoint == null) {
-              // Wenn es keinen Zielpunkt gibt, einen beliebigen (?) Nachbarpunkt zum aktuellen Punkt suchen
-              for (AbstractConnection connection : currentPoint.getConnections()) {
-                if (connection.getStartComponent().equals(currentPoint)) {
-                  ModelComponent destinationPoint = connection.getEndComponent();
-                  // Die Links (zu Locations) geh�ren auch zu den Connections
-                  if (destinationPoint instanceof PointModel) {
-                    nextPoint = (PointModel) connection.getEndComponent();
-                    break;
-                  }
+          if (nextPoint == null) {
+            // Wenn es keinen Zielpunkt gibt, einen beliebigen (?) Nachbarpunkt zum aktuellen Punkt suchen
+            for (AbstractConnection connection : currentPoint.getConnections()) {
+              if (connection.getStartComponent().equals(currentPoint)) {
+                ModelComponent destinationPoint = connection.getEndComponent();
+                // Die Links (zu Locations) gehï¿½ren auch zu den Connections
+                if (destinationPoint instanceof PointModel) {
+                  nextPoint = (PointModel) connection.getEndComponent();
+                  break;
                 }
               }
             }
+          }
 
-            if (nextPoint != null) {
-              AbstractConnection connection = currentPoint.getConnectionTo(nextPoint);
+          if (nextPoint != null) {
+            AbstractConnection connection = currentPoint.getConnectionTo(nextPoint);
 
-              if (connection == null) {
-                return;
-              }
+            if (connection == null) {
+              return;
+            }
 
-              PathConnection pathFigure = (PathConnection) connection.getFigure();
-              PointFigure cpf = currentPoint.getFigure().getPresentationFigure();
+            PathConnection pathFigure = (PathConnection) connection.getFigure();
+            PointFigure cpf = currentPoint.getFigure().getPresentationFigure();
 
-              if (pathFigure.getLiner() instanceof BezierLiner) {
-                BezierPath bezierPath = pathFigure.getBezierPath();
-                Point2D.Double cp = bezierPath.get(0, BezierPath.C2_MASK);
-                double dx = cp.getX() - cpf.getZoomPoint().getX();
-                double dy = cp.getY() - cpf.getZoomPoint().getY();
-                // An die Tangente der Verbindungskurve ausrichten
-                fAngle = Math.toDegrees(Math.atan2(-dy, dx));
-              }
-              else {
-                PointFigure npf = nextPoint.getFigure().getPresentationFigure();
-                double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
-                double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
-                // Nach dem direkten Winkel ausrichten
-                fAngle = Math.toDegrees(Math.atan2(-dy, dx));
-              }
+            if (pathFigure.getLiner() instanceof BezierLiner) {
+              BezierPath bezierPath = pathFigure.getBezierPath();
+              Point2D.Double cp = bezierPath.get(0, BezierPath.C2_MASK);
+              double dx = cp.getX() - cpf.getZoomPoint().getX();
+              double dy = cp.getY() - cpf.getZoomPoint().getY();
+              // An die Tangente der Verbindungskurve ausrichten
+              fAngle = Math.toDegrees(Math.atan2(-dy, dx));
+            }
+            else {
+              PointFigure npf = nextPoint.getFigure().getPresentationFigure();
+              double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
+              double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
+              // Nach dem direkten Winkel ausrichten
+              fAngle = Math.toDegrees(Math.atan2(-dy, dx));
             }
           }
         }
@@ -408,7 +403,8 @@ public class VehicleFigure
       return;
     }
 
-    int dx, dy;
+    int dx;
+    int dy;
     Rectangle r = displayBox();
 
     if (fImage != null) {
@@ -429,10 +425,10 @@ public class VehicleFigure
 
     // Text
     String name = getModel().getName();
-    Pattern p = Pattern.compile("\\d+");	// Ziffern suchen
+    Pattern p = Pattern.compile("\\d+");  // Ziffern suchen
     Matcher m = p.matcher(name);
 
-    if (m.find()) {	// Wenn es mindestens eine Ziffer gibt...
+    if (m.find()) {  // Wenn es mindestens eine Ziffer gibt...
       String number = m.group();
       g2d.setPaint(Color.BLUE);
       g2d.drawString(number, (int) r.getCenterX() - 5, (int) r.getCenterY() + 6);
@@ -453,12 +449,12 @@ public class VehicleFigure
         handles.add(new VehicleOutlineHandle(this));
         break;
 
-      case 0:	// Mouse clicked
-//			handles.add(new VehicleOutlineHandle(this));
+      case 0:  // Mouse clicked
+//      handles.add(new VehicleOutlineHandle(this));
         break;
 
-      case 1:	// Double-Click
-//			handles.add(new VehicleOutlineHandle(this));
+      case 1:  // Double-Click
+//      handles.add(new VehicleOutlineHandle(this));
         break;
 
       default:
@@ -505,29 +501,38 @@ public class VehicleFigure
       // Wenn weder Punkt noch exakte Position bekannt: Figur nicht zeichnen
       setVisible(false);
     }
-    else {
-      // Wenn eine exakte Position existiert, wird diese in setBounds() gesetzt,
-      // ben�tigt also keine anderen Koordinaten
-      if (precisePosition != null && !ignorePrecisePosition) {
-        setVisible(true);
-        setBounds(new Point2D.Double(), null);
-        // Nur aufrufen, wenn Figure sichtbar - sonst gibt es in BoundsOutlineHandle eine NP-Exception!
-        fireFigureChanged();
-      }
-      else if (point != null) {
-        setVisible(true);
-        Rectangle2D.Double r = point.getFigure().getBounds();
-        Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
-        // Figur an der Mitte des Knotens zeichnen.
-        // Die Winkelausrichtung wird in setBounds() bestimmt
-        setBounds(pCenter, null);
-        // Nur aufrufen, wenn Figure sichtbar - sonst gibt es in BoundsOutlineHandle eine NP-Exception!
-        fireFigureChanged();
-      }
-      else {
-        setVisible(false);
-      }
+    else // Wenn eine exakte Position existiert, wird diese in setBounds() gesetzt,
+    // benï¿½tigt also keine anderen Koordinaten
+    if (precisePosition != null && !ignorePrecisePosition) {
+      setVisible(true);
+      setBounds(new Point2D.Double(), null);
+      // Nur aufrufen, wenn Figure sichtbar - sonst gibt es in BoundsOutlineHandle eine NP-Exception!
+      fireFigureChanged();
     }
+    else if (point != null) {
+      setVisible(true);
+      Rectangle2D.Double r = point.getFigure().getBounds();
+      Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
+      // Figur an der Mitte des Knotens zeichnen.
+      // Die Winkelausrichtung wird in setBounds() bestimmt
+      setBounds(pCenter, null);
+      // Nur aufrufen, wenn Figure sichtbar - sonst gibt es in BoundsOutlineHandle eine NP-Exception!
+      fireFigureChanged();
+    }
+    else {
+      setVisible(false);
+    }
+  }
+
+  @Override
+  public boolean imageUpdate(Image img, int infoflags,
+                             int x, int y,
+                             int width, int height) {
+    if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
+      invalidate();
+    }
+
+    return (infoflags & (ALLBITS | ABORT)) == 0;
   }
 
   /**
@@ -554,14 +559,4 @@ public class VehicleFigure
     }
   }
 
-  @Override
-  public boolean imageUpdate(Image img, int infoflags,
-                             int x, int y,
-                             int width, int height) {
-    if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
-      invalidate();
-    }
-
-    return (infoflags & (ALLBITS | ABORT)) == 0;
-  }
 }

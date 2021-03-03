@@ -103,7 +103,7 @@ public class PathModel
     StringProperty pPathControlPoints = new StringProperty(this);
     pPathControlPoints.setDescription(bundle.getString("element.pathControlPoints.text"));
     pPathControlPoints.setHelptext(bundle.getString("element.pathControlPoints.helptext"));
-    // Control Points können nur in der Drawing verschoben werden.
+    // Control Points kÃ¶nnen nur in der Drawing verschoben werden.
     // TODO: Auch in der Tabelle editieren?
     pPathControlPoints.setModellingEditable(false);
     setProperty(ElementPropKeys.PATH_CONTROL_POINTS, pPathControlPoints);
@@ -131,7 +131,7 @@ public class PathModel
     pLocked.setDescription(bundle.getString("path.locked.text"));
     pLocked.setHelptext(bundle.getString("path.locked.helptext"));
     pLocked.setCollectiveEditable(true);
-    // Zustand "gesperrt" darf auch im Operating Mode geändert werden.
+    // Zustand "gesperrt" darf auch im Operating Mode geÃ¤ndert werden.
     pLocked.setOperatingEditable(true);
     setProperty(LOCKED, pLocked);
     // Miscellaneous properties

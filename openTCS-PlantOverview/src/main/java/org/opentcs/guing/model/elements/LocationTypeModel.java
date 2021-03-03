@@ -68,12 +68,12 @@ public class LocationTypeModel
     pSymbol.setDescription(r.getString("locationType.symbol.text"));
     pSymbol.setHelptext(r.getString("locationType.symbol.helptext"));
     setProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, pSymbol);
-    // Der zugehörige Enum-Wert wird unter Misc-Properies gespeichert
+    // Der zugehÃ¶rige Enum-Wert wird unter Misc-Properies gespeichert
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(r.getString("locationType.miscellaneous.text"));
     pMiscellaneous.setHelptext(r.getString("locationType.miscellaneous.helptext"));
     // HH 2014-02-17: Miscellaneous Properties vorerst nicht collective editable
-//	pMiscellaneous.setModellingEditable(false);
+//  pMiscellaneous.setModellingEditable(false);
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 }

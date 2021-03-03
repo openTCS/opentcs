@@ -22,7 +22,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.DefaultFormatter;
 import org.opentcs.access.ConfigurationItemTO;
-import org.opentcs.access.Kernel;
+import org.opentcs.access.LocalKernel;
 import org.opentcs.util.configuration.ConfigurationDataType;
 
 /**
@@ -36,7 +36,7 @@ public class ConfigurationItemDialog
   /**
    * The proxy kernel this client has to communicate with.
    */
-  private final Kernel kernel;
+  private final LocalKernel kernel;
   /**
    * The configuration item object.
    */
@@ -48,7 +48,7 @@ public class ConfigurationItemDialog
   /**
    * The list of Enum values.
    */
-  private JComboBox enumValueList;
+  private JComboBox<String> enumValueList;
   /**
    * The list of possible integer values for Integer type Items.
    */
@@ -67,7 +67,7 @@ public class ConfigurationItemDialog
    * @param configItem The current select configuration item.
    */
   @SuppressWarnings("unchecked")
-  public ConfigurationItemDialog(Kernel kernel,
+  public ConfigurationItemDialog(LocalKernel kernel,
                                  ConfigurationItemTO configItem) {
     this.kernel = Objects.requireNonNull(kernel, "kernel is null");
     this.configItem = Objects.requireNonNull(configItem, "configItem");
@@ -97,7 +97,7 @@ public class ConfigurationItemDialog
       gridBagConstraints.gridx = 2;
       gridBagConstraints.gridy = 8;
       gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-      enumValueList = new JComboBox(configItem.getConstraint().getEnum().toArray());
+      enumValueList = new JComboBox<>(configItem.getConstraint().getEnum().toArray(new String[0]));
       gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
       gridBagConstraints.weightx = 1.0;

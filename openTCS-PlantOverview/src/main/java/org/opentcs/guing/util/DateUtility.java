@@ -14,7 +14,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
- * Liefert Methoden für die Datumsberechnung, insbesondere was die Sommerzeit
+ * Liefert Methoden fÃ¼r die Datumsberechnung, insbesondere was die Sommerzeit
  * angeht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -29,11 +29,11 @@ public final class DateUtility {
   }
 
   /**
-   * Prüft, ob ein Zeitpunkt innerhalb der Sommerzeit liegt. Dies ist vom ersten
-   * Sonntag im März 2.00 Uhr bis zum letzten Sonntag im Oktober 3.00 Uhr der
+   * PrÃ¼ft, ob ein Zeitpunkt innerhalb der Sommerzeit liegt. Dies ist vom ersten
+   * Sonntag im MÃ¤rz 2.00 Uhr bis zum letzten Sonntag im Oktober 3.00 Uhr der
    * Fall. Zu Beginn der Sommerzeit wird die Uhr eine Stunde vorgestellt von
    * 2.00 Uhr auf 3.00 Uhr. Zum Ende der Sommerzeit wird die Uhr eine Stunde
-   * zurückgestellt von 3.00 Uhr auf 2.00 Uhr.
+   * zurÃ¼ckgestellt von 3.00 Uhr auf 2.00 Uhr.
    *
    * @param time der Zeitpunkt
    * @return
@@ -43,7 +43,7 @@ public final class DateUtility {
     Calendar calendar = new GregorianCalendar();
     calendar.setTimeInMillis(time);
     int year = calendar.get(Calendar.YEAR);
-    // letzten Sonntag im März finden, März hat immer 31 Tage
+    // letzten Sonntag im MÃ¤rz finden, MÃ¤rz hat immer 31 Tage
     Calendar begin = new GregorianCalendar(year, 2, 31, 2, 0);
     int weekday = begin.get(Calendar.DAY_OF_WEEK);
 

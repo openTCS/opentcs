@@ -9,13 +9,12 @@
 
 package org.opentcs.guing.components.properties.type;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.data.model.Triple;
 import org.opentcs.guing.model.ModelComponent;
+import org.slf4j.LoggerFactory;
 
 /**
- * Ein Property f�r einen 3D-Punkt. Der Datentyp f�r die Koordinaten des Punktes
+ * Ein Property fï¿½r einen 3D-Punkt. Der Datentyp fï¿½r die Koordinaten des Punktes
  * ist <code>long</code>.
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -43,8 +42,8 @@ public class TripleProperty
   }
 
   /**
-   * Setzt f�r das Attribut einen neuen Wert und eine neue Ma�einheit. Eine
-   * Ausnahme wird ausgel�st, wenn es sich bei der Ma�einheit um keine m�gliche
+   * Setzt fï¿½r das Attribut einen neuen Wert und eine neue Maï¿½einheit. Eine
+   * Ausnahme wird ausgelï¿½st, wenn es sich bei der Maï¿½einheit um keine mï¿½gliche
    * Einheit handelt.
    *
    * @param triple
@@ -73,7 +72,7 @@ public class TripleProperty
       setValue(foreignTriple.clone());
     }
     catch (Exception e) {
-      Logger.getLogger(TripleProperty.class.getName()).log(Level.SEVERE, "Exception: ", e);
+      LoggerFactory.getLogger(TripleProperty.class).error("Exception", e);
     }
   }
 }

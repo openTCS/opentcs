@@ -20,7 +20,7 @@ import org.opentcs.util.gui.Icons;
 
 /**
  * Ein Dialog mit einem Ok- und einem Cancel-Button, dem im Konstruktor ein
- * JComponent-Objekt als Inhalt übergeben wird. Für gewöhnlich handelt es sich
+ * JComponent-Objekt als Inhalt Ã¼bergeben wird. FÃ¼r gewÃ¶hnlich handelt es sich
  * bei den Inhalten um PropertiesPane-Objekte.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -43,7 +43,7 @@ public class StandardDialog
   private int returnStatus = RET_CANCEL;
 
   /**
-   * Erzeugt ein neues Exemplar von StandardDialog. Die Größe des Dialogs wird
+   * Erzeugt ein neues Exemplar von StandardDialog. Die GrÃ¶ÃŸe des Dialogs wird
    * an den Inhalt angepasst.
    *
    * @param parent Die Komponente, zu der der Dialog zentriert wird.
@@ -60,7 +60,7 @@ public class StandardDialog
   }
 
   /**
-   * Passt die Größe des Dialogs nach dem Hinzufügen des Panels an.
+   * Passt die GrÃ¶ÃŸe des Dialogs nach dem HinzufÃ¼gen des Panels an.
    *
    * @param content
    */
@@ -152,7 +152,7 @@ public class StandardDialog
     }//GEN-LAST:event_closeDialog
 
   /**
-   * Schließt den Dialog.
+   * SchlieÃŸt den Dialog.
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;

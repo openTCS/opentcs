@@ -8,12 +8,13 @@
  */
 package org.opentcs.guing.exchange;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
@@ -21,12 +22,16 @@ import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper class for creating transport orders with the kernel.
@@ -38,8 +43,7 @@ public class TransportOrderUtil {
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(TransportOrderDispatcher.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(TransportOrderUtil.class);
   /**
    * Provides access to a kernel.
    */
@@ -58,27 +62,65 @@ public class TransportOrderUtil {
   /**
    * Creates a new transport order.
    *
-   * @param locModels The locations to visit.
+   * @param destModels The locations or points to visit.
    * @param actions The actions to execute.
    * @param deadline The deadline.
    * @param vModel The vehicle that shall execute this order. Pass
    * <code>null</code> to let the kernel determine one.
    */
   @SuppressWarnings("unchecked")
-  public void createTransportOrder(List<LocationModel> locModels,
+  public void createTransportOrder(List<AbstractFigureComponent> destModels,
                                    List<String> actions,
                                    long deadline,
                                    VehicleModel vModel) {
-    requireNonNull(locModels, "locations");
+    createTransportOrder(destModels, actions, new ArrayList<>(), deadline, vModel);
+  }
+
+  /**
+   * Creates a new transport order.
+   *
+   * @param destModels The locations or points to visit.
+   * @param actions The actions to execute.
+   * @param propertiesList The properties for each destination.
+   * @param deadline The deadline.
+   * @param vModel The vehicle that shall execute this order. Pass
+   * <code>null</code> to let the kernel determine one.
+   */
+  @SuppressWarnings("unchecked")
+  public void createTransportOrder(List<AbstractFigureComponent> destModels,
+                                   List<String> actions,
+                                   List<Map<String, String>> propertiesList,
+                                   long deadline,
+                                   VehicleModel vModel) {
+    requireNonNull(destModels, "locations");
     requireNonNull(actions, "actions");
+    requireNonNull(propertiesList, "propertiesList");
+    checkArgument(!destModels.stream()
+        .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
+                  "destModels have to be a PointModel or a Locationmodel");
 
     List<DriveOrder.Destination> destinations = new ArrayList<>();
-    for (int i = 0; i < locModels.size(); i++) {
-      LocationModel locModel = locModels.get(i);
+    for (int i = 0; i < destModels.size(); i++) {
+      AbstractFigureComponent locModel = destModels.get(i);
       String action = actions.get(i);
+      Map<String, String> properties = new HashMap<>();
+      if (!propertiesList.isEmpty()) {
+        properties = propertiesList.get(i);
+      }
       Location location
           = getKernel().getTCSObject(Location.class, locModel.getName());
-      destinations.add(new DriveOrder.Destination(location.getReference(), action));
+      DriveOrder.Destination destination;
+      if (location == null) {
+        Point point = getKernel().getTCSObject(Point.class, locModel.getName());
+        destination
+            = new DriveOrder.Destination(TCSObjectReference.getDummyReference(Location.class,
+                                                                              point.getName()),
+                                         action);
+      }
+      else {
+        destination = new DriveOrder.Destination(location.getReference(), action, properties);
+      }
+      destinations.add(destination);
     }
 
     try {
@@ -94,7 +136,7 @@ public class TransportOrderUtil {
       getKernel().activateTransportOrder(tOrder.getReference());
     }
     catch (CredentialsException | ObjectUnknownException e) {
-      log.log(Level.WARNING, "Unexpected exception", e);
+      LOG.warn("Unexpected exception", e);
     }
   }
 
@@ -104,6 +146,8 @@ public class TransportOrderUtil {
    * @param pattern The transport order that server as a pattern.
    */
   public void createTransportOrder(TransportOrder pattern) {
+    requireNonNull(pattern, "pattern");
+
     List<DriveOrder.Destination> destinations = new ArrayList<>();
     List<DriveOrder> driveOrders = new ArrayList<>();
     driveOrders.addAll(pattern.getPastDriveOrders());
@@ -120,6 +164,10 @@ public class TransportOrderUtil {
 
     try {
       TransportOrder tOrder = getKernel().createTransportOrder(destinations);
+      pattern.getProperties().entrySet()
+          .forEach(entry -> getKernel().setTCSObjectProperty(tOrder.getReference(),
+                                                             entry.getKey(),
+                                                             entry.getValue()));
       getKernel().setTransportOrderDeadline(tOrder.getReference(),
                                             pattern.getDeadline());
 
@@ -131,7 +179,7 @@ public class TransportOrderUtil {
       getKernel().activateTransportOrder(tOrder.getReference());
     }
     catch (CredentialsException | ObjectUnknownException e) {
-      log.log(Level.WARNING, "Unexpected exception", e);
+      LOG.warn("Unexpected exception", e);
     }
   }
 
@@ -168,7 +216,7 @@ public class TransportOrderUtil {
       getKernel().activateTransportOrder(t.getReference());
     }
     catch (CredentialsException | ObjectUnknownException e) {
-      log.log(Level.WARNING, "Unexpected exception", e);
+      LOG.warn("Unexpected exception", e);
     }
   }
 

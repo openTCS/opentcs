@@ -75,7 +75,7 @@ public class SingleVehicleView
    */
   private final MenuFactory menuFactory;
   /**
-   * Die Zeichenfl‰che im Dialog.
+   * Die Zeichenfl√§che im Dialog.
    */
   private final JPanel fVehicleView;
 
@@ -129,7 +129,7 @@ public class SingleVehicleView
     figure = crsObjFactory.createVehicleFigure(fVehicleModel);
     figure.setIgnorePrecisePosition(true);
     // Figur im Dialog-Panel zentrieren
-    // TODO: Maﬂstab ber¸cksichtigen!
+    // TODO: Ma√üstab ber√ºcksichtigen!
     Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2, fVehicleView.getHeight() / 2);
     figure.setBounds(posDialog, null);
     figure.setAngle(0.0);

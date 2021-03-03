@@ -8,16 +8,14 @@ import com.google.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import static org.junit.Assert.assertEquals;
 import org.junit.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.persistence.OrderPersister;
 import org.opentcs.util.eventsystem.EventHub;
 import org.opentcs.util.eventsystem.TCSEvent;
 
@@ -41,8 +39,6 @@ public class StandardKernelTest {
   public void setUp() {
     @SuppressWarnings("unchecked")
     EventHub<TCSEvent> eventHub = mock(EventHub.class);
-    ModelPersister modelPersister = mock(ModelPersister.class);
-    OrderPersister orderPersister = mock(OrderPersister.class);
 
     // Build a map of providers for our mocked state objects.
     Map<Kernel.State, Provider<KernelState>> stateMap = new HashMap<>();
@@ -61,10 +57,7 @@ public class StandardKernelTest {
     stateMap.put(Kernel.State.OPERATING,
                  new KernelStateProvider(kernelStateOperating));
 
-    kernel = new StandardKernel(eventHub,
-                                stateMap,
-                                modelPersister,
-                                orderPersister);
+    kernel = new StandardKernel(eventHub, stateMap);
   }
 
   @After

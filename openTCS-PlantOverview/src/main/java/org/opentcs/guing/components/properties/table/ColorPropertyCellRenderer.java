@@ -18,7 +18,7 @@ import javax.swing.border.Border;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 
 /**
- * Ein Renderer für ein ColorProperty.
+ * Ein Renderer fÃ¼r ein ColorProperty.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

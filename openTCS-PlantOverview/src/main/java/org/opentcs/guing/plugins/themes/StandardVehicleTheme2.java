@@ -16,9 +16,9 @@ import java.util.EnumMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.imageio.ImageIO;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.LoadHandlingDevice;
-import org.opentcs.util.gui.plugins.VehicleTheme;
+import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 
 /**
  * Standard implementation of <code>VehicleTheme</code>.

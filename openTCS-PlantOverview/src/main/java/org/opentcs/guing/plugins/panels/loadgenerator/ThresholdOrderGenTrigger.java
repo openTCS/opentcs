@@ -11,8 +11,6 @@ package org.opentcs.guing.plugins.panels.loadgenerator;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObjectEvent;
@@ -20,6 +18,8 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Triggers creation of a batch of orders if the number of transport orders
@@ -34,7 +34,7 @@ class ThresholdOrderGenTrigger
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(ThresholdOrderGenTrigger.class.getName());
+      = LoggerFactory.getLogger(ThresholdOrderGenTrigger.class);
   /**
    * The kernel we talk to.
    */
@@ -119,7 +119,7 @@ class ThresholdOrderGenTrigger
       // Now let's check if the number of orders "in progress" has dropped below
       // the threshold. If so, create a new batch of orders.
       if (knownOrders.size() <= threshold) {
-        log.fine("orderCount = " + knownOrders.size() + ", triggering...");
+        log.debug("orderCount = " + knownOrders.size() + ", triggering...");
         trigger();
       }
     }
@@ -130,9 +130,7 @@ class ThresholdOrderGenTrigger
       triggerOrderGeneration();
     }
     catch (KernelRuntimeException exc) {
-      log.log(Level.WARNING,
-              "Exception triggering order generation, terminating triggering",
-              exc);
+      log.warn("Exception triggering order generation, terminating triggering", exc);
       setTriggeringEnabled(false);
     }
   }

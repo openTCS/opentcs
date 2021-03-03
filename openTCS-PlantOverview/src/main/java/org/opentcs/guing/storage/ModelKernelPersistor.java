@@ -10,13 +10,12 @@ package org.opentcs.guing.storage;
 
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
-import java.util.logging.Logger;
 import org.opentcs.access.Kernel;
-import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.model.ModelComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Synchronizes data kept in <code>ModelComponents</code> to the kernel.
@@ -30,7 +29,7 @@ public class ModelKernelPersistor
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(ModelKernelPersistor.class.getName());
+      = LoggerFactory.getLogger(ModelKernelPersistor.class);
 
   /**
    * The event dispatcher providing the process adapters.
@@ -64,10 +63,6 @@ public class ModelKernelPersistor
   public void init() {
     // Start with a clean, empty model.
     kernel.createModel(modelName);
-    Set<VisualLayout> layouts = kernel.getTCSObjects(VisualLayout.class);
-    if (layouts.isEmpty()) {
-      kernel.createVisualLayout();
-    }
   }
 
   @Override
@@ -79,7 +74,7 @@ public class ModelKernelPersistor
       adapter.updateProcessProperties(kernel);
     }
     else {
-      log.warning("No process adapter for model component " + component.getName()
+      log.warn("No process adapter for model component " + component.getName()
           + " was found.");
     }
   }

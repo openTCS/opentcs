@@ -18,10 +18,10 @@ import java.lang.annotation.Target;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
-import org.opentcs.algorithms.KernelExtension;
+import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.customizations.kernel.ActiveInModellingMode;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -37,9 +37,12 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.kernel.workingset.MessageBuffer;
+import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the standard openTCS kernel in modelling mode.
@@ -52,8 +55,7 @@ class KernelStateModelling
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(KernelStateModelling.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(KernelStateModelling.class);
   /**
    * This kernel state's local extensions.
    */
@@ -64,60 +66,62 @@ class KernelStateModelling
   private boolean initialized;
 
   /**
-   * Creates a new kernel.
+   * Creates a new instance.
    *
-   * @param kernel The kernel.
    * @param objectPool The object pool to be used.
    * @param messageBuffer The message buffer to be used.
-   * @param saveModelOnTerminate Whether to save the model when this state is
-   * terminated.
+   * @param modelPersister The model persister to be used.
+   * @param saveModelOnTerminate Whether to save the model when this state is terminated.
    */
   @Inject
-  KernelStateModelling(StandardKernel kernel,
-                       @GlobalKernelSync Object globalSyncObject,
+  KernelStateModelling(@GlobalKernelSync Object globalSyncObject,
                        TCSObjectPool objectPool,
                        Model model,
-                       MessageBuffer messageBuffer,
+                       NotificationBuffer messageBuffer,
+                       ModelPersister modelPersister,
                        @SaveModelOnTerminate boolean saveModelOnTerminate,
-                       @KernelExtension.Modelling Set<KernelExtension> extensions) {
-    super(kernel, globalSyncObject, objectPool, model, messageBuffer,
-          saveModelOnTerminate);
+                       @ActiveInModellingMode Set<KernelExtension> extensions) {
+    super(globalSyncObject, objectPool, model, messageBuffer, modelPersister, saveModelOnTerminate);
     this.extensions = requireNonNull(extensions, "extensions");
   }
 
-  // Implementation of abstract class StandardKernelState starts here.
   @Override
   public void initialize() {
     if (initialized) {
       throw new IllegalStateException("Already initialized");
     }
-    log.fine("Initializing operating state...");
+    LOG.debug("Initializing modelling state...");
     // Start kernel extensions.
     for (KernelExtension extension : extensions) {
-      extension.plugIn();
+      extension.initialize();
     }
 
     initialized = true;
 
-    log.fine("Modelling state initialized.");
+    LOG.debug("Modelling state initialized.");
   }
 
+  @Override
+  public boolean isInitialized() {
+    return initialized;
+  }
+  
   @Override
   public void terminate() {
     if (!initialized) {
       throw new IllegalStateException("Not initialized, cannot terminate");
     }
-    log.fine("Terminating modelling state...");
+    LOG.debug("Terminating modelling state...");
     super.terminate();
 
     // Terminate everything that may still use resources.
     for (KernelExtension extension : extensions) {
-      extension.plugOut();
+      extension.terminate();
     }
 
     initialized = false;
 
-    log.fine("Modelling state terminated.");
+    LOG.debug("Modelling state terminated.");
   }
 
   @Override
@@ -127,59 +131,59 @@ class KernelStateModelling
 
   @Override
   public void createModel(String modelName) {
-    synchronized (globalSyncObject) {
+    synchronized (getGlobalSyncObject()) {
       // Clear the model and set its name.
-      model.clear();
-      model.setName(modelName);
+      getModel().clear();
+      getModel().setName(modelName);
     }
   }
 
   @Override
   public void loadModel()
       throws IOException {
-    synchronized (globalSyncObject) {
-      kernel.modelPersister.loadModel(model);
+    synchronized (getGlobalSyncObject()) {
+      getModelPersister().loadModel(getModel());
     }
   }
 
   @Override
   public void removeModel()
       throws IOException {
-    kernel.modelPersister.removeModel();
+    getModelPersister().removeModel();
   }
 
   @Override
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      TCSObject<?> object = globalObjectPool.getObject(ref);
+    synchronized (getGlobalSyncObject()) {
+      TCSObject<?> object = getGlobalObjectPool().getObject(ref);
       if (object == null) {
         throw new ObjectUnknownException(ref);
       }
       // We only allow removal of model objects in modelling mode.
       if (object instanceof Block) {
-        model.removeBlock(((Block) object).getReference());
+        getModel().removeBlock(((Block) object).getReference());
       }
       else if (object instanceof Group) {
-        model.removeGroup(((Group) object).getReference());
+        getModel().removeGroup(((Group) object).getReference());
       }
       else if (object instanceof Location) {
-        model.removeLocation(((Location) object).getReference());
+        getModel().removeLocation(((Location) object).getReference());
       }
       else if (object instanceof LocationType) {
-        model.removeLocationType(((LocationType) object).getReference());
+        getModel().removeLocationType(((LocationType) object).getReference());
       }
       else if (object instanceof Path) {
-        model.removePath(((Path) object).getReference());
+        getModel().removePath(((Path) object).getReference());
       }
       else if (object instanceof Point) {
-        model.removePoint(((Point) object).getReference());
+        getModel().removePoint(((Point) object).getReference());
       }
       else if (object instanceof StaticRoute) {
-        model.removeStaticRoute(((StaticRoute) object).getReference());
+        getModel().removeStaticRoute(((StaticRoute) object).getReference());
       }
       else if (object instanceof Vehicle) {
-        model.removeVehicle(((Vehicle) object).getReference());
+        getModel().removeVehicle(((Vehicle) object).getReference());
       }
       else {
         super.removeTCSObject(ref);
@@ -189,8 +193,8 @@ class KernelStateModelling
 
   @Override
   public VisualLayout createVisualLayout() {
-    synchronized (globalSyncObject) {
-      return model.createVisualLayout(null).clone();
+    synchronized (getGlobalSyncObject()) {
+      return getModel().createVisualLayout(null).clone();
     }
   }
 
@@ -198,8 +202,8 @@ class KernelStateModelling
   public void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                                     double scaleX)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVisualLayoutScaleX(ref, scaleX);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVisualLayoutScaleX(ref, scaleX);
     }
   }
 
@@ -207,8 +211,8 @@ class KernelStateModelling
   public void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                                     double scaleY)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVisualLayoutScaleY(ref, scaleY);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVisualLayoutScaleY(ref, scaleY);
     }
   }
 
@@ -216,8 +220,8 @@ class KernelStateModelling
   public void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                                     Map<String, Color> colors)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVisualLayoutColors(ref, colors);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVisualLayoutColors(ref, colors);
     }
   }
 
@@ -225,16 +229,16 @@ class KernelStateModelling
   public void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                       Set<LayoutElement> elements)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVisualLayoutElements(ref, elements);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVisualLayoutElements(ref, elements);
     }
   }
 
   @Override
   public Point createPoint() {
-    synchronized (globalSyncObject) {
+    synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return model.createPoint(null).clone();
+      return getModel().createPoint(null).clone();
     }
   }
 
@@ -242,8 +246,8 @@ class KernelStateModelling
   public void setPointPosition(TCSObjectReference<Point> ref,
                                Triple position)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPointPosition(ref, position);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPointPosition(ref, position);
     }
   }
 
@@ -251,8 +255,8 @@ class KernelStateModelling
   public void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                               double angle)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPointVehicleOrientationAngle(ref, angle);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPointVehicleOrientationAngle(ref, angle);
     }
   }
 
@@ -260,8 +264,8 @@ class KernelStateModelling
   public void setPointType(TCSObjectReference<Point> ref,
                            Point.Type newType)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPointType(ref, newType);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPointType(ref, newType);
     }
   }
 
@@ -269,32 +273,32 @@ class KernelStateModelling
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      return model.createPath(null, srcRef, destRef).clone();
+    synchronized (getGlobalSyncObject()) {
+      return getModel().createPath(null, srcRef, destRef).clone();
     }
   }
 
   @Override
   public void setPathLength(TCSObjectReference<Path> ref, long length)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPathLength(ref, length);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPathLength(ref, length);
     }
   }
 
   @Override
   public void setPathRoutingCost(TCSObjectReference<Path> ref, long cost)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPathRoutingCost(ref, cost);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPathRoutingCost(ref, cost);
     }
   }
 
   @Override
   public void setPathMaxVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPathMaxVelocity(ref, velocity);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPathMaxVelocity(ref, velocity);
     }
   }
 
@@ -302,38 +306,38 @@ class KernelStateModelling
   public void setPathMaxReverseVelocity(TCSObjectReference<Path> ref,
                                         int velocity)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPathMaxReverseVelocity(ref, velocity);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPathMaxReverseVelocity(ref, velocity);
     }
   }
 
   @Override
   public void setPathLocked(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setPathLocked(ref, locked);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setPathLocked(ref, locked);
     }
   }
 
   @Override
   public Vehicle createVehicle() {
-    synchronized (globalSyncObject) {
-      return model.createVehicle(null).clone();
+    synchronized (getGlobalSyncObject()) {
+      return getModel().createVehicle(null).clone();
     }
   }
 
   @Override
   public void setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVehicleLength(ref, length);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVehicleLength(ref, length);
     }
   }
 
   @Override
   public LocationType createLocationType() {
-    synchronized (globalSyncObject) {
-      return model.createLocationType(null).clone();
+    synchronized (getGlobalSyncObject()) {
+      return getModel().createLocationType(null).clone();
     }
   }
 
@@ -342,8 +346,8 @@ class KernelStateModelling
       TCSObjectReference<LocationType> ref,
       String operation)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.addLocationTypeAllowedOperation(ref, operation);
+    synchronized (getGlobalSyncObject()) {
+      getModel().addLocationTypeAllowedOperation(ref, operation);
     }
   }
 
@@ -351,16 +355,16 @@ class KernelStateModelling
   public void removeLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.removeLocationTypeAllowedOperation(ref, operation);
+    synchronized (getGlobalSyncObject()) {
+      getModel().removeLocationTypeAllowedOperation(ref, operation);
     }
   }
 
   @Override
   public Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      return model.createLocation(null, typeRef).clone();
+    synchronized (getGlobalSyncObject()) {
+      return getModel().createLocation(null, typeRef).clone();
     }
   }
 
@@ -368,8 +372,8 @@ class KernelStateModelling
   public void setLocationPosition(TCSObjectReference<Location> ref,
                                   Triple position)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setLocationPosition(ref, position);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setLocationPosition(ref, position);
     }
   }
 
@@ -377,8 +381,8 @@ class KernelStateModelling
   public void setLocationType(TCSObjectReference<Location> ref,
                               TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setLocationType(ref, typeRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setLocationType(ref, typeRef);
     }
   }
 
@@ -386,8 +390,8 @@ class KernelStateModelling
   public void connectLocationToPoint(TCSObjectReference<Location> locRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.connectLocationToPoint(locRef, pointRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().connectLocationToPoint(locRef, pointRef);
     }
   }
 
@@ -395,8 +399,8 @@ class KernelStateModelling
   public void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.disconnectLocationFromPoint(locRef, pointRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().disconnectLocationFromPoint(locRef, pointRef);
     }
   }
 
@@ -405,8 +409,8 @@ class KernelStateModelling
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.addLocationLinkAllowedOperation(locRef, pointRef, operation);
+    synchronized (getGlobalSyncObject()) {
+      getModel().addLocationLinkAllowedOperation(locRef, pointRef, operation);
     }
   }
 
@@ -415,8 +419,8 @@ class KernelStateModelling
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.removeLocationLinkAllowedOperation(locRef, pointRef, operation);
+    synchronized (getGlobalSyncObject()) {
+      getModel().removeLocationLinkAllowedOperation(locRef, pointRef, operation);
     }
   }
 
@@ -424,16 +428,16 @@ class KernelStateModelling
   public void clearLocationLinkAllowedOperations(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.clearLocationLinkAllowedOperations(locRef, pointRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().clearLocationLinkAllowedOperations(locRef, pointRef);
     }
   }
 
   @Override
   public Block createBlock() {
-    synchronized (globalSyncObject) {
+    synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return model.createBlock(null).clone();
+      return getModel().createBlock(null).clone();
     }
   }
 
@@ -441,8 +445,8 @@ class KernelStateModelling
   public void addBlockMember(TCSObjectReference<Block> ref,
                              TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.addBlockMember(ref, newMemberRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().addBlockMember(ref, newMemberRef);
     }
   }
 
@@ -450,16 +454,16 @@ class KernelStateModelling
   public void removeBlockMember(TCSObjectReference<Block> ref,
                                 TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.removeBlockMember(ref, rmMemberRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().removeBlockMember(ref, rmMemberRef);
     }
   }
 
   @Override
   public StaticRoute createStaticRoute() {
-    synchronized (globalSyncObject) {
+    synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return model.createStaticRoute(null).clone();
+      return getModel().createStaticRoute(null).clone();
     }
   }
 
@@ -467,34 +471,16 @@ class KernelStateModelling
   public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.addStaticRouteHop(ref, newHopRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().addStaticRouteHop(ref, newHopRef);
     }
   }
 
   @Override
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.clearStaticRouteHops(ref);
-    }
-  }
-
-  @Override
-  public void attachResource(TCSResourceReference<?> resource,
-                             TCSResourceReference<?> newResource)
-      throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.attachResource(resource, newResource).clone();
-    }
-  }
-
-  @Override
-  public void detachResource(TCSResourceReference<?> resource,
-                             TCSResourceReference<?> rmResource)
-      throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.detachResource(resource, rmResource).clone();
+    synchronized (getGlobalSyncObject()) {
+      getModel().clearStaticRouteHops(ref);
     }
   }
 

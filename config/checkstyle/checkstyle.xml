@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+  
+  <module name="SuppressionFilter">
+    <property name="file" value="${suppressions_file}"/>
+  </module>
+  
+  <!-- Checks that a package-info.java file exists for each package. -->
+  <module name="JavadocPackage">
+    <property name="allowLegacy" value="false"/>
+    <property name="severity" value="info"/>
+  </module>
+
+  <!-- Checks whether files end with a new line.                        -->
+  <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
+  <module name="NewlineAtEndOfFile"/>
+
+  <!-- Checks that property files contain the same keys.         -->
+  <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
+  <!-- <module name="Translation"/> -->
+
+
+  <module name="FileLength"/>
+    
+  <module name="FileTabCharacter"/>
+  
+  <module name="SuppressionCommentFilter"/>
+    
+  <module name="TreeWalker">
+
+    <!-- Checks for Javadoc comments.                     -->
+    <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+    <module name="JavadocType">
+      <property name="authorFormat" value="\S"/>
+      <property name="severity" value="info"/>
+    </module>
+    <module name="JavadocMethod">
+      <property name="scope" value="package"/>
+      <property name="allowMissingJavadoc" value="true"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
+      <property name="allowUndeclaredRTE" value="true"/>
+      <property name="allowThrowsTagsForSubclasses" value="true"/>
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="JavadocVariable">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="JavadocStyle">
+      <property name="checkEmptyJavadoc" value="true"/>
+      <property name="severity" value="warning"/>
+    </module>
+
+
+    <!-- Checks for Naming Conventions.                  -->
+    <!-- See http://checkstyle.sf.net/config_naming.html -->
+    <!--module name="ConstantName"/-->
+    <!--module name="LocalFinalVariableName"/-->
+    <module name="LocalVariableName"/>
+    <module name="MemberName"/>
+    <module name="MethodName"/>
+    <module name="PackageName"/>
+    <module name="ParameterName"/>
+    <module name="StaticVariableName"/>
+    <module name="TypeName"/>
+
+
+    <!-- Checks for imports                              -->
+    <!-- See http://checkstyle.sf.net/config_import.html -->
+    <module name="AvoidStarImport">
+      <property name="excludes" value="org.junit,org.junit.Assert"/>
+      <property name="severity" value="info"/>
+    </module>
+    <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+    <module name="RedundantImport">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="UnusedImports">
+      <property name="severity" value="warning"/>
+    </module>
+
+
+    <!-- Checks for Size Violations.                    -->
+    <!-- See http://checkstyle.sf.net/config_sizes.html -->
+    <module name="LineLength">
+      <property name="max" value="100"/>
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="MethodLength"/>
+    <module name="AnonInnerLength">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="ParameterNumber">
+      <property name="ignoreOverriddenMethods" value="true"/>
+    </module>
+
+
+    <!-- Modifier Checks                                    -->
+    <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+    <module name="ModifierOrder">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="RedundantModifier">
+      <property name="severity" value="warning"/>
+    </module>
+
+
+    <!-- Checks for blocks. You know, those {}'s         -->
+    <!-- See http://checkstyle.sf.net/config_blocks.html -->
+    <module name="EmptyBlock">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="LeftCurly"/>
+    <module name="NeedBraces"/>
+    <module name="RightCurly">
+      <property name="option" value="alone"/>
+    </module>
+    <!-- module name="AvoidNestedBlocks"/ -->
+
+
+    <!-- Checks for common coding problems               -->
+    <!-- See http://checkstyle.sf.net/config_coding.html -->
+    <!-- <module name="AvoidInlineConditionals"/> -->
+    <module name="CovariantEquals"/>
+    <module name="EmptyStatement"/>
+    <module name="EqualsHashCode"/>
+    <!--
+    <module name="HiddenField">
+      <property name="ignoreConstructorParameter" value="true"/>
+      <property name="ignoreSetter" value="true"/>
+      <property name="severity" value="info"/>
+    </module>
+    -->
+    <module name="IllegalInstantiation">
+      <property name="classes" value="java.lang.Boolean,java.lang.String"/>
+      <property name="severity" value="info"/>
+    </module>
+    <module name="InnerAssignment"/>
+        <!-- module name="MagicNumber"/-->
+    <module name="MissingSwitchDefault"/>
+    <module name="ModifiedControlVariable"/>
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="StringLiteralEquality"/>
+    <module name="NestedIfDepth">
+      <property name="max" value="2"/>
+    </module>
+    <module name="NestedTryDepth"/>
+    <module name="SuperClone"/>
+    <module name="IllegalCatch"/>
+    <module name="IllegalThrows"/>
+    <module name="PackageDeclaration"/>
+    <module name="ReturnCount">
+      <property name="max" value="3"/>
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="IllegalType">
+      <property name="tokens" value="PARAMETER_DEF, METHOD_DEF"/>
+    </module>
+    <module name="DeclarationOrder">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="ParameterAssignment"/>
+    <module name="ExplicitInitialization">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="DefaultComesLast"/>
+    <module name="MissingCtor">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="FallThrough"/>
+    <module name="MultipleVariableDeclarations"/>
+    <module name="UnnecessaryParentheses">
+      <property name="severity" value="warning"/>
+    </module>
+
+    <!-- Checks for class design                         -->
+    <!-- See http://checkstyle.sf.net/config_design.html -->
+    <module name="VisibilityModifier"/>
+    <!--module name="FinalClass"/-->
+    <module name="InterfaceIsType">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="HideUtilityClassConstructor"/>
+	<!-- <module name="DesignForExtension"/> -->
+    <module name="MutableException"/>
+    <module name="InnerTypeLast"/>
+
+
+    <!-- Miscellaneous other checks.                   -->
+    <!-- See http://checkstyle.sf.net/config_misc.html -->
+    <!--module name="TodoComment">
+      <property name="format" value="TODO|XXX"/>
+    </module-->
+    <module name="UncommentedMain">
+      <property name="excludedClasses" value="KernelStarter"/>
+      <property name="severity" value="info"/>
+    </module>
+    <module name="UpperEll"/>
+    <module name="ArrayTypeStyle"/>
+    <!-- <module name="FinalParameters"/> -->
+    <!-- <module name="Indentation">
+      <property name="basicOffset" value="2"/>
+      <property name="caseIndent" value="2"/>
+    </module> -->
+    <module name="TrailingComment">
+      <!-- Trailing comments are often seen in NetBeans' generated GUI code. -->
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="RegexpSinglelineJava">
+      <property name="format" value="\S\s+$"/>
+      <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <module name="FileContentsHolder"/>
+
+  </module>
+
+</module>

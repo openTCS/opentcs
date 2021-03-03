@@ -13,7 +13,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Property für einen String.
+ * Ein Property fÃ¼r einen String.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -35,7 +35,7 @@ public class StringProperty
   }
 
   /**
-   * Konstruktor, dem der String übergeben wird.
+   * Konstruktor, dem der String Ã¼bergeben wird.
    *
    * @param model
    *

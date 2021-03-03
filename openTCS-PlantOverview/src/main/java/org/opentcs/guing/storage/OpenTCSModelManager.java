@@ -9,6 +9,7 @@
  */
 package org.opentcs.guing.storage;
 
+import com.google.common.collect.Iterators;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -21,18 +22,18 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
-import org.opentcs.access.ApplicationHome;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
@@ -97,8 +98,10 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.Colors;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.guing.util.JOptionPaneUtil;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.ObjectListCycler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages (loads, persists and keeps) the driving course model.
@@ -110,8 +113,8 @@ public class OpenTCSModelManager
     implements ModelManager {
 
   /**
-   * Identifier für das Layout-Objekt, welches das standardmäßige Fahrkursmodell
-   * enthält.
+   * Identifier fï¿½r das Layout-Objekt, welches das standardmï¿½ï¿½ige Fahrkursmodell
+   * enthï¿½lt.
    */
   public static final String DEFAULT_LAYOUT = "Default";
   /**
@@ -126,7 +129,7 @@ public class OpenTCSModelManager
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(OpenTCSModelManager.class.getName());
+      = LoggerFactory.getLogger(OpenTCSModelManager.class);
   /**
    * The StatusPanel at the bottom to log messages.
    */
@@ -152,6 +155,14 @@ public class OpenTCSModelManager
    */
   private final JFileChooser modelFileChooser;
   /**
+   * Provides new instances to validate a system model.
+   */
+  private final Provider<ModelJAXBValidator> validatorProvider;
+  /**
+   * Provides new instances to read models from a file.
+   */
+  private final Provider<ModelJAXBReader> readerProvider;
+  /**
    * The model currently loaded.
    */
   private SystemModel systemModel;
@@ -173,6 +184,8 @@ public class OpenTCSModelManager
    * @param systemModelProvider Provides instances of SystemModel.
    * @param statusPanel StatusPanel to log messages.
    * @param homeDir The application's home directory.
+   * @param validatorProvider Provider for the system model validator
+   * @param modelReader the provider for a file reader for models
    */
   @Inject
   public OpenTCSModelManager(CourseObjectFactory crsObjFactory,
@@ -180,7 +193,9 @@ public class OpenTCSModelManager
                              ProcessAdapterUtil procAdapterUtil,
                              Provider<SystemModel> systemModelProvider,
                              StatusPanel statusPanel,
-                             @ApplicationHome File homeDir) {
+                             @ApplicationHome File homeDir,
+                             Provider<ModelJAXBValidator> validatorProvider,
+                             Provider<ModelJAXBReader> modelReader) {
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.procAdapterFactory = requireNonNull(procAdapterFactory,
                                              "procAdapterFactory");
@@ -191,7 +206,9 @@ public class OpenTCSModelManager
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     requireNonNull(homeDir, "homeDir");
     this.modelFileChooser = new JFileChooser(new File(homeDir, "data"));
-    this.modelFileChooser.setFileFilter(new ModelFileFilter());
+    this.modelFileChooser.setFileFilter(new ModelFileFilter(FILE_ENDING));
+    this.validatorProvider = requireNonNull(validatorProvider, "validatorProvider");
+    this.readerProvider = requireNonNull(modelReader, "modelReader");
   }
 
   @Override
@@ -201,14 +218,23 @@ public class OpenTCSModelManager
 
   @Override
   public boolean loadModel(@Nullable File modelFile) {
-    File file = modelFile != null ? modelFile : showOpenDialog();
+    return loadModel(modelFile, readerProvider.get());
+  }
+
+  @Override
+  public boolean loadModel(File modelFile, ModelReader reader) {
+    return loadModel(modelFile, reader, FILE_ENDING);
+  }
+
+  @Override
+  public boolean loadModel(File modelFile, ModelReader reader, String fileEnding) {
+    File file = modelFile != null ? modelFile : showOpenDialog(fileEnding);
     if (file == null) {
       return false;
     }
 
     try {
-      systemModel
-          = new ModelJAXBReader(systemModelProvider.get()).deserialize(file);
+      systemModel = reader.deserialize(file);
       currentModelFile = file;
       statusPanel.clear();
       return true;
@@ -218,7 +244,7 @@ public class OpenTCSModelManager
                                 ResourceBundleUtil.getBundle()
                                 .getFormatted("modelManager.persistence.notLoaded",
                                               file.getName()));
-      log.log(Level.INFO, "Error reading file", ex);
+      log.info("Error reading file", ex);
     }
 
     return false;
@@ -231,12 +257,17 @@ public class OpenTCSModelManager
       ModelPersistor persistor = new ModelKernelPersistor(
           systemModel.getEventDispatcher(), kernel, fModelName);
       statusPanel.clear();
-      return persistModel(systemModel, persistor);
+      return persistModel(systemModel, persistor, false);
     }
     catch (IOException | CredentialsException e) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
-      log.log(Level.WARNING, "Exception persisting model", e);
+      log.warn("Exception persisting model", e);
+      return false;
+    }
+    catch (IllegalArgumentException e) {
+      statusPanel.setLogMessage(Level.SEVERE,
+                                e.getMessage());
       return false;
     }
   }
@@ -259,13 +290,18 @@ public class OpenTCSModelManager
     }
     try {
       ModelJAXBPersistor persistor = new ModelJAXBPersistor(currentModelFile);
-      return persistModel(systemModel, persistor);
+      statusPanel.clear();
+      return persistModel(systemModel, persistor, true);
     }
     catch (IOException e) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
-      log.log(Level.WARNING, "Exception persisting model", e);
+      log.warn("Exception persisting model", e);
       return false;
+    }
+    catch (IllegalArgumentException e) {
+      JOptionPane.showConfirmDialog(statusPanel, e.getMessage());
+      return true;
     }
   }
 
@@ -288,6 +324,12 @@ public class OpenTCSModelManager
     }
     systemModel.setName(Kernel.DEFAULT_MODEL_NAME);
     fModelName = systemModel.getName();
+    LayoutModel layoutComponent
+        = (LayoutModel) systemModel.getMainFolder(SystemModel.FolderKey.LAYOUT);
+
+    LayoutAdapter adapter = procAdapterFactory.createLayoutAdapter(
+        layoutComponent, systemModel.getEventDispatcher());
+    adapter.register();
   }
 
   /**
@@ -295,12 +337,34 @@ public class OpenTCSModelManager
    *
    * @param systemModel The system model to be persisted.
    * @param persistor The persistor to be used.
+   * @param ignoreError whether the model should be persisted when duplicates exist
    * @return Whether the model was actually saved.
    */
-  private boolean persistModel(SystemModel systemModel, ModelPersistor persistor)
+  private boolean persistModel(SystemModel systemModel, ModelPersistor persistor,
+                               boolean ignoreError)
       throws IOException, KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
+
+    ModelJAXBValidator validator = validatorProvider.get();
+    boolean valid = true;
+    for (ModelComponent component : systemModel.getAll()) {
+      valid &= validator.isValidWith(systemModel, component);
+    }
+    //Report possible duplicates if we persist to the kernel
+    if (!valid) {
+      if (!ignoreError) {
+        //Use a hash set to avoid duplicate errors
+        Set<String> errors = new HashSet<>(validator.getErrors());
+        ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+        JOptionPaneUtil.showDialogWithTextArea(
+            statusPanel,
+            bundle.getString("ValidationWarning.title"),
+            bundle.getString("ValidationWarning.descriptionSavingKernel"),
+            errors);
+        return false;
+      }
+    }
 
     persistor.init();
 
@@ -345,7 +409,16 @@ public class OpenTCSModelManager
 
     persistor.close();
     systemModel.setName(fModelName);
-
+    //If there are errors while persisting to a file, show the dialog for errors
+    if (!valid) {
+      Set<String> errors = new HashSet<>(validator.getErrors());
+      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+      JOptionPaneUtil.showDialogWithTextArea(
+          statusPanel,
+          bundle.getString("ValidationWarning.title"),
+          bundle.getString("ValidationWarning.descriptionSavingFile"),
+          errors);
+    }
     return true;
   }
 
@@ -373,16 +446,20 @@ public class OpenTCSModelManager
     restoreModelLinks(systemModel.getLinkModels());
 
     Drawing drawing = systemModel.getDrawing();
-
+    LayoutAdapter adapter;
+    adapter = procAdapterFactory.createLayoutAdapter(
+        layoutComponent, systemModel.getEventDispatcher());
+    adapter.register();
     restoredFigures.stream().forEach((figure) -> {
       drawing.add(figure);
     });
   }
 
   @Override
-  public void restoreModel(Kernel kernel) {
+  public void restoreModel(Kernel kernel
+  ) {
     createEmptyModel();
-    fModelName = kernel.getCurrentModelName();
+    fModelName = kernel.getLoadedModelName();
     ((StringProperty) systemModel.getProperty(ModelComponent.NAME)).setText(fModelName);
 
     // Die im Kernel gespeicherten Layouts
@@ -406,7 +483,7 @@ public class OpenTCSModelManager
     // "Neues" Modell: Layout ist im Visual-Layout Objekt gespeichert
     VisualLayout visualLayout = null;
     for (VisualLayout visLayout : allVisualLayouts) {
-      visualLayout = visLayout;	// Es sollte genau ein Layout geben
+      visualLayout = visLayout;  // Es sollte genau ein Layout geben
       systemModel.createLayoutMap(visualLayout, allPoints, allPaths, allLocations, allBlocks);
       scaleX = visualLayout.getScaleX();
       scaleY = visualLayout.getScaleY();
@@ -431,10 +508,12 @@ public class OpenTCSModelManager
         scale.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
       }
       catch (IllegalArgumentException ex) {
-        log.log(Level.WARNING, "Exception in setValueAndUnit():\n{0}", ex);
+        log.warn("Exception in setValueAndUnit()", ex);
       }
 
-      adapter = createLayoutAdapter(systemModel, layoutComponent);
+      adapter = procAdapterFactory.createLayoutAdapter(
+          layoutComponent, systemModel.getEventDispatcher());
+      adapter.register();
       createdAdapters.add(adapter);
     }
     else {
@@ -545,8 +624,7 @@ public class OpenTCSModelManager
                                         Set<ProcessAdapter> createdAdapters,
                                         Kernel kernel) {
     // --- Static Routes ---
-    ObjectListCycler<Color> routeColorCycler
-        = new ObjectListCycler<>(Colors.defaultColors());
+    Iterator<Color> routeColorCycler = Iterators.cycle(Colors.defaultColors());
     for (StaticRoute staticRoute : allStaticRoutes) {
       StaticRouteModel staticRouteModel = crsObjFactory.createStaticRouteModel();
       StaticRouteAdapter adapter = procAdapterFactory.createStaticRouteAdapter(
@@ -558,20 +636,20 @@ public class OpenTCSModelManager
                                     staticRoute,
                                     null);
 
-      // Neue Farbe suchen für StaticRoutes, die min. 1 Hop haben
+      // Neue Farbe suchen fï¿½r StaticRoutes, die min. 1 Hop haben
       if (!staticRoute.getHops().isEmpty()) {
         ((ColorProperty) staticRouteModel
          .getProperty(ElementPropKeys.BLOCK_COLOR))
             .setColor(routeColorCycler.next());
       }
-      // Das zugehörige Model Layout Element suchen
+      // Das zugehï¿½rige Model Layout Element suchen
       ModelLayoutElement element = systemModel.getLayoutMap().get(staticRoute.getReference());
 
       if (element != null) {
         Map<String, String> properties = element.getProperties();
-        // Im Layout Element gespeicherte Farbe überschreibt den Default-Wert
+        // Im Layout Element gespeicherte Farbe ï¿½berschreibt den Default-Wert
         String sColor = properties.get(ElementPropKeys.BLOCK_COLOR);
-        String srgb = sColor.substring(1);	// delete trailing "#"
+        String srgb = sColor.substring(1);  // delete trailing "#"
         int rgb = Integer.parseInt(srgb, 16);
         Color color = new Color(rgb);
         ColorProperty cp = (ColorProperty) staticRouteModel.getProperty(ElementPropKeys.BLOCK_COLOR);
@@ -601,8 +679,7 @@ public class OpenTCSModelManager
                                   Set<ProcessAdapter> createdAdapters,
                                   Kernel kernel) {
     // --- Alle Blocks, die der Kernel kennt ---
-    ObjectListCycler<Color> blockColorCycler
-        = new ObjectListCycler<>(Colors.defaultColors());
+    Iterator<Color> blockColorCycler = Iterators.cycle(Colors.defaultColors());
     for (Block block : allBlocks) {
       BlockModel blockModel = crsObjFactory.createBlockModel();
       BlockAdapter adapter = procAdapterFactory.createBlockAdapter(
@@ -614,26 +691,26 @@ public class OpenTCSModelManager
                                     block,
                                     null);
 
-//			Iterator iMembers = block.getMembers().iterator();
+//      Iterator iMembers = block.getMembers().iterator();
 //
-//			while (iMembers.hasNext()) {
-//				ModelComponent modelComponent = getModelComponent(systemModel, (TCSObjectReference) iMembers.next());
-//				blockModel.addCourseElement(modelComponent);
-//			}
-      // Neue Farbe suchen für Blocks, die mindestens ein Member haben
+//      while (iMembers.hasNext()) {
+//        ModelComponent modelComponent = getModelComponent(systemModel, (TCSObjectReference) iMembers.next());
+//        blockModel.addCourseElement(modelComponent);
+//      }
+      // Neue Farbe suchen fï¿½r Blocks, die mindestens ein Member haben
       if (!block.getMembers().isEmpty()) {
         ((ColorProperty) blockModel
          .getProperty(ElementPropKeys.BLOCK_COLOR))
             .setColor(blockColorCycler.next());
       }
-      // Das zugehörige Model Layout Element suchen
+      // Das zugehï¿½rige Model Layout Element suchen
       ModelLayoutElement element = systemModel.getLayoutMap().get(block.getReference());
 
       if (element != null) {
         Map<String, String> properties = element.getProperties();
-        // Im Layout Element gespeicherte Farbe überschreibt den Default-Wert
+        // Im Layout Element gespeicherte Farbe ï¿½berschreibt den Default-Wert
         String sColor = properties.get(ElementPropKeys.BLOCK_COLOR);
-        String srgb = sColor.substring(1);	// delete trailing "#"
+        String srgb = sColor.substring(1);  // delete trailing "#"
         Color color = new Color(Integer.parseInt(srgb, 16));
         ((ColorProperty) blockModel.getProperty(ElementPropKeys.BLOCK_COLOR))
             .setColor(color);
@@ -677,7 +754,7 @@ public class OpenTCSModelManager
       stringProperty = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
       String labelOffsetY = stringProperty.getText();
       // TODO: labelOrientationAngle auswerten
-//			String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
       double labelPositionX;
       double labelPositionY;
@@ -694,7 +771,7 @@ public class OpenTCSModelManager
         labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
         label.setOffset(labelPosition);
       }
-      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);	// Vorzeichen!
+      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
       locationFigure.setBounds(figurePosition, figurePosition);
 
       labelPosition = locationFigure.getStartPoint();
@@ -743,15 +820,15 @@ public class OpenTCSModelManager
       // Neues Figure-Objekt
       LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
       LocationFigure locationFigure = llf.getPresentationFigure();
-      // Das zugehörige Modell
+      // Das zugehï¿½rige Modell
       LocationModel locationModel = locationFigure.getModel();
-      // Adapter zur Verknüpfung des Kernel-Objekts mit der Figur
+      // Adapter zur Verknï¿½pfung des Kernel-Objekts mit der Figur
       LocationAdapter adapter = procAdapterFactory.createLocationAdapter(
           locationModel, systemModel.getEventDispatcher());
       adapter.register();
 
       createdAdapters.add(adapter);
-      // Das zugehörige Model Layout Element suchen und mit dem Adapter verknüpfen
+      // Das zugehï¿½rige Model Layout Element suchen und mit dem Adapter verknï¿½pfen
       ModelLayoutElement layoutElement
           = systemModel.getLayoutMap().get(location.getReference());
 
@@ -759,10 +836,10 @@ public class OpenTCSModelManager
       adapter.updateModelProperties(kernel,
                                     location,
                                     layoutElement);
-      // Default-Position für den Fall, dass kein Layout-Element zu dieser Location gefunden wurde
+      // Default-Position fï¿½r den Fall, dass kein Layout-Element zu dieser Location gefunden wurde
       double figurePositionX = location.getPosition().getX();
       double figurePositionY = location.getPosition().getY();
-      // Die zugehörige Beschriftung:
+      // Die zugehï¿½rige Beschriftung:
       TCSLabelFigure label = new TCSLabelFigure(location.getName());
 
       Point2D.Double labelPosition;
@@ -770,8 +847,8 @@ public class OpenTCSModelManager
         Map<String, String> layoutProperties = layoutElement.getProperties();
         String locPosX = layoutProperties.get(ElementPropKeys.LOC_POS_X);
         String locPosY = layoutProperties.get(ElementPropKeys.LOC_POS_Y);
-        // Die in den Properties gespeicherte Position überschreibt die im Kernel-Objekt gespeicherten Werte
-        // TO DO: Auswahl, z.B. über Parameter?
+        // Die in den Properties gespeicherte Position ï¿½berschreibt die im Kernel-Objekt gespeicherten Werte
+        // TO DO: Auswahl, z.B. ï¿½ber Parameter?
         if (locPosX != null && locPosY != null) {
           try {
             figurePositionX = Integer.parseInt(locPosX);
@@ -785,7 +862,7 @@ public class OpenTCSModelManager
         String labelOffsetX = layoutProperties.get(ElementPropKeys.LOC_LABEL_OFFSET_X);
         String labelOffsetY = layoutProperties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y);
         // TODO: labelOrientationAngle auswerten
-//			String labelOrientationAngle = properties.get(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
+//      String labelOrientationAngle = properties.get(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
 
         double labelPositionX;
         double labelPositionY;
@@ -803,7 +880,7 @@ public class OpenTCSModelManager
         }
       }
       // Figur auf diese Position verschieben
-      Point2D.Double figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);	// Vorzeichen!
+      Point2D.Double figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
       locationFigure.setBounds(figurePosition, figurePosition);
 
       labelPosition = locationFigure.getStartPoint();
@@ -830,7 +907,7 @@ public class OpenTCSModelManager
         for (String key : location.getProperties().keySet()) {
           misc.addItem(new KeyValueProperty(locationModel, key, location.getProperties().get(key)));
         }
-        // Datei für Default-Symbol
+        // Datei fï¿½r Default-Symbol
         SymbolProperty symbol = (SymbolProperty) locationModel.getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
 
         if (symbol.getLocationRepresentation() != null) {
@@ -847,7 +924,7 @@ public class OpenTCSModelManager
         }
       }
 
-      // Die zugehörigen Links
+      // Die zugehï¿½rigen Links
       for (Link link : location.getAttachedLinks()) {
         // Der mit dem Link verbundene Point
         PointModel pointModel = (PointModel) getModelComponent(systemModel, link.getPoint());
@@ -857,9 +934,9 @@ public class OpenTCSModelManager
         // ...verbindet Point und Location
         linkConnection.connect(lpf, llf);
 
-        // Das zur Figure gehörige Datenmodell in der GUI
+        // Das zur Figure gehï¿½rige Datenmodell in der GUI
         LinkModel linkModel = linkConnection.getModel();
-        // Speziell für diesen Link erlaubte Operation
+        // Speziell fï¿½r diesen Link erlaubte Operation
         StringSetProperty pOperations = (StringSetProperty) linkModel.getProperty(LinkModel.ALLOWED_OPERATIONS);
         pOperations.setItems(new ArrayList<>(link.getAllowedOperations()));
 
@@ -871,7 +948,7 @@ public class OpenTCSModelManager
         restoredFigures.add(linkConnection);
       }
 
-      // Koordinaten der Location ändern sich, wenn der Maßstab verändert wird
+      // Koordinaten der Location ï¿½ndern sich, wenn der Maï¿½stab verï¿½ndert wird
       origin.addListener(llf);
       llf.set(FigureConstants.ORIGIN, origin);
     }
@@ -930,7 +1007,7 @@ public class OpenTCSModelManager
     for (Vehicle vehicle : allVehicles) {
       VehicleModel vehicleModel = crsObjFactory.createVehicleModel();
       vehicleModel.setVehicle(vehicle);
-      // Adapter zur Verknüpfung des Kernel-Objekts mit der Figur
+      // Adapter zur Verknï¿½pfung des Kernel-Objekts mit der Figur
       VehicleAdapter adapter = procAdapterFactory.createVehicleAdapter(
           vehicleModel, systemModel.getEventDispatcher());
       adapter.register();
@@ -993,19 +1070,19 @@ public class OpenTCSModelManager
     for (Path path : allPaths) {
       // Neues Figure-Objekt
       PathConnection pathFigure = crsObjFactory.createPathConnection();
-      // Das zugehörige Modell
+      // Das zugehï¿½rige Modell
       PathModel pathModel = pathFigure.getModel();
       // Anfangs- und Endpunkte
       PointModel startPointModel = (PointModel) getModelComponent(systemModel, path.getSourcePoint());
       PointModel endPointModel = (PointModel) getModelComponent(systemModel, path.getDestinationPoint());
       pathFigure.connect(startPointModel.getFigure(), endPointModel.getFigure());
-      // Adapter zur Verknüpfung des Kernel-Objekts mit der Figur
+      // Adapter zur Verknï¿½pfung des Kernel-Objekts mit der Figur
       PathAdapter adapter = procAdapterFactory.createPathAdapter(
           pathModel, systemModel.getEventDispatcher());
       adapter.register();
 
       createdAdapters.add(adapter);
-      // Das zugehörige Model Layout Element suchen und mit dem Adapter verknüpfen
+      // Das zugehï¿½rige Model Layout Element suchen und mit dem Adapter verknï¿½pfen
       ModelLayoutElement layoutElement = systemModel.getLayoutMap().get(path.getReference());
 
       // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
@@ -1035,7 +1112,7 @@ public class OpenTCSModelManager
       pathModel.addAttributesChangeListener(pathFigure);
       systemModel.getMainFolder(SystemModel.FolderKey.PATHS).add(pathModel);
       restoredFigures.add(pathFigure);
-      // Koordinaten der Kontrollpunkte ändern sich, wenn der Maßstab verändert wird
+      // Koordinaten der Kontrollpunkte ï¿½ndern sich, wenn der Maï¿½stab verï¿½ndert wird
       origin.addListener(pathFigure);
       pathFigure.set(FigureConstants.ORIGIN, origin);
     }
@@ -1059,10 +1136,10 @@ public class OpenTCSModelManager
               int xcp2 = Integer.parseInt(values[2]);
               int ycp2 = Integer.parseInt(values[3]);
               Point2D.Double cp2 = new Point2D.Double(xcp2, ycp2);
-              pathFigure.addControlPoints(cp1, cp2);	// Cubic curve
+              pathFigure.addControlPoints(cp1, cp2);  // Cubic curve
             }
             else {
-              pathFigure.addControlPoints(cp1, cp1);	// Quadratic curve
+              pathFigure.addControlPoints(cp1, cp1);  // Quadratic curve
             }
           }
         }
@@ -1106,7 +1183,7 @@ public class OpenTCSModelManager
       stringProperty = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
       String labelOffsetY = stringProperty.getText();
       // TODO: labelOrientationAngle auswerten
-//			String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
       double labelPositionX;
       double labelPositionY;
@@ -1124,7 +1201,7 @@ public class OpenTCSModelManager
         label.setOffset(labelPosition);
       }
       // Figur auf diese Position verschieben
-      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);	// Vorzeichen!
+      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
       pointFigure.setBounds(figurePosition, figurePosition);
 
       labelPosition = pointFigure.getStartPoint();
@@ -1140,7 +1217,7 @@ public class OpenTCSModelManager
       procAdapterUtil.createProcessAdapter(pointModel,
                                            systemModel
                                            .getEventDispatcher());
-      // Koordinaten der Punkte ändern sich, wenn der Maßstab verändert wird
+      // Koordinaten der Punkte ï¿½ndern sich, wenn der Maï¿½stab verï¿½ndert wird
       origin.addListener(lpf);
       lpf.set(FigureConstants.ORIGIN, origin);
     }
@@ -1156,14 +1233,14 @@ public class OpenTCSModelManager
       // Neues Figure-Objekt
       LabeledPointFigure lpf = crsObjFactory.createPointFigure();
       PointFigure pointFigure = lpf.getPresentationFigure();
-      // Das zugehörige Modell
+      // Das zugehï¿½rige Modell
       PointModel pointModel = pointFigure.getModel();
-      // Adapter zur Verknüpfung des Kernel-Objekts mit der Figur
+      // Adapter zur Verknï¿½pfung des Kernel-Objekts mit der Figur
       PointAdapter adapter = procAdapterFactory.createPointAdapter(
           pointModel, systemModel.getEventDispatcher());
       adapter.register();
 
-      // Das zugehörige Model Layout Element suchen und mit dem Adapter verknüpfen
+      // Das zugehï¿½rige Model Layout Element suchen und mit dem Adapter verknï¿½pfen
       ModelLayoutElement layoutElement = systemModel.getLayoutMap().get(point.getReference());
       // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
       adapter.updateModelProperties(kernel,
@@ -1173,8 +1250,8 @@ public class OpenTCSModelManager
       // Die im Kernel gespeicherte Position
       double figurePositionX = point.getPosition().getX();
       double figurePositionY = point.getPosition().getY();
-      // TODO: positionZ = point.getPosition().getZ();	// immer 0
-      // Die zugehörige Beschriftung:
+      // TODO: positionZ = point.getPosition().getZ();  // immer 0
+      // Die zugehï¿½rige Beschriftung:
       TCSLabelFigure label = new TCSLabelFigure(point.getName());
 
       Point2D.Double labelPosition;
@@ -1183,8 +1260,8 @@ public class OpenTCSModelManager
         Map<String, String> layoutProperties = layoutElement.getProperties();
         String pointPosX = layoutProperties.get(ElementPropKeys.POINT_POS_X);
         String pointPosY = layoutProperties.get(ElementPropKeys.POINT_POS_Y);
-        // Die in den Properties gespeicherte Position überschreibt die im Kernel-Objekt gespeicherten Werte
-        // TO DO: Auswahl, z.B. über Parameter?
+        // Die in den Properties gespeicherte Position ï¿½berschreibt die im Kernel-Objekt gespeicherten Werte
+        // TO DO: Auswahl, z.B. ï¿½ber Parameter?
         if (pointPosX != null && pointPosY != null) {
           try {
             figurePositionX = Integer.parseInt(pointPosX);
@@ -1198,7 +1275,7 @@ public class OpenTCSModelManager
         String labelOffsetX = layoutProperties.get(ElementPropKeys.POINT_LABEL_OFFSET_X);
         String labelOffsetY = layoutProperties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y);
         // TODO: labelOrientationAngle auswerten
-//			String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
         double labelPositionX;
         double labelPositionY;
@@ -1217,7 +1294,7 @@ public class OpenTCSModelManager
         }
       }
       // Figur auf diese Position verschieben
-      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);	// Vorzeichen!
+      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
       pointFigure.setBounds(figurePosition, figurePosition);
 
       labelPosition = pointFigure.getStartPoint();
@@ -1231,37 +1308,24 @@ public class OpenTCSModelManager
       systemModel.getMainFolder(SystemModel.FolderKey.POINTS).add(pointModel);
       restoredFigures.add(lpf);
 
-      // Koordinaten der Punkte ändern sich, wenn der Maßstab verändert wird
+      // Koordinaten der Punkte ï¿½ndern sich, wenn der Maï¿½stab verï¿½ndert wird
       origin.addListener(lpf);
       lpf.set(FigureConstants.ORIGIN, origin);
     }
   }
 
-  private LayoutAdapter createLayoutAdapter(SystemModel systemModel,
-                                            LayoutModel model) {
-    LayoutAdapter adapter = procAdapterFactory.createLayoutAdapter(
-        model, systemModel.getEventDispatcher());
-    adapter.register();
-
-    try {
-      systemModel.getEventDispatcher().addProcessAdapter(adapter);
-    }
-    catch (KernelRuntimeException ex) {
-      log.log(Level.SEVERE, "Exception in creating process object", ex);
-    }
-
-    return adapter;
-  }
-
   /**
    * Shows a dialog to select a model to load.
    *
+   * @param fileEnding The ending format of the allowed model file.
+   *
    * @return The selected file or <code>null</code>, if nothing was selected.
    */
-  private File showOpenDialog() {
+  private File showOpenDialog(String fileEnding) {
     if (!modelFileChooser.getCurrentDirectory().isDirectory()) {
       modelFileChooser.getCurrentDirectory().mkdir();
     }
+    modelFileChooser.setFileFilter(new ModelFileFilter(fileEnding));
     if (modelFileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
       return null;
     }
@@ -1299,11 +1363,11 @@ public class OpenTCSModelManager
   }
 
   /**
-   * Erzeugt zu einer gelesenen Verknüpfung einen passenden ProcessAdapter und
-   * fügt ihn dem EventDispatcher hinzu.
+   * Erzeugt zu einer gelesenen Verknï¿½pfung einen passenden ProcessAdapter und
+   * fï¿½gt ihn dem EventDispatcher hinzu.
    *
    * @param systemModel
-   * @param link Die Verknüpfung
+   * @param link Die Verknï¿½pfung
    * @param point Der Meldepunkt
    * @param location Die Station
    * @return Der erzeugte ProcessAdapter
@@ -1423,13 +1487,13 @@ public class OpenTCSModelManager
       StringProperty endProperty
           = (StringProperty) link.getProperty(AbstractConnection.END_COMPONENT);
       if (startProperty.getText().equals(locationName)) {
-        PointModel endComponent = getPointComponent(endProperty.getText());
-        link.setConnectedComponents(locationModel, endComponent);
+        PointModel pointModel = getPointComponent(endProperty.getText());
+        link.setConnectedComponents(pointModel, locationModel);
         links.add(link);
       }
       else if (endProperty.getText().equals(locationName)) {
-        PointModel startComponent = getPointComponent(startProperty.getText());
-        link.setConnectedComponents(startComponent, locationModel);
+        PointModel pointModel = getPointComponent(startProperty.getText());
+        link.setConnectedComponents(pointModel, locationModel);
         links.add(link);
       }
     }
@@ -1443,20 +1507,25 @@ public class OpenTCSModelManager
   private static class ModelFileFilter
       extends FileFilter {
 
+    private final String fileEnding;
+
     /**
      * Creates a new instance.
+     *
+     * @param fileEnding The allowed file ending for this filter.
      */
-    public ModelFileFilter() {
+    public ModelFileFilter(String fileEnding) {
+      this.fileEnding = requireNonNull(fileEnding, "fileEnding");
     }
 
     @Override
     public boolean accept(File f) {
-      return f.isDirectory() || f.getName().endsWith(FILE_ENDING);
+      return f.isDirectory() || f.getName().endsWith(fileEnding);
     }
 
     @Override
     public String getDescription() {
-      return "*.opentcs";
+      return String.format("*%s", fileEnding);
     }
   }
 }

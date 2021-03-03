@@ -9,6 +9,7 @@
  */
 package org.opentcs.guing.components.dialogs;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,12 +18,14 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
+import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
+import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Benutzeroberfl‰che zur Bearbeitung eines Fahrauftrags.
+ * Benutzeroberfl√§che zur Bearbeitung eines Fahrauftrags.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -34,11 +37,11 @@ public class EditDriveOrderPanel
    */
   private final List<LocationModel> fLocations;
   /**
-   * Die ausgew‰hlte Station.
+   * Die ausgew√§hlte Station.
    */
-  private LocationModel fSelectedLocation;
+  private AbstractFigureComponent fSelectedLocation;
   /**
-   * Die ausgew‰hlte Aktion.
+   * Die ausgew√§hlte Aktion.
    */
   private String fSelectedAction;
 
@@ -61,7 +64,11 @@ public class EditDriveOrderPanel
    * @param action die Aktion
    */
   public EditDriveOrderPanel(List<LocationModel> locations,
-                             LocationModel location, String action) {
+                             AbstractFigureComponent location, String action) {
+    checkArgument(location instanceof PointModel || location instanceof LocationModel,
+                  String.format("Selected location has to be of type PointModel or "
+                      + "LocationModel and not %s.",
+                                location.getClass()));
     initComponents();
     fLocations = sortLocations(locations);
     fSelectedLocation = location;
@@ -115,9 +122,9 @@ public class EditDriveOrderPanel
   }
 
   /**
-   * Liefert die ausgew‰hlte Station.
+   * Liefert die ausgew√§hlte Station.
    *
-   * @return die ausgew‰hlte Station
+   * @return die ausgew√§hlte Station
    */
   public Optional<LocationModel> getSelectedLocation() {
     int index = locationComboBox.getSelectedIndex();
@@ -125,9 +132,9 @@ public class EditDriveOrderPanel
   }
 
   /**
-   * Liefert die ausgew‰hlte Aktion.
+   * Liefert die ausgew√§hlte Aktion.
    *
-   * @return die ausgew‰hlte Aktion
+   * @return die ausgew√§hlte Aktion
    */
   public Optional<String> getSelectedAction() {
     return Optional.ofNullable((String) actionComboBox.getSelectedItem());
@@ -199,10 +206,10 @@ public class EditDriveOrderPanel
 
   /**
    * Aktualisiert den Inhalt der ComboBox mit den Aktionen. Wird aufgerufen,
-   * wenn in der ComboBox mit den Stationen ein anderes Element ausgew‰hlt
+   * wenn in der ComboBox mit den Stationen ein anderes Element ausgew√§hlt
    * wurde.
    *
-   * @param evt das auslˆsende Ereignis
+   * @param evt das ausl√∂sende Ereignis
    */
     private void locationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboBoxActionPerformed
       DefaultComboBoxModel<String> model

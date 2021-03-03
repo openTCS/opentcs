@@ -10,17 +10,17 @@
 
 package org.opentcs.guing.components.properties.panel;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.AbstractQuantity;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Ein Panel, mit dem ein Zahlenwert und eine Ma�einheit editiert werden k�nnen.
+ * Ein Panel, mit dem ein Zahlenwert und eine Maï¿½einheit editiert werden kï¿½nnen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -32,7 +32,7 @@ public class QuantityEditorPanel
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(QuantityEditorPanel.class.getName());
+      = LoggerFactory.getLogger(QuantityEditorPanel.class);
   /**
    * Das Property, auf das der Panel zugreift.
    */
@@ -52,7 +52,7 @@ public class QuantityEditorPanel
 
   /**
    * Richtet die Dialogelemente entsprechend den Eigenschaftswerten ein. Diese
-   * Methode wird aufgerufen, wenn der Dialog ge�ffnet wird.
+   * Methode wird aufgerufen, wenn der Dialog geï¿½ffnet wird.
    */
   public void initFields() {
     unitComboBox.setSelectedItem(fProperty.getUnit());
@@ -83,7 +83,7 @@ public class QuantityEditorPanel
       // Don't parse String "<different values>"
     }
     catch (IllegalArgumentException e) {
-      log.log(Level.SEVERE, "Exception: ", e);
+      log.error("Exception", e);
     }
   }
 

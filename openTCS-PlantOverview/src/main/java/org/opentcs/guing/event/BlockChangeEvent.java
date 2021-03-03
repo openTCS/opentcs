@@ -19,14 +19,14 @@ import org.opentcs.guing.model.elements.BlockModel;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class BlockChangeEvent
-		extends EventObject {
+    extends EventObject {
 
-	/**
-	 * Creates a new instance of BlockElementChangeEvent.
+  /**
+   * Creates a new instance of BlockElementChangeEvent.
    * 
    * @param block The <code>BlockModel</code> that has changed.
-	 */
-	public BlockChangeEvent(BlockModel block) {
-		super(block);
-	}
+   */
+  public BlockChangeEvent(BlockModel block) {
+    super(block);
+  }
 }

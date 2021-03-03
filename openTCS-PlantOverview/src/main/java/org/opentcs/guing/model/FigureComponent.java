@@ -15,8 +15,8 @@ import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.model.elements.AbstractConnection;
 
 /**
- * Interface für solche ModelComponent-Klassen, die jeweils ein Figure als
- * grafische Repräsentation besitzen.
+ * Interface fÃ¼r solche ModelComponent-Klassen, die jeweils ein Figure als
+ * grafische ReprÃ¤sentation besitzen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

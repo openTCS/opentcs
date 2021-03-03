@@ -14,8 +14,6 @@ import com.google.inject.assistedinject.Assisted;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JCheckBox;
@@ -68,6 +66,8 @@ import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Zeigt die Attribute eines ModelComponent in einer Tabelle. Die
@@ -87,7 +87,7 @@ public class PropertiesTableContent
    * This class's logger.
    */
   private static final Logger logger
-      = Logger.getLogger(PropertiesTableContent.class.getName());
+      = LoggerFactory.getLogger(PropertiesTableContent.class);
   /**
    * A factory for cell editors.
    */
@@ -129,7 +129,7 @@ public class PropertiesTableContent
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
   }
 
-  @Override	// AbstractTableContent
+  @Override  // AbstractTableContent
   public void tableModelChanged() {
     if (!fEvaluateTableChanges) {
       return;
@@ -146,7 +146,7 @@ public class PropertiesTableContent
       setModel(fModel);
     }
     else {
-      // Pr�fen, ob Name g�ltig
+      // Prï¿½fen, ob Name gï¿½ltig
       if (fModel.getName().isEmpty()) {
         try {
           if (fUndoRedoManager.canUndo()) {
@@ -154,16 +154,16 @@ public class PropertiesTableContent
           }
         }
         catch (CannotUndoException ex) {
-          logger.log(Level.WARNING, "Exception trying to undo", ex);
+          logger.warn("Exception trying to undo", ex);
         }
       }
-      // 2013-11-04 HH: Alle �nderungen im Modell speichern, nicht nur den Namen!
+      // 2013-11-04 HH: Alle ï¿½nderungen im Modell speichern, nicht nur den Namen!
       fModel.propertiesChanged(this);
       eventBus.publish(new ResetInteractionToolCommand(this));
     }
   }
 
-  @Override	// AbstractAttributesContent
+  @Override  // AbstractAttributesContent
   public void setModel(ModelComponent model) {
     if (fModel != null) {
       fModel.removeAttributesChangeListener(this);
@@ -183,7 +183,7 @@ public class PropertiesTableContent
     setTableContent(fModel.getProperties());
   }
 
-  @Override	// AbstractAttributesContent
+  @Override  // AbstractAttributesContent
   public String getDescription() {
     if (fModel != null) {
       return fModel.getDescription();
@@ -192,7 +192,7 @@ public class PropertiesTableContent
     return "";
   }
 
-  @Override	// AbstractAttributesContent
+  @Override  // AbstractAttributesContent
   public void reset() {
     if (fModel != null) {
       fModel.removeAttributesChangeListener(this);
@@ -206,10 +206,10 @@ public class PropertiesTableContent
     setTableContent(new HashMap<String, Property>());
   }
 
-  @Override	// AttributesChangeListener
+  @Override  // AttributesChangeListener
   public void propertiesChanged(AttributesChangeEvent e) {
 //    if (e.getInitiator() == this) {
-//      // Setzt das SelectionTool zur�ck, wenn der Benutzer �nderungen
+//      // Setzt das SelectionTool zurï¿½ck, wenn der Benutzer ï¿½nderungen
 //      // an der Tabelle vorgenommen hat
 //      guiManager.resetSelectionTool();
 //    }
@@ -221,7 +221,7 @@ public class PropertiesTableContent
 //    }
   }
 
-  @Override	// ConnectionChangeListener
+  @Override  // ConnectionChangeListener
   public void connectionChanged(ConnectionChangeEvent e) {
     setTableContent(fModel.getProperties());
   }
@@ -236,14 +236,14 @@ public class PropertiesTableContent
 
   }
 
-  @Override	// AbstractTableContent
+  @Override  // AbstractTableContent
   protected void setTableCellRenderers() {
     fTable.setDefaultRenderer(Object.class, new StandardPropertyCellRenderer());
     fTable.setDefaultRenderer(BooleanProperty.class, new BooleanPropertyCellRenderer());
     fTable.setDefaultRenderer(ColorProperty.class, new ColorPropertyCellRenderer());
   }
 
-  @Override	// AbstractTableContent
+  @Override  // AbstractTableContent
   protected void setTableCellEditors() {
     // A dialog for entering values of complex properties
     DetailsDialog dialog;
@@ -346,7 +346,7 @@ public class PropertiesTableContent
     fTable.setDefaultEditor(ColorProperty.class, undoableEditor);
   }
 
-  @Override	// AbstractTableContent
+  @Override  // AbstractTableContent
   protected TableModel createTableModel(Map<String, Property> content) {
     AttributesTableModel model = tableModelProvider.get();
     ResourceBundleUtil r = ResourceBundleUtil.getBundle();

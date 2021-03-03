@@ -13,7 +13,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierung f¸r Attribute von ModelComponent-Objekten.
+ * Basisimplementierung f√ºr Attribute von ModelComponent-Objekten.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -21,11 +21,11 @@ public abstract class AbstractModelAttribute
     implements ModelAttribute {
 
   /**
-   * Das Model, zu dem dieses Attribut gehˆrt.
+   * Das Model, zu dem dieses Attribut geh√∂rt.
    */
   private ModelComponent fModel;
   /**
-   * Zeigt an, ob sich das Attribut ge‰ndert hat.
+   * Zeigt an, ob sich das Attribut ge√§ndert hat.
    */
   private ChangeState fChangeState = ChangeState.NOT_CHANGED;
   /**
@@ -42,11 +42,11 @@ public abstract class AbstractModelAttribute
    */
   private boolean fCollectiveEditable;
   /**
-   * Zeigt an, ob das Attribut im Modus "Modelling" ver‰ndert werden kann.
+   * Zeigt an, ob das Attribut im Modus "Modelling" ver√§ndert werden kann.
    */
   private boolean fModellingEditable = true;
   /**
-   * Zeigt an, ob das Attribut im Modus "Operating" ver‰ndert werden kann.
+   * Zeigt an, ob das Attribut im Modus "Operating" ver√§ndert werden kann.
    */
   private boolean fOperatingEditable;
 

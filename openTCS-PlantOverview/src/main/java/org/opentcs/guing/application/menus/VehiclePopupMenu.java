@@ -75,7 +75,14 @@ public class VehiclePopupMenu
     vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE, model);
     vehicleAction.setEnabled(model.isAvailableForOrder());
     add(vehicleAction);
+    vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY, model);
+    vehicleAction.setEnabled(model.isAvailableForOrder());
+    add(vehicleAction);
     add(actionFactory.createVehicleAction(VehicleAction.DISPATCH_VEHICLE, model));
+    
+    addSeparator();
+    
+    add(actionFactory.createVehicleAction(VehicleAction.RELEASE_VEHICLE, model));
   }
 
 }

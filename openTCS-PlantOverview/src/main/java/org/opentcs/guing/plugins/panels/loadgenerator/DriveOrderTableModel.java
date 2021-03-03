@@ -11,11 +11,11 @@ package org.opentcs.guing.plugins.panels.loadgenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A table model for drive orders.
@@ -29,7 +29,7 @@ class DriveOrderTableModel
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(DriveOrderTableModel.class.getName());
+      = LoggerFactory.getLogger(DriveOrderTableModel.class);
   /**
    * The column names.
    */
@@ -120,7 +120,7 @@ class DriveOrderTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.log(Level.WARNING, "Invalid columnIndex", exc);
+      log.warn("Invalid columnIndex", exc);
       return "FEHLER";
     }
   }

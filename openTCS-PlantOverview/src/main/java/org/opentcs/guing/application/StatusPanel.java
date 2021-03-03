@@ -15,9 +15,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Objects;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A panel at the bottom of the view, showing the mouse position and status.
@@ -31,7 +33,7 @@ public class StatusPanel
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(StatusPanel.class.getName());
+      = LoggerFactory.getLogger(StatusPanel.class);
   /**
    * A text field for status messages.
    */
@@ -90,12 +92,14 @@ public class StatusPanel
    */
   public void setLogMessage(Level level, String text) {
     if (level == Level.SEVERE) {
+      showOptionPane(text);
       textFieldStatus.setForeground(Color.magenta);
-      log.severe(text);
+      log.error(text);
     }
     else if (level == Level.WARNING) {
+      showOptionPane(text);
       textFieldStatus.setForeground(Color.red);
-      log.warning(text);
+      log.warn(text);
     }
     else if (level == Level.INFO) {
       textFieldStatus.setForeground(Color.blue);
@@ -117,5 +121,9 @@ public class StatusPanel
   public void setPositionText(String text) {
     Objects.requireNonNull(text, "text is null");
     textFieldPosition.setText(text);
+  }
+  
+  private void showOptionPane(String text) {
+    JOptionPane.showMessageDialog(this.getParent(), text, "", JOptionPane.ERROR_MESSAGE);
   }
 }

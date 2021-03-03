@@ -15,8 +15,6 @@ import java.awt.geom.Point2D;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -42,6 +40,8 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for points.
@@ -56,7 +56,7 @@ public class PointAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(PointAdapter.class.getName());
+      = LoggerFactory.getLogger(PointAdapter.class);
 
   /**
    * Creates a new instance.
@@ -75,7 +75,7 @@ public class PointAdapter
     return (PointModel) super.getModel();
   }
 
-  @Override	// OpenTCSProcessAdapter
+  @Override  // OpenTCSProcessAdapter
   public void updateModelProperties(Kernel kernel,
                                     TCSObject<?> tcsObject,
                                     @Nullable ModelLayoutElement layoutElement) {
@@ -107,11 +107,11 @@ public class PointAdapter
       updateMiscModelProperties(point);
     }
     catch (CredentialsException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
-  @Override	// OpenTCSProcessAdapter
+  @Override  // OpenTCSProcessAdapter
   public void updateProcessProperties(Kernel kernel) {
     Point point = kernel.createPoint();
     TCSObjectReference<Point> reference = point.getReference();
@@ -136,7 +136,7 @@ public class PointAdapter
       updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
@@ -283,7 +283,7 @@ public class PointAdapter
     layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_Y,
                          (int) offset.y + "");
     // TODO:
-//		layoutProperties.put(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, ...);
+//    layoutProperties.put(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, ...);
     layoutElement.setProperties(layoutProperties);
 
     Set<LayoutElement> layoutElements = layout.getLayoutElements();

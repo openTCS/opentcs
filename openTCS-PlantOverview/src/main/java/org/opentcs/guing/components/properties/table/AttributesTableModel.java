@@ -16,10 +16,10 @@ import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 
 /**
- * Ein Tabellenmodell (TableModel) für die PropertiesTable.
- * Es sorgt dafür, dass die Namen der Attribute (die erste Spalte) sowie
- * die Attributwerte, die in ihrer Methode isEditable() false zurückliefern,
- * nicht durch den Benutzer verändert werden können.
+ * Ein Tabellenmodell (TableModel) fÃ¼r die PropertiesTable.
+ * Es sorgt dafÃ¼r, dass die Namen der Attribute (die erste Spalte) sowie
+ * die Attributwerte, die in ihrer Methode isEditable() false zurÃ¼ckliefern,
+ * nicht durch den Benutzer verÃ¤ndert werden kÃ¶nnen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -42,8 +42,8 @@ public class AttributesTableModel
   }
 
   /**
-   * Gibt zurück, dass die Zellen der ersten Spalte nicht editierbar sind. Auch
-   * die Attributwerte (zweite Spalte) sind nur dann veränderbar, wenn
+   * Gibt zurÃ¼ck, dass die Zellen der ersten Spalte nicht editierbar sind. Auch
+   * die Attributwerte (zweite Spalte) sind nur dann verÃ¤nderbar, wenn
    * <code>isEditable() true</code> liefert.
    *
    * @param row
@@ -66,7 +66,7 @@ public class AttributesTableModel
     }
   }
 
-  @Override	// AbstractTableModel
+  @Override  // AbstractTableModel
   public void fireTableDataChanged() {
     super.fireTableDataChanged();
   }

@@ -8,38 +8,34 @@
  */
 package org.opentcs.kernel.controlcenter.vehicles;
 
+import static com.google.common.base.Preconditions.checkState;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.algorithms.KernelExtension;
-import org.opentcs.data.ObjectPropConstants;
+import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.BasicCommunicationAdapter;
-import org.opentcs.drivers.CommunicationAdapterFactory;
-import org.opentcs.drivers.CommunicationAdapterRegistry;
-import org.opentcs.drivers.SimCommunicationAdapter;
-import org.opentcs.drivers.VehicleManager;
-import org.opentcs.drivers.VehicleModel;
+import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.configuration.ConfigurationStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Frame containing all vehicles and detailed information.
@@ -48,35 +44,42 @@ import org.opentcs.util.configuration.ConfigurationStore;
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class DriverGUI
-    extends JPanel
-    implements KernelExtension {
+    extends ControlCenterPanel {
 
   /**
    * This class's Logger.
    */
-  private static final Logger log = Logger.getLogger(DriverGUI.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(DriverGUI.class);
   /**
    * This class's ConfigurationStore.
    */
-  private static final ConfigurationStore configStore =
-      ConfigurationStore.getStore(DriverGUI.class.getName());
+  private static final ConfigurationStore CONFIG_STORE
+      = ConfigurationStore.getStore(DriverGUI.class.getName());
   /**
    * This class's resource bundle.
    */
-  private final ResourceBundle bundle =
-      ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/vehicles/Bundle");
+  private final ResourceBundle bundle
+      = ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/vehicles/Bundle");
   /**
    * Proxy kernel to communicate with.
    */
   private final LocalKernel kernel;
   /**
-   * The list of vehicle models.
+   * The comm adapter registry.
    */
-  private final List<VehicleModel> vehicleModels = new LinkedList<>();
+  private final VehicleCommAdapterRegistry commAdapterRegistry;
+  /**
+   * Manages attachment of drivers with vehicles.
+   */
+  private final AttachmentManager attachManager;
+  /**
+   * The list of vehicle entries.
+   */
+  private final List<VehicleEntry> vehicleEntries = new LinkedList<>();
   /**
    * A flag indicating whether this KernelExtension has been plugged in already.
    */
-  private boolean pluggedIn;
+  private boolean initialized;
   /**
    * A flag indicating whether to attach adapters automatically on startup.
    */
@@ -87,308 +90,152 @@ public class DriverGUI
   private boolean autoEnableOnStartup;
 
   /**
-   * Creates a new DriverGUI.
-   * 
+   * Creates a new instance.
+   *
    * @param kernel The kernel.
+   * @param attachManager The attachment manager.
+   * @param commAdapterRegistry The comm adapter registry.
    */
-  public DriverGUI(LocalKernel kernel) {
-    if (kernel == null) {
-      throw new NullPointerException("kernel is null");
-    }
-    this.kernel = kernel;
+  @Inject
+  public DriverGUI(@Nonnull LocalKernel kernel,
+                   @Nonnull AttachmentManager attachManager,
+                   @Nonnull VehicleCommAdapterRegistry commAdapterRegistry) {
+    this.kernel = requireNonNull(kernel, "kernel");
+    this.attachManager = requireNonNull(attachManager, "attachManager");
+    this.commAdapterRegistry = requireNonNull(commAdapterRegistry, "commAdapterRegistry");
+
     initComponents();
 
     // Initialize detail panels.
-    vehicleDetailPanel.add(new DetailPanel(""));
+    vehicleDetailPanel.add(new DetailPanel());
 
     // Auto-attach vehicles (if we should)
-    autoAttachOnStartup = configStore.getBoolean("autoAttachOnStartup", false);
-    autoEnableOnStartup = configStore.getBoolean("autoEnableOnStartup", false);
+    autoAttachOnStartup = CONFIG_STORE.getBoolean("autoAttachOnStartup", false);
+    autoEnableOnStartup = CONFIG_STORE.getBoolean("autoEnableOnStartup", false);
   }
 
   @Override
-  public boolean isPluggedIn() {
-    return pluggedIn;
+  public boolean isInitialized() {
+    return initialized;
   }
 
   @Override
-  public void plugIn() {
-    if (pluggedIn) {
-      throw new IllegalStateException("Already plugged in.");
+  public void initialize() {
+    if (initialized) {
+      LOG.debug("Already initialized.");
+      return;
     }
 
     // Verify that the kernel is in a state in which controlling vehicles is
     // possible.
     Kernel.State kernelState = kernel.getState();
-    if (!Kernel.State.OPERATING.equals(kernelState)) {
-      throw new IllegalStateException("Cannot work in kernel state "
-          + kernelState.name());
-    }
+    checkState(Kernel.State.OPERATING.equals(kernelState),
+               "Cannot work in kernel state %s",
+               kernelState);
 
-    EventQueue.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // Initialize list of vehicles.
-        initVehicleModels();
-        VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-        for (VehicleModel curModel : vehicleModels) {
-          model.addData(curModel);
-          curModel.addObserver(model);
-        }
+    commAdapterRegistry.initialize();
 
-        if (model.getVehicleModels().isEmpty()) {
-          vehicleTable.getComponentPopupMenu().setEnabled(false);
-        }
-
-        initAdapterComboBoxes();
-        vehicleTable.setDragEnabled(true);
-
-        if (autoAttachOnStartup) {
-          autoAttachAll();
-          // Auto-enable vehicles (if we should)
-          if (autoEnableOnStartup) {
-            enableAll();
-          }
-        }
-        JFrame rootFrame = (JFrame) SwingUtilities.getRoot(DriverGUI.this);
-        if (rootFrame.getExtendedState() == JFrame.NORMAL) {
-          rootFrame.pack();
-        }
-      }
+    EventQueue.invokeLater(() -> {
+      initVehicleModels();
+      initVehicleList();
+      initAutoAttach();
     });
 
-    pluggedIn = true;
+    initialized = true;
   }
 
   @Override
-  public void plugOut() {
-    if (!pluggedIn) {
-      throw new IllegalStateException("Not plugged in.");
+  public void terminate() {
+    if (!initialized) {
+      LOG.debug("Not initialized.");
+      return;
     }
 
     // Detach all attached drivers to clean up.
     detachOnExit();
 
-    pluggedIn = false;
-  }
+    commAdapterRegistry.terminate();
 
-  /**
-   * Attaches an adapter to a vehicle.
-   * 
-   * @param vehicleModel The vehicleModel
-   * @param factory The factory that shall be assigned
-   */
-  private void attachAdapterToVehicle(VehicleModel vehicleModel,
-                                      CommunicationAdapterFactory factory) {
-    if (vehicleModel == null) {
-      return;
-    }
-    if (vehicleModel.hasCommunicationAdapter()) {
-      vehicleModel.getCommunicationAdapter().disable();
-      vehicleModel.removeCommunicationAdapter();
-      if (vehicleModel.hasVehicleManager()) {
-        try {
-          kernel.getVehicleManagerPool().detachVehicleManager(
-              vehicleModel.getName());
-        }
-        catch (IllegalArgumentException e) {
-          // Don't do anything. As vehicleModel.setVehicleManager(null);
-          // is not called an exception will be thrown here.
-        }
-        // Don't do this for now, though it would be correct. If we set the
-        // manager to null here, we cannot reset the vehicle's position any
-        // more.
-//          vehicleModel.setVehicleManager(null);
-      }
-    }
-    if (factory == null) {
-      return;
-    }
-
-    BasicCommunicationAdapter commAdapter;
-    VehicleManager vehicleManager;
-    if (vehicleModel.hasCommunicationFactory()) {
-      if (factory.getAdapterDescription().equals(
-          vehicleModel.getCommunicationFactory().getAdapterDescription())) {
-        return;
-      }
-    }
-    commAdapter = factory.getAdapterFor(vehicleModel.getVehicle());
-    if (commAdapter == null) {
-      return;
-    }
-
-    commAdapter.setVehicleModel(vehicleModel);
-    vehicleManager = kernel.getVehicleManagerPool().getVehicleManager(
-        vehicleModel.getName(), commAdapter);
-    vehicleModel.setVehicleManager(vehicleManager);
-    vehicleModel.setCommunicationAdapter(commAdapter);
-    vehicleModel.setCommunicationFactory(factory);
-    kernel.setTCSObjectProperty(vehicleModel.getVehicle().getReference(),
-                                Vehicle.PREFERRED_ADAPTER,
-                                factory.getClass().getName());
-
-    // Set initial vehicle position if related property is set
-    if (commAdapter instanceof SimCommunicationAdapter) {
-      SimCommunicationAdapter simCommAdapter;
-      simCommAdapter = (SimCommunicationAdapter) commAdapter;
-      Vehicle vehicle = vehicleModel.getVehicle();
-      String initialPos = vehicle.getProperties().get(
-          ObjectPropConstants.VEHICLE_INITIAL_POSITION);
-      if (initialPos != null) {
-        simCommAdapter.initVehiclePosition(initialPos);
-      }
-    }
+    initialized = false;
   }
 
   /**
    * Disables all adapters when exiting.
    */
   private void detachOnExit() {
-    log.info("Detaching communication adapters...");
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    List<VehicleModel> listModel = model.getVehicleModels();
-    for (int i = 0; i < listModel.size(); i++) {
-      VehicleModel vehicleModel = listModel.get(i);
-      if (vehicleModel.hasCommunicationAdapter()) {
-        vehicleModel.getCommunicationAdapter().disable();
-      }
+    LOG.info("Detaching vehicle communication adapters...");
+    for (VehicleEntry entry : vehicleEntries) {
+      attachManager.detachAdapterFromVehicle(entry, false);
     }
-    log.info("Detached communication adapters");
+    LOG.info("Detached vehicle communication adapters");
   }
 
   /**
    * Auto attaches adapters to every vehicle.
    */
   private void autoAttachAll() {
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    List<VehicleModel> listModel = model.getVehicleModels();
-    CommunicationAdapterRegistry reg = kernel.getCommAdapterRegistry();
-    for (int i = 0; i < listModel.size(); i++) {
-      VehicleModel vehicleModel = listModel.get(i);
-      if (!vehicleModel.hasCommunicationAdapter()) {
-        Vehicle veh = getUpdatedVehicle(vehicleModel.getVehicle());
-        String preferedAdapter = null;
-        if (veh != null) {
-          preferedAdapter = veh.getProperties().get(Vehicle.PREFERRED_ADAPTER);
-        }
-        boolean foundFactory = false;
-        if (preferedAdapter != null) {
-          for (CommunicationAdapterFactory factory : reg.getFactories()) {
-            if (preferedAdapter.equals(factory.getClass().getName())) {
-              attachAdapterToVehicle(vehicleModel, factory);
-              foundFactory = true;
-              break;
-            }
-          }
-          if (!foundFactory) {
-            log.info("Couldn't autoattach prefered adapter "
-                + preferedAdapter + " to " + vehicleModel.getName()
-                + ". Such an adapter doesn't exist.");
-          }
-        }
-        if (!foundFactory) {
-          List<CommunicationAdapterFactory> factories =
-              reg.findFactoriesFor(vehicleModel.getVehicle());
-          // Attach the first adapter that is available.
-          if (!factories.isEmpty()) {
-            attachAdapterToVehicle(vehicleModel, factories.get(0));
-          }
-        }
-      }
+    for (VehicleEntry entry : vehicleEntries) {
+      attachManager.autoAttachAdapterToVehicle(entry);
+    }
+  }
+
+  private void autoAttachSelected() {
+    for (int selectedRowIndex : vehicleTable.getSelectedRows()) {
+      attachManager.autoAttachAdapterToVehicle(vehicleEntries.get(selectedRowIndex));
     }
   }
 
   /**
-   * Returns an updated version of a vehicle.
-   * 
-   * @param oldVehicle The old vehicle.
-   * @return The updated vehicle.
+   * Enables an attached adapter for all vehicles in the list.
    */
-  private Vehicle getUpdatedVehicle(Vehicle oldVehicle) {
-    Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    vehicles.addAll(kernel.getTCSObjects(Vehicle.class));
-    for (Vehicle curVeh : vehicles) {
-      if (curVeh.getName().equals(oldVehicle.getName())) {
-        return curVeh;
-      }
-    }
-    return null;
+  private void enableCommAdaptersForAll() {
+    enableCommAdapters(vehicleEntries);
   }
 
   /**
-   * Enables an attached adapter for all
-   * vehicles in the gui list.
+   * Enables an attached adapter for all selected vehicles in the list.
    */
-  private void enableAll() {
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    List<VehicleModel> listModel = model.getVehicleModels();
-    for (int i = 0; i < listModel.size(); i++) {
-      VehicleModel vehicleModel = listModel.get(i);
-      if (vehicleModel.hasCommunicationAdapter()) {
-        if (!vehicleModel.getCommunicationAdapter().isEnabled()) {
-          vehicleModel.getCommunicationAdapter().enable();
-        }
-      }
+  private void enableCommAdaptersForSelection() {
+    List<VehicleEntry> selectedEntries = new LinkedList<>();
+    for (int selectedIndex : vehicleTable.getSelectedRows()) {
+      selectedEntries.add(vehicleEntries.get(selectedIndex));
     }
+
+    enableCommAdapters(selectedEntries);
+  }
+
+  private void enableCommAdapters(List<VehicleEntry> selectedEntries) {
+    selectedEntries.stream()
+        .map(entry -> entry.getCommAdapter())
+        .filter(adapter -> adapter != null)
+        .filter(adapter -> !adapter.isEnabled())
+        .forEach(adapter -> adapter.enable());
   }
 
   /**
-   * Enables an attached adapter for all
-   * selected vehicles in the gui list.
+   * Disables an attached adapter for all vehicles in the list.
    */
-  private void enableAllSelected() {
-    List<VehicleModel> selectedVehicleModels = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedVehicleModels.add(model.getDataAt(selectedTableValues[i]));
-    }
-
-    for (VehicleModel vehicleModel : selectedVehicleModels) {
-      if (vehicleModel.hasCommunicationAdapter()) {
-        if (!vehicleModel.getCommunicationAdapter().isEnabled()) {
-          vehicleModel.getCommunicationAdapter().enable();
-        }
-      }
-    }
+  private void disableCommAdaptersForAll() {
+    disableCommAdapters(vehicleEntries);
   }
 
   /**
-   * Disables an attached adapter for all
-   * vehicles in the gui list.
+   * Disables an attached adapter for all selected vehicles in the list.
    */
-  private void disableAll() {
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    List<VehicleModel> listModel = model.getVehicleModels();
-    for (int i = 0; i < listModel.size(); i++) {
-      VehicleModel vehicleModel = listModel.get(i);
-      if (vehicleModel.hasCommunicationAdapter()) {
-        if (vehicleModel.getCommunicationAdapter().isEnabled()) {
-          vehicleModel.getCommunicationAdapter().disable();
-        }
-      }
+  private void disableCommAdaptersForSelection() {
+    List<VehicleEntry> selectedEntries = new LinkedList<>();
+    for (int selectedIndex : vehicleTable.getSelectedRows()) {
+      selectedEntries.add(vehicleEntries.get(selectedIndex));
     }
+
+    disableCommAdapters(selectedEntries);
   }
 
-  /**
-   * Disables an attached adapter for all
-   * selected vehicles in the gui list.
-   */
-  private void disableAllSelected() {
-    List<VehicleModel> selectedVehicleModels = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedVehicleModels.add(model.getDataAt(selectedTableValues[i]));
-    }
-    for (VehicleModel vehicleModel : selectedVehicleModels) {
-      if (vehicleModel.hasCommunicationAdapter()) {
-        if (vehicleModel.getCommunicationAdapter().isEnabled()) {
-          vehicleModel.getCommunicationAdapter().disable();
-        }
-      }
-    }
+  private void disableCommAdapters(List<VehicleEntry> selectedEntries) {
+    selectedEntries.stream()
+        .filter(entry -> entry.getCommAdapter() != null)
+        .filter(entry -> entry.getCommAdapter().isEnabled())
+        .forEach(entry -> entry.getCommAdapter().disable());
   }
 
   /**
@@ -396,144 +243,145 @@ public class DriverGUI
    */
   private void initAdapterComboBoxes() {
     SingleCellEditor adapterCellEditor = new SingleCellEditor(vehicleTable);
-    final SingleCellEditor pointsCellEditor = new SingleCellEditor(vehicleTable);
+    SingleCellEditor pointsCellEditor = new SingleCellEditor(vehicleTable);
 
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    List<VehicleModel> vehicles = model.getVehicleModels();
-
-    for (int i = 0; i < vehicles.size(); i++) {
-      VehicleModel currentVehicle = vehicles.get(i);
-      List<CommunicationAdapterFactory> factories = new LinkedList<>();
-      factories.add(null);
-      factories.addAll(kernel.getCommAdapterRegistry().findFactoriesFor(currentVehicle.getVehicle()));
-
-      final WideComboBox<CommunicationAdapterFactory> comboBox =
-          new WideComboBox<>();
-      for (CommunicationAdapterFactory currentFactory : factories) {
-        comboBox.addItem(currentFactory);
-      }
-      comboBox.setSelectedIndex(0);
-      currentVehicle.addObserver(comboBox);
-      comboBox.setRenderer(new AdapterFactoryCellRenderer());
-
-      comboBox.addItemListener(new java.awt.event.ItemListener() {
-        @Override
-        public void itemStateChanged(java.awt.event.ItemEvent evt) {
-          CommunicationAdapterFactory factory = (CommunicationAdapterFactory) comboBox.getSelectedItem();
-          VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-          final VehicleModel selectedVehicle = model.getDataAt(vehicleTable.getSelectedRow());
-          attachAdapterToVehicle(selectedVehicle, factory);
-        }
-      });
-      initPointsComboBox(i, pointsCellEditor);
-      adapterCellEditor.setEditorAt(i, new DefaultCellEditor(comboBox));
+    for (int rowIndex = 0; rowIndex < vehicleEntries.size(); rowIndex++) {
+      initCommAdaptersComboBox(rowIndex, adapterCellEditor);
+      initPointsComboBox(rowIndex, pointsCellEditor);
     }
 
     vehicleTable.getColumn("Adapter").setCellEditor(adapterCellEditor);
     vehicleTable.getColumn("Position").setCellEditor(pointsCellEditor);
   }
 
-  /**
-   * If a loopback adapter was chosen this method initializes the combo boxes
-   * with positions the user can set the vehicle to.
-   *
-   * @param i An index indicating which row this combo box belongs to
-   * @param pointsCellEditor The <code>SingleCellEditor</code> containing
-   * the combo boxes.
-   */
-  private void initPointsComboBox(int i, SingleCellEditor pointsCellEditor) {
-    Set<Point> points = new TreeSet<>(Comparators.objectsByName());
-    points.addAll(kernel.getTCSObjects(Point.class));
-    final JComboBox<Point> pointComboBox = new JComboBox<>();
+  private void initCommAdaptersComboBox(int rowIndex, SingleCellEditor adapterCellEditor) {
+    VehicleEntry currentEntry = vehicleEntries.get(rowIndex);
 
-    for (Point currentPoint : points) {
-      pointComboBox.addItem(currentPoint);
-    }
-    pointComboBox.setSelectedIndex(-1);
+    final CommAdapterComboBox<VehicleCommAdapterFactory> comboBox = new CommAdapterComboBox<>();
+    comboBox.addItem(null);
+    commAdapterRegistry.findFactoriesFor(currentEntry.getVehicle())
+        .forEach(factory -> comboBox.addItem(factory));
+    comboBox.setSelectedIndex(0);
+    currentEntry.addPropertyChangeListener(comboBox);
+    comboBox.setRenderer(new AdapterFactoryCellRenderer());
 
-    pointComboBox.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        Point newPoint = (Point) e.getItem();
-        VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-        VehicleModel vehicle = model.getDataAt(vehicleTable.getSelectedRow());
-        if (vehicle.getCommunicationAdapter() instanceof SimCommunicationAdapter) {
-          SimCommunicationAdapter adapter =
-              (SimCommunicationAdapter) vehicle.getCommunicationAdapter();
-          adapter.initVehiclePosition(newPoint.getName());
+    comboBox.addActionListener((ActionEvent evt) -> {
+      // XXX We currently have to check if any row is selected because this action listener can be
+      // triggered be the "auto-attach all" function, too, which would cause an exception in
+      // vehicleTable.getSelectedRow().
+      // Since this effectively detaches a newly-created comm adapter and then attaches a new one of
+      // the same type, a better solution should be found.
+      if (vehicleTable.getSelectedRowCount() > 0) {
+        VehicleCommAdapterFactory factory = (VehicleCommAdapterFactory) comboBox.getSelectedItem();
+        if (factory == null) {
+          // If the user has selected the empty entry from the combo box, just detach any comm
+          // adapter from the vehicle.
+          attachManager.detachAdapterFromVehicle(currentEntry, true);
         }
         else {
-          log.warning("Communication adapter of vehicle " + vehicle.getName()
-              + " does not implement SimCommunicationAdapter.");
+          // If the user has actually selected a new adapter to be attached, do it.
+          attachManager.attachAdapterToVehicle(vehicleEntries.get(vehicleTable.getSelectedRow()),
+                                               factory);
         }
       }
     });
-    pointsCellEditor.setEditorAt(i, new DefaultCellEditor(pointComboBox));
+    adapterCellEditor.setEditorAt(rowIndex, new DefaultCellEditor(comboBox));
+  }
+
+  /**
+   * If a loopback adapter was chosen, this method initializes the combo boxes
+   * with positions the user can set the vehicle to.
+   *
+   * @param rowIndex An index indicating which row this combo box belongs to
+   * @param pointsCellEditor The <code>SingleCellEditor</code> containing
+   * the combo boxes.
+   */
+  private void initPointsComboBox(int rowIndex, SingleCellEditor pointsCellEditor) {
+    final JComboBox<Point> pointComboBox = new JComboBox<>();
+
+    kernel.getTCSObjects(Point.class).stream()
+        .sorted(Comparators.objectsByName())
+        .forEach(point -> pointComboBox.addItem(point));
+    pointComboBox.setSelectedIndex(-1);
+
+    pointComboBox.addItemListener((ItemEvent e) -> {
+      Point newPoint = (Point) e.getItem();
+      VehicleEntry entry = vehicleEntries.get(vehicleTable.getSelectedRow());
+      if (entry.getCommAdapter() instanceof SimVehicleCommAdapter) {
+        SimVehicleCommAdapter adapter = (SimVehicleCommAdapter) entry.getCommAdapter();
+        adapter.initVehiclePosition(newPoint.getName());
+      }
+      else {
+        LOG.debug("Vehicle {}: Not a simulation adapter -> not setting initial position.",
+                  entry.getVehicle().getName());
+      }
+    });
+    pointsCellEditor.setEditorAt(rowIndex, new DefaultCellEditor(pointComboBox));
   }
 
   /**
    * Enables or disables auto attaching adapters on startup.
-   * 
+   *
    * @param autoAttachOnStartup <code>true</code> to enable, <code>false</code>
    * to disable
    */
   private void setAutoAttachOnStartup(boolean autoAttachOnStartup) {
     this.autoAttachOnStartup = autoAttachOnStartup;
-    configStore.setBoolean("autoAttachOnStartup", autoAttachOnStartup);
+    CONFIG_STORE.setBoolean("autoAttachOnStartup", autoAttachOnStartup);
   }
 
   /**
    * Enables or disables auto enabling adapters on startup.
-   * 
+   *
    * @param autoEnableOnStartup <code>true</code> to enable, <code>false</code>
    * to disable
    */
   private void setAutoEnableOnStartup(boolean autoEnableOnStartup) {
     this.autoEnableOnStartup = autoEnableOnStartup;
-    configStore.setBoolean("autoEnableOnStartup", autoEnableOnStartup);
+    CONFIG_STORE.setBoolean("autoEnableOnStartup", autoEnableOnStartup);
   }
 
   /**
    * Resets selected vehicles' positions to null.
    */
   private void resetSelectedVehiclePositions() {
-    List<VehicleModel> selectedVehicleModels = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedVehicleModels.add(model.getDataAt(selectedTableValues[i]));
-    }
-    for (VehicleModel vehicleModel : selectedVehicleModels) {
-      // If the vehicle has a communication adapter and it's disabled, reset the
-      // position with it.
-      if (vehicleModel.hasCommunicationAdapter()) {
-        vehicleModel.getCommunicationAdapter().setVehiclePosition(null);
-      }
-      // If the vehicle doesn't have a communication adapter, reset the position
-      // directly with the vehicle manager.
-      else if (vehicleModel.hasVehicleManager()) {
-        vehicleModel.getVehicleManager().setVehiclePosition(null);
-      }
-      else {
-        log.warning("Cannot reset position without comm adapter or manager");
-      }
+    for (int selectedRowIndex : vehicleTable.getSelectedRows()) {
+      vehicleEntries.get(selectedRowIndex).getProcessModel().setVehiclePosition(null);
     }
   }
 
-  /**
-   * Initializes all available vehicle models.
-   */
   private void initVehicleModels() {
-    vehicleModels.clear();
-    Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    vehicles.addAll(kernel.getTCSObjects(Vehicle.class));
-    for (Vehicle i : vehicles) {
-      vehicleModels.add(new VehicleModel(i));
+    vehicleEntries.clear();
+    kernel.getTCSObjects(Vehicle.class).stream()
+        .sorted(Comparators.objectsByName())
+        .forEach(vehicle -> vehicleEntries.add(new VehicleEntry(vehicle)));
+  }
+
+  private void initVehicleList() {
+    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
+    for (VehicleEntry curEntry : vehicleEntries) {
+      model.addData(curEntry);
+      curEntry.addPropertyChangeListener(model);
+    }
+
+    vehicleTable.getComponentPopupMenu().setEnabled(!model.getVehicleEntries().isEmpty());
+
+    initAdapterComboBoxes();
+  }
+
+  private void initAutoAttach() {
+    if (autoAttachOnStartup) {
+      autoAttachAll();
+      // Auto-enable vehicles (if we should)
+      if (autoEnableOnStartup) {
+        enableCommAdaptersForAll();
+      }
     }
   }
 
   // CHECKSTYLE:OFF
-  /** This method is called from within the constructor to
+  /**
+   * This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
    * always regenerated by the Form Editor.
@@ -735,26 +583,22 @@ public class DriverGUI
   }// </editor-fold>//GEN-END:initComponents
 
   private void driverMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_driverMenuMenuSelected
-    List<VehicleModel> selectedVehicleModels = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedVehicleModels.add(model.getDataAt(selectedTableValues[i]));
+    List<VehicleEntry> selectedEntries = new LinkedList<>();
+    for (int selectedRowIndex : vehicleTable.getSelectedRows()) {
+      selectedEntries.add(vehicleEntries.get(selectedRowIndex));
     }
     driverMenu.removeAll();
-    CommunicationAdapterRegistry reg = kernel.getCommAdapterRegistry();
-    List<CommunicationAdapterFactory> factories = reg.getFactories();
-    for (CommunicationAdapterFactory factory : factories) {
+    for (VehicleCommAdapterFactory factory : commAdapterRegistry.getFactories()) {
       boolean enabled = true;
-      List<VehicleModel> vehiclesToAttach = new LinkedList<>();
-      for (VehicleModel selectedVehicleModel : selectedVehicleModels) {
-        if (!factory.providesAdapterFor(selectedVehicleModel.getVehicle())) {
+      List<VehicleEntry> vehiclesToAttach = new LinkedList<>();
+      for (VehicleEntry selectedEntry : selectedEntries) {
+        if (!factory.providesAdapterFor(selectedEntry.getVehicle())) {
           enabled = false;
           vehiclesToAttach.clear();
           break;
         }
-        else if (selectedVehicleModel.getCommunicationAdapter() == null) {
-          vehiclesToAttach.add(selectedVehicleModel);
+        else if (selectedEntry.getCommAdapter() == null) {
+          vehiclesToAttach.add(selectedEntry);
         }
       }
       Action action = new AttachCommAdapterAction(factory.getAdapterDescription(),
@@ -770,120 +614,35 @@ public class DriverGUI
   }//GEN-LAST:event_autoAttachAllMenuItemActionPerformed
 
   private void autoAttachSelectedMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAttachSelectedMenuItemActionPerformed
-    List<VehicleModel> selectedValues = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedValues.add(model.getDataAt(selectedTableValues[i]));
-    }
-
-    CommunicationAdapterRegistry reg = kernel.getCommAdapterRegistry();
-    for (VehicleModel vehicleModel : selectedValues) {
-      if (!vehicleModel.hasCommunicationAdapter()) {
-        Vehicle veh = getUpdatedVehicle(vehicleModel.getVehicle());
-        String preferedAdapter = null;
-        if (veh != null) {
-          preferedAdapter = veh.getProperties().get(Vehicle.PREFERRED_ADAPTER);
-        }
-        boolean foundFactory = false;
-        if (preferedAdapter != null) {
-          for (CommunicationAdapterFactory factory : reg.getFactories()) {
-            if (preferedAdapter.equals(factory.getClass().getName())) {
-              attachAdapterToVehicle(vehicleModel, factory);
-              foundFactory = true;
-              model.update(vehicleModel, null);
-              break;
-            }
-          }
-          if (!foundFactory) {
-            log.info("Couldn't autoattach prefered adapter "
-                + preferedAdapter + " to " + vehicleModel.getName()
-                + ". Such an adapter doesn't exist.");
-          }
-        }
-        if (!foundFactory) {
-          List<CommunicationAdapterFactory> factories =
-              reg.findFactoriesFor(vehicleModel.getVehicle());
-          // Attach the first adapter that is available.
-          if (!factories.isEmpty()) {
-            attachAdapterToVehicle(vehicleModel, factories.get(0));
-          }
-        }
-      }
-    }
+    autoAttachSelected();
   }//GEN-LAST:event_autoAttachSelectedMenuItemActionPerformed
 
   private void detachAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detachAllMenuItemActionPerformed
-    log.finer("method entry");
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    List<VehicleModel> listModel = model.getVehicleModels();
-    for (int i = 0; i < listModel.size(); i++) {
-      VehicleModel vehicleModel = listModel.get(i);
-      if (vehicleModel.hasCommunicationAdapter()) {
-        vehicleModel.getCommunicationAdapter().disable();
-        vehicleModel.removeCommunicationAdapter();
-      }
-      if (vehicleModel.hasVehicleManager()) {
-        try {
-          kernel.getVehicleManagerPool().detachVehicleManager(
-              vehicleModel.getName());
-        }
-        catch (IllegalArgumentException e) {
-          // Don't do anything. As vehicleModel.setVehicleManager(null);
-          // is not called an exception will be thrown here.
-        }
-        // Don't do this for now, though it would be correct. If we set the
-        // manager to null here, we cannot reset the vehicle's position any
-        // more.
-//          vehicleModel.setVehicleManager(null);
-      }
+    for (VehicleEntry entry : vehicleEntries) {
+      attachManager.detachAdapterFromVehicle(entry, true);
     }
-    log.fine("method exit");
   }//GEN-LAST:event_detachAllMenuItemActionPerformed
 
   private void detachAllSelectedMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detachAllSelectedMenuItemActionPerformed
-    List<VehicleModel> selectedVehicleModels = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedVehicleModels.add(model.getDataAt(selectedTableValues[i]));
-    }
-    for (VehicleModel vehicleModel : selectedVehicleModels) {
-      if (vehicleModel.hasCommunicationAdapter()) {
-        vehicleModel.getCommunicationAdapter().disable();
-        vehicleModel.removeCommunicationAdapter();
-      }
-      if (vehicleModel.hasVehicleManager()) {
-        try {
-          kernel.getVehicleManagerPool().detachVehicleManager(
-              vehicleModel.getName());
-        }
-        catch (IllegalArgumentException e) {
-          // Don't do anything. As vehicleModel.setVehicleManager(null);
-          // is not called an exception will be thrown here.
-        }
-        // Don't do this for now, though it would be correct. If we set the
-        // manager to null here, we cannot reset the vehicle's position any
-        // more.
-//          vehicleModel.setVehicleManager(null);
-      }
+    for (int selectedRowIndex : vehicleTable.getSelectedRows()) {
+      attachManager.detachAdapterFromVehicle(vehicleEntries.get(selectedRowIndex), true);
     }
   }//GEN-LAST:event_detachAllSelectedMenuItemActionPerformed
 
   private void enableAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableAllMenuItemActionPerformed
-    enableAll();
+    enableCommAdaptersForAll();
   }//GEN-LAST:event_enableAllMenuItemActionPerformed
 
   private void enableAllSelectedMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableAllSelectedMenuItemActionPerformed
-    enableAllSelected();
+    enableCommAdaptersForSelection();
   }//GEN-LAST:event_enableAllSelectedMenuItemActionPerformed
 
   private void disableAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableAllMenuItemActionPerformed
-    disableAll();
+    disableCommAdaptersForAll();
   }//GEN-LAST:event_disableAllMenuItemActionPerformed
 
   private void disableAllSelectedMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableAllSelectedMenuItemActionPerformed
-    disableAllSelected();
+    disableCommAdaptersForSelection();
   }//GEN-LAST:event_disableAllSelectedMenuItemActionPerformed
 
   private void resetVehiclePositionMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetVehiclePositionMenuItemActionPerformed
@@ -911,13 +670,14 @@ public class DriverGUI
     int disabledCount = 0;
     boolean resetAll = false;
     // Find out how many vehicles (don't) have a driver attached.
-    for (VehicleModel vehicleModel : vehicleModels) {
-      if (vehicleModel.getCommunicationAdapter() == null) {
+    for (VehicleEntry entry : vehicleEntries) {
+      VehicleCommAdapter commAdapter = entry.getCommAdapter();
+      if (commAdapter == null) {
         detachedCount++;
       }
       else {
         attachedCount++;
-        if (vehicleModel.getCommunicationAdapter().isEnabled()) {
+        if (commAdapter.isEnabled()) {
           enabledCount++;
         }
         else {
@@ -934,19 +694,18 @@ public class DriverGUI
     detachedCount = 0;
     enabledCount = 0;
     disabledCount = 0;
-    List<VehicleModel> selectedVehicleModels = new LinkedList<>();
-    int[] selectedTableValues = vehicleTable.getSelectedRows();
-    VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-    for (int i = 0; i < selectedTableValues.length; i++) {
-      selectedVehicleModels.add(model.getDataAt(selectedTableValues[i]));
+    List<VehicleEntry> selectedEntries = new LinkedList<>();
+    for (int selectedRowIndex : vehicleTable.getSelectedRows()) {
+      selectedEntries.add(vehicleEntries.get(selectedRowIndex));
     }
-    for (VehicleModel vehicleModel : selectedVehicleModels) {
-      if (!vehicleModel.hasCommunicationAdapter()) {
+    for (VehicleEntry entry : selectedEntries) {
+      VehicleCommAdapter commAdapter = entry.getCommAdapter();
+      if (commAdapter == null) {
         detachedCount++;
       }
       else {
         attachedCount++;
-        if (vehicleModel.getCommunicationAdapter().isEnabled()) {
+        if (commAdapter.isEnabled()) {
           enabledCount++;
         }
         else {
@@ -954,9 +713,10 @@ public class DriverGUI
         }
       }
     }
-    for (VehicleModel vehicleModel : selectedVehicleModels) {
-      if (vehicleModel.hasCommunicationAdapter()) {
-        if (vehicleModel.getCommunicationAdapter().isEnabled()) {
+    for (VehicleEntry entry : selectedEntries) {
+      VehicleCommAdapter commAdapter = entry.getCommAdapter();
+      if (commAdapter != null) {
+        if (commAdapter.isEnabled()) {
           resetAll = false;
           break;
         }
@@ -980,9 +740,9 @@ public class DriverGUI
       int index = vehicleTable.getSelectedRow();
       if (index >= 0) {
         VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
-        VehicleModel clickedModel = model.getDataAt(index);
+        VehicleEntry clickedEntry = model.getDataAt(index);
         DetailPanel detailPanel = (DetailPanel) vehicleDetailPanel.getComponent(0);
-        detailPanel.attachToVehicle(clickedModel);
+        detailPanel.attachToVehicle(clickedEntry);
       }
     }
   }//GEN-LAST:event_vehicleTableMouseClicked
@@ -1016,41 +776,39 @@ public class DriverGUI
   // CHECKSTYLE:ON
 
   /**
-   * Attaches an adapter to a vehicle when performed.
+   * Attaches adapters produced by a given factory to a set of vehicles when performed.
    */
-  private final class AttachCommAdapterAction
+  private class AttachCommAdapterAction
       extends AbstractAction {
 
     /**
-     * The vehicle's model.
+     * The affected vehicles' entries.
      */
-    private final List<VehicleModel> vehicleModelList;
+    private final List<VehicleEntry> vehicleEntries;
     /**
      * The factory providing the communication adapter.
      */
-    private final CommunicationAdapterFactory factory;
+    private final VehicleCommAdapterFactory factory;
 
     /**
      * Creates a new AttachCommAdapterAction.
      *
      * @param description A string describing the factory.
-     * @param vehicleModelList The vehicle's model list.
+     * @param vehicleEntries The affected vehicles' entries.
      * @param factory The factory providing the communication adapter.
      */
     private AttachCommAdapterAction(String description,
-                                    List<VehicleModel> vehicleModelList,
-                                    CommunicationAdapterFactory factory) {
+                                    List<VehicleEntry> vehicleEntries,
+                                    VehicleCommAdapterFactory factory) {
       super(description);
-      assert vehicleModelList != null;
-      assert factory != null;
-      this.vehicleModelList = vehicleModelList;
-      this.factory = factory;
+      this.vehicleEntries = requireNonNull(vehicleEntries, "vehicleEntries");
+      this.factory = requireNonNull(factory, "factory");
     }
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-      for (VehicleModel vehicleModel : vehicleModelList) {
-        attachAdapterToVehicle(vehicleModel, factory);
+      for (VehicleEntry entry : vehicleEntries) {
+        attachManager.attachAdapterToVehicle(entry, factory);
       }
     }
   }

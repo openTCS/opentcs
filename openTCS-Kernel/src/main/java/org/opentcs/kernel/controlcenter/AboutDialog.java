@@ -50,6 +50,8 @@ public class AboutDialog
     opentcsLbl = new javax.swing.JLabel();
     versionLbl = new javax.swing.JLabel();
     versionTxtLbl = new javax.swing.JLabel();
+    customVersionLbl = new javax.swing.JLabel();
+    customVersionTxtLbl = new javax.swing.JLabel();
     homepageLbl = new javax.swing.JLabel();
     homepageTxtLbl = new javax.swing.JLabel();
     emailLbl = new javax.swing.JLabel();
@@ -120,14 +122,14 @@ public class AboutDialog
     gridBagConstraints.insets = new java.awt.Insets(6, 0, 0, 0);
     opentcsContactPanel.add(opentcsLbl, gridBagConstraints);
 
-    versionLbl.setText(bundle.getString("Version")); // NOI18N
+    versionLbl.setText(bundle.getString("BaselineVersion")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     opentcsContactPanel.add(versionLbl, gridBagConstraints);
 
-    versionTxtLbl.setText(Environment.getVersionString());
+    versionTxtLbl.setText(Environment.getBaselineVersion());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -135,17 +137,32 @@ public class AboutDialog
     gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
     opentcsContactPanel.add(versionTxtLbl, gridBagConstraints);
 
-    homepageLbl.setText(bundle.getString("HomePage")); // NOI18N
+    customVersionLbl.setText(bundle.getString("CustomVersion")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    opentcsContactPanel.add(customVersionLbl, gridBagConstraints);
+
+    customVersionTxtLbl.setText(Environment.getCustomizationName() + " " + Environment.getCustomizationVersion());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+    opentcsContactPanel.add(customVersionTxtLbl, gridBagConstraints);
+
+    homepageLbl.setText(bundle.getString("HomePage")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     opentcsContactPanel.add(homepageLbl, gridBagConstraints);
 
     homepageTxtLbl.setText("http://www.opentcs.org/");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
     opentcsContactPanel.add(homepageTxtLbl, gridBagConstraints);
@@ -153,14 +170,14 @@ public class AboutDialog
     emailLbl.setText(bundle.getString("Email")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     opentcsContactPanel.add(emailLbl, gridBagConstraints);
 
     emailTxtLbl.setText("info@opentcs.org");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
     opentcsContactPanel.add(emailTxtLbl, gridBagConstraints);
@@ -303,6 +320,8 @@ public class AboutDialog
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton closeButton;
   private javax.swing.JPanel contactPanel;
+  private javax.swing.JLabel customVersionLbl;
+  private javax.swing.JLabel customVersionTxtLbl;
   private javax.swing.JLabel emailIfakLbl;
   private javax.swing.JLabel emailIfakTxtLbl;
   private javax.swing.JLabel emailImlLbl;

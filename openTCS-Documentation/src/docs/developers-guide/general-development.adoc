@@ -1,0 +1,98 @@
+
+== Development with openTCS in general
+
+=== System requirements
+
+The openTCS source code is written in Java.
+To compile it, you need a Java Development Kit (JDK) 1.8 or later.
+To run the resulting binaries, you need a Java Runtime Environment (JRE) 1.8 or later.
+All other required libraries are included in the openTCS distribution or will be downloaded automatically when building it from source code.
+
+=== Available artifacts and API compatibility
+
+The openTCS project publishes artifacts for releases via link:https://bintray.com/bintray/jcenter[JCenter], so you can easily integrate them with build systems such as Gradle or Maven.
+In Gradle build scripts, for example, use something like the following to integrate an openTCS library:
+
+[source, groovy, subs="attributes"]
+----
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile group: 'org.opentcs', name: '${ARTIFACT}', version: '{project-version}'
+}
+----
+
+Set the version number of the openTCS release you actually want to work with, and select the appropriate `${ARTIFACT}` name from the following table:
+
+[cols="1,1,2", options="header"]
+.Artifacts published by the openTCS project
+|===
+
+|Artifact name |API compatibility between minor releases |Content
+
+|`opentcs-api-base`
+|Yes
+|Contains the base API for clients and extensions.
+This is what most developer's probably want to use.
+
+|`opentcs-api-injection`
+|Yes
+|Contains API interfaces and classes used for dependency injection within the kernel and plant overview applications.
+This is required in integration projects customizing these applications, e.g. adding components like vehicle driver implementations.
+
+|`opentcs-common`
+|No
+|Contains a collection of utility classes used by openTCS components.
+
+|`opentcs-commadapter-loopback`
+|No
+|Contains a very basic vehicle driver simulating a virtual vehicle.
+
+|`opentcs-strategies-default`
+|No
+|Contains the default implementations of strategies that are used by the kernel application.
+
+|`opentcs-kernel`
+|No
+|Contains the kernel application.
+
+|`opentcs-plantoverview`
+|No
+|Contains the plant overview application.
+
+|===
+
+Note that only the basic API libraries provide a documented API that the openTCS developers try to keep compatible between releases.
+All other artifacts' contents can and will change regardless of any compatibility concerns, so if you use these and switch to a different version of openTCS, you may have to adjust and recompile your code.
+
+=== Modularity and extensibility
+
+The openTCS project heavily relies on link:https://github.com/google/guice[Guice] for dependency injection and wiring of components as well as for providing plugin-like extension mechanisms.
+In the injection API, relevant classes can be found in the package `org.opentcs.customizations`.
+For examples, see <<Customizing and extending the kernel application>> and <<Customizing and extending the plant overview application>>.
+
+=== Logging
+
+The code in the official openTCS distribution uses http://www.slf4j.org/[SLF4J] for logging.
+Thus, the actual logging implementation is easily interchangeable by replacing the SLF4J binding in the respective application's classpath.
+The kernel and plant overview client applications come with SLF4J's bindings for `java.util.logging` by default.
+For more information on how to change the actual logging implementation, e.g. to use log4j, please see the SLF4J documentation.
+
+=== Working with the openTCS source code
+
+The openTCS project itself uses link:https://gradle.org/[Gradle] as its build management tool.
+To build openTCS from source code, just run `gradlew build` from the source distribution's main directory.
+For details on how to work with Gradle, please see link:https://docs.gradle.org/[its documentation].
+
+These are the main Gradle tasks of the root project you need to know to get started:
+
+* `build`: Compiles the source code of all subprojects.
+* `release`: Builds and packages all system components to a distribution in `build/`.
+* `clean`: Cleans up everything produced by the other tasks.
+
+To work with the source code in your IDE, see the IDE's documentation for Gradle integration.
+
+In case you use NetBeans, install the link:http://plugins.netbeans.org/plugin/44510/gradle-support[Gradle Support] plugin from the NetBeans plugin portal.
+You should then be able to open the source distribution's root directory as a Gradle project and compile and run the components from within NetBeans.

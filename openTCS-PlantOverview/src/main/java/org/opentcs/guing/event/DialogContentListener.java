@@ -17,17 +17,17 @@ package org.opentcs.guing.event;
  */
 public interface DialogContentListener {
 
-	/**
+  /**
    * Message of the content that it needs repainting.
-	 *
-	 * @param evt The fired event.
-	 */
-	void requestLayoutUpdate(DialogContentEvent evt);
+   *
+   * @param evt The fired event.
+   */
+  void requestLayoutUpdate(DialogContentEvent evt);
 
-	/**
-	 * Message of the content that it is ready to be closed.
-	 *
-	 * @param evt The fired event.
-	 */
-	void requestClose(DialogContentEvent evt);
+  /**
+   * Message of the content that it is ready to be closed.
+   *
+   * @param evt The fired event.
+   */
+  void requestClose(DialogContentEvent evt);
 }

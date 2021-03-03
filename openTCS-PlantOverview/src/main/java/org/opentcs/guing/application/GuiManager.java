@@ -14,8 +14,7 @@ import org.opentcs.guing.model.FiguresFolder;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Provides some central services for various parts of the plant overview
- * application.
+ * Provides some central services for various parts of the plant overview application.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -23,54 +22,49 @@ import org.opentcs.guing.model.ModelComponent;
 public interface GuiManager {
 
   /**
-   * Wird aufgerufen, wenn das Objekt im Baum selektiert wurde.
+   * Called when an object was selected in the tree view.
    *
-   * @param modelComponent A folder in the system model tree
+   * @param modelComponent The selected object.
    */
   void selectModelComponent(ModelComponent modelComponent);
 
   /**
-   * Wird aufgerufen, wenn mehrere Objekte im Baum selektiert wurden.
+   * Called when an additional object was selected in the tree view.
    *
-   * @param modelComponent
+   * @param modelComponent The selected object.
    */
   void addSelectedModelComponent(ModelComponent modelComponent);
 
   /**
-   * Wird aufgerufen, wenn das Objekt aus dem Baum entfernt wurde (aufgrund
-   * einer Nutzereingabe).
+   * Called when an object was removed from the tree view (by user interaction).
    *
-   * @param fDataObject
-   * @return true, wenn das Objekt entfernt wurde
+   * @param fDataObject The object to be removed.
+   * @return Indicates whether the object was really removed from the model.
    */
   boolean treeComponentRemoved(ModelComponent fDataObject);
 
   /**
-   * Informiert die Applikation, dass im TreeView ein Figure-Objekt doppelt
-   * angeklickt wurde.
+   * Notifies about a figure object being selected.
    *
-   * @param modelComponent
+   * @param modelComponent The selected object.
    */
   void figureSelected(ModelComponent modelComponent);
 
   /**
-   * Wird aufgerufen, wenn im TreeView eine Blockstrecke doppelt angeklickt
-   * wurde. Selektiert alle Figures im DrawingView, die zu der Blockstrecke
-   * gehören.
+   * Called when a block was selected in the tree view.
+   * Should select all figures in the drawing view belonging to the block.
    *
-   * @param blockFiguresFolder
+   * @param blockFiguresFolder 
    */
   void blockSelected(FiguresFolder blockFiguresFolder);
 
   /**
-   * Löscht alles aus dem openTCS-Kern und führt Initialisierungen zu einem neu
-   * erstellten Modell durch. Das Modell muss bei Aufruf dieser Methode bereits
-   * erzeugt sein.
+   * Creates a new, empty model and initializes it.
    */
   void createEmptyModel();
 
   /**
-   * Lädt ein Fahrkurs-Modell vom Kernel
+   * Loads a plant model.
    */
   void loadModel();
 
@@ -86,11 +80,11 @@ public interface GuiManager {
   boolean saveModelAs();
 
   /**
-   * Erzeugt eine neues ModelComponent-Objekt, für das es kein Figure-Pendant
-   * gibt. Hierzu gehören Blockbereich, Fahrzeug und Stationstyp.
+   * Creates a new model component instance that does not have a corresponding figure.
+   * (Like a block or a location type.)
    *
-   * @param clazz Der Typ des zu erzeugenden Objekts.
-   * @return das erzeugte ModelComponent-Objekt
+   * @param clazz The type of object to be created.
+   * @return The created object.
    */
   ModelComponent createModelComponent(Class<? extends ModelComponent> clazz);
 }

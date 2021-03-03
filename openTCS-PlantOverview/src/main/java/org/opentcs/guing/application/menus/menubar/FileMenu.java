@@ -117,7 +117,7 @@ public class FileMenu
     // Menu item File -> Close
     menuItemClose = new JMenuItem(actionMap.get(CloseFileAction.ID));
     labels.configureMenu(menuItemClose, CloseFileAction.ID);
-    add(menuItemClose);	// TODO: Nur bei "Stand-Alone" Frame
+    add(menuItemClose); // TODO: Nur bei "Stand-Alone" Frame
   }
 
   /**

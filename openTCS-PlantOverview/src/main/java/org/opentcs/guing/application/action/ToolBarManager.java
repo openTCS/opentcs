@@ -293,16 +293,16 @@ public class ToolBarManager {
     toolBarCreation.setName(labels.getString("toolBarCreation.title"));
     toolBarList.add(toolBarCreation);
 
-//		// --- 2. ToolBar: Attributes ---
-//    // TODO: Diesen Toolbar "später" wieder einfügen, sobald es freie Grafikelemente im Modell gibt
-//		// Pick, Apply
-//		// Color: Stroke, Fill, Text
-//		// Stroke: Decoration, Width, Dashes, Type, Placement, Cap, Join
-//		// Font: Font; Bold, Italic, Underline
-//		toolBarAttributes = new JToolBar();
-//		ButtonFactory.addAttributesButtonsTo(toolBarAttributes, editor);
-//		toolBarAttributes.setName(labels.getString("toolBarAttributes.title"));
-//		toolBarList.add(toolBarAttributes);
+//    // --- 2. ToolBar: Attributes ---
+//    // TODO: Diesen Toolbar "spÃ¤ter" wieder einfÃ¼gen, sobald es freie Grafikelemente im Modell gibt
+//    // Pick, Apply
+//    // Color: Stroke, Fill, Text
+//    // Stroke: Decoration, Width, Dashes, Type, Placement, Cap, Join
+//    // Font: Font; Bold, Italic, Underline
+//    toolBarAttributes = new JToolBar();
+//    ButtonFactory.addAttributesButtonsTo(toolBarAttributes, editor);
+//    toolBarAttributes.setName(labels.getString("toolBarAttributes.title"));
+//    toolBarList.add(toolBarAttributes);
     // --- 3. ToolBar: Alignment (nur im Modelling Mode) ---
     // Align: West, East, Horizontal; North, South, Vertical
     // Move: West, East, North, South
@@ -349,7 +349,7 @@ public class ToolBarManager {
   }
 
   public void setOperationMode(OperationMode mode) {
-//		toolBarAttributes.setVisible(mode == OperationMode.MODELLING);
+//    toolBarAttributes.setVisible(mode == OperationMode.MODELLING);
     toolBarAlignment.setVisible(mode == OperationMode.MODELLING);
     // Items in Toolbar "Create"
     buttonCreatePoint.setVisible(mode == OperationMode.MODELLING);
@@ -422,7 +422,7 @@ public class ToolBarManager {
     ResourceBundleUtil.getBundle().configureToolBarButton(toggleButton, "openTCS.selectionTool");
     toggleButton.setSelected(true);
     toggleButton.addItemListener(new ToolButtonListener(selectionTool, editor));
-//		toggleButton.setFocusable(false);
+//    toggleButton.setFocusable(false);
     buttonGroup.add(toggleButton);
     toolBar.add(toggleButton);
 
@@ -454,7 +454,7 @@ public class ToolBarManager {
 
     button.setSelected(false);
     button.addItemListener(new ToolButtonListener(dragTool, editor));
-//		button.setFocusable(false);
+//    button.setFocusable(false);
 
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
     group.add(button);
@@ -519,7 +519,7 @@ public class ToolBarManager {
 
     labels.configureToolBarButton(toggleButton, labelKey);
     toggleButton.addItemListener(new ToolButtonListener(tool, editor));
-//		toggleButton.setFocusable(false);
+//    toggleButton.setFocusable(false);
 
     ToolListener toolHandler = (ToolListener) toolBar.getClientProperty("toolHandler");
     tool.addToolListener(toolHandler);

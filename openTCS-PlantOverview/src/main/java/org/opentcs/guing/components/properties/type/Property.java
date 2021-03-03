@@ -11,14 +11,14 @@
 package org.opentcs.guing.components.properties.type;
 
 /**
- * Interface für Attribute. Die Attribute arbeiten als Wrapper, d.h. sie
+ * Interface fÃ¼r Attribute. Die Attribute arbeiten als Wrapper, d.h. sie
  * erlauben den Zugriff auf ihre Daten, ohne dabei jedoch ein neues
  * Attribut-Objekt zu erzeugen. Die Datentypen String, Boolean, Integer usw.
- * bieten dieses nicht, so dass die Veränderung eines Attributs zu einem neuen
- * Attribut führen würde. Ergebnis wäre das ständige Setzen der Attribute im
+ * bieten dieses nicht, so dass die VerÃ¤nderung eines Attributs zu einem neuen
+ * Attribut fÃ¼hren wÃ¼rde. Ergebnis wÃ¤re das stÃ¤ndige Setzen der Attribute im
  * Datenobjekt.
  * Vorteil der hier eingesetzten Methode ist, dass das Attribut-Objekt selbst
- * stets dasselbe bleibt, dessen Inhalt sich jedoch ändern lässt.
+ * stets dasselbe bleibt, dessen Inhalt sich jedoch Ã¤ndern lÃ¤sst.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -26,8 +26,8 @@ public interface Property
     extends ModelAttribute, Cloneable {
 
   /**
-   * Übernimmt die Werte von dem übergebenen Attribut. Die Eigenschaften
-   * Visibility, Editable usw. werden jedoch nicht übernommen.
+   * Ãœbernimmt die Werte von dem Ã¼bergebenen Attribut. Die Eigenschaften
+   * Visibility, Editable usw. werden jedoch nicht Ã¼bernommen.
    *
    * @param property
    */

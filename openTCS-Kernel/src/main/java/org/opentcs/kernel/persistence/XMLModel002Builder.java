@@ -24,8 +24,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -56,6 +54,8 @@ import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.util.Comparators;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Version 0.0.2 of the implementation of {@link XMLModelReader XMLModelReader}
@@ -75,7 +75,7 @@ public class XMLModel002Builder
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(XMLModel002Builder.class.getName());
+      = LoggerFactory.getLogger(XMLModel002Builder.class);
   /**
    * The URL of the schema for XML model validataion.
    */
@@ -218,7 +218,7 @@ public class XMLModel002Builder
       return builder.build(inStream);
     }
     catch (JDOMException exc) {
-      log.log(Level.SEVERE, "Exception parsing input", exc);
+      log.error("Exception parsing input", exc);
       throw new IOException("Exception parsing input: " + exc.getMessage());
     }
   }
@@ -603,7 +603,7 @@ public class XMLModel002Builder
         // Don't persist layout elements for model elements that don't exist,
         // but leave a log message in that case.
         if (vObj == null) {
-          log.severe("Visualized object " + curMLE.getVisualizedObject()
+          log.error("Visualized object " + curMLE.getVisualizedObject()
               + " does not exist (any more?), not persisting layout element");
           continue;
         }

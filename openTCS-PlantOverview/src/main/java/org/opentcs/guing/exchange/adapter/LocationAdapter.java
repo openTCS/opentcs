@@ -15,8 +15,6 @@ import java.awt.geom.Point2D;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -47,6 +45,8 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for locations.
@@ -61,7 +61,7 @@ public class LocationAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(LocationAdapter.class.getName());
+      = LoggerFactory.getLogger(LocationAdapter.class);
 
   /**
    * Creates a new instance.
@@ -80,7 +80,7 @@ public class LocationAdapter
     return (LocationModel) super.getModel();
   }
 
-  @Override	// OpenTCSProcessAdapter
+  @Override  // OpenTCSProcessAdapter
   public void updateModelProperties(Kernel kernel,
                                     TCSObject<?> tcsObject,
                                     @Nullable ModelLayoutElement layoutElement) {
@@ -116,11 +116,11 @@ public class LocationAdapter
       }
     }
     catch (CredentialsException | IllegalArgumentException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
-  @Override	// OpenTCSProcessAdapter
+  @Override  // OpenTCSProcessAdapter
   public void updateProcessProperties(Kernel kernel) {
     LocationType locType
         = kernel.getTCSObject(LocationType.class,
@@ -148,18 +148,18 @@ public class LocationAdapter
       updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
   private void updateRepresentation(KeyValueSetProperty miscellaneous) {
     for (KeyValueProperty kvp : miscellaneous.getItems()) {
       switch (kvp.getKey()) {
-////					case LocationModel.LABEL:
-////						StringProperty pLabel = (StringProperty) getModel().getProperty(LocationModel.LABEL);
-////						pLabel.setText(value);
-////						pLabel.unmarkChanged();					
-////						break;
+////          case LocationModel.LABEL:
+////            StringProperty pLabel = (StringProperty) getModel().getProperty(LocationModel.LABEL);
+////            pLabel.setText(value);
+////            pLabel.unmarkChanged();          
+////            break;
 
         case ObjectPropConstants.LOC_DEFAULT_REPRESENTATION:
           SymbolProperty pSymbol = (SymbolProperty) getModel()
@@ -167,6 +167,7 @@ public class LocationAdapter
           pSymbol.setLocationRepresentation(
               LocationRepresentation.valueOf(kvp.getValue()));
           break;
+        default:
       }
     }
   }
@@ -207,7 +208,7 @@ public class LocationAdapter
     cpy.unmarkChanged();
   }
 
-  @Override	// OpenTCSProcessAdapter
+  @Override  // OpenTCSProcessAdapter
   protected void updateMiscProcessProperties(Kernel kernel,
                                              TCSObjectReference<?> ref)
       throws KernelRuntimeException {
@@ -282,7 +283,7 @@ public class LocationAdapter
     layoutProperties
         .put(ElementPropKeys.LOC_LABEL_OFFSET_Y, (int) offset.y + "");
     // TODO:
-//		layoutProperties.put(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, ...);
+//    layoutProperties.put(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, ...);
 
     layoutElement.setProperties(layoutProperties);
 

@@ -11,9 +11,9 @@
 package org.opentcs.guing.util;
 
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for loading icons.
@@ -26,7 +26,7 @@ public class IconToolkit {
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(IconToolkit.class.getName());
+      = LoggerFactory.getLogger(IconToolkit.class);
   /**
    * The default path for icons.
    */
@@ -68,7 +68,7 @@ public class IconToolkit {
       return new ImageIcon(url);
     }
     else {
-      log.log(Level.WARNING, "Icon not found: " + fullPath);
+      log.warn("Icon not found: " + fullPath);
       return null;
     }
   }

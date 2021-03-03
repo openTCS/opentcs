@@ -15,8 +15,8 @@ import java.util.List;
 import org.opentcs.guing.components.tree.TreeViewManager;
 
 /**
- * Basisimplementierung für ein Kompositum im Systemmodell. Ein Kompositum
- * enthält eine Menge von Kindobjekten.
+ * Basisimplementierung fÃ¼r ein Kompositum im Systemmodell. Ein Kompositum
+ * enthÃ¤lt eine Menge von Kindobjekten.
  * <p>
  * <b>Entwurfsmuster:</b> Kompositum.
  * CompositeModelComponent ist ein abstraktes Kompositum.

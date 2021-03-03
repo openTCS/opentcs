@@ -33,10 +33,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
-import org.opentcs.access.ApplicationHome;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
@@ -44,7 +41,8 @@ import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.rmi.CallPermissions;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.RemoteKernel;
-import org.opentcs.algorithms.KernelExtension;
+import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.data.user.UserAccount;
 import org.opentcs.data.user.UserExistsException;
 import org.opentcs.data.user.UserPermission;
@@ -52,13 +50,15 @@ import org.opentcs.data.user.UserUnknownException;
 import org.opentcs.kernel.persistence.UserAccountPersister;
 import org.opentcs.kernel.persistence.XMLFileUserAccountPersister;
 import org.opentcs.util.CyclicTask;
-import org.opentcs.util.communication.RMIRegistries;
+import org.opentcs.util.RMIRegistries;
 import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventBuffer;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.RefusingTCSEventFilter;
 import org.opentcs.util.eventsystem.TCSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is the standard implementation of the {@link RemoteKernel
@@ -93,7 +93,7 @@ class StandardRemoteKernel
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(StandardRemoteKernel.class.getName());
+      = LoggerFactory.getLogger(StandardRemoteKernel.class);
   /**
    * The kernel's data directory.
    */
@@ -172,8 +172,8 @@ class StandardRemoteKernel
           "IOException trying to load user account data", exc);
     }
     if (accounts.isEmpty()) {
-      accounts.add(new UserAccount(RemoteKernel.guestUser,
-                                   RemoteKernel.guestPassword,
+      accounts.add(new UserAccount(RemoteKernel.GUEST_USER,
+                                   RemoteKernel.GUEST_PASSWORD,
                                    EnumSet.allOf(UserPermission.class)));
       try {
         accountPersister.saveUserAccounts(accounts);
@@ -190,28 +190,28 @@ class StandardRemoteKernel
     cleanerTask = new ClientCleanerTask(sweepInterval);
 
     proxy = (RemoteKernel) Proxy.newProxyInstance(Kernel.class.getClassLoader(),
-                                                  new Class[] {RemoteKernel.class},
+                                                  new Class<?>[] {RemoteKernel.class},
                                                   this);
   }
 
   // Implementation of interface KernelExtension starts here.
   @Override
-  public void plugIn() {
+  public void initialize() {
     if (enabled) {
       return;
     }
     // Register as event listener with the kernel.
-    log.fine("Registering as event listener with local kernel.");
+    log.debug("Registering as event listener with local kernel.");
     localKernel.addEventListener(this,
                                  new AcceptingTCSEventFilter());
     // Start the thread that periodically cleans up the list of known clients
     // and event buffers.
-    log.fine("Starting cleanerThread.");
+    log.debug("Starting cleanerThread.");
     Thread cleanerThread = new Thread(cleanerTask, "cleanerThread");
     cleanerThread.setPriority(Thread.MIN_PRIORITY);
     cleanerThread.start();
     // Ensure a registry is running.
-    log.config("Checking for RMI registry on host " + registryAddress.getHost());
+    log.debug("Checking for RMI registry on host " + registryAddress.getHost());
     Optional<Registry> registry;
     if (Objects.equals(registryAddress.getHost(), "localhost")) {
       registry = RMIRegistries.lookupOrInstallRegistry(registryAddress.getPort());
@@ -224,46 +224,46 @@ class StandardRemoteKernel
     rmiRegistry = registry.get();
     // Export this instance via RMI.
     try {
-      log.fine("Exporting proxy...");
+      log.debug("Exporting proxy...");
       UnicastRemoteObject.exportObject(proxy, 0);
-      log.fine("Binding instance with RMI registry...");
-      rmiRegistry.rebind(RemoteKernel.registrationName, proxy);
+      log.debug("Binding instance with RMI registry...");
+      rmiRegistry.rebind(RemoteKernel.REGISTRATION_NAME, proxy);
     }
     catch (RemoteException exc) {
-      log.log(Level.SEVERE, "Could not export or bind with RMI registry", exc);
+      log.error("Could not export or bind with RMI registry", exc);
     }
     enabled = true;
   }
 
   @Override
-  public void plugOut() {
+  public void terminate() {
     if (!enabled) {
       return;
     }
     try {
-      log.fine("Shutting down RMI interface...");
-      rmiRegistry.unbind(RemoteKernel.registrationName);
+      log.debug("Shutting down RMI interface...");
+      rmiRegistry.unbind(RemoteKernel.REGISTRATION_NAME);
       UnicastRemoteObject.unexportObject(proxy, true);
     }
     catch (RemoteException | NotBoundException exc) {
-      log.log(Level.WARNING, "Exception shutting down RMI interface", exc);
+      log.warn("Exception shutting down RMI interface", exc);
     }
-    log.fine("Terminating cleaner task...");
+    log.debug("Terminating cleaner task...");
     cleanerTask.terminate();
-    log.fine("Unregistering event listener...");
+    log.debug("Unregistering event listener...");
     localKernel.removeEventListener(this);
     enabled = false;
   }
 
   @Override
-  public boolean isPluggedIn() {
+  public boolean isInitialized() {
     return enabled;
   }
 
   // Implementation of interface EventListener<TCSObjectEvent> starts here.
   @Override
   public void processEvent(TCSEvent event) {
-    log.finer("method entry");
+    log.debug("method entry");
     // Forward the event to all clients' event buffers.
     synchronized (knownClients) {
       for (ClientEntry curEntry : knownClients.values()) {
@@ -287,12 +287,12 @@ class StandardRemoteKernel
         CallPermissions perms = method.getAnnotation(CallPermissions.class);
         Class<?>[] paramTypes = method.getParameterTypes();
         if (perms == null) {
-          log.warning(method
+          log.warn(method
               + " not annotated with CallPermissions, allowing by default");
         }
         else if (paramTypes.length == 0
             || !ClientID.class.equals(method.getParameterTypes()[0])) {
-          log.fine("First parameter not a ClientID, allowing by default: "
+          log.debug("First parameter not a ClientID, allowing by default: "
               + method);
         }
         else {
@@ -341,7 +341,7 @@ class StandardRemoteKernel
    */
   public ClientID login(String userName, String password)
       throws CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     if (userName == null) {
       throw new NullPointerException("userName is null");
     }
@@ -361,7 +361,7 @@ class StandardRemoteKernel
       ClientEntry clientEntry = new ClientEntry(userName,
                                                 account.getPermissions());
       knownClients.put(clientId, clientEntry);
-      log.fine("New client named " + clientId.getClientName() + " logged in");
+      log.debug("New client named " + clientId.getClientName() + " logged in");
       return clientId;
     }
   }
@@ -377,7 +377,7 @@ class StandardRemoteKernel
    * @param clientID The client's ID.
    */
   public void logout(ClientID clientID) {
-    log.finer("method entry");
+    log.debug("method entry");
     if (clientID == null) {
       throw new NullPointerException("clientID is null");
     }
@@ -399,7 +399,7 @@ class StandardRemoteKernel
    * invalid, the returned Set will be empty.
    */
   public Set<UserPermission> getUserPermissions(ClientID clientID) {
-    log.finer("method entry");
+    log.debug("method entry");
     if (clientID == null) {
       throw new NullPointerException("clientID is null");
     }
@@ -423,7 +423,7 @@ class StandardRemoteKernel
                          String userPassword,
                          Set<UserPermission> userPermissions)
       throws UserExistsException, CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     if (userName == null) {
       throw new NullPointerException("userName is null");
     }
@@ -436,7 +436,7 @@ class StandardRemoteKernel
     // Check if a user with the given name already exists.
     UserAccount account = knownUsers.get(userName);
     if (account != null) {
-      log.warning("attempt to create existing user '" + userName + "'");
+      log.warn("attempt to create existing user '" + userName + "'");
       throw new UserExistsException("user exists: '" + userName + "'");
     }
     account = new UserAccount(userName, userPassword, userPermissions);
@@ -447,7 +447,7 @@ class StandardRemoteKernel
                               String userName,
                               String userPassword)
       throws UserUnknownException, CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     // Check if it's the user himself changing his own password.
     boolean userChangesOwnPass;
     synchronized (knownClients) {
@@ -456,13 +456,13 @@ class StandardRemoteKernel
     }
     // If the user is not changing his own password, check for permissions.
     if (!userChangesOwnPass) {
-      log.finer("user changes foreign password, checking permissions");
+      log.debug("user changes foreign password, checking permissions");
       checkCredentialsForRole(clientID, UserPermission.MANAGE_USERS);
     }
     // Check if a user with the given name really exists.
     UserAccount account = knownUsers.get(userName);
     if (account == null) {
-      log.warning("unknown user: " + userName);
+      log.warn("unknown user: " + userName);
       throw new UserUnknownException("unknown user: '" + userName + "'");
     }
     account.setPassword(userPassword);
@@ -472,11 +472,11 @@ class StandardRemoteKernel
                                  String userName,
                                  Set<UserPermission> userPermissions)
       throws UserUnknownException, CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     // Check if a user with the given name really exists.
     UserAccount account = knownUsers.get(userName);
     if (account == null) {
-      log.warning("unknown user: " + userName);
+      log.warn("unknown user: " + userName);
       throw new UserUnknownException("unknown user: '" + userName + "'");
     }
     account.setPermissions(userPermissions);
@@ -484,10 +484,10 @@ class StandardRemoteKernel
 
   public void removeUser(ClientID clientID, String userName)
       throws UserUnknownException, CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     UserAccount account = knownUsers.remove(userName);
     if (account == null) {
-      log.warning("unknown user: " + userName);
+      log.warn("unknown user: " + userName);
       throw new UserUnknownException("unknown user: '" + userName + "'");
     }
   }
@@ -495,7 +495,7 @@ class StandardRemoteKernel
   public void setEventFilter(ClientID clientID,
                              EventFilter<TCSEvent> eventFilter)
       throws CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     if (eventFilter == null) {
       throw new NullPointerException("eventFilter is null");
     }
@@ -518,7 +518,7 @@ class StandardRemoteKernel
    */
   public List<TCSEvent> pollEvents(ClientID clientID, long timeout)
       throws CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     ClientEntry clientEntry;
     EventBuffer<TCSEvent> eventBuffer;
     synchronized (knownClients) {
@@ -568,7 +568,7 @@ class StandardRemoteKernel
   private void checkCredentialsForRole(ClientID clientID,
                                        UserPermission requiredPermission)
       throws CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     if (clientID == null) {
       throw new NullPointerException("clientID is null");
     }
@@ -607,7 +607,7 @@ class StandardRemoteKernel
   private void checkCredentialsForAnnotation(ClientID clientID,
                                              CallPermissions perms)
       throws CredentialsException {
-    log.finer("method entry");
+    log.debug("method entry");
     Objects.requireNonNull(clientID, "clientID is null");
     Objects.requireNonNull(perms, "perms is null");
 
@@ -780,7 +780,7 @@ class StandardRemoteKernel
 
     @Override
     protected void runActualTask() {
-      log.finer("CleanerTask sweeping");
+      log.debug("CleanerTask sweeping");
       synchronized (knownClients) {
         Iterator<Map.Entry<ClientID, ClientEntry>> clientIter
             = knownClients.entrySet().iterator();
@@ -799,7 +799,7 @@ class StandardRemoteKernel
             // ID from the list of known clients - the client has been
             // inactive for long enough.
             else {
-              log.finer("removing inactive client entry (client user: "
+              log.debug("removing inactive client entry (client user: "
                   + clientEntry.userName + ")");
               clientIter.remove();
             }

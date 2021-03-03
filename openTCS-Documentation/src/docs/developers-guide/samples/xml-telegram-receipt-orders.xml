@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tcsResponseSet>
+    <response xsi:type="transportResponse" executionSuccessful="true" orderName="TOrder-0001" id="TransportOrder-01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <response xsi:type="transportResponse" executionSuccessful="true" orderName="TOrder-0002" id="TransportOrder-02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</tcsResponseSet>

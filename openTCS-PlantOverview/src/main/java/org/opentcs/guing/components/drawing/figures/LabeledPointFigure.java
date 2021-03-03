@@ -45,7 +45,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * LabeledPointFigure: PointFigure mit zugehörigem Label, das mit der Figur
+ * LabeledPointFigure: PointFigure mit zugehÃ¶rigem Label, das mit der Figur
  * bewegt wird.
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -76,39 +76,37 @@ public class LabeledPointFigure
     return getPresentationFigure().getShape();
   }
 
-  // TODO: Diese Methode überschreiben, damit keine Resize-Handles angezeigt werden
-//	@Override	// LabeledFigure
-//	public Collection<Handle> createHandles(int detailLevel) {
-//		Collection<Handle> handles = getPresentationFigure().createHandles(detailLevel);
-//		handles.addAll(fLabel.createHandles(detailLevel));
-//		
-//		return handles;
-//	}
-  // AbstractFigure
+  // TODO: Diese Methode Ã¼berschreiben, damit keine Resize-Handles angezeigt werden
+//  @Override  // LabeledFigure
+//  public Collection<Handle> createHandles(int detailLevel) {
+//    Collection<Handle> handles = getPresentationFigure().createHandles(detailLevel);
+//    handles.addAll(fLabel.createHandles(detailLevel));
+//
+//    return handles;
+//  }
   @Override
   public Connector findConnector(Point2D.Double p, ConnectionFigure prototype) {
-//		double min = java.lang.Double.MAX_VALUE;
-//		Connector closest = null;
+//    double min = java.lang.Double.MAX_VALUE;
+//    Connector closest = null;
 //
-//		for (Connector c : connectors) {
-//			Point2D.Double p2 = Geom.center(c.getBounds());
-//			double d2 = Geom.length2(p.x, p.y, p2.x, p2.y);	// distance^2
+//    for (Connector c : connectors) {
+//      Point2D.Double p2 = Geom.center(c.getBounds());
+//      double d2 = Geom.length2(p.x, p.y, p2.x, p2.y);  // distance^2
 //
-//			if (d2 < min) {
-//				min = d2;
-//				closest = c;
+//      if (d2 < min) {
+//        min = d2;
+//        closest = c;
 //
-////				if (min == 0.0) {
-////					break;
-////				}
-//			}
-//		}
+////        if (min == 0.0) {
+////          break;
+////        }
+//      }
+//    }
 //
-//		return closest;
+//    return closest;
     return (new ChopEllipseConnector(this));
   }
 
-  // AbstractFigure
   @Override
   public String getToolTipText(Point2D.Double p) {
     PointFigure pf = getPresentationFigure();
@@ -130,7 +128,7 @@ public class LabeledPointFigure
     return sb.toString();
   }
 
-  @Override // GraphicalCompositeFigure
+  @Override
   public LabeledPointFigure clone() {
     // Do NOT clone the label here.
     LabeledPointFigure that = (LabeledPointFigure) super.clone();
@@ -142,14 +140,14 @@ public class LabeledPointFigure
     return that;
   }
 
-  @Override // GraphicalCompositeFigure
+  @Override
   public void read(DOMInput in) throws IOException {
     double x = in.getAttribute("x", 0d);
     double y = in.getAttribute("y", 0d);
     setBounds(new Point2D.Double(x, y), new Point2D.Double(x, y));
   }
 
-  @Override // GraphicalCompositeFigure
+  @Override
   public void write(DOMOutput out) throws IOException {
     PointFigure pf = getPresentationFigure();
     out.addAttribute("x", pf.getZoomPoint().getX());
@@ -157,7 +155,7 @@ public class LabeledPointFigure
     out.addAttribute("name", get(FigureConstants.MODEL).getName());
   }
 
-  @Override // AbstractFigure
+  @Override
   public Collection<Action> getActions(Point2D.Double p) {
     LinkedList<Action> editOptions = new LinkedList<>();
 //    editOptions.add(new CutAction());
@@ -168,7 +166,7 @@ public class LabeledPointFigure
     return editOptions;
   }
 
-  @Override // AttributesChangeListener
+  @Override
   public void propertiesChanged(AttributesChangeEvent event) {
     if (event.getInitiator().equals(this)) {
       return;
@@ -201,7 +199,7 @@ public class LabeledPointFigure
     fireFigureChanged();
   }
 
-  @Override // LabeledFigure
+  @Override
   public void updateModel() {
     Origin origin = get(FigureConstants.ORIGIN);
     PointFigure pf = getPresentationFigure();
@@ -210,14 +208,14 @@ public class LabeledPointFigure
     CoordinateProperty cpy = (CoordinateProperty) model.getProperty(PointModel.MODEL_Y_POSITION);
     // Schreibt die aktuellen Modell-Koordinaten in die Properties
     if ((double) cpx.getValue() == 0.0 && (double) cpy.getValue() == 0.0) {
-      // Koordinaten nur einmal beim Erzeugen aus Layout übernehmen
+      // Koordinaten nur einmal beim Erzeugen aus Layout Ã¼bernehmen
       origin.calculateRealPosition(pf.center(), cpx, cpy);
       cpx.markChanged();
       cpy.markChanged();
     }
     // Schreibt die aktuellen Layout-Koordinaten in die Properties
     ZoomPoint zoomPoint = pf.getZoomPoint();
-    // Wenn die Figure gerade gelöscht wurde, kann der Origin schon null sein
+    // Wenn die Figure gerade gelÃ¶scht wurde, kann der Origin schon null sein
     if (zoomPoint != null && origin != null) {
       StringProperty sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_X);
       String sValue = sp.getText();
@@ -246,7 +244,7 @@ public class LabeledPointFigure
         oldValue = (int) Double.parseDouble(sp.getText());
       }
 
-      newValue = (int) (-zoomPoint.getY() * origin.getScaleY());	// Vorzeichen!
+      newValue = (int) (-zoomPoint.getY() * origin.getScaleY());  // Vorzeichen!
 
       if (newValue != oldValue) {
         sp.setText(String.format("%d", newValue));
@@ -262,7 +260,7 @@ public class LabeledPointFigure
     fireFigureChanged();
   }
 
-  @Override // LabeledFigure
+  @Override
   public Collection<Handle> createHandles(int detailLevel) {
     LinkedList<Handle> handles = new LinkedList<>();
 
@@ -271,7 +269,7 @@ public class LabeledPointFigure
         handles.add(new PointOutlineHandle(getPresentationFigure()));
         break;
 
-      case 0:	// Mouse clicked
+      case 0:  // Mouse clicked
         // 4 Rechteckige Move Handles in den Ecken der Figur
         MoveHandle.addMoveHandles(this, handles);
         // 4 Rechteckige Move Handles in den Ecken des Labels
@@ -282,7 +280,7 @@ public class LabeledPointFigure
 
         break;
 
-      case 1:	// Double-Click
+      case 1:  // Double-Click
         // Blauer Rahemen + 8 kleine blaue Resize Handles an den Ecken und den Seiten der Figur
         // TODO: Figur "springt" in die falsche Richtung!
         ResizeHandleKit.addResizeHandles(this, handles);

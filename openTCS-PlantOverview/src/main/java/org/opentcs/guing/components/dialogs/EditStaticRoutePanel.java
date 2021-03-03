@@ -27,7 +27,7 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Benutzeroberfläche zum Bearbeiten einer statischen Route.
+ * BenutzeroberflÃ¤che zum Bearbeiten einer statischen Route.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -210,9 +210,9 @@ public class EditStaticRoutePanel
   // CHECKSTYLE:ON
 
   /**
-   * Fügt Knoten ab dem letzten Knoten hinzu.
+   * FÃ¼gt Knoten ab dem letzten Knoten hinzu.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void buttonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEditActionPerformed
       PointModel point = null;
@@ -235,7 +235,7 @@ public class EditStaticRoutePanel
   /**
    * Entfernt den markierten und alle nachfolgenden Knoten.
    *
-   * @evt das auslösende Ereignis
+   * @evt das auslÃ¶sende Ereignis
    */
     private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
       int i = listPoints.getSelectedIndex();

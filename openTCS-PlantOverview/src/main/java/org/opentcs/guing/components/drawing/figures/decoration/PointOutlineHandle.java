@@ -27,37 +27,37 @@ import org.opentcs.guing.components.drawing.figures.PointFigure;
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class PointOutlineHandle
-		extends BoundsOutlineHandle {
+    extends BoundsOutlineHandle {
 
-	public PointOutlineHandle(Figure owner) {
-		super(owner);
-	}
+  public PointOutlineHandle(Figure owner) {
+    super(owner);
+  }
 
-	@Override
-	public void draw(Graphics2D g) {
-		PointFigure pf = (PointFigure) getOwner();
-		Shape bounds = pf.getShape();
+  @Override
+  public void draw(Graphics2D g) {
+    PointFigure pf = (PointFigure) getOwner();
+    Shape bounds = pf.getShape();
 
-		if (getOwner().get(AttributeKeys.TRANSFORM) != null) {
-			bounds = getOwner().get(AttributeKeys.TRANSFORM).createTransformedShape(bounds);
-		}
+    if (getOwner().get(AttributeKeys.TRANSFORM) != null) {
+      bounds = getOwner().get(AttributeKeys.TRANSFORM).createTransformedShape(bounds);
+    }
 
-		if (view != null) {
-			bounds = view.getDrawingToViewTransform().createTransformedShape(bounds);
-			Rectangle2D bounds2D = bounds.getBounds2D();
-			float centerX = (float) bounds2D.getCenterX();
-			float centerY = (float) bounds2D.getCenterY();
-			Point2D center = new Point2D.Float(centerX, centerY);
-			float radius = 10.0f;
-			float[] dist = {0.1f, 0.9f};
-			Color[] colors = {Color.CYAN, Color.BLUE};
+    if (view != null) {
+      bounds = view.getDrawingToViewTransform().createTransformedShape(bounds);
+      Rectangle2D bounds2D = bounds.getBounds2D();
+      float centerX = (float) bounds2D.getCenterX();
+      float centerY = (float) bounds2D.getCenterY();
+      Point2D center = new Point2D.Float(centerX, centerY);
+      float radius = 10.0f;
+      float[] dist = {0.1f, 0.9f};
+      Color[] colors = {Color.CYAN, Color.BLUE};
 
-			RadialGradientPaint radialGradientPaint = new RadialGradientPaint(center, radius, dist, colors);
-			Paint oldPaint = g.getPaint();
-			g.setPaint(radialGradientPaint);
+      RadialGradientPaint radialGradientPaint = new RadialGradientPaint(center, radius, dist, colors);
+      Paint oldPaint = g.getPaint();
+      g.setPaint(radialGradientPaint);
 
-			g.fill(bounds);
-			g.setPaint(oldPaint);
-		}
-	}
+      g.fill(bounds);
+      g.setPaint(oldPaint);
+    }
+  }
 }

@@ -54,7 +54,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * in einem einzigen Baum.
  * <p>
  * <b>Entwurfsmuster:</b> Befehl.
- * StandardTreeViewPanel ist der Auslöser für die Ausführung eines konkreten
+ * StandardTreeViewPanel ist der AuslÃ¶ser fÃ¼r die AusfÃ¼hrung eines konkreten
  * UserObjects, welches ja einen Befehl darstellt.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -207,8 +207,8 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Traversiert den gesamten Baum, um den Knoten zu finden, der das übergebene
-   * Datenobjekt in seinem UserObject hält.
+   * Traversiert den gesamten Baum, um den Knoten zu finden, der das Ã¼bergebene
+   * Datenobjekt in seinem UserObject hÃ¤lt.
    *
    * @param dataObject
    * @return
@@ -300,7 +300,7 @@ public abstract class AbstractTreeViewPanel
     else {
       ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
       String treeViewName;
-      boolean sorting = true;	// Die Kindelemente des Knotens sollen sortiert werden
+      boolean sorting = true;  // Die Kindelemente des Knotens sollen sortiert werden
       // Statische Routen sollen nicht sortiert werden
       if (parent instanceof SimpleFolder) {
         SimpleFolder folder = (SimpleFolder) parent;
@@ -460,10 +460,10 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Fügt ein Element am übergebenen Index bzw an letzter Stelle ein, falls
+   * FÃ¼gt ein Element am Ã¼bergebenen Index bzw an letzter Stelle ein, falls
    * das Elternobjekt weniger Elemente besitzt.
    *
-   * @param treeItem Das einzufügende Item.
+   * @param treeItem Das einzufÃ¼gende Item.
    * @param parentItem Das Elternobjekt.
    * @param index Die Position.
    */
@@ -502,7 +502,7 @@ public abstract class AbstractTreeViewPanel
 
   /**
    * Fabrikmethode zur Erzeugung eines Comparators, mit dessen Hilfe die
-   * Sortierung durchgeführt wird.
+   * Sortierung durchgefÃ¼hrt wird.
    *
    * @return
    */
@@ -511,7 +511,7 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Traversiert den gesamten Baum, um alle Knoten zu finden, die das übergebene
+   * Traversiert den gesamten Baum, um alle Knoten zu finden, die das Ã¼bergebene
    * Datenobjekt in ihrem UserObject halten.
    *
    * @param dataObject

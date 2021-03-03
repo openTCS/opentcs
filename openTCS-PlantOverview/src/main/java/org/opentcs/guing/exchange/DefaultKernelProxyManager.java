@@ -11,14 +11,14 @@
 package org.opentcs.guing.exchange;
 
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.rmi.DynamicRemoteKernelProxy;
 import org.opentcs.access.rmi.KernelProxy;
 import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation of {@link KernelProxyManager}, providing a single
@@ -34,7 +34,7 @@ class DefaultKernelProxyManager
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(DefaultKernelProxyManager.class.getName());
+      = LoggerFactory.getLogger(DefaultKernelProxyManager.class);
   /**
    * A reference to the kernel connected to.
    * <code>null</code> if no connection is currently established.
@@ -71,7 +71,7 @@ class DefaultKernelProxyManager
       this.port = port;
     }
     catch (CredentialsException | KernelUnavailableException e) {
-      log.log(Level.WARNING, "Exception trying to connect to remote kernel", e);
+      log.warn("Exception trying to connect to remote kernel", e);
       return false;
     }
 

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Component;
@@ -17,19 +16,14 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {
+ * Ein CellEditor fÃ¼r Attribute vom Typ {
  *
  * @see StringProperty}. Der Editor umfasst ein Textfeld zur schnellen Eingabe
  * sowie den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs öffnet.
+ * DetailsDialog zum komfortablen Bearbeiten des Attributs Ã¶ffnet.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -64,18 +58,7 @@ public class StringPropertyCellEditor
     setValue(value);
     JTextField textField = (JTextField) getComponent();
     if (value instanceof StringProperty) {
-      StringProperty stringProperty = (StringProperty) value;
-      ModelComponent model = stringProperty.getModel();
-      if (stringProperty.getDescription().equals("Name")
-          && (model instanceof PointModel
-              || model instanceof LocationModel
-              || model instanceof LocationTypeModel
-              || model instanceof StaticRouteModel)) {
-        textField.setDocument(new JTextFieldLimit(Long.toString(Long.MAX_VALUE).length()));
-      }
-      else {
-        textField.setDocument(new PlainDocument());
-      }
+      textField.setDocument(new PlainDocument());
     }
     textField.setText(property().getText());
 
@@ -116,7 +99,8 @@ public class StringPropertyCellEditor
     }
 
     @Override
-    public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+    public void insertString(int offset, String str, AttributeSet attr)
+        throws BadLocationException {
       if (str == null) {
         return;
       }

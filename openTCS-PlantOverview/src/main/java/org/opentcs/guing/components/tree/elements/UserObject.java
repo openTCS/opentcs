@@ -16,22 +16,22 @@ import javax.swing.JPopupMenu;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein UserObject hat die Funktion eines Stellvertreters für ein Datenobjekt
- * (ModelComponent) im TreeView. Es kennt sein Datenobjekt und ist dafür
- * zuständig, Aktionen des Nutzer wie Selektieren, Löschen, Doppelklicken usw.
+ * Ein UserObject hat die Funktion eines Stellvertreters fÃ¼r ein Datenobjekt
+ * (ModelComponent) im TreeView. Es kennt sein Datenobjekt und ist dafÃ¼r
+ * zustÃ¤ndig, Aktionen des Nutzer wie Selektieren, LÃ¶schen, Doppelklicken usw.
  * auszuwerten. In der Regel wird es jeweils eine bestimmte Methode der
  * Applikation aufrufen, in der dann das Ereignis behandelt wird. <br> Neben der
- * Auswertung von Nutzereingaben kann ein UserObject ein Popup-Menü sowie ein
+ * Auswertung von Nutzereingaben kann ein UserObject ein Popup-MenÃ¼ sowie ein
  * Icon bereitstellen. <br> Im TreeView sind prinzipiell alle Objekte vom Typ
  * DefaultMutableTreeNode. Ein DefaultMutableTreeNode besitzt eine Referenz auf
  * ein UserObject. Der TreeView kennt bei einer Aktion des Nutzers nur den
- * DefaultMutableTreeNode, auf dem die Aktion ausgeführt wurde. Dadurch, dass
- * aber jeder DefaultMutableTreeNode ein UserObject besitzt, können auf dem
- * UserObject die jeweiligen Aktionen ausgeführt werden.
+ * DefaultMutableTreeNode, auf dem die Aktion ausgefÃ¼hrt wurde. Dadurch, dass
+ * aber jeder DefaultMutableTreeNode ein UserObject besitzt, kÃ¶nnen auf dem
+ * UserObject die jeweiligen Aktionen ausgefÃ¼hrt werden.
  * <p>
  * <b>Entwurfsmuster:
  * </b>Befehl. UserObject ist der abstrakte Befehl. Klient ist der TreeView und
- * Empfänger ist die Applikation.
+ * EmpfÃ¤nger ist die Applikation.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see ModelComponent
@@ -46,14 +46,14 @@ public interface UserObject {
   ModelComponent getModelComponent();
 
   /**
-   * Liefert ein passendes Popup-Menü.
+   * Liefert ein passendes Popup-MenÃ¼.
    *
    * @return
    */
   JPopupMenu getPopupMenu();
 
   /**
-   * Liefert das zugehörige Icon.
+   * Liefert das zugehÃ¶rige Icon.
    *
    * @return
    */

@@ -11,13 +11,13 @@ package org.opentcs.guing.plugins.panels.statistics;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.opentcs.util.gui.plugins.PluggablePanel;
+import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.util.statistics.StatisticsLogParser;
 import org.opentcs.util.statistics.StatisticsRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A panel for displaying statistics data.
@@ -31,7 +31,7 @@ public class StatisticsPanel
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(StatisticsPanel.class.getName());
+      = LoggerFactory.getLogger(StatisticsPanel.class);
   /**
    * A file chooser for selecting the input file.
    */
@@ -48,6 +48,10 @@ public class StatisticsPanel
    * The parsed analysis data.
    */
   private AnalysisData analysisData;
+  /**
+   * Indicates whether this component is enabled.
+   */
+  private boolean initialized;
 
   /**
    * Creates a new StatisticsPanel.
@@ -61,13 +65,18 @@ public class StatisticsPanel
   }
 
   @Override
-  public void plugIn() {
-    // Do nada.
+  public void initialize() {
+    initialized = true;
   }
 
   @Override
-  public void plugOut() {
-    // Do nada.
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  @Override
+  public void terminate() {
+    initialized = false;
   }
 
   /**
@@ -137,9 +146,7 @@ public class StatisticsPanel
         }
       }
       catch (IOException exc) {
-        log.log(Level.WARNING,
-                "Exception parsing input file " + inputFile,
-                exc);
+        log.warn("Exception parsing input file " + inputFile, exc);
         inputFile = null;
         inputRecords = null;
         analysisData = null;

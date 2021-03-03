@@ -8,54 +8,56 @@
  */
 package org.opentcs.kernel.controlcenter.vehicles;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import org.opentcs.drivers.CommunicationAdapterFactory;
-import org.opentcs.drivers.VehicleModel;
-import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterFactory;
+import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+import org.opentcs.drivers.vehicle.VehicleProcessModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A model for displaying a list/table of vehicles in the kernel GUI.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 final class VehicleTableModel
     extends AbstractTableModel
-    implements Observer {
+    implements PropertyChangeListener {
 
   /**
-   * This class's Logger.
+   * This class's logger.
    */
-  private static final Logger log =
-      Logger.getLogger(VehicleTableModel.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleTableModel.class);
   /**
    * This class's resource bundle.
    */
-  private static final ResourceBundle bundle =
-      ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/vehicles/Bundle");
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/vehicles/Bundle");
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    bundle.getString("Vehicle"),
-    bundle.getString("State"),
+    BUNDLE.getString("Vehicle"),
+    BUNDLE.getString("State"),
     "Adapter",
-    bundle.getString("Enabled?"),
+    BUNDLE.getString("Enabled?"),
     "Position"
   };
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     String.class,
     String.class,
-    CommunicationAdapterFactory.class,
+    VehicleCommAdapterFactory.class,
     Boolean.class,
     String.class
   };
@@ -82,34 +84,33 @@ final class VehicleTableModel
   /**
    * The vehicles we're controlling.
    */
-  private final List<VehicleModel> vehicleList = new ArrayList<>();
+  private final List<VehicleEntry> entries = new ArrayList<>();
 
   /**
    * Creates a new instance.
    */
   VehicleTableModel() {
-    // Do nada.
   }
 
   /**
-   * Adds a new <code>VehicleModel</code> to this model.
-   * 
-   * @param newVehicle The new <code>VehicleModel</code>
+   * Adds a new entry to this model.
+   *
+   * @param newEntry The new entry.
    */
-  public void addData(VehicleModel newVehicle) {
-    vehicleList.add(newVehicle);
-    fireTableRowsInserted(vehicleList.size(), vehicleList.size());
+  public void addData(VehicleEntry newEntry) {
+    entries.add(newEntry);
+    fireTableRowsInserted(entries.size(), entries.size());
   }
 
   /**
-   * Returns the vehicle model at the given row.
-   * 
+   * Returns the vehicle entry at the given row.
+   *
    * @param row The row.
-   * @return The VehicleModel at this row.
+   * @return The entry at the given row.
    */
-  public VehicleModel getDataAt(int row) {
+  public VehicleEntry getDataAt(int row) {
     if (row >= 0) {
-      return vehicleList.get(row);
+      return entries.get(row);
     }
     else {
       return null;
@@ -118,7 +119,7 @@ final class VehicleTableModel
 
   @Override
   public int getRowCount() {
-    return vehicleList.size();
+    return entries.size();
   }
 
   @Override
@@ -128,55 +129,52 @@ final class VehicleTableModel
 
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-    VehicleModel vehicle = vehicleList.get(rowIndex);
+    VehicleEntry entry = entries.get(rowIndex);
     switch (columnIndex) {
       case ADAPTER_COLUMN:
         break;
       case ENABLED_COLUMN:
-        if (vehicle.getCommunicationAdapter() != null) {
-          boolean enabled = (boolean) aValue;
-          if (enabled) {
-            vehicle.getCommunicationAdapter().enable();
+        VehicleCommAdapter commAdapter = entry.getCommAdapter();
+        if (commAdapter != null) {
+          if ((boolean) aValue) {
+            commAdapter.enable();
           }
           else {
-            vehicle.getCommunicationAdapter().disable();
+            commAdapter.disable();
           }
         }
         break;
       case POSITION_COLUMN:
         break;
       default:
-        throw new IllegalArgumentException("Unhandled columnIndex: "
-            + columnIndex);
+        LOG.warn("Unhandled column index: {}", columnIndex);
     }
   }
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    if (rowIndex >= vehicleList.size()) {
+    if (rowIndex >= entries.size()) {
       return null;
     }
-    VehicleModel vehicle = vehicleList.get(rowIndex);
+
+    VehicleEntry entry = entries.get(rowIndex);
 
     switch (columnIndex) {
       case VEHICLE_COLUMN:
-        return vehicle.getName();
+        return entry.getVehicle().getName();
       case STATE_COLUMNN:
-        return vehicle.getVehicle().getState().name();
+        return entry.getVehicle().getState().name();
       case ADAPTER_COLUMN:
-        try {
-          return vehicle.getCommunicationFactory().getAdapterDescription();
-        }
-        catch (NullPointerException e) {
-          return null;
-        }
+        VehicleCommAdapterFactory factory = entry.getCommAdapterFactory();
+        return factory == null ? null : factory.getAdapterDescription();
       case ENABLED_COLUMN:
-        return vehicle.isCommunicationAdapterEnabled();
+        VehicleCommAdapter commAdapter = entry.getCommAdapter();
+        return commAdapter != null && commAdapter.isEnabled();
       case POSITION_COLUMN:
-        return vehicle.getPosition();
+        return entry.getProcessModel().getVehiclePosition();
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        LOG.warn("Unhandled column index: {}", columnIndex);
+        return "Invalid column index " + columnIndex;
     }
   }
 
@@ -186,8 +184,8 @@ final class VehicleTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.log(Level.WARNING, "Invalid columnIndex", exc);
-      return "FEHLER";
+      LOG.warn("Invalid columnIndex", exc);
+      return "Invalid column index " + columnIndex;
     }
   }
 
@@ -204,8 +202,8 @@ final class VehicleTableModel
       case ENABLED_COLUMN:
         return true;
       case POSITION_COLUMN:
-        return vehicleList.get(rowIndex).isCommunicationAdapterEnabled()
-            && vehicleList.get(rowIndex).getCommunicationFactory() instanceof LoopbackCommunicationAdapterFactory;
+        VehicleCommAdapter commAdapter = entries.get(rowIndex).getCommAdapter();
+        return commAdapter instanceof SimVehicleCommAdapter && commAdapter.isEnabled();
       default:
         return false;
     }
@@ -213,22 +211,38 @@ final class VehicleTableModel
 
   /**
    * Returns a list containing the vehicle models associated with this model.
-   * 
+   *
    * @return A list containing the vehicle models associated with this model.
    */
-  public List<VehicleModel> getVehicleModels() {
-    return vehicleList;
+  public List<VehicleEntry> getVehicleEntries() {
+    return entries;
   }
 
   @Override
-  public void update(Observable o, Object arg) {
-    VehicleModel model = (VehicleModel) o;
-    int i = 0;
-
-    while (!model.equals(vehicleList.get(i))) {
-      i++;
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (!(evt.getSource() instanceof VehicleEntry)) {
+      return;
     }
-    vehicleList.set(i, model);
-    fireTableRowsUpdated(i, i);
+
+    if (!isRelevantUpdate(evt.getPropertyName())) {
+      return;
+    }
+    
+    VehicleEntry entry = (VehicleEntry) evt.getSource();
+
+    for (int index = 0; index < entries.size(); index++) {
+      if (entry == entries.get(index)) {
+        int myIndex = index;
+        SwingUtilities.invokeLater(() -> fireTableRowsUpdated(myIndex, myIndex));
+      }
+    }
+  }
+
+  private boolean isRelevantUpdate(String propertyName) {
+    return Objects.equals(propertyName, VehicleEntry.Attribute.COMM_ADAPTER_FACTORY.name())
+        || Objects.equals(propertyName, VehicleEntry.Attribute.COMM_ADAPTER.name())
+        || Objects.equals(propertyName, VehicleProcessModel.Attribute.STATE.name())
+        || Objects.equals(propertyName, VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name())
+        || Objects.equals(propertyName, VehicleProcessModel.Attribute.POSITION.name());
   }
 }

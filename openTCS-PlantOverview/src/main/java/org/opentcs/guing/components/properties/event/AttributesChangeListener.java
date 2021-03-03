@@ -11,9 +11,9 @@
 package org.opentcs.guing.components.properties.event;
 
 /**
- * Interface, das Controller/Views implementieren. Ändert sich das Model, so
+ * Interface, das Controller/Views implementieren. Ã„ndert sich das Model, so
  * werden alle Controller/Views, die sich zuvor als Listener registriert haben,
- * über diese Änderung benachrichtigt.
+ * Ã¼ber diese Ã„nderung benachrichtigt.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see PropertiesModel
@@ -22,8 +22,8 @@ package org.opentcs.guing.components.properties.event;
 public interface AttributesChangeListener {
 
   /**
-   * Information für den View, dass sich die Eigenschaften des Models geändert
-   * haben. Der View ist nun selbst dafür zuständig, sich zu aktualisieren.
+   * Information fÃ¼r den View, dass sich die Eigenschaften des Models geÃ¤ndert
+   * haben. Der View ist nun selbst dafÃ¼r zustÃ¤ndig, sich zu aktualisieren.
    *
    * @param e
    */

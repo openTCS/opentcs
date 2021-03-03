@@ -18,7 +18,7 @@ import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LayoutModel;
 
 /**
- * Die Repr‰sentation eines Point-Objekts in der Baumansicht.
+ * Die Repr√§sentation eines Point-Objekts in der Baumansicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)

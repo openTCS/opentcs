@@ -19,7 +19,7 @@ import javax.swing.JTable;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 
 /**
- * Ein CellEditor für ein ColorProperty.
+ * Ein CellEditor fÃ¼r ein ColorProperty.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -29,7 +29,7 @@ public class ColorPropertyCellEditor
                java.awt.event.ActionListener {
 
   /**
-   * Für den CellEditor wird ein Button verwendet.
+   * FÃ¼r den CellEditor wird ein Button verwendet.
    */
   protected JButton fButton;
   /**
@@ -68,7 +68,7 @@ public class ColorPropertyCellEditor
   @Override
   public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
     Frame parent = JOptionPane.getFrameForComponent(fTable);
-    Color newColor = JColorChooser.showDialog(parent, "Farbe wählen", fColorProperty.getColor());
+    Color newColor = JColorChooser.showDialog(parent, "Farbe wÃ¤hlen", fColorProperty.getColor());
 
     if (newColor != null) {
       Color oldColor = fColorProperty.getColor();

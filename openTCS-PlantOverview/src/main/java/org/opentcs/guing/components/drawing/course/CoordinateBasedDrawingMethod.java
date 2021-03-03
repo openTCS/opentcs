@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.course;
 
 /**
@@ -18,22 +17,22 @@ package org.opentcs.guing.components.drawing.course;
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class CoordinateBasedDrawingMethod
-		implements DrawingMethod {
+    implements DrawingMethod {
 
-	/**
-	 * Der Referenzpunkt.
-	 */
-	protected Origin fOrigin;
+  /**
+   * Der Referenzpunkt.
+   */
+  protected Origin fOrigin;
 
-	/**
-	 * Creates a new instance of CoordinateBasedDrawingMethod
-	 */
-	public CoordinateBasedDrawingMethod() {
-		fOrigin = new Origin();
-	}
+  /**
+   * Creates a new instance of CoordinateBasedDrawingMethod
+   */
+  public CoordinateBasedDrawingMethod() {
+    fOrigin = new Origin();
+  }
 
   @Override
-	public Origin getOrigin() {
-		return fOrigin;
-	}
+  public Origin getOrigin() {
+    return fOrigin;
+  }
 }

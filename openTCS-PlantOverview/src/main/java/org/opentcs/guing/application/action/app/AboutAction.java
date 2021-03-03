@@ -70,7 +70,9 @@ public class AboutAction
   public void actionPerformed(ActionEvent evt) {
     JOptionPane.showMessageDialog(
         dialogParent,
-        "<html><p><b>" + OpenTCSView.NAME + " - " + Environment.getVersionString() + "</b><br>"
+        "<html><p><b>" + OpenTCSView.NAME + "</b><br> "
+        + "openTCS baseline version: " + Environment.getBaselineVersion() + "<br>"
+        + "openTCS customization: " + Environment.getCustomizationName() + " " + Environment.getCustomizationVersion() + "<br>"
         + OpenTCSView.COPYRIGHT + "<br>"
         + "Running on<br>"
         + "Java: " + System.getProperty("java.version") + ", " + System.getProperty("java.vendor") + "<br>"

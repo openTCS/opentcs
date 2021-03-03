@@ -1,0 +1,18 @@
+= openTCS: Developer's Guide
+The openTCS developers <info@opentcs.org>
+openTCS {project-version}
+:last-update-label!:
+ifdef::backend-pdf[:imagesdir: {imagesoutdir}]
+ifdef::backend-html5[:imagesdir: images]
+
+include::general-development.adoc[]
+
+include::kernel-api.adoc[]
+
+include::tcp-host-interface.adoc[]
+
+include::extending-kernel.adoc[]
+
+include::extending-plantoverview.adoc[]
+
+include::appendix.adoc[]

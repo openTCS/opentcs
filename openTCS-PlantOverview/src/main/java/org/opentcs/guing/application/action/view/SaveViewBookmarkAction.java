@@ -99,7 +99,7 @@ public class SaveViewBookmarkAction
       return;
     }
 
-    // Das Kernel-Objekt für das aktuelle VisualLayout
+    // Das Kernel-Objekt fÃ¼r das aktuelle VisualLayout
     // Beim starten der Visualisierung im Operating-Mode wird kein VisualLayout erzeugt!
     Set<VisualLayout> sLayouts = kernel.getTCSObjects(VisualLayout.class);
 
@@ -110,7 +110,7 @@ public class SaveViewBookmarkAction
 
     VisualLayout layout = sLayouts.iterator().next();
 
-    // Die View Bookmarks für dieses Layout
+    // Die View Bookmarks fÃ¼r dieses Layout
     List<ViewBookmark> bookmarks = new ArrayList<>(layout.getViewBookmarks());
 
     ViewBookmarkNameChooser content

@@ -15,6 +15,7 @@
  */
 package org.opentcs.guing.components.drawing;
 
+import com.google.common.collect.Iterators;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -63,8 +64,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -138,7 +137,8 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
-import org.opentcs.util.ObjectListCycler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A DrawingView implementation for the openTCS plant overview.
@@ -155,7 +155,7 @@ public abstract class OpenTCSDrawingView
    * This class's logger.
    */
   private static final Logger logger
-      = Logger.getLogger(OpenTCSDrawingView.class.getName());
+      = LoggerFactory.getLogger(OpenTCSDrawingView.class);
   /**
    * Decoration of paths, points and locations that are part of a block.
    */
@@ -167,13 +167,13 @@ public abstract class OpenTCSDrawingView
   /**
    * Decoration of paths that are part of a transport order.
    */
-  private static final float PATH_DASH[] = {10.0f, 5.0f};
+  private static final float[] PATH_DASH = {10.0f, 5.0f};
   private static final BasicStroke PATH_STROKE = new BasicStroke(
       6.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, PATH_DASH, 0.0f);
   /**
    * Decoration of paths that are part of a withdrawn transport order.
    */
-  private static final float WITHDRAWN_PATH_DASH[] = {8.0f, 4.0f, 2.0f, 4.0f};
+  private static final float[] WITHDRAWN_PATH_DASH = {8.0f, 4.0f, 2.0f, 4.0f};
   private static final BasicStroke WITHDRAWN_PATH_STROKE
       = new BasicStroke(6.0f,
                         BasicStroke.CAP_BUTT,
@@ -271,7 +271,7 @@ public abstract class OpenTCSDrawingView
   /**
    * A cycler for colors to be used for order routes.
    */
-  private final ObjectListCycler<Color> orderColorCycler;
+  private final Iterator<Color> orderColorCycler;
   /**
    * A pointer to a figure that shall be highlighted by a red circle.
    */
@@ -366,11 +366,11 @@ public abstract class OpenTCSDrawingView
     setOpaque(true);
     setAutoscrolls(true);
 
-    orderColorCycler = new ObjectListCycler<>(Color.GRAY, Color.MAGENTA,
-                                              Color.BLUE, Color.CYAN,
-                                              Color.PINK, Color.RED,
-                                              Color.ORANGE, Color.YELLOW,
-                                              Color.GREEN, Color.DARK_GRAY);
+    orderColorCycler = Iterators.cycle(Color.GRAY, Color.MAGENTA,
+                                       Color.BLUE, Color.CYAN,
+                                       Color.PINK, Color.RED,
+                                       Color.ORANGE, Color.YELLOW,
+                                       Color.GREEN, Color.DARK_GRAY);
   }
 
   @Override
@@ -699,7 +699,7 @@ public abstract class OpenTCSDrawingView
     Runnable doScroll = new Runnable() {
       @Override
       public void run() {
-        Point2D.Double pCenterView = new Point2D.Double(xCenter, -yCenter);	// Vorzeichen!
+        Point2D.Double pCenterView = new Point2D.Double(xCenter, -yCenter); // Vorzeichen!
         Point pCenterDrawing = drawingToView(pCenterView);
         JViewport viewport = (JViewport) getParent();
         int xUpperLeft = pCenterDrawing.x - viewport.getSize().width / 2;
@@ -883,8 +883,8 @@ public abstract class OpenTCSDrawingView
       drawing.draw(g2d);
     }
     catch (ConcurrentModificationException e) {
-      logger.log(Level.WARNING, "Exception from JHotDraw caught while calling DefaultDrawing.draw(). "
-                 + "Continuing drawing the course.");
+      logger.warn("Exception from JHotDraw caught while calling DefaultDrawing.draw(). "
+          + "Continuing drawing the course.");
       // TODO What to do when it is catched?
     }
 
@@ -1213,7 +1213,7 @@ public abstract class OpenTCSDrawingView
           }
         }
         catch (InterruptedException ex) {
-          logger.log(Level.WARNING, "Unexpected exception", ex);
+          logger.warn("Unexpected exception", ex);
         }
 
         fFocusStaticRoute = null;
@@ -1365,7 +1365,7 @@ public abstract class OpenTCSDrawingView
     List<Handle> result = Collections.unmodifiableList(secondaryHandles);
 
     if (!result.isEmpty()) {
-      logger.log(Level.INFO, "Secondary handles: {0}", result.size());
+      logger.info("Secondary handles: {}", result.size());
     }
 
     return result;
@@ -1454,7 +1454,7 @@ public abstract class OpenTCSDrawingView
         continue;
       }
 
-      break;	// while
+      break;  // while
     }
 
     if (invalidatedArea != null) {
@@ -1504,13 +1504,12 @@ public abstract class OpenTCSDrawingView
           cachedDrawingArea = drawing.getDrawingArea();
         }
         catch (NullPointerException ex) {
-          logger.log(Level.WARNING,
-                     "NullPointerException in OpenTCSDrawingView.getDrawingArea():\n{0}", ex);
+          logger.warn("NullPointerException in OpenTCSDrawingView.getDrawingArea()", ex);
           cachedDrawingArea = new Rectangle2D.Double();
         }
       }
       else {
-        logger.warning("No Drawing in OpenTCSDrawingView.getDrawingArea()");
+        logger.warn("No Drawing in OpenTCSDrawingView.getDrawingArea()");
         cachedDrawingArea = new Rectangle2D.Double();
       }
     }
@@ -1917,7 +1916,7 @@ public abstract class OpenTCSDrawingView
       if (model != null) {
         Origin origin = model.getDrawingMethod().getOrigin();
         OriginFigure originFigure = origin.getFigure();
-        // OriginFigure nur einmal zufügen!
+        // OriginFigure nur einmal zufï¿½gen!
         if (!this.drawing.contains(originFigure)) {
           this.drawing.add(originFigure);
         }
@@ -1937,12 +1936,12 @@ public abstract class OpenTCSDrawingView
     validateViewTranslation();
     paintEnabled = false;
     Timer t = new Timer(10, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        repaint();
-        paintEnabled = true;
-      }
-    });
+                      @Override
+                      public void actionPerformed(ActionEvent e) {
+                        repaint();
+                        paintEnabled = true;
+                      }
+                    });
     t.setRepeats(false);
     t.start();
   }
@@ -2286,13 +2285,13 @@ public abstract class OpenTCSDrawingView
     Rectangle2D.Double visibleViewRect = viewToDrawing(getVisibleRect());
 
     int centerX = (int) visibleViewRect.getCenterX();
-    int centerY = (int) -visibleViewRect.getCenterY();	// signum!
+    int centerY = (int) -visibleViewRect.getCenterY();  // signum!
     bookmark.setCenterX(centerX);
     bookmark.setCenterY(centerY);
     double zoomFactor = getScaleFactor();
     bookmark.setViewScaleX(zoomFactor);
-    bookmark.setViewScaleY(zoomFactor);	// TODO: discriminate x/y
-    bookmark.setViewRotation(0);	// TODO    
+    bookmark.setViewScaleY(zoomFactor);  // TODO: discriminate x/y
+    bookmark.setViewRotation(0);  // TODO    
     bookmark.setLabel("");
 
     return bookmark;
@@ -2319,7 +2318,7 @@ public abstract class OpenTCSDrawingView
         double yFactor = visibleRect.height / hDrawing;
 
         double newZoom = Math.min(xFactor, yFactor);
-        newZoom = Math.min(newZoom, 4.0);	// Limit to 400%
+        newZoom = Math.min(newZoom, 4.0);  // Limit to 400%
 
         // round it to two decimal places
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
@@ -2349,7 +2348,7 @@ public abstract class OpenTCSDrawingView
     // Convert to drawing coordinates
     Rectangle2D.Double visibleViewRect = viewToDrawing(visibleRect);
     final int centerX = (int) ((visibleViewRect.getCenterX() + 0.5));
-    final int centerY = (int) ((-(visibleViewRect.getCenterY() + 0.5)));	// Vorzeichen!
+    final int centerY = (int) ((-(visibleViewRect.getCenterY() + 0.5)));  // Vorzeichen!
     for (BitmapFigure bmFigure : bitmapFigures) {
       bmFigure.setScaleFactor(zoomX, newValue);
     }
@@ -2394,7 +2393,7 @@ public abstract class OpenTCSDrawingView
   public AffineTransform getDrawingToViewTransform() {
     AffineTransform t = new AffineTransform();
     t.translate(-translation.x, -translation.y);
-    t.scale(zoomX, zoomY);	// ???
+    t.scale(zoomX, zoomY);  // ???
 
     return t;
   }
@@ -2539,7 +2538,7 @@ public abstract class OpenTCSDrawingView
     // Abort, if not all of the selected figures may be removed from the drawing
     for (Figure figure : deletedFigures) {
       if (!figure.isRemovable()) {
-        logger.log(Level.INFO, "Figure is not removable: {0}", figure);
+        logger.info("Figure is not removable: {}", figure);
         getToolkit().beep();
         return;
       }
@@ -2815,10 +2814,8 @@ public abstract class OpenTCSDrawingView
           repaintDrawingArea(viewToDrawing(getCanvasViewBounds()));
         }
       }
-      else {
-        if (e.getInvalidatedArea() != null) {
-          repaintDrawingArea(e.getInvalidatedArea());
-        }
+      else if (e.getInvalidatedArea() != null) {
+        repaintDrawingArea(e.getInvalidatedArea());
       }
     }
 

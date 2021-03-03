@@ -8,12 +8,12 @@
  */
 package org.opentcs.guing.application.action;
 
+import org.opentcs.components.plantoverview.LocationTheme;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.application.action.course.VehicleAction;
 import org.opentcs.guing.application.action.view.LocationThemeAction;
 import org.opentcs.guing.application.action.view.VehicleThemeAction;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.util.gui.plugins.LocationTheme;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * A factory for various actions.

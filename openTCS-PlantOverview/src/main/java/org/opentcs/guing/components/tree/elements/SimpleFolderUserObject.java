@@ -19,7 +19,7 @@ import org.opentcs.guing.model.CompositeModelComponent;
 import org.opentcs.guing.model.ModelManager;
 
 /**
- * Ein einfacher Ordner in der Baumansicht, dem keine weitere Funktionalit‰t
+ * Ein einfacher Ordner in der Baumansicht, dem keine weitere Funktionalit√§t
  * zugeordnet ist.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)

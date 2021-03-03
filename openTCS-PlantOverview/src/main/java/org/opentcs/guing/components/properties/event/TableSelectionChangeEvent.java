@@ -15,31 +15,31 @@ import org.opentcs.guing.components.properties.table.AttributesTable;
 
 /**
  * Ein Event, der generiert wird, wenn der Benutzer eine Tabellenzeile
- * selektiert. Das Event enth‰lt die Tabelle, in der die Selektierung stattfand,
+ * selektiert. Das Event enth√§lt die Tabelle, in der die Selektierung stattfand,
  * sowie das Attribut, das sich in der selektierten Tabellenzeile befindet.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class TableSelectionChangeEvent
-		extends EventObject {
+    extends EventObject {
 
-	/**
-	 * Das Attribut.
-	 */
-	protected Object fSelectedValue;
+  /**
+   * Das Attribut.
+   */
+  protected Object fSelectedValue;
 
-	/**
-	 * Creates a new instance of TableSelectionChangeEvent
-	 */
-	public TableSelectionChangeEvent(AttributesTable table, Object selectedValue) {
-		super(table);
-		fSelectedValue = selectedValue;
-	}
+  /**
+   * Creates a new instance of TableSelectionChangeEvent
+   */
+  public TableSelectionChangeEvent(AttributesTable table, Object selectedValue) {
+    super(table);
+    fSelectedValue = selectedValue;
+  }
 
-	/**
-	 * Liefert das Attribut, das sich in der selektierten Tabellenzeile befindet.
-	 */
-	public Object getSelectedValue() {
-		return fSelectedValue;
-	}
+  /**
+   * Liefert das Attribut, das sich in der selektierten Tabellenzeile befindet.
+   */
+  public Object getSelectedValue() {
+    return fSelectedValue;
+  }
 }

@@ -10,12 +10,12 @@ package org.opentcs.guing.util;
 
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
-import org.opentcs.util.gui.plugins.VehicleTheme;
-import org.opentcs.util.gui.plugins.VehicleThemeRegistry;
+import org.opentcs.guing.plugins.themes.VehicleThemeRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the registered vehicle themes.
@@ -30,7 +30,7 @@ public class DefaultVehicleThemeManager
    * This class's logger.
    */
   private static final Logger logger
-      = Logger.getLogger(DefaultVehicleThemeManager.class.getName());
+      = LoggerFactory.getLogger(DefaultVehicleThemeManager.class);
   /**
    * The application's configuration.
    */
@@ -98,12 +98,14 @@ public class DefaultVehicleThemeManager
 
     if (defaultTheme == null) {
       if (!themes.isEmpty()) {
-        logger.log(Level.WARNING, "Theme with name {0} not found. Using {1}",
-                   new Object[] {themeProperty == null ? null : themeProperty.getTheme(), themes.get(0).getClass().getName()});
+        logger.warn("Theme with name {} not found. Using {}",
+                    themeProperty == null ? null : themeProperty.getTheme(),
+                    themes.get(0).getClass().getName());
         defaultTheme = themes.get(0);
       }
       else {
-        logger.log(Level.SEVERE, "Theme with name {0} not found and no other factory available.", themeProperty.getTheme());
+        logger.error("Theme with name {} not found and no other factory available.",
+                     themeProperty.getTheme());
       }
     }
   }

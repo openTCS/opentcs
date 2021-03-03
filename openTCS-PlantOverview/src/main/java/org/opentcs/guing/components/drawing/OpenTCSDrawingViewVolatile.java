@@ -136,6 +136,8 @@ public class OpenTCSDrawingViewVolatile
           // image was restored, but buffer lost; redraw everything
           dirtyArea.setBounds(bufferedArea);
           break;
+          
+        default:
       }
 
       if (drawingBuffer == null) {

@@ -16,7 +16,7 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Benutzeroberfl‰che zum Bearbeiten eines Key-Value-Paares.
+ * Benutzeroberfl√§che zum Bearbeiten eines Key-Value-Paares.
  *
  * {
  *

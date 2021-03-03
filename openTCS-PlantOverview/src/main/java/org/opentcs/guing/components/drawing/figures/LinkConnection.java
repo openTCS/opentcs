@@ -26,7 +26,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * Eine gestrichelte Linie, die einen Meldepunkt mit einer Übergabestation oder
+ * Eine gestrichelte Linie, die einen Meldepunkt mit einer Ãœbergabestation oder
  * einer Batterieladestation verbindet. Eine SimpleLineConnection besitzt keine
  * Pfeilspitzen.
  *
@@ -49,7 +49,7 @@ public class LinkConnection
                         SelectionPropertiesComponent propertiesComponent,
                         @Assisted LinkModel model) {
     super(componentsTreeManager, propertiesComponent, model);
-    double dash[] = {5.0, 5.0};
+    double[] dash = {5.0, 5.0};
     set(AttributeKeys.START_DECORATION, null);
     set(AttributeKeys.END_DECORATION, null);
     set(AttributeKeys.STROKE_WIDTH, 1.0);
@@ -66,7 +66,7 @@ public class LinkConnection
   }
 
   /**
-   * Verknüpft zwei Figure-Objekte durch diese Verbindung.
+   * VerknÃ¼pft zwei Figure-Objekte durch diese Verbindung.
    *
    * @param point das erste Figure-Objekt
    * @param location das zweite Figure-Objekt

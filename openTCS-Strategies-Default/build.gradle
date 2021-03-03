@@ -1,0 +1,8 @@
+dependencies {
+  compile project(':openTCS-API-Injection')
+  compile project(':openTCS-Common')
+}
+
+task release {
+  dependsOn build
+}

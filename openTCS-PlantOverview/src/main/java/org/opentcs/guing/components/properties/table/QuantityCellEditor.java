@@ -11,8 +11,6 @@
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Component;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import org.opentcs.guing.components.properties.type.AbstractQuantity;
@@ -20,13 +18,14 @@ import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.slf4j.LoggerFactory;
 
 /**
- * Ein CellEditor f�r Attribute vom Typ {
+ * Ein CellEditor fï¿½r Attribute vom Typ {
  *
  * @see AbstractQuantity}. Der Editor umfasst ein Textfeld zur schnellen Eingabe
  * sowie den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs �ffnet.
+ * DetailsDialog zum komfortablen Bearbeiten des Attributs ï¿½ffnet.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -65,9 +64,9 @@ public class QuantityCellEditor
 
   /**
    * Extrahiert aus dem String des Textfeldes den Wert und die Einheit. Wurde
-   * die Eingabe durch den Benutzer nicht korrekt get�tigt, wird eine Exception
-   * ausgel�st. In diesem Fall erfolgt keine �nderung des Attributs.
-   * Unterklassen k�nnen diese Methode �berschreiben, um ein toleranteres
+   * die Eingabe durch den Benutzer nicht korrekt getï¿½tigt, wird eine Exception
+   * ausgelï¿½st. In diesem Fall erfolgt keine ï¿½nderung des Attributs.
+   * Unterklassen kï¿½nnen diese Methode ï¿½berschreiben, um ein toleranteres
    * Verhalten zu implementieren.
    *
    * @param text
@@ -141,7 +140,7 @@ public class QuantityCellEditor
     return super.stopCellEditing();
   }
 
-  @Override	// DefaultCellEditor
+  @Override  // DefaultCellEditor
   public Component getTableCellEditorComponent(
       JTable table, Object value, boolean isSelected, int row, int column) {
 
@@ -151,7 +150,7 @@ public class QuantityCellEditor
     return fComponent;
   }
 
-  @Override	// DefaultCellEditor
+  @Override  // DefaultCellEditor
   public Object getCellEditorValue() {
     JTextField textField = (JTextField) getComponent();
     String text = textField.getText();
@@ -160,7 +159,7 @@ public class QuantityCellEditor
       extractQuantity(text);
     }
     catch (IllegalArgumentException e) {
-      Logger.getLogger(QuantityCellEditor.class.getName()).log(Level.SEVERE, "Exception: ", e);
+      LoggerFactory.getLogger(QuantityCellEditor.class).error("Exception", e);
     }
 
     return property();

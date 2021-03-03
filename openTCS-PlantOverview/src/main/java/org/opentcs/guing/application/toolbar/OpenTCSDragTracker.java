@@ -21,7 +21,6 @@ import org.jhotdraw.draw.event.TransformEdit;
 import org.jhotdraw.draw.tool.DefaultDragTracker;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
-import org.opentcs.guing.components.drawing.figures.BitmapFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerEdit;
 
@@ -145,7 +144,7 @@ public class OpenTCSDragTracker
         break;
 
       case OPERATING:
-        break;
+      default:
     }
   }
 

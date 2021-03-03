@@ -19,17 +19,17 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.gui.plugins.LocationTheme;
 
 /**
- * Grafische Benutzeroberfl‰che zur Bearbeitung eines Attributs, das ein
- * grafisches Symbol repre‰sentiert.
+ * Grafische Benutzeroberfl√§che zur Bearbeitung eines Attributs, das ein
+ * grafisches Symbol repre√§sentiert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -224,9 +224,9 @@ public class SymbolPropertyEditorPanel
     }// </editor-fold>//GEN-END:initComponents
 
   /**
-   * Bl‰ttert weiter zum n‰chsten Symbol.
+   * Bl√§ttert weiter zum n√§chsten Symbol.
    *
-   * @param evt das auslˆsende Ereignis
+   * @param evt das ausl√∂sende Ereignis
    */
     private void nextSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSymbolButtonActionPerformed
       if (fIndex >= fSymbols.size() - 1 || fIndex < 0) {
@@ -240,9 +240,9 @@ public class SymbolPropertyEditorPanel
     }//GEN-LAST:event_nextSymbolButtonActionPerformed
 
   /**
-   * Bl‰ttert zur¸ck zum vorherigen Symbol.
+   * Bl√§ttert zur√ºck zum vorherigen Symbol.
    *
-   * @param evt das auslˆsende Ereignis
+   * @param evt das ausl√∂sende Ereignis
    */
     private void previousSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousSymbolButtonActionPerformed
       if (fIndex <= 0 || fIndex >= fSymbols.size()) {

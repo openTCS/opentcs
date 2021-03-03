@@ -12,34 +12,36 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Logger;
-import javax.swing.JPanel;
+import javax.inject.Inject;
 import org.opentcs.access.ConfigurationItemTO;
-import org.opentcs.access.Kernel;
+import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.ControlCenterPanel;
+import org.opentcs.util.Comparators;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A kernel configuration panel.
  * 
  * @author Philipp Seifert (Fraunhofer IML)
  */
-final class KernelConfigurationPanel
-    extends JPanel {
+public class KernelConfigurationPanel
+    extends ControlCenterPanel {
 
   /**
    * This class's Logger.
    */
-  private static final Logger log =
-      Logger.getLogger(KernelConfigurationPanel.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(KernelConfigurationPanel.class);
   /**
-   * A flag indicating whether this KernelExtension has been plugged in already.
+   * A flag indicating whether this component has been initialized.
    */
-  private boolean pluggedIn;
+  private boolean initialized;
   /**
    * The proxy kernel this client has to communicate with.
    */
-  private final Kernel kernel;
+  private final LocalKernel kernel;
   /**
    * List containing all configuration items.
    */
@@ -50,31 +52,26 @@ final class KernelConfigurationPanel
    *
    * @param kernel The kernel.
    */
-  public KernelConfigurationPanel(Kernel kernel) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
+  @Inject
+  public KernelConfigurationPanel(LocalKernel kernel) {
+    this.kernel = requireNonNull(kernel, "kernel");
 
     Set<ConfigurationItemTO> configs = kernel.getConfigurationItems();
     configList = new ArrayList<>(configs);
-    Collections.sort(configList);
+    Collections.sort(configList, Comparators.configItemsByFullyQualifiedName());
     initComponents();
   }
 
-  /**
-   * Checks whether this panel should currently be shown or not.
-   *
-   * @return <code>true</code> if, and only if, this panel should currently be
-   * shown.
-   */
-  public boolean isPluggedIn() {
-    return pluggedIn;
+  @Override
+  public boolean isInitialized() {
+    return initialized;
   }
 
-  /**
-   * Enables this panel.
-   */
-  public void plugIn() {
-    if (pluggedIn) {
-      throw new IllegalStateException("Already plugged in.");
+  @Override
+  public void initialize() {
+    if (initialized) {
+      LOG.debug("Already initialized, doing nothing.");
+      return;
     }
     switch (kernel.getState()) {
       case OPERATING:
@@ -83,17 +80,16 @@ final class KernelConfigurationPanel
       default:
         setSimulationConfigEnabled(false);
     }
-    pluggedIn = true;
+    initialized = true;
   }
 
-  /**
-   * Disables this panel.
-   */
-  public void plugOut() {
-    if (!pluggedIn) {
-      throw new IllegalStateException("Not plugged in.");
+  @Override
+  public void terminate() {
+    if (!initialized) {
+      LOG.debug("Not initialized, doing nothing.");
+      return;
     }
-    pluggedIn = false;
+    initialized = false;
   }
 
   /**
@@ -158,7 +154,7 @@ final class KernelConfigurationPanel
     genericConfigPanel = new javax.swing.JPanel();
     configsPanel = new javax.swing.JPanel();
     configsScrollPane = new javax.swing.JScrollPane();
-    configJList = new javax.swing.JList(configList.toArray());
+    configJList = new javax.swing.JList<>(configList.toArray(new ConfigurationItemTO[0]));
     buttonPanel = new javax.swing.JPanel();
     configureButton = new javax.swing.JButton();
     refreshButton = new javax.swing.JButton();
@@ -416,7 +412,7 @@ final class KernelConfigurationPanel
 
     Set<ConfigurationItemTO> configs = kernel.getConfigurationItems();
     configList = new ArrayList<>(configs);
-    Collections.sort(configList);
+    Collections.sort(configList, Comparators.configItemsByFullyQualifiedName());
     ConfigurationItemTO[] data = new ConfigurationItemTO[configList.size()];
     int i = 0;
     Iterator<ConfigurationItemTO> it = configList.iterator();

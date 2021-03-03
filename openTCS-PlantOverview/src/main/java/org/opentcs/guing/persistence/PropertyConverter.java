@@ -351,6 +351,8 @@ public class PropertyConverter {
         revertMiscellaneosProperty(model,
                                    (KeyValueSetListWrapper) property.getValue(),
                                    (KeyValueSetProperty) model.getProperty(MISCELLANEOUS));
+        break;
+      default:
     }
   }
 

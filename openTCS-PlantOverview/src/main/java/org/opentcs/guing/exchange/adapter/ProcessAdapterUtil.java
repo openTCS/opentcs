@@ -9,7 +9,6 @@
 package org.opentcs.guing.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
@@ -23,6 +22,8 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for handling of process adapters.
@@ -38,7 +39,7 @@ public class ProcessAdapterUtil {
   /**
    * This class' logger.
    */
-  private final Logger log = Logger.getLogger(getClass().getName());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   /**
    * Creates a new instance.
@@ -64,7 +65,7 @@ public class ProcessAdapterUtil {
     requireNonNull(dispatcher, "dispatcher");
 
     if (dispatcher.findProcessAdapter(model) != null) {
-      log.warning("There is already a process adapter for model " + model.getName());
+      log.warn("There is already a process adapter for model " + model.getName());
     }
 
     ProcessAdapter adapter = basicCreateProcessAdapter(model, dispatcher);

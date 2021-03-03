@@ -7,11 +7,11 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.course;
 
 /**
- * Ein Interface für Zeichenmethoden. Mögliche Zeichenmethoden können sein: <p>
+ * Ein Interface fÃ¼r Zeichenmethoden. MÃ¶gliche Zeichenmethoden kÃ¶nnen sein:
+ * <p>
  * <ul> <li> symbolisch: Zwischen der Realposition von Fahrkurselementen und der
  * Position von Figures besteht kein Zusammenhang <li> auf Koordinaten
  * basierend: Die Position der Figures entspricht genau der Position der
@@ -24,8 +24,8 @@ package org.opentcs.guing.components.drawing.course;
  */
 public interface DrawingMethod {
 
-	/**
-	 * Liefert den Origin.
-	 */
-	Origin getOrigin();
+  /**
+   * Liefert den Origin.
+   */
+  Origin getOrigin();
 }

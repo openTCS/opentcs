@@ -43,7 +43,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -75,9 +74,11 @@ import org.jhotdraw.util.ReversedList;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.data.message.Message;
+import org.opentcs.components.plantoverview.PluggablePanel;
+import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ViewBookmark;
+import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.application.action.ToolBarManager;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
@@ -118,7 +119,7 @@ import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.components.tree.elements.ContextObject;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.components.tree.elements.UserObjectContext;
-import org.opentcs.guing.components.tree.elements.UserObjectContext.CONTEXT_TYPE;
+import org.opentcs.guing.components.tree.elements.UserObjectContext.ContextType;
 import org.opentcs.guing.components.tree.elements.UserObjectUtil;
 import org.opentcs.guing.components.tree.elements.VehicleUserObject;
 import org.opentcs.guing.event.BlockChangeEvent;
@@ -165,8 +166,8 @@ import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
 import org.opentcs.util.UniqueStringGenerator;
-import org.opentcs.util.gui.plugins.PanelFactory;
-import org.opentcs.util.gui.plugins.PluggablePanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Visualizes the driving course and other kernel objects as well as messages
@@ -202,12 +203,11 @@ public class OpenTCSView
   /**
    *
    */
-  public static final String toolBarActionsProperty = "toolBarActions";
+  public static final String TOOLBAR_ACTIONS_PROPERTY = "toolBarActions";
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(OpenTCSView.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(OpenTCSView.class);
   /**
    * A single central instance (singleton) of this class.
    * XXX This should be removed as soon as instance() isn't called by other
@@ -315,8 +315,7 @@ public class OpenTCSView
   /**
    * Handles events for changes of properties.
    */
-  private final AttributesChangeListener attributesEventHandler
-      = new AttributesEventHandler();
+  private final AttributesChangeListener attributesEventHandler = new AttributesEventHandler();
   /**
    * Generates names for model objects.
    */
@@ -483,33 +482,22 @@ public class OpenTCSView
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.panelRegistry = requireNonNull(panelRegistry, "panelRegistry");
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
-    this.procAdapterUtil = requireNonNull(procAdapterUtil,
-                                          "procAdapterUtil");
-    this.userMessageHelper = requireNonNull(userMessageHelper,
-                                            "userMessageHelper");
-    this.drawingViewFactory = requireNonNull(drawingViewFactory,
-                                             "drawingViewFactory");
+    this.procAdapterUtil = requireNonNull(procAdapterUtil, "procAdapterUtil");
+    this.userMessageHelper = requireNonNull(userMessageHelper, "userMessageHelper");
+    this.drawingViewFactory = requireNonNull(drawingViewFactory, "drawingViewFactory");
     this.modelCompNameGen = requireNonNull(modelCompNameGen, "modelCompNameGen");
     this.fUndoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
-    this.fComponentsTreeManager = requireNonNull(componentsTreeManager,
-                                                 "componentsTreeManager");
-    this.fBlocksTreeManager = requireNonNull(blocksTreeManager,
-                                             "blocksTreeManager");
-    this.fGroupsTreeManager = requireNonNull(groupsTreeManager,
-                                             "groupsTreeManager");
-    this.kernelStatusPanel = requireNonNull(kernelStatusPanel,
-                                            "kernelStatusPanel");
-    this.fPropertiesComponent = requireNonNull(propertiesComponent,
-                                               "propertiesComponent");
+    this.fComponentsTreeManager = requireNonNull(componentsTreeManager, "componentsTreeManager");
+    this.fBlocksTreeManager = requireNonNull(blocksTreeManager, "blocksTreeManager");
+    this.fGroupsTreeManager = requireNonNull(groupsTreeManager, "groupsTreeManager");
+    this.kernelStatusPanel = requireNonNull(kernelStatusPanel, "kernelStatusPanel");
+    this.fPropertiesComponent = requireNonNull(propertiesComponent, "propertiesComponent");
     this.vehiclesPanel = requireNonNull(vehiclesPanel, "vehiclesPanel");
     this.userObjectUtil = requireNonNull(userObjectUtil, "userObjectUtil");
-    this.actionMapProvider = requireNonNull(actionMapProvider,
-                                            "actionMapProvider");
+    this.actionMapProvider = requireNonNull(actionMapProvider, "actionMapProvider");
     this.menuBarProvider = requireNonNull(menuBarProvider, "menuBarProvider");
-    this.toolBarManagerProvider = requireNonNull(toolBarManagerProvider,
-                                                 "toolBarManagerProvider");
-    this.propertiesPanelFactory = requireNonNull(propertiesPanelFactory,
-                                                 "propertiesPanelFactory");
+    this.toolBarManagerProvider = requireNonNull(toolBarManagerProvider, "toolBarManagerProvider");
+    this.propertiesPanelFactory = requireNonNull(propertiesPanelFactory, "propertiesPanelFactory");
     this.toContainerPanelProvider = requireNonNull(toContainerPanelProvider,
                                                    "toContainerPanelProvider");
     this.osContainerPanelProvider = requireNonNull(osContainerPanelProvider,
@@ -519,8 +507,7 @@ public class OpenTCSView
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
     this.drawingViewFocusHandler = requireNonNull(drawingViewFocusHandler,
                                                   "drawingViewFocusHandler");
-    this.dockableHandlerFactory = requireNonNull(dockableHandlerFactory,
-                                                 "dockableHandlerFactory");
+    this.dockableHandlerFactory = requireNonNull(dockableHandlerFactory, "dockableHandlerFactory");
   }
 
   @Override // AbstractView
@@ -554,9 +541,9 @@ public class OpenTCSView
     createEmptyModel();
   }
 
-  @Override	// AbstractView
+  @Override // AbstractView
   public void stop() {
-    log.info("GUI terminating...");
+    LOG.info("GUI terminating...");
     // Exclude the modelling view here.
     appConfig.setDrawingViewCount(viewManager.getDrawingViewMap().size() - 1);
     appConfig.setOrderViewCount(viewManager.getTransportOrderMap().size());
@@ -573,24 +560,24 @@ public class OpenTCSView
    * invoked on the AWT Event Dispatcher Thread. Das darf es eben nicht! HH
    * 31.8.2012
    */
-  @Override	// AbstractView
+  @Override  // AbstractView
   public void clear() {
-//		final Drawing newDrawing = createDrawing();
-//		try {
-//			SwingUtilities.invokeAndWait(new Runnable() {
+//    final Drawing newDrawing = createDrawing();
+//    try {
+//      SwingUtilities.invokeAndWait(new Runnable() {
 //
-//				@Override
-//				public void run() {
-//					drawingView.getDrawing().removeUndoableEditListener(undo);
-//					drawingView.setDrawing(newDrawing);
-//					drawingView.getDrawing().addUndoableEditListener(undo);
-//					undo.discardAllEdits();
-//				}
-//			});
-//		}
-//		catch (InvocationTargetException | InterruptedException ex) {
-//			Main.logger.log(Level.SEVERE, "Exception in clear():\n" + ex);
-//		}
+//        @Override
+//        public void run() {
+//          drawingView.getDrawing().removeUndoableEditListener(undo);
+//          drawingView.setDrawing(newDrawing);
+//          drawingView.getDrawing().addUndoableEditListener(undo);
+//          undo.discardAllEdits();
+//        }
+//      });
+//    }
+//    catch (InvocationTargetException | InterruptedException ex) {
+//      Main.logger.log(Level.SEVERE, "Exception in clear():\n" + ex);
+//    }
   }
 
   @Handler
@@ -617,7 +604,7 @@ public class OpenTCSView
    * @param factory The factory resp. panel that shall be shown / hidden.
    * @param visible True to set it visible, false otherwise.
    */
-  public void showPluginPanel(PanelFactory factory, boolean visible) {
+  public void showPluginPanel(PluggablePanelFactory factory, boolean visible) {
     String id = factory.getClass().getName();
     SingleCDockable dockable
         = dockingManager.getCControl().getSingleDockable(id);
@@ -625,10 +612,9 @@ public class OpenTCSView
       // dockable is not null at this point when the user hides the plugin 
       // panel by clicking on its menu entry
       PluggablePanel panel = (PluggablePanel) dockable.getFocusComponent();
-      panel.plugOut();
+      panel.terminate();
       if (!dockingManager.getCControl().removeDockable(dockable)) {
-        log.warning("Couldn't remove dockable for plugin panel '"
-            + factory.getPanelDescription() + "'");
+        LOG.warn("Couldn't remove dockable for plugin panel '{}'", factory.getPanelDescription());
         return;
       }
     }
@@ -652,11 +638,11 @@ public class OpenTCSView
 
         @Override
         public void closed(CVetoClosingEvent event) {
-          panel.plugOut();
+          panel.terminate();
           dockingManager.getCControl().removeDockable(factoryDockable);
         }
       });
-      panel.plugIn();
+      panel.initialize();
     }
   }
 
@@ -997,11 +983,11 @@ public class OpenTCSView
    *
    * @param message The message to log.
    */
-  private void log(Message message) {
+  private void log(UserNotification message) {
     kernelStatusPanel.display(message);
   }
 
-  @Override	// GuiManager
+  @Override  // GuiManager
   public void createEmptyModel() {
     CloseFileAction action
         = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
@@ -1022,7 +1008,7 @@ public class OpenTCSView
         this, SystemModelTransitionEvent.Stage.UNLOADED));
 
     // Create the new, empty model.
-    log.fine("Creating new driving course model...");
+    LOG.debug("Creating new driving course model...");
     fModelManager.createEmptyModel();
 
     eventBus.publish(new SystemModelTransitionEvent(
@@ -1044,7 +1030,7 @@ public class OpenTCSView
     try {
       kernelProvider.register(localKernelClient);
       if (!kernelProvider.kernelShared()) {
-        log.info("Kernel unavailable, aborting.");
+        LOG.info("Kernel unavailable, aborting.");
         return;
       }
       loadCurrentKernelModel(kernelProvider.getKernel());
@@ -1191,7 +1177,7 @@ public class OpenTCSView
           String text = labels.getFormatted("mode.status.kernelConnectionLost",
                                             labels.getString(
                                                 "kernel.stateModelling"));
-          log(new Message(text, Message.Type.WARNING));
+          log(new UserNotification(text, UserNotification.Level.NOTEWORTHY));
         }
         break;
       default:
@@ -1245,7 +1231,7 @@ public class OpenTCSView
         getFormatted("mode.status.kernelInModelling",
                      labels.getString("kernel.stateModelling"),
                      labels.getString("kernel.stateOperating"));
-    log(new Message(text, Message.Type.INFO));
+    log(new UserNotification(text, UserNotification.Level.INFORMATIONAL));
   }
 
   private void setPlantOverviewStateProperty(String kernelState) {
@@ -1336,8 +1322,7 @@ public class OpenTCSView
           }
         }
         catch (CloneNotSupportedException ex) {
-          log.log(Level.WARNING, "clone() not supported for {0}", modelComponent
-                  .getName());
+          LOG.warn("clone() not supported for {}", modelComponent.getName());
         }
       }
 
@@ -1350,14 +1335,13 @@ public class OpenTCSView
       }
 
       addModelComponent(folder, modelComponent);
-      CONTEXT_TYPE type = null;
+      ContextType type = null;
       if (userObject instanceof ContextObject) {
         ContextObject co = (ContextObject) userObject;
         type = co.getContextType();
       }
       UserObjectContext context = userObjectUtil.createContext(type);
-      userObject = userObjectUtil.createUserObject(modelComponent, context);
-      restoredUserObjects.add(userObject);
+      restoredUserObjects.add(userObjectUtil.createUserObject(modelComponent, context));
     }
 
     return restoredUserObjects;
@@ -1448,19 +1432,19 @@ public class OpenTCSView
     return clonedFigures;
   }
 
-  @Override	// View
+  @Override  // View
   public void write(URI f, URIChooser chooser)
       throws IOException {
-    log.severe("method entry");
+    LOG.error("method entry");
     Drawing drawing = fDrawingEditor.getDrawing();
     OutputFormat outputFormat = drawing.getOutputFormats().get(0);
     outputFormat.write(f, drawing);
   }
 
-  @Override	// View
+  @Override  // View
   public void read(URI f, URIChooser chooser)
       throws IOException {
-    log.severe("method entry");
+    LOG.error("method entry");
     try {
       final Drawing drawing = createDrawing();
       InputFormat inputFormat = drawing.getInputFormats().get(0);
@@ -1487,12 +1471,12 @@ public class OpenTCSView
     }
   }
 
-  @Override	// AbstractView
+  @Override  // AbstractView
   public boolean canSaveTo(URI file) {
     return new File(file).getName().endsWith(".xml");
   }
 
-  @Override	// AbstractView
+  @Override  // AbstractView
   public URI getURI() {
     String modelName = fModelManager.getModel().getName();
 
@@ -1500,9 +1484,7 @@ public class OpenTCSView
       uri = new URI(modelName);
     }
     catch (URISyntaxException ex) {
-      log.log(Level.WARNING,
-              "URISyntaxException in getURI({0}):\n{1}",
-              new Object[] {modelName, ex});
+      LOG.warn("URISyntaxException in getURI({})", modelName, ex);
     }
 
     return uri;
@@ -1641,7 +1623,7 @@ public class OpenTCSView
     return componentRemoved || componentRemovedFromFolder;
   }
 
-  @Override	// GuiManager
+  @Override  // GuiManager
   public void figureSelected(ModelComponent modelComponent) {
     modelComponent.addAttributesChangeListener(attributesEventHandler);
     fPropertiesComponent.setModel(modelComponent);
@@ -1657,7 +1639,7 @@ public class OpenTCSView
     }
   }
 
-  @Override	// GuiManager
+  @Override  // GuiManager
   public void blockSelected(FiguresFolder blockFiguresFolder) {
     Rectangle2D r = null;
     Iterator<Figure> figureIter = blockFiguresFolder.figures();
@@ -1683,12 +1665,12 @@ public class OpenTCSView
         drawingView.addToSelection(figureIter.next());
       }
 
-      //	drawingView.scrollTo(Geom.center(r));
+      //  drawingView.scrollTo(Geom.center(r));
       drawingView.updateBlock(blockFiguresFolder);
     }
   }
 
-  @Override	// GuiManager
+  @Override  // GuiManager
   public void loadModel() {
     if (hasUnsavedChanges()) {
       if (!showUnsavedChangesDialog()) {
@@ -1762,7 +1744,7 @@ public class OpenTCSView
             labels.getString("saveModel.kernelNotInOperating.title"),
             labels.getString("saveModel.kernelNotInOperating.text"),
             UserMessageHelper.Type.QUESTION)
-            != UserMessageHelper.RET_TYPE.OK) {
+            != UserMessageHelper.ReturnType.OK) {
           return false;
         }
       }
@@ -1783,8 +1765,7 @@ public class OpenTCSView
       return didSave;
     }
     catch (CredentialsException e) {
-      log.log(Level.WARNING, "Exception persisting model " + fModelManager
-              .getModel().getName(), e);
+      LOG.warn("Exception persisting model {}", fModelManager.getModel().getName(), e);
       statusPanel.setLogMessage(Level.WARNING, e.getMessage());
       return false;
     }
@@ -1801,7 +1782,7 @@ public class OpenTCSView
     return saved;
   }
 
-  @Override	// GuiManager
+  @Override  // GuiManager
   public boolean saveModelAs() {
     boolean saved = fModelManager.persistModel(true);
     if (saved) {
@@ -1812,7 +1793,7 @@ public class OpenTCSView
     return saved;
   }
 
-  @Override	// GuiManager
+  @Override  // GuiManager
   public ModelComponent createModelComponent(
       Class<? extends ModelComponent> clazz) {
     requireNonNull(clazz, "clazz");
@@ -1984,7 +1965,7 @@ public class OpenTCSView
       configureToolBarButtons(bar);
     }
 
-    getComponent().putClientProperty(toolBarActionsProperty, toolBarActions);
+    getComponent().putClientProperty(TOOLBAR_ACTIONS_PROPERTY, toolBarActions);
 
     return viewComponent;
   }
@@ -2002,7 +1983,7 @@ public class OpenTCSView
   }
 
   private void closeOpenedPluginPanels() {
-    for (PanelFactory factory : panelRegistry.getFactories()) {
+    for (PluggablePanelFactory factory : panelRegistry.getFactories()) {
       showPluginPanel(factory, false);
     }
   }
@@ -2049,7 +2030,7 @@ public class OpenTCSView
         SwingUtilities.invokeAndWait(run);
       }
       catch (InterruptedException | InvocationTargetException ex) {
-        log.log(Level.SEVERE, "Unexpected exception ", ex);
+        LOG.error("Unexpected exception ", ex);
       }
     }
 
@@ -2272,7 +2253,7 @@ public class OpenTCSView
     return null;
   }
 
-  private void setSystemModel(SystemModel systemModel) {
+  public void setSystemModel(SystemModel systemModel) {
     requireNonNull(systemModel, "systemModel is null");
 
     // Clear the name generator
@@ -2351,16 +2332,10 @@ public class OpenTCSView
   private void initializeFrame() {
     if (!SwingUtilities.isEventDispatchThread()) {
       try {
-        SwingUtilities.invokeAndWait(new Runnable() {
-
-          @Override
-          public void run() {
-            initializeFrame();
-          }
-        });
+        SwingUtilities.invokeAndWait(() -> initializeFrame());
       }
       catch (InterruptedException | InvocationTargetException e) {
-        log.log(Level.WARNING, "Exception initializing frame", e);
+        LOG.warn("Exception initializing frame", e);
       }
       return;
     }
@@ -2423,7 +2398,7 @@ public class OpenTCSView
     public AttributesEventHandler() {
     }
 
-    @Override	// AttributesChangeListener
+    @Override  // AttributesChangeListener
     public void propertiesChanged(AttributesChangeEvent event) {
       if (event.getInitiator() == this) {
         return;
@@ -2456,7 +2431,7 @@ public class OpenTCSView
           if (scaleX != 0.0 && scaleY != 0.0) {
             fModelManager.getModel().getDrawingMethod().getOrigin().setScale(
                 scaleX, scaleY);
-//					fModelManager.restoreModel();	// ???
+//          fModelManager.restoreModel();  // ???
           }
         }
       }
@@ -2482,7 +2457,7 @@ public class OpenTCSView
               .getLocationTypeModels());
         }
       }
-//	resetSelectionTool(); ???
+//  resetSelectionTool(); ???
     }
   }
 
@@ -2498,7 +2473,7 @@ public class OpenTCSView
     public BlockEventHandler() {
     }
 
-    @Override	// BlockChangeListener
+    @Override  // BlockChangeListener
     public void courseElementsChanged(BlockChangeEvent event) {
       BlockModel block = (BlockModel) event.getSource();
       // Remove all children from the block and re-add those that are still there.
@@ -2514,7 +2489,7 @@ public class OpenTCSView
     public void colorChanged(BlockChangeEvent event) {
     }
 
-    @Override	// BlockChangeListener
+    @Override  // BlockChangeListener
     public void blockRemoved(BlockChangeEvent event) {
     }
   }
@@ -2531,7 +2506,7 @@ public class OpenTCSView
     public StaticRouteEventHandler() {
     }
 
-    @Override	// StaticRouteChangeListener
+    @Override  // StaticRouteChangeListener
     public void pointsChanged(StaticRouteChangeEvent event) {
       StaticRouteModel staticRoute = (StaticRouteModel) event.getSource();
       // Remove all elements from the static route and re-add the ones left.
@@ -2572,7 +2547,7 @@ public class OpenTCSView
       this.modelManager = requireNonNull(modelManager, "modelManager");
     }
 
-    @Override	// DrawingEditorListener
+    @Override  // DrawingEditorListener
     public ModelComponent figureAdded(DrawingEditorEvent event) {
       Figure figure = event.getFigure();
       FigureComponent model = figure.get(FigureConstants.MODEL);

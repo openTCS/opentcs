@@ -138,14 +138,14 @@ public class GroupModel
     pElements.getItems().remove(removedModelName);
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public String getTreeViewName() {
     String treeViewName = getDescription() + " " + getName();
 
     return treeViewName;
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("group.description");
   }

@@ -149,7 +149,7 @@ public class ViewMenu
     // Popup menu View -> Toolbars: Show/hide single toolbars
     // The ToolBarActions are set in OpenTCSView.wrapViewComponent().
     // Therefore createToolBars() has to be called() first.
-    Object object = view.getComponent().getClientProperty(OpenTCSView.toolBarActionsProperty);
+    Object object = view.getComponent().getClientProperty(OpenTCSView.TOOLBAR_ACTIONS_PROPERTY);
     List<Action> viewActions = (List<Action>) object;
 
     if (viewActions != null && !viewActions.isEmpty()) {

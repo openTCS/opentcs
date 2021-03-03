@@ -28,7 +28,7 @@ public interface ModelPersister {
    * model.
    * @throws IOException If reading the model name from the model file failed.
    */
-  Optional<String> getModelName()
+  Optional<String> getPersistentModelName()
       throws IOException;
 
   /**

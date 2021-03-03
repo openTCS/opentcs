@@ -1,0 +1,2 @@
+org.opentcs.kernel.DefaultKernelExtensionsModule
+org.opentcs.kernel.LoopbackCommAdapterModule

@@ -98,7 +98,7 @@ public abstract class LabeledFigure
         handles.add(new BoundsOutlineHandle(getPresentationFigure(), false, true));
         break;
 
-      case 0:	// Mouse clicked
+      case 0: // Mouse clicked
         // 4 Rechteckige Move Handles in den Ecken der Figur
         MoveHandle.addMoveHandles(this, handles);
         // 4 Rechteckige Move Handles in den Ecken des Labels
@@ -109,7 +109,7 @@ public abstract class LabeledFigure
 
         break;
 
-      case 1:	// Double-Click
+      case 1: // Double-Click
         // Blauer Rahemen + 8 kleine blaue Resize Handles an den Ecken und den Seiten der Figur
         // TODO: Figur "springt" in die falsche Richtung!
         ResizeHandleKit.addResizeHandles(this, handles);

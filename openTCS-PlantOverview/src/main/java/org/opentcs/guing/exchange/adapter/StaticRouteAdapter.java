@@ -14,8 +14,6 @@ import com.google.inject.assistedinject.Assisted;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -35,6 +33,8 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for static routes.
@@ -49,7 +49,7 @@ public class StaticRouteAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(StaticRouteAdapter.class.getName());
+      = LoggerFactory.getLogger(StaticRouteAdapter.class);
 
   /**
    * Creates a new instance.
@@ -90,7 +90,7 @@ public class StaticRouteAdapter
       updateMiscModelProperties(route);
     }
     catch (CredentialsException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
@@ -121,7 +121,7 @@ public class StaticRouteAdapter
       updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
@@ -133,7 +133,7 @@ public class StaticRouteAdapter
 
     ColorProperty pColor
         = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
-    int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;	// mask alpha bits
+    int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
     layoutProperties.put(ElementPropKeys.BLOCK_COLOR,
                          String.format("#%06X", rgb));
     layoutElement.setProperties(layoutProperties);

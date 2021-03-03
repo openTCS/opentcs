@@ -40,7 +40,7 @@ public class SymbolProperty
   }
 
   /**
-   * Setzt den Namen der Datei, welche das grafische Symbol enthält.
+   * Setzt den Namen der Datei, welche das grafische Symbol enthÃ¤lt.
    *
    * @param filename der Name der Bilddatei
    */
@@ -69,7 +69,7 @@ public class SymbolProperty
   @Override // AbstractProperty
   public void copyFrom(Property property) {
     SymbolProperty symbolProperty = (SymbolProperty) property;
-    symbolProperty.setValue(null); // Text "<different Values>" löschen
+    symbolProperty.setValue(null); // Text "<different Values>" lÃ¶schen
     setLocationRepresentation(symbolProperty.getLocationRepresentation());
   }
 }

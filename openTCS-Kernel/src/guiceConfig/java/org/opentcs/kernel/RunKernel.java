@@ -10,9 +10,18 @@ package org.opentcs.kernel;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.util.logging.Logger;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ServiceLoader;
+import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.util.Environment;
+import org.opentcs.util.configuration.Configuration;
+import org.opentcs.util.configuration.XMLConfiguration;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The kernel process's default entry point.
@@ -24,21 +33,50 @@ public class RunKernel {
   /**
    * This class's Logger.
    */
-  private static final Logger log = Logger.getLogger(RunKernel.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(RunKernel.class);
 
   /**
    * Initializes the system and starts the openTCS kernel including modules.
    *
    * @param args The command line arguments.
+   * @throws Exception If there was a problem starting the kernel.
    */
-  public static void main(String[] args) {
+  public static void main(String[] args)
+      throws Exception {
     System.setSecurityManager(new SecurityManager());
-    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(true));
+    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
+    System.setProperty(Configuration.PROPKEY_IMPL_CLASS, XMLConfiguration.class.getName());
 
     Environment.logSystemInfo();
 
-    log.fine("Setting up openTCS kernel " + Environment.getVersionString() + "...");
-    Injector injector = Guice.createInjector(new KernelInjectionModule());
+    LOG.debug("Setting up openTCS kernel {}...", Environment.getBaselineVersion());
+    Injector injector = Guice.createInjector(customConfigurationModule());
     injector.getInstance(KernelStarter.class).startKernel();
+  }
+
+  /**
+   * Builds and returns a Guice module containing the custom configuration for the kernel
+   * application, including additions and overrides by the user.
+   *
+   * @return The custom configuration module.
+   */
+  private static Module customConfigurationModule() {
+    return Modules.override(new DefaultKernelInjectionModule(),
+                            new DefaultKernelStrategiesModule())
+        .with(findRegisteredModules());
+  }
+
+  /**
+   * Finds and returns all Guice modules registered via ServiceLoader.
+   *
+   * @return The registered/found modules.
+   */
+  private static List<KernelInjectionModule> findRegisteredModules() {
+    List<KernelInjectionModule> registeredModules = new LinkedList<>();
+    for (KernelInjectionModule module : ServiceLoader.load(KernelInjectionModule.class)) {
+      LOG.info("Integrating injection module {}", module.getClass().getName());
+      registeredModules.add(module);
+    }
+    return registeredModules;
   }
 }

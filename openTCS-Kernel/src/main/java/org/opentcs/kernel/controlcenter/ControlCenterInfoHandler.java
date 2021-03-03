@@ -8,18 +8,22 @@
  */
 package org.opentcs.kernel.controlcenter;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import org.opentcs.access.TCSNotificationEvent;
+import org.opentcs.data.notification.UserNotification;
 import org.opentcs.util.configuration.ConfigurationStore;
+import org.opentcs.util.eventsystem.EventListener;
+import org.opentcs.util.eventsystem.TCSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A logging handler that writes all INFO-logs to KernelControlCenter's
@@ -28,18 +32,25 @@ import org.opentcs.util.configuration.ConfigurationStore;
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class ControlCenterInfoHandler
-    extends Handler {
+    implements EventListener<TCSEvent> {
 
   /**
    * This class's Logger.
    */
-  private static final Logger log =
-      Logger.getLogger(ControlCenterInfoHandler.class.getName());
+  private static final Logger log
+      = LoggerFactory.getLogger(ControlCenterInfoHandler.class);
   /**
    * This class's ConfigurationStore.
    */
-  private static final ConfigurationStore configStore =
-      ConfigurationStore.getStore(ControlCenterInfoHandler.class.getName());
+  private static final ConfigurationStore configStore
+      = ConfigurationStore.getStore(ControlCenterInfoHandler.class.getName());
+  /**
+   * Formats time stamps.
+   */
+  private static final DateTimeFormatter dateFormat = DateTimeFormatter
+      .ofLocalizedDateTime(FormatStyle.SHORT)
+      .withLocale(Locale.getDefault())
+      .withZone(ZoneId.systemDefault());
   /**
    * The text area we're writing in.
    */
@@ -60,16 +71,19 @@ public class ControlCenterInfoHandler
    */
   public ControlCenterInfoHandler(JTextArea textArea) {
     this.textArea = Objects.requireNonNull(textArea);
-    this.setFormatter(new SimpleFormatter());
-    //this.setFormatter(new SingleLineFormatter());
     maxDocLength = configStore.getInt("maxCharactersAllowedInKernelLoggingArea",
                                       3000);
     autoScroll = true;
+  }
 
-    // Set a configurable log level.
-    String levelPropName = getClass().getName() + ".level";
-    String levelProp = LogManager.getLogManager().getProperty(levelPropName);
-    setLevel(levelProp == null ? Level.INFO : Level.parse(levelProp));
+  @Override
+  public void processEvent(TCSEvent event) {
+    if (!(event instanceof TCSNotificationEvent)) {
+      return;
+    }
+    SwingUtilities.invokeLater(() -> {
+      publish(((TCSNotificationEvent) event).getNotification());
+    });
   }
 
   /**
@@ -106,29 +120,12 @@ public class ControlCenterInfoHandler
     return maxDocLength;
   }
 
-  @Override
-  public void publish(final LogRecord record) {
-    Objects.requireNonNull(record);
-    if (!isLoggable(record)) {
-      return;
-    }
-    Runnable runPublish = new Runnable() {
-
-      @Override
-      public void run() {
-        publishP(record);
-      }
-    };
-
-    SwingUtilities.invokeLater(runPublish);
-  }
-
   /**
-   * Writes the actual message.
-   * 
-   * @param record The message
+   * Displays the notification.
+   *
+   * @param notification The notification
    */
-  private void publishP(LogRecord record) {
+  private void publish(UserNotification notification) {
     DefaultCaret caret = (DefaultCaret) textArea.getCaret();
     if (autoScroll) {
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -138,16 +135,16 @@ public class ControlCenterInfoHandler
       caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
     }
 
-    textArea.append(this.getFormatter().format(record));
+    textArea.append(format(notification));
+    textArea.append("\n");
     checkLength();
   }
 
-  @Override
-  public void flush() {
-  }
-
-  @Override
-  public void close() throws SecurityException {
+  private String format(UserNotification notification) {
+    return dateFormat.format(notification.getTimestamp())
+        + " " + notification.getLevel()
+        + ": [" + notification.getSource() + "] "
+        + notification.getText();
   }
 
   /**
@@ -155,19 +152,15 @@ public class ControlCenterInfoHandler
    * our <code>maxDocLength</code> and cuts it if neccessary.
    */
   private synchronized void checkLength() {
-    SwingUtilities.invokeLater(new Runnable() {
+    SwingUtilities.invokeLater(() -> {
+      int docLength = textArea.getDocument().getLength();
 
-      @Override
-      public void run() {
-        int docLength = textArea.getDocument().getLength();
-
-        if (docLength > maxDocLength) {
-          try {
-            textArea.getDocument().remove(0, docLength - maxDocLength);
-          }
-          catch (BadLocationException e) {
-            log.log(Level.WARNING, "Caught exception", e);
-          }
+      if (docLength > maxDocLength) {
+        try {
+          textArea.getDocument().remove(0, docLength - maxDocLength);
+        }
+        catch (BadLocationException e) {
+          log.warn("Caught exception", e);
         }
       }
     });

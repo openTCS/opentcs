@@ -16,7 +16,7 @@ import org.opentcs.guing.components.properties.event.NullAttributesChangeListene
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Ein Undo für die Änderung eines Attributs.
+ * Ein Undo fÃ¼r die Ã„nderung eines Attributs.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -28,11 +28,11 @@ public class PropertyUndoActivity
    */
   protected Property fProperty;
   /**
-   * Der Zustand des Attributs vor der Änderung.
+   * Der Zustand des Attributs vor der Ã„nderung.
    */
   protected Property fBeforeModification;
   /**
-   * Der Zustand des Attributs nach der Änderung.
+   * Der Zustand des Attributs nach der Ã„nderung.
    */
   protected Property fAfterModification;
   /**
@@ -56,14 +56,14 @@ public class PropertyUndoActivity
   }
 
   /**
-   * Erstellt eine Momentaufnahme vor der Änderung des Attributs.
+   * Erstellt eine Momentaufnahme vor der Ã„nderung des Attributs.
    */
   public void snapShotBeforeModification() {
     fBeforeModification = createMemento();
   }
 
   /**
-   * Erstellt eine Momentaufnahme nach der Änderung des Attributs.
+   * Erstellt eine Momentaufnahme nach der Ã„nderung des Attributs.
    */
   public void snapShotAfterModification() {
     fAfterModification = createMemento();

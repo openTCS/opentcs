@@ -59,6 +59,8 @@ public class OrderSequenceDispatcher
       case OBJECT_REMOVED:
         eventBus.publish(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_REMOVED));
         break;
+        
+      default:
     }
   }
 }

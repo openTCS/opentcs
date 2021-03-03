@@ -22,8 +22,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -47,9 +45,11 @@ import org.opentcs.guing.event.OrderSequenceEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Eine Ansicht f�r Transportauftragsketten. Teil dieser Ansicht ist die
+ * Eine Ansicht fï¿½r Transportauftragsketten. Teil dieser Ansicht ist die
  * Tabelle, in der die Transportauftragsketten dargestellt sind.
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -66,7 +66,7 @@ public class OrderSequencesContainerPanel
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(OrderSequencesContainerPanel.class.getName());
+      = LoggerFactory.getLogger(OrderSequencesContainerPanel.class);
   /**
    * Provides access to a kernel.
    */
@@ -175,7 +175,7 @@ public class OrderSequencesContainerPanel
                         bundle.getString("OrderSequencesContainerPanel.finished"),
                         bundle.getString("OrderSequencesContainerPanel.failureFatal")};
     fTableModel = new FilterTableModel(new DefaultTableModel(columns, 0));
-    fTableModel.setColumnIndexToFilter(5);	// Column "Finished"
+    fTableModel.setColumnIndexToFilter(5);  // Column "Finished"
     fTable = new OrdersTable(fTableModel);
 
     JScrollPane scrollPane = new JScrollPane(fTable);
@@ -183,7 +183,7 @@ public class OrderSequencesContainerPanel
 
     fFilterButtons = createFilterButtons();
     JToolBar toolBar = createToolBar(fFilterButtons);
-//		addControlButtons(toolBar);
+//    addControlButtons(toolBar);
     add(toolBar, BorderLayout.NORTH);
 
     fTable.addMouseListener(new MouseAdapter() {
@@ -213,7 +213,7 @@ public class OrderSequencesContainerPanel
       dialog.setVisible(true);
     }
     catch (CredentialsException e) {
-      log.log(Level.WARNING, "Exception fetching order sequences from kernel", e);
+      log.warn("Exception fetching order sequences from kernel", e);
     }
   }
 
@@ -337,7 +337,7 @@ public class OrderSequencesContainerPanel
     String name = os.getName();
     row.addElement(name);
 
-    // Spalte 2: Gew�nschtes Fahrzeug
+    // Spalte 2: Gewï¿½nschtes Fahrzeug
     TCSObjectReference<Vehicle> intendedVehicle = os.getIntendedVehicle();
 
     if (intendedVehicle != null) {
@@ -347,7 +347,7 @@ public class OrderSequencesContainerPanel
       row.addElement(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.table.determineAutomatic"));
     }
 
-    // Spalte 3: Ausf�hrendes Fahrzeug
+    // Spalte 3: Ausfï¿½hrendes Fahrzeug
     TCSObjectReference<Vehicle> processingVehicle = os.getProcessingVehicle();
 
     if (processingVehicle != null) {
@@ -374,8 +374,8 @@ public class OrderSequencesContainerPanel
     row.addElement(failureFatal);
 
     // Weitere Felder der Ordersequence:
-//	TCSObjectReference<TransportOrder> nextUnfinishedOrder = os.getNextUnfinishedOrder();
-//	List<TCSObjectReference<TransportOrder>> orders = os.getOrders();
+//  TCSObjectReference<TransportOrder> nextUnfinishedOrder = os.getNextUnfinishedOrder();
+//  List<TCSObjectReference<TransportOrder>> orders = os.getOrders();
     return row;
   }
 }

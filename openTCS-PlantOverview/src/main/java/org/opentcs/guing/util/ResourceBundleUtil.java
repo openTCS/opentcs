@@ -33,8 +33,6 @@ import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -43,6 +41,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.jhotdraw.util.LocaleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a convenience wrapper for accessing resources stored in a
@@ -96,7 +96,7 @@ public class ResourceBundleUtil
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(ResourceBundleUtil.class.getName());
+      = LoggerFactory.getLogger(ResourceBundleUtil.class);
   /**
    * The global verbose property.
    */
@@ -184,9 +184,7 @@ public class ResourceBundleUtil
     catch (MissingResourceException e) {
       // System.out.println("ResourceBundleUtil "+baseName+" get("+key+"):***MISSING***");
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "baseName: " + baseName + ", \"" + key + "\" not found.",
-                e);
+        log.warn("baseName: " + baseName + ", \"" + key + "\" not found.", e);
       }
 
       return key;
@@ -329,9 +327,7 @@ public class ResourceBundleUtil
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "baseName: " + baseName + ", \"" + key + "\" not found.",
-                e);
+        log.warn("baseName: " + baseName + ", \"" + key + "\" not found.", e);
       }
 
       return -1;
@@ -356,18 +352,15 @@ public class ResourceBundleUtil
       URL url = baseClass.getResource(rsrcName);
 
       if (isVerbose && url == null) {
-        log.log(Level.WARNING,
-                "[" + baseName + "]. getIconProperty \"" + key + ".icon\" resource:" + rsrcName + " not found.",
-                new Exception("Exception just for tracing"));
+        log.warn("[" + baseName + "]. getIconProperty \"" + key + ".icon\" resource:" + rsrcName + " not found.",
+                 new Exception("Exception just for tracing"));
       }
 
       return (url == null) ? null : new ImageIcon(url);
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "[" + baseName + "].getIconProperty \"" + key + ".icon\" not found.",
-                e);
+        log.warn("[" + baseName + "].getIconProperty \"" + key + ".icon\" not found.", e);
       }
 
       return null;
@@ -389,18 +382,15 @@ public class ResourceBundleUtil
       URL url = baseClass.getResource(rsrcName);
 
       if (isVerbose && url == null) {
-        log.log(Level.WARNING,
-                "[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" resource:" + rsrcName + " not found.",
-                new Exception("Exception just for tracing"));
+        log.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" resource:" + rsrcName + " not found.",
+                 new Exception("Exception just for tracing"));
       }
 
       return (url == null) ? null : new ImageIcon(url);
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" not found.",
-                e);
+        log.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" not found.", e);
       }
 
       return null;
@@ -437,9 +427,7 @@ public class ResourceBundleUtil
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "[" + baseName + "] \"" + key + ".mnemonic\" not found.",
-                e);
+        log.warn("[" + baseName + "] \"" + key + ".mnemonic\" not found.", e);
       }
 
       s = null;
@@ -464,9 +452,7 @@ public class ResourceBundleUtil
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "[" + baseName + "] \"" + key + ".toolTipText\" not found.",
-                e);
+        log.warn("[" + baseName + "] \"" + key + ".toolTipText\" not found.", e);
       }
 
       return null;
@@ -488,9 +474,7 @@ public class ResourceBundleUtil
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "[" + baseName + "] \"" + key + ".text\" not found.",
-                e);
+        log.warn("[" + baseName + "] \"" + key + ".text\" not found.", e);
       }
 
       return null;
@@ -538,9 +522,7 @@ public class ResourceBundleUtil
     }
     catch (MissingResourceException e) {
       if (isVerbose) {
-        log.log(Level.WARNING,
-                "[" + baseName + "] \"" + key + ".accelerator\" not found.",
-                e);
+        log.warn("[" + baseName + "] \"" + key + ".accelerator\" not found.", e);
       }
     }
     catch (NoSuchElementException e) {

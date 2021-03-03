@@ -20,7 +20,7 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Erlaubt die gleichzeitige Änderung von gleichnamigen Attributen mehrerer
+ * Erlaubt die gleichzeitige Ã„nderung von gleichnamigen Attributen mehrerer
  * Modellkomponenten auf einmal.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -44,7 +44,7 @@ public class PropertiesCollection
   }
 
   /**
-   * Findet die Attribute heraus, die gemeinschaftlich bearbeitet werden können.
+   * Findet die Attribute heraus, die gemeinschaftlich bearbeitet werden kÃ¶nnen.
    */
   private void extractSameProperties() {
     if (getChildComponents().isEmpty()) {
@@ -121,9 +121,9 @@ public class PropertiesCollection
   }
 
   /**
-   * Informiert alle registrierten Listener (Controller/Views) über die Änderung
-   * der Daten. Der Controller/View, der die Änderung verursacht hat, ruft diese
-   * Methode auf und übergibt sich dabei selbst.
+   * Informiert alle registrierten Listener (Controller/Views) Ã¼ber die Ã„nderung
+   * der Daten. Der Controller/View, der die Ã„nderung verursacht hat, ruft diese
+   * Methode auf und Ã¼bergibt sich dabei selbst.
    *
    * @param listener
    */
@@ -138,7 +138,7 @@ public class PropertiesCollection
   }
 
   /**
-   * Übernimmt alle Werte der hiesigen Attribute für das übergebene Modell.
+   * Ãœbernimmt alle Werte der hiesigen Attribute fÃ¼r das Ã¼bergebene Modell.
    *
    * @param model
    */

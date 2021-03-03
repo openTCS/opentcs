@@ -79,7 +79,7 @@ public class CreateTransportOrderAction
     if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
       return;
     }
-    orderUtil.createTransportOrder(contentPanel.getLocations(),
+    orderUtil.createTransportOrder(contentPanel.getDestinationModels(),
                                    contentPanel.getActions(),
                                    contentPanel.getSelectedDeadline(),
                                    contentPanel.getSelectedVehicle());

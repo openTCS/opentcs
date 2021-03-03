@@ -11,7 +11,7 @@
 package org.opentcs.guing.components.properties.event;
 
 /**
- * Interface für Klassen, die benachrichtigt werden möchten, wenn der Benutzer
+ * Interface fÃ¼r Klassen, die benachrichtigt werden mÃ¶chten, wenn der Benutzer
  * eine Tabellenzeile selektiert. Ein TableChangeListener registriert sich dazu
  * bei einer Tabelle.
  *
@@ -23,14 +23,14 @@ public interface TableChangeListener
   /**
    * Nachricht der Tabelle, dass eine Tabellenzeile selektiert wurde.
    *
-   * @param event Das TableSelectionChangeEvent gibt Auskunft über die Tabelle,
+   * @param event Das TableSelectionChangeEvent gibt Auskunft Ã¼ber die Tabelle,
    * in der die Selektierung stattfand, sowie das Attribut, das sich in der
    * selektierten Zeile befindet.
    */
   void tableSelectionChanged(TableSelectionChangeEvent event);
 
   /**
-   * Nachricht der Tabelle, das Änderungen am Tabelleninhalt aufgetreten sind.
+   * Nachricht der Tabelle, das Ã„nderungen am Tabelleninhalt aufgetreten sind.
    */
   void tableModelChanged();
 }

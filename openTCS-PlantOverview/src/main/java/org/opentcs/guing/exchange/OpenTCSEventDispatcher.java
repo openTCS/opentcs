@@ -10,15 +10,14 @@
 package org.opentcs.guing.exchange;
 
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.TCSKernelStateEvent;
-import org.opentcs.access.TCSMessageEvent;
 import org.opentcs.access.TCSModelTransitionEvent;
+import org.opentcs.access.TCSNotificationEvent;
 import org.opentcs.access.rmi.RemoteKernelConnection;
 import org.opentcs.access.rmi.TCSProxyStateEvent;
 import org.opentcs.data.TCSObjectEvent;
@@ -38,6 +37,8 @@ import org.opentcs.guing.util.MessageDisplay;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The openTCS implementation of the abstract event dispatcher.
@@ -52,8 +53,7 @@ public class OpenTCSEventDispatcher
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(OpenTCSEventDispatcher.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(OpenTCSEventDispatcher.class);
   /**
    * A display for messages received from the kernel.
    */
@@ -97,10 +97,10 @@ public class OpenTCSEventDispatcher
 
   @Override
   public void register() {
-    log.fine("Dispatcher " + this + " registering with kernel...");
+    LOG.debug("Dispatcher {} registering with kernel...", this);
     Kernel kernel = getKernel();
     if (kernel == null) {
-      log.warning("No kernel to register with, aborting.");
+      LOG.warn("No kernel to register with, aborting.");
       return;
     }
 
@@ -167,7 +167,7 @@ public class OpenTCSEventDispatcher
           return true;
         }
 
-        if (event instanceof TCSMessageEvent) {
+        if (event instanceof TCSNotificationEvent) {
           return true;
         }
 
@@ -180,10 +180,10 @@ public class OpenTCSEventDispatcher
 
   @Override
   public void release() {
-    log.fine("Dispatcher " + this + " unregistering with kernel...");
+    LOG.debug("Dispatcher {} unregistering with kernel...", this);
     Kernel kernel = getKernel();
     if (kernel == null) {
-      log.warning("No kernel to unregister with, aborting.");
+      LOG.warn("No kernel to unregister with, aborting.");
       return;
     }
 
@@ -204,7 +204,8 @@ public class OpenTCSEventDispatcher
       // the transition to finish
       if (kse.isTransitionFinished()
           || kse.getEnteredState() == Kernel.State.SHUTDOWN) {
-        eventBus.publish(new KernelStateChangeEvent(this, 
+        eventBus.publish(new KernelStateChangeEvent(
+            this,
             KernelStateChangeEvent.convertKernelState(kse.getEnteredState())));
       }
     }
@@ -212,12 +213,12 @@ public class OpenTCSEventDispatcher
       TCSProxyStateEvent pse = (TCSProxyStateEvent) event;
 
       if (pse.getEnteredState() == RemoteKernelConnection.State.DISCONNECTED) {
-        eventBus.publish(new KernelStateChangeEvent(this, 
-            KernelStateChangeEvent.State.DISCONNECTED));
+        eventBus.publish(new KernelStateChangeEvent(this,
+                                                    KernelStateChangeEvent.State.DISCONNECTED));
       }
     }
-    else if (event instanceof TCSMessageEvent) {
-      messageDisplay.display(((TCSMessageEvent) event).getMessage());
+    else if (event instanceof TCSNotificationEvent) {
+      messageDisplay.display(((TCSNotificationEvent) event).getNotification());
     }
   }
 
@@ -239,7 +240,6 @@ public class OpenTCSEventDispatcher
         register();
         break;
       default:
-      // Do nada.
     }
   }
 
@@ -257,8 +257,13 @@ public class OpenTCSEventDispatcher
     logObjectEvent(objectEvent);
 
     if (objectEvent.getType() == OBJECT_MODIFIED) {
-      ProcessAdapter adapter = findProcessAdapter(
-          objectEvent.getCurrentObjectState().getReference());
+      ProcessAdapter adapter
+          = findProcessAdapter(objectEvent.getCurrentObjectState().getReference());
+      if (adapter == null) {
+        LOG.debug("No adapter found for {}",
+                  objectEvent.getCurrentOrPreviousObjectState().getName());
+        return;
+      }
       adapter.updateModelProperties(getKernel(),
                                     objectEvent.getCurrentObjectState(),
                                     null);
@@ -266,14 +271,10 @@ public class OpenTCSEventDispatcher
   }
 
   private void logObjectEvent(TCSObjectEvent objectEvent) {
-    StringBuilder msg = new StringBuilder();
-    msg.append("TCSObject created. Id: ")
-        .append(objectEvent.getCurrentObjectState().getId())
-        .append(" Name: ")
-        .append(objectEvent.getCurrentObjectState().getName())
-        .append(" Event type:")
-        .append(objectEvent.getType().name());
-    log.fine(msg.toString());
+    LOG.debug("TCSObjectEvent received. ID: {} Name: {} Event type: {}",
+              objectEvent.getCurrentOrPreviousObjectState().getId(),
+              objectEvent.getCurrentOrPreviousObjectState().getName(),
+              objectEvent.getType().name());
   }
 
 }

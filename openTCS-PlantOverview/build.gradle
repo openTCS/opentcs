@@ -1,4 +1,4 @@
-apply plugin: 'application'
+apply from: "${rootDir}/gradle/application-guice.gradle"
 
 if (!hasProperty('mainClass')) {
   ext.mainClass = 'org.opentcs.guing.RunPlantOverview'
@@ -6,47 +6,22 @@ if (!hasProperty('mainClass')) {
 mainClassName = ext.mainClass
 
 ext.collectableDistDir = new File(buildDir, 'install')
-ext.appDir = new File(collectableDistDir, project.name)
-
-sourceSets {
-  guiceConfig
-}
-
-configurations {
-  guiceConfigCompile.extendsFrom compile
-}
 
 dependencies {
-  compile project(':openTCS-Base')
-  compile group: 'com.google.inject', name: 'guice', version: '3.0'
-  compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
-  compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '3.0'
-  compile group: 'net.engio', name: 'mbassador', version: '1.1.10'
+  compile project(':openTCS-API-Injection')
+  compile project(':openTCS-Common')
   // There does not seem to be an official binary release for JHotDraw...
   compile files(rootProject.file('lib/jhotdraw-7.6.jar'))
   // This preview version of Docking Frames is not in Maven Central, yet.
   compile files(rootProject.file('lib/docking-frames-common-1.1.2p11.jar'))
   compile files(rootProject.file('lib/docking-frames-core-1.1.2p11.jar'))
   
-  guiceConfigCompile sourceSets.main.output
+  runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 
 compileJava {
-  options.compilerArgs << "-Xlint:all"
-  options.compilerArgs << "-Xlint:-serial"
   options.compilerArgs << "-Xlint:-rawtypes"
   options.compilerArgs << "-Xlint:-unchecked"
-}
-
-compileTestJava {
-  options.compilerArgs << "-Xlint:all"
-}
-
-jar {
-  from sourceSets.guiceConfig.output
-  // This merely tells NetBeans where to look for classes in case other
-  // subprojects depending on this one. By default, it only scans 'main'.
-  ext.netBeansSourceSets = [sourceSets.guiceConfig, sourceSets.main]
 }
 
 // For now, we're using hand-crafted start scripts, so disable the application
@@ -55,15 +30,11 @@ startScripts.enabled = false
 
 task release {
   dependsOn build
-  dependsOn installApp
+  dependsOn installDist
 }
 
 run {
-  dependsOn installApp
-  workingDir appDir
-  enableAssertions true
-  classpath(files { new File(appDir, 'lib').listFiles() })
-  systemProperties(['java.util.logging.config.file':'./config/logging-plantoverview.config',\
+  systemProperties(['java.util.logging.config.file':'./config/logging.config',\
                     'java.security.policy':'file:./config/java.policy',\
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
@@ -75,18 +46,4 @@ run {
                     'org.opentcs.util.configuration.saveonexit':'true'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\
           '-splash:bin/splash-image.gif')
-}
-
-task(debug, type:JavaExec) {
-  dependsOn installApp
-  workingDir run.workingDir
-  enableAssertions run.enableAssertions
-  
-  main run.main
-  args run.args
-  classpath run.classpath
-  jvmArgs run.jvmArgs
-  systemProperties run.systemProperties
-
-  debug true
 }

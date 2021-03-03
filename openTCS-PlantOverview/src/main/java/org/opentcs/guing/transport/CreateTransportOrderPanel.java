@@ -17,9 +17,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -32,6 +34,7 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.EditDriveOrderPanel;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
+import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
@@ -48,17 +51,18 @@ public class CreateTransportOrderPanel
     extends DialogContent {
 
   /**
-   * Die ausgewählte Frist.
+   * Die ausgewÃ¤hlte Frist.
    */
   private long fSelectedDeadline;
   /**
    * Die anzufahrenden Stationen.
    */
-  private final List<LocationModel> fLocationModels = new ArrayList<>();
+  private final List<AbstractFigureComponent> fDestinationModels = new ArrayList<>();
   /**
-   * Die an den Stationen auszuführenden Aktionen.
+   * Die an den Stationen auszufÃ¼hrenden Aktionen.
    */
   private final List<String> fActions = new ArrayList<>();
+  private final List<Map<String, String>> fPropertiesList = new ArrayList<>();
   /**
    * Die zur Auswahl stehenden Fahrzeuge.
    */
@@ -114,24 +118,29 @@ public class CreateTransportOrderPanel
 
   /**
    * Liefert die anzufahrenden Stationen.
+   * Returns location or point models to allow transport orders with a point as destination.
    *
    * @return die Stationen
    */
-  public List<LocationModel> getLocations() {
-    return fLocationModels;
+  public List<AbstractFigureComponent> getDestinationModels() {
+    return fDestinationModels;
   }
 
   /**
-   * Liefert die auszuführenden Aktionen.
+   * Liefert die auszufÃ¼hrenden Aktionen.
    *
    * @return die Aktionen
    */
   public List<String> getActions() {
     return fActions;
   }
+  
+  public List<Map<String, String>> getPropertiesList() {
+    return fPropertiesList;
+  }
 
   /**
-   * Liefert die ausgewählte Frist.
+   * Liefert die ausgewÃ¤hlte Frist.
    *
    * @return die Frist
    */
@@ -155,12 +164,12 @@ public class CreateTransportOrderPanel
   @Override
   public void update() {
     try {
-      // Temporärer Kalender zum puffern des Datums
+      // TemporÃ¤rer Kalender zum puffern des Datums
       Calendar calDate = new GregorianCalendar();
       SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy");
       Date date = f.parse(dateTextField.getText());
       calDate.setTime(date);
-      // Temporärer Kalender zum puffern der Uhrzeit
+      // TemporÃ¤rer Kalender zum puffern der Uhrzeit
       Calendar calTime = new GregorianCalendar();
       f = new SimpleDateFormat("HH:mm");
       Date time = f.parse(timeTextField.getText());
@@ -181,7 +190,7 @@ public class CreateTransportOrderPanel
 
     fParsingFailed = false;
 
-    if (fLocationModels.isEmpty()) {
+    if (fDestinationModels.isEmpty()) {
       String title = ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.inputError");
       String message = ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.errorMessage");
       int messageType = JOptionPane.ERROR_MESSAGE;
@@ -224,7 +233,7 @@ public class CreateTransportOrderPanel
         vehicleComboBox.setSelectedItem(fPattern.getIntendedVehicle().getName());
       }
 
-      // Fahraufträge
+      // FahrauftrÃ¤ge
       List<DriveOrder> driveOrders = new LinkedList<>();
       driveOrders.addAll(fPattern.getPastDriveOrders());
 
@@ -238,14 +247,19 @@ public class CreateTransportOrderPanel
       for (DriveOrder o : driveOrders) {
         String location = o.getDestination().getLocation().getName();
         String action = o.getDestination().getOperation();
+        Map<String, String> properties = o.getDestination().getProperties();
 
         String[] row = new String[2];
         row[0] = location;
         row[1] = action;
         model.addRow(row);
-
-        fLocationModels.add(fModelManager.getModel().getLocationModel(location));
+        AbstractFigureComponent destModel = fModelManager.getModel().getLocationModel(location);
+        if (destModel == null) {
+          destModel = fModelManager.getModel().getPointModel(location);
+        }
+        fDestinationModels.add(destModel);
         fActions.add(action);
+        fPropertiesList.add(properties);
       }
     }
 
@@ -262,7 +276,7 @@ public class CreateTransportOrderPanel
   }
 
   /**
-   * Aktualisiert den Zustand der Schaltflächen {enabled | disabled}.
+   * Aktualisiert den Zustand der SchaltflÃ¤chen {enabled | disabled}.
    */
   private void updateButtons() {
     boolean state = driveOrdersTable.getSelectedRow() != -1;
@@ -498,9 +512,9 @@ public class CreateTransportOrderPanel
     }// </editor-fold>//GEN-END:initComponents
 
   /**
-   * Rückt den ausgewählten Fahrauftrag um eine Position nach unten.
+   * RÃ¼ckt den ausgewÃ¤hlten Fahrauftrag um eine Position nach unten.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
@@ -517,19 +531,22 @@ public class CreateTransportOrderPanel
       model.moveRow(index, index, index + 1);
       driveOrdersTable.getSelectionModel().setSelectionInterval(index + 1, index + 1);
 
-      LocationModel location = fLocationModels.remove(index);
-      fLocationModels.add(index + 1, location);
+      AbstractFigureComponent location = fDestinationModels.remove(index);
+      fDestinationModels.add(index + 1, location);
 
       String action = fActions.remove(index);
       fActions.add(index + 1, action);
+      
+      Map<String, String> properties = fPropertiesList.remove(index);
+      fPropertiesList.add(index + 1, properties);
 
       updateButtons();
     }//GEN-LAST:event_moveDownButtonActionPerformed
 
   /**
-   * Rückt den ausgewählten Fahrauftrag um eine Position nach oben.
+   * RÃ¼ckt den ausgewÃ¤hlten Fahrauftrag um eine Position nach oben.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void moveUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
@@ -542,19 +559,22 @@ public class CreateTransportOrderPanel
       model.moveRow(index, index, index - 1);
       driveOrdersTable.getSelectionModel().setSelectionInterval(index - 1, index - 1);
 
-      LocationModel location = fLocationModels.remove(index);
-      fLocationModels.add(index - 1, location);
+      AbstractFigureComponent location = fDestinationModels.remove(index);
+      fDestinationModels.add(index - 1, location);
 
       String action = fActions.remove(index);
       fActions.add(index - 1, action);
 
+      Map<String, String> properties = fPropertiesList.remove(index);
+      fPropertiesList.add(index - 1, properties);
+      
       updateButtons();
     }//GEN-LAST:event_moveUpButtonActionPerformed
 
   /**
-   * Entfernt den ausgewählten Fahrauftrag.
+   * Entfernt den ausgewÃ¤hlten Fahrauftrag.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
@@ -563,8 +583,9 @@ public class CreateTransportOrderPanel
         return;
       }
 
-      fLocationModels.remove(index);
+      fDestinationModels.remove(index);
       fActions.remove(index);
+      fPropertiesList.remove(index);
 
       DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
       model.removeRow(index);
@@ -572,9 +593,9 @@ public class CreateTransportOrderPanel
     }//GEN-LAST:event_removeButtonActionPerformed
 
   /**
-   * Bearbeitet den ausgewählten Fahrauftrag.
+   * Bearbeitet den ausgewÃ¤hlten Fahrauftrag.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
@@ -583,7 +604,7 @@ public class CreateTransportOrderPanel
         return;
       }
 
-      LocationModel location = fLocationModels.get(index);
+      AbstractFigureComponent location = fDestinationModels.get(index);
       String action = fActions.get(index);
       EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels(), location, action);
       StandardContentDialog dialog
@@ -601,15 +622,15 @@ public class CreateTransportOrderPanel
         driveOrdersTable.setValueAt(location.getName(), index, 0);
         driveOrdersTable.setValueAt(action, index, 1);
 
-        fLocationModels.set(index, location);
+        fDestinationModels.set(index, location);
         fActions.set(index, action);
       }
     }//GEN-LAST:event_editButtonActionPerformed
 
   /**
-   * Fügt einen Fahrauftrag hinzu.
+   * FÃ¼gt einen Fahrauftrag hinzu.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels());
@@ -634,8 +655,9 @@ public class CreateTransportOrderPanel
         DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
         model.addRow(row);
 
-        fLocationModels.add(location);
+        fDestinationModels.add(location);
         fActions.add(action);
+        fPropertiesList.add(new HashMap<>());
 
         driveOrdersTable.setRowSelectionInterval(index, index);
         updateButtons();

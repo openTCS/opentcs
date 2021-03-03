@@ -21,49 +21,49 @@ import javax.swing.JToggleButton;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class FilterButton
-		extends JToggleButton {
+    extends JToggleButton {
 
-	/**
-	 * Das TableModel, das die Filterung vornimmt.
-	 */
-	private final FilterTableModel fTableModel;
-	/**
-	 * Der Filter.
-	 */
-	private final Object fFilter;
+  /**
+   * Das TableModel, das die Filterung vornimmt.
+   */
+  private final FilterTableModel fTableModel;
+  /**
+   * Der Filter.
+   */
+  private final Object fFilter;
 
-	/**
-	 * Creates a new instance.
+  /**
+   * Creates a new instance.
    * 
    * @param icon The image that the button should display
    * @param tableModel The table model to be filtered
    * @param filter The actual filter
-	 */
-	public FilterButton(ImageIcon icon, FilterTableModel tableModel, Object filter) {
-		super(icon);
-		fTableModel = tableModel;
-		fFilter = filter;
+   */
+  public FilterButton(ImageIcon icon, FilterTableModel tableModel, Object filter) {
+    super(icon);
+    fTableModel = tableModel;
+    fFilter = filter;
 
-		addActionListener(new ActionListener() {
+    addActionListener(new ActionListener() {
 
       @Override
-			public void actionPerformed(ActionEvent e) {
-				changed();
-			}
-		});
-		
-		setSelected(true);
-	}
+      public void actionPerformed(ActionEvent e) {
+        changed();
+      }
+    });
+    
+    setSelected(true);
+  }
 
-	/**
+  /**
    * Called when the button has changed.
-	 */
-	private void changed() {
-		if (isSelected()) {
-			fTableModel.removeFilter(fFilter);
-		}
-		else {
-			fTableModel.addFilter(fFilter);
-		}
-	}
+   */
+  private void changed() {
+    if (isSelected()) {
+      fTableModel.removeFilter(fFilter);
+    }
+    else {
+      fTableModel.addFilter(fFilter);
+    }
+  }
 }

@@ -22,7 +22,7 @@ public class KeyValueProperty
     extends AbstractComplexProperty {
 
   /**
-   * Der Schlüssel.
+   * Der SchlÃ¼ssel.
    */
   private String fKey;
 
@@ -38,7 +38,7 @@ public class KeyValueProperty
    * Creates a new instance of KeyValueProperty.
    *
    * @param model
-   * @param key der Schlüssel
+   * @param key der SchlÃ¼ssel
    * @param value der Wert
    */
   public KeyValueProperty(ModelComponent model, String key, String value) {
@@ -53,9 +53,9 @@ public class KeyValueProperty
   }
 
   /**
-   * Setzt den Schlüssel und den Wert.
+   * Setzt den SchlÃ¼ssel und den Wert.
    *
-   * @param key der Schlüssel
+   * @param key der SchlÃ¼ssel
    * @param value der Wert
    */
   public void setKeyAndValue(String key, String value) {
@@ -64,9 +64,9 @@ public class KeyValueProperty
   }
 
   /**
-   * Liefert den Schlüssel.
+   * Liefert den SchlÃ¼ssel.
    *
-   * @return den Schlüssel
+   * @return den SchlÃ¼ssel
    */
   public String getKey() {
     return fKey;

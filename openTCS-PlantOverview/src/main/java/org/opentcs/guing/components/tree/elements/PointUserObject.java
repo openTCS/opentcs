@@ -22,7 +22,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repr‰sentation eines Point-Objekts in der Baumansicht.
+ * Die Repr√§sentation eines Point-Objekts in der Baumansicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -69,7 +69,7 @@ public class PointUserObject
   }
 
   @Override
-  public UserObjectContext.CONTEXT_TYPE getContextType() {
+  public UserObjectContext.ContextType getContextType() {
     return context.getType();
   }
 }

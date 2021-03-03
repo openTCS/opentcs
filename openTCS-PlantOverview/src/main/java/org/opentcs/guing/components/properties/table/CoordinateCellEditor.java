@@ -21,11 +21,11 @@ import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {CoordinateQuantity}.
+ * Ein CellEditor fÃ¼r Attribute vom Typ {CoordinateQuantity}.
  * Der Editor umfasst:
  * - ein Textfeld zur schnellen Eingabe
  * - den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs öffnet
+ * DetailsDialog zum komfortablen Bearbeiten des Attributs Ã¶ffnet
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
@@ -56,7 +56,7 @@ public class CoordinateCellEditor
    *
    * @return
    */
-  @Override	// AbstractPropertyCellEditor
+  @Override  // AbstractPropertyCellEditor
   protected JComponent createComponent() {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -69,7 +69,7 @@ public class CoordinateCellEditor
 
   /**
    * Liefert die CellEditor-Komponente. Wird bei Bearbeitungsbeginn aufgerufen.
-   * Die Editor-Komponente ist mit dem Wert des Attributs zu füllen.
+   * Die Editor-Komponente ist mit dem Wert des Attributs zu fÃ¼llen.
    *
    * @param table
    * @param value
@@ -78,7 +78,7 @@ public class CoordinateCellEditor
    * @param column
    * @return
    */
-  @Override	// DefaultCellEditor
+  @Override  // DefaultCellEditor
   public Component getTableCellEditorComponent(
       JTable table, Object value, boolean isSelected, int row, int column) {
 
@@ -95,7 +95,7 @@ public class CoordinateCellEditor
    *
    * @return
    */
-  @Override	// DefaultCellEditor
+  @Override  // DefaultCellEditor
   public Object getCellEditorValue() {
     Object result = super.getCellEditorValue();
 

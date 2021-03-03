@@ -28,7 +28,7 @@ import org.opentcs.guing.components.properties.table.AttributesTable;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Basisimplementierung für Inhalte, die Eigenschaften eines Modells in einer
+ * Basisimplementierung fÃ¼r Inhalte, die Eigenschaften eines Modells in einer
  * Tabelle darstellen. Im unteren Bereich wird zu jeder Eigenschaft ein
  * Hilfetext angezeigt.
  *
@@ -47,7 +47,7 @@ public abstract class AbstractTableContent
    */
   protected List<TableCellEditor> fCellEditors = new ArrayList<>();
   /**
-   * Zeigt an, ob Änderungen am Tabellenmodell ausgewertet, das heißt, an
+   * Zeigt an, ob Ã„nderungen am Tabellenmodell ausgewertet, das heiÃŸt, an
    * ModelComponent weitergeleitet werden sollen.
    */
   protected boolean fEvaluateTableChanges = true;
@@ -97,20 +97,20 @@ public abstract class AbstractTableContent
   }
 
   /**
-   * Setzt die Renderer für die Tabelle.
+   * Setzt die Renderer fÃ¼r die Tabelle.
    */
   protected void setTableCellRenderers() {
   }
 
   /**
-   * Setzt die Editoren für die Tabelle.
+   * Setzt die Editoren fÃ¼r die Tabelle.
    */
   protected void setTableCellEditors() {
   }
 
   /**
    * Weist der Tabelle einen neuen Inhalt zu (neue Eigenschaften und Werte).
-   * Die Eigenschaften und ihre Werte befinden sich in der übergebenen
+   * Die Eigenschaften und ihre Werte befinden sich in der Ã¼bergebenen
    * <code>Hashtable</code>.
    *
    * @param content
@@ -138,7 +138,7 @@ public abstract class AbstractTableContent
   }
 
   /**
-   * Erzeugt aus der übergebenen <code>Hashtable</code> ein neues
+   * Erzeugt aus der Ã¼bergebenen <code>Hashtable</code> ein neues
    * <code>TableModel</code>.
    *
    * @param content

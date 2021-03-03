@@ -135,7 +135,7 @@ public class DrawingViewPlacardPanel
             // Text input in the combo box
             String text = (String) comboBox.getSelectedItem();
             double factor = Double.parseDouble(text.split(" ")[0]);
-            scaleFactor = factor * 0.01;	// Eingabe in %
+            scaleFactor = factor * 0.01;  // Eingabe in %
             comboBox.setSelectedItem((int) (factor + 0.5) + " %");
           }
           catch (NumberFormatException ex) {

@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.figures;
 
 import java.awt.Graphics2D;
@@ -22,11 +21,11 @@ import static java.awt.image.ImageObserver.ALLBITS;
 import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.jhotdraw.draw.AbstractAttributedDecoratedFigure;
 import org.opentcs.guing.components.drawing.ZoomPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Figure displaying a bitmap.
@@ -36,12 +35,12 @@ import org.opentcs.guing.components.drawing.ZoomPoint;
 public class BitmapFigure
     extends AbstractAttributedDecoratedFigure
     implements ImageObserver {
-  
+
   /**
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(BitmapFigure.class.getName());
+      = LoggerFactory.getLogger(BitmapFigure.class);
   /**
    * The image to be displayed.
    */
@@ -69,7 +68,7 @@ public class BitmapFigure
       image = ImageIO.read(file);
       imagePath = file.getPath();
       if (image == null) {
-        log.severe("Couldn't open image file at" + file.getPath());
+        log.error("Couldn't open image file at" + file.getPath());
         fDisplayBox = new Rectangle(0, 0, 0, 0);
         fZoomPoint = new ZoomPoint(0, 0);
         requestRemove();
@@ -79,7 +78,7 @@ public class BitmapFigure
       fZoomPoint = new ZoomPoint(0.5 * image.getWidth(), 0.5 * image.getHeight());
     }
     catch (IOException ex) {
-      log.log(Level.SEVERE, null, ex);
+      log.error("", ex);
       requestRemove();
     }
   }
@@ -105,7 +104,7 @@ public class BitmapFigure
     fDisplayBox = displayBox;
   }
 
-  @Override	// AbstractFigure
+  @Override // AbstractFigure
   public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
     //resize
     if (lead != null) {
@@ -121,7 +120,7 @@ public class BitmapFigure
     }
   }
 
-  @Override	// ImageObserver
+  @Override // ImageObserver
   public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
     if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
       invalidate();

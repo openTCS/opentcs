@@ -69,7 +69,7 @@ public class ComponentContext
   }
 
   @Override
-  public CONTEXT_TYPE getType() {
-    return CONTEXT_TYPE.COMPONENT;
+  public ContextType getType() {
+    return ContextType.COMPONENT;
   }
 }

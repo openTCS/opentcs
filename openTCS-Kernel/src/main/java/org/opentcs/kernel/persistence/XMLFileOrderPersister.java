@@ -21,8 +21,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.jdom2.Document;
@@ -31,13 +29,15 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.opentcs.access.ApplicationHome;
+import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This implementation of <code>OrderPersister</code> realizes persistence of
@@ -52,7 +52,7 @@ public class XMLFileOrderPersister
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(XMLFileOrderPersister.class.getName());
+      = LoggerFactory.getLogger(XMLFileOrderPersister.class);
   /**
    * The name of the file in which the data of finished transport orders is
    * archived.
@@ -100,7 +100,7 @@ public class XMLFileOrderPersister
    */
   @Inject
   public XMLFileOrderPersister(@ApplicationHome File directory) {
-    log.finer("method entry");
+    log.debug("method entry");
     Objects.requireNonNull(directory, "directory is null");
     dataDirectory = new File(directory, "data");
     if (!dataDirectory.isDirectory() && !dataDirectory.mkdirs()) {
@@ -207,7 +207,7 @@ public class XMLFileOrderPersister
       }
     }
     catch (FileNotFoundException | JDOMException exc) {
-      log.log(Level.WARNING, "Exception loading transport orders", exc);
+      log.warn("Exception loading transport orders", exc);
       // XXX Do we need to react in any way? Probably not.
     }
     // XXX Implement this.

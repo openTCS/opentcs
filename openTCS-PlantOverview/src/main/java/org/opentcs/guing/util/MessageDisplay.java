@@ -8,7 +8,7 @@
  */
 package org.opentcs.guing.util;
 
-import org.opentcs.data.message.Message;
+import org.opentcs.data.notification.UserNotification;
 
 /**
  * Implementations of this interface provide a way to display messages to the
@@ -23,5 +23,5 @@ public interface MessageDisplay {
    *
    * @param message The message.
    */
-  void display(Message message);
+  void display(UserNotification message);
 }

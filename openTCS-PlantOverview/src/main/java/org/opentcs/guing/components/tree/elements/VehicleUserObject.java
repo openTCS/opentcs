@@ -31,7 +31,7 @@ import org.opentcs.guing.util.IconToolkit;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class VehicleUserObject
-		extends AbstractUserObject {
+    extends AbstractUserObject {
   
   /**
    * Stores the application's current state.
@@ -42,8 +42,8 @@ public class VehicleUserObject
    */
   private final MenuFactory menuFactory;
 
-	/**
-	 * Creates a new instance.
+  /**
+   * Creates a new instance.
    *
    * @param model The corresponding vehicle object.
    * @param appState Stores the application's current state.
@@ -51,40 +51,40 @@ public class VehicleUserObject
    * @param editor The drawing editor.
    * @param modelManager Provides the current system model.
    * @param menuFactory A factory for popup menus.
-	 */
+   */
   @Inject
-	public VehicleUserObject(@Assisted VehicleModel model,
+  public VehicleUserObject(@Assisted VehicleModel model,
                            ApplicationState appState,
                            OpenTCSView view,
                            OpenTCSDrawingEditor editor,
                            ModelManager modelManager,
                            MenuFactory menuFactory) {
-		super(model, view, editor, modelManager);
+    super(model, view, editor, modelManager);
     this.appState = requireNonNull(appState, "appState");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
-	}
+  }
 
   @Override
   public VehicleModel getModelComponent() {
     return (VehicleModel) super.getModelComponent();
   }
 
-	@Override	// AbstractUserObject
-	public void doubleClicked() {
-		getView().figureSelected(getModelComponent());
-	}
+  @Override  // AbstractUserObject
+  public void doubleClicked() {
+    getView().figureSelected(getModelComponent());
+  }
 
-	@Override	// AbstractUserObject
-	public JPopupMenu getPopupMenu() {
-		if (appState.hasOperationMode(OperationMode.OPERATING)) {
+  @Override  // AbstractUserObject
+  public JPopupMenu getPopupMenu() {
+    if (appState.hasOperationMode(OperationMode.OPERATING)) {
       return menuFactory.createVehiclePopupMenu(getModelComponent());
-		}
+    }
 
-		return null;
-	}
+    return null;
+  }
 
-	@Override	// AbstractUserObject
-	public ImageIcon getIcon() {
-		return IconToolkit.instance().createImageIcon("tree/vehicle.18x18.png");
-	}
+  @Override  // AbstractUserObject
+  public ImageIcon getIcon() {
+    return IconToolkit.instance().createImageIcon("tree/vehicle.18x18.png");
+  }
 }

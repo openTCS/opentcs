@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
@@ -18,8 +17,6 @@ import java.awt.geom.Point2D.Double;
 import java.util.Collection;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
 import org.jhotdraw.draw.AttributeKey;
@@ -45,10 +42,13 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
+import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.event.PathLockedEvent;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PathModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Eine Verbindung zwischen zwei Punkten.
@@ -62,8 +62,7 @@ public class PathConnection
   /**
    * This class's logger.
    */
-  private static final Logger logger
-      = Logger.getLogger(PathConnection.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(PathConnection.class);
   /**
    * The application's event bus.
    */
@@ -75,7 +74,7 @@ public class PathConnection
   /**
    * Control point 2.
    */
-  private Point2D.Double cp2;  
+  private Point2D.Double cp2;
 
   /**
    * Creates a new instance.
@@ -102,7 +101,7 @@ public class PathConnection
   }
 
   /**
-   * Kontrollpunkte l�schen; Anfang und Ende durch eine Gerade verbinden.
+   * Kontrollpunkte lï¿½schen; Anfang und Ende durch eine Gerade verbinden.
    */
   private void resetPath() {
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
@@ -114,12 +113,12 @@ public class PathConnection
         ep = path.get(1, BezierPath.C0_MASK);
         break;
 
-      case 4: // ELBOW/Slanted: zus�tzlich 2 St�tzpunkte
+      case 4: // ELBOW/Slanted: zusï¿½tzlich 2 Stï¿½tzpunkte
         ep = path.get(3, BezierPath.C0_MASK);
         break;
 
       default:
-        logger.log(Level.WARNING, "Path has {0} points", size);
+        LOG.warn("Path has {} points", size);
         return;
     }
 
@@ -128,6 +127,12 @@ public class PathConnection
     path.add(new BezierPath.Node(ep));
     cp1 = cp2 = null;
     getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+  }
+
+  @Override
+  public void updateConnection() {
+    super.updateConnection();
+    updateControlPoints();
   }
 
   /**
@@ -144,12 +149,12 @@ public class PathConnection
         ep = path.get(1, BezierPath.C0_MASK);
         break;
 
-      case 4: // ELBOW/Slanted: zus�tzlich 2 St�tzpunkte
+      case 4: // ELBOW/Slanted: zusï¿½tzlich 2 Stï¿½tzpunkte
         ep = path.get(3, BezierPath.C0_MASK);
         break;
 
       default:
-        logger.log(Level.WARNING, "Path has {0} points", size);
+        LOG.warn("Path has {} points", size);
         return;
     }
 
@@ -193,7 +198,9 @@ public class PathConnection
   public Point2D.Double getCenter() {
     // Computes the center of the curve.
     // Approximation: Center of the control points.
-    Point2D.Double p1, p2, pc;
+    Point2D.Double p1;
+    Point2D.Double p2;
+    Point2D.Double pc;
 
     p1 = (cp1 == null ? path.get(0, BezierPath.C0_MASK) : cp1);
     p2 = (cp2 == null ? path.get(1, BezierPath.C0_MASK) : cp2);
@@ -214,11 +221,28 @@ public class PathConnection
       cp2 = path.get(1, BezierPath.C1_MASK);
     }
 
-    getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+    String sControlPoints = "";
+    if (cp1 != null) {
+      if (cp2 != null) {
+        // Format: x1,y1;x2,y2
+        sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
+                                       (int) (cp1.y), (int) (cp2.x),
+                                       (int) (cp2.y));
+      }
+      else {
+        // Format: x1,y1
+        sControlPoints = String.format("%d,%d", (int) (cp1.x), (int) (cp1.y));
+      }
+    }
+
+    StringProperty sProp
+        = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
+    sProp.setText(sControlPoints);
+    sProp.markChanged();
   }
 
   /**
-   * Verkn�pft zwei Figure-Objekte durch diese Verbindung.
+   * Verknï¿½pft zwei Figure-Objekte durch diese Verbindung.
    *
    * @param start das erste Figure-Objekt
    * @param end das zweite Figure-Objekt
@@ -304,7 +328,7 @@ public class PathConnection
 
       if (property != null) {
         double length = (double) property.getValue();
-        // Tbd: Wann soll die L�nge aus dem Abstand der verbundenen Punkte neu berechnet werden?
+        // Tbd: Wann soll die Lï¿½nge aus dem Abstand der verbundenen Punkte neu berechnet werden?
         if (length <= 0.0) {
           PointFigure start = ((LabeledPointFigure) getStartFigure()).getPresentationFigure();
           PointFigure end = ((LabeledPointFigure) getEndFigure()).getPresentationFigure();
@@ -319,12 +343,12 @@ public class PathConnection
       return property;
     }
     catch (IllegalArgumentException ex) {
-      logger.log(Level.SEVERE, "calculateLength():\n", ex);
+      LOG.error("calculateLength()", ex);
       return null;
     }
   }
 
-  @Override	// AbstractFigure
+  @Override  // AbstractFigure
   public String getToolTipText(Point2D.Double p) {
     StringBuilder sb = new StringBuilder("<html>Path ");
     sb.append("<b>").append(getModel().getName()).append("</b>");
@@ -340,7 +364,7 @@ public class PathConnection
     return connector;
   }
 
-  @Override	// LineConnectionFigure
+  @Override  // LineConnectionFigure
   public Collection<Handle> createHandles(int detailLevel) {
     LinkedList<Handle> handles = new LinkedList<>();
     // see BezierFigure
@@ -349,8 +373,8 @@ public class PathConnection
         handles.add(new BezierOutlineHandle(this, true));
         break;
 
-      case 0:	// Mouse clicked
-//			handles.add(new BezierLinerHandle(this));
+      case 0:  // Mouse clicked
+//      handles.add(new BezierLinerHandle(this));
 
         if (cp1 != null) {
           // Startpunkt: Handle nach CP2
@@ -364,17 +388,19 @@ public class PathConnection
 
         break;
 
-      case 1:	// double click
+      case 1:  // double click
         // Rechteckiger Rahmen + Drehpunkt
-//			TransformHandleKit.addTransformHandles(this, handles);
+//      TransformHandleKit.addTransformHandles(this, handles);
         handles.add(new BezierOutlineHandle(this));
         break;
+
+      default:
     }
 
     return handles;
   }
 
-  @Override	// LineConnectionFigure
+  @Override  // LineConnectionFigure
   public void lineout() {
     if (getLiner() == null) {
       path.invalidatePath();
@@ -404,20 +430,20 @@ public class PathConnection
 //    setLinerByName(sLinerType);
   }
 
-  @Override	// SimpleLineConnection
+  @Override  // SimpleLineConnection
   public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
     boolean ret = super.handleMouseClick(p, evt, drawingView);
 
     return ret;
   }
 
-  @Override	// SimpleLineConnection
+  @Override  // SimpleLineConnection
   public void propertiesChanged(AttributesChangeEvent e) {
     if (!e.getInitiator().equals(this)) {
       SelectionProperty pType = (SelectionProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
       PathModel.LinerType type = (PathModel.LinerType) pType.getValue();
       setLinerByType(type);
-      // L�nge neu berechnen
+      // Lï¿½nge neu berechnen
       calculateLength();
       lineout();
     }
@@ -428,10 +454,10 @@ public class PathConnection
   /**
    * Updates the arrows.
    */
-  @Override	// SimpleLineConnection
+  @Override  // SimpleLineConnection
   public void updateDecorations() {
-    final double lockedDash[] = {6.0, 4.0};
-    final double unlockedDash[] = {10.0, 0.0};
+    final double[] lockedDash = {6.0, 4.0};
+    final double[] unlockedDash = {10.0, 0.0};
 
     if (getModel() != null) {
       LineDecoration startDecoration = null;
@@ -470,7 +496,7 @@ public class PathConnection
       }
     }
   }
-  
+
   @Override
   public <T> void set(AttributeKey<T> key, T newValue) {
     super.set(key, newValue);
@@ -481,7 +507,7 @@ public class PathConnection
     }
   }
 
-  @Override	// SimpleLineConnection
+  @Override  // SimpleLineConnection
   public void updateModel() {
     if (calculateLength() == null) {
       return;

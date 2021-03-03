@@ -82,7 +82,7 @@ public class OpenTCSSDIApplication
     if (contentFrame != null) {
       setupContentFrame(opentcsView);
     }
-    // Bei ƒnderungen am Modell wird in der View HAS_UNSAVED_CHANGES_PROPERTY gesetzt.
+    // Bei √Ñnderungen am Modell wird in der View HAS_UNSAVED_CHANGES_PROPERTY gesetzt.
     // Beim Laden eines neuen Modells wird in der View MODELNAME_PROPERTY gesetzt.
     // Beim Umschalten der Kernel-Betriebsart wird in der View OPERATIONMODE_PROPERTY gesetzt.
     // Damit wird die Titelzeile aktualisiert
@@ -115,7 +115,7 @@ public class OpenTCSSDIApplication
           + modelName + "\"");
     }
   }
-  
+
   @Handler
   public void modelNameChange(ModelNameChangeEvent event) {
     OpenTCSView opentcsView = (OpenTCSView) event.getSource();
@@ -136,10 +136,10 @@ public class OpenTCSSDIApplication
     // Menu erzeugen...
     // ... und im Frame anzeigen
     contentFrame.setJMenuBar(opentcsView.getMenuBar());
-    // Ein Icon f¸r den Frame
+    // Ein Icon f√ºr den Frame
     contentFrame.setIconImages(Icons.getOpenTCSIcons());
-    // Grˆﬂe des Frames
-    contentFrame.setSize(1024, 768);	// Default size
+    // Gr√∂√üe des Frames
+    contentFrame.setSize(1024, 768); // Default size
 
     // Restore the window's dimensions from the configuration.
     contentFrame.setExtendedState(appConfig.getFrameExtendedState());
@@ -150,7 +150,7 @@ public class OpenTCSSDIApplication
 
     if (kernelProvider.kernelShared()) {
       final Kernel kernel = kernelProvider.getKernel();
-      if (kernel.getCurrentModelName()
+      if (kernel.getLoadedModelName()
           .equals(appConfig.getLastLoadedModelName())) {
         int n = 1;
         for (OpenTCSDrawingView drawView : opentcsView
@@ -162,9 +162,9 @@ public class OpenTCSSDIApplication
       }
 
     }
-    // Action "Frame schlieﬂen" abfangen
+    // Action "Frame schlie√üen" abfangen
     contentFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    // Fenster-Dimensionen beim Schlieﬂen in openTCS Configuration speichern
+    // Fenster-Dimensionen beim Schlie√üen in openTCS Configuration speichern
     contentFrame.addWindowListener(new WindowStatusUpdater(opentcsView));
   }
 

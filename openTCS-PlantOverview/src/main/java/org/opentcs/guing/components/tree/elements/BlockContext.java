@@ -46,7 +46,7 @@ public class BlockContext
   }
 
   @Override
-  public CONTEXT_TYPE getType() {
-    return CONTEXT_TYPE.BLOCK;
+  public ContextType getType() {
+    return ContextType.BLOCK;
   }
 }

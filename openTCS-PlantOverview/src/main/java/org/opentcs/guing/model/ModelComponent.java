@@ -17,12 +17,12 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.tree.TreeViewManager;
 
 /**
- * Interface für alle Komponenten des Systemmodells. Konkrete Implementierungen
- * sind entweder Komposita oder Blätter. Eine Komponente ist für folgende Dinge
- * zuständig:
+ * Interface fÃ¼r alle Komponenten des Systemmodells. Konkrete Implementierungen
+ * sind entweder Komposita oder BlÃ¤tter. Eine Komponente ist fÃ¼r folgende Dinge
+ * zustÃ¤ndig:
  * - Bereitstellung einer JComponent (in der Regel eines JPanels), auf dem
- * die Eigenschaften der Komponente veränderbar sind
- * - Bereitstellung eines passenden UserObjects, das für die Anzeige der
+ * die Eigenschaften der Komponente verÃ¤nderbar sind
+ * - Bereitstellung eines passenden UserObjects, das fÃ¼r die Anzeige der
  * Komponente im TreeView eingesetzt wird
  * - Verwaltung der Kindelemente, wenn es sich um ein Kompositum handelt
  * - Wiederherstellung des TreeViews nach dem Laden von der Festplatte
@@ -35,17 +35,17 @@ public interface ModelComponent
     extends Cloneable {
 
   /**
-   * Der Schlüssel für das Namensattribut.
+   * Der SchlÃ¼ssel fÃ¼r das Namensattribut.
    */
   String NAME = "Name";
   /**
-   * Der Schlüssel für sonstige Eigenschaften.
+   * Der SchlÃ¼ssel fÃ¼r sonstige Eigenschaften.
    */
   String MISCELLANEOUS = "Miscellaneous";
 
   /**
-   * Fügt das eigene Objekt dem TreeView hinzu und ruft die restore()- Methode
-   * auf alle Kindobjekte auf. Wird für die Wiederherstellung der Baumansicht
+   * FÃ¼gt das eigene Objekt dem TreeView hinzu und ruft die restore()- Methode
+   * auf alle Kindobjekte auf. Wird fÃ¼r die Wiederherstellung der Baumansicht
    * nach dem Laden von der Festplatte verwendet.
    *
    * @param parent
@@ -54,7 +54,7 @@ public interface ModelComponent
   void treeRestore(ModelComponent parent, TreeViewManager treeViewManager);
 
   /**
-   * Fügt ein Kindobjekt hinzu.
+   * FÃ¼gt ein Kindobjekt hinzu.
    *
    * @param component
    */
@@ -82,7 +82,7 @@ public interface ModelComponent
   String getTreeViewName();
 
   /**
-   * Gibt an, ob die übergebene Komponente eine direkte Komponente ist.
+   * Gibt an, ob die Ã¼bergebene Komponente eine direkte Komponente ist.
    *
    * @param component
    * @return
@@ -112,7 +112,7 @@ public interface ModelComponent
   void setParent(ModelComponent parent);
 
   /**
-   * Liefert true zurück, wenn die Komponente im TreeView dargestellt werden
+   * Liefert true zurÃ¼ck, wenn die Komponente im TreeView dargestellt werden
    * soll, ansonsten false.
    *
    * @return
@@ -128,7 +128,7 @@ public interface ModelComponent
   void setTreeViewVisibility(boolean visibility);
 
   /**
-   * Liefert eine ganz kurze Beschreibung, um was für ein Objekt es sich
+   * Liefert eine ganz kurze Beschreibung, um was fÃ¼r ein Objekt es sich
    * handelt.
    *
    * @return
@@ -150,7 +150,7 @@ public interface ModelComponent
   void setName(String name);
 
   /**
-   * Liefert zum aktuellen Schlüssel das Attribut mit dem übergebenen Namen.
+   * Liefert zum aktuellen SchlÃ¼ssel das Attribut mit dem Ã¼bergebenen Namen.
    *
    * @param name
    * @return
@@ -158,14 +158,14 @@ public interface ModelComponent
   Property getProperty(String name);
 
   /**
-   * Liefert eine Hashtable mit den Attributen des aktuell gesetzten Schlüssels.
+   * Liefert eine Hashtable mit den Attributen des aktuell gesetzten SchlÃ¼ssels.
    *
    * @return
    */
   Map<String, Property> getProperties();
 
   /**
-   * Fügt unter dem übergebenen Namen einen Beutel mit Attributen hinzu.
+   * FÃ¼gt unter dem Ã¼bergebenen Namen einen Beutel mit Attributen hinzu.
    *
    * @param name
    * @param property
@@ -173,27 +173,27 @@ public interface ModelComponent
   void setProperty(String name, Property property);
 
   /**
-   * Fügt den übergebenen AttributesChangeListener hinzu und informiert diesen
-   * fortan, wenn sich die Eigenschaften oder Zustände des ModelComponent
-   * geändert haben.
+   * FÃ¼gt den Ã¼bergebenen AttributesChangeListener hinzu und informiert diesen
+   * fortan, wenn sich die Eigenschaften oder ZustÃ¤nde des ModelComponent
+   * geÃ¤ndert haben.
    *
-   * @param l der hinzuzufügende AttributesChangeListener
+   * @param l der hinzuzufÃ¼gende AttributesChangeListener
    */
   void addAttributesChangeListener(AttributesChangeListener l);
 
   /**
-   * Entfernt den übergebenen AttributesChangeListener und informiert diesen
-   * fortan nicht mehr, wenn sich die Eigenschaften oder Zustände des
-   * ModelComponent geändert haben.
+   * Entfernt den Ã¼bergebenen AttributesChangeListener und informiert diesen
+   * fortan nicht mehr, wenn sich die Eigenschaften oder ZustÃ¤nde des
+   * ModelComponent geÃ¤ndert haben.
    *
    * @param l der zu entfernende AttributesChangeListener
    */
   void removeAttributesChangeListener(AttributesChangeListener l);
 
   /**
-   * Prüft, ob ein bestimmter AttributesChangeListener vorhanden ist.
+   * PrÃ¼ft, ob ein bestimmter AttributesChangeListener vorhanden ist.
    *
-   * @param l der zu prüfende AttributesChangeListener
+   * @param l der zu prÃ¼fende AttributesChangeListener
    * @return
    * <code> true </code>, wenn der AttributesChangeListener vorhanden ist
    */
@@ -201,9 +201,9 @@ public interface ModelComponent
 
   /**
    * Benachrichtigt alle registrierten AttributesChangeListener, dass sich die
-   * Eigenschaften des Models geändert haben.
+   * Eigenschaften des Models geÃ¤ndert haben.
    *
-   * @param l Der Initiator der Änderung.
+   * @param l Der Initiator der Ã„nderung.
    */
   void propertiesChanged(AttributesChangeListener l);
 

@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Ein Dialog, der einen Schlieﬂen-Button besitzt.
+ * Ein Dialog, der einen Schlie√üen-Button besitzt.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -43,7 +43,7 @@ public class ClosableDialog
   }
 
   /**
-   * Schlieﬂt den Dialog.
+   * Schlie√üt den Dialog.
    */
   private void doClose() {
     setVisible(false);

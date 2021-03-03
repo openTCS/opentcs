@@ -15,9 +15,9 @@ import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Inhalt für eine Swing-Komponente, der über Eigenschaften eines
- * ModelComponent-Objekt Auskunft gibt und Möglichkeiten bietet, diese
- * Eigenschaften zu verändern.
+ * Ein Inhalt fÃ¼r eine Swing-Komponente, der Ã¼ber Eigenschaften eines
+ * ModelComponent-Objekt Auskunft gibt und MÃ¶glichkeiten bietet, diese
+ * Eigenschaften zu verÃ¤ndern.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -30,7 +30,7 @@ public interface AttributesContent {
   void setModel(ModelComponent model);
 
   /**
-   * Setzt die Anzeige zurück, wenn kein ModelComponente-Objekt mehr dargestellt
+   * Setzt die Anzeige zurÃ¼ck, wenn kein ModelComponente-Objekt mehr dargestellt
    * werden soll.
    */
   void reset();
@@ -45,7 +45,7 @@ public interface AttributesContent {
 
   /**
    * Liefert eine Beschreibung des Inhalts, der bei Aktivierung in der
-   * übergeordneten Swing-Komponente angezeigt werden kann.
+   * Ã¼bergeordneten Swing-Komponente angezeigt werden kann.
    *
    * @return
    */

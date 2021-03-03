@@ -13,7 +13,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import org.opentcs.drivers.CommunicationAdapterFactory;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
  * ListCellRenderer for the adapter combo box.
@@ -22,7 +22,7 @@ import org.opentcs.drivers.CommunicationAdapterFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 final class AdapterFactoryCellRenderer
-    implements ListCellRenderer<CommunicationAdapterFactory> {
+    implements ListCellRenderer<VehicleCommAdapterFactory> {
 
   /**
    * A default renderer for creating the label.
@@ -38,8 +38,8 @@ final class AdapterFactoryCellRenderer
   }
 
   @Override
-  public Component getListCellRendererComponent(JList<? extends CommunicationAdapterFactory> list,
-                                                CommunicationAdapterFactory value,
+  public Component getListCellRendererComponent(JList<? extends VehicleCommAdapterFactory> list,
+                                                VehicleCommAdapterFactory value,
                                                 int index,
                                                 boolean isSelected,
                                                 boolean cellHasFocus) {

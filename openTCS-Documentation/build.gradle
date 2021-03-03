@@ -1,130 +1,306 @@
-// Add dependencies for the JDocBook plugin
-buildscript {
-  repositories {
-    jcenter()
-    mavenCentral()
-    maven {
-      name "jboss"
-      url "http://repository.jboss.org/nexus/content/groups/public/"
-    }
-  }
-  dependencies {
-    classpath group: 'org.jboss.jdocbook', name: 'gradle-jdocbook', version: '1.2.2'
-    classpath group: 'net.sf.docbook', name: 'docbook-xsl', version: '1.78.1', classifier: 'ns-resources', ext: 'zip'
-  }
-}
+evaluationDependsOn(':openTCS-API-Base')
+evaluationDependsOn(':openTCS-API-Injection')
+evaluationDependsOn(':openTCS-Common')
+evaluationDependsOn(':openTCS-Kernel')
+evaluationDependsOn(':openTCS-PlantOverview')
 
-apply plugin: "distribution"
-apply plugin: "jdocbook"
+apply plugin: 'distribution'
+// To use AsciiDoctor for documentation
+apply plugin: 'org.asciidoctor.convert'
 
-def baseApiDir = new File(buildDir, 'base-api')
-def schemasDir = new File(buildDir, 'schemagen')
-def manualDir = file(buildDir.absolutePath + '/docbook/publish')
+def baseApiDir = file("$buildDir/api-base")
+def injectionApiDir = file("$buildDir/api-injection")
+def schemasDir = file("$buildDir/schemagen")
+def samplesDir = file("$buildDir/samples")
+def userManualDir = file("$buildDir/users-guide")
+def devManualDir = file("$buildDir/developers-guide")
+def devManualImagesDir = file("$devManualDir/images")
+def readmeDir = file("$buildDir/readme")
 
-ext.collectableDistDir = new File(buildDir, 'install')
+ext.collectableDistDir = file("$buildDir/install")
 
 configurations {
   schemagen
 }
 
 dependencies {
-  schemagen project(':openTCS-Base')
+  compile project(':openTCS-Kernel')
+  schemagen project(':openTCS-Kernel')
   schemagen project(':openTCS-PlantOverview')
   schemagen jar.outputs.files
-
-  // Add the JAR containing the stylesheets for DocBook rendering.
-  jdocbookStyles jar.outputs.files
 }
 
 distributions {
   main {
     contents.from(baseApiDir) {
-      into('Base-API')
+      into('developer/api-base')
+    }
+    contents.from(injectionApiDir) {
+      into('developer/api-injection')
     }
     contents.from(schemasDir) {
-      into('XML-Schemas')
+      into('developer/xml-schemas')
     }
-    contents.from( { filesInSubdirs(manualDir) } ) {
-      into('Manual')
+    contents.from(devManualDir) {
+      into('developer/developers-guide')
     }
+    contents.from(userManualDir) {
+      into('user')
+    }
+    contents.from(readmeDir)
   }
 }
 
-installDist {
-  dependsOn 'baseApi'
+task renderDocs {
+  dependsOn 'apiBase'
+  dependsOn 'apiInjection'
   dependsOn 'schemagen'
-  dependsOn 'buildDocs'
+  dependsOn 'asciidoctor'
 }
 
-compileJava {
-  options.compilerArgs << "-Xlint:all"
-  options.compilerArgs << "-Xlint:-serial"
-}
-
-compileTestJava {
-  options.compilerArgs << "-Xlint:all"
-}
-
-// Make sure the JAR containing the stylesheets are built before building
-// DocBook documents.
-// This shouldn't be required any more once the JDocBook plugin is fixed.
-// See http://discuss.gradle.org/t/how-to-declare-a-dependency-on-another-configurations-artifact-in-the-same-project/8814
-afterEvaluate {
-  tasks.findAll() { task ->
-    if (task.name.startsWith('stageStyles_')) {
-      task.dependsOn('assemble')
-    }
-  }
-}
+installDist.dependsOn renderDocs
+distTar.dependsOn renderDocs
+distZip.dependsOn renderDocs
 
 task release {
   dependsOn build
   dependsOn installDist
 }
 
-task baseApi(type: Javadoc, description: 'Creates Javadoc for base lib.') {
+task apiBase(type: Javadoc, description: 'Creates Javadoc for base API.') {
   title = "openTCS ${project.version} Base API documentation"
   destinationDir = baseApiDir
 
-  source = project(':openTCS-Base').sourceSets.main.allJava
-  classpath = project(':openTCS-Base').sourceSets.main.compileClasspath
+  source = project(':openTCS-API-Base').sourceSets.main.allJava
+  classpath = project(':openTCS-API-Base').sourceSets.main.compileClasspath
   options {
-    encoding = 'ISO-8859-15'
     header = "openTCS ${project.version}"
     footer = "openTCS ${project.version}"
-    overview = "${project(':openTCS-Base').projectDir}/src/main/java/overview.html"
+    overview = "${project(':openTCS-API-Base').projectDir}/src/main/java/overview.html"
     group("Basic data structures", "org.opentcs.data*")
     group("Interfaces and supporting classes for accessing the kernel", "org.opentcs.access*")
-    group("Pluggable kernel algorithms and strategies", "org.opentcs.algorithms*")
-    group("Vehicle driver framework", "org.opentcs.drivers*")
+    group("Kernel strategies, plant overview panels and other components", "org.opentcs.components*")
+    group("Communication adapter framework", "org.opentcs.drivers*")
     group("Utility classes", "org.opentcs.util*")
   }
 }
 
-jdocbook {
-  manual {
-    masterSourceDocumentName = 'openTCS-manual-en.xml'
-    format {
-      name = 'pdf'
-      finalName = "openTCS-manual-en.pdf"
-      stylesheet = "classpath:/opentcs-jdocbook-style/xslt/opentcs-fo.xsl"
-    }
+task apiInjection(type: Javadoc, description: 'Creates Javadoc for injection API.') {
+  title = "openTCS ${project.version} Injection API documentation"
+  destinationDir = injectionApiDir
+
+  source = project(':openTCS-API-Injection').sourceSets.main.allJava
+  classpath = project(':openTCS-API-Injection').sourceSets.main.compileClasspath
+  options {
+    header = "openTCS ${project.version}"
+    footer = "openTCS ${project.version}"
+    overview = "${project(':openTCS-API-Injection').projectDir}/src/main/java/overview.html"
+    group("Classes supporting customization of openTCS applications", "org.opentcs.customizations*")
+  }
+}
+
+asciidoctor {
+  dependsOn 'asciidoctorUsersGuide'
+  dependsOn 'asciidoctorDevelopersGuide'
+  dependsOn 'asciidoctorReadme'
+  enabled = false
+}
+
+task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/users-guide")
+  
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = userManualDir
+  
+  // Whether to put backends' outputs into separate subdirectories  
+  separateOutputDirs = false
+	
+  sources {
+    include 'opentcs-users-guide.adoc'
   }
   
-  readme {
-    masterSourceDocumentName = 'README.xml'
-    format {
-      name = 'xhtml'
-      finalName = "README.html"
-      stylesheet = "classpath:/opentcs-jdocbook-style/xslt/opentcs-xhtml.xsl"
+  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+	backends = ['html5', 'pdf']
+
+  attributes 'source-highlighter': 'coderay',
+             'coderay-linenums-mode': 'table',
+             'imagesdir': 'images',
+  // The directory where the theme file is located
+             'pdf-stylesdir': 'themes',
+  // The name of the YAML theme file to load. If the name ends with ".yml", it's
+  // assumed to be the complete name of the file. Otherwise, "-theme.yml" is appended
+  // to the name to make the file name.
+             'pdf-style': 'custom',
+  // Include a table of contents (on the left side, when rendering to HTML)
+  toc: 'left',
+  toclevels: '3',
+  // Turn on section numbering.
+  sectnums: '1',
+  // Depth of section numbering
+  sectnumlevels: '6',
+  // Whether to use icons for admonitions. Possible values: 'font' to use
+  // FontAwesome glyphs or anything else to use graphics files.
+  // Note: FontAwesome requires internet connectivity for viewing the resulting
+  // HTML output...
+//  icons: '1',
+  icons: 'font',
+  // Where to find the icons. Default: ./images/icons.
+  // iconsdir: './images/icons',
+  // The type of the icons.
+  // icontype: 'png',
+  // Allow attributes in links (target="_blank" etc.) to be used.
+  linkattrs: true,
+  // Document encoding.
+  encoding: 'utf-8',
+  // Render page numbers in the PDF
+  pagenums: '1',
+  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
+  experimental: true
+
+  resources {
+    from(sourceDir) {
+      include '**/*.jpg'
+      include '**/*.png'
+      include '**/*.svg'
+      exclude 'samples'
+      exclude 'themes'
     }
   }
 }
 
-task schemagen(dependsOn: ['assemble', ':openTCS-Base:assemble', ':openTCS-PlantOverview:assemble']) {
+task asciidoctorReadme(type: org.asciidoctor.gradle.AsciidoctorTask) {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/readme")
+  
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = readmeDir
+  
+  // Whether to put backends' outputs into separate subdirectories  
+  separateOutputDirs = false
+	
+  sources {
+    include 'README.adoc'
+  }
+  
+  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+	backends = ['html5']
+	
+  attributes 'source-highlighter': 'coderay',
+             'coderay-linenums-mode': 'table',
+  //           'imagesdir': 'images',
+  // Include a table of contents (on the left side, when rendering to HTML)
+  toc: 'left',
+  toclevels: '3',
+  // Turn on section numbering.
+  sectnums: '1',
+  // Whether to use icons for admonitions. Possible values: 'font' to use
+  // FontAwesome glyphs or anything else to use graphics files.
+  // Note: FontAwesome requires internet connectivity for viewing the resulting
+  // HTML output...
+//  icons: '1',
+  icons: 'font',
+  // Where to find the icons. Default: ./images/icons.
+  // iconsdir: './images/icons',
+  // The type of the icons.
+  // icontype: 'png',
+  // Allow attributes in links (target="_blank" etc.) to be used.
+  linkattrs: true,
+  // Document encoding.
+  encoding: 'utf-8',
+  // Render page numbers in the PDF
+  pagenums: '1',
+  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
+  experimental: true
+}
+
+task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
+  dependsOn 'samplesgen'
+  
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/developers-guide")
+  
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = devManualDir
+  
+  // Whether to put backends' outputs into separate subdirectories  
+  separateOutputDirs = false
+	
+  sources {
+    include 'opentcs-developers-guide.adoc'
+  }
+  
+  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+	backends = ['html5', 'pdf']
+	
+  requires 'asciidoctor-diagram'
+  
+  attributes 'source-highlighter': 'coderay',
+             'coderay-linenums-mode': 'table',
+             'base-javaSrc': project(':openTCS-API-Base').javaSrcDir,
+             'base-testSrc': project(':openTCS-API-Base').testSrcDir,
+             'kernel-javaSrc': project(':openTCS-Kernel').javaSrcDir,
+             'kernel-guiceSrc': project(':openTCS-Kernel').guiceSrcDir,
+             'kernel-testSrc': project(':openTCS-Kernel').testSrcDir,
+             'plantoverview-javaSrc': project(':openTCS-PlantOverview').javaSrcDir,
+             'plantoverview-guiceSrc': project(':openTCS-PlantOverview').guiceSrcDir,
+             'plantoverview-testSrc': project(':openTCS-PlantOverview').testSrcDir,
+             'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
+             'samples': samplesDir,
+  // 'imagesdir': 'images',
+  // Include a table of contents (on the left side, when rendering to HTML)
+  toc: 'left',
+  toclevels: '3',
+  // Turn on section numbering.
+  sectnums: '1',
+  // Whether to use icons for admonitions. Possible values: 'font' to use
+  // FontAwesome glyphs or anything else to use graphics files.
+  // Note: FontAwesome requires internet connectivity for viewing the resulting
+  // HTML output...
+//  icons: '1',
+  icons: 'font',
+  // Where to find the icons. Default: ./images/icons.
+  // iconsdir: './images/icons',
+  // The type of the icons.
+  // icontype: 'png',
+  // Allow attributes in links (target="_blank" etc.) to be used.
+  linkattrs: true,
+  // Document encoding.
+  encoding: 'utf-8',
+  // Render page numbers in the PDF
+  pagenums: '1',
+  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
+  experimental: true
+  
+  resources {
+    from(sourceDir) {
+      include '**/*.png'
+      exclude 'samples'
+    }
+  }
+  
+  doLast{
+    delete "$devManualDir/.asciidoctor"
+  }
+}
+
+task schemagen {
+  dependsOn 'jar'
+  dependsOn ':openTCS-Kernel:jar'
+  dependsOn ':openTCS-PlantOverview:jar'
+
   File schemagenDir = schemasDir
 
-  project(':openTCS-Base').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+  project(':openTCS-Kernel').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
     inputs.dir srcDir
   }
   project(':openTCS-PlantOverview').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
@@ -138,39 +314,39 @@ task schemagen(dependsOn: ['assemble', ':openTCS-Base:assemble', ':openTCS-Plant
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/openTCS-host-order.xsd",
-             "org.opentcs.access.xmlorders.TCSOrderSet",
-             "org.opentcs.access.xmlorders.Transport",
-             "org.opentcs.access.xmlorders.TransportScript" ]
+      args = [ "${schemagenDir}/opentcs-host-order.xsd",
+             "org.opentcs.kernel.xmlorders.binding.TCSOrderSet",
+             "org.opentcs.kernel.xmlorders.binding.Transport",
+             "org.opentcs.kernel.xmlorders.binding.TransportScript" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/openTCS-host-orderscript.xsd",
-             "org.opentcs.access.xmlorders.TCSScriptFile",
-             "org.opentcs.access.xmlorders.Transport",
-             "org.opentcs.access.xmlorders.TransportScript" ]
+      args = [ "${schemagenDir}/opentcs-host-orderscript.xsd",
+             "org.opentcs.kernel.xmlorders.binding.TCSScriptFile",
+             "org.opentcs.kernel.xmlorders.binding.Transport",
+             "org.opentcs.kernel.xmlorders.binding.TransportScript" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/openTCS-host-response.xsd",
-             "org.opentcs.access.xmlorders.TCSResponseSet",
-             "org.opentcs.access.xmlorders.TransportResponse",
-             "org.opentcs.access.xmlorders.ScriptResponse" ]
+      args = [ "${schemagenDir}/opentcs-host-response.xsd",
+             "org.opentcs.kernel.xmlorders.binding.TCSResponseSet",
+             "org.opentcs.kernel.xmlorders.binding.TransportResponse",
+             "org.opentcs.kernel.xmlorders.binding.ScriptResponse" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/openTCS-host-statuschannel.xsd",
-             "org.opentcs.access.xmlstatus.TCSStatusMessageSet",
-             "org.opentcs.access.xmlstatus.OrderStatusMessage",
-             "org.opentcs.access.xmlstatus.VehicleStatusMessage" ]
+      args = [ "${schemagenDir}/opentcs-host-statuschannel.xsd",
+             "org.opentcs.kernel.xmlstatus.binding.TCSStatusMessageSet",
+             "org.opentcs.kernel.xmlstatus.binding.OrderStatusMessage",
+             "org.opentcs.kernel.xmlstatus.binding.VehicleStatusMessage" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/openTCS-plantoverview-persistence.xsd",
+      args = [ "${schemagenDir}/opentcs-plantoverview-persistence.xsd",
              "org.opentcs.guing.persistence.CourseModel",
              "org.opentcs.guing.persistence.CourseElement",
              "org.opentcs.guing.persistence.CourseObjectProperty",
@@ -179,18 +355,39 @@ task schemagen(dependsOn: ['assemble', ':openTCS-Base:assemble', ':openTCS-Plant
   }
 }
 
-Set<File> filesInSubdirs(File dir) {
-  Set<File> result = new HashSet<>()
-  if (!dir.isDirectory()) {
-    return result;
-  }
-  for (File curFile in dir.listFiles()) {
-    if (curFile.isDirectory()) {
-      result.addAll(filesInSubdirs(curFile))
+task samplesgen {
+  dependsOn 'jar'
+  doLast {
+    mkdir(samplesDir)
+    //Args contains a tupel of (task-name, outputFile)
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = "org.opentcs.documentation.SamplesGenerator"
+      args "TELEGRAM_TWO_ORDERS", "${samplesDir}/xml-telegram-two-orders.xml"
     }
-    else if (curFile.isFile()) {
-      result.addAll(curFile)
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.SamplesGenerator'
+      args "TELEGRAM_STATUS", "${samplesDir}/xml-telegram-status.xml"
+    }
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.SamplesGenerator'
+      args "TELEGRAM_RECEIPT_ORDERS", "${samplesDir}/xml-telegram-receipt-orders.xml"
+    }
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.SamplesGenerator'
+      args "TELEGRAM_RECEIPT_BATCH", "${samplesDir}/xml-telegram-receipt-batch.xml"
+    }
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.SamplesGenerator'
+      args "TELEGRAM_BATCH", "${samplesDir}/xml-telegram-batch.xml"
     }
   }
-  return result;
 }

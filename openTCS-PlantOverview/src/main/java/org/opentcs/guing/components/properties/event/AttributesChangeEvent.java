@@ -15,7 +15,7 @@ import org.opentcs.guing.model.ModelComponent;
 
 /**
  * Erweiterung von PropertiesModelChangeEvent um das Objekt, dessen Properties
- * geändert wurden. Wichtig für eine Klasse, die sich bei mehreren
+ * geÃ¤ndert wurden. Wichtig fÃ¼r eine Klasse, die sich bei mehreren
  * PropertiesModel-Objekten als Listener registriert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)

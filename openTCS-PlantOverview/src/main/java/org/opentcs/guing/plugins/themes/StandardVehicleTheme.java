@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.imageio.ImageIO;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * Standard implementation of <code>VehicleTheme</code>.

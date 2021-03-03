@@ -14,7 +14,7 @@ import java.io.Serializable;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Interface für Eigenschaften (Property) von ModelComponent-Objekten.
+ * Interface fÃ¼r Eigenschaften (Property) von ModelComponent-Objekten.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -24,12 +24,12 @@ public interface ModelAttribute
   public static enum ChangeState {
 
     NOT_CHANGED,
-    CHANGED, // Das Attribut wurde in der Tabelle geändert
-    DETAIL_CHANGED, // Das Attribut wurde über den Popup-Dialog geändert
+    CHANGED, // Das Attribut wurde in der Tabelle geÃ¤ndert
+    DETAIL_CHANGED, // Das Attribut wurde Ã¼ber den Popup-Dialog geÃ¤ndert
   };
 
   /**
-   * Liefert das Model, zu dem dieses Attribut gehört.
+   * Liefert das Model, zu dem dieses Attribut gehÃ¶rt.
    *
    * @return
    */
@@ -42,13 +42,13 @@ public interface ModelAttribute
   public void setModel(ModelComponent model);
 
   /**
-   * Kennzeichnet das Attribut als geändert. Wird vom Controller/View
-   * aufgerufen, der die Änderung vorgenommen hat.
+   * Kennzeichnet das Attribut als geÃ¤ndert. Wird vom Controller/View
+   * aufgerufen, der die Ã„nderung vorgenommen hat.
    */
   void markChanged();
 
   /**
-   * Kennzeichnet ein Attribut als nicht geändert. Hebt damit markChanged() auf.
+   * Kennzeichnet ein Attribut als nicht geÃ¤ndert. Hebt damit markChanged() auf.
    * Wird vom Model aufgerufen, nachdem sich alle Views aktualisiert haben.
    */
   void unmarkChanged();
@@ -60,16 +60,16 @@ public interface ModelAttribute
   void setChangeState(AbstractModelAttribute.ChangeState changeState);
 
   /**
-   * Gibt zurück, ob sich der Zustand geändert hat oder nicht. Damit wissen
-   * Views und Fahrkurselemente von Fahrzeugtypen, ob überhaupt eine
-   * übernehmenswerte Änderung vorliegt.
+   * Gibt zurÃ¼ck, ob sich der Zustand geÃ¤ndert hat oder nicht. Damit wissen
+   * Views und Fahrkurselemente von Fahrzeugtypen, ob Ã¼berhaupt eine
+   * Ã¼bernehmenswerte Ã„nderung vorliegt.
    *
    * @return
    */
   boolean hasChanged();
 
   /**
-   * Setzt die Bezeichnung dieser Zustandsrepräsentation.
+   * Setzt die Bezeichnung dieser ZustandsreprÃ¤sentation.
    *
    * @param description
    */
@@ -83,14 +83,14 @@ public interface ModelAttribute
   String getDescription();
 
   /**
-   * Setzt den Hilfetext für einen Zustand.
+   * Setzt den Hilfetext fÃ¼r einen Zustand.
    *
    * @param helptext
    */
   void setHelptext(String helptext);
 
   /**
-   * Liefert den Hilfetext für diesen Zustand.
+   * Liefert den Hilfetext fÃ¼r diesen Zustand.
    *
    * @return
    */
@@ -114,25 +114,25 @@ public interface ModelAttribute
 
   /**
    * @param editable true, wenn der Benutzer das Attribut im Kernel-Modus
-   * "Modelling" verändern kann.
+   * "Modelling" verÃ¤ndern kann.
    */
   void setModellingEditable(boolean editable);
 
   /**
    * @return true, wenn der Benutzer das Property im Kernel-Modus "Modelling"
-   * verändern kann, ansonsten false.
+   * verÃ¤ndern kann, ansonsten false.
    */
   boolean isModellingEditable();
 
   /**
    * @param editable true, wenn der Benutzer das Attribut im Kernel-Modus
-   * "Operating" verändern kann.
+   * "Operating" verÃ¤ndern kann.
    */
   void setOperatingEditable(boolean editable);
 
   /**
    * @return true, wenn der Benutzer das Property im Kernel-Modus "Operating"
-   * verändern kann, ansonsten false.
+   * verÃ¤ndern kann, ansonsten false.
    */
   boolean isOperatingEditable();
 }

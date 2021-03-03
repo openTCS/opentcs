@@ -16,13 +16,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.algorithms.KernelExtension;
+import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.customizations.kernel.ActiveInAllModes;
 import org.opentcs.kernel.controlcenter.ChooseModelDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Initializes an openTCS kernel instance.
@@ -35,8 +37,7 @@ public class KernelStarter {
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(KernelStarter.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(KernelStarter.class);
   /**
    * The kernel we're working with.
    */
@@ -65,7 +66,7 @@ public class KernelStarter {
    */
   @Inject
   protected KernelStarter(LocalKernel kernel,
-                          @KernelExtension.Permanent Set<KernelExtension> extensions,
+                          @ActiveInAllModes Set<KernelExtension> extensions,
                           @LoadModelOnStartup boolean loadModelOnStartup,
                           @ShowStartupDialog boolean showStartupDialog) {
     this.kernel = Objects.requireNonNull(kernel, "kernel is null");
@@ -73,15 +74,17 @@ public class KernelStarter {
     this.showStartupDialog = showStartupDialog;
     this.loadModelOnStartup = loadModelOnStartup && !showStartupDialog;
     if (loadModelOnStartup && showStartupDialog) {
-      log.warning("Model will not be loaded automatically because startup "
-          + "dialog is to be shown");
+      LOG.debug("Model will not be loaded automatically because startup dialog is to be shown");
     }
   }
 
   /**
    * Initializes the system and starts the openTCS kernel including modules.
+   *
+   * @throws IOException If there was a problem loading model data.
    */
-  public void startKernel() {
+  public void startKernel()
+      throws IOException {
     // Register kernel extensions.
     for (KernelExtension extension : extensions) {
       kernel.addKernelExtension(extension);
@@ -89,43 +92,27 @@ public class KernelStarter {
 
     // Start local kernel.
     kernel.initialize();
-    log.fine("Kernel initialized.");
-    String savedModelName;
-    try {
-      savedModelName = kernel.getModelName();
-    }
-    catch (IOException exc) {
-      throw new IllegalStateException("Unhandled exception loading model",
-                                      exc);
-    }
+    LOG.debug("Kernel initialized.");
+    String savedModelName = kernel.getPersistentModelName();
     boolean modelingMode = false;
 
     boolean loadModel = loadModelOnStartup;
     // Show ChooseModelDialog and see if we should load a model
     if (showStartupDialog) {
-      ChooseModelDialog chooseModelDialog;
-      chooseModelDialog
-          = new ChooseModelDialog(savedModelName);
+      ChooseModelDialog chooseModelDialog = new ChooseModelDialog(savedModelName);
       chooseModelDialog.setVisible(true);
-      String modelName = chooseModelDialog.savedModelSelected()
-          ? savedModelName : null;
+      String modelName = chooseModelDialog.savedModelSelected() ? savedModelName : null;
       modelingMode = chooseModelDialog.modelingSelected();
 
       loadModel = modelName != null;
     }
     // Load the saved model if there is one
     if (loadModel && savedModelName != null) {
-      try {
-        log.fine("Loading model: " + savedModelName);
-        kernel.loadModel();
-        log.info("Loaded model: " + savedModelName);
-        if (!modelingMode) {
-          kernel.setState(Kernel.State.OPERATING);
-        }
-      }
-      catch (IOException exc) {
-        throw new IllegalStateException("Unhandled exception loading model",
-                                        exc);
+      LOG.debug("Loading model: " + savedModelName);
+      kernel.loadModel();
+      LOG.info("Loaded model: " + savedModelName);
+      if (!modelingMode) {
+        kernel.setState(Kernel.State.OPERATING);
       }
     }
     // Load an empty model in modelling mode

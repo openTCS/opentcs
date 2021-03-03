@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
@@ -15,25 +14,25 @@ import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class NewModelAction
-		extends AbstractAction {
+    extends AbstractAction {
 
-	public final static String ID = "file.newModel";
-	private final GuiManager view;
+  public final static String ID = "file.newModel";
+  private final GuiManager view;
 
-	/**
-	 * Creates a new instance.
-	 */
-	public NewModelAction(GuiManager view) {
-		this.view = view;
-		ResourceBundleUtil.getBundle().configureAction(this, ID);
-	}
+  /**
+   * Creates a new instance.
+   */
+  public NewModelAction(GuiManager view) {
+    this.view = view;
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-		view.createEmptyModel();
-	}
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    view.createEmptyModel();
+  }
 }

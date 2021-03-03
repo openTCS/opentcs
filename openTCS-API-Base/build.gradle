@@ -1,0 +1,6 @@
+dependencies {
+}
+
+task release {
+  dependsOn build
+}

@@ -1,0 +1,78 @@
+
+== Customizing and extending the plant overview application
+
+=== Guice modules
+
+Analogous to the kernel application, the plant overview application uses Guice to configure its components.
+To modify the wiring of components within the application and to add your own components, you can register custom Guice modules.
+Modules are found and registered automatically via `java.util.ServiceLoader`.
+
+Basically, the following steps are required for customizing the application:
+
+. Build a JAR file for your custom injection module with the following content:
+.. A subclass of `PlantOverviewInjectionModule`, which can be found in the base library, must be contained.
+Configure your custom components or adjust the application's default wiring in this module.
+`PlantOverviewInjectionModule` provides a few supporting methods you can use.
+.. A plain text file named `META-INF/services/org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule` must also be contained.
+This file should contain a single line of text with the fully qualified class name of your module.
+. Ensure that the JAR file(s) containing your Guice modules and the implementation of your custom component(s) are part of the class path when you start the plant overview application.
+
+For more information on how the automatic registration works, see the documentation of `java.util.ServiceLoader` in the Java class library.
+For more information on how Guice works, see the Guice documentation.
+
+=== How to create a plugin panel for the plant overview client
+
+The plant overview client offers to integrate custom panels providing project-specific functionality.
+
+. Implement a subclass of `PluggablePanel`.
+. Implement a `PluggablePanelFactory` that produces instances of your `PluggablePanel`.
+. Create a Guice module for your `PluggablePanelFactory` by subclassing `PlantOverviewInjectionModule`.
+Implement the `configure()` method and add a binding to your `PluggablePanelFactory` using `pluggablePanelFactoryBinder()`.
+The following example demonstrates how this module looks like for the panels that are part of the openTCS distribution:
++
+[source, java]
+----
+include::{plantoverview-guiceSrc}/org/opentcs/guing/DefaultPluginPanelsModule.java[tags=documentation_createPluginPanelModule]
+----
+
+. Build and package the `PluggablePanel`, `PluggablePanelFactory` and Guice module into a JAR file.
+. In the JAR file, register the Guice module class as a service of type `PlantOverviewInjectionModule`.
+To do that, ensure that the JAR file contains a folder named `META-INF/services/` with a file named `org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule`.
+This file should consist of a single line of text holding simply the name of the guice module class, e.g.:
++
+[source]
+----
+org.opentcs.guing.DefaultPluginPanelsModule
+----
+
+. Place the JAR file in the Plant Overview application's class path (subdirectory `lib/openTCS-extensions/` of the application's installation directory) and start the application.
+
+=== How to create a location/vehicle theme for openTCS
+
+Locations and vehicles are visualized in the plant overview client using pluggable themes.
+To customize the appearance of locations and vehicles, new theme implementations can be created and integrated into the plant overview client.
+
+. Create a new class which implements `LocationTheme` or `VehicleTheme`.
+. Create a Guice module for your theme by creating a class inheriting `PlantOverviewInjectionModule`.
+Implement the `configure()` method and add a binding to your theme using `vehicleThemeBinder()` or `locationThemeBinder()`.
+The following example demonstrates how this module looks like for the themes that are part of the openTCS distribution:
++
+[source, java]
+----
+include::{plantoverview-guiceSrc}/org/opentcs/guing/DefaultThemesModule.java[tags=documentation_createThemeModule]
+----
+
+. Ensure that the JAR file containing your theme(s) also contains a folder named `META-INF/services/` with a file named `org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule`.
+This file should consist of a single line of text holding simply the name of the implementing class, e.g.:
++
+[source]
+----
+org.opentcs.guing.DefaultThemesModule
+----
++
+NOTE: Background: openTCS uses `java.util.ServiceLoader` to automatically find Guice modules on startup, which depends on this file (with this name) being present.
+. Place the JAR file of your theme, containing all required resources, in the subdirectory `lib/openTCS-extensions/` of the openTCS plant overview application's installation directory _before_ the application is started.
+(The openTCS start scripts include all JAR files in that directory in the application's classpath.)
+
+Themes meeting these requirements are found automatically when you start the plant overview client.
+

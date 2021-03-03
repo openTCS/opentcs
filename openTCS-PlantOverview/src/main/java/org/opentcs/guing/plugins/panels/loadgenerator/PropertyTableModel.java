@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Table model for transport order proerties.
@@ -29,7 +29,7 @@ class PropertyTableModel
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(PropertyTableModel.class.getName());
+      = LoggerFactory.getLogger(PropertyTableModel.class);
   /**
    * The column names.
    */
@@ -96,7 +96,7 @@ class PropertyTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.log(Level.WARNING, "Invalid columnIndex", exc);
+      log.warn("Invalid columnIndex", exc);
       return "FEHLER";
     }
   }

@@ -36,9 +36,9 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
- * Interface für das Datenmodell des gesamten modellierten Systems. Besteht aus
+ * Interface fÃ¼r das Datenmodell des gesamten modellierten Systems. Besteht aus
  * den Fahrzeugen und dem Fahrkurslayout. Das Systemmodell verwaltet
- * Komposita-Komponenten, die unbedingt vorhanden sein müssen.
+ * Komposita-Komponenten, die unbedingt vorhanden sein mÃ¼ssen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -46,7 +46,7 @@ public interface SystemModel
     extends ModelComponent {
 
   /**
-   * Fügt dem Systemmodell eine Hauptkomponente hinzu.
+   * FÃ¼gt dem Systemmodell eine Hauptkomponente hinzu.
    *
    * @param key
    * @param component
@@ -54,7 +54,7 @@ public interface SystemModel
   void addMainFolder(FolderKey key, ModelComponent component);
 
   /**
-   * Liefert die zum Schlüssel passende Hauptkomponente.
+   * Liefert die zum SchlÃ¼ssel passende Hauptkomponente.
    *
    * @param key
    * @return
@@ -63,7 +63,7 @@ public interface SystemModel
 
   /**
    * Liefert das Elternobjekt zu einem ModelComponent-Objekt. Die Zuordnung wird
-   * über das Class-Objekt von item vorgenommen.
+   * Ã¼ber das Class-Objekt von item vorgenommen.
    *
    * @param item
    * @return
@@ -71,13 +71,20 @@ public interface SystemModel
   ModelComponent getFolder(ModelComponent item);
 
   /**
-   * Liefert alle Objekt, die zu einer bestimmten Klasse gehören.
+   * Liefert alle Objekt, die zu einer bestimmten Klasse gehÃ¶ren.
    *
    * @param foldername der Name des Ordners, in dem gesucht werden soll
-   * @param classType die Klasse, von der die Objekte sein müssen
+   * @param classType die Klasse, von der die Objekte sein mÃ¼ssen
    * @return alle Objekte einer Klasse
    */
   <T> List<T> getAll(FolderKey foldername, Class<T> classType);
+  
+  /**
+   * Liefert alle Objekte in allen Ordnern.
+   * 
+   * @return Liste aller Objekte
+   */
+  List<ModelComponent> getAll();
 
   /**
    * Liefert die Zuordnungstabelle.
@@ -94,7 +101,7 @@ public interface SystemModel
   Drawing getDrawing();
 
   /**
-   * Liefert die Zeichenmethode. Hier sind beispielsweise möglich "symbolisch"
+   * Liefert die Zeichenmethode. Hier sind beispielsweise mÃ¶glich "symbolisch"
    * und auf "Koordinaten basierend".
    *
    * @return
@@ -148,7 +155,7 @@ public interface SystemModel
   PointModel getPointModel(String name);
 
   /**
-   * Liefert alle Stationen (Übergabestationen, Batterieladestation,
+   * Liefert alle Stationen (Ãœbergabestationen, Batterieladestation,
    * Arbeitsstationen).
    *
    * @return eine Liste aller Stationen
@@ -156,7 +163,7 @@ public interface SystemModel
   List<LocationModel> getLocationModels();
 
   /**
-   * Liefert alle Stationen, die zu einem bestimmten Typ gehören.
+   * Liefert alle Stationen, die zu einem bestimmten Typ gehÃ¶ren.
    *
    * @param locationType der Stationstyp
    * @return die Stationen
@@ -190,7 +197,7 @@ public interface SystemModel
   PathModel getPathModel(String name);
 
   /**
-   * Liefert alle ´Links, die jeweils einen Punkt mit einer Station verbinden.
+   * Liefert alle Â´Links, die jeweils einen Punkt mit einer Station verbinden.
    *
    * @return eine Liste aller Referenzen
    */
@@ -237,7 +244,7 @@ public interface SystemModel
 
   /**
    * Liefert alle grafischen Objekte, die lediglich eine illustrierende Wirkung
-   * haben. Diese Objekte sind für den Fahrkurs irrelevant.
+   * haben. Diese Objekte sind fÃ¼r den Fahrkurs irrelevant.
    *
    * @return eine Liste aller sonstigen grafischen Objekte, die mit dem Fahrkurs
    * direkt nichts zu tun haben

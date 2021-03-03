@@ -28,17 +28,17 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Basisimplementierung für einen
+ * Basisimplementierung fÃ¼r einen
  * <code>CellEditor</code>, der aus einer Editor-Komponente (Textfeld, ComboBox
  * oder CheckBox) sowie aus einem kleinen Button mit drei Punkten besteht. Beim
  * Anklicken des kleinen Buttons erscheint ein Dialog, mit dessen Hilfe der Wert
- * eines Attributs komfortabler geändert werden kann.
+ * eines Attributs komfortabler geÃ¤ndert werden kann.
  * <p>
  * Ein
  * <code>CellEditor</code> verwaltet ein {
  *
  * @see Property}, das bearbeitet werden kann (der Editor wird jedoch mehrfach,
- * genauer gesagt für eine bestimmte Klasse von Property eingesetzt).
+ * genauer gesagt fÃ¼r eine bestimmte Klasse von Property eingesetzt).
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -129,7 +129,7 @@ public abstract class AbstractPropertyCellEditor
   /**
    * Erzeugt den Button mit den drei Punkten. Soll kein Button erscheinen, muss
    * hier
-   * <code>null</code> zurückgegeben werden.
+   * <code>null</code> zurÃ¼ckgegeben werden.
    *
    * @return
    */
@@ -168,15 +168,15 @@ public abstract class AbstractPropertyCellEditor
   }
 
   /**
-   * Markiert das Attribut als geändert.
+   * Markiert das Attribut als geÃ¤ndert.
    */
   protected void markProperty() {
     fProperty.markChanged();
   }
 
   /**
-   * Öffnet den Dialog, mit dessen Hilfe die Eigenschaften eines Attributs
-   * komfortabler eingestellt werden können.
+   * Ã–ffnet den Dialog, mit dessen Hilfe die Eigenschaften eines Attributs
+   * komfortabler eingestellt werden kÃ¶nnen.
    */
   protected void showDialog() {
     if (fDetailsDialog != null) {

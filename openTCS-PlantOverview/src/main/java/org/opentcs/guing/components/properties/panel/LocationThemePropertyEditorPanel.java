@@ -20,13 +20,13 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.gui.plugins.LocationTheme;
 
 /**
  * A panel that shows all images of a specific location theme.

@@ -1,4 +1,4 @@
-apply plugin: 'application'
+apply from: "${rootDir}/gradle/application-guice.gradle"
 
 if (!hasProperty('mainClass')) {
   ext.mainClass = 'org.opentcs.kernel.RunKernel'
@@ -6,44 +6,14 @@ if (!hasProperty('mainClass')) {
 mainClassName = ext.mainClass
 
 ext.collectableDistDir = new File(buildDir, 'install')
-ext.appDir = new File(collectableDistDir, project.name)
-
-sourceSets {
-  guiceConfig
-}
-
-configurations {
-  guiceConfigCompile.extendsFrom compile
-}
 
 dependencies {
-  compile project(':openTCS-Base')
-  compile project(':openTCS-Strategies-Basic')
-  compile group: 'com.google.inject', name: 'guice', version: '3.0'
-  compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
-  compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '3.0'
-  compile group: 'net.engio', name: 'mbassador', version: '1.1.10'
-  compile group: 'org.jfree', name: 'jfreechart', version: '1.0.17'
+  compile project(':openTCS-API-Injection')
+  compile project(':openTCS-Common')
+  compile project(':openTCS-CommAdapter-Loopback')
+  compile project(':openTCS-Strategies-Default')
   
-  guiceConfigCompile sourceSets.main.output
-}
-
-compileJava {
-  options.compilerArgs << "-Xlint:all"
-  options.compilerArgs << "-Xlint:-serial"
-  options.compilerArgs << "-Xlint:-rawtypes"
-}
-
-compileTestJava {
-  options.compilerArgs << "-Xlint:all"
-  options.compilerArgs << "-Xlint:-serial"
-}
-
-jar {
-  from sourceSets.guiceConfig.output
-  // This merely tells NetBeans where to look for classes in case other
-  // subprojects depending on this one. By default, it only scans 'main'.
-  ext.netBeansSourceSets = [sourceSets.guiceConfig, sourceSets.main]
+  runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 
 // For now, we're using hand-crafted start scripts, so disable the application
@@ -52,14 +22,10 @@ startScripts.enabled = false
 
 task release {
   dependsOn build
-  dependsOn installApp
+  dependsOn installDist
 }
 
 run {
-  dependsOn installApp
-  workingDir appDir
-  enableAssertions true
-  classpath(files { new File(appDir, 'lib').listFiles() })
   systemProperties(['java.util.logging.config.file':'./config/logging.config',\
                     'java.security.policy':'file:./config/java.policy',\
                     'opentcs.base':'.',\
@@ -69,18 +35,4 @@ run {
                     'org.opentcs.virtualvehicle.profiles.file':'./config/virtualvehicle-profiles.xml'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\
           '-splash:bin/splash-image.gif')
-}
-
-task(debug, type:JavaExec) {
-  dependsOn installApp
-  workingDir run.workingDir
-  enableAssertions run.enableAssertions
-  
-  main run.main
-  args run.args
-  classpath run.classpath
-  jvmArgs run.jvmArgs
-  systemProperties run.systemProperties
-
-  debug true
 }

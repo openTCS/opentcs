@@ -1,0 +1,24 @@
+
+== Introduction
+
+=== Purpose of the software
+
+openTCS is a control system software for automatic vehicles.
+It was primarily developed for the coordination of automated guided vehicles (AGV), but it is generally conceivable to use it with other automatic vehicles like mobile robots or quadrocopters, as openTCS controls the vehicles independent of their specific characteristics like track guidance system or load handling device.
+
+=== System requirements
+
+To run openTCS, a Java Runtime Environment (JRE) version 1.8 or later is required. (The directory `bin` of the installed JRE, for example `C:/Program Files/Java/jre1.8.0/bin`, should be included in the enviroment variable PATH to be able to use the included start scripts.)
+
+=== Further documentation
+
+If you intend to extend and customize openTCS, please also see the Developer's Guide and the JavaDoc documentation that is part of the openTCS distribution.
+
+=== Questions and problem reports
+
+If you have questions about this manual, the openTCS project or about using or extending openTCS, please contact the development team by using the discussion forums at http://sourceforge.net/projects/opentcs/ or by sending an e-mail to info@opentcs.org.
+
+If you encounter technical problems using openTCS, please remember to include enough data in your problem report to help the developers help you, e.g.:
+
+* The applications' log files, contained in the subdirectory `log/` of both the kernel and the plant overview application
+* The plant model you are working with, contained in the subdirectory `data/` of the kernel and/or plant overview application

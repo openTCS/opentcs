@@ -10,12 +10,12 @@ package org.opentcs.guing.util;
 
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
+import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.guing.components.properties.type.LocationThemeProperty;
-import org.opentcs.util.gui.plugins.LocationTheme;
-import org.opentcs.util.gui.plugins.LocationThemeRegistry;
+import org.opentcs.guing.plugins.themes.LocationThemeRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the registered location themes.
@@ -30,7 +30,7 @@ public class DefaultLocationThemeManager
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(DefaultLocationThemeManager.class.getName());
+      = LoggerFactory.getLogger(DefaultLocationThemeManager.class);
   /**
    * The application's configuration.
    */
@@ -96,7 +96,7 @@ public class DefaultLocationThemeManager
         defaultTheme = themes.get(0);
       }
       else {
-        log.log(Level.WARNING, "Theme with name {0} not found and no other factory available.", themeProperty.getTheme());
+        log.warn("Theme with name {} not found and no other factory available.", themeProperty.getTheme());
       }
     }
   }

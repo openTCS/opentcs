@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.util;
 
 import javax.swing.JOptionPane;
@@ -57,11 +56,11 @@ public class UserMessageHelper {
    * @param title The title of the dialog.
    * @param message The message to be shown.
    * @param type The type of the message.
-   * @return A {@link RET_TYPE} indicating the selected value.
+   * @return A {@link ReturnType} indicating the selected value.
    */
-  public RET_TYPE showConfirmDialog(String title,
-                                    String message,
-                                    Type type) {
+  public ReturnType showConfirmDialog(String title,
+                                      String message,
+                                      Type type) {
     return translateJOptionReturnType(showJOptionConfirmDialog(title, message, type));
   }
 
@@ -105,16 +104,17 @@ public class UserMessageHelper {
     return jOptionType;
   }
 
-  private RET_TYPE translateJOptionReturnType(int type) {
+  private ReturnType translateJOptionReturnType(int type) {
     switch (type) {
       case JOptionPane.OK_OPTION:
-        return RET_TYPE.OK;
+        return ReturnType.OK;
       case JOptionPane.NO_OPTION:
-        return RET_TYPE.NO;
+        return ReturnType.NO;
       case JOptionPane.CANCEL_OPTION:
-        return RET_TYPE.CANCEL;
+        return ReturnType.CANCEL;
+      default:
+        return ReturnType.CANCEL;
     }
-    return RET_TYPE.CANCEL;
   }
 
   private void showJOptionPane(String title,
@@ -130,11 +130,16 @@ public class UserMessageHelper {
 
   public enum Type {
 
-    PLAIN, INFO, ERROR, QUESTION;
+    PLAIN,
+    INFO,
+    ERROR,
+    QUESTION;
   }
 
-  public enum RET_TYPE {
+  public enum ReturnType {
 
-    OK, NO, CANCEL;
+    OK,
+    NO,
+    CANCEL;
   }
 }

@@ -1,12 +1,32 @@
-import org.gradle.api.artifacts.*
+buildscript {
+  repositories {
+    jcenter()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    // AsciiDoctor plugin(s)
+    classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+    classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.0'
+    // Versions plugin
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
+    // Stats plugin
+    classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.0'
+  }
+}
 
 apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
+apply plugin: 'com.github.ben-manes.versions'
 
-apply from: "${rootDir}/versioning.gradle"
+apply from: "${rootDir}/gradle/versioning.gradle"
+
+group = 'org.opentcs'
 
 subprojects {
-  apply from: rootProject.file('common.gradle')
+  apply from: rootProject.file('gradle/common.gradle')
 }
 evaluationDependsOnChildren()
 
@@ -24,15 +44,27 @@ distributions {
   }
 }
 
-installDist {
-  dependsOn(':openTCS-Kernel:installApp')
-  dependsOn(':openTCS-PlantOverview:installApp')
+task statsAggregate(type: org.kordamp.gradle.stats.AggregateStatsReportTask) {
+  dependsOn subprojects*.stats
+}
+
+task subDists {
+  dependsOn(':openTCS-Kernel:installDist')
+  dependsOn(':openTCS-PlantOverview:installDist')
   dependsOn(':openTCS-Documentation:installDist')
 }
 
+installDist.dependsOn subDists
+
 distZip {
   classifier = 'bin'
-  dependsOn installDist
+  dependsOn subDists
+}
+
+distTar {
+  classifier = 'bin'
+  dependsOn subDists
+  compression = Compression.GZIP
 }
 
 task distSrcZip(type: Zip) {
@@ -53,18 +85,23 @@ task distSrcZip(type: Zip) {
   excludes << '**/build'
 }
 
-task build {
+artifacts {
+  archives distZip
+  archives distSrcZip
+}
+
+build {
   dependsOn subprojects*.build
+  dependsOn installDist
 }
 
 task release {
   dependsOn build
   dependsOn subprojects*.release
-  dependsOn installDist
   dependsOn distZip
   dependsOn distSrcZip
 }
 
 task wrapper(type: Wrapper, description: 'Creates and deploys the Gradle wrapper to the current directory.') {
-  gradleVersion = '2.1'
+  gradleVersion = '2.13'
 }

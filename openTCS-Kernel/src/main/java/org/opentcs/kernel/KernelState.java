@@ -13,12 +13,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opentcs.access.ConfigurationItemTO;
 import org.opentcs.access.Kernel.State;
 import org.opentcs.access.TravelCosts;
@@ -26,12 +27,11 @@ import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.queries.Queries;
 import org.opentcs.access.queries.Query;
 import org.opentcs.access.queries.QueryTopologyInfo;
-import org.opentcs.algorithms.Scheduler;
+import org.opentcs.components.Lifecycle;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.message.Message;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
 import org.opentcs.data.model.Location;
@@ -46,20 +46,18 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.drivers.CommunicationAdapter;
-import org.opentcs.drivers.CommunicationAdapterRegistry;
-import org.opentcs.drivers.LoadHandlingDevice;
-import org.opentcs.drivers.VehicleControllerPool;
-import org.opentcs.drivers.VehicleManagerPool;
-import org.opentcs.kernel.workingset.MessageBuffer;
+import org.opentcs.drivers.vehicle.LoadHandlingDevice;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.configuration.Configuration;
 import org.opentcs.util.configuration.ConfigurationItem;
 
@@ -69,33 +67,29 @@ import org.opentcs.util.configuration.ConfigurationItem;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-abstract class KernelState {
+abstract class KernelState
+    implements Lifecycle {
 
-  /**
-   * The kernel we're working for.
-   */
-  protected final StandardKernel kernel;
   /**
    * A global object to be used within the kernel.
    */
-  protected final Object globalSyncObject;
+  private final Object globalSyncObject;
   /**
    * The container of all course model and transport order objects.
    */
-  protected final TCSObjectPool globalObjectPool;
+  private final TCSObjectPool globalObjectPool;
   /**
    * The model facade to the object pool.
    */
-  protected final Model model;
+  private final Model model;
   /**
    * The buffer for all messages published.
    */
-  protected final MessageBuffer messageBuffer;
+  private final NotificationBuffer notificationBuffer;
   /**
-   * This class's Logger.
+   * The persister loading and storing model data.
    */
-  private static final Logger log
-      = Logger.getLogger(KernelState.class.getName());
+  private final ModelPersister modelPersister;
 
   /**
    * Creates a new state.
@@ -104,35 +98,25 @@ abstract class KernelState {
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param objectPool The object pool to be used.
    * @param model The model to be used.
-   * @param messageBuffer The message buffer to be used.
+   * @param notificationBuffer The notification buffer to be used.
    */
-  KernelState(StandardKernel kernel,
-              Object globalSyncObject,
+  KernelState(Object globalSyncObject,
               TCSObjectPool objectPool,
               Model model,
-              MessageBuffer messageBuffer) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
-    this.globalSyncObject = Objects.requireNonNull(globalSyncObject,
-                                                   "globalSyncObject is null");
-    this.globalObjectPool = Objects.requireNonNull(objectPool,
-                                                   "objectPool is null");
-    this.model = Objects.requireNonNull(model, "model is null");
-    this.messageBuffer = Objects.requireNonNull(messageBuffer,
-                                                "messageBuffer is null");
+              NotificationBuffer notificationBuffer,
+              ModelPersister modelPersister) {
+    this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
+    this.globalObjectPool = requireNonNull(objectPool, "objectPool");
+    this.model = requireNonNull(model, "model");
+    this.notificationBuffer = requireNonNull(notificationBuffer, "notificationBuffer");
+    this.modelPersister = requireNonNull(modelPersister, "modelPersister");
   }
 
   /**
-   * Initializes this kernel state.
-   * (Allocates resources, starts kernel extensions etc.)
+   * Returns the current state.
+   *
+   * @return The current state.
    */
-  public abstract void initialize();
-
-  /**
-   * Terminates this kernel state.
-   * (Frees resources, stops kernel extensions etc.)
-   */
-  public abstract void terminate();
-
   public abstract State getState();
 
   /**
@@ -141,14 +125,14 @@ abstract class KernelState {
    * @return The name of the model which is not present when there is no model.
    * @throws IOException If reading the model name from the model file failed.
    */
-  public final Optional<String> getModelName()
+  public final Optional<String> getPersistentModelName()
       throws IOException {
-    return kernel.modelPersister.getModelName();
+    return modelPersister.getPersistentModelName();
   }
 
-  public final String getCurrentModelName() {
-    synchronized (globalSyncObject) {
-      return model.getName();
+  public final String getLoadedModelName() {
+    synchronized (getGlobalSyncObject()) {
+      return getModel().getName();
     }
   }
 
@@ -173,23 +157,23 @@ abstract class KernelState {
 
   public final <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                        TCSObjectReference<T> ref) {
-    synchronized (globalSyncObject) {
-      T result = globalObjectPool.getObject(clazz, ref);
+    synchronized (getGlobalSyncObject()) {
+      T result = getGlobalObjectPool().getObject(clazz, ref);
       return result == null ? null : clazz.cast(result.clone());
     }
   }
 
   public final <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                        String name) {
-    synchronized (globalSyncObject) {
-      T result = globalObjectPool.getObject(clazz, name);
+    synchronized (getGlobalSyncObject()) {
+      T result = getGlobalObjectPool().getObject(clazz, name);
       return result == null ? null : clazz.cast(result.clone());
     }
   }
 
   public final <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz) {
-    synchronized (globalSyncObject) {
-      Set<T> objects = globalObjectPool.getObjects(clazz);
+    synchronized (getGlobalSyncObject()) {
+      Set<T> objects = getGlobalObjectPool().getObjects(clazz);
       Set<T> copies = new HashSet<>();
       for (T object : objects) {
         copies.add(clazz.cast(object.clone()));
@@ -200,8 +184,8 @@ abstract class KernelState {
 
   public final <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
                                                              Pattern regexp) {
-    synchronized (globalSyncObject) {
-      Set<T> objects = globalObjectPool.getObjects(clazz, regexp);
+    synchronized (getGlobalSyncObject()) {
+      Set<T> objects = getGlobalObjectPool().getObjects(clazz, regexp);
       Set<T> copies = new HashSet<>();
       for (T object : objects) {
         copies.add(clazz.cast(object.clone()));
@@ -210,41 +194,50 @@ abstract class KernelState {
     }
   }
 
+  public <T extends TCSObject<T>> Set<T> getTCSObjects(@Nonnull Class<T> clazz,
+                                                       @Nonnull Predicate<? super T> predicate) {
+    synchronized (getGlobalSyncObject()) {
+      return getGlobalObjectPool().getObjects(clazz, predicate).stream()
+          .map(obj -> clazz.cast(obj.clone()))
+          .collect(Collectors.toSet());
+    }
+  }
+
   public final <T extends TCSObject<T>> T getTCSObjectOriginal(
       Class<T> clazz,
       TCSObjectReference<T> ref) {
-    synchronized (globalSyncObject) {
-      return globalObjectPool.getObject(clazz, ref);
+    synchronized (getGlobalSyncObject()) {
+      return getGlobalObjectPool().getObject(clazz, ref);
     }
   }
 
   public final <T extends TCSObject<T>> T getTCSObjectOriginal(Class<T> clazz,
                                                                String name) {
-    synchronized (globalSyncObject) {
-      return globalObjectPool.getObject(clazz, name);
+    synchronized (getGlobalSyncObject()) {
+      return getGlobalObjectPool().getObject(clazz, name);
     }
   }
 
   public final <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(
       Class<T> clazz) {
-    synchronized (globalSyncObject) {
-      return globalObjectPool.getObjects(clazz);
+    synchronized (getGlobalSyncObject()) {
+      return getGlobalObjectPool().getObjects(clazz);
     }
   }
 
   public final <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(
       Class<T> clazz,
       Pattern regexp) {
-    synchronized (globalSyncObject) {
-      return globalObjectPool.getObjects(clazz, regexp);
+    synchronized (getGlobalSyncObject()) {
+      return getGlobalObjectPool().getObjects(clazz, regexp);
     }
   }
 
   public final void renameTCSObject(TCSObjectReference<?> ref,
                                     String newName)
       throws ObjectUnknownException, ObjectExistsException {
-    synchronized (globalSyncObject) {
-      globalObjectPool.renameObject(ref, newName);
+    synchronized (getGlobalSyncObject()) {
+      getGlobalObjectPool().renameObject(ref, newName);
     }
   }
 
@@ -252,15 +245,15 @@ abstract class KernelState {
                                          String key,
                                          String value)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      globalObjectPool.setObjectProperty(ref, key, value);
+    synchronized (getGlobalSyncObject()) {
+      getGlobalObjectPool().setObjectProperty(ref, key, value);
     }
   }
 
   public final void clearTCSObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      globalObjectPool.clearObjectProperties(ref);
+    synchronized (getGlobalSyncObject()) {
+      getGlobalObjectPool().clearObjectProperties(ref);
     }
   }
 
@@ -269,9 +262,15 @@ abstract class KernelState {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public Message publishMessage(String message, Message.Type type) {
-    synchronized (globalSyncObject) {
-      return messageBuffer.createMessage(message, type);
+  public void publishUserNotification(UserNotification notification) {
+    synchronized (getGlobalSyncObject()) {
+      notificationBuffer.addNotification(notification);
+    }
+  }
+
+  public List<UserNotification> getUserNotifications(Predicate<UserNotification> predicate) {
+    synchronized (getGlobalSyncObject()) {
+      return notificationBuffer.getNotifications(predicate);
     }
   }
 
@@ -380,16 +379,16 @@ abstract class KernelState {
       TCSObjectReference<Vehicle> ref,
       int energyLevel)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVehicleEnergyLevelCritical(ref, energyLevel);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVehicleEnergyLevelCritical(ref, energyLevel);
     }
   }
 
   public final void setVehicleEnergyLevelGood(TCSObjectReference<Vehicle> ref,
                                               int energyLevel)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVehicleEnergyLevelGood(ref, energyLevel);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVehicleEnergyLevelGood(ref, energyLevel);
     }
   }
 
@@ -435,7 +434,7 @@ abstract class KernelState {
   }
 
   public void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
-                                     CommunicationAdapter.State newState)
+                                     VehicleCommAdapter.State newState)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
@@ -576,25 +575,25 @@ abstract class KernelState {
   }
 
   public Group createGroup() {
-    synchronized (globalSyncObject) {
+    synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return model.createGroup(null).clone();
+      return getModel().createGroup(null).clone();
     }
   }
 
   public void addGroupMember(TCSObjectReference<Group> ref,
                              TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.addGroupMember(ref, newMemberRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().addGroupMember(ref, newMemberRef);
     }
   }
 
   public void removeGroupMember(TCSObjectReference<Group> ref,
                                 TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.removeGroupMember(ref, rmMemberRef);
+    synchronized (getGlobalSyncObject()) {
+      getModel().removeGroupMember(ref, rmMemberRef);
     }
   }
 
@@ -609,18 +608,6 @@ abstract class KernelState {
   }
 
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
-      throws ObjectUnknownException {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  public void attachResource(TCSResourceReference<?> resource,
-                             TCSResourceReference<?> newResource)
-      throws ObjectUnknownException {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  public void detachResource(TCSResourceReference<?> resource,
-                             TCSResourceReference<?> rmResource)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
@@ -784,6 +771,10 @@ abstract class KernelState {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  public void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef) {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef,
                                      Object message) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
@@ -795,11 +786,10 @@ abstract class KernelState {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public final Set<TCSResource> expandResources(
-      Set<TCSResourceReference> resources)
+  public final Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      return model.expandResources(resources);
+    synchronized (getGlobalSyncObject()) {
+      return getModel().expandResources(resources);
     }
   }
 
@@ -817,7 +807,7 @@ abstract class KernelState {
       return null;
     }
     if (QueryTopologyInfo.class.equals(clazz)) {
-      return clazz.cast(new QueryTopologyInfo(model.getInfo()));
+      return clazz.cast(new QueryTopologyInfo(getModel().getInfo()));
     }
     else {
       // The given query should be available in this state, but isn't - throw an
@@ -826,24 +816,6 @@ abstract class KernelState {
           + " should be available in kernel state " + getState().name()
           + ", but noone processed it.");
     }
-  }
-
-  public VehicleManagerPool getVehicleManagerPool() {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  public VehicleControllerPool getVehicleControllerPool() {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  public CommunicationAdapterRegistry getCommAdapterRegistry() {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "4.0.0")
-  public Scheduler getScheduler() {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   public double getSimulationTimeFactor() {
@@ -880,8 +852,23 @@ abstract class KernelState {
     Configuration.getInstance().setConfigurationItem(item);
   }
 
+  public Object getGlobalSyncObject() {
+    return globalSyncObject;
+  }
+
+  public ModelPersister getModelPersister() {
+    return modelPersister;
+  }
+
+  public TCSObjectPool getGlobalObjectPool() {
+    return globalObjectPool;
+  }
+
+  public Model getModel() {
+    return model;
+  }
+
   private String unsupportedMsg() {
-    return "Called operation not supported in this kernel mode ("
-        + getState().name() + ").";
+    return "Called operation not supported in this kernel mode (" + getState().name() + ").";
   }
 }

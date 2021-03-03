@@ -107,7 +107,7 @@ public class CloseFileAction
       fileSaved = JOptionPane.CANCEL_OPTION;
 
       switch (option) {
-        case JOptionPane.YES_OPTION:	// Save
+        case JOptionPane.YES_OPTION: // Save
           if (((OpenTCSView) view).saveModel()) {
             fileSaved = JOptionPane.YES_OPTION;
             doIt(evt.getActionCommand(), view);
@@ -115,11 +115,12 @@ public class CloseFileAction
 
           break;
 
-        case JOptionPane.NO_OPTION:	// Don't save
+        case JOptionPane.NO_OPTION:  // Don't save
           fileSaved = JOptionPane.NO_OPTION; // Der Benutzer will nicht speichern
           doIt(evt.getActionCommand(), view);
           break;
 
+        default:
         case JOptionPane.CANCEL_OPTION:
           break;
       }

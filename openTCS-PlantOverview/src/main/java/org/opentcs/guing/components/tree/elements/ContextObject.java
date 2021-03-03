@@ -16,5 +16,5 @@ package org.opentcs.guing.components.tree.elements;
  */
 public interface ContextObject {
   
-  UserObjectContext.CONTEXT_TYPE getContextType();
+  UserObjectContext.ContextType getContextType();
 }

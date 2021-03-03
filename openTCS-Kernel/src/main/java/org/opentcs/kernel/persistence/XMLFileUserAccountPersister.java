@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -30,6 +29,8 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.opentcs.data.user.UserAccount;
 import org.opentcs.data.user.UserPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of <code>UserAccountPersister</code> that stores user
@@ -41,15 +42,9 @@ public class XMLFileUserAccountPersister
     implements UserAccountPersister {
 
   /**
-   * This class's name as a String.
-   */
-  private static final String CLASSNAME
-      = XMLFileUserAccountPersister.class.getName();
-  /**
    * This class's Logger.
    */
-  private static final Logger log = Logger.getLogger(CLASSNAME);
-
+  private static final Logger log = LoggerFactory.getLogger(XMLFileUserAccountPersister.class);
   /**
    * The name of the file containing the account data.
    */
@@ -126,7 +121,7 @@ public class XMLFileUserAccountPersister
           permissions.add(UserPermission.valueOf(perm));
         }
         catch (IllegalArgumentException exc) {
-          log.warning("Unknown permission '" + perm + "' ignored.");
+          log.warn("Unknown permission '" + perm + "' ignored.");
         }
       }
       result.add(new UserAccount(userName, userPass, permissions));
@@ -141,7 +136,9 @@ public class XMLFileUserAccountPersister
       throw new NullPointerException("accounts is null");
     }
     // Sort the accounts alphabetically.
-    SortedSet<UserAccount> sortedAccounts = new TreeSet<>(accounts);
+    SortedSet<UserAccount> sortedAccounts
+        = new TreeSet<>((a1, a2) -> a1.getUserName().compareTo(a2.getUserName()));
+    sortedAccounts.addAll(accounts);
     // Open the output file.
     File accountFile = new File(dataDirectory, accountFileName);
     OutputStream outStream = new FileOutputStream(accountFile);

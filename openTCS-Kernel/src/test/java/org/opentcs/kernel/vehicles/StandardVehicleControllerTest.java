@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import org.opentcs.DataObjectFactory;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -27,9 +28,10 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
-import org.opentcs.drivers.CommunicationAdapter;
-import org.opentcs.drivers.CommunicationAdapterEvent;
-import org.opentcs.drivers.LoadHandlingDevice;
+import org.opentcs.drivers.vehicle.LoadHandlingDevice;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
+import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.strategies.basic.scheduling.DummyScheduler;
 
 /**
@@ -40,6 +42,7 @@ import org.opentcs.strategies.basic.scheduling.DummyScheduler;
  */
 public class StandardVehicleControllerTest {
 
+  private static final String RECHARGE_OP = "recharge";
   /**
    * Creates model objects for us.
    */
@@ -47,41 +50,61 @@ public class StandardVehicleControllerTest {
   /**
    * Represents the kernel application's event bus.
    */
-  private final MBassador<Object> eventBus
-      = new MBassador<>(BusConfiguration.Default());
+  private final MBassador<Object> eventBus = new MBassador<>(BusConfiguration.Default());
   /**
    * A vehicle.
    */
   private Vehicle vehicle;
   /**
+   * A vehicle model.
+   */
+  private VehicleProcessModel vehicleModel;
+  /**
    * A (mocked) communication adapter.
    */
-  private CommunicationAdapter commAdapter;
+  private VehicleCommAdapter commAdapter;
   /**
    * The (mocked) kernel.
    */
   private LocalKernel localKernel;
   /**
+   * A dummy scheduler.
+   */
+  private Scheduler scheduler;
+  /**
    * The instance we're testing.
    */
-  private StandardVehicleController stdVehicleController;
+  private DefaultVehicleController stdVehicleController;
 
   @Before
   public void setUp() {
     vehicle = dataObjectFactory.createVehicle();
-    commAdapter = mock(CommunicationAdapter.class);
+    vehicleModel = new VehicleProcessModel(vehicle);
+    commAdapter = mock(VehicleCommAdapter.class);
     localKernel = mock(LocalKernel.class);
 
-    doReturn(vehicle).when(localKernel).getTCSObject(Vehicle.class,
-                                                     vehicle.getReference());
-    doReturn(vehicle).when(localKernel).getTCSObject(Vehicle.class,
-                                                     vehicle.getName());
+    doReturn(RECHARGE_OP).when(commAdapter).getRechargeOperation();
+    doReturn(vehicleModel).when(commAdapter).getProcessModel();
 
-    stdVehicleController = new StandardVehicleController(vehicle,
-                                                         commAdapter,
-                                                         localKernel,
-                                                         new DummyScheduler(),
-                                                         eventBus);
+    doReturn(vehicle).when(localKernel).getTCSObject(Vehicle.class, vehicle.getReference());
+    doReturn(vehicle).when(localKernel).getTCSObject(Vehicle.class, vehicle.getName());
+
+    scheduler = new DummyScheduler();
+    scheduler.initialize();
+
+    stdVehicleController = new DefaultVehicleController(vehicle,
+                                                        commAdapter,
+                                                        localKernel,
+                                                        scheduler,
+                                                        eventBus,
+                                                        true);
+    stdVehicleController.initialize();
+  }
+
+  @After
+  public void tearDown() {
+    stdVehicleController.terminate();
+    scheduler.terminate();
   }
 
   // Test cases for implementation of interface VehicleManager start here.
@@ -90,7 +113,7 @@ public class StandardVehicleControllerTest {
     Point point = dataObjectFactory.createPoint();
     doReturn(point).when(localKernel).getTCSObject(Point.class, point.getName());
 
-    stdVehicleController.setVehiclePosition(point.getName());
+    vehicleModel.setVehiclePosition(point.getName());
 
     verify(localKernel).setVehiclePosition(vehicle.getReference(),
                                            point.getReference());
@@ -99,7 +122,7 @@ public class StandardVehicleControllerTest {
   @Test
   public void should_forward_precise_position_change_to_kernel() {
     Triple newPos = new Triple(211, 391, 0);
-    stdVehicleController.setVehiclePrecisePosition(newPos);
+    vehicleModel.setVehiclePrecisePosition(newPos);
 
     verify(localKernel).setVehiclePrecisePosition(vehicle.getReference(),
                                                   newPos);
@@ -108,7 +131,7 @@ public class StandardVehicleControllerTest {
   @Test
   public void should_forward_angle_change_to_kernel() {
     double newAngle = 7.5;
-    stdVehicleController.setVehicleOrientationAngle(newAngle);
+    vehicleModel.setVehicleOrientationAngle(newAngle);
 
     verify(localKernel).setVehicleOrientationAngle(vehicle.getReference(),
                                                    newAngle);
@@ -117,7 +140,7 @@ public class StandardVehicleControllerTest {
   @Test
   public void should_forward_energy_level_change_to_kernel() {
     int newLevel = 80;
-    stdVehicleController.setVehicleEnergyLevel(newLevel);
+    vehicleModel.setVehicleEnergyLevel(newLevel);
     verify(localKernel).setVehicleEnergyLevel(vehicle.getReference(),
                                               newLevel);
   }
@@ -126,7 +149,7 @@ public class StandardVehicleControllerTest {
   public void should_forward_load_handling_devices_change_to_kernel() {
     List<LoadHandlingDevice> devices = new LinkedList<>();
     devices.add(new LoadHandlingDevice("MyLoadHandlingDevice", true));
-    stdVehicleController.setVehicleLoadHandlingDevices(devices);
+    vehicleModel.setVehicleLoadHandlingDevices(devices);
 
     verify(localKernel).setVehicleLoadHandlingDevices(vehicle.getReference(),
                                                       devices);
@@ -134,7 +157,7 @@ public class StandardVehicleControllerTest {
 
   @Test
   public void should_forward_vehicle_state_change_to_kernel() {
-    stdVehicleController.setVehicleState(Vehicle.State.EXECUTING);
+    vehicleModel.setVehicleState(Vehicle.State.EXECUTING);
 
     verify(localKernel).setVehicleState(vehicle.getReference(),
                                         Vehicle.State.EXECUTING);
@@ -142,31 +165,30 @@ public class StandardVehicleControllerTest {
 
   @Test
   public void should_forward_adapter_state_change_to_kernel() {
-    stdVehicleController.setAdapterState(CommunicationAdapter.State.UNKNOWN);
+    vehicleModel.setVehicleAdapterState(VehicleCommAdapter.State.UNKNOWN);
 
     verify(localKernel).setVehicleAdapterState(vehicle.getReference(),
-                                               CommunicationAdapter.State.UNKNOWN);
+                                               VehicleCommAdapter.State.UNKNOWN);
   }
 
   @Test
   public void should_forward_event_to_bus() {
     final String adapterName = "myAdapter";
     final String eventString = "myString";
-    final List<CommunicationAdapterEvent> eventsReceived = new LinkedList<>();
+    final List<VehicleCommAdapterEvent> eventsReceived = new LinkedList<>();
     Object eventHandler = new Object() {
 
       @Handler
-      public void handleEvent(CommunicationAdapterEvent event) {
+      public void handleEvent(VehicleCommAdapterEvent event) {
         eventsReceived.add(event);
       }
     };
     eventBus.subscribe(eventHandler);
 
-    stdVehicleController.publishEvent(
-        new CommunicationAdapterEvent(adapterName, eventString));
+    vehicleModel.publishEvent(new VehicleCommAdapterEvent(adapterName, eventString));
 
     assertEquals("Did not receive exactly one event", 1, eventsReceived.size());
-    CommunicationAdapterEvent event = eventsReceived.get(0);
+    VehicleCommAdapterEvent event = eventsReceived.get(0);
     assertEquals("Received event does not seem to be published event",
                  eventString,
                  event.getAppendix());
@@ -175,14 +197,14 @@ public class StandardVehicleControllerTest {
   // Test cases for implementation of interface VehicleController start here.
   @Test
   public void should_have_idempotent_enabled_state() {
-    stdVehicleController.enable();
-    assertTrue(stdVehicleController.isEnabled());
-    stdVehicleController.enable();
-    assertTrue(stdVehicleController.isEnabled());
-    stdVehicleController.disable();
-    assertFalse(stdVehicleController.isEnabled());
-    stdVehicleController.disable();
-    assertFalse(stdVehicleController.isEnabled());
+    stdVehicleController.initialize();
+    assertTrue(stdVehicleController.isInitialized());
+    stdVehicleController.initialize();
+    assertTrue(stdVehicleController.isInitialized());
+    stdVehicleController.terminate();
+    assertFalse(stdVehicleController.isInitialized());
+    stdVehicleController.terminate();
+    assertFalse(stdVehicleController.isInitialized());
   }
 
   @Test(expected = IllegalStateException.class)

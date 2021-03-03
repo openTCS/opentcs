@@ -29,7 +29,7 @@ import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * Ein Figure-Objekt, das einen Meldepunkt darstellt. Das zugehörige Datenobjekt
+ * Ein Figure-Objekt, das einen Meldepunkt darstellt. Das zugehÃ¶rige Datenobjekt
  * ist vom Typ Point. Darstellung als Kreis mit 20 Layout-Units Durchmesser
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -90,7 +90,7 @@ public class PointFigure
     return shape;
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public Rectangle2D.Double getBounds() {
     Rectangle2D r2 = fDisplayBox.getBounds2D();
     Rectangle2D.Double r2d = new Rectangle2D.Double();
@@ -99,13 +99,13 @@ public class PointFigure
     return r2d;
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public Object getTransformRestoreData() {
     // Never used?
     return fDisplayBox.clone();
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public void restoreTransformTo(Object restoreData) {
     // Never used?
     Rectangle r = (Rectangle) restoreData;
@@ -117,16 +117,16 @@ public class PointFigure
     fZoomPoint.setY(r.y + 0.5 * r.height);
   }
 
-  @Override	// Figure
+  @Override  // Figure
   public void transform(AffineTransform tx) {
     Point2D center = getZoomPoint().getPixelLocationExactly();
-    Point2D lead = new Point2D.Double();	// not used
+    Point2D lead = new Point2D.Double();  // not used
     setBounds(
         (Point2D.Double) tx.transform(center, center),
         (Point2D.Double) tx.transform(lead, lead));
   }
 
-  @Override	// AbstractFigure
+  @Override  // AbstractFigure
   public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
     fZoomPoint.setX(anchor.x);
     fZoomPoint.setY(anchor.y);
@@ -134,7 +134,7 @@ public class PointFigure
     fDisplayBox.y = (int) (anchor.y - 0.5 * fDiameter);
   }
 
-  @Override	// AbstractAttributedFigure
+  @Override  // AbstractAttributedFigure
   protected void drawFill(Graphics2D g) {
     Rectangle rect = fDisplayBox;
     FigureComponent model = get(FigureConstants.MODEL);
@@ -158,7 +158,7 @@ public class PointFigure
       g.setColor(Color.white);
       Font oldFont = g.getFont();
       // bei fDiameter = 20
-//			g.drawString("P", (int) (rect.x + 6), (int) (rect.y + rect.height - 5));
+//      g.drawString("P", (int) (rect.x + 6), (int) (rect.y + rect.height - 5));
       // bei fDiameter = 10
       Font newFont = new Font(Font.DIALOG, Font.BOLD, 7);
       g.setFont(newFont);
@@ -167,7 +167,7 @@ public class PointFigure
     }
   }
 
-  @Override	// AbstractAttributedFigure
+  @Override  // AbstractAttributedFigure
   protected void drawStroke(Graphics2D g) {
     Rectangle r = fDisplayBox;
 

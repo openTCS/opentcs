@@ -20,12 +20,12 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.VehicleThemeManager;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * A panel that shows all images of a specific vehicle theme.

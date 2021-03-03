@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tcsStatusMessageSet timeStamp="2016-11-24T11:41:41.875+01:00">
+    <statusMessage xsi:type="orderStatusMessage" orderName="TOrder-0001" orderState="ACTIVE" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <destination locationName="Storage 01" operation="Load cargo" state="PRISTINE"/>
+        <destination locationName="Storage 02" operation="Unload cargo" state="PRISTINE"/>
+        <property key="waitBefore" value="Unload"/>
+    </statusMessage>
+</tcsStatusMessageSet>

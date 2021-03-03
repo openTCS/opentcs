@@ -29,19 +29,19 @@ import org.opentcs.guing.components.properties.event.TableSelectionChangeEvent;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 
 /**
- * Eine Tabelle, in der Attribute dargestellt und verändert werden können. Sie
- * besteht aus zwei Spalten: die erste enthält die Namen der Attribute, die
+ * Eine Tabelle, in der Attribute dargestellt und verÃ¤ndert werden kÃ¶nnen. Sie
+ * besteht aus zwei Spalten: die erste enthÃ¤lt die Namen der Attribute, die
  * zweite die Werte der Attribute.
  * <p>
  * Die Tabelle ist Teil der {
  *
  * @see PropertiesComponent}. Diese besitzt unterhalb der Tabelle einen Bereich
- * für attributspezifische Hilfetexte. PropertiesComponent muss deshalb wissen,
+ * fÃ¼r attributspezifische Hilfetexte. PropertiesComponent muss deshalb wissen,
  * welche Tabellenzeile der Benutzer gerade selektiert, um den entsprechenden
- * Hilfetext anzeigen zu können. Daher registriert sich PropertiesComponent als
+ * Hilfetext anzeigen zu kÃ¶nnen. Daher registriert sich PropertiesComponent als
  * {
- * @see TableSelectionChangeListener} bei der Tabelle und wird dann über jede
- * Veränderung informiert.
+ * @see TableSelectionChangeListener} bei der Tabelle und wird dann Ã¼ber jede
+ * VerÃ¤nderung informiert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -103,7 +103,7 @@ public class AttributesTable
   }
 
   /**
-   * Fügt einen TableSelectionChangeListener hinzu.
+   * FÃ¼gt einen TableSelectionChangeListener hinzu.
    *
    * @param l
    */
@@ -151,12 +151,12 @@ public class AttributesTable
   }
 
   /**
-   * Zeigt an, ob die übergebene Zeile editierbar ist. Dies ist dann der Fall,
+   * Zeigt an, ob die Ã¼bergebene Zeile editierbar ist. Dies ist dann der Fall,
    * wenn das Attribut in seiner
    * <code>isEditable()
    * </code> Methode
    * <code>true</code> liefert. Diese Methode wird von CellRenderern benutzt, um
-   * nicht veränderbare Zeilen anders darzustellen.
+   * nicht verÃ¤nderbare Zeilen anders darzustellen.
    *
    * @param row
    * @return

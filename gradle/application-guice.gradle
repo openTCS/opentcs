@@ -1,0 +1,47 @@
+apply plugin: 'application'
+
+sourceSets {
+  guiceConfig
+}
+
+configurations {
+  guiceConfigCompile.extendsFrom compile
+}
+
+dependencies {
+  guiceConfigCompile sourceSets.main.output
+}
+
+// Attributes for the AsciiDoc documentation to include code from source files
+ext.guiceSrcDir = sourceSets.guiceConfig.java.srcDirs[0]
+
+jar {
+  from sourceSets.guiceConfig.output
+  // This merely tells NetBeans where to look for classes in case of other
+  // subprojects depending on this one. By default, it only scans 'main'.
+  ext.netBeansSourceSets = [sourceSets.guiceConfig, sourceSets.main]
+}
+
+run {
+  dependsOn installDist
+  workingDir new File(new File(buildDir, 'install'), project.name)
+  enableAssertions true
+  classpath sourceSets.guiceConfig.output
+}
+
+task(debug, type:JavaExec) {
+  dependsOn installDist
+
+  doFirst {
+    workingDir = run.workingDir
+    enableAssertions = run.enableAssertions
+  
+    main = run.main
+    args = run.args
+    classpath = run.classpath
+    jvmArgs = run.jvmArgs
+    systemProperties = run.systemProperties
+
+    debug true
+  }
+}

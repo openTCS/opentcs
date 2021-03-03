@@ -13,7 +13,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für einen booleschen Wert.
+ * Ein Attribut fÃ¼r einen booleschen Wert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

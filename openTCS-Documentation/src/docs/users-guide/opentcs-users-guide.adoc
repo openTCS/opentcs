@@ -1,0 +1,18 @@
+= openTCS: User's Guide
+The openTCS developers <info@opentcs.org>
+openTCS {project-version}
+:last-update-label!:
+
+// TIP: Always have the comprehensive http://asciidoctor.org/docs/asciidoc-syntax-quick-reference[QuickReference] handy.
+
+include::introduction.adoc[]
+
+include::system-overview.adoc[]
+
+include::operating-opentcs.adoc[]
+
+include::advanced-usage.adoc[]
+
+include::customizing-and-integrating.adoc[]
+
+include::appendix.adoc[]

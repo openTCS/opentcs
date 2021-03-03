@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für Prozentangaben.
+ * Ein Attribut fÃ¼r Prozentangaben.
  * Beispiele: 47 %
  *
  * @author Heinz Huber (Fraunhofer IML)

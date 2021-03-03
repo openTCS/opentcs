@@ -33,22 +33,22 @@ public class Colors {
   public static final List<Color> defaultColors() {
     List<Color> colors = new ArrayList<>();
     // Farbbezeichnungen aus CorelDraw-Palette
-    colors.add(new Color(255, 0, 0));	// Rot
-    colors.add(new Color(0, 0, 255));	// Blau
-    colors.add(new Color(0, 255, 255));	// Cyan
-    colors.add(new Color(255, 255, 0));	// Gelb
-    colors.add(new Color(255, 0, 255));	// Magenta
-    colors.add(new Color(153, 0, 204));	// Lila
-    colors.add(new Color(255, 102, 0));	// Orange
-    colors.add(new Color(204, 204, 255));	// Taubenblau
-    colors.add(new Color(153, 153, 255));	// Pastelbalu
-    colors.add(new Color(0, 51, 153));	// Marineblau
-    colors.add(new Color(51, 204, 102));	// Hellgrün
-    colors.add(new Color(0, 102, 51));	// Waldgrün
-    colors.add(new Color(102, 255, 204));	// Türkis
-    colors.add(new Color(255, 204, 0));	// Dunkelgelb
-    colors.add(new Color(255, 153, 255));	// Hellviolett
-    colors.add(new Color(255, 102, 102));	// Tropischrosa
+    colors.add(new Color(255, 0, 0));  // Rot
+    colors.add(new Color(0, 0, 255));  // Blau
+    colors.add(new Color(0, 255, 255));  // Cyan
+    colors.add(new Color(255, 255, 0));  // Gelb
+    colors.add(new Color(255, 0, 255));  // Magenta
+    colors.add(new Color(153, 0, 204));  // Lila
+    colors.add(new Color(255, 102, 0));  // Orange
+    colors.add(new Color(204, 204, 255));  // Taubenblau
+    colors.add(new Color(153, 153, 255));  // Pastelbalu
+    colors.add(new Color(0, 51, 153));  // Marineblau
+    colors.add(new Color(51, 204, 102));  // HellgrÃ¼n
+    colors.add(new Color(0, 102, 51));  // WaldgrÃ¼n
+    colors.add(new Color(102, 255, 204));  // TÃ¼rkis
+    colors.add(new Color(255, 204, 0));  // Dunkelgelb
+    colors.add(new Color(255, 153, 255));  // Hellviolett
+    colors.add(new Color(255, 102, 102));  // Tropischrosa
 
     return colors;
   }

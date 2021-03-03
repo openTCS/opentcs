@@ -33,7 +33,7 @@ public class GroupsTreeViewManager
   public void addItem(Object parent, ModelComponent item) {
     if (item.isTreeViewVisible()) {
       UserObjectContext context = 
-          userObjectUtil.createContext(UserObjectContext.CONTEXT_TYPE.GROUP);
+          userObjectUtil.createContext(UserObjectContext.ContextType.GROUP);
       getTreeView().addItem(parent, userObjectUtil.createUserObject(item, context));
     }
   }

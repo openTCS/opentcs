@@ -10,11 +10,11 @@
 package org.opentcs.guing.application;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.opentcs.util.gui.Icons;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A frame for displaying the progress of longer-running processes.
@@ -29,7 +29,7 @@ public class SplashFrame
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(SplashFrame.class.getName());
+      = LoggerFactory.getLogger(SplashFrame.class);
 
   /**
    * Creates new form SplashFrame
@@ -51,7 +51,7 @@ public class SplashFrame
         });
       }
       catch (InterruptedException | InvocationTargetException exc) {
-        log.log(Level.WARNING, "Unexpected exception", exc);
+        log.warn("Unexpected exception", exc);
       }
       return;
     }
@@ -72,7 +72,7 @@ public class SplashFrame
         });
       }
       catch (InterruptedException | InvocationTargetException exc) {
-        log.log(Level.WARNING, "Unexpected exception", exc);
+        log.warn("Unexpected exception", exc);
       }
       return;
     }
@@ -95,7 +95,7 @@ public class SplashFrame
         });
       }
       catch (InterruptedException | InvocationTargetException exc) {
-        log.log(Level.WARNING, "Unexpected exception", exc);
+        log.warn("Unexpected exception", exc);
       }
       return;
     }

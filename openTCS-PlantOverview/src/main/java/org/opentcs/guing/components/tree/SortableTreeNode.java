@@ -12,13 +12,12 @@ package org.opentcs.guing.components.tree;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
+import org.slf4j.LoggerFactory;
 
 /**
- * Ein TreeNode, dessen Elemente sortiert werden k�nnen.
+ * Ein TreeNode, dessen Elemente sortiert werden kï¿½nnen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -59,7 +58,7 @@ public class SortableTreeNode
 
   /**
    * Sortiert die Kindelemente. Um die Darstellung zu aktualisieren, ist ein
-   * reload() im TreeModel n�tig.
+   * reload() im TreeModel nï¿½tig.
    *
    * @param comparator
    */
@@ -74,9 +73,8 @@ public class SortableTreeNode
     }
     catch (ArrayIndexOutOfBoundsException e) {
       // XXX remove if never observed
-      Logger.getLogger(SortableTreeNode.class.getName()).log(Level.SEVERE,
-                                                             "Exception while calling SortableTreeNode.getChildAt()",
-                                                             e);
+      LoggerFactory.getLogger(SortableTreeNode.class)
+          .error("Exception while calling SortableTreeNode.getChildAt()", e);
       return null;
     }
   }

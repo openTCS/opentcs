@@ -59,6 +59,8 @@ public class TransportOrderDispatcher
       case OBJECT_REMOVED:
         eventBus.publish(new TransportOrderEvent(this, t, TransportOrderEvent.Type.ORDER_REMOVED));
         break;
+        
+      default:
     }
   }
 }

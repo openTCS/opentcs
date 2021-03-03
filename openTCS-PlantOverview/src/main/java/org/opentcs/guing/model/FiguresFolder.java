@@ -18,10 +18,10 @@ import org.jhotdraw.draw.Figure;
 
 /**
  * Eine Komponente des Systemmodells, die nur Objekte vom Typ FigureComponent
- * enthält. Ein FigureComponent besitzt eine Referenz auf ein Figure.
+ * enthÃ¤lt. Ein FigureComponent besitzt eine Referenz auf ein Figure.
  * FiguresFolder verwaltet ein Drawing, in dem die Figure-Objekte der
  * FigureComponents enthalten sind. Soll im DrawingEditor ein anderes Drawing
- * gesetzt werden, so holt sich die Applikation zunächst das entsprechende
+ * gesetzt werden, so holt sich die Applikation zunÃ¤chst das entsprechende
  * Drawing von einem FiguresFolder.
  * <p>
  * <b>Entwurfsmuster:</b> Kompositum.
@@ -51,9 +51,9 @@ public class FiguresFolder
   }
 
   /**
-   * Liefert einen Vector mit den enthaltenen Figures zurück. Da Blockline
-   * prinzipiell nur FigureComponents enthält, die wiederum die Figures
-   * enthalten, müssen erst die Figures aus den FigureComponents
+   * Liefert einen Vector mit den enthaltenen Figures zurÃ¼ck. Da Blockline
+   * prinzipiell nur FigureComponents enthÃ¤lt, die wiederum die Figures
+   * enthalten, mÃ¼ssen erst die Figures aus den FigureComponents
    * herausextrahiert werden.
    *
    * @return
@@ -77,10 +77,10 @@ public class FiguresFolder
   }
 
   /**
-   * Liefert das FigureComponent-Objekt, das eine Referenz auf das übergebene
-   * Figure enthält. Liefert null, falls keines der enthaltenen
-   * FigureComponent-Objekte eine Referenz auf das übergebene Figure besitzt.
-   * Diese Methode kann daher auch für Überprüfungen nach einem Enthaltensein
+   * Liefert das FigureComponent-Objekt, das eine Referenz auf das Ã¼bergebene
+   * Figure enthÃ¤lt. Liefert null, falls keines der enthaltenen
+   * FigureComponent-Objekte eine Referenz auf das Ã¼bergebene Figure besitzt.
+   * Diese Methode kann daher auch fÃ¼r ÃœberprÃ¼fungen nach einem Enthaltensein
    * verwendet werden.
    *
    * @param figure

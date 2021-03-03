@@ -19,7 +19,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * Ein Property, das einen Wert aus einer gegebenen Menge von Werten annehmen
  * kann.
  * Beispiel: links aus der Menge {links, rechts},
- * Nord aus der Menge {Nord, Süd, Ost, West}
+ * Nord aus der Menge {Nord, SÃ¼d, Ost, West}
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @param <E> The type of the enum.
@@ -29,7 +29,7 @@ public class SelectionProperty<E extends Enum<E>>
     implements Selectable<E> {
 
   /**
-   * Die möglichen Werte.
+   * Die mÃ¶glichen Werte.
    */
   private List<E> fPossibleValues;
 
@@ -63,9 +63,9 @@ public class SelectionProperty<E extends Enum<E>>
   }
 
   /**
-   * Setzt die möglichen Werte im Nachhinein.
+   * Setzt die mÃ¶glichen Werte im Nachhinein.
    *
-   * @param possibleValues Ein Array mit den möglichen Werte.
+   * @param possibleValues Ein Array mit den mÃ¶glichen Werte.
    */
   @Override
   public void setPossibleValues(List<E> possibleValues) {

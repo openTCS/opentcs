@@ -1,0 +1,26 @@
+
+== Customizing and integrating openTCS
+
+=== Loading a model on kernel startup
+
+When running the kernel using the startup script that is part of the openTCS distribution (`startKernel.bat` or `startKernel.sh`, depending on the operating system), a dialog is shown that allows you to select the driving course model to be loaded and the desired kernel mode (modelling or operating the system).
+To load a specific model on startup, do the following:
+
+. Start the plant overview and the kernel and load the desired model.
+. Persist the loaded model in the kernel (menu:File[Persist model in the kernel] in the plant overview client).
+. In the kernel's configuration file, search for "loadModelOnStartup" and set its value to "true".
+Also search for "showStartupDialog" and set it to "false" so the user does not have to interact with it.
+
+=== Running kernel and plant overview on separate systems
+
+The kernel and the plant overview client communicate via Java's Remote Method Invocation (RMI) mechanism.
+This makes it possible to run the kernel and the plant overview client on separate systems, as long as a network connection between these systems exists and is usable.
+
+To connect a plant overview client to a kernel running on a remote system, do the following:
+
+. Open the plant overview client's startup script that comes with the openTCS distribution (`startPlantOverview.bat` or `startPlantOverview.sh`, depending on the operating system) in a text editor.
+. Find the line containing the Java VM startup parameter `-Dopentcs.kernel.host=localhost`.
+. With this parameter, change `localhost` to one of the following:
+* If you want the plant overview client to always connect to a kernel on a specific host, replace `localhost` with the host name or IP address of this host.
+* If you do not know the host name or IP address of the system the kernel will be running on in advance, simply remove `localhost` from the parameter, leaving only `-Dopentcs.kernel.host=`.
+This will result in a dialog being shown every time the plant overview client is started, allowing you to enter the host name or IP address to be used for that session.

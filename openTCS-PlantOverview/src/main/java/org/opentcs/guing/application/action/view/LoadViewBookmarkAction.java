@@ -86,7 +86,7 @@ public class LoadViewBookmarkAction
       return;
     }
 
-    // Das Kernel-Objekt für das aktuelle VisualLayout
+    // Das Kernel-Objekt fÃ¼r das aktuelle VisualLayout
     // Beim starten der Visualisierung im Operating-Mode wird kein VisualLayout erzeugt!
     Set<VisualLayout> sLayouts = kernel.getTCSObjects(VisualLayout.class);
 

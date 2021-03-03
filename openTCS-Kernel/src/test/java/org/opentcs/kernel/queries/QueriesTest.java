@@ -2,8 +2,8 @@
  */
 package org.opentcs.kernel.queries;
 
-import static org.junit.Assert.fail;
 import org.junit.*;
+import static org.junit.Assert.fail;
 import org.opentcs.access.queries.Availability;
 import org.opentcs.access.queries.Queries;
 import org.opentcs.access.queries.Query;

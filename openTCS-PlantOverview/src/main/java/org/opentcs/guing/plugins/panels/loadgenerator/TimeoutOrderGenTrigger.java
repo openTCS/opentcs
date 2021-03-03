@@ -9,10 +9,10 @@
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.util.CyclicTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Triggers creation of a batch of orders after a given timeout.
@@ -26,7 +26,7 @@ class TimeoutOrderGenTrigger
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(TimeoutOrderGenTrigger.class.getName());
+      = LoggerFactory.getLogger(TimeoutOrderGenTrigger.class);
   /**
    * The timeout after which to trigger (in ms).
    */
@@ -95,9 +95,7 @@ class TimeoutOrderGenTrigger
         triggerOrderGeneration();
       }
       catch (KernelRuntimeException exc) {
-        log.log(Level.WARNING,
-                "Exception triggering order generation, terminating trigger task",
-                exc);
+        log.warn("Exception triggering order generation, terminating trigger task", exc);
         this.terminate();
       }
     }

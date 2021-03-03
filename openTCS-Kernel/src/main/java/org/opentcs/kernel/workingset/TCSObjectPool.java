@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
 import org.opentcs.data.ObjectExistsException;
@@ -25,6 +27,8 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.util.UniqueStringGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A container for <code>TCSObject</code>s belonging together.
@@ -39,7 +43,7 @@ public class TCSObjectPool {
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(TCSObjectPool.class.getName());
+      = LoggerFactory.getLogger(TCSObjectPool.class);
   /**
    * The objects contained in this pool, indexed by their IDs.
    * Note that this has to be an <code>AutoGrowingArrayList</code> because its
@@ -211,7 +215,7 @@ public class TCSObjectPool {
    * @return A set of objects belonging to the given class.
    */
   public <T extends TCSObject<T>> Set<T> getObjects(Class<T> clazz) {
-    return getObjects(clazz, null);
+    return getObjects(clazz, (Pattern) null);
   }
 
   /**
@@ -240,6 +244,27 @@ public class TCSObjectPool {
       }
     }
     return result;
+  }
+
+  /**
+   * Returns a set of objects of the given class for which the given predicate is true.
+   *
+   * @param <T> The objects' type.
+   * @param clazz The class of the objects to be returned.
+   * @param predicate The predicate that must be true for returned objects.
+   * @return A set of objects of the given class for which the given predicate is true. If no such
+   * objects exist, the returned set is empty.
+   */
+  public <T extends TCSObject<T>> Set<T> getObjects(@Nonnull Class<T> clazz,
+                                                    @Nonnull Predicate<? super T> predicate) {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(predicate, "predicate");
+
+    return objectsById.stream()
+        .filter(obj -> clazz.isInstance(obj))
+        .map(obj -> clazz.cast(obj))
+        .filter(predicate)
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -361,7 +386,7 @@ public class TCSObjectPool {
       throw new ObjectUnknownException("No object with ID " + ref.getId());
     }
     final TCSObject<?> previousState = object.clone();
-    log.fine("Setting property: " + ref.getName() + ", " + key + ", " + value);
+    log.debug("Setting property: " + ref.getName() + ", " + key + ", " + value);
     object.setProperty(key, value);
     emitObjectEvent(object.clone(),
                     previousState,

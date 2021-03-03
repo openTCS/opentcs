@@ -13,7 +13,7 @@ package org.opentcs.guing.components.properties.type;
 import java.io.Serializable;
 
 /**
- * Ein Umwandlungsverhältnis zwischen zwei Einheiten.
+ * Ein UmwandlungsverhÃ¤ltnis zwischen zwei Einheiten.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -22,15 +22,15 @@ public class Relation<U>
     implements Serializable {
 
   /**
-   * Die Maßeinheit von der umgewandelt wird.
+   * Die MaÃŸeinheit von der umgewandelt wird.
    */
   private final U fUnitFrom;
   /**
-   * Die Maßeinheit, in die umgewandelt wird.
+   * Die MaÃŸeinheit, in die umgewandelt wird.
    */
   private final U fUnitTo;
   /**
-   * Das Umwandlungsverhältnis.
+   * Das UmwandlungsverhÃ¤ltnis.
    */
   private final double fRelationValue;
 
@@ -48,8 +48,8 @@ public class Relation<U>
   }
 
   /**
-   * Prüft, ob das Umwandlungsverhältnis für die beiden übergebenen Einheiten
-   * passend ist. Liefert <code>true</code> zurück, falls ja.
+   * PrÃ¼ft, ob das UmwandlungsverhÃ¤ltnis fÃ¼r die beiden Ã¼bergebenen Einheiten
+   * passend ist. Liefert <code>true</code> zurÃ¼ck, falls ja.
    *
    * @param unitA
    * @param unitB
@@ -68,7 +68,7 @@ public class Relation<U>
   }
 
   /**
-   * Liefert das Umwandlungsverhältnis als eine Zahl.
+   * Liefert das UmwandlungsverhÃ¤ltnis als eine Zahl.
    *
    * @return
    */
@@ -77,9 +77,9 @@ public class Relation<U>
   }
 
   /**
-   * Liefert die Rechenoperation, die für die Umwandlung der ersten Einheit in
+   * Liefert die Rechenoperation, die fÃ¼r die Umwandlung der ersten Einheit in
    * die zweite Einheit angewendet werden muss. In Frage kommt die
-   * Multiplikation und die Division. Zurückgeliefert wird nicht die Operation
+   * Multiplikation und die Division. ZurÃ¼ckgeliefert wird nicht die Operation
    * im eigentlichen Sinne, sondern nur ein beschreibender Text aus der Menge
    * {"multiplication", "division"}.
    *

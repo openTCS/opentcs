@@ -11,8 +11,8 @@ package org.opentcs.guing.exchange;
 import java.rmi.registry.Registry;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A set of parameters for a connection to the kernel.
@@ -33,7 +33,7 @@ public class ConnectionParamSet {
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(ConnectionParamSet.class.getName());
+      = LoggerFactory.getLogger(ConnectionParamSet.class);
   /**
    * The host name.
    */
@@ -149,7 +149,7 @@ public class ConnectionParamSet {
         port = Integer.parseInt(propPort);
       }
       catch (NumberFormatException exc) {
-        log.log(Level.WARNING, "Exception parsing port number", exc);
+        log.warn("Exception parsing port number", exc);
         return null;
       }
     }

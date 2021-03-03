@@ -36,7 +36,7 @@ public class ComponentsTreeViewManager
   public void addItem(Object parent, ModelComponent item) {
     if (item.isTreeViewVisible()) {
       UserObjectContext context = 
-          userObjectUtil.createContext(UserObjectContext.CONTEXT_TYPE.COMPONENT);
+          userObjectUtil.createContext(UserObjectContext.ContextType.COMPONENT);
       getTreeView().addItem(parent, userObjectUtil.createUserObject(item, context));
     }
   }

@@ -368,17 +368,17 @@ public class VehicleModel
     pName.setDescription(bundle.getString("vehicle.name.text"));
     pName.setHelptext(bundle.getString("vehicle.name.helptext"));
     setProperty(NAME, pName);
-    // Fahrzeuglänge
+    // FahrzeuglÃ¤nge
     LengthProperty pLength = new LengthProperty(this);
     pLength.setDescription(bundle.getString("vehicle.length.text"));
     pLength.setHelptext(bundle.getString("vehicle.length.helptext"));
     setProperty(LENGTH, pLength);
-    // Unterer Schwellwert für "kritischen" Batterie-Ladezustand
+    // Unterer Schwellwert fÃ¼r "kritischen" Batterie-Ladezustand
     PercentProperty pEnergyLevelCritical = new PercentProperty(this, true);
     pEnergyLevelCritical.setDescription(bundle.getString("vehicle.energyLevelCritical.text"));
     pEnergyLevelCritical.setHelptext(bundle.getString("vehicle.energyLevelCritical.helptext"));
     setProperty(ENERGY_LEVEL_CRITICAL, pEnergyLevelCritical);
-    // Obererer Schwellwert für "guten" Batterie-Ladezustand
+    // Obererer Schwellwert fÃ¼r "guten" Batterie-Ladezustand
     PercentProperty pEnergyLevelGood = new PercentProperty(this, true);
     pEnergyLevelGood.setDescription(bundle.getString("vehicle.energyLevelGood.text"));
     pEnergyLevelGood.setHelptext(bundle.getString("vehicle.energyLevelGood.helptext"));
@@ -388,7 +388,7 @@ public class VehicleModel
     pInitialPosition.setDescription(bundle.getString("vehicle.initialPosition.text"));
     pInitialPosition.setHelptext(bundle.getString("vehicle.initialPosition.helptext"));
     setProperty(INITIAL_POSITION, pInitialPosition);
-    // Diese Größen werden vom Fahrzeugtreiber gesetzt und sind nicht editierbar
+    // Diese GrÃ¶ÃŸen werden vom Fahrzeugtreiber gesetzt und sind nicht editierbar
     // Aktueller Batterie-Ladezustand
     PercentProperty pEnergyLevel = new PercentProperty(this, true);
     pEnergyLevel.setDescription(bundle.getString("vehicle.energyLevel.text"));

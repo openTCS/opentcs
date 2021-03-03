@@ -42,11 +42,11 @@ public class StandardContentDialog
    */
   public static final int OK_CANCEL = 10;
   /**
-   * Button-Konfiguration Ok, Abbrechen und Übernehmen.
+   * Button-Konfiguration Ok, Abbrechen und Ãœbernehmen.
    */
   public static final int OK_CANCEL_APPLY = 11;
   /**
-   * Button-Konfiguration Schließen.
+   * Button-Konfiguration SchlieÃŸen.
    */
   public static final int CLOSE = 12;
   /**
@@ -75,7 +75,7 @@ public class StandardContentDialog
    * @param parent Die Komponente, zu der der Dialog zentriert wird
    * @param content der Inhalt
    * @param modal ob der Dialog modal sein soll
-   * @param options welche Schaltflächen angezeigt werden sollen
+   * @param options welche SchaltflÃ¤chen angezeigt werden sollen
    */
   public StandardContentDialog(Component parent,
                                DialogContent content,
@@ -103,9 +103,9 @@ public class StandardContentDialog
   }
 
   /**
-   * Initialisiert die Schaltknöpfe.
+   * Initialisiert die SchaltknÃ¶pfe.
    *
-   * @param options welche Schaltknöpfe angezeigt werden sollen
+   * @param options welche SchaltknÃ¶pfe angezeigt werden sollen
    */
   protected final void initButtons(int options) {
     switch (options) {
@@ -130,6 +130,8 @@ public class StandardContentDialog
         applyButton.setVisible(false);
         closeButton.setVisible(false);
         break;
+        
+      default:
     }
   }
 
@@ -143,10 +145,10 @@ public class StandardContentDialog
   }
 
   /**
-   * Fügt eine benutzerdefinierte Schaltfläche hinzu.
+   * FÃ¼gt eine benutzerdefinierte SchaltflÃ¤che hinzu.
    *
-   * @param text die Beschriftung der Schaltfläche
-   * @param returnStatus der Rückgabewert, wenn die Schaltfläche gedrückt wird
+   * @param text die Beschriftung der SchaltflÃ¤che
+   * @param returnStatus der RÃ¼ckgabewert, wenn die SchaltflÃ¤che gedrÃ¼ckt wird
    */
   public void addUserDefinedButton(String text, final int returnStatus) {
     JButton button = new JButton(text);
@@ -236,7 +238,7 @@ public class StandardContentDialog
   // CHECKSTYLE:ON
 
   /**
-   * Button "Schließen" gedrückt.
+   * Button "SchlieÃŸen" gedrÃ¼ckt.
    *
    * @param evt das Ereignis
    */
@@ -245,7 +247,7 @@ public class StandardContentDialog
     }//GEN-LAST:event_closeButtonActionPerformed
 
   /**
-   * Button "Übernehmen" gedrückt.
+   * Button "Ãœbernehmen" gedrÃ¼ckt.
    *
    * @param evt das Ereignis
    */
@@ -254,7 +256,7 @@ public class StandardContentDialog
     }//GEN-LAST:event_applyButtonActionPerformed
 
   /**
-   * Button "Ok" gedrückt.
+   * Button "Ok" gedrÃ¼ckt.
    *
    * @param evt das Ereignis
    */
@@ -267,7 +269,7 @@ public class StandardContentDialog
     }//GEN-LAST:event_okButtonActionPerformed
 
   /**
-   * Button "Abbrechen" gedrückt.
+   * Button "Abbrechen" gedrÃ¼ckt.
    *
    * @param evt das Ereignis
    */
@@ -283,9 +285,9 @@ public class StandardContentDialog
     }//GEN-LAST:event_closeDialog
 
   /**
-   * Schließt den Dialog.
+   * SchlieÃŸt den Dialog.
    *
-   * @param retStatus der Rückgabestatus
+   * @param retStatus der RÃ¼ckgabestatus
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;

@@ -9,9 +9,9 @@
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.access.KernelRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Triggers creation of transport orders only once.
@@ -25,7 +25,7 @@ class SingleOrderGenTrigger
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(SingleOrderGenTrigger.class.getName());
+      = LoggerFactory.getLogger(SingleOrderGenTrigger.class);
   /**
    * The instance actually creating the new orders.
    */
@@ -57,9 +57,7 @@ class SingleOrderGenTrigger
       }
     }
     catch (KernelRuntimeException exc) {
-      log.log(Level.WARNING,
-              "Exception triggering order generation, terminating triggering",
-              exc);
+      log.warn("Exception triggering order generation, terminating triggering", exc);
     }
   }
 }

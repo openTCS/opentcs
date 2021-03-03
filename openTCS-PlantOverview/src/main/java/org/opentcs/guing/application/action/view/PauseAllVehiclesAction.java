@@ -10,16 +10,16 @@ package org.opentcs.guing.application.action.view;
 
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.drivers.messages.LimitSpeed;
+import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action for pausing all vehicles.
@@ -67,18 +67,18 @@ public class PauseAllVehiclesAction
       kernelProvider.register(kernelClient);
 
       paused = !paused;
-      limitVehicleSpeed(paused ? 0 : 100, kernelProvider.getKernel());
+      setVehicleSpeedMultiplier(paused ? 0 : 100, kernelProvider.getKernel());
     }
     finally {
       kernelProvider.unregister(kernelClient);
     }
   }
 
-  private void limitVehicleSpeed(int speed, Kernel kernel) {
+  private void setVehicleSpeedMultiplier(int speed, Kernel kernel) {
     if (kernel == null) {
       return;
     }
-    Logger.getLogger(PauseAllVehiclesAction.class.getName()).warning("Limiting to " + speed);
+    LoggerFactory.getLogger(PauseAllVehiclesAction.class).debug("Limiting to " + speed);
     ModelComponent folder
         = modelManager.getModel().getMainFolder(SystemModel.FolderKey.VEHICLES);
 
@@ -86,8 +86,7 @@ public class PauseAllVehiclesAction
       for (ModelComponent component : folder.getChildComponents()) {
         VehicleModel vModel = (VehicleModel) component;
         kernel.sendCommAdapterMessage(vModel.getVehicle().getReference(),
-                                      new LimitSpeed(LimitSpeed.Type.RELATIVE_VEHICLE,
-                                                     speed));
+                                      new SetSpeedMultiplier(speed));
       }
     }
   }

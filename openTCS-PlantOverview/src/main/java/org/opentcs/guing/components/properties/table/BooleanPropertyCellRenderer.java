@@ -16,10 +16,10 @@ import javax.swing.JTable;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 
 /**
- * Ein CellRenderer für Attribute vom Typ {
+ * Ein CellRenderer fÃ¼r Attribute vom Typ {
  *
  * @see BooleanProperty}. Ein solches Attribut wird nicht durch einen Text
- * dargestellt, sondern durch ein Kästchen mit einem Häkchen (abhängig vom
+ * dargestellt, sondern durch ein KÃ¤stchen mit einem HÃ¤kchen (abhÃ¤ngig vom
  * Zustand des Attributs). Zum Einsatz kommt daher eine Checkbox.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)

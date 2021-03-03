@@ -26,33 +26,33 @@ import org.opentcs.guing.model.ModelComponent;
  * bearbeitet werden.
  * <p>
  * Die Komponente zeigt oberhalb der Tabelle einen Text
- * an, der das Objekt, zu dem die gerade angezeigten Eigenschaften gehören,
+ * an, der das Objekt, zu dem die gerade angezeigten Eigenschaften gehÃ¶ren,
  * bezeichnet.
  * <p>
  * Wird eine Eigenschaft in der Tabelle angeklickt, so erscheint
  * im unteren Teil der Komponente ein Hilfetext, der die Eigenschaft genauer
- * erläutert.
+ * erlÃ¤utert.
  * <p>
  * Die Funktionen der Listener-Implementierungen: <br>
  * TableChangeListener: Hat der Benutzer in irgendeinem Tabellenfeld den
  * Editiermodus aktiviert, so ist davon auszugehen, dass sich dieses Attribut
- * geändert hat. Als registrierter TableChangeListener wird die
+ * geÃ¤ndert hat. Als registrierter TableChangeListener wird die
  * PropertiesComponent davon unterrichtet und kann daraufhin dem aktuellen
- * ModelComponent mitteilen, dass sich seine Attribute geändert haben. <br>
+ * ModelComponent mitteilen, dass sich seine Attribute geÃ¤ndert haben. <br>
  * PropertiesModelChangeListener: PropertiesComponent stellt die Attribute
- * jeweils eines ModelComponent dar. Ändern sich die Attributwerte durch
- * irgendeinen Grund, so müssen die neuen Werte unverzüglich in der
+ * jeweils eines ModelComponent dar. Ã„ndern sich die Attributwerte durch
+ * irgendeinen Grund, so mÃ¼ssen die neuen Werte unverzÃ¼glich in der
  * PropertiesComponent zu sehen sein. Als registrierter
- * PropertiesModelChangeListener wird PropertiesComponent sofort von Änderungen
+ * PropertiesModelChangeListener wird PropertiesComponent sofort von Ã„nderungen
  * unterrichtet und kann sich aktualisieren. <br> ConnectionChangeListener:
- * Referenzen zwischen Knoten und Station laufen über eine allgemeine Referenz,
+ * Referenzen zwischen Knoten und Station laufen Ã¼ber eine allgemeine Referenz,
  * die alle Methodenaufrufe an eine spezialisierte Referenz delegiert. Die
  * spezialisierte Referenz richtet sich nach der Station. Wird nun die Referenz
- * von einer Station an eine andere gehängt, so ändert sich also die
+ * von einer Station an eine andere gehÃ¤ngt, so Ã¤ndert sich also die
  * spezialisierte Referenz und damit auch die darzustellenden Attribute. Da sich
- * die allgemeine Referenz jedoch dabei nicht ändert, schlägt die
- * Benachrichtigung der PropertiesComponent über den
- * PropertiesModelChangeListener fehl; der Weg über den ConnectionChangeListener
+ * die allgemeine Referenz jedoch dabei nicht Ã¤ndert, schlÃ¤gt die
+ * Benachrichtigung der PropertiesComponent Ã¼ber den
+ * PropertiesModelChangeListener fehl; der Weg Ã¼ber den ConnectionChangeListener
  * funktioniert aber.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -101,7 +101,7 @@ public class AttributesComponent
   }
 
   /**
-   * Setzt die Anzeige zurück, wenn kein ModelComponente-Objekt mehr dargestellt
+   * Setzt die Anzeige zurÃ¼ck, wenn kein ModelComponente-Objekt mehr dargestellt
    * werden soll.
    */
   public void reset() {
@@ -122,7 +122,7 @@ public class AttributesComponent
   }
 
   /**
-   * Setzt einen PropertiesContent an dem übergebenen Index.
+   * Setzt einen PropertiesContent an dem Ã¼bergebenen Index.
    *
    * @param content
    */

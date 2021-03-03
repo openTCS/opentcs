@@ -31,23 +31,23 @@ public class OtherGraphicalElement
   @Override
   public String getDescription() {
 
-////		if (getFigure() instanceof TransformableDecorator) {
-////			TransformableDecorator decorator = (TransformableDecorator) getFigure();
+////    if (getFigure() instanceof TransformableDecorator) {
+////      TransformableDecorator decorator = (TransformableDecorator) getFigure();
 ////
-////			if (decorator.getDecoratedFigure() instanceof RectangleFigure) {
-////				return "Rechteck";
-////			}
-////			if (decorator.getDecoratedFigure() instanceof EllipseFigure) {
-////				return "Ellipse";
-////			}
-////			if (decorator.getDecoratedFigure() instanceof LineFigure) {
-////				return "Linie";
-////			}
-////		}
+////      if (decorator.getDecoratedFigure() instanceof RectangleFigure) {
+////        return "Rechteck";
+////      }
+////      if (decorator.getDecoratedFigure() instanceof EllipseFigure) {
+////        return "Ellipse";
+////      }
+////      if (decorator.getDecoratedFigure() instanceof LineFigure) {
+////        return "Linie";
+////      }
+////    }
 ////
-////		if (getFigure() instanceof TextFigure) {
-////			return "Text";
-////		}
+////    if (getFigure() instanceof TextFigure) {
+////      return "Text";
+////    }
     return "Grafisches Objekt";
   }
 }

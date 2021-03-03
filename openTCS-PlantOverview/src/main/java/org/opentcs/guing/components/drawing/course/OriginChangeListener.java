@@ -13,7 +13,7 @@ package org.opentcs.guing.components.drawing.course;
 import java.util.EventObject;
 
 /**
- * Interface für Klassen, die an Änderungen des Koordinaten-Ursprungs
+ * Interface fÃ¼r Klassen, die an Ã„nderungen des Koordinaten-Ursprungs
  * interessiert sind.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -21,14 +21,14 @@ import java.util.EventObject;
 public interface OriginChangeListener {
 
   /**
-   * Nachricht, dass sich die Position des Ursprungs geändert hat.
+   * Nachricht, dass sich die Position des Ursprungs geÃ¤ndert hat.
    *
    * @param evt das Ereignis
    */
   void originLocationChanged(EventObject evt);
 
   /**
-   * Nachricht, dass sich der Maßstab geändert hat.
+   * Nachricht, dass sich der MaÃŸstab geÃ¤ndert hat.
    *
    * @param evt das Ereignis
    */

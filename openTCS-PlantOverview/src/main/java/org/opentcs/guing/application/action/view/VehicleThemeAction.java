@@ -14,10 +14,10 @@ import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.VehicleThemeManager;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  * An action to set the default theme in the client.

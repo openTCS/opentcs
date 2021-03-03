@@ -10,8 +10,8 @@ package org.opentcs.guing.util;
 
 import com.google.inject.AbstractModule;
 import javax.inject.Singleton;
-import org.opentcs.util.gui.plugins.LocationThemeRegistry;
-import org.opentcs.util.gui.plugins.VehicleThemeRegistry;
+import org.opentcs.guing.plugins.themes.LocationThemeRegistry;
+import org.opentcs.guing.plugins.themes.VehicleThemeRegistry;
 
 /**
  * A default Guice module for this package.

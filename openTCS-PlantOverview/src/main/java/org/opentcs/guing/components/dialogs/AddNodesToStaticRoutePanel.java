@@ -29,7 +29,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Benutzerschnittstelle zum Hinzufügen von Knoten zu einer statischen Route.
+ * Benutzerschnittstelle zum HinzufÃ¼gen von Knoten zu einer statischen Route.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -37,11 +37,11 @@ public class AddNodesToStaticRoutePanel
     extends DialogContent {
 
   /**
-   * Die hinzugefügten Knoten.
+   * Die hinzugefÃ¼gten Knoten.
    */
   private List<PointModel> fAddedPoints;
   /**
-   * Die möglichen Knoten.
+   * Die mÃ¶glichen Knoten.
    */
   private List<PointModel> fAvailablePoints;
   /**
@@ -59,7 +59,7 @@ public class AddNodesToStaticRoutePanel
    * @param guiManager The GUI manager.
    * @param point der Knoten, von dem die nachfolgenden Knoten bestimmt werden
    * sollen
-   * @param allPoints alle im Fahrkurs verfügbaren Knoten
+   * @param allPoints alle im Fahrkurs verfÃ¼gbaren Knoten
    */
   @Inject
   public AddNodesToStaticRoutePanel(final GuiManager guiManager,
@@ -102,9 +102,9 @@ public class AddNodesToStaticRoutePanel
   }
 
   /**
-   * Liefert die hinzugefügten Knoten.
+   * Liefert die hinzugefÃ¼gten Knoten.
    *
-   * @return die hinzugefügten Knoten
+   * @return die hinzugefÃ¼gten Knoten
    */
   public List<PointModel> getAddedPoints() {
     return fAddedPoints;
@@ -151,7 +151,7 @@ public class AddNodesToStaticRoutePanel
 
   /**
    * Sucht zu einem Knoten alle benachbarten Knoten heraus, die direkt erreicht
-   * werden können.
+   * werden kÃ¶nnen.
    *
    * @param point der Knoten, dessen erreichbare benachbarte Knoten
    * herausgesucht werden sollen
@@ -167,16 +167,16 @@ public class AddNodesToStaticRoutePanel
 
       SpeedProperty p = (SpeedProperty) connection.getProperty(PathModel.MAX_VELOCITY);
 
-      if (connection.getStartComponent() == point) {	// Outgoing path
-        if ((double) p.getValue() > 0.0) {	// Point can be reached driving forward
+      if (connection.getStartComponent() == point) { // Outgoing path
+        if ((double) p.getValue() > 0.0) { // Point can be reached driving forward
           points.add((PointModel) connection.getEndComponent());
         }
       }
 
       p = (SpeedProperty) connection.getProperty(PathModel.MAX_REVERSE_VELOCITY);
 
-      if (connection.getEndComponent() == point) {	// Incoming path
-        if ((double) p.getValue() > 0.0) {	// Point can be reached driving backward
+      if (connection.getEndComponent() == point) {  // Incoming path
+        if ((double) p.getValue() > 0.0) {  // Point can be reached driving backward
           points.add((PointModel) connection.getStartComponent());
         }
       }
@@ -261,10 +261,10 @@ public class AddNodesToStaticRoutePanel
     }// </editor-fold>//GEN-END:initComponents
 
   /**
-   * Fügt den markierten Knoten hinzu und setzt diesen gleich wieder als
+   * FÃ¼gt den markierten Knoten hinzu und setzt diesen gleich wieder als
    * Ausgangsknoten ein.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void buttonSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSelectActionPerformed
       int i = listAvailablePoints.getSelectedIndex();

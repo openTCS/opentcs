@@ -19,8 +19,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,6 +29,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A table model for transport orders.
@@ -46,7 +46,7 @@ class TransportOrderTableModel
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(TransportOrderTableModel.class.getName());
+      = LoggerFactory.getLogger(TransportOrderTableModel.class);
   /**
    * The column names.
    */
@@ -147,7 +147,7 @@ class TransportOrderTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.log(Level.WARNING, "Invalid columnIndex", exc);
+      log.warn("Invalid columnIndex", exc);
       return "FEHLER";
     }
   }
@@ -222,7 +222,7 @@ class TransportOrderTableModel
       marshaller.marshal(this, stringWriter);
     }
     catch (JAXBException exc) {
-      log.log(Level.WARNING, "Exception marshalling data", exc);
+      log.warn("Exception marshalling data", exc);
       throw new IllegalStateException("Exception marshalling data", exc);
     }
     return stringWriter.toString();
@@ -265,7 +265,7 @@ class TransportOrderTableModel
       return ((TransportOrderTableModel) o).xmlData;
     }
     catch (JAXBException exc) {
-      log.log(Level.WARNING, "Exception unmarshalling data", exc);
+      log.warn("Exception unmarshalling data", exc);
       throw new IllegalStateException("Exception unmarshalling data", exc);
     }
   }

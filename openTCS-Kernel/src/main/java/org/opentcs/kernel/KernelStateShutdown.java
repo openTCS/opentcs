@@ -10,8 +10,9 @@ package org.opentcs.kernel;
 
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
-import org.opentcs.kernel.workingset.MessageBuffer;
+import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 
 /**
@@ -23,34 +24,44 @@ final class KernelStateShutdown
     extends KernelState {
 
   /**
+   * Indicates whether this component is enabled.
+   */
+  private boolean initialized;
+
+  /**
    * Creates a new StandardKernelShutdownState.
    *
-   * @param kernel The kernel.
    * @param objectPool The object pool to be used.
    * @param messageBuffer The message buffer to be used.
+   * @param modelPersister The model persister to be used.
    */
   @Inject
-  public KernelStateShutdown(StandardKernel kernel,
-                             @GlobalKernelSync Object globalSyncObject,
+  public KernelStateShutdown(@GlobalKernelSync Object globalSyncObject,
                              TCSObjectPool objectPool,
                              Model model,
-                             MessageBuffer messageBuffer) {
-    super(kernel,
-          globalSyncObject,
+                             NotificationBuffer messageBuffer,
+                             ModelPersister modelPersister) {
+    super(globalSyncObject,
           objectPool,
           model,
-          messageBuffer);
+          messageBuffer,
+          modelPersister);
   }
 
   // Methods that HAVE to be implemented/overridden start here.
   @Override
   public void initialize() {
-    // Do nada.
+    initialized = true;
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return initialized;
   }
 
   @Override
   public void terminate() {
-    // Do nada.
+    initialized = false;
   }
 
   @Override

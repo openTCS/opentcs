@@ -7,13 +7,13 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,12 +51,12 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Standardimplementierung des Datenmodells des gesamten modellierten Systems.
- * Besteht aus den Batterien, den Transportgütern, den Fahrzeugtypen mit ihren
- * Fahrzeugen und dem Fahrkurslayout. Das Systemmodell verwaltet zusätzlich zu
+ * Besteht aus den Batterien, den TransportgÃ¼tern, den Fahrzeugtypen mit ihren
+ * Fahrzeugen und dem Fahrkurslayout. Das Systemmodell verwaltet zusÃ¤tzlich zu
  * seinen Kindelementen eine Hastable mit den Komposita-Komponenten, die
- * unbedingt vorhanden sein müssen. Die Applikation als Klient fragt das
- * Systemmodell dann nach einer bestimmten Komponente (z.B. der für die
- * Transportgüter), um herauszufinden, wo ein neu erzeugtes Transportgut
+ * unbedingt vorhanden sein mÃ¼ssen. Die Applikation als Klient fragt das
+ * Systemmodell dann nach einer bestimmten Komponente (z.B. der fÃ¼r die
+ * TransportgÃ¼ter), um herauszufinden, wo ein neu erzeugtes Transportgut
  * abgelegt werden kann.
  * <p>
  * <b>Entwurfsmuster:</b> Kompositum.
@@ -74,9 +74,9 @@ class StandardSystemModel
    */
   private final Map<FolderKey, ModelComponent> fMainFolders = new HashMap<>();
   /**
-   * Enthält Zuordnungen zwischen den Hauptordnern des Modells und
+   * EnthÃ¤lt Zuordnungen zwischen den Hauptordnern des Modells und
    * Class-Objekten von ModelComponent-Objekten. Hierdurch ist praktisch
-   * konfigurierbar, welche ModelComponent-Objekte in welchen Ordner gehören.
+   * konfigurierbar, welche ModelComponent-Objekte in welchen Ordner gehÃ¶ren.
    */
   private final Map<Class, ModelComponent> fParentFolders = new HashMap<>();
   /**
@@ -89,7 +89,7 @@ class StandardSystemModel
   private final Map<TCSObjectReference<?>, ModelLayoutElement> fLayoutMap
       = new HashMap<>();
   /**
-   * Die für das Modell verwendete Zeichenmethode.
+   * Die fÃ¼r das Modell verwendete Zeichenmethode.
    */
   private final DrawingMethod fDrawingMethod;
   /**
@@ -97,7 +97,7 @@ class StandardSystemModel
    * Leitsteuerungsobjekt.
    */
   private final EventDispatcher fEventDispatcher;
-  
+
   private final CourseObjectFactory crsObjFactory;
 
   /**
@@ -161,6 +161,20 @@ class StandardSystemModel
       }
     }
 
+    return items;
+  }
+
+  @Override
+  public List<ModelComponent> getAll() {
+    List<ModelComponent> items = new ArrayList<>();
+    for (ModelComponent o : fMainFolders.values()) { //Iterate over folders
+      if (o instanceof CompositeModelComponent) {
+        items.addAll(getAll((CompositeModelComponent) o));
+      }
+      else {
+        items.add(o);
+      }
+    }
     return items;
   }
 
@@ -331,7 +345,7 @@ class StandardSystemModel
   public List<LocationTypeModel> getLocationTypeModels() {
     List<LocationTypeModel> result = new ArrayList<>();
     for (ModelComponent component
-         : getMainFolder(FolderKey.LOCATION_TYPES).getChildComponents()) {
+             : getMainFolder(FolderKey.LOCATION_TYPES).getChildComponents()) {
       result.add((LocationTypeModel) component);
     }
     return result;
@@ -370,7 +384,7 @@ class StandardSystemModel
   public List<StaticRouteModel> getStaticRouteModels() {
     List<StaticRouteModel> result = new ArrayList<>();
     for (ModelComponent component
-         : getMainFolder(FolderKey.STATIC_ROUTES).getChildComponents()) {
+             : getMainFolder(FolderKey.STATIC_ROUTES).getChildComponents()) {
       result.add((StaticRouteModel) component);
     }
     return result;
@@ -380,7 +394,7 @@ class StandardSystemModel
   public List<OtherGraphicalElement> getOtherGraphicalElements() {
     List<OtherGraphicalElement> result = new ArrayList<>();
     for (ModelComponent component
-         : getMainFolder(FolderKey.OTHER_GRAPHICAL_ELEMENTS).getChildComponents()) {
+             : getMainFolder(FolderKey.OTHER_GRAPHICAL_ELEMENTS).getChildComponents()) {
       result.add((OtherGraphicalElement) component);
     }
     return result;
@@ -417,6 +431,25 @@ class StandardSystemModel
     return fLayoutMap;
   }
 
+  /**
+   * Liefert rekursiv alle Komponenten in dem Ordner.
+   *
+   * @param folder der Ordner
+   * @return alle Elemente in dem Ordner
+   */
+  private List<ModelComponent> getAll(CompositeModelComponent folder) {
+    List<ModelComponent> result = new LinkedList<>();
+    for (ModelComponent component : folder.getChildComponents()) {
+      if (component instanceof CompositeModelComponent) {
+        result.addAll(getAll((CompositeModelComponent) component));
+      }
+      else {
+        result.add(component);
+      }
+    }
+    return result;
+  }
+
   private void mapLayoutElement(TCSObjectReference<?> reference,
                                 Collection<LayoutElement> elements) {
     for (LayoutElement element : elements) {
@@ -430,20 +463,20 @@ class StandardSystemModel
   }
 
   /**
-   * Erstellt die unveränderlichen Hauptordner des TreeViews. Hauptordner
+   * Erstellt die unverÃ¤nderlichen Hauptordner des TreeViews. Hauptordner
    * existieren immer, auch wenn es sonst keine Komponenten im Systemmodell
-   * gibt. Hauptordner sollen allein durch Nutzereingaben nicht gelöscht werden
-   * können.
+   * gibt. Hauptordner sollen allein durch Nutzereingaben nicht gelÃ¶scht werden
+   * kÃ¶nnen.
    */
   private void createMainFolders() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     createMainFolder(this, FolderKey.VEHICLES,
                      new SimpleFolder(bundle.getString("tree.vehicles.text")));
-    
+
     LayoutModel layoutModel = crsObjFactory.createLayoutModel();
     layoutModel.setName("VLayout-1");
     createMainFolder(this, FolderKey.LAYOUT, layoutModel);
-    
+
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.POINTS,
                      new SimpleFolder(bundle.getString("tree.points.text")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.PATHS,
@@ -475,7 +508,7 @@ class StandardSystemModel
 
   /**
    * Erzeugt einen Hauptordner, der sowohl dem TreeView als auch dem
-   * Systemmodell hinzugefügt wird.
+   * Systemmodell hinzugefÃ¼gt wird.
    */
   private void createMainFolder(ModelComponent parentFolder,
                                 FolderKey key,

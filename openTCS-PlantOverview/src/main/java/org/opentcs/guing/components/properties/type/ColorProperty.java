@@ -36,7 +36,7 @@ public final class ColorProperty
   }
 
   /**
-   * Konstruktor mit Übergabe einer Farbe.
+   * Konstruktor mit Ãœbergabe einer Farbe.
    *
    * @param model
    *

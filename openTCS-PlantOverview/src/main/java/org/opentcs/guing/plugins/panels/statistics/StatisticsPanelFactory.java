@@ -8,11 +8,13 @@
  */
 package org.opentcs.guing.plugins.panels.statistics;
 
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.util.gui.plugins.PanelFactory;
-import org.opentcs.util.gui.plugins.PluggablePanel;
+import org.opentcs.components.plantoverview.PluggablePanel;
+import org.opentcs.components.plantoverview.PluggablePanelFactory;
 
 /**
  * Creates statistics panels.
@@ -20,24 +22,26 @@ import org.opentcs.util.gui.plugins.PluggablePanel;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class StatisticsPanelFactory
-    implements PanelFactory {
+    implements PluggablePanelFactory {
 
   /**
    * This class's bundle.
    */
   private final ResourceBundle bundle
       = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
+  /**
+   * A provider for the actual panels.
+   */
+  private final Provider<StatisticsPanel> panelProvider;
 
   /**
    * Creates a new instance.
+   *
+   * @param panelProvider A provider for the actual panels.
    */
-  public StatisticsPanelFactory() {
-    // Do nada.
-  }
-
-  @Override
-  public void setKernelProvider(SharedKernelProvider kernelProvider) {
-    // Do nada.
+  @Inject
+  public StatisticsPanelFactory(Provider<StatisticsPanel> panelProvider) {
+    this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }
 
   @Override
@@ -47,7 +51,7 @@ public class StatisticsPanelFactory
 
   @Override
   public PluggablePanel createPanel(Kernel.State state) {
-    return new StatisticsPanel();
+    return panelProvider.get();
   }
 
   @Override

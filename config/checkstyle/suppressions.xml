@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+  <!-- Package-wide exceptions start here. -->
+  <!-- We don't touch anything in the deadlock avoidance classes for now. -->
+  <suppress files="org.opentcs.kernel.module.deadlockavoidance.*"
+            checks=".*"/>
+  <!-- We don't touch anything in the simulation classes of the generic client
+       for now. -->
+  <suppress files="org.opentcs.remote.genericclient.simulation.*"
+            checks=".*"/>
+
+  <!-- Suppress JavaDoc checks for some classes that are knowingly not
+       explicitly documented. -->
+  <suppress files="org.opentcs.access.rmi.RemoteKernel.java"
+            checks="JavadocMethod"/>
+  <suppress files="org.opentcs.kernel.KernelState.java"
+            checks="JavadocMethod"/>
+  <suppress files="org.opentcs.kernel.StandardRemoteKernel.java"
+            checks="JavadocMethod"/>
+  <suppress files="org.opentcs.*"
+            checks="RegexpSinglelineJava"/>
+
+</suppressions>

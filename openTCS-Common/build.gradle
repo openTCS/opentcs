@@ -1,0 +1,21 @@
+dependencies {
+  compile project(':openTCS-API-Base')
+
+  compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
+  compile group: 'net.engio', name: 'mbassador', version: '1.1.10'
+}
+
+processResources.doLast {
+  // Write a properties file with the build version and date.
+  def props = new Properties()
+  props.setProperty('opentcs.version', version)
+  props.setProperty('opentcs.builddate', project.ext.buildDate)
+  
+  new File(sourceSets.main.output.resourcesDir, 'opentcs.properties').withWriter() {
+    props.store(it, null)
+  }
+}
+
+task release {
+  dependsOn build
+}

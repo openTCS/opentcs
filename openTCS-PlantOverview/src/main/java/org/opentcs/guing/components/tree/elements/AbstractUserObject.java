@@ -22,11 +22,11 @@ import org.opentcs.guing.model.ModelManager;
  * Defaultimplementierung des UserObject-Interfaces. Ein UserObject ist das
  * Objekt, das ein DefaultMutableTreeNode in einem JTree mit verwaltet. Ein
  * UserObject hat hier die Funktion des Befehls im Befehlsmuster. Die
- * ModelingApplication ist der Befehlsempf‰nger. Ein UserObject h‰lt dar¸ber
+ * ModelingApplication ist der Befehlsempf√§nger. Ein UserObject h√§lt dar√ºber
  * hinaus eine Referenz auf ein Datenobjekt aus dem Systemmodell.
  * <p>
  * <b>Entwurfsmuster:</b> Befehl. AbstractUserObject ist der abstrakte Befehl.
- * Klient ist der TreeView und Empf‰nger die Applikation.
+ * Klient ist der TreeView und Empf√§nger die Applikation.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

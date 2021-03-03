@@ -1,0 +1,76 @@
+
+[appendix]
+== Structure and processing of transport orders
+
+image::transport_order_course.png[]
+
+. A `TransportOrder` is created by passing a list of `DriveOrder.Destination` instances to the `Kernel` instance's `createTransportOrder()` method.
+.. The Kernel wraps each `Destination` in a newly-created `DriveOrder` instance.
+.. These ``DriveOrder``s are themselves wrapped by the kernel in a single, newly-created `TransportOrder` instance in their given order (see figure below).
+. Once a `TransportOrder` is being assigned to a vehicle by the `Dispatcher`, a `Route` is computed for each of its ``DriveOrder``s.
+These ``Route``s are then stored in the corresponding ``DriveOrder``s.
+
+[ditaa, "create_transport_order_process_ditaa"]
+....
+
+                                                                                                             +------------------------------+
+                                                                                                             |cEEE                          |
+                                                                                                             |TransportOrder                |
+                                                                                                             |+----------------------------+|
+                                                                                                             ||cDDD                        ||
+                                                                                                             ||DriveOrder                  ||
+                                                                                                             ||+--------------------------+||
+                                                                                                             |||cEEE                      |||
+                                                                                                             |||DriveOrder.Destination (1)|||
+                                                                       +------------------------------+      |||                          |||
+                                                                       |cEEE                          |      ||+--------------------------+||
+                                   +----------------------------+      |TransportOrder                |      ||                            ||
+                                   |cDDD                        |      |+----------------------------+|      ||+--------------------------+||
+                                   |DriveOrder                  |      ||cDDD                        ||      |||cEEE                      |||
+                                   |+--------------------------+|      ||DriveOrder                  ||      |||Route (1)                 |||
+                                   ||cEEE                      ||      ||+--------------------------+||      |||                          |||
+                                   ||DriveOrder.Destination (1)||      |||cEEE                      |||      ||+--------------------------+||
+ +--------------------------+      ||                          ||      |||DriveOrder.Destination (1)|||      |+----------------------------+|
+ |cEEE                      |      |+--------------------------+|      |||                          |||      |                              |
+ |DriveOrder.Destination (1)|      +----------------------------+      ||+--------------------------+||      |+----------------------------+|
+ |                          |                                          |+----------------------------+|      ||cDDD                        ||
+ +--------------------------+      +----------------------------+      |                              |      ||DriveOrder                  ||
+                                   |cDDD                        |      |+----------------------------+|      ||+--------------------------+||
+ +--------------------------+      |DriveOrder                  |      ||cDDD                        ||      |||cEEE                      |||
+ |cEEE                      |      |+--------------------------+|      ||DriveOrder                  ||      |||DriveOrder.Destination (2)|||
+ |DriveOrder.Destination (2)|----->||cEEE                      ||----->||+--------------------------+||----->|||                          |||
+ |                          |      ||DriveOrder.Destination (2)||      |||cEEE                      |||      ||+--------------------------+||
+ +--------------------------+      ||                          ||      |||DriveOrder.Destination (2)|||      ||                            ||
+                                   |+--------------------------+|      |||                          |||      ||+--------------------------+||
+ +--------------------------+      +----------------------------+      ||+--------------------------+||      |||cEEE                      |||
+ |cEEE                      |                                          |+----------------------------+|      |||Route (2)                 |||
+ |DriveOrder.Destination (3)|      +----------------------------+      |                              |      |||                          |||
+ |                          |      |cDDD                        |      |+----------------------------+|      ||+--------------------------+||
+ +--------------------------+      |DriveOrder                  |      ||cDDD                        ||      |+----------------------------+|
+                                   |+--------------------------+|      ||DriveOrder                  ||      |                              |
+                                   ||cEEE                      ||      ||+--------------------------+||      |+----------------------------+|
+                                   ||DriveOrder.Destination (3)||      |||cEEE                      |||      ||cDDD                        ||
+                                   ||                          ||      |||DriveOrder.Destination (3)|||      ||DriveOrder                  ||
+                                   |+--------------------------+|      |||                          |||      ||+--------------------------+||
+                                   +----------------------------+      ||+--------------------------+||      |||cEEE                      |||
+                                                                       |+----------------------------+|      |||DriveOrder.Destination (3)|||
+                                                                       +------------------------------+      |||                          |||
+                                                                                                             ||+--------------------------+||
+                                                                                                             ||                            ||
+                                                                                                             ||+--------------------------+||
+                                                                                                             |||cEEE                      |||
+                                                                                                             |||Route (3)                 |||
+                                                                                                             |||                          |||
+                                                                                                             ||+--------------------------+||
+                                                                                                             |+----------------------------+|
+                                                                                                             +------------------------------+
+....
+
+[start=3]
+. As soon as a vehicle (driver) is able to process a `DriveOrder`, the single ``Step``s of its `Route` are mapped to ``MovementCommand``s.
+These ``MovementCommand``s contain all information the vehicle driver needs to reach the final destination and to perform the desired operation there.
+. The ``MovementCommand``s for the partial routes to be travelled are sent to the vehicle driver bit by bit.
+The kernel only sends as many ``MovementCommands``s in advance as is required for the vehicle driver to function properly; it does this to maintain fine-grained control over the paths/resources used by all vehicles.
+A vehicle driver may set the maximum number of ``MovementCommand``s it gets in advance by adjusting its command queue capacity.
+. As soon as a `DriveOrder` is finished, the `Route` of the next `DriveOrder` is mapped to ``MovementCommand``s.
+. Once the last `DriveOrder` of a `TransportOrder` is finished, the whole `TransportOrder` is finished, as well.

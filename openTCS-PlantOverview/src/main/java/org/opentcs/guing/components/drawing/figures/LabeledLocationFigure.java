@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
@@ -35,7 +34,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 
 /**
- * LabeledLocationFigure: LocationFigure mit zugehörigem Label, das mit der
+ * LabeledLocationFigure: LocationFigure mit zugehÃ¶rigem Label, das mit der
  * Figur bewegt wird.
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -66,7 +65,7 @@ public class LabeledLocationFigure
     return getPresentationFigure().getDrawingArea();
   }
 
-  @Override	// AbstractFigure
+  @Override
   public String getToolTipText(Point2D.Double p) {
     LocationFigure lf = getPresentationFigure();
     StringBuilder sb = new StringBuilder("<html>Location ");
@@ -87,7 +86,7 @@ public class LabeledLocationFigure
     return sb.toString();
   }
 
-  @Override	// GraphicalCompositeFigure
+  @Override
   public LabeledLocationFigure clone() {
     // Do NOT clone the label here.
     LabeledLocationFigure that = (LabeledLocationFigure) super.clone();
@@ -104,22 +103,24 @@ public class LabeledLocationFigure
     return that;
   }
 
-  @Override	// GraphicalCompositeFigure
-  public void read(DOMInput in) throws IOException {
+  @Override
+  public void read(DOMInput in)
+      throws IOException {
     double x = in.getAttribute("x", 0d);
     double y = in.getAttribute("y", 0d);
     setBounds(new Point2D.Double(x, y), new Point2D.Double(x, y));
   }
 
-  @Override	// GraphicalCompositeFigure
-  public void write(DOMOutput out) throws IOException {
+  @Override
+  public void write(DOMOutput out)
+      throws IOException {
     LocationFigure lf = getPresentationFigure();
     out.addAttribute("x", lf.getZoomPoint().getX());
     out.addAttribute("y", lf.getZoomPoint().getY());
     out.addAttribute("name", get(FigureConstants.MODEL).getName());
   }
 
-  @Override // AbstractFigure
+  @Override
   public Collection<Action> getActions(Point2D.Double p) {
     LinkedList<Action> editOptions = new LinkedList<>();
 //    editOptions.add(new CutAction());
@@ -130,7 +131,7 @@ public class LabeledLocationFigure
     return editOptions;
   }
 
-  @Override	// AttributesChangeListener
+  @Override
   public void propertiesChanged(AttributesChangeEvent event) {
     if (event.getInitiator().equals(this)) {
       return;
@@ -163,7 +164,7 @@ public class LabeledLocationFigure
     fireFigureChanged();
   }
 
-  @Override // LabeledFigure
+  @Override
   public void updateModel() {
     Origin origin = get(FigureConstants.ORIGIN);
     LocationFigure lf = getPresentationFigure();
@@ -172,14 +173,14 @@ public class LabeledLocationFigure
     CoordinateProperty cpy = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);
     // Schreibt die aktuellen Modell-Koordinaten in die Properties
     if ((double) cpx.getValue() == 0.0 && (double) cpy.getValue() == 0.0) {
-      // Koordinaten nur einmal beim Erzeugen aus Layout übernehmen
+      // Koordinaten nur einmal beim Erzeugen aus Layout Ã¼bernehmen
       origin.calculateRealPosition(lf.center(), cpx, cpy);
       cpx.markChanged();
       cpy.markChanged();
     }
     // Schreibt die aktuellen Layout-Koordinaten in die Properties
     ZoomPoint zoomPoint = lf.getZoomPoint();
-    // Wenn die Figure gerade gelöscht wurde, kann der Origin schon null sein
+    // Wenn die Figure gerade gelÃ¶scht wurde, kann der Origin schon null sein
     if (zoomPoint != null && origin != null) {
       StringProperty sp = (StringProperty) model.getProperty(ElementPropKeys.LOC_POS_X);
       String sValue = sp.getText();
@@ -208,7 +209,7 @@ public class LabeledLocationFigure
         oldValue = (int) Double.parseDouble(sp.getText());
       }
 
-      newValue = (int) (-zoomPoint.getY() * origin.getScaleY());	// Vorzeichen!
+      newValue = (int) (-zoomPoint.getY() * origin.getScaleY());  // Vorzeichen!
 
       if (newValue != oldValue) {
         sp.setText(String.format("%d", newValue));

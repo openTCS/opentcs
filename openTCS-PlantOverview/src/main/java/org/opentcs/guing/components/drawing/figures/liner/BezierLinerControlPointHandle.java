@@ -26,7 +26,7 @@ public class BezierLinerControlPointHandle
     super(owner, index, coord);
   }
 
-  @Override	// BezierControlPointHandle
+  @Override  // BezierControlPointHandle
   public void trackEnd(Point anchor, Point lead, int modifiersEx) {
     super.trackEnd(anchor, lead, modifiersEx);
     // Fire edit event to update the control points of the Path figure

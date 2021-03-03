@@ -108,7 +108,7 @@ public class OrderSequenceView
     // TODO...
     // Transport orders
     DefaultTableModel tableModel = new UneditableTableModel();
-    tableModel.setColumnIdentifiers(new String[] {"Name"});	// , "Quelle", "Ziel"...
+    tableModel.setColumnIdentifiers(new String[] {"Name"});  // , "Quelle", "Ziel"...
 
     for (TCSObjectReference<TransportOrder> to : getOrderSequence().getOrders()) {
       String[] row = new String[1];
@@ -333,7 +333,7 @@ public class OrderSequenceView
         add(transportOrdersPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-	private void checkBoxCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCompleteActionPerformed
+  private void checkBoxCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCompleteActionPerformed
     int n = JOptionPane.showConfirmDialog(this,
                                           "Transportauftrags-Kette als komplett markieren?",
                                           "Auftragskette",
@@ -346,7 +346,7 @@ public class OrderSequenceView
     else {
       checkBoxComplete.setSelected(false);
     }
-	}//GEN-LAST:event_checkBoxCompleteActionPerformed
+  }//GEN-LAST:event_checkBoxCompleteActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox checkBoxComplete;
     private javax.swing.JCheckBox checkBoxFailureFatal;

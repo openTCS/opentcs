@@ -93,7 +93,7 @@ public class PointModel
     // HH 2014-02-17: Miscellaneous Properties vorerst nicht collective editable
 //  pMiscellaneous.setCollectiveEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
-    // Das zugehörige Model-Layout-Element
+    // Das zugehÃ¶rige Model-Layout-Element
     // Position x im Layout
     StringProperty pPointPosX = new StringProperty(this);
     pPointPosX.setDescription(bundle.getString("element.pointPosX.text"));
@@ -108,19 +108,19 @@ public class PointModel
     pPointPosY.setHelptext(bundle.getString("element.pointPosY.helptext"));
     pPointPosY.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_POS_Y, pPointPosY);
-    // Position x des zugehörigen Labels im Layout
+    // Position x des zugehÃ¶rigen Labels im Layout
     StringProperty pPointLabelOffsetX = new StringProperty(this);
     pPointLabelOffsetX.setDescription(bundle.getString("element.pointLabelOffsetX.text"));
     pPointLabelOffsetX.setHelptext(bundle.getString("element.pointLabelOffsetX.helptext"));
     pPointLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_X, pPointLabelOffsetX);
-    // Position y des zugehörigen Labels im Layout
+    // Position y des zugehÃ¶rigen Labels im Layout
     StringProperty pPointLabelOffsetY = new StringProperty(this);
     pPointLabelOffsetY.setDescription(bundle.getString("element.pointLabelOffsetY.text"));
     pPointLabelOffsetY.setHelptext(bundle.getString("element.pointLabelOffsetY.helptext"));
     pPointLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y, pPointLabelOffsetY);
-    // Winkelausrichtung des zugehörigen Labels im Layout
+    // Winkelausrichtung des zugehÃ¶rigen Labels im Layout
     StringProperty pPointLabelOrientationAngle = new StringProperty(this);
     pPointLabelOrientationAngle.setDescription(bundle.getString("element.pointLabelOrientationAngle.text"));
     pPointLabelOrientationAngle.setHelptext(bundle.getString("element.pointLabelOrientationAngle.helptext"));

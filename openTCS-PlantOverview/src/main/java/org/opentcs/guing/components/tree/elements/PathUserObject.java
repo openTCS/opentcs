@@ -21,7 +21,7 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repr‰sentation eines Pfades in der Baumansicht.
+ * Die Repr√§sentation eines Pfades in der Baumansicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -63,7 +63,7 @@ public class PathUserObject
   }
 
   @Override
-  public UserObjectContext.CONTEXT_TYPE getContextType() {
+  public UserObjectContext.ContextType getContextType() {
     return context.getType();
   }
 }

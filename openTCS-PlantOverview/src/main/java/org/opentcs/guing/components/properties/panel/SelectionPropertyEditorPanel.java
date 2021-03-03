@@ -19,7 +19,7 @@ import org.opentcs.guing.components.properties.type.Selectable;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Benutzerschnittstelle zum Ausw‰hlen eines Wertes aus einer ComboBox.
+ * Benutzerschnittstelle zum Ausw√§hlen eines Wertes aus einer ComboBox.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

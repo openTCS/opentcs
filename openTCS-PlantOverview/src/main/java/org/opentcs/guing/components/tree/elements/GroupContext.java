@@ -61,7 +61,7 @@ public class GroupContext
   }
 
   @Override
-  public CONTEXT_TYPE getType() {
-    return CONTEXT_TYPE.GROUP;
+  public ContextType getType() {
+    return ContextType.GROUP;
   }
 }

@@ -73,8 +73,11 @@ public class OpenTCSDrawingEditor
   /**
    *
    */
-  private final CompositeFigureEventHandler cmpFigureEvtHandler
-      = new CompositeFigureEventHandler();
+  private final CompositeFigureEventHandler cmpFigureEvtHandler = new CompositeFigureEventHandler();
+  /**
+   * Width on the screen edge.
+   */
+  private static final int MARGIN = 20;
   /**
    * The drawing that contains all figures.
    */
@@ -88,10 +91,6 @@ public class OpenTCSDrawingEditor
   private OffsetFigure bottomOffsetFigure;
   private OffsetFigure rightOffsetFigure;
   private OffsetFigure leftOffsetFigure;
-  /**
-   * Width on the screen edge.
-   */
-  private final int MARGIN = 20;
 
   /**
    * Creates a new instance.
@@ -362,13 +361,13 @@ public class OpenTCSDrawingEditor
    *
    * @return The input map.
    */
-  @Override	// DefaultDrawingEditor
+  @Override  // DefaultDrawingEditor
   protected InputMap createInputMap() {
     InputMap m = new InputMap();
 
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), DeleteAction.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.ID);
-    // Alle Verschiebungen über MoveAction, nicht über MoveConstrainedAction
+    // Alle Verschiebungen Ã¼ber MoveAction, nicht Ã¼ber MoveConstrainedAction
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), MoveAction.West.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), MoveAction.East.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), MoveAction.North.ID);
@@ -392,7 +391,7 @@ public class OpenTCSDrawingEditor
     return m;
   }
 
-  @Override	// DefaultDrawingEditor
+  @Override  // DefaultDrawingEditor
   protected ActionMap createActionMap() {
     ActionMap m = new ActionMap();
 

@@ -11,7 +11,7 @@ package org.opentcs.kernel.controlcenter.vehicles;
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
-import org.opentcs.drivers.MovementCommand;
+import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
  * A cell renderer for the DetailPanel's command queue display.
@@ -29,7 +29,7 @@ final class CommandListCellRenderer
   }
 
   @Override
-  public Component getListCellRendererComponent(JList list,
+  public Component getListCellRendererComponent(JList<?> list,
                                                 Object value,
                                                 int index,
                                                 boolean isSelected,

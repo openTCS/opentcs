@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import net.engio.mbassy.listener.Handler;
@@ -45,6 +43,8 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PathModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for Path objects.
@@ -58,8 +58,7 @@ public class PathAdapter
   /**
    * This class's logger.
    */
-  private static final Logger logger
-      = Logger.getLogger(PathAdapter.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(PathAdapter.class);
   /**
    * Provides access to a kernel.
    */
@@ -153,26 +152,34 @@ public class PathAdapter
       }
     }
     catch (CredentialsException e) {
-      logger.log(Level.WARNING, null, e);
+      LOG.warn("", e);
     }
   }
 
   @Override // OpenTCSProcessAdapter
   public void updateProcessProperties(Kernel kernel) {
+    requireNonNull(kernel, "kernel");
     ModelComponent srcPoint = getModel().getStartComponent();
     ModelComponent dstPoint = getModel().getEndComponent();
+    
+    LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.", getModel().getName(), srcPoint, dstPoint);
 
-    TCSObjectReference<Point> startRef
-        = kernel.getTCSObject(Point.class, srcPoint.getName()).getReference();
-    TCSObjectReference<Point> endRef
-        = kernel.getTCSObject(Point.class, dstPoint.getName()).getReference();
-    Path path = kernel.createPath(startRef, endRef);
+    Point startPoint = kernel.getTCSObject(Point.class, srcPoint.getName());
+    if (startPoint == null) {
+      LOG.warn("Start point with name {} does not exist in kernel, ignored.", srcPoint.getName());
+      return;
+    }
+    Point endPoint = kernel.getTCSObject(Point.class, dstPoint.getName());
+    if (endPoint == null) {
+      LOG.warn("End point with name {} does not exist in kernel, ignored.", dstPoint.getName());
+      return;
+    }
+    Path path = kernel.createPath(startPoint.getReference(), endPoint.getReference());
     TCSObjectReference<Path> reference = path.getReference();
 
     // The kernel object will be created when the points to connect are
     // known. Before the reference is null.
-    StringProperty pName
-        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
     String name = pName.getText();
 
     try {
@@ -196,7 +203,7 @@ public class PathAdapter
       updateProcessLocked(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      logger.log(Level.WARNING, null, e);
+      LOG.warn("", e);
     }
   }
 
@@ -281,7 +288,7 @@ public class PathAdapter
         pLength.markChanged();
       }
       catch (IllegalArgumentException ex) {
-        logger.log(Level.WARNING, null, ex);
+        LOG.warn("", ex);
       }
     }
 

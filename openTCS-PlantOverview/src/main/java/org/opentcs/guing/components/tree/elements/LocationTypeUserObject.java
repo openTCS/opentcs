@@ -20,7 +20,7 @@ import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repr‰sentation einer Station in der Baumansicht.
+ * Die Repr√§sentation einer Station in der Baumansicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

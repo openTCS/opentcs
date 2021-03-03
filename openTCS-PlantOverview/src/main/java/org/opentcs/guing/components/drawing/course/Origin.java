@@ -15,19 +15,19 @@ import java.awt.geom.Point2D;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.guing.components.drawing.figures.OriginFigure;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Der Ursprung des Koordinatensystems. Er ist sozusagen das Modell zur {
  *
  * @see OriginFigure}. Er kennt die Ausdehnung der Zeichnung in m, mm oder cm
- * und er kennt das gew�nschte Koordinatensystem. Anhand des Koordinatensystems
+ * und er kennt das gewï¿½nschte Koordinatensystem. Anhand des Koordinatensystems
  * kann die reale Position von anderen Figures berechnet werden (Umrechnung von
- * Pixel in eine L�ngeneinheit).
+ * Pixel in eine Lï¿½ngeneinheit).
  * <p>
  * Die aktuelle Position des Ursprungs in
  * Pixel wird durch die OriginFigure bestimmt.
@@ -36,7 +36,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
  */
 public final class Origin {
 
-  private static final Logger log = Logger.getLogger(Origin.class.getName());
+  private static final Logger log = LoggerFactory.getLogger(Origin.class);
   public static final double DEFAULT_SCALE = 50.0; // mm per Pixel
   /**
    * Soviele mm entsprechen einem Pixel in waagerechter Richtung.
@@ -55,7 +55,7 @@ public final class Origin {
    */
   private CoordinateSystem fCoordinateSystem;
   /**
-   * Liste aller Objekte, die an einer �nderung des Referenzpunktes interessiert
+   * Liste aller Objekte, die an einer ï¿½nderung des Referenzpunktes interessiert
    * sind.
    */
   private final Set<OriginChangeListener> fListeners;
@@ -77,8 +77,8 @@ public final class Origin {
   }
 
   /**
-   * Setzt die Werte der Millimeter pro Pixel. Diese Werte k�nnen sich mit jedem
-   * Zoom �ndern.
+   * Setzt die Werte der Millimeter pro Pixel. Diese Werte kï¿½nnen sich mit jedem
+   * Zoom ï¿½ndern.
    */
   public void setScale(double scaleX, double scaleY) {
     fScaleX = scaleX;
@@ -132,7 +132,7 @@ public final class Origin {
 
   /**
    * Wandelt echte Koordinaten in Pixelkoordinaten um. Die echten Koordinaten
-   * gibt der Benutzer durch �ndern der Attribute vor. Daraufhin muss berechnet
+   * gibt der Benutzer durch ï¿½ndern der Attribute vor. Daraufhin muss berechnet
    * werden, an welche Position in Pixel das entsprechende Figure zu setzen ist.
    */
   public Point calculatePixelPosition(LengthProperty xReal, LengthProperty yReal) {
@@ -143,7 +143,7 @@ public final class Origin {
 
   /**
    * Wandelt echte Koordinaten in Pixelkoordinaten um. Die echten Koordinaten
-   * gibt der Benutzer durch �ndern der Attribute vor. Daraufhin muss berechnet
+   * gibt der Benutzer durch ï¿½ndern der Attribute vor. Daraufhin muss berechnet
    * werden, an welche Position in Pixel das entsprechende Figure zu setzen ist.
    *
    * @param xReal
@@ -170,7 +170,7 @@ public final class Origin {
       return pixelPosition;
     }
     catch (NumberFormatException e) {
-      log.log(Level.INFO, "Couldn't parse layout coordinates:", e);
+      log.info("Couldn't parse layout coordinates", e);
       return new Point2D.Double();
     }
   }
@@ -181,9 +181,9 @@ public final class Origin {
    * umgerechnet werden.
    *
    * @param pixelPosition die Position des Figures in Pixeln
-   * @param xReal das L�ngenattribut f�r die x-Achse, in welches der errechnete
+   * @param xReal das Lï¿½ngenattribut fï¿½r die x-Achse, in welches der errechnete
    * reale Wert geschrieben wird
-   * @param yReal das L�ngenattribut f�r die y-Achse, in welches der errechnete
+   * @param yReal das Lï¿½ngenattribut fï¿½r die y-Achse, in welches der errechnete
    * reale Wert geschrieben wird
    */
   public Point2D calculateRealPosition(Point pixelPosition, LengthProperty xReal, LengthProperty yReal) {
@@ -212,7 +212,7 @@ public final class Origin {
   }
 
   /**
-   * F�gt einen Beobachter hinzu.
+   * Fï¿½gt einen Beobachter hinzu.
    */
   public void addListener(OriginChangeListener l) {
     fListeners.add(l);
@@ -226,9 +226,9 @@ public final class Origin {
   }
 
   /**
-   * Pr�ft, ob ein bestimmter Beobachter vorhanden ist.
+   * Prï¿½ft, ob ein bestimmter Beobachter vorhanden ist.
    *
-   * @param l der zu pr�fende Boebachter
+   * @param l der zu prï¿½fende Boebachter
    * @return
    * <code> true </code>, wenn der Beobachter vorhanden ist
    */
@@ -238,7 +238,7 @@ public final class Origin {
 
   /**
    * Informiert alle Beobachter, dass sich die Position des Referenzpunktes
-   * ge�ndert hat.
+   * geï¿½ndert hat.
    */
   public void notifyLocationChanged() {
     for (OriginChangeListener l : fListeners) {
@@ -247,7 +247,7 @@ public final class Origin {
   }
 
   /**
-   * Informiert alle Beobachter, dass sich der Ma�stab ge�ndert hat.
+   * Informiert alle Beobachter, dass sich der Maï¿½stab geï¿½ndert hat.
    */
   public void notifyScaleChanged() {
     for (OriginChangeListener l : fListeners) {
@@ -256,9 +256,9 @@ public final class Origin {
   }
 
   /**
-   * Liefert die grafische Repr�sentation des Ursprungs.
+   * Liefert die grafische Reprï¿½sentation des Ursprungs.
    *
-   * @return das {@link OriginFigure} als grafische Repr�sentation des
+   * @return das {@link OriginFigure} als grafische Reprï¿½sentation des
    * Referenzpunktes
    */
   public OriginFigure getFigure() {

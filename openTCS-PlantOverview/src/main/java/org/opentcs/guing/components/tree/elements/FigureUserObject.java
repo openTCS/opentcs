@@ -25,10 +25,10 @@ import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repr‰sentation eines Figure-Objekts in der Baumansicht. Korrekter w‰re
- * es, wenn FigureUserObject nicht FigureUserObject hieﬂe, sondern
- * FigureComponentUserObject, denn es fungiert als Stellvertreter f¸r ein
- * FigureComponent-Objekt und nicht f¸r ein Figure-Objekt.
+ * Die Repr√§sentation eines Figure-Objekts in der Baumansicht. Korrekter w√§re
+ * es, wenn FigureUserObject nicht FigureUserObject hie√üe, sondern
+ * FigureComponentUserObject, denn es fungiert als Stellvertreter f√ºr ein
+ * FigureComponent-Objekt und nicht f√ºr ein Figure-Objekt.
  * <p>
  * <b>Entwurfsmuster:</b> Befehl. FigureUserObject ist ein konkreter Befehl.
  *

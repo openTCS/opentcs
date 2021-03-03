@@ -20,11 +20,11 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Ein CellRenderer für alle Attribute außer vom Typ {
+ * Ein CellRenderer fÃ¼r alle Attribute auÃŸer vom Typ {
  *
  * @see BooleanProperty}. Dargestellt wird lediglich der Text, den ein Attribut
  * in der
- * <code>toString()</code> Methode zurückliefert.
+ * <code>toString()</code> Methode zurÃ¼ckliefert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -53,7 +53,7 @@ public class StandardPropertyCellRenderer
   /**
    * Liefert die Komponente zur Darstellung des Attributs (hier das Label mit
    * dem Text, den das Attribut in seiner toString()- Methode liefert. Ist das
-   * Attribut in der Zeile nicht veränderbar, so wird für das Label
+   * Attribut in der Zeile nicht verÃ¤nderbar, so wird fÃ¼r das Label
    * <code>enabled(false)</code> gesetzt.
    *
    * @return
@@ -87,6 +87,8 @@ public class StandardPropertyCellRenderer
         }
         label.setForeground(editable ? Color.blue : Color.darkGray);
         break;
+        
+      default:
     }
 
     return this;

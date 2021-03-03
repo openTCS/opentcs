@@ -51,10 +51,10 @@ public class BookmarkSelectionPanel
   }
 
   /**
-   * Liefert das ausgewählte Ziel, zu dem das Fahrzeug hinbeordert werden soll.
+   * Liefert das ausgewÃ¤hlte Ziel, zu dem das Fahrzeug hinbeordert werden soll.
    *
    * @return das Ziel oder
-   * <code>null</code>, falls kein Ziel ausgewählt wurde
+   * <code>null</code>, falls kein Ziel ausgewÃ¤hlt wurde
    */
   public ViewBookmark getSelectedItem() {
     int index = comboBoxItems.getSelectedIndex();
@@ -68,12 +68,12 @@ public class BookmarkSelectionPanel
 
   @Override
   public void update() {
-    // wird nicht benötigt
+    // wird nicht benÃ¶tigt
   }
 
   @Override
   public void initFields() {
-    // wird nicht benötigt
+    // wird nicht benÃ¶tigt
   }
 
   // CHECKSTYLE:OFF
@@ -119,9 +119,9 @@ public class BookmarkSelectionPanel
         add(buttonAddItem, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-	private void buttonAddItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddItemActionPerformed
+  private void buttonAddItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddItemActionPerformed
 
-	}//GEN-LAST:event_buttonAddItemActionPerformed
+  }//GEN-LAST:event_buttonAddItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAddItem;

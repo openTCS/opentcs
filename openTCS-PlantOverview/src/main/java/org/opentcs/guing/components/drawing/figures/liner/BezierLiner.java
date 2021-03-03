@@ -26,47 +26,47 @@ import org.jhotdraw.xml.DOMOutput;
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class BezierLiner
-		implements 
-		org.jhotdraw.draw.liner.Liner, 
-		org.jhotdraw.xml.DOMStorable {
+    implements 
+    org.jhotdraw.draw.liner.Liner, 
+    org.jhotdraw.xml.DOMStorable {
 
-	/**
-	 * Creates a new instance.
-	 */
-	public BezierLiner() {
-	}
+  /**
+   * Creates a new instance.
+   */
+  public BezierLiner() {
+  }
 
-	@Override	// Liner
-	public Collection<Handle> createHandles(BezierPath path) {
-		return Collections.emptyList();
-	}
+  @Override  // Liner
+  public Collection<Handle> createHandles(BezierPath path) {
+    return Collections.emptyList();
+  }
 
-	@Override	// Liner
-	public void lineout(ConnectionFigure figure) {
-		BezierPath path = ((LineConnectionFigure) figure).getBezierPath();
+  @Override  // Liner
+  public void lineout(ConnectionFigure figure) {
+    BezierPath path = ((LineConnectionFigure) figure).getBezierPath();
 
-		if (path != null) {
-			path.invalidatePath();
-		}
-	}
+    if (path != null) {
+      path.invalidatePath();
+    }
+  }
 
-	@Override // DOMStorable
-	public void read(DOMInput in) {
-	}
+  @Override // DOMStorable
+  public void read(DOMInput in) {
+  }
 
-	@Override // DOMStorable
-	public void write(DOMOutput out) {
-	}
+  @Override // DOMStorable
+  public void write(DOMOutput out) {
+  }
 
-	@Override // Object
-	public Liner clone() {
-		try {
-			return (Liner) super.clone();
-		}
-		catch (CloneNotSupportedException ex) {
-			InternalError error = new InternalError(ex.getMessage());
-			error.initCause(ex);
-			throw error;
-		}
-	}
+  @Override // Object
+  public Liner clone() {
+    try {
+      return (Liner) super.clone();
+    }
+    catch (CloneNotSupportedException ex) {
+      InternalError error = new InternalError(ex.getMessage());
+      error.initCause(ex);
+      throw error;
+    }
+  }
 }

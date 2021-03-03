@@ -54,19 +54,19 @@ public class BlockModel
     createProperties();
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public String getTreeViewName() {
     String treeViewName = getDescription() + " " + getName();
 
     return treeViewName;
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("block.description");
   }
 
-  @Override	// AbstractModelComponent
+  @Override  // AbstractModelComponent
   public void propertiesChanged(AttributesChangeListener listener) {
     if (getProperty(ElementPropKeys.BLOCK_COLOR).hasChanged()) {
       colorChanged();

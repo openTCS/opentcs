@@ -10,7 +10,7 @@ package org.opentcs.guing.components.tree.elements;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import org.opentcs.guing.components.tree.elements.UserObjectContext.CONTEXT_TYPE;
+import org.opentcs.guing.components.tree.elements.UserObjectContext.ContextType;
 import org.opentcs.guing.model.CompositeModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.BlockModel;
@@ -83,7 +83,7 @@ public class UserObjectUtil {
         + model.getClass());
   }
 
-  public UserObjectContext createContext(CONTEXT_TYPE type) {
+  public UserObjectContext createContext(ContextType type) {
     switch (type) {
       case COMPONENT:
         return factory.createComponentContext();

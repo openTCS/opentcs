@@ -11,11 +11,11 @@
 package org.opentcs.guing.components.dialogs;
 
 /**
- * Interface für Dialoge, die das komfortable Bearbeiten von Attributen
- * ermöglichen. Der Dialog selbst gibt nur den Rahmen vor, z.B. einen Ok- und
+ * Interface fÃ¼r Dialoge, die das komfortable Bearbeiten von Attributen
+ * ermÃ¶glichen. Der Dialog selbst gibt nur den Rahmen vor, z.B. einen Ok- und
  * einen Cancel-Button. Die Komponente, mit der die eigentliche Bearbeitung
  * eines Attributs erfolgt, ist vom Typ DialogContent und wird dem Dialog 
- * hinzugefügt.
+ * hinzugefÃ¼gt.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -23,17 +23,17 @@ public interface DetailsDialog {
 
   /**
    * Liefert die Komponente, mit der die Einstellungen des Attributs komfortabel
-   * vorgenommen werden können.
+   * vorgenommen werden kÃ¶nnen.
    *
    * @return
    */
   DetailsDialogContent getDialogContent();
 
   /**
-   * Aktiviert den Dialog. Das sollte durch einen Klienten immer dann ausgelöst
-   * werden, wenn der Dialog sichtbar gemacht wird. Wird benötigt, um die
-   * Funktion "Änderungen für alle Fahrzeugtypen übernehmen" realisieren zu
-   * können.
+   * Aktiviert den Dialog. Das sollte durch einen Klienten immer dann ausgelÃ¶st
+   * werden, wenn der Dialog sichtbar gemacht wird. Wird benÃ¶tigt, um die
+   * Funktion "Ã„nderungen fÃ¼r alle Fahrzeugtypen Ã¼bernehmen" realisieren zu
+   * kÃ¶nnen.
    */
   void activate();
 }

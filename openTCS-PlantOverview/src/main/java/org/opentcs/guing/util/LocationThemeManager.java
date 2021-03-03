@@ -10,8 +10,8 @@
 package org.opentcs.guing.util;
 
 import java.util.List;
+import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.guing.components.properties.type.LocationThemeProperty;
-import org.opentcs.util.gui.plugins.LocationTheme;
 
 /**
  *

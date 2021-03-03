@@ -8,11 +8,14 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.util.gui.plugins.PanelFactory;
-import org.opentcs.util.gui.plugins.PluggablePanel;
+import org.opentcs.components.plantoverview.PluggablePanel;
+import org.opentcs.components.plantoverview.PluggablePanelFactory;
 
 /**
  * Creates load generator panels.
@@ -20,7 +23,7 @@ import org.opentcs.util.gui.plugins.PluggablePanel;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class ContinuousLoadPanelFactory
-    implements PanelFactory {
+    implements PluggablePanelFactory {
 
   /**
    * This classe's bundle.
@@ -30,18 +33,23 @@ public class ContinuousLoadPanelFactory
   /**
    * A reference to the shared kernel provider.
    */
-  private SharedKernelProvider kernelProvider;
+  private final SharedKernelProvider kernelProvider;
+  /**
+   * A provider for the actual panels.
+   */
+  private final Provider<ContinuousLoadPanel> panelProvider;
 
   /**
    * Creates a new instance.
+   * 
+   * @param kernelProvider The application's kernel provider.
+   * @param panelProvider A provider for the actual panels.
    */
-  public ContinuousLoadPanelFactory() {
-    // Do nada.
-  }
-
-  @Override
-  public void setKernelProvider(SharedKernelProvider kernelProvider) {
-    this.kernelProvider = kernelProvider;
+  @Inject
+  public ContinuousLoadPanelFactory(SharedKernelProvider kernelProvider,
+                                    Provider<ContinuousLoadPanel> panelProvider) {
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }
 
   @Override
@@ -55,7 +63,7 @@ public class ContinuousLoadPanelFactory
       return null;
     }
 
-    return new ContinuousLoadPanel(kernelProvider);
+    return panelProvider.get();
   }
 
   @Override

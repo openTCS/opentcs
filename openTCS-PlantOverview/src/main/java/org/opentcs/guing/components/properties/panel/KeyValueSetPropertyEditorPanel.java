@@ -31,7 +31,7 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Benutzeroberfläche zum Bearbeiten einer Menge von Key-Value-Paaren.
+ * BenutzeroberflÃ¤che zum Bearbeiten einer Menge von Key-Value-Paaren.
  * {
  *
  * @see KeyValueSetProperty}
@@ -129,9 +129,9 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Liefert das ausgewählte KeyValueProperty.
+   * Liefert das ausgewÃ¤hlte KeyValueProperty.
    *
-   * @return das ausgewählte KeyValueProperty
+   * @return das ausgewÃ¤hlte KeyValueProperty
    */
   private KeyValueProperty getSelectedKeyValueProperty() {
     int i = itemsTable.getSelectedRow();
@@ -147,10 +147,10 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Wählt eine bestimmte Tabellezeile (das heißt ein bestimmtes
-   * Schlüssel-Wert-Paar) aus.
+   * WÃ¤hlt eine bestimmte Tabellezeile (das heiÃŸt ein bestimmtes
+   * SchlÃ¼ssel-Wert-Paar) aus.
    *
-   * @param key der Schlüssel des auszuwählenden Paares
+   * @param key der SchlÃ¼ssel des auszuwÃ¤hlenden Paares
    */
   private void selectItem(String key) {
     for (int i = 0; i < itemsTable.getRowCount(); i++) {
@@ -162,7 +162,7 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Sortiert die Schlüssel-Wert-Paare nach ihrem Schlüssel.
+   * Sortiert die SchlÃ¼ssel-Wert-Paare nach ihrem SchlÃ¼ssel.
    */
   private void sortItems() {
     Map<String, String> items = new HashMap<>();
@@ -188,11 +188,11 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Setzt einen Eintrag in der Tabelle bestehend aus Schlüssel und Wert. Ist
-   * der Schlüssel bereits vorhanden, wird der zugehörige Wert überschrieben
+   * Setzt einen Eintrag in der Tabelle bestehend aus SchlÃ¼ssel und Wert. Ist
+   * der SchlÃ¼ssel bereits vorhanden, wird der zugehÃ¶rige Wert Ã¼berschrieben
    * andernfalls wird ein neuer Eintrag erzeugt.
    *
-   * @param key der Schlüssel
+   * @param key der SchlÃ¼ssel
    * @param value der Wert
    */
   private void setItem(String key, String value) {
@@ -208,7 +208,7 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Bearbeitet den ausgewählten Eintrag.
+   * Bearbeitet den ausgewÃ¤hlten Eintrag.
    */
   private void edit() {
     KeyValueProperty p = getSelectedKeyValueProperty();
@@ -236,7 +236,7 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Fügt einen neuen Eintrag hinzu.
+   * FÃ¼gt einen neuen Eintrag hinzu.
    */
   private void add() {
     JDialog parent = (JDialog) getTopLevelAncestor();
@@ -258,15 +258,15 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Wird aufgerufen, wenn ein anderes Schlüssel-Wert-Paar ausgewählt wurde.
+   * Wird aufgerufen, wenn ein anderes SchlÃ¼ssel-Wert-Paar ausgewÃ¤hlt wurde.
    */
   private void handleSelectionChanged() {
     updateView();
   }
 
   /**
-   * Macht die verschiedenen Schaltflächen benutzbar oder unbenutzbar, je
-   * nachdem, ob ein Schlüssel-Wert-Paar ausgewählt wurde.
+   * Macht die verschiedenen SchaltflÃ¤chen benutzbar oder unbenutzbar, je
+   * nachdem, ob ein SchlÃ¼ssel-Wert-Paar ausgewÃ¤hlt wurde.
    */
   private void updateView() {
     final TableModel model = itemsTable.getModel();
@@ -274,7 +274,7 @@ public class KeyValueSetPropertyEditorPanel
     
     for (int selRowIndex : itemsTable.getSelectedRows()) {
       String key = (String) model.getValueAt(selRowIndex, 0);
-      // Sonderfall: Dieses Property wird indirekt über das Symbol einer Location
+      // Sonderfall: Dieses Property wird indirekt Ã¼ber das Symbol einer Location
       // gesetzt und sollte nicht direkt editierbar sein
       if (key.equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
           || key.equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
@@ -381,9 +381,9 @@ public class KeyValueSetPropertyEditorPanel
   }// </editor-fold>//GEN-END:initComponents
 
   /**
-   * Entfernt das ausgewählte Element.
+   * Entfernt das ausgewÃ¤hlte Element.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
       int i = itemsTable.getSelectedRow();
@@ -399,18 +399,18 @@ public class KeyValueSetPropertyEditorPanel
     }//GEN-LAST:event_removeButtonActionPerformed
 
   /**
-   * Bearbeitet das ausgewählte Element.
+   * Bearbeitet das ausgewÃ¤hlte Element.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
       edit();
     }//GEN-LAST:event_editButtonActionPerformed
 
   /**
-   * Fügt ein Element hinzu.
+   * FÃ¼gt ein Element hinzu.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt das auslÃ¶sende Ereignis
    */
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       add();

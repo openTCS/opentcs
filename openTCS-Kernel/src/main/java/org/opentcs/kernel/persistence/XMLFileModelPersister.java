@@ -19,14 +19,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
-import org.opentcs.access.ApplicationHome;
+import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.util.FileSystems;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A ModelPersister implementation realizing persistence of models with XML
@@ -42,7 +42,7 @@ public class XMLFileModelPersister
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(XMLFileModelPersister.class.getName());
+      = LoggerFactory.getLogger(XMLFileModelPersister.class);
   /**
    * The name of the model file in the model directory.
    */
@@ -73,7 +73,7 @@ public class XMLFileModelPersister
   public XMLFileModelPersister(@ApplicationHome File directory,
                                Provider<XMLModelReader> readerProvider,
                                Provider<XMLModelWriter> writerProvider) {
-    log.finer("method entry");
+    log.debug("method entry");
     this.readerProvider = Objects.requireNonNull(readerProvider);
     this.writerProvider = Objects.requireNonNull(writerProvider);
     Objects.requireNonNull(directory, "directory is null");
@@ -85,9 +85,9 @@ public class XMLFileModelPersister
   }
 
   @Override
-  public Optional<String> getModelName()
+  public Optional<String> getPersistentModelName()
       throws IOException {
-    log.finer("method entry");
+    log.debug("method entry");
     if (!hasSavedModel()) {
       return Optional.empty();
     }
@@ -98,7 +98,7 @@ public class XMLFileModelPersister
   @Override
   public void saveModel(Model model, @Nullable String modelName)
       throws IOException {
-    log.finer("method entry");
+    log.debug("method entry");
     Objects.requireNonNull(model, "model is null");
 
     StringBuilder message = new StringBuilder();
@@ -106,7 +106,7 @@ public class XMLFileModelPersister
     if (modelName != null) {
       message.append(" as ").append(modelName);
     }
-    log.fine(message.toString());
+    log.debug(message.toString());
 
     File modelFile = new File(dataDirectory, modelFileName);
     // Check if writing the model is possible.
@@ -133,19 +133,19 @@ public class XMLFileModelPersister
   @Override
   public void loadModel(Model model)
       throws IOException {
-    log.finer("method entry");
+    log.debug("method entry");
     Objects.requireNonNull(model, "model is null");
     // Return empty model if there is no saved model
     if (!hasSavedModel()) {
       model.clear();
       return;
     }
-    log.fine("Loading model. '" + getModelName() + "'");
+    log.debug("Loading model. '" + getPersistentModelName() + "'");
     checkIfModelFileExists();
     // Read the model from the file.
     File modelFile = new File(dataDirectory, modelFileName);
     readXMLModel(modelFile, model);
-    log.fine("Successfully loaded model '" + model.getName() + "'");
+    log.debug("Successfully loaded model '" + model.getName() + "'");
   }
 
   @Override
@@ -202,7 +202,7 @@ public class XMLFileModelPersister
    */
   private void checkIfModelFileExists()
       throws IOException {
-    log.finer("method entry");
+    log.debug("method entry");
     File modelFile = new File(dataDirectory, modelFileName);
     if (!dataDirectory.exists()) {
       throw new IOException(dataDirectory.getPath() + " does not exist");
@@ -223,8 +223,8 @@ public class XMLFileModelPersister
   @Override
   public void removeModel()
       throws IOException {
-    log.finer("method entry");
-    log.fine("Removing model.");
+    log.debug("method entry");
+    log.debug("Removing model.");
     File modelFile = new File(dataDirectory, modelFileName);
     // If the model file does not exist, don't do anything
     try {
@@ -247,7 +247,7 @@ public class XMLFileModelPersister
    */
   private String readXMLModelName(File modelFile)
       throws IOException {
-    log.finer("method entry");
+    log.debug("method entry");
     try (InputStream inStream = new FileInputStream(modelFile)) {
       XMLModelReader reader = readerProvider.get();
       return reader.readModelName(inStream);
@@ -265,13 +265,13 @@ public class XMLFileModelPersister
    */
   private void readXMLModel(File modelFile, Model model)
       throws IOException {
-    log.finer("method entry");
+    log.debug("method entry");
     try (InputStream inStream = new FileInputStream(modelFile)) {
       XMLModelReader reader = readerProvider.get();
       reader.readXMLModel(inStream, model);
     }
     catch (InvalidModelException exc) {
-      log.log(Level.SEVERE, "Exception parsing input", exc);
+      log.error("Exception parsing input", exc);
       throw new IOException("Exception parsing input: " + exc.getMessage());
     }
   }

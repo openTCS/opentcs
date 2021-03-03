@@ -16,12 +16,12 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import org.jhotdraw.app.action.ActionUtil;
+import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.view.VehicleThemeAction;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.VehicleThemeManager;
-import org.opentcs.util.gui.plugins.VehicleTheme;
 
 /**
  *

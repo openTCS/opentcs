@@ -161,13 +161,13 @@ public class LocationModel
     pType.setDescription(bundle.getString("location.type.text"));
     pType.setHelptext(bundle.getString("location.type.helptext"));
     setProperty(TYPE, pType);
-//		// Beschriftung
+//    // Beschriftung
 //    StringProperty pLabel = new StringProperty(this);
-//		pLabel.setDescription(bundle.getString("location.label.text"));
-//		pLabel.setHelptext(bundle.getString("location.label.helptext"));
-//		pLabel.setCollectiveEditable(true);
-//		setProperty(LABEL, pLabel);
-    // Symbol - der gehörige Enum-Wert wird unter Miscellaneous Properies gespeichert
+//    pLabel.setDescription(bundle.getString("location.label.text"));
+//    pLabel.setHelptext(bundle.getString("location.label.helptext"));
+//    pLabel.setCollectiveEditable(true);
+//    setProperty(LABEL, pLabel);
+    // Symbol - der gehÃ¶rige Enum-Wert wird unter Miscellaneous Properies gespeichert
     SymbolProperty pSymbol = new SymbolProperty(this);
     pSymbol.setDescription(bundle.getString("location.symbol.text"));
     pSymbol.setHelptext(bundle.getString("location.symbol.helptext"));
@@ -186,19 +186,19 @@ public class LocationModel
     pLocPosY.setHelptext(bundle.getString("element.locPosY.helptext"));
     pLocPosY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_POS_Y, pLocPosY);
-    // Position x des zugehörigen Labels im Layout
+    // Position x des zugehÃ¶rigen Labels im Layout
     StringProperty pLocLabelOffsetX = new StringProperty(this);
     pLocLabelOffsetX.setDescription(bundle.getString("element.locLabelOffsetX.text"));
     pLocLabelOffsetX.setHelptext(bundle.getString("element.locLabelOffsetX.helptext"));
     pLocLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, pLocLabelOffsetX);
-    // Position y des zugehörigen Labels im Layout
+    // Position y des zugehÃ¶rigen Labels im Layout
     StringProperty pLocLabelOffsetY = new StringProperty(this);
     pLocLabelOffsetY.setDescription(bundle.getString("element.locLabelOffsetY.text"));
     pLocLabelOffsetY.setHelptext(bundle.getString("element.locLabelOffsetY.helptext"));
     pLocLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, pLocLabelOffsetY);
-    // Winkelausrichtung des zugehörigen Labels im Layout
+    // Winkelausrichtung des zugehÃ¶rigen Labels im Layout
     StringProperty pLocLabelOrientationAngle = new StringProperty(this);
     pLocLabelOrientationAngle.setDescription(bundle.getString("element.locLabelOrientationAngle.text"));
     pLocLabelOrientationAngle.setHelptext(bundle.getString("element.locLabelOrientationAngle.helptext"));

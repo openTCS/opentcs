@@ -11,11 +11,12 @@ package org.opentcs.guing.util;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.ServiceLoader;
-import java.util.logging.Logger;
+import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.util.gui.plugins.PanelFactory;
+import org.opentcs.components.plantoverview.PluggablePanelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A registry for all plugin panel factories.
@@ -27,30 +28,31 @@ public class PanelRegistry {
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(PanelRegistry.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(PanelRegistry.class);
   /**
    * The registered factories.
    */
-  private final List<PanelFactory> factories = new LinkedList<>();
+  private final List<PluggablePanelFactory> factories = new LinkedList<>();
 
   /**
    * Creates a new instance.
    *
    * @param kernelProvider The shared kernel provider to be used.
+   * @param factories The factories.
    */
   @Inject
-  public PanelRegistry(SharedKernelProvider kernelProvider) {
+  @SuppressWarnings("deprecation")
+  public PanelRegistry(SharedKernelProvider kernelProvider, Set<PluggablePanelFactory> factories) {
     requireNonNull(kernelProvider, "kernelProvider");
+    requireNonNull(factories, "factories");
 
     // Auto-detect generic client panel factories.
-    for (PanelFactory factory : ServiceLoader.load(PanelFactory.class)) {
-      factory.setKernelProvider(kernelProvider);
-      factories.add(factory);
-      log.info("Found plugin panel factory: " + factory.getClass().getName());
+    for (PluggablePanelFactory factory : factories) {
+      LOG.info("Setting up plugin panel factory: {}", factory.getClass().getName());
+      this.factories.add(factory);
     }
-    if (factories.isEmpty()) {
-      log.info("No plugin panel factories found.");
+    if (this.factories.isEmpty()) {
+      LOG.info("No plugin panel factories found.");
     }
   }
 
@@ -59,7 +61,7 @@ public class PanelRegistry {
    *
    * @return The registered factories.
    */
-  public List<PanelFactory> getFactories() {
+  public List<PluggablePanelFactory> getFactories() {
     return new LinkedList<>(factories);
   }
 }

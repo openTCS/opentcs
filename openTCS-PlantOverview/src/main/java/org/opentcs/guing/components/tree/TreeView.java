@@ -19,15 +19,15 @@ import javax.swing.tree.TreeNode;
 import org.opentcs.guing.components.tree.elements.UserObject;
 
 /**
- * Ein Interface für die Baumansicht auf der linken Seite. Eine Baumansicht
+ * Ein Interface fÃ¼r die Baumansicht auf der linken Seite. Eine Baumansicht
  * verwaltet ein Modell, das eine Menge von DefaultMutableTreeNode-Objekten
  * besitzt. Jeder DefaultMutableTreeNode referenziert ein UserObject. Ein
- * UserObject kapselt ein richtiges Objekt (z.B. Article, Figure, ...). Es weiß,
+ * UserObject kapselt ein richtiges Objekt (z.B. Article, Figure, ...). Es weiÃŸ,
  * welche Methode der Applikation aufgerufen werden muss, wenn sein Objekt im
- * Baum selektiert, gelöscht oder doppelt angeklickt wird.
+ * Baum selektiert, gelÃ¶scht oder doppelt angeklickt wird.
  * <p>
  * <b>Entwurfsmuster:</b> Befehl. TreeView (bzw. eine Unterklasse) ist der
- * Auslöser für die Ausführung eines konkreten UserObjects, welches ja einen
+ * AuslÃ¶ser fÃ¼r die AusfÃ¼hrung eines konkreten UserObjects, welches ja einen
  * Befehl darstellt.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -36,7 +36,7 @@ import org.opentcs.guing.components.tree.elements.UserObject;
 public interface TreeView {
 
   /**
-   * Fügt dem Baum ein Item hinzu. Übergebenes Elternobjekt ist ein richtiges
+   * FÃ¼gt dem Baum ein Item hinzu. Ãœbergebenes Elternobjekt ist ein richtiges
    * Objekt, das im Baum gesucht werden muss. Item ist ein UserObject.
    *
    * @param parent
@@ -102,7 +102,7 @@ public interface TreeView {
   void setCursor(Cursor cursor);
 
   /**
-   * Löscht aus dem Baum ein Item. Item ist ein richtiges Objekt, d.h. kein
+   * LÃ¶scht aus dem Baum ein Item. Item ist ein richtiges Objekt, d.h. kein
    * DefaultMutableTreeNode und kein UserObject sondern beispielsweise ein
    * Article.
    *
@@ -134,8 +134,8 @@ public interface TreeView {
   void selectItems(Set items);
 
   /**
-   * Teilt dem Baum mit, dass sich die Eigenschaften des übergeben Objekts
-   * geändert haben und seine Darstellung aktualisiert werden muss. Item ist ein
+   * Teilt dem Baum mit, dass sich die Eigenschaften des Ã¼bergeben Objekts
+   * geÃ¤ndert haben und seine Darstellung aktualisiert werden muss. Item ist ein
    * richtiges Objekt, d.h. kein DefaultMutableTreeNode und kein UserObject
    * sondern beispielsweise ein Article.
    *

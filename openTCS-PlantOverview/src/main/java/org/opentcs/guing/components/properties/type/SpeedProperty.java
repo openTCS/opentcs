@@ -15,7 +15,7 @@ import java.util.List;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für Geschwindigkeitsangaben.
+ * Ein Attribut fÃ¼r Geschwindigkeitsangaben.
  * Beispiele: 1 m/s, 2.2 km/h
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -34,7 +34,7 @@ public class SpeedProperty
   }
 
   /**
-   * Konstruktor mit Wert und Maßeinheit.
+   * Konstruktor mit Wert und MaÃŸeinheit.
    *
    * @param model
    * @param value

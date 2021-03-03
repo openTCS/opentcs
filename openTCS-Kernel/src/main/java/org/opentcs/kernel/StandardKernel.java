@@ -8,6 +8,7 @@
  */
 package org.opentcs.kernel;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
 import java.awt.Color;
 import java.io.IOException;
@@ -16,9 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,13 +34,12 @@ import org.opentcs.access.TCSModelTransitionEvent;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.queries.Query;
-import org.opentcs.algorithms.KernelExtension;
-import org.opentcs.algorithms.Scheduler;
+import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.customizations.kernel.CentralEventHub;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.message.Message;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
 import org.opentcs.data.model.Location;
@@ -53,26 +54,21 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.user.UserPermission;
-import org.opentcs.drivers.CommunicationAdapter;
-import org.opentcs.drivers.CommunicationAdapterRegistry;
-import org.opentcs.drivers.LoadHandlingDevice;
-import org.opentcs.drivers.VehicleControllerPool;
-import org.opentcs.drivers.VehicleManagerPool;
-import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.persistence.OrderPersister;
-import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.configuration.ConfigurationStore;
-import org.opentcs.util.eventsystem.CentralEventHub;
+import org.opentcs.drivers.vehicle.LoadHandlingDevice;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventHub;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the standard openTCS kernel.
@@ -82,9 +78,6 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * <dt><b>messageBufferCapacity:</b></dt>
  * <dd>An integer defining the maximum number of messages to be kept in the
  * kernel's message buffer (default: 500).</dd>
- * <dt><b>defaultModel:</b></dt>
- * <dd>The name of the default model to load if told to do so via command line
- * (default: empty string).</dd>
  * </dl>
  * <hr>
  *
@@ -98,27 +91,12 @@ final class StandardKernel
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(StandardKernel.class.getName());
-  /**
-   * This class's ConfigurationStore.
-   */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(StandardKernel.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(StandardKernel.class);
   /**
    * Message for UnsupportedKernelOpExceptions thrown in user management
    * methods.
    */
-  private static final String msgUserManagementUnsupported
-      = "No user management in local kernel";
-  /**
-   * The persister loading and storing model data.
-   */
-  final ModelPersister modelPersister;
-  /**
-   * The persister loading and storing transport order data.
-   */
-  final OrderPersister orderPersister;
+  private static final String MSG_NO_USER_MANAGEMENT = "No user management in local kernel";
   /**
    * A map to state providers used when switching kernel states.
    */
@@ -137,13 +115,9 @@ final class StandardKernel
    */
   private final Object waitObject = new Object();
   /**
-   * This kernel's <em>terminated</em> flag.
+   * This kernel's <em>initialized</em> flag.
    */
-  private volatile boolean terminated;
-  /**
-   * Indicates whether the kernel has finished its shutdown sequence.
-   */
-  private volatile boolean terminationFinished;
+  private volatile boolean initialized;
   /**
    * The kernel implementing the actual functionality for the current mode.
    */
@@ -154,59 +128,60 @@ final class StandardKernel
    *
    * @param eventHub The central event hub to be used.
    * @param stateProviders The state map to be used.
-   * @param modelPersister The model persister to be used.
-   * @param orderPersister The order persister to be used.
    */
   @Inject
   StandardKernel(@CentralEventHub EventHub<TCSEvent> eventHub,
-                 Map<Kernel.State, Provider<KernelState>> stateProviders,
-                 ModelPersister modelPersister,
-                 OrderPersister orderPersister) {
-    log.finer("method entry");
-    this.eventHub = Objects.requireNonNull(eventHub, "eventHub is null");
-    this.stateProviders = Objects.requireNonNull(stateProviders,
-                                                 "stateProviders is null");
-    this.modelPersister = Objects.requireNonNull(modelPersister,
-                                                 "modelPersister is null");
-    this.orderPersister = Objects.requireNonNull(orderPersister,
-                                                 "orderPersister is null");
+                 Map<Kernel.State, Provider<KernelState>> stateProviders) {
+    this.eventHub = requireNonNull(eventHub, "eventHub");
+    this.stateProviders = requireNonNull(stateProviders, "stateProviders");
   }
 
   @Override
   public void initialize() {
+    if (initialized) {
+      LOG.debug("Already initialized, doing nothing.");
+      return;
+    }
     // First of all, start all kernel extensions that are already registered.
     for (KernelExtension extension : kernelExtensions) {
-      extension.plugIn();
+      LOG.debug("Initializing extension: {}", extension.getName());
+      extension.initialize();
     }
 
     // Initial state is modelling.
     setState(State.MODELLING);
 
-    log.fine("Starting kernel thread");
+    initialized = true;
+    LOG.debug("Starting kernel thread");
     Thread kernelThread = new Thread(this, "kernelThread");
     kernelThread.start();
   }
 
   @Override
-  public void waitForTermination() {
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  @Override
+  public void terminate() {
+    if (!initialized) {
+      LOG.debug("Not initialized, doing nothing.");
+      return;
+    }
+    // Note that the actual shutdown of extensions should happen when the kernel
+    // thread (see run()) finishes, not here.
+    // Set the terminated flag and wake up this kernel's thread.
+    initialized = false;
     synchronized (waitObject) {
-      while (!terminationFinished) {
-        try {
-          waitObject.wait(100);
-        }
-        catch (InterruptedException exc) {
-          log.log(Level.SEVERE, "Unexpectedly interrupted, ignored.", exc);
-        }
-      }
+      waitObject.notifyAll();
     }
   }
 
-  // Implementation of interface Runnable starts here.
   @Override
   public void run() {
     synchronized (waitObject) {
       // Wait until terminated.
-      while (!terminated) {
+      while (initialized) {
         try {
           waitObject.wait();
         }
@@ -215,28 +190,22 @@ final class StandardKernel
         }
       }
     }
-    log.info("Termination flag set, terminating...");
+    LOG.info("Termination flag set, terminating...");
     // Sleep a bit so clients have some time to receive an event for the
     // SHUTDOWN state change and shut down gracefully themselves.
-    try {
-      Thread.sleep(1000);
-    }
-    catch (InterruptedException exc) {
-      log.log(Level.SEVERE, "Unexpectedly interrupted, ignored.", exc);
-    }
+    Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
     // Shut down all kernel extensions.
-    log.fine("Shutting down kernel extensions...");
+    LOG.debug("Shutting down kernel extensions...");
     for (KernelExtension extension : kernelExtensions) {
-      extension.plugOut();
+      extension.terminate();
     }
-    log.info("Kernel thread finished.");
-    terminationFinished = true;
+    LOG.info("Kernel thread finished.");
   }
 
   // Implementation of interface Kernel starts here.
   @Override
   public Set<UserPermission> getUserPermissions() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return EnumSet.allOf(UserPermission.class);
   }
 
@@ -244,49 +213,48 @@ final class StandardKernel
   public void createUser(String userName, String userPassword,
                          Set<UserPermission> userPermissions)
       throws UnsupportedKernelOpException {
-    log.finer("method entry");
-    throw new UnsupportedKernelOpException(msgUserManagementUnsupported);
+    LOG.debug("method entry");
+    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   public void setUserPassword(String userName, String userPassword)
       throws UnsupportedKernelOpException {
-    log.finer("method entry");
-    throw new UnsupportedKernelOpException(msgUserManagementUnsupported);
+    LOG.debug("method entry");
+    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   public void setUserPermissions(String userName,
                                  Set<UserPermission> userPermissions)
       throws UnsupportedKernelOpException {
-    log.finer("method entry");
-    throw new UnsupportedKernelOpException(msgUserManagementUnsupported);
+    LOG.debug("method entry");
+    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   public void removeUser(String userName)
       throws UnsupportedKernelOpException {
-    log.finer("method entry");
-    throw new UnsupportedKernelOpException(msgUserManagementUnsupported);
+    LOG.debug("method entry");
+    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   public State getState() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getState();
   }
 
   @Override
   public void setState(State newState)
       throws IllegalArgumentException {
-    log.finer("method entry");
     Objects.requireNonNull(newState, "newState is null");
     final Kernel.State oldState;
     if (kernelState != null) {
       oldState = kernelState.getState();
       // Don't do anything if the new state is the same as the current one.
-      if (oldState.equals(newState)) {
-        log.warning("Already in state " + newState + ", doing nothing.");
+      if (oldState == newState) {
+        LOG.debug("Already in state '{}', doing nothing.", newState.name());
         return;
       }
       // Let listeners know we're in transition.
@@ -297,20 +265,18 @@ final class StandardKernel
     else {
       oldState = null;
     }
+    LOG.info("Switching kernel to state '{}'", newState.name());
     switch (newState) {
       case SHUTDOWN:
-        log.info("Switching kernel to state SHUTDOWN...");
         kernelState = stateProviders.get(Kernel.State.SHUTDOWN).get();
         kernelState.initialize();
         terminate();
         break;
       case MODELLING:
-        log.info("Switching kernel to state MODELLING...");
         kernelState = stateProviders.get(Kernel.State.MODELLING).get();
         kernelState.initialize();
         break;
       case OPERATING:
-        log.info("Switching kernel to state OPERATING...");
         kernelState = stateProviders.get(Kernel.State.OPERATING).get();
         kernelState.initialize();
         break;
@@ -318,7 +284,8 @@ final class StandardKernel
         throw new IllegalArgumentException("Unexpected state: " + newState);
     }
     emitStateEvent(oldState, newState, true);
-    publishMessage("Kernel is now in state " + newState, Message.Type.INFO);
+    publishUserNotification(new UserNotification("Kernel is now in state " + newState,
+                                                 UserNotification.Level.INFORMATIONAL));
   }
 
   @Override
@@ -326,68 +293,69 @@ final class StandardKernel
       TCSObjectReference<Vehicle> vRef,
       TCSObjectReference<Location> srcRef,
       Set<TCSObjectReference<Location>> destRefs) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTravelCosts(vRef, srcRef, destRefs);
   }
 
   @Override
-  public String getModelName()
+  public String getPersistentModelName()
       throws IOException {
-    log.finer("method entry");
-    return kernelState.getModelName().orElse(null);
+    LOG.debug("method entry");
+    return kernelState.getPersistentModelName().orElse(null);
   }
 
   @Override
-  public String getCurrentModelName() {
-    log.finer("method entry");
-    return kernelState.getCurrentModelName();
+  public String getLoadedModelName() {
+    LOG.debug("method entry");
+    return kernelState.getLoadedModelName();
   }
 
   @Override
   public void createModel(String modelName) {
-    log.finer("method entry");
-    final String oldModelName = kernelState.getCurrentModelName();
+    LOG.debug("method entry");
+    final String oldModelName = kernelState.getLoadedModelName();
     emitModelEvent(oldModelName, modelName, true, false);
     kernelState.createModel(modelName);
     emitModelEvent(oldModelName, modelName, true, true);
-    publishMessage("Kernel created model " + modelName, Message.Type.INFO);
+    publishUserNotification(new UserNotification("Kernel created model " + modelName,
+                                                 UserNotification.Level.INFORMATIONAL));
   }
 
   @Override
   public void loadModel()
       throws IOException {
-    log.finer("method entry");
-    final String oldModelName = kernelState.getCurrentModelName();
-    final String newModelName = kernelState.getModelName().orElse("");
+    LOG.debug("method entry");
+    final String oldModelName = kernelState.getLoadedModelName();
+    final String newModelName = kernelState.getPersistentModelName().orElse("");
     // Let listeners know we're in transition.
     emitModelEvent(oldModelName, newModelName, true, false);
     // Load the new model
     kernelState.loadModel();
-    // If loading the model was successful, remember it as the new default.
-    configStore.setString("defaultModel", newModelName);
     // Let listeners know we're done with the transition.
     emitModelEvent(oldModelName, newModelName, true, true);
-    publishMessage("Kernel loaded model " + newModelName, Message.Type.INFO);
+    publishUserNotification(new UserNotification("Kernel loaded model " + newModelName,
+                                                 UserNotification.Level.INFORMATIONAL));
   }
 
   @Override
   public void saveModel(String modelName)
       throws IOException {
-    log.finer("method entry");
-    final String oldModelName = kernelState.getCurrentModelName();
+    LOG.debug("method entry");
+    final String oldModelName = kernelState.getLoadedModelName();
     final String newModelName = (modelName == null) ? oldModelName : modelName;
     // Let listeners know we're in transition.
     emitModelEvent(oldModelName, newModelName, false, false);
     kernelState.saveModel(newModelName);
     // Let listeners know we're done with the transition.
     emitModelEvent(oldModelName, newModelName, false, true);
-    publishMessage("Kernel saved model " + newModelName, Message.Type.INFO);
+    publishUserNotification(new UserNotification("Kernel saved model " + newModelName,
+                                                 UserNotification.Level.INFORMATIONAL));
   }
 
   @Override
   public void removeModel()
       throws IOException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeModel();
   }
 
@@ -395,7 +363,7 @@ final class StandardKernel
   public <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                  TCSObjectReference<T> ref)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObject(clazz, ref);
   }
 
@@ -403,14 +371,14 @@ final class StandardKernel
   public <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                  String name)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObject(clazz, name);
   }
 
   @Override
   public <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObjects(clazz);
   }
 
@@ -418,8 +386,15 @@ final class StandardKernel
   public <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
                                                        Pattern regexp)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObjects(clazz, regexp);
+  }
+
+  @Override
+  public <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
+                                                       Predicate<? super T> predicate)
+      throws CredentialsException {
+    return kernelState.getTCSObjects(clazz, predicate);
   }
 
   @Override
@@ -427,7 +402,7 @@ final class StandardKernel
       Class<T> clazz,
       TCSObjectReference<T> ref)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObjectOriginal(clazz, ref);
   }
 
@@ -435,14 +410,14 @@ final class StandardKernel
   public <T extends TCSObject<T>> T getTCSObjectOriginal(Class<T> clazz,
                                                          String name)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObjectOriginal(clazz, name);
   }
 
   @Override
   public <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(Class<T> clazz)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObjectsOriginal(clazz);
   }
 
@@ -450,14 +425,14 @@ final class StandardKernel
   public <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(Class<T> clazz,
                                                                Pattern regexp)
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getTCSObjectsOriginal(clazz, regexp);
   }
 
   @Override
   public void renameTCSObject(TCSObjectReference<?> ref, String newName)
       throws CredentialsException, ObjectUnknownException, ObjectExistsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.renameTCSObject(ref, newName);
   }
 
@@ -465,33 +440,40 @@ final class StandardKernel
   public void setTCSObjectProperty(TCSObjectReference<?> ref, String key,
                                    String value)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTCSObjectProperty(ref, key, value);
   }
 
   @Override
   public void clearTCSObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.clearTCSObjectProperties(ref);
   }
 
   @Override
   public void removeTCSObject(TCSObjectReference<?> ref) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeTCSObject(ref);
   }
 
   @Override
-  public Message publishMessage(String message, Message.Type type) {
-    log.finer("method entry");
-    return kernelState.publishMessage(message, type);
+  public void publishUserNotification(UserNotification notification) {
+    LOG.debug("method entry");
+    kernelState.publishUserNotification(notification);
+  }
+
+  @Override
+  public List<UserNotification> getUserNotifications(Predicate<UserNotification> predicate)
+      throws CredentialsException {
+    LOG.debug("method entry");
+    return kernelState.getUserNotifications(predicate);
   }
 
   @Override
   public VisualLayout createVisualLayout()
       throws CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createVisualLayout();
   }
 
@@ -499,7 +481,7 @@ final class StandardKernel
   public void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                                     double scaleX)
       throws ObjectUnknownException, CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVisualLayoutScaleX(ref, scaleX);
   }
 
@@ -507,7 +489,7 @@ final class StandardKernel
   public void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                                     double scaleY)
       throws ObjectUnknownException, CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVisualLayoutScaleY(ref, scaleY);
   }
 
@@ -515,7 +497,7 @@ final class StandardKernel
   public void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                                     Map<String, Color> colors)
       throws ObjectUnknownException, CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVisualLayoutColors(ref, colors);
   }
 
@@ -523,7 +505,7 @@ final class StandardKernel
   public void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                       Set<LayoutElement> elements)
       throws ObjectUnknownException, CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVisualLayoutElements(ref, elements);
   }
 
@@ -531,20 +513,20 @@ final class StandardKernel
   public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                            List<ViewBookmark> bookmarks)
       throws ObjectUnknownException, CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVisualLayoutViewBookmarks(ref, bookmarks);
   }
 
   @Override
   public Point createPoint() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createPoint();
   }
 
   @Override
   public void setPointPosition(TCSObjectReference<Point> ref, Triple position)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPointPosition(ref, position);
   }
 
@@ -552,14 +534,14 @@ final class StandardKernel
   public void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                               double angle)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPointVehicleOrientationAngle(ref, angle);
   }
 
   @Override
   public void setPointType(TCSObjectReference<Point> ref, Point.Type newType)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPointType(ref, newType);
   }
 
@@ -567,28 +549,28 @@ final class StandardKernel
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createPath(srcRef, destRef);
   }
 
   @Override
   public void setPathLength(TCSObjectReference<Path> ref, long length)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPathLength(ref, length);
   }
 
   @Override
   public void setPathRoutingCost(TCSObjectReference<Path> ref, long cost)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPathRoutingCost(ref, cost);
   }
 
   @Override
   public void setPathMaxVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPathMaxVelocity(ref, velocity);
   }
 
@@ -596,20 +578,20 @@ final class StandardKernel
   public void setPathMaxReverseVelocity(TCSObjectReference<Path> ref,
                                         int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPathMaxReverseVelocity(ref, velocity);
   }
 
   @Override
   public void setPathLocked(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setPathLocked(ref, locked);
   }
 
   @Override
   public Vehicle createVehicle() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createVehicle();
   }
 
@@ -617,7 +599,7 @@ final class StandardKernel
   public void setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                     int energyLevel)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleEnergyLevel(ref, energyLevel);
   }
 
@@ -625,7 +607,7 @@ final class StandardKernel
   public void setVehicleEnergyLevelCritical(TCSObjectReference<Vehicle> ref,
                                             int energyLevel)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleEnergyLevelCritical(ref, energyLevel);
   }
 
@@ -633,7 +615,7 @@ final class StandardKernel
   public void setVehicleEnergyLevelGood(TCSObjectReference<Vehicle> ref,
                                         int energyLevel)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleEnergyLevelGood(ref, energyLevel);
   }
 
@@ -641,7 +623,7 @@ final class StandardKernel
   public void setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                           String rechargeOperation)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleRechargeOperation(ref, rechargeOperation);
   }
 
@@ -649,7 +631,7 @@ final class StandardKernel
   public void setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                             List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleLoadHandlingDevices(ref, devices);
   }
 
@@ -657,7 +639,7 @@ final class StandardKernel
   public void setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref,
                                     int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleMaxVelocity(ref, velocity);
   }
 
@@ -665,7 +647,7 @@ final class StandardKernel
   public void setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                            int velocity)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleMaxReverseVelocity(ref, velocity);
   }
 
@@ -673,7 +655,7 @@ final class StandardKernel
   public void setVehicleState(TCSObjectReference<Vehicle> ref,
                               Vehicle.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleState(ref, newState);
   }
 
@@ -681,22 +663,22 @@ final class StandardKernel
   public void setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                   Vehicle.ProcState newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleProcState(ref, newState);
   }
 
   @Override
   public void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
-                                     CommunicationAdapter.State newState)
+                                     VehicleCommAdapter.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleAdapterState(ref, newState);
   }
 
   @Override
   public void setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleLength(ref, length);
   }
 
@@ -704,7 +686,7 @@ final class StandardKernel
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehiclePosition(vehicleRef, pointRef);
   }
 
@@ -712,7 +694,7 @@ final class StandardKernel
   public void setVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleNextPosition(vehicleRef, pointRef);
   }
 
@@ -720,7 +702,7 @@ final class StandardKernel
   public void setVehiclePrecisePosition(TCSObjectReference<Vehicle> vehicleRef,
                                         Triple newPosition)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehiclePrecisePosition(vehicleRef, newPosition);
   }
 
@@ -728,7 +710,7 @@ final class StandardKernel
   public void setVehicleOrientationAngle(TCSObjectReference<Vehicle> vehicleRef,
                                          double angle)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleOrientationAngle(vehicleRef, angle);
   }
 
@@ -736,7 +718,7 @@ final class StandardKernel
   public void setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                        TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleTransportOrder(vehicleRef, orderRef);
   }
 
@@ -744,7 +726,7 @@ final class StandardKernel
   public void setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleOrderSequence(vehicleRef, seqRef);
   }
 
@@ -753,13 +735,13 @@ final class StandardKernel
       TCSObjectReference<Vehicle> vehicleRef,
       int index)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setVehicleRouteProgressIndex(vehicleRef, index);
   }
 
   @Override
   public LocationType createLocationType() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createLocationType();
   }
 
@@ -767,7 +749,7 @@ final class StandardKernel
   public void addLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addLocationTypeAllowedOperation(ref, operation);
   }
 
@@ -775,14 +757,14 @@ final class StandardKernel
   public void removeLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeLocationTypeAllowedOperation(ref, operation);
   }
 
   @Override
   public Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createLocation(typeRef);
   }
 
@@ -790,7 +772,7 @@ final class StandardKernel
   public void setLocationPosition(TCSObjectReference<Location> ref,
                                   Triple position)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setLocationPosition(ref, position);
   }
 
@@ -798,7 +780,7 @@ final class StandardKernel
   public void setLocationType(TCSObjectReference<Location> ref,
                               TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setLocationType(ref, typeRef);
   }
 
@@ -806,7 +788,7 @@ final class StandardKernel
   public void connectLocationToPoint(TCSObjectReference<Location> locRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.connectLocationToPoint(locRef, pointRef);
   }
 
@@ -814,7 +796,7 @@ final class StandardKernel
   public void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.disconnectLocationFromPoint(locRef, pointRef);
   }
 
@@ -823,7 +805,7 @@ final class StandardKernel
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addLocationLinkAllowedOperation(locRef, pointRef, operation);
   }
 
@@ -832,7 +814,7 @@ final class StandardKernel
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeLocationLinkAllowedOperation(locRef, pointRef, operation);
   }
 
@@ -840,13 +822,13 @@ final class StandardKernel
   public void clearLocationLinkAllowedOperations(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.clearLocationLinkAllowedOperations(locRef, pointRef);
   }
 
   @Override
   public Block createBlock() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createBlock();
   }
 
@@ -854,7 +836,7 @@ final class StandardKernel
   public void addBlockMember(TCSObjectReference<Block> ref,
                              TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addBlockMember(ref, newMemberRef);
   }
 
@@ -862,13 +844,13 @@ final class StandardKernel
   public void removeBlockMember(TCSObjectReference<Block> ref,
                                 TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeBlockMember(ref, rmMemberRef);
   }
 
   @Override
   public Group createGroup() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createGroup();
   }
 
@@ -876,7 +858,7 @@ final class StandardKernel
   public void addGroupMember(TCSObjectReference<Group> ref,
                              TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addGroupMember(ref, newMemberRef);
   }
 
@@ -884,13 +866,13 @@ final class StandardKernel
   public void removeGroupMember(TCSObjectReference<Group> ref,
                                 TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeGroupMember(ref, rmMemberRef);
   }
 
   @Override
   public StaticRoute createStaticRoute() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createStaticRoute();
   }
 
@@ -898,36 +880,20 @@ final class StandardKernel
   public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addStaticRouteHop(ref, newHopRef);
   }
 
   @Override
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.clearStaticRouteHops(ref);
   }
 
   @Override
-  public void attachResource(TCSResourceReference<?> resource,
-                             TCSResourceReference<?> newResource)
-      throws ObjectUnknownException {
-    log.finer("method entry");
-    kernelState.attachResource(resource, newResource);
-  }
-
-  @Override
-  public void detachResource(TCSResourceReference<?> resource,
-                             TCSResourceReference<?> rmResource)
-      throws ObjectUnknownException {
-    log.finer("method entry");
-    kernelState.detachResource(resource, rmResource);
-  }
-
-  @Override
   public TransportOrder createTransportOrder(List<Destination> destinations) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createTransportOrder(destinations);
   }
 
@@ -935,14 +901,14 @@ final class StandardKernel
   public void setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
                                         long deadline)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderDeadline(ref, deadline);
   }
 
   @Override
   public void activateTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.activateTransportOrder(ref);
   }
 
@@ -950,7 +916,7 @@ final class StandardKernel
   public void setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                      TransportOrder.State newState)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderState(ref, newState);
   }
 
@@ -959,7 +925,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderIntendedVehicle(orderRef, vehicleRef);
   }
 
@@ -968,7 +934,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderProcessingVehicle(orderRef, vehicleRef);
   }
 
@@ -977,7 +943,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderFutureDriveOrders(orderRef, newOrders);
   }
 
@@ -985,7 +951,7 @@ final class StandardKernel
   public void setTransportOrderInitialDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderInitialDriveOrder(ref);
   }
 
@@ -993,7 +959,7 @@ final class StandardKernel
   public void setTransportOrderNextDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderNextDriveOrder(ref);
   }
 
@@ -1002,7 +968,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> newDepRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addTransportOrderDependency(orderRef, newDepRef);
   }
 
@@ -1011,7 +977,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeTransportOrderDependency(orderRef, rmDepRef);
   }
 
@@ -1020,7 +986,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       Rejection newRejection)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addTransportOrderRejection(orderRef, newRejection);
   }
 
@@ -1029,7 +995,7 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderWrappingSequence(orderRef, seqRef);
   }
 
@@ -1038,27 +1004,27 @@ final class StandardKernel
       TCSObjectReference<TransportOrder> orderRef,
       boolean dispensable)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setTransportOrderDispensable(orderRef, dispensable);
   }
 
   @Override
   public OrderSequence createOrderSequence() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createOrderSequence();
   }
 
   @Override
   public void addOrderSequenceOrder(TCSObjectReference<OrderSequence> seqRef,
                                     TCSObjectReference<TransportOrder> orderRef) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.addOrderSequenceOrder(seqRef, orderRef);
   }
 
   @Override
   public void removeOrderSequenceOrder(TCSObjectReference<OrderSequence> seqRef,
                                        TCSObjectReference<TransportOrder> orderRef) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.removeOrderSequenceOrder(seqRef, orderRef);
   }
 
@@ -1066,19 +1032,19 @@ final class StandardKernel
   public void setOrderSequenceFinishedIndex(
       TCSObjectReference<OrderSequence> seqRef,
       int index) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setOrderSequenceFinishedIndex(seqRef, index);
   }
 
   @Override
   public void setOrderSequenceComplete(TCSObjectReference<OrderSequence> seqRef) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setOrderSequenceComplete(seqRef);
   }
 
   @Override
   public void setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setOrderSequenceFinished(seqRef);
   }
 
@@ -1086,7 +1052,7 @@ final class StandardKernel
   public void setOrderSequenceFailureFatal(
       TCSObjectReference<OrderSequence> seqRef,
       boolean fatal) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setOrderSequenceFailureFatal(seqRef, fatal);
   }
 
@@ -1094,7 +1060,7 @@ final class StandardKernel
   public void setOrderSequenceIntendedVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setOrderSequenceIntendedVehicle(seqRef, vehicleRef);
   }
 
@@ -1102,7 +1068,7 @@ final class StandardKernel
   public void setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setOrderSequenceProcessingVehicle(seqRef, vehicleRef);
   }
 
@@ -1111,122 +1077,95 @@ final class StandardKernel
                                      boolean immediateAbort,
                                      boolean disableVehicle)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.withdrawTransportOrder(ref, immediateAbort, disableVehicle);
   }
 
   @Override
-  public void withdrawTransportOrderByVehicle(
-      TCSObjectReference<Vehicle> vehicleRef,
-      boolean immediateAbort,
-      boolean disableVehicle)
+  public void withdrawTransportOrderByVehicle(TCSObjectReference<Vehicle> vehicleRef,
+                                              boolean immediateAbort,
+                                              boolean disableVehicle)
       throws ObjectUnknownException {
-    log.finer("method entry");
-    kernelState.withdrawTransportOrderByVehicle(vehicleRef,
-                                                immediateAbort,
-                                                disableVehicle);
+    LOG.debug("method entry");
+    kernelState.withdrawTransportOrderByVehicle(vehicleRef, immediateAbort, disableVehicle);
   }
 
   @Override
   public void dispatchVehicle(TCSObjectReference<Vehicle> vehicleRef,
                               boolean setIdleIfUnavailable) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.dispatchVehicle(vehicleRef, setIdleIfUnavailable);
+  }
+
+  @Override
+  public void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef)
+      throws ObjectUnknownException, CredentialsException {
+    LOG.debug("method entry");
+    kernelState.releaseVehicle(vehicleRef);
   }
 
   @Override
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef,
                                      Object message)
       throws ObjectUnknownException, CredentialsException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.sendCommAdapterMessage(vehicleRef, message);
   }
 
   @Override
   public List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws ObjectUnknownException, IOException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.createTransportOrdersFromScript(fileName);
   }
 
   @Override
-  public Set<TCSResource> expandResources(Set<TCSResourceReference> resources)
+  public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.expandResources(resources);
   }
 
   @Override
   public <T extends Query<T>> T query(Class<T> clazz) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.query(clazz);
   }
 
   @Override
   public double getSimulationTimeFactor() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getSimulationTimeFactor();
   }
 
   @Override
   public void setSimulationTimeFactor(double angle) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setSimulationTimeFactor(angle);
   }
 
   @Override
   public Set<ConfigurationItemTO> getConfigurationItems() {
-    log.finer("method entry");
+    LOG.debug("method entry");
     return kernelState.getConfigurationItems();
   }
 
   @Override
   public void setConfigurationItem(ConfigurationItemTO itemTO) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     kernelState.setConfigurationItem(itemTO);
   }
 
   @Override
-  public String getDefaultModelName() {
-    return configStore.getString("defaultModel", "");
-  }
-
-  @Override
-  public VehicleManagerPool getVehicleManagerPool() {
-    log.finer("method entry");
-    return kernelState.getVehicleManagerPool();
-  }
-
-  @Override
-  public VehicleControllerPool getVehicleControllerPool() {
-    log.finer("method entry");
-    return kernelState.getVehicleControllerPool();
-  }
-
-  @Override
-  public CommunicationAdapterRegistry getCommAdapterRegistry() {
-    log.finer("method entry");
-    return kernelState.getCommAdapterRegistry();
-  }
-
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "4.0.0")
-  public Scheduler getScheduler() {
-    log.finer("method entry");
-    return kernelState.getScheduler();
-  }
-
-  @Override
   public void addKernelExtension(final KernelExtension newExtension) {
-    log.fine("method entry");
+    LOG.debug("method entry");
     Objects.requireNonNull(newExtension, "newExtension is null");
     kernelExtensions.add(newExtension);
   }
 
   @Override
   public void removeKernelExtension(final KernelExtension rmExtension) {
-    log.fine("method entry");
+    LOG.debug("method entry");
     Objects.requireNonNull(rmExtension, "rmExtension is null");
     kernelExtensions.remove(rmExtension);
   }
@@ -1235,13 +1174,13 @@ final class StandardKernel
   @Override
   public void addEventListener(EventListener<TCSEvent> listener,
                                EventFilter<TCSEvent> filter) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     eventHub.addEventListener(listener, filter);
   }
 
   @Override
   public void removeEventListener(EventListener<TCSEvent> listener) {
-    log.finer("method entry");
+    LOG.debug("method entry");
     eventHub.removeEventListener(listener);
   }
 
@@ -1260,7 +1199,7 @@ final class StandardKernel
     TCSKernelStateEvent event = new TCSKernelStateEvent(leftState,
                                                         enteredState,
                                                         transitionFinished);
-    log.fine("Emitting kernel state event: " + event);
+    LOG.debug("Emitting kernel state event: " + event);
     eventHub.processEvent(event);
   }
 
@@ -1282,20 +1221,7 @@ final class StandardKernel
                                       enteredModelName,
                                       modelContentChanged,
                                       transitionFinished);
-    log.fine("Emitting model transition event: " + event);
+    LOG.debug("Emitting model transition event: " + event);
     eventHub.processEvent(event);
-  }
-
-  /**
-   * Terminates this Kernel.
-   */
-  private void terminate() {
-    // Note that the actual shutdown of extensions should happen when the kernel
-    // thread (see run()) finishes, not here.
-    // Set the terminated flag and wake up this kernel's thread.
-    terminated = true;
-    synchronized (waitObject) {
-      waitObject.notifyAll();
-    }
   }
 }

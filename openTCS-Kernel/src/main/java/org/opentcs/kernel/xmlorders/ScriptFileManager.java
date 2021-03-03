@@ -15,20 +15,20 @@ import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
-import org.opentcs.access.ApplicationHome;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.xmlorders.Destination;
-import org.opentcs.access.xmlorders.TCSScriptFile;
+import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.xmlorders.binding.Destination;
+import org.opentcs.kernel.xmlorders.binding.TCSScriptFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides helper methods for retrieving order script files.
@@ -40,8 +40,7 @@ public final class ScriptFileManager {
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(ScriptFileManager.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(ScriptFileManager.class);
   /**
    * The directory in which to look for scripts.
    */
@@ -207,7 +206,7 @@ public final class ScriptFileManager {
       writer.close();
     }
     catch (IOException exc) {
-      log.log(Level.WARNING, "Exception writing template script", exc);
+      LOG.warn("Exception writing template script", exc);
     }
   }
 }

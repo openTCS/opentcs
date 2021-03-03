@@ -21,12 +21,12 @@ import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {
+ * Ein CellEditor fÃ¼r Attribute vom Typ {
  *
  * @see SelectionProperty}. Der Editor besteht nur aus einer ComboBox, so dass
- * der Benutzer aus einer Liste von Werten einen Wert auswählen kann. Einen
+ * der Benutzer aus einer Liste von Werten einen Wert auswÃ¤hlen kann. Einen
  * Button mit drei Punkten, bei dessen Anklicken sich ein DetailsDialog zum
- * komfortablen Bearbeiten des Attributs öffnet, gibt es nicht.
+ * komfortablen Bearbeiten des Attributs Ã¶ffnet, gibt es nicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -60,12 +60,12 @@ public class SelectionPropertyCellEditor
   public Object getCellEditorValue() {
     JComboBox comboBox = (JComboBox) getComponent();
 
-    // Wenn das Objekt über den Popup-Dialog geändert wurde, wird dieser Wert übernommen
+    // Wenn das Objekt Ã¼ber den Popup-Dialog geÃ¤ndert wurde, wird dieser Wert Ã¼bernommen
     if (property().getChangeState() == ModelAttribute.ChangeState.DETAIL_CHANGED) {
-      Object value = property().getValue();	// DEBUG
+      Object value = property().getValue();  // DEBUG
     }
     else {
-      // ...sonst den Wert direkt im Tabellenfeld auswählen
+      // ...sonst den Wert direkt im Tabellenfeld auswÃ¤hlen
       Object selectedItem = comboBox.getSelectedItem();
       Object oldValue = property().getValue();
       property().setValue(selectedItem);

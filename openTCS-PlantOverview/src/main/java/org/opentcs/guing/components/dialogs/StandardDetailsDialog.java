@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.dialogs;
 
 import java.awt.Component;
@@ -23,9 +22,9 @@ import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 
 /**
- * Ein Dialog, in den eine Komponente vom Typ DialogContent zum Ändern von
+ * Ein Dialog, in den eine Komponente vom Typ DialogContent zum Ã„ndern von
  * Eigenschaftswerten hineingelegt werden.
- * Der Dialog verfügt über einen Ok- und einen Cancel-Button.
+ * Der Dialog verfÃ¼gt Ã¼ber einen Ok- und einen Cancel-Button.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -43,7 +42,7 @@ public class StandardDetailsDialog
   public static final int RET_OK = 1;
   private int returnStatus = RET_CANCEL;
   /**
-   * Die Komponente, die das Ändern eines Properties erlaubt.
+   * Die Komponente, die das Ã„ndern eines Properties erlaubt.
    */
   private final DetailsDialogContent fContent;
   private final Component fParentComponent;
@@ -56,7 +55,7 @@ public class StandardDetailsDialog
    * @param modal ob der Dialog modal sein soll
    */
   public StandardDetailsDialog(JPanel parent, boolean modal, DetailsDialogContent content) {
-		super(JOptionPane.getFrameForComponent(parent), modal);
+    super(JOptionPane.getFrameForComponent(parent), modal);
     fContent = content;
     fParentComponent = parent;
     initialize();
@@ -100,7 +99,7 @@ public class StandardDetailsDialog
   }
 
   /**
-   * Gibt zurück, ob der Benutzer den Ok- oder den Cancel-Button gedrückt hat,
+   * Gibt zurÃ¼ck, ob der Benutzer den Ok- oder den Cancel-Button gedrÃ¼ckt hat,
    * um dem Dialog zu beenden.
    *
    * @return the return status of this dialog - one of RET_OK or RET_CANCEL
@@ -164,14 +163,14 @@ public class StandardDetailsDialog
   // CHECKSTYLE:ON
 
   /**
-   * Wird aufgerufen, wenn der Nutzer den Cancel-Button drückt.
+   * Wird aufgerufen, wenn der Nutzer den Cancel-Button drÃ¼ckt.
    */
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
       doClose(RET_CANCEL);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
   /**
-   * Wird aufgerufen, wenn der Nutzer den OK-Button drückt.
+   * Wird aufgerufen, wenn der Nutzer den OK-Button drÃ¼ckt.
    */
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
       fContent.updateValues();
@@ -186,16 +185,16 @@ public class StandardDetailsDialog
     }//GEN-LAST:event_okButtonActionPerformed
 
   /**
-   * Schließt den Dialog.
+   * SchlieÃŸt den Dialog.
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;
 
     if (fParentComponent instanceof OpenTCSView
         && fContent.getProperty() instanceof SymbolProperty) {
-      ((OpenTCSView) fParentComponent).updateLocationThemes();      
+      ((OpenTCSView) fParentComponent).updateLocationThemes();
     }
-    else if(fParentComponent instanceof OpenTCSView
+    else if (fParentComponent instanceof OpenTCSView
         && fContent.getProperty() instanceof VehicleThemeProperty) {
       ((OpenTCSView) fParentComponent).updateVehicleThemes();
     }

@@ -17,8 +17,6 @@ import java.lang.annotation.Target;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.data.ObjectUnknownException;
@@ -27,6 +25,8 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.CyclicTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A task that periodically removes orders in a final state.
@@ -40,7 +40,7 @@ abstract class OrderCleanerTask
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(OrderCleanerTaskByAmount.class.getName());
+      = LoggerFactory.getLogger(OrderCleanerTaskByAmount.class);
   /**
    * The kernel we scan regularly.
    */
@@ -162,7 +162,7 @@ abstract class OrderCleanerTask
         return 1;
       }
       catch (ObjectUnknownException exc) {
-        log.log(Level.WARNING, "Order vanished", exc);
+        log.warn("Order vanished", exc);
         return 0;
       }
     }
@@ -251,7 +251,7 @@ abstract class OrderCleanerTask
         kernel().removeTCSObject(sequence.getReference());
       }
       catch (ObjectUnknownException exc) {
-        log.log(Level.WARNING, "Sequence vanished", exc);
+        log.warn("Sequence vanished", exc);
       }
       return result;
     }

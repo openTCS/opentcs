@@ -11,11 +11,12 @@ package org.opentcs.guing.exchange;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a kernel for clients in the plant overview application.
@@ -29,7 +30,7 @@ public class ApplicationKernelProvider
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(ApplicationKernelProvider.class.getName());
+      = LoggerFactory.getLogger(ApplicationKernelProvider.class);
   /**
    * The registered clients.
    */
@@ -64,7 +65,7 @@ public class ApplicationKernelProvider
     requireNonNull(client, "client");
 
     if (!kernelShared()) {
-      log.fine("Initiating kernel connection for new client...");
+      log.debug("Initiating kernel connection for new client...");
       connectKernel();
     }
     return clients.add(client);
@@ -76,7 +77,7 @@ public class ApplicationKernelProvider
 
     if (clients.remove(client)) {
       if (clients.isEmpty()) {
-        log.fine("Last client left. Terminating kernel connection...");
+        log.debug("Last client left. Terminating kernel connection...");
         kernelProxyManager.disconnect();
       }
       return true;

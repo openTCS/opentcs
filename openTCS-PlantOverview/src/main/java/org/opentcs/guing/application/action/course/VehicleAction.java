@@ -13,11 +13,10 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
@@ -29,6 +28,7 @@ import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.exchange.TransportOrderUtil;
+import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
@@ -36,6 +36,8 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.transport.LocationActionPanel;
 import org.opentcs.guing.transport.PointPanel;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Different actions are unified here. One can call this class to get
@@ -68,19 +70,35 @@ public class VehicleAction
    */
   public static final String WITHDRAW_TRANSPORT_ORDER = "course.vehicle.withdrawTransportOrder";
   /**
+   * Withdraws the current transport order from a vehicle immediately and sets its ProcState to
+   * UNAVAILABLE.
+   */
+  public static final String WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY = "course.vehicle.withdrawTransportOrderImmediately";
+  /**
    * Withdraws the current transport order from a vehicle and sets its
    * ProcState to UNAVAILABLE.
    */
   public static final String WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE = "course.vehicle.withdrawTransportOrderDisableVehicle";
   /**
+   * Withdraws the current transport order from a vehicle, disables it and resets its position.
+   */
+  public static final String RELEASE_VEHICLE = "course.vehicle.releaseVehicle";
+  /**
    * Dispatches the vehicle.
    */
   public static final String DISPATCH_VEHICLE = "course.vehicle.dispatchVehicle";
   /**
+   * Property key of the vehicle release confirmation text.
+   */
+  private static final String MESSAGE_CONFIRM_RELEASE_TEXT = "message.confirmVehicleRelease.text";
+  /**
+   * Property key of the vehicle release confirmation title.
+   */
+  private static final String MESSAGE_CONFIRM_RELEASE_TITLE = "message.confirmVehicleRelease.title";
+  /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(VehicleAction.class.getName());
+  private static final Logger log = LoggerFactory.getLogger(VehicleAction.class);
   /**
    * The vehicle.
    */
@@ -188,14 +206,14 @@ public class VehicleAction
 
         if (fDialog.getReturnStatus() == StandardContentDialog.RET_OK) {
           LocationModel location = contentPanel.getSelectedLocation();
-          List<LocationModel> locations = new ArrayList<>();
-          locations.add(location);
+          List<AbstractFigureComponent> destinationModels = new ArrayList<>();
+          destinationModels.add(location);
           List<String> actions = new ArrayList<>();
           actions.add(contentPanel.getSelectedAction());
-          orderUtil.createTransportOrder(locations,
-                                                 actions,
-                                                 System.currentTimeMillis(),
-                                                 fVehicle);
+          orderUtil.createTransportOrder(destinationModels,
+                                         actions,
+                                         System.currentTimeMillis(),
+                                         fVehicle);
         }
       }
     }
@@ -204,7 +222,15 @@ public class VehicleAction
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), false, false);
       }
       catch (KernelRuntimeException e) {
-        log.log(Level.WARNING, "Unexpected exception", e);
+        log.warn("Unexpected exception", e);
+      }
+    }
+    else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY + ".text"))) {
+      try {
+        kernel().withdrawTransportOrderByVehicle(vehicleReference(), true, true);
+      }
+      catch (KernelRuntimeException e) {
+        log.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE + ".text"))) {
@@ -212,7 +238,22 @@ public class VehicleAction
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), false, true);
       }
       catch (KernelRuntimeException e) {
-        log.log(Level.WARNING, "Unexpected exception", e);
+        log.warn("Unexpected exception", e);
+      }
+    }
+    else if (evt.getActionCommand().equals(labels.getString(RELEASE_VEHICLE + ".text"))) {
+      if (JOptionPane.showConfirmDialog(
+          view,
+          labels.getString(MESSAGE_CONFIRM_RELEASE_TEXT) + " " + vehicleReference().getName(),
+          labels.getString(MESSAGE_CONFIRM_RELEASE_TITLE),
+          JOptionPane.YES_NO_OPTION)
+          == JOptionPane.YES_OPTION) {
+        try {
+          kernel().releaseVehicle(vehicleReference());
+        }
+        catch (KernelRuntimeException e) {
+          log.warn("Unexpected exception", e);
+        }
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(DISPATCH_VEHICLE + ".text"))) {
@@ -220,7 +261,7 @@ public class VehicleAction
         kernel().dispatchVehicle(vehicleReference(), true);
       }
       catch (KernelRuntimeException e) {
-        log.log(Level.WARNING, "Unexpected exception", e);
+        log.warn("Unexpected exception", e);
       }
     }
   }

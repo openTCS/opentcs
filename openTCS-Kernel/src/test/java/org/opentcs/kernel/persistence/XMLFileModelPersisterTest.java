@@ -17,10 +17,10 @@ import java.util.regex.Pattern;
 import javax.inject.Provider;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
+import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
@@ -147,7 +147,7 @@ public class XMLFileModelPersisterTest {
     persister.saveModel(createTestModel(MODEL_NAME), MODEL_NAME);
     deleteBackups();
     persister.removeModel();
-    assertFalse(persister.getModelName().isPresent());
+    assertFalse(persister.getPersistentModelName().isPresent());
   }
 
   @Test
@@ -155,10 +155,10 @@ public class XMLFileModelPersisterTest {
   public void testSavedModelNameShouldBeAsSpecified()
       throws IOException {
     persister.saveModel(createTestModel(MODEL_NAME), OTHER_MODEL_NAME);
-    assertEquals(OTHER_MODEL_NAME, persister.getModelName().orElse(null));
+    assertEquals(OTHER_MODEL_NAME, persister.getPersistentModelName().orElse(null));
     deleteBackups();
     persister.saveModel(createTestModel(MODEL_NAME), null);
-    assertEquals(MODEL_NAME, persister.getModelName().orElse(null));
+    assertEquals(MODEL_NAME, persister.getPersistentModelName().orElse(null));
   }
 
   @Test

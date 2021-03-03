@@ -20,7 +20,7 @@ import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repr‰sentation eines Links in der Baumansicht.
+ * Die Repr√§sentation eines Links in der Baumansicht.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

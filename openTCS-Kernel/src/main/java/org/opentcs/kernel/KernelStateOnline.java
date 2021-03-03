@@ -10,15 +10,16 @@ package org.opentcs.kernel;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.kernel.workingset.MessageBuffer;
+import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The base class for the kernel's online states.
@@ -31,8 +32,7 @@ abstract class KernelStateOnline
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(KernelStateOnline.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(KernelStateOnline.class);
   /**
    * Whether to save the model when this state is terminated.
    */
@@ -41,21 +41,20 @@ abstract class KernelStateOnline
   /**
    * Creates a new instance.
    *
-   * @param kernel The kernel.
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param objectPool The object pool to be used.
    * @param model The model to be used.
    * @param messageBuffer The message buffer to be used.
-   * @param saveModelOnTerminate Whether to save the model when this state is
-   * terminated.
+   * @param modelPersister The model persister to be used.
+   * @param saveModelOnTerminate Whether to save the model when this state is terminated.
    */
-  public KernelStateOnline(StandardKernel kernel,
-                           Object globalSyncObject,
+  public KernelStateOnline(Object globalSyncObject,
                            TCSObjectPool objectPool,
                            Model model,
-                           MessageBuffer messageBuffer,
+                           NotificationBuffer messageBuffer,
+                           ModelPersister modelPersister,
                            boolean saveModelOnTerminate) {
-    super(kernel, globalSyncObject, objectPool, model, messageBuffer);
+    super(globalSyncObject, objectPool, model, messageBuffer, modelPersister);
     this.saveModelOnTerminate = saveModelOnTerminate;
   }
 
@@ -66,7 +65,7 @@ abstract class KernelStateOnline
         saveModel(null);
       }
       catch (IOException exc) {
-        log.log(Level.WARNING, "Could not save model on termination", exc);
+        LOG.warn("Could not save model on termination", exc);
       }
     }
   }
@@ -74,8 +73,8 @@ abstract class KernelStateOnline
   @Override
   public void saveModel(String modelName)
       throws IOException {
-    synchronized (globalSyncObject) {
-      kernel.modelPersister.saveModel(model, modelName);
+    synchronized (getGlobalSyncObject()) {
+      getModelPersister().saveModel(getModel(), modelName);
     }
   }
 
@@ -83,8 +82,8 @@ abstract class KernelStateOnline
   public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                            List<ViewBookmark> bookmarks)
       throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      model.setVisualLayoutViewBookmarks(ref, bookmarks);
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVisualLayoutViewBookmarks(ref, bookmarks);
     }
   }
 

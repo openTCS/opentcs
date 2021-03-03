@@ -26,27 +26,23 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.xmlstatus.OrderStatusMessage;
-import org.opentcs.access.xmlstatus.StatusMessage;
-import org.opentcs.access.xmlstatus.TCSStatusMessageSet;
-import org.opentcs.access.xmlstatus.VehicleStatusMessage;
-import org.opentcs.algorithms.KernelExtension;
+import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.data.TCSObjectEvent;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.xmlstatus.binding.OrderStatusMessage;
+import org.opentcs.kernel.xmlstatus.binding.StatusMessage;
+import org.opentcs.kernel.xmlstatus.binding.TCSStatusMessageSet;
+import org.opentcs.kernel.xmlstatus.binding.VehicleStatusMessage;
 import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An instance of this class accepts TCP connections from clients that wish to
@@ -65,8 +61,7 @@ public class StatusMessageDispatcher
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(StatusMessageDispatcher.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(StatusMessageDispatcher.class);
   /**
    * The port on which to listen for connections.
    */
@@ -107,12 +102,12 @@ public class StatusMessageDispatcher
   }
 
   @Override
-  public boolean isPluggedIn() {
+  public boolean isInitialized() {
     return enabled;
   }
 
   @Override
-  public void plugIn() {
+  public void initialize() {
     if (enabled) {
       return;
     }
@@ -121,11 +116,11 @@ public class StatusMessageDispatcher
         = new Thread(connectionListener, "statusMessageListenerThread");
     connectionListenerThread.start();
     enabled = true;
-    log.fine("StatusMessageDispatcher enabled");
+    LOG.debug("StatusMessageDispatcher enabled");
   }
 
   @Override
-  public void plugOut() {
+  public void terminate() {
     if (!enabled) {
       return;
     }
@@ -139,7 +134,7 @@ public class StatusMessageDispatcher
   @BindingAnnotation
   @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
   @Retention(RetentionPolicy.RUNTIME)
-  static @interface ListenPort {
+  public static @interface ListenPort {
     // Nothing here.
   }
 
@@ -149,14 +144,14 @@ public class StatusMessageDispatcher
   @BindingAnnotation
   @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
   @Retention(RetentionPolicy.RUNTIME)
-  static @interface MessageSeparator {
+  public static @interface MessageSeparator {
     // Nothing here.
   }
 
   /**
    * The task listening for new client connections.
    */
-  private final class ConnectionListener
+  private class ConnectionListener
       implements Runnable {
 
     /**
@@ -188,7 +183,7 @@ public class StatusMessageDispatcher
           serverSocket.close();
         }
         catch (IOException exc) {
-          log.log(Level.WARNING, "Exception closing server socket", exc);
+          LOG.warn("Exception closing server socket", exc);
         }
       }
     }
@@ -202,13 +197,11 @@ public class StatusMessageDispatcher
         terminated = false;
         while (!terminated) {
           Socket clientSocket = serverSocket.accept();
-          log.fine("Connection from "
-              + clientSocket.getInetAddress().getHostAddress() + ":"
-              + clientSocket.getPort());
-          ConnectionHandler newHandler = new ConnectionHandler(clientSocket,
-                                                               localKernel);
-          localKernel.addEventListener(newHandler,
-                                       new AcceptingTCSEventFilter());
+          LOG.debug("Connection from {}:{}",
+                    clientSocket.getInetAddress().getHostAddress(),
+                    clientSocket.getPort());
+          ConnectionHandler newHandler = new ConnectionHandler(clientSocket, localKernel);
+          localKernel.addEventListener(newHandler, new AcceptingTCSEventFilter());
           clientExecutor.execute(newHandler);
           runningHandlers.add(newHandler);
           // Forget any handlers that have terminated since the last run.
@@ -224,16 +217,14 @@ public class StatusMessageDispatcher
       catch (SocketException exc) {
         // Check if we're supposed to terminate.
         if (terminated) {
-          log.fine("Received termination signal.");
+          LOG.debug("Received termination signal.");
         }
         else {
-          log.log(Level.WARNING,
-                  "SocketException without termination flag set",
-                  exc);
+          LOG.warn("SocketException without termination flag set", exc);
         }
       }
       catch (IOException exc) {
-        log.log(Level.WARNING, "IOException handling server socket", exc);
+        LOG.warn("IOException handling server socket", exc);
       }
       finally {
         clientExecutor.shutdown();
@@ -242,7 +233,7 @@ public class StatusMessageDispatcher
             serverSocket.close();
           }
           catch (IOException exc) {
-            log.log(Level.SEVERE, "Couldn't close server socket", exc);
+            LOG.error("Couldn't close server socket", exc);
           }
         }
         // Terminate all handlers that may still be running.
@@ -251,7 +242,7 @@ public class StatusMessageDispatcher
           handler.terminate();
         }
       }
-      log.fine("Terminated connection listener.");
+      LOG.debug("Terminated connection listener.");
     }
   }
 
@@ -259,7 +250,8 @@ public class StatusMessageDispatcher
    * The task handling client connections.
    */
   private final class ConnectionHandler
-      implements Runnable, EventListener<TCSEvent> {
+      implements Runnable,
+                 EventListener<TCSEvent> {
 
     /**
      * The connection to the client.
@@ -336,53 +328,16 @@ public class StatusMessageDispatcher
         while (!terminated) {
           TCSObjectEvent event = getNextEventFromQueue();
           if (!terminated && event != null) {
-            Class<?> eventObjectClass
-                = event.getCurrentOrPreviousObjectState().getClass();
+            Class<?> eventObjectClass = event.getCurrentOrPreviousObjectState().getClass();
             TCSStatusMessageSet messageSet = new TCSStatusMessageSet();
             StatusMessage message = null;
             if (eventObjectClass.equals(TransportOrder.class)) {
-              TransportOrder order
-                  = (TransportOrder) event.getCurrentOrPreviousObjectState();
-              OrderStatusMessage orderMessage = new OrderStatusMessage();
-              orderMessage.setOrderName(order.getName());
-              orderMessage.setOrderState(order.getState());
-              for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
-                OrderStatusMessage.Destination dest
-                    = new OrderStatusMessage.Destination();
-                dest.setLocationName(
-                    curDriveOrder.getDestination().getLocation().getName());
-                dest.setOperation(curDriveOrder.getDestination().getOperation());
-                dest.setState(curDriveOrder.getState());
-                orderMessage.getDestinations().add(dest);
-                message = orderMessage;
-              }
+              message = OrderStatusMessage.fromTransportOrder(
+                  (TransportOrder) event.getCurrentOrPreviousObjectState());
             }
             else if (eventObjectClass.equals(Vehicle.class)) {
-              Vehicle vehicle
-                  = (Vehicle) event.getCurrentOrPreviousObjectState();
-              VehicleStatusMessage vehicleMessage = new VehicleStatusMessage();
-              // Set vehicle name
-              vehicleMessage.setVehicleName(vehicle.getName());
-              // Set position
-              TCSObjectReference<Point> posRef = vehicle.getCurrentPosition();
-              if (posRef != null) {
-                vehicleMessage.setPosition(posRef.getName());
-              }
-              // Set vehicle state
-              Vehicle.State state = vehicle.getState();
-              vehicleMessage.setState(state);
-              // Set vehciel processing state
-              Vehicle.ProcState procState = vehicle.getProcState();
-              vehicleMessage.setProcState(procState);
-              // Set presice position
-              Triple precisePos = vehicle.getPrecisePosition();
-              if (precisePos != null) {
-                VehicleStatusMessage.PrecisePosition precisePosElement;
-                precisePosElement = new VehicleStatusMessage.PrecisePosition(
-                    precisePos.getX(), precisePos.getY(), precisePos.getZ());
-                vehicleMessage.setPrecisePosition(precisePosElement);
-              }
-              message = vehicleMessage;
+              message = VehicleStatusMessage.fromVehicle(
+                  (Vehicle) event.getCurrentOrPreviousObjectState());
             }
             if (message != null) {
               messageSet.getStatusMessages().add(message);
@@ -392,10 +347,10 @@ public class StatusMessageDispatcher
             }
           }
         }
-        log.fine("Terminating connection handler");
+        LOG.debug("Terminating connection handler");
       }
       catch (IOException exc) {
-        log.log(Level.WARNING, "Exception terminates connection handler", exc);
+        LOG.warn("Exception terminates connection handler", exc);
         terminated = true;
       }
       finally {
@@ -420,7 +375,7 @@ public class StatusMessageDispatcher
             eventQueue.wait();
           }
           catch (InterruptedException exc) {
-            log.log(Level.WARNING, "Unexpectedly interrupted, ignoring", exc);
+            LOG.warn("Unexpectedly interrupted, ignoring", exc);
           }
         }
         TCSEvent event = eventQueue.poll();
@@ -446,10 +401,10 @@ public class StatusMessageDispatcher
           socket.close();
         }
         catch (IOException exc) {
-          log.log(Level.WARNING, "Exception closing socket, ignored", exc);
+          LOG.warn("Exception closing socket, ignored", exc);
         }
       }
-      log.fine("Unregistering from event source");
+      LOG.debug("Unregistering from event source");
       eventSource.removeEventListener(this);
     }
   }

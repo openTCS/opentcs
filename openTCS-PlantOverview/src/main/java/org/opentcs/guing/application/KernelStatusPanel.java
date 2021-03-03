@@ -10,14 +10,16 @@ package org.opentcs.guing.application;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 import static java.util.Objects.requireNonNull;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
-import org.opentcs.data.message.Message;
+import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.util.MessageDisplay;
 
 /**
@@ -31,10 +33,12 @@ public class KernelStatusPanel
     implements MessageDisplay {
 
   /**
-   * Formats time stamps for messages.
+   * Formats time stamps.
    */
-  private static final DateFormat format
-      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private static final DateTimeFormatter dateFormat = DateTimeFormatter
+      .ofLocalizedDateTime(FormatStyle.SHORT)
+      .withLocale(Locale.getDefault())
+      .withZone(ZoneId.systemDefault());
   /**
    * A text area for the output.
    */
@@ -50,14 +54,15 @@ public class KernelStatusPanel
   /**
    * Logs a message to the status text area.
    *
-   * @param message The message to log.
+   * @param notification The message to log.
    */
   @Override
-  public void display(Message message) {
-    requireNonNull(message, "message");
+  public void display(UserNotification notification) {
+    requireNonNull(notification, "message");
 
-    statusTextArea.append(format.format(message.getTimestamp()) + " "
-        + message.getType() + ": " + message.getMessage() + "\n");
+    statusTextArea.append(dateFormat.format(notification.getTimestamp()) + " "
+        + notification.getLevel() + ": [" + notification.getSource() + "] "
+        + notification.getText() + "\n");
     statusTextArea.setCaretPosition(statusTextArea.getDocument().getLength());
   }
 

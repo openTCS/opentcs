@@ -286,7 +286,7 @@ public class ConnectToServerDialog
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-	private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+  private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
     host = textFieldServer.getText();
     try {
       port = Integer.parseInt(textFieldPort.getText());
@@ -318,11 +318,11 @@ public class ConnectToServerDialog
       handleError();
       textFieldServer.setText(host);
     }
-	}//GEN-LAST:event_okButtonActionPerformed
+  }//GEN-LAST:event_okButtonActionPerformed
 
-	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     doClose(RET_CANCEL);
-	}//GEN-LAST:event_cancelButtonActionPerformed
+  }//GEN-LAST:event_cancelButtonActionPerformed
 
   private void cbComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbComboBoxActionPerformed
     DefaultComboBoxModel<ConnectionParamSet> model

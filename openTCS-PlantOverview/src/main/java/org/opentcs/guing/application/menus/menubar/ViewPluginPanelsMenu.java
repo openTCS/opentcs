@@ -14,13 +14,13 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.access.Kernel;
+import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.view.AddPluginPanelAction;
 import org.opentcs.guing.components.dockable.DockingManager;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.gui.plugins.PanelFactory;
 
 /**
  *
@@ -74,7 +74,7 @@ public class ViewPluginPanelsMenu
 
     removeAll();
 
-    for (final PanelFactory factory : panelRegistry.getFactories()) {
+    for (final PluggablePanelFactory factory : panelRegistry.getFactories()) {
       if (factory.providesPanel(equivalentState)) {
         String title = factory.getPanelDescription();
         final JCheckBoxMenuItem utilMenuItem = new JCheckBoxMenuItem();

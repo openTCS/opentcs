@@ -15,7 +15,7 @@ import java.util.List;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut f¸r Winkelangaben.
+ * Ein Attribut f√ºr Winkelangaben.
  * Beispiele: 0.1 rad, 30 deg
  *
  * @author Heinz Huber (Fraunhofer IML)
@@ -34,7 +34,7 @@ public class AngleProperty
   }
 
   /**
-   * Konstruktor mit Wert und Maﬂeinheit.
+   * Konstruktor mit Wert und Ma√üeinheit.
    *
    * @param model
    * @param value

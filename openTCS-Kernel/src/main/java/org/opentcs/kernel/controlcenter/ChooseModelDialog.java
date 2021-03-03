@@ -2,9 +2,10 @@ package org.opentcs.kernel.controlcenter;
 
 import java.awt.event.ItemEvent;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.swing.JDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A dialog for the user to choose a model to load and the mode the kernel
@@ -20,7 +21,7 @@ public class ChooseModelDialog
    * This class's logger.
    */
   private static final Logger log =
-      Logger.getLogger(ChooseModelDialog.class.getName());
+      LoggerFactory.getLogger(ChooseModelDialog.class);
   /**
    * Flag whether user wants to stay in modeling mode or not.
    */

@@ -18,8 +18,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.opentcs.guing.components.tree.elements.UserObject;
 
 /**
- * Ein CellRenderer für die Knoten der Baumansicht, die über spezielle Icons
- * verfügen.
+ * Ein CellRenderer fÃ¼r die Knoten der Baumansicht, die Ã¼ber spezielle Icons
+ * verfÃ¼gen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

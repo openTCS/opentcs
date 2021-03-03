@@ -1,0 +1,277 @@
+= openTCS: Release Notes
+The openTCS developers <info@opentcs.org>
+openTCS {project-version}
+:last-update-label!:
+
+== Introduction
+
+openTCS (short for "open Transportation Control System") is a free platform for controlling vehicles in an Automated Guided Vehicle System (AGVS).
+It should generally be possible to control any track-guided vehicle with it, even if the tracks are only virtual, but AGVSs are the main target.
+It is being maintained at the Fraunhofer Institute for Material Flow and Logistics in Dortmund, Germany.
+
+The software runs on the Java platform (version 1.8 or later).
+All libraries required for compiling and/or using it are freely available, too.
+
+openTCS itself is not a complete product you can use "out-of-the-box" to control an AGVS with.
+Primarily, It is a framework/an implementation of the basic data structures and algorithms (routing, dispatching, scheduling) needed for running an AGVS with more than one vehicle.
+It tries to be as generic as possible to allow interoperation with track-guided vehicles of practically any vendor.
+Thus it is usually necessary to at least create and integrate a vehicle driver (called "communication adapter" in openTCS-speak) that translates between the abstract interface of the openTCS kernel and the communication protocol your vehicle understands.
+Depending on your needs, it might also be necessary to adapt algorithms or add project-specific strategies.
+
+The openTCS source code is licensed partly under the terms of the MIT License and partly under the terms of the GNU Lesser General Public License.
+A copy of the licenses is included in the distribution.
+For details on the licensing, see the file `LICENSE.txt`.
+
+Please note that openTCS is distributed without any warranty - without even the implied warranty of merchantibility or fitness for a particular purpose.
+Please refer to the license for details.
+
+We are grateful to any developers that have contributed to openTCS.
+A list of all contributors known by name can be found at the end of this document.
+
+To download the latest version and/or read news about openTCS, please see its web site at http://www.opentcs.org/ or the project homepage at http://sourceforge.net/projects/opentcs/.
+
+== Getting started
+
+To get started with openTCS, please refer to the user's guide, the developer's guide and the JavaDoc API documentation that are included in the distribution.
+
+== Support
+
+Please note that, while we are happy to be able to release openTCS to the public as free software and would like to see it used and improved continuously, the development team cannot provide unlimited free support for it.
+
+If you have technical/support questions, please post them in the forum on the project's homepage, where the community and the developers involved will respond as time permits.
+For customers, Fraunhofer IML also provides support via e-mail or telephone - please contact us via info@opentcs.org.
+
+Legal notice:
+This announcement of possible supporting services is not intended to create any binding or legal obligations or an obligation on entering any contract.
+It does not impose any duty on Fraunhofer IML to disclose any information nor to enter into any individual agreement or obligation.
+
+== Changelog
+
+This changelog lists the most relevant changes for past releases in reverse chronological order.
+
+=== Version 4.0 (2017-02-11)
+
+* Split the base library into a base API, an injection API and a library with commonly used utility classes to reduce the load of transitive dependencies for API users.
+* Heavily cleaned up the APIs, including some backwards-incompatible changes (mainly renaming and removing previously deprecated elements).
+  Notable examples:
+** Moved vehicle communication adapter base classes to `org.opentcs.drivers.vehicle` and named them more appropriately.
+** Removed TCP/IP communication implementation from `org.opentcs.util.communication.tcp` and a few more utility classes.
+   Maintaining these is out of the openTCS project's scope.
+* Greatly improved extension and customization capabilities for both the kernel and plant overview applications by applying dependency injection in more places.
+** Communication adapters may now participate with dependency injection.
+** Default kernel strategies may now easily be overridden.
+* Simplified the default `Scheduler` implementation.
+* Switched logging to SLF4J.
+* Improved project documentation for both users and developers and migrated to Asciidoctor for easier maintenance.
+* Updated Guice to 4.1.0.
+* Updated Guava to 19.0.
+* Updated JDOM to 2.0.6.
+* Updated Gradle to 2.13.
+* Many small bugfixes and improvements.
+
+=== Version 3.2 (2016-01-19)
+
+* Switched to Gradle as the build management system for improved dependency management and release process.
+This introduces cleanly separate subprojects for base library, basic strategies library, kernel application, plant overview application and documentation.
+It also adds clean separation of application code and Guice configuration.
+* Added an event bus-backed event hub implementation for the kernel to distribute events sent by e.g. communication adapters and make it possible to forward them to kernel clients.
+Also add method `publishEvent()` to `BasicCommunicationAdapter` to allow communication adapters to use it.
+* Adjusted the dispatcher's and kernel's methods for withdrawing transport orders to explicitly state whether the order should be withdrawn regularly or aborted immediately, which makes them deterministic for the caller.
+* Moved code for handling transport order states/activations from the kernel to the dispatcher implementation for better separation of concerns.
+* Improved the use of dependency injection via Guice in the kernel to make the code more modular.
+* Added annotation `@ScheduledApiChange` for marking scheduled incompatible API changes.
+* Updated library Guava to 18.0.
+* Many small fixes and improvements.
+
+=== Version 3.1.1 (2015-05-06)
+
+* Fix a crash in the plant overview client that occured when the user tried to add a drive order to a transport order.
+
+=== Version 3.1 (2015-03-23)
+
+* Fix the encoding of model files written by the plant overview client.
+* Fix a problem with renaming points that resulted in broken model files.
+* Fix a crash that happened when trying to open a context menu on a vehicle in modelling mode.
+* Properly set the scale factor when loading a model from a file.
+* Avoid a crash when trying to create a transport order with a model that does not contain any locations/transport order destinations.
+* Fix direction indicators of paths not being displayed properly after loading a model from a file.
+* Fix outdated documentation in a couple of places.
+
+=== Version 3.0 (2014-11-25)
+
+* The plant overview client can now be used for offline modelling, i.e. without requiring a permanent connection to the kernel.
+* To further reflect these changes, the plant overview client now maintains its operating mode independently from the kernel's state.
+If the user sets the mode of the plant overview client to `OPERATING` while the kernel is in modelling mode, an empty model will be displayed and the actual model will be loaded as soon as the connected kernel switches back to operating mode.
+Furthermore, this allows to modify the driving course model in the plant overview client while the kernel remains in operating mode.
+See the manual for more information.
+* The management of course model files was moved to the plant overview client.
+As of this version, the kernel stores only a single driving course model which can be persisted by selecting the corresponding menu item in the graphical user interface of the plant overview client.
+Changes made to the model in the plant overview client must be explicitly transferred to the kernel.
+To migrate all of your existing models to this new version, please refer to the manual.
+* Changes made to the Kernel API:
+** Method `Set<String> getModelNames()` was changed to `String getModelName()`, as from now on there exists only one model at a time.
+** Method `loadModel(String modelName)` no longer requires/accepts a parameter.
+** Method `saveModel(String modelName, boolean overwrite)` no longer accepts the `boolean` parameter and overwrites the model automatically.
+** Method `removeModel(String rmName)` no longer requires/accepts a parameter.
+** Methods `createLayout(byte[] layoutData)` and `setLayoutData(TCSObjectReference<Layout> ref, byte[] newData)` have been removed along with class `Layout`.
+* Updated library Google Guava to 17.0.
+* Updated library JAXB to 2.2.7.
+* Updated project to Java 8.
+
+=== Version 2.7.1 (2014-06-30)
+
+* Fixed a potential crash with switching to plant operation mode when the model contained static routes.
+
+=== Version 2.7 (2014-06-25)
+
+* Updated library Docking Frames to 1.1.2p11.
+* Added library Google Guava 16.0.1 for better code readability via small utility methods.
+* Added position coordinates to locations.
+* Added synchronization of model and layout coordinates for points and locations.
+* Fixed reconstruction of routing tables when locking/unlocking paths in plant operation mode.
+* Reimplemented the former Dijkstra-based routing table construction, now providing one based on breadth-first search and an alternative based on depth-first search, and use pluggable routing cost functions.
+* Implemented a proper life cycle for plant overview plugin panels.
+* Modified model management to not allow model names to differ in the case of their spelling only to prevent inconsistencies on Windows systems.
+* Replaced the reference on a Location in a MovementCommand with the Location itself to provide more information to the vehicle driver.
+* Made more wide-spread use of dependency injection via Guice and refactored, cleaned up and simplified source code in many places, primarily in the plant overview client.
+* Many small bugfixes and improvements.
+
+=== Version 2.6.1 (2014-03-14)
+
+* Properly color the route for vehicles that have just been created and not loaded from an existing plant model.
+* Fix loading plant models created by older versions of openTCS that contained certain path liner types.
+* Properly set point types as read from the plant model in the plant overview client.
+* Do not provide a clickable graphical figure in the plant overview client for vehicles that should actually be invisible.
+
+=== Version 2.6 (2014-02-28)
+
+* Updated library Docking Frames to 1.1.2p10e.
+* Updated library JDOM to 2.0.5.
+* Updated library JFreeChart to 1.0.17, including an update of JCommon to 1.0.21.
+* Updated library JUnit to 4.11, including the addition of Hamcrest 1.3.
+* Updated DocBook style sheets to 1.78.1.
+* Added library Google Guice 3.0 for dependency injection and thus better modularity.
+* Added library Mockito 1.9.5 to simplify and improve the included unit tests.
+* Downgraded the Saxon XSL processor to version 6.5.5, as more recent versions seem to have deficiencies with DocBook to FO transformations.
+* Merged the experimental generic client application into the plant overview client, which can now be extended with plugin-like panels providing custom functionality.
+* Added plugin panels for load generation and statistics reports into the plant overview client.
+* Improved the undo/redo functionality of the plant overview client in modelling mode.
+* Temporarily disabled the copy-and-paste functionality of the plant overview client in modelling mode until some major usability issues have been sorted out.
+* Improved editing of multiple driving course elements at the same time.
+* Temporarily disabled the possibility to add background graphics until this works more reliably.
+* Unified look-and-feel and fonts in the kernel control center and the plant overview client and removed the selection menu for different Swing look-and-feels from the kernel control center.
+* Improved localization of the plant overview client.
+* Removed the kernel's explicit "simulation" mode, which was never fully implemented or used and provided practically no advantages over the normal mode of operation, in which vehicles can be simulated using the loopback driver.
+* Fixed/improved GUI layout in multiple places of the kernel control center.
+* Many bugfixes and improvements to code and documentation.
+
+=== Version 2.5 (2013-12-18)
+
+* Added library Docking Frames 1.1.2-P8c.
+* Made some panels in the plant overview client (un)dockable.
+* Added a panel with an overview of all vehicles and their respective states to the plant overview client.
+* Added a pause button to the plant overview client to pause/stop all active vehicles at once.
+* Introduced pluggable themes to customize the appearance of locations and vehicles in the plant overview.
+* Added generic grouping of driving course elements, primarily to support visualization in the plant overview.
+* Translated the user manual to English.
+* Many small bugfixes and improvements to both the code and the documentation.
+
+=== Version 2.4.2 (2013-07-29)
+
+* Updated the XML Schema definitions for the host interface.
+
+=== Version 2.4.1 (2013-05-30)
+
+* Updated the visualization client, including many bug fixes, usability improvements and internationalization (English and German language).
+* Properly included a vehicle's length when persisting/materializing a course model.
+* Removed an erroneous JAXB annotation that led to an exception when trying to persist load generator input data in the generic client.
+* Changed the startup scripts/batch files to look for extension JARs in `lib/openTCS-extensions/` instead of `lib/`.
+
+=== Version 2.4 (2013-02-07)
+
+* Updated JDOM to 2.0.4.
+* Updated JHotDraw to 7.6.
+* Updated Checkstyle to 5.6.
+* Integrated Saxon 9.4 and Apache FOP 1.1 into the build for processing the DocBook manual.
+* Major overhaul of the visualization client, including:
+Integration of both modes (modelling and visualization) into a single application, preparation for proper localization and integration of the course layout information into model data structures, making it easier to create complete models including course layout via the kernel API.
+(This basically allows to implement other clients that can create new models or import/convert existing models from other applications.)
+Using models containing "old" layout data is still supported but deprecated.
+* Changed license of the visualization client to LGPL.
+* Improved support for vehicle energy management:
+For each vehicle, a specific charging operation may be specified (default: "`CHARGE`"), which will be used by the dispatcher to automatically create orders to recharge the vehicle's energy source.
+* Improved strategies for selecting parking positions and charging locations.
+* Changed initial processing state of a vehicle to `UNAVAILABLE`, preventing immediate dispatching of vehicles on startup.
+* Improved kernel methods for withdrawing orders from vehicles and allow setting a vehicle's processing state to `UNAVAILABLE` to prevent it being dispatched again immediately.
+* Added kernel method dispatchVehicle() to allow vehicles in state `UNAVAILABLE` to be dispatched again.
+* (Re-)Added 'dispensable' flag to class TransportOrder to indicate that an order may be withdrawn automatically by the dispatcher.
+(Primarily used to make parking orders abortable.)
+* Improved handling of order sequences.
+* Added a simple, preliminary implementation of data collection for statistics based on event data in `org.opentcs.util.statistics`.
+* Removed class `VehicleType` and all references to it completely.
+All information about the vehicles themselves is stored in Vehicle, now, simplifying the code in which `VehicleType` was used.
+* Added `Vehicle.State.UNAVAILABLE` for vehicles that are not in an ERROR state but currently remotely usable, either.
+(Examples: manual or semi-automatic modes)
+* Added methods `Kernel.sendCommAdapterMessage()` and `CommunicationAdapter.processMessage()` to allow clients to send generic messages to communication adapters associated with vehicles.
+* Removed methods `stop()`, `pause()` and `resume()` from communication adapter interface as they had not served any purpose for long time.
+* Removed kernel method `getInfoText()`, for which the `query()` method has served as a replacement for a while, now.
+* Properly propagate exceptions to clients connected via the RMI proxy.
+* Small bug fixes and improvements to code and documentation.
+
+=== Version 2.3 (2012-09-17)
+
+* Moved sources of the generic client into the main project's source tree.
+* Updated JFreeChart to 1.0.14.
+* Use JFreeChart for drawing the velocity graph of a communication adapter.
+* Instead of emitting an event only after the kernel's state changed, emit an additional one before the state transition.
+* Implemented org.opentcs.data.order.OrderSequence for processes spanning more than one transport order that should be processed by a single vehicle.
+* Added a set of properties to DriveOrder.Destination and MovementCommand, allowing an order/command to carry additional information for a communication adapter or vehicle, if necessary.
+* (Re-)Added `State.CHARGING` and merged `State.DRIVING` and `State.OPERATING` into `State.EXECUTING` in `org.opentcs.data.model.Vehicle`.
+* Added a settable threshold for critical and good energy levels of a vehicle.
+* Added a vehicle specific charging operation to Vehicle, settable by the communication adapter.
+* Recompute routing tables when (un)locking a path.
+* Remove `org.opentcs.data.model.Path.Action`, which wasn't really used anywhere and doesn't provide any benefit over a Path's properties.
+* Remove a lot of deprecated methods in the kernel interface.
+* Replace the existing dispatcher with one that is aware of order sequences and vehicles' energy levels and automatically creates orders to recharge vehicles.
+* Deprecated and largely removed references to `org.opentcs.data.model.VehicleType`, simplifying some code.
+* Bug fix in `KernelStateOperating.activateTransportOrder()`:
+Use our own references to the transport order, not the one we received as a parameter, as that causes problems if the order has been renamed but a reference with the old name is being used by the calling client.
+* Moved classes to packages properly separated by functionality, and removed a few utility classes that were not used and didn't provide much.
+(This effectively means the API provided by the base JAR changed.
+Fixing any resulting broken imports should be the only thing required to use the new version.)
+
+=== Version 2.2 (2012-07-10)
+
+* Published as free open source software (license: the MIT license, see `LICENSE.txt`) - Requires Java 1.7
+* Update JDOM to 2.0.2.
+* Integrated kernel and driver GUI into a single application.
+* Basic support for energy management
+* Support for dynamic load handling devices reported by vehicles/vehicle drivers to the kernel
+* Simplified integration of vehicle drivers: Vehicle drivers in the class path are found automatically using `java.util.ServiceLoader`.
+* Automatic backup copies (in `$KERNEL/data/backups/`) when saving models
+* Switched from properties to XML for configuration files
+* Simplified and more consistent kernel API
+* Many small bug fixes and adjustments of the included strategies
+
+== Contributors
+
+We are grateful for anyone helping us to improve openTCS by contributing code or documentation.
+So far, the developers involved were/are (in alphabetical order by last name):
+
+* Hubert Buechter
+* Iryna Felko
+* Martin Grzenia
+* Preity Gupta
+* Heinz Huber
+* Olaf Krause
+* Tobias Marquardt
+* Sebastian Naumann
+* Volkmar Pontow
+* Philipp Seifert
+* Andreas Trautmann
+* Stefan Walter
+* Mats Wilhelm
+* Mustafa Yalciner
+* Youssef Zaki
+
+If you have contributed to openTCS and we have missed you on this list, please accept our apologies and send us an e-mail via info@opentcs.org.

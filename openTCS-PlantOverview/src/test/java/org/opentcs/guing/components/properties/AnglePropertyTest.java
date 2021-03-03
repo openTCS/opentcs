@@ -5,8 +5,8 @@ package org.opentcs.guing.components.properties;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import static org.junit.Assert.assertEquals;
 import org.junit.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import org.opentcs.guing.components.properties.table.QuantityCellEditor;
 import org.opentcs.guing.components.properties.type.AngleProperty;

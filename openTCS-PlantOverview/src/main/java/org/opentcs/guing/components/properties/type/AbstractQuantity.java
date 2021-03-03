@@ -14,18 +14,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Basisimplementierung f�r Properties, die einen Wert und eine Einheit
- * besitzen. Beispiele hierf�r sind 1 s, 200 m, 30 km/h. Zudem werden
- * Umwandlungsverh�ltnisse (siehe {
+ * Basisimplementierung fï¿½r Properties, die einen Wert und eine Einheit
+ * besitzen. Beispiele hierfï¿½r sind 1 s, 200 m, 30 km/h. Zudem werden
+ * Umwandlungsverhï¿½ltnisse (siehe {
  *
- * @see Relation}) zwischen verschiedenen Ma�einheiten festgelegt. Mit Hilfe
- * dieser Umwandlungsverh�ltnisse k�nnen Konvertierungen der Werte in andere
+ * @see Relation}) zwischen verschiedenen Maï¿½einheiten festgelegt. Mit Hilfe
+ * dieser Umwandlungsverhï¿½ltnisse kï¿½nnen Konvertierungen der Werte in andere
  * Einheiten vorgenommen werden.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -38,17 +38,17 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(AbstractQuantity.class.getName());
+      = LoggerFactory.getLogger(AbstractQuantity.class);
   /**
    * The unit's enum class;
    */
   private final Class<U> fUnitClass;
   /**
-   * Die m�glichen Einheiten.
+   * Die mï¿½glichen Einheiten.
    */
   private final List<U> fPossibleUnits;
   /**
-   * Die Verh�ltnisse zwischen den Einheiten.
+   * Die Verhï¿½ltnisse zwischen den Einheiten.
    */
   private final List<Relation<U>> fRelations;
   /**
@@ -70,7 +70,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   protected ValidRangePair validRange = new ValidRangePair();
 
   /**
-   * Konstruktor mit Wert und Ma�einheit.
+   * Konstruktor mit Wert und Maï¿½einheit.
    *
    * @param model
    * @param value
@@ -159,13 +159,13 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       }
     }
     catch (NumberFormatException nfe) {
-      log.log(Level.INFO, "Error parsing value", nfe);
+      log.info("Error parsing value", nfe);
       return fValue;
     }
   }
 
   /**
-   * Liefert den Wert, der der �bergebenen Einheit entspricht, ohne eine feste
+   * Liefert den Wert, der der ï¿½bergebenen Einheit entspricht, ohne eine feste
    * Umwandlung vorzunehmen.
    *
    * @param unit
@@ -196,7 +196,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       return value;
     }
     catch (IllegalArgumentException e) {
-      log.log(Level.SEVERE, "Exception: ", e);
+      log.error("Exception: ", e);
     }
 
     return Double.NaN;
@@ -204,7 +204,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
 
   /**
    * Konvertiert den aktuellen Wert mit der aktuellen Einheit in einen neuen
-   * Wert mit der �bergebenen
+   * Wert mit der ï¿½bergebenen
    *
    * @param unit Einheit.
    */
@@ -263,7 +263,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Liefert die Ma�einheit.
+   * Liefert die Maï¿½einheit.
    *
    * @return
    */
@@ -272,10 +272,10 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Pr�ft, ob es sich bei der �bergebenen Ma�einheit um eine m�gliche Einheit
+   * Prï¿½ft, ob es sich bei der ï¿½bergebenen Maï¿½einheit um eine mï¿½gliche Einheit
    * handelt. Gibt in diesem Fall
    * <code>true
-   * </code> zur�ck.
+   * </code> zurï¿½ck.
    *
    * @param unit
    * @return
@@ -285,8 +285,8 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Setzt f�r das Attribut einen neuen Wert und eine neue Ma�einheit. Eine
-   * Ausnahme wird ausgel�st, wenn es sich bei der Ma�einheit um keine m�gliche
+   * Setzt fï¿½r das Attribut einen neuen Wert und eine neue Maï¿½einheit. Eine
+   * Ausnahme wird ausgelï¿½st, wenn es sich bei der Maï¿½einheit um keine mï¿½gliche
    * Einheit handelt.
    *
    * @param value
@@ -346,7 +346,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Liefert die m�glichen Ma�einheiten.
+   * Liefert die mï¿½glichen Maï¿½einheiten.
    *
    * @return
    */
@@ -367,13 +367,13 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       }
     }
     catch (IllegalArgumentException e) {
-      log.log(Level.SEVERE, "Exception: ", e);
+      log.error("Exception: ", e);
     }
   }
 
   /**
-   * Findet aus der Menge der Umwandlungsverh�ltnisse das heraus, welches f�r
-   * die beiden �bergebenen Einheiten passend ist.
+   * Findet aus der Menge der Umwandlungsverhï¿½ltnisse das heraus, welches fï¿½r
+   * die beiden ï¿½bergebenen Einheiten passend ist.
    */
   private Relation<U> findFittingRelation(U unitFrom, U unitTo) {
     for (Relation<U> relation : fRelations) {

@@ -20,8 +20,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -34,6 +33,7 @@ import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -41,14 +41,15 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.UniqueStringGenerator;
-import org.opentcs.util.gui.plugins.PluggablePanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A panel for continously creating transport orders.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class ContinuousLoadPanel
+public class ContinuousLoadPanel
     extends PluggablePanel {
 
   /**
@@ -61,7 +62,7 @@ class ContinuousLoadPanel
    * This class' logger.
    */
   private static final Logger log
-      = Logger.getLogger(ContinuousLoadPanel.class.getName());
+      = LoggerFactory.getLogger(ContinuousLoadPanel.class);
   /**
    * This classe's bundle.
    */
@@ -83,12 +84,17 @@ class ContinuousLoadPanel
    * The currently selected transport order data.
    */
   private TransportOrderData selectedTrOrder;
+  /**
+   * Indicates whether this component is enabled.
+   */
+  private boolean initialized;
 
   /**
    * Creates a new ContinuousLoadPanel.
    *
-   * @param kernel The kernel.
+   * @param kernelProvider The application's kernel provider.
    */
+  @Inject
   public ContinuousLoadPanel(SharedKernelProvider kernelProvider) {
     this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
     initComponents();
@@ -106,7 +112,7 @@ class ContinuousLoadPanel
   }
 
   @Override
-  public void plugIn() {
+  public void initialize() {
     // Get a kernel reference.
     kernelProvider.register(this);
     // XXX Check if the kernel is actually available. If not...do something.
@@ -121,16 +127,23 @@ class ContinuousLoadPanel
     }
     DefaultCellEditor vehicleEditor = new DefaultCellEditor(vehiclesComboBox);
     toTable.setDefaultEditor(TCSObjectReference.class, vehicleEditor);
+    initialized = true;
   }
 
   @Override
-  public void plugOut() {
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  @Override
+  public void terminate() {
     // Disable order generation
     orderGenChkBox.setSelected(false);
 
     // Free kernel reference.
     kernel = null;
     kernelProvider.unregister(this);
+    initialized = false;
   }
 
   /**
@@ -265,7 +278,7 @@ class ContinuousLoadPanel
       return new SingleOrderGenTrigger(batchCreator);
     }
     else {
-      log.warning("No trigger selected");
+      log.warn("No trigger selected");
       return null;
     }
   }
@@ -1025,8 +1038,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         model.toFile(targetFile);
       }
       catch (Exception exc) {
-        log.log(Level.WARNING,
-                "Exception saving property set to " + targetFile.getPath(), exc);
+        log.warn("Exception saving property set to " + targetFile.getPath(), exc);
         JOptionPane.showMessageDialog(this,
                                       "Exception saving property set: " + exc.getMessage(),
                                       "Exception saving property set", JOptionPane.ERROR_MESSAGE);
@@ -1101,9 +1113,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         toTable.setModel(model);
       }
       catch (IOException | CredentialsException exc) {
-        log.log(Level.WARNING,
-                "Exception reading property set from " + targetFile.getPath(),
-                exc);
+        log.warn("Exception reading property set from " + targetFile.getPath(), exc);
         JOptionPane.showMessageDialog(this, "Exception reading property set:\n"
             + exc.getMessage(),
                                       "Exception reading property set",

@@ -177,7 +177,7 @@ public abstract class TreeViewManager {
   }
 
   /**
-   * Erstellt die Baumansicht für die übergebene Komponente des Systemmodells.
+   * Erstellt die Baumansicht fÃ¼r die Ã¼bergebene Komponente des Systemmodells.
    * Dieser Aufruf ergeht dann rekursiv an alle Kindkomponenten.
    *
    * @param component
@@ -195,16 +195,16 @@ public abstract class TreeViewManager {
   }
 
   /**
-   * Fügt dem TreeView ein Item hinzu.
+   * FÃ¼gt dem TreeView ein Item hinzu.
    *
    * @param parent das Elternobjekt
-   * @param item das hinzuzufügende Element
+   * @param item das hinzuzufÃ¼gende Element
    */
   public abstract void addItem(Object parent, ModelComponent item);
 
   /**
-   * Teilt dem TreeView mit, dass sich ein Item geändert hat, welches also
-   * aktualisiert werden müsste.
+   * Teilt dem TreeView mit, dass sich ein Item geÃ¤ndert hat, welches also
+   * aktualisiert werden mÃ¼sste.
    *
    * @param item
    */
@@ -213,7 +213,7 @@ public abstract class TreeViewManager {
   }
 
   /**
-   * Teilt dem TreeView mit, dass es ein bestimmtes Item löschen soll.
+   * Teilt dem TreeView mit, dass es ein bestimmtes Item lÃ¶schen soll.
    *
    * @param item
    */
@@ -223,7 +223,7 @@ public abstract class TreeViewManager {
 
   /**
    * Teilt dem TreeView mit, dass alle Kindelemente eines bestimmtes Items
-   * gelöscht werden sollen. Das übergebene Item wird jedoch nicht entfernt.
+   * gelÃ¶scht werden sollen. Das Ã¼bergebene Item wird jedoch nicht entfernt.
    *
    * @param item
    */

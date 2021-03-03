@@ -15,8 +15,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.LineConnectionFigure;
@@ -32,6 +30,8 @@ import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,14 +46,14 @@ public abstract class SimpleLineConnection
       = new AttributeKey<>("FillColor", Color.class);
   protected static final AttributeKey<Color> STROKE_COLOR
       = new AttributeKey<>("StrokeColor", Color.class);
-  // Pfeil f�r Vorw�rtsfahrt: gef�llt mit Stroke Color
+  // Pfeil fï¿½r Vorwï¿½rtsfahrt: gefï¿½llt mit Stroke Color
   protected static final ArrowTip ARROW_FORWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, true);
-  // Pfeil f�r R�ckw�rtsfahrt: gef�llt mit Fill Color
+  // Pfeil fï¿½r Rï¿½ckwï¿½rtsfahrt: gefï¿½llt mit Fill Color
   protected static final ArrowTip ARROW_BACKWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, false);
   private static final Logger logger
-      = Logger.getLogger(SimpleLineConnection.class.getName());
+      = LoggerFactory.getLogger(SimpleLineConnection.class);
 
   /**
    * The manager for the components tree view.
@@ -86,7 +86,7 @@ public abstract class SimpleLineConnection
 
   /**
    * Wird aufgerufen, wenn das Figure gerade durch Klonen erzeugt wurde und
-   * erlaubt das Durchf�hren von Initialisierungen.
+   * erlaubt das Durchfï¿½hren von Initialisierungen.
    */
   protected final void initConnectionFigure() {
     updateDecorations();
@@ -116,14 +116,14 @@ public abstract class SimpleLineConnection
       return super.getCappedPath();
     }
     catch (NullPointerException ex) {
-      logger.log(Level.WARNING, null, ex);
+      logger.warn("", ex);
       return path.clone();
     }
   }
 
   /**
    * Aktualisiert die Eigenschaften des Models. Wird z.B. aufgerufen, wenn sich
-   * der Ma�stab des Layout ge�ndert hat
+   * der Maï¿½stab des Layout geï¿½ndert hat
    */
   public abstract void updateModel();
 
@@ -137,11 +137,11 @@ public abstract class SimpleLineConnection
     double dX = p1.getX() - p2.getX();
     double dY = p1.getY() - p2.getY();
     double dist = Math.sqrt(dX * dX + dY * dY);
-    // TODO: ScaleX, ScaleY ber�cksichtigen
+    // TODO: ScaleX, ScaleY berï¿½cksichtigen
 
-//		path.validatePath();
-//		dist = path.getLengthOfPath(1.5);	// TEST! Welcher Faktor?
-    dist = Math.floor(dist + 0.5);	// Auf ganze Zahl runden
+//    path.validatePath();
+//    dist = path.getLengthOfPath(1.5);  // TEST! Welcher Faktor?
+    dist = Math.floor(dist + 0.5);  // Auf ganze Zahl runden
 
     return dist;
   }
@@ -153,14 +153,14 @@ public abstract class SimpleLineConnection
   }
 
   /**
-   * Pr�ft, ob zwei Figures durch eine Strecke miteinander verbunden werden
-   * k�nnen. Verbunden werden d�rfen nur Meldepunkte mit St�tzknoten in
+   * Prï¿½ft, ob zwei Figures durch eine Strecke miteinander verbunden werden
+   * kï¿½nnen. Verbunden werden dï¿½rfen nur Meldepunkte mit Stï¿½tzknoten in
    * beliebiger Kombination, nicht jedoch Meldepunkte mit Arbeitsstationen.
    *
    * @param start
    * @param end
    * @return
-   * <code>true</code>, wenn eine Verbindung m�glich ist, ansonsten
+   * <code>true</code>, wenn eine Verbindung mï¿½glich ist, ansonsten
    * <code>false</code>
    */
   @Override // LineConnectionFigure
@@ -202,7 +202,7 @@ public abstract class SimpleLineConnection
   @Override // LineConnectionFigure
   public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
     // Bei Doppelclick auf eine Strecke:
-    // 1. Das zugeh�rige Objekt im Tree markieren
+    // 1. Das zugehï¿½rige Objekt im Tree markieren
     // 2. Die Eigenschaften dieses Objekts im Property Panel anzeigen
     AbstractConnection model = getModel();
     componentsTreeManager.selectItem(model);
@@ -221,7 +221,7 @@ public abstract class SimpleLineConnection
 
   @Override // OriginChangeListener
   public void originLocationChanged(EventObject event) {
-    // ist f�r Strecken uninteressant
+    // ist fï¿½r Strecken uninteressant
   }
 
   @Override // OriginChangeListener

@@ -12,8 +12,6 @@ package org.opentcs.guing.components.properties.table;
 
 import java.awt.Component;
 import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
@@ -21,13 +19,14 @@ import javax.swing.JTextField;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.slf4j.LoggerFactory;
 
 /**
- * Ein CellEditor f�r Attribute vom Typ {
+ * Ein CellEditor fï¿½r Attribute vom Typ {
  *
  * @see StringProperty}. Der Editor umfasst ein Textfeld zur schnellen Eingabe
  * sowie den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs �ffnet.
+ * DetailsDialog zum komfortablen Bearbeiten des Attributs ï¿½ffnet.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -87,7 +86,7 @@ public class IntegerPropertyCellEditor
       textField.commitEdit();
     }
     catch (ParseException ex) {
-      Logger.getLogger(IntegerPropertyCellEditor.class.getName()).log(Level.SEVERE, "ParseException: {0}", textField.getText());
+      LoggerFactory.getLogger(IntegerPropertyCellEditor.class).error("ParseException: {0}", textField.getText());
     }
 
     try {

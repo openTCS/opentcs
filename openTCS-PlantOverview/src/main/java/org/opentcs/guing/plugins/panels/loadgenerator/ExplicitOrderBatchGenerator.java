@@ -14,12 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A batch generator for creating explicit transport orders.
@@ -33,7 +34,7 @@ class ExplicitOrderBatchGenerator
    * This class's Logger.
    */
   private static final Logger log
-      = Logger.getLogger(ExplicitOrderBatchGenerator.class.getName());
+      = LoggerFactory.getLogger(ExplicitOrderBatchGenerator.class);
   /**
    * The kernel we talk to.
    */

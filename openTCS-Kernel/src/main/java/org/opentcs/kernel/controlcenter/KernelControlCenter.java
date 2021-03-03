@@ -12,13 +12,19 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -32,13 +38,18 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.TCSKernelStateEvent;
 import org.opentcs.access.TCSModelTransitionEvent;
-import org.opentcs.algorithms.KernelExtension;
-import org.opentcs.kernel.controlcenter.vehicles.DriverGUI;
+import org.opentcs.access.TCSNotificationEvent;
+import org.opentcs.components.kernel.ControlCenterPanel;
+import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.customizations.kernel.ActiveInModellingMode;
+import org.opentcs.customizations.kernel.ActiveInOperatingMode;
 import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.opentcs.util.gui.Icons;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A GUI frontend for basic control over the kernel.
@@ -47,38 +58,50 @@ import org.opentcs.util.gui.Icons;
  */
 public class KernelControlCenter
     extends JFrame
-    implements KernelExtension, EventListener<TCSEvent> {
+    implements KernelExtension,
+               EventListener<TCSEvent> {
 
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = Logger.getLogger(KernelControlCenter.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(KernelControlCenter.class);
   /**
    * This class's ConfigurationStore.
    */
-  private static final ConfigurationStore configStore
+  private static final ConfigurationStore CONFIG_STORE
       = ConfigurationStore.getStore(KernelControlCenter.class.getName());
   /**
    * The key of the bundle string that's always in this frame's title.
    */
-  private static final String titleBase = "KernelControlCenter.titleBase";
+  private static final String TITLE_BASE = "KernelControlCenter.titleBase";
   /**
    * This class's resource bundle.
    */
-  private static final ResourceBundle bundle;
+  private static final ResourceBundle BUNDLE;
   /**
-   * The kernel we control.
+   * The kernel.
    */
   private final LocalKernel kernel;
+  /**
+   * Providers for panels shown in modelling mode.
+   */
+  private final Collection<Provider<ControlCenterPanel>> panelProvidersModelling;
+  /**
+   * Providers for panels shown in operating mode.
+   */
+  private final Collection<Provider<ControlCenterPanel>> panelProvidersOperating;
   /**
    * An about dialog.
    */
   private final AboutDialog aboutDialog;
   /**
-   * Indicates whether this KernelExtension is enabled or not.
+   * Panels currently active/shown.
    */
-  private boolean pluggedIn;
+  private final Set<ControlCenterPanel> activePanels = Collections.synchronizedSet(new HashSet<>());
+  /**
+   * Indicates whether this component is initialized.
+   */
+  private boolean initialized;
   /**
    * The kernel's current state.
    */
@@ -88,35 +111,26 @@ public class KernelControlCenter
    */
   private ControlCenterInfoHandler infoHandler;
   /**
-   * The driver panel. May be <code>null</code> if not in a mode that
-   * requires/allows vehicle management.
-   */
-  private volatile DriverGUI driverPanel;
-  /**
-   * The configuration panel. May be <code>null</code> if not in a mode that
-   * requires/allows editing configuration.
-   */
-  private volatile KernelConfigurationPanel configPanel;
-  /**
    * The current Model Name.
    */
-  private String currentModel;
+  private String currentModel = "";
 
   static {
-    String language = configStore.getString("language", "ENGLISH");
+    String language = CONFIG_STORE.getString("language", "ENGLISH");
     if (language.equals("GERMAN")) {
       Locale.setDefault(Locale.GERMAN);
     }
     else {
       Locale.setDefault(Locale.ENGLISH);
     }
-    bundle = ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/Bundle");
+    BUNDLE = ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/Bundle");
     // Look and feel
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
-    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-      log.log(Level.WARNING, "Exception setting look and feel", ex);
+    catch (ClassNotFoundException | InstantiationException |
+           IllegalAccessException | UnsupportedLookAndFeelException ex) {
+      LOG.warn("Exception setting look and feel", ex);
     }
   }
 
@@ -124,58 +138,62 @@ public class KernelControlCenter
    * Creates new form KernelControlCenter.
    *
    * @param kernel The kernel.
+   * @param panelProvidersModelling Providers for panels in modelling mode.
+   * @param panelProvidersOperating Providers for panels in operating mode.
    */
   @Inject
-  public KernelControlCenter(final LocalKernel kernel) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
+  public KernelControlCenter(
+      @Nonnull LocalKernel kernel,
+      @Nonnull @ActiveInModellingMode Collection<Provider<ControlCenterPanel>> panelProvidersModelling,
+      @Nonnull @ActiveInOperatingMode Collection<Provider<ControlCenterPanel>> panelProvidersOperating) {
+    this.kernel = requireNonNull(kernel, "kernel");
+    this.panelProvidersModelling = requireNonNull(panelProvidersModelling,
+                                                  "panelProvidersModelling");
+    this.panelProvidersOperating = requireNonNull(panelProvidersOperating,
+                                                  "panelProvidersOperating");
+
     initComponents();
     setIconImages(Icons.getOpenTCSIcons());
     aboutDialog = new AboutDialog(this, false);
     aboutDialog.setAlwaysOnTop(true);
     registerControlCenterInfoHandler();
-    this.currentModel = "";
-  }
-
-  // Methods declared in KernelExtension start here.
-  @Override
-  public boolean isPluggedIn() {
-    return pluggedIn;
   }
 
   @Override
-  public void plugIn() {
-    if (pluggedIn) {
-      throw new IllegalStateException("Already plugged in.");
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  @Override
+  public void initialize() {
+    if (initialized) {
+      LOG.debug("Already initialized.");
+      return;
     }
-    
+
     kernel.addEventListener(this, new AcceptingTCSEventFilter());
 
     try {
-      EventQueue.invokeAndWait(new Runnable() {
-        @Override
-        public void run() {
-          // Show the window.
-          setVisible(true);
-        }
-      });
+      EventQueue.invokeAndWait(() -> setVisible(true));
     }
     catch (InterruptedException | InvocationTargetException exc) {
       throw new IllegalStateException("Unexpected exception initializing", exc);
     }
 
-    pluggedIn = true;
+    initialized = true;
   }
 
   @Override
-  public void plugOut() {
-    if (!pluggedIn) {
-      throw new IllegalStateException("Not plugged in.");
+  public void terminate() {
+    if (!initialized) {
+      LOG.debug("Not initialized");
+      return;
     }
     // Hide the window.
     setVisible(false);
     dispose();
 
-    pluggedIn = false;
+    initialized = false;
   }
 
   // Methods declared in EventListener<TCSEvent> start here.
@@ -196,27 +214,16 @@ public class KernelControlCenter
     }
   }
 
-  // Class-specific code starts here.
   /**
    * Perfoms some tasks when a state is being leaved.
    *
    * @param oldState The state we're leaving
    */
   private void leavingKernelState(Kernel.State oldState) {
-    Objects.requireNonNull(oldState, "oldState is null");
-    switch (oldState) {
-      case OPERATING:
-        // When leaving normal operation mode, we want the driver panel to
-        // disappear.
-        disableDriverGui();
-        disableConfigurationPanel();
-        break;
-      case MODELLING:
-        disableConfigurationPanel();
-        break;
-      default:
-      // Do nada.
-    }
+    requireNonNull(oldState, "oldState");
+
+    removePanels(activePanels);
+    activePanels.clear();
   }
 
   /**
@@ -225,18 +232,19 @@ public class KernelControlCenter
    * @param newState
    */
   private void enteringKernelState(Kernel.State newState) {
-    Objects.requireNonNull(newState, "newState is null");
+    requireNonNull(newState, "newState");
+
     switch (newState) {
       case OPERATING:
-        enableConfigurationPanel();
-        // When we enter normal operation mode, we want drivers to be available.
-        enableDriverGui();
+        addPanels(panelProvidersOperating);
+
         menuButtonOperating.setSelected(true);
         menuButtonModel.setEnabled(false);
         newModelMenuItem.setEnabled(false);
         break;
       case MODELLING:
-        enableConfigurationPanel();
+        addPanels(panelProvidersModelling);
+
         menuButtonModelling.setSelected(true);
         menuButtonModel.setEnabled(true);
         newModelMenuItem.setEnabled(true);
@@ -248,6 +256,28 @@ public class KernelControlCenter
     kernelState = newState;
     // Updating the window title
     setWindowTitle();
+  }
+
+  private void addPanels(Collection<Provider<ControlCenterPanel>> providers) {
+    for (Provider<ControlCenterPanel> provider : providers) {
+      SwingUtilities.invokeLater(() -> addPanel(provider.get()));
+    }
+  }
+
+  private void addPanel(ControlCenterPanel panel) {
+    panel.initialize();
+    activePanels.add(panel);
+    tabbedPaneMain.add(panel.getTitle(), panel);
+  }
+
+  private void removePanels(Collection<ControlCenterPanel> panels) {
+    List<ControlCenterPanel> panelsCopy = new ArrayList<>(panels);
+    SwingUtilities.invokeLater(() -> {
+      for (ControlCenterPanel panel : panelsCopy) {
+        tabbedPaneMain.remove(panel);
+        panel.terminate();
+      }
+    });
   }
 
   /**
@@ -267,102 +297,19 @@ public class KernelControlCenter
    */
   private boolean confirmExit() {
     int n = JOptionPane.showConfirmDialog(this,
-                                          bundle.getString("EXIT_MESSAGE"),
-                                          bundle.getString("EXIT_TITLE"),
+                                          BUNDLE.getString("EXIT_MESSAGE"),
+                                          BUNDLE.getString("EXIT_TITLE"),
                                           JOptionPane.YES_NO_OPTION);
     return n == JOptionPane.YES_OPTION;
-  }
-
-  /**
-   * Enables the vehicle driver framework and its GUI.
-   */
-  private void enableDriverGui() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // Make sure it's really not enabled, yet, first.
-        if (driverPanel != null) {
-          log.warning("Driver panel already enabled, doing nothing.");
-          return;
-        }
-        driverPanel = new DriverGUI(kernel);
-        tabbedPaneMain.add(
-            driverPanel.getAccessibleContext().getAccessibleName(),
-            driverPanel);
-        driverPanel.plugIn();
-      }
-    });
-  }
-
-  /**
-   * Disables the vehicle driver framework and its GUI.
-   */
-  private void disableDriverGui() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // Make sure it's actually enabled.
-        if (driverPanel == null) {
-          log.warning("No driver panel, doing nothing.");
-          return;
-        }
-        driverPanel.plugOut();
-        tabbedPaneMain.remove(driverPanel);
-        driverPanel = null;
-      }
-    });
-  }
-
-  /**
-   * Enables the KernelConfigurationPanel.
-   */
-  private void enableConfigurationPanel() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // Make sure it's really not enabled, yet, first.
-        if (configPanel != null) {
-          log.warning("Configuration panel already enabled, doing nothing.");
-          return;
-        }
-        configPanel = new KernelConfigurationPanel(kernel);
-        tabbedPaneMain.add(
-            configPanel.getAccessibleContext().getAccessibleName(),
-            configPanel);
-        configPanel.plugIn();
-      }
-    });
-  }
-
-  /**
-   * Disables the configuration panel.
-   */
-  private void disableConfigurationPanel() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // Make sure it's actually enabled.
-        if (configPanel == null) {
-          log.warning("No configuration panel, doing nothing.");
-          return;
-        }
-        configPanel.plugOut();
-        tabbedPaneMain.remove(configPanel);
-        configPanel = null;
-      }
-    });
   }
 
   /**
    * Adds the ControlCenterInfoHandler to the root logger.
    */
   private void registerControlCenterInfoHandler() {
-    Logger curLogger = log;
-    while (curLogger.getParent() != null) {
-      curLogger = curLogger.getParent();
-    }
     infoHandler = new ControlCenterInfoHandler(loggingTextArea);
-    curLogger.addHandler(infoHandler);
+    kernel.addEventListener(infoHandler, (event) -> event instanceof TCSNotificationEvent);
+
     maxDocLengthTextField.setText("" + infoHandler.getMaxDocLength());
   }
 
@@ -371,11 +318,10 @@ public class KernelControlCenter
    */
   private void setWindowTitle() {
     if ("".equals(currentModel)) {
-      setTitle(bundle.getString(titleBase) + " - "
-          + kernelStateString(kernelState));
+      setTitle(BUNDLE.getString(TITLE_BASE) + " - " + kernelStateString(kernelState));
     }
     else {
-      setTitle(bundle.getString(titleBase) + " - "
+      setTitle(BUNDLE.getString(TITLE_BASE) + " - "
           + kernelStateString(kernelState) + " - \"" + currentModel + "\"");
     }
   }
@@ -387,8 +333,7 @@ public class KernelControlCenter
    * @return A user friendly string for the given kernel state.
    */
   private String kernelStateString(Kernel.State state) {
-    return bundle.getString(
-        "KernelControlCenter.kernelState." + state.name());
+    return BUNDLE.getString("KernelControlCenter.kernelState." + state.name());
   }
 
   // CHECKSTYLE:OFF
@@ -433,7 +378,7 @@ public class KernelControlCenter
     menuAbout = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-    setTitle(bundle.getString(titleBase));
+    setTitle(BUNDLE.getString(TITLE_BASE));
     setMinimumSize(new java.awt.Dimension(1200, 750));
     addWindowListener(new java.awt.event.WindowAdapter() {
       public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -443,10 +388,7 @@ public class KernelControlCenter
 
     loggingPanel.setLayout(new java.awt.BorderLayout());
 
-    loggingScrollPane.setFont(new java.awt.Font("Courier New", 0, 13)); // NOI18N
-
     loggingTextArea.setEditable(false);
-    loggingTextArea.setFont(new java.awt.Font("Courier New", 0, 13)); // NOI18N
     loggingScrollPane.setViewportView(loggingTextArea);
 
     loggingPanel.add(loggingScrollPane, java.awt.BorderLayout.CENTER);
@@ -670,7 +612,7 @@ public class KernelControlCenter
   private void menuButtonModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonModelActionPerformed
     Optional<String> modelName;
     try {
-      modelName = Optional.ofNullable(kernel.getModelName());
+      modelName = Optional.ofNullable(kernel.getPersistentModelName());
     }
     catch (IOException exc) {
       throw new IllegalStateException("Unhandled exception loading model",
@@ -679,25 +621,24 @@ public class KernelControlCenter
     if (modelName.isPresent()) {
       // Show confirmation dialog
       String message = new StringBuilder()
-          .append(bundle.getString("loadModelMessagePart1"))
+          .append(BUNDLE.getString("loadModelMessagePart1"))
           .append(" ")
           .append(modelName.get())
-          .append(bundle.getString("loadModelMessagePart2"))
+          .append(BUNDLE.getString("loadModelMessagePart2"))
           .toString();
-      int reply = JOptionPane.showConfirmDialog(
-          null,
-          message,
-          bundle.getString("loadModelConfirmTitle"),
-          JOptionPane.YES_NO_OPTION,
-          JOptionPane.QUESTION_MESSAGE);
-      if(reply != JOptionPane.YES_OPTION) {
+      int reply = JOptionPane.showConfirmDialog(null,
+                                                message,
+                                                BUNDLE.getString("loadModelConfirmTitle"),
+                                                JOptionPane.YES_NO_OPTION,
+                                                JOptionPane.QUESTION_MESSAGE);
+      if (reply != JOptionPane.YES_OPTION) {
         return;
       }
       // Load model
       try {
-        log.info("Loading model: " + modelName.get());
+        LOG.info("Loading model: " + modelName.get());
         kernel.loadModel();
-        log.info("Finished loading the model.");
+        LOG.info("Finished loading the model.");
       }
       catch (IOException exc) {
         throw new IllegalStateException("Unhandled exception loading model",
@@ -705,30 +646,29 @@ public class KernelControlCenter
       }
     }
     else {
-      JOptionPane.showMessageDialog(
-          null,
-          bundle.getString("loadModelInfoMessage"),
-          bundle.getString("loadModelInfoTitle"),
-          JOptionPane.WARNING_MESSAGE);
-      log.info("No model available, keeping current model.");
+      JOptionPane.showMessageDialog(null,
+                                    BUNDLE.getString("loadModelInfoMessage"),
+                                    BUNDLE.getString("loadModelInfoTitle"),
+                                    JOptionPane.WARNING_MESSAGE);
+      LOG.info("No model available, keeping current model.");
     }
   }//GEN-LAST:event_menuButtonModelActionPerformed
 
   private void menuGermanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGermanActionPerformed
     Locale.setDefault(Locale.GERMAN);
-    configStore.setString("language", "GERMAN");
+    CONFIG_STORE.setString("language", "GERMAN");
     JOptionPane.showMessageDialog(this,
-                                  bundle.getString("RestartToApplyChanges"),
-                                  bundle.getString("RestartRequired"),
+                                  BUNDLE.getString("RestartToApplyChanges"),
+                                  BUNDLE.getString("RestartRequired"),
                                   JOptionPane.INFORMATION_MESSAGE);
   }//GEN-LAST:event_menuGermanActionPerformed
 
   private void menuEnglishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEnglishActionPerformed
     Locale.setDefault(Locale.ENGLISH);
-    configStore.setString("language", "ENGLISH");
+    CONFIG_STORE.setString("language", "ENGLISH");
     JOptionPane.showMessageDialog(this,
-                                  bundle.getString("RestartToApplyChanges"),
-                                  bundle.getString("RestartRequired"),
+                                  BUNDLE.getString("RestartToApplyChanges"),
+                                  BUNDLE.getString("RestartRequired"),
                                   JOptionPane.INFORMATION_MESSAGE);
   }//GEN-LAST:event_menuEnglishActionPerformed
 
@@ -737,7 +677,7 @@ public class KernelControlCenter
       kernel.saveModel(null);
     }
     catch (IOException | CredentialsException ex) {
-      log.log(Level.SEVERE, null, ex);
+      LOG.error("Exception saving model", ex);
     }
   }//GEN-LAST:event_menuItemSaveSettingsActionPerformed
 
@@ -750,7 +690,7 @@ public class KernelControlCenter
 
     private void newModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newModelMenuItemActionPerformed
       if (kernelState == Kernel.State.MODELLING) {
-        String message = bundle.getString("ConfirmNewModelMsg");
+        String message = BUNDLE.getString("ConfirmNewModelMsg");
         String dialogTitle = "ConfirmNewModelTitle";
         // display the JOptionPane showConfirmDialog
         int reply = JOptionPane.showConfirmDialog(null,

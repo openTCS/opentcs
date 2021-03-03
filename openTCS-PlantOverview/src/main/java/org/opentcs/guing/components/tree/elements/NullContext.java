@@ -30,7 +30,7 @@ public class NullContext
   }
 
   @Override
-  public CONTEXT_TYPE getType() {
-    return CONTEXT_TYPE.NULL;
+  public ContextType getType() {
+    return ContextType.NULL;
   }
 }

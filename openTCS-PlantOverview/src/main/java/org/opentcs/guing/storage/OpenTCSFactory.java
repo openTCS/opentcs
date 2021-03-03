@@ -21,31 +21,31 @@ import org.opentcs.guing.components.drawing.figures.PathConnection;
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class OpenTCSFactory
-		extends DefaultDOMFactory {
+    extends DefaultDOMFactory {
 
-	private final static Object[][] classTagArray = {
-		// openTCS Objects
-		{LabeledPointFigure.class, "Point"},
-		{LabeledLocationFigure.class, "Location"},
+  private final static Object[][] classTagArray = {
+    // openTCS Objects
+    {LabeledPointFigure.class, "Point"},
+    {LabeledLocationFigure.class, "Location"},
     {PathConnection.class, "Path"},
     {LinkConnection.class, "Link"}
-	};
-//	private final static Object[][] enumTagArray = {
-//		{
-//			AttributeKeys.StrokeType.class, "strokeType"
-//		}
-//	};
+  };
+//  private final static Object[][] enumTagArray = {
+//    {
+//      AttributeKeys.StrokeType.class, "strokeType"
+//    }
+//  };
 
-	/**
-	 * Creates a new instance.
-	 */
-	public OpenTCSFactory() {
-		for (Object[] o : classTagArray) {
-			addStorableClass((String) o[1], (Class) o[0]);
-		}
+  /**
+   * Creates a new instance.
+   */
+  public OpenTCSFactory() {
+    for (Object[] o : classTagArray) {
+      addStorableClass((String) o[1], (Class) o[0]);
+    }
 
-//		for (Object[] o : enumTagArray) {
-//			addEnumClass((String) o[1], (Class) o[0]);
-//		}
-	}
+//    for (Object[] o : enumTagArray) {
+//      addEnumClass((String) o[1], (Class) o[0]);
+//    }
+  }
 }

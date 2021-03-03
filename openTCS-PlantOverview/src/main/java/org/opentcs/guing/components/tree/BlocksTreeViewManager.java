@@ -32,7 +32,7 @@ public class BlocksTreeViewManager
   @Override
   public void addItem(Object parent, ModelComponent item) {
     if (item.isTreeViewVisible()) {
-      UserObjectContext context = userObjectUtil.createContext(UserObjectContext.CONTEXT_TYPE.BLOCK);
+      UserObjectContext context = userObjectUtil.createContext(UserObjectContext.ContextType.BLOCK);
       getTreeView().addItem(parent, userObjectUtil.createUserObject(item, context));
     }
   }

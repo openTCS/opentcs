@@ -12,8 +12,6 @@ package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
 import static java.util.Objects.requireNonNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
@@ -37,6 +35,8 @@ import org.opentcs.guing.plugins.themes.StandardLocationTheme;
 import org.opentcs.guing.plugins.themes.StandardVehicleTheme;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.VehicleThemeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for VisualLayout instances.
@@ -51,7 +51,7 @@ public class LayoutAdapter
    * This class's logger.
    */
   private static final Logger log
-      = Logger.getLogger(LayoutAdapter.class.getName());
+      = LoggerFactory.getLogger(LayoutAdapter.class);
   /**
    * Manages the location themes.
    */
@@ -102,7 +102,7 @@ public class LayoutAdapter
       updateMiscModelProperties(layout);
     }
     catch (Exception e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 
@@ -130,7 +130,7 @@ public class LayoutAdapter
       updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.log(Level.WARNING, null, e);
+      log.warn("", e);
     }
   }
 

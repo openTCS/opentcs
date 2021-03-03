@@ -7,8 +7,6 @@ package org.opentcs.guing.application.action.edit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -16,11 +14,14 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
+import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import static org.opentcs.guing.event.SystemModelTransitionEvent.Stage.UNLOADING;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Same as javax.swing.UndoManager but provides actions for undo and redo
@@ -30,31 +31,10 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class UndoRedoManager
-    extends javax.swing.undo.UndoManager {
+    extends UndoManager {
 
-  public final static String UNDO_ACTION_ID = "edit.undo";
-  public final static String REDO_ACTION_ID = "edit.redo";
-
-  /**
-   * This class's logger.
-   */
-  private static final Logger logger
-      = Logger.getLogger(UndoRedoManager.class.getName());
-
-  protected PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
-
-  /**
-   * This flag is set to true when at least one significant UndoableEdit
-   * has been added to the manager since the last call to discardAllEdits.
-   */
-  private boolean hasSignificantEdits = false;
-
-  /**
-   * This flag is set to true when an undo or redo operation is in progress.
-   * The UndoRedoManager ignores all incoming UndoableEdit events while
-   * this flag is true.
-   */
-  private boolean undoOrRedoInProgress;
+  public static final String UNDO_ACTION_ID = "edit.undo";
+  public static final String REDO_ACTION_ID = "edit.redo";
 
   /**
    * Sending this UndoableEdit event to the UndoRedoManager
@@ -73,48 +53,24 @@ public class UndoRedoManager
   };
 
   /**
-   * Undo Action for use in a menu bar.
+   * This class's logger.
    */
-  private class UndoAction
-      extends AbstractAction {
+  private static final Logger LOG = LoggerFactory.getLogger(UndoRedoManager.class);
 
-    public UndoAction() {
-      ResourceBundleUtil.getBundle().configureAction(this, UNDO_ACTION_ID);
-      setEnabled(false);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent evt) {
-      try {
-        undo();
-      }
-      catch (CannotUndoException e) {
-        logger.log(Level.FINE, "Cannot undo: {0}", e);
-      }
-    }
-  }
+  protected PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
 
   /**
-   * Redo Action for use in a menu bar.
+   * This flag is set to true when at least one significant UndoableEdit
+   * has been added to the manager since the last call to discardAllEdits.
    */
-  private class RedoAction
-      extends AbstractAction {
+  private boolean hasSignificantEdits = false;
 
-    public RedoAction() {
-      ResourceBundleUtil.getBundle().configureAction(this, REDO_ACTION_ID);
-      setEnabled(false);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent evt) {
-      try {
-        redo();
-      }
-      catch (CannotRedoException e) {
-        logger.log(Level.FINE, "Cannot redo: {0}", e);
-      }
-    }
-  }
+  /**
+   * This flag is set to true when an undo or redo operation is in progress.
+   * The UndoRedoManager ignores all incoming UndoableEdit events while
+   * this flag is true.
+   */
+  private boolean undoOrRedoInProgress;
 
   /**
    * The undo action instance.
@@ -140,7 +96,7 @@ public class UndoRedoManager
     updateActions();
     setHasSignificantEdits(false);
   }
-  
+
   @Handler
   public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
     switch (evt.getStage()) {
@@ -261,7 +217,8 @@ public class UndoRedoManager
    * while undo is in progress.
    */
   @Override
-  public void undo() throws CannotUndoException {
+  public void undo()
+      throws CannotUndoException {
     undoOrRedoInProgress = true;
 
     try {
@@ -279,12 +236,14 @@ public class UndoRedoManager
    * while redo is in progress.
    */
   @Override
-  public void redo() throws CannotUndoException {
+  public void redo()
+      throws CannotUndoException {
     undoOrRedoInProgress = true;
 
     try {
       super.redo();
-    }    finally {
+    }
+    finally {
       undoOrRedoInProgress = false;
       updateActions();
     }
@@ -296,7 +255,8 @@ public class UndoRedoManager
    * while undo or redo is in progress.
    */
   @Override
-  public void undoOrRedo() throws CannotUndoException, CannotRedoException {
+  public void undoOrRedo()
+      throws CannotUndoException, CannotRedoException {
     undoOrRedoInProgress = true;
 
     try {
@@ -335,4 +295,49 @@ public class UndoRedoManager
   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
     propertySupport.firePropertyChange(propertyName, oldValue, newValue);
   }
+
+  /**
+   * Undo Action for use in a menu bar.
+   */
+  private class UndoAction
+      extends AbstractAction {
+
+    public UndoAction() {
+      ResourceBundleUtil.getBundle().configureAction(this, UNDO_ACTION_ID);
+      setEnabled(false);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent evt) {
+      try {
+        undo();
+      }
+      catch (CannotUndoException e) {
+        LOG.debug("Cannot undo: {}", e);
+      }
+    }
+  }
+
+  /**
+   * Redo Action for use in a menu bar.
+   */
+  private class RedoAction
+      extends AbstractAction {
+
+    public RedoAction() {
+      ResourceBundleUtil.getBundle().configureAction(this, REDO_ACTION_ID);
+      setEnabled(false);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent evt) {
+      try {
+        redo();
+      }
+      catch (CannotRedoException e) {
+        LOG.debug("Cannot redo: {}", e);
+      }
+    }
+  }
+
 }

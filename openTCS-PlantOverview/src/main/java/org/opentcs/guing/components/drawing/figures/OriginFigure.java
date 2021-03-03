@@ -61,7 +61,7 @@ public class OriginFigure
     fDisplayBox = new Rectangle(-fSideLength / 2, -fSideLength / 2,
                                 fSideLength, fSideLength);
     set(AttributeKeys.STROKE_COLOR, Color.blue);
-    // Kein Copy/Paste etc. für diese Figur!
+    // Kein Copy/Paste etc. fÃ¼r diese Figur!
     setSelectable(false);
   }
 
@@ -133,7 +133,7 @@ public class OriginFigure
   @Override
   public void transform(AffineTransform tx) {
     Point2D center = getZoomPoint().getPixelLocationExactly();
-    Point2D lead = new Point2D.Double();	// not used
+    Point2D lead = new Point2D.Double();  // not used
     setBounds(
         (Point2D.Double) tx.transform(center, center),
         (Point2D.Double) tx.transform(lead, lead));

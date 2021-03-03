@@ -24,33 +24,33 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.xmlorders.ScriptResponse;
-import org.opentcs.access.xmlorders.TCSOrder;
-import org.opentcs.access.xmlorders.TCSOrderSet;
-import org.opentcs.access.xmlorders.TCSResponse;
-import org.opentcs.access.xmlorders.TCSResponseSet;
-import org.opentcs.access.xmlorders.TCSScriptFile;
-import org.opentcs.access.xmlorders.Transport;
-import org.opentcs.access.xmlorders.TransportResponse;
-import org.opentcs.access.xmlorders.TransportScript;
-import org.opentcs.algorithms.KernelExtension;
+import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.xmlorders.binding.ScriptResponse;
+import org.opentcs.kernel.xmlorders.binding.TCSOrder;
+import org.opentcs.kernel.xmlorders.binding.TCSOrderSet;
+import org.opentcs.kernel.xmlorders.binding.TCSResponse;
+import org.opentcs.kernel.xmlorders.binding.TCSResponseSet;
+import org.opentcs.kernel.xmlorders.binding.TCSScriptFile;
+import org.opentcs.kernel.xmlorders.binding.Transport;
+import org.opentcs.kernel.xmlorders.binding.TransportResponse;
+import org.opentcs.kernel.xmlorders.binding.TransportScript;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Instances of this class accept general orders for the openTCS system encoded
  * in XML via TCP connections.
  * <p>
  * Setting up the server socket is done in a separate thread that is started
- * when {@link #plugIn() plugIn()} is called and stopped when
- * {@link #plugOut() plugOut()} is called. Incoming client connections will be
+ * when {@link #initialize() initialize()} is called and stopped when
+ * {@link #terminate() terminate()} is called. Incoming client connections will be
  * handled concurrently in separate threads.
  * </p>
  *
@@ -63,14 +63,13 @@ import org.opentcs.data.order.TransportOrder;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class XMLTelegramOrderReceiver
+public class XMLTelegramOrderReceiver
     implements KernelExtension {
 
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = Logger.getLogger(XMLTelegramOrderReceiver.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(XMLTelegramOrderReceiver.class);
   /**
    * The sequence of bytes marking the end of an incoming telegram.
    */
@@ -137,12 +136,12 @@ class XMLTelegramOrderReceiver
   }
 
   @Override
-  public boolean isPluggedIn() {
+  public boolean isInitialized() {
     return enabled;
   }
 
   @Override
-  public void plugIn() {
+  public void initialize() {
     // Only react if the state really changes.
     if (enabled) {
       return;
@@ -152,24 +151,23 @@ class XMLTelegramOrderReceiver
                                           "xmlOrderListenerThread");
     connectionListenerThread.start();
     enabled = true;
-    log.fine("XMLTelegramOrderReceiver enabled");
+    LOG.debug("XMLTelegramOrderReceiver initialized");
   }
 
   @Override
-  public void plugOut() {
+  public void terminate() {
     // Only react if the state really changes.
     if (!enabled) {
       return;
     }
-    log.info("Terminating connection listener...");
+    LOG.info("Terminating connection listener...");
     connectionListener.terminate();
     try {
       connectionListenerThread.join();
-      log.info("Connection listener thread has terminated.");
+      LOG.info("Connection listener thread has terminated.");
     }
     catch (InterruptedException exc) {
-      throw new RuntimeException(
-          "Interrupted while waiting for connection listener to die.");
+      LOG.warn("Interrupted while waiting for connection listener to die.");
     }
     finally {
       connectionListenerThread = null;
@@ -195,7 +193,7 @@ class XMLTelegramOrderReceiver
   @BindingAnnotation
   @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
   @Retention(RetentionPolicy.RUNTIME)
-  static @interface ListenPort {
+  public static @interface ListenPort {
     // Nothing here.
   }
 
@@ -205,7 +203,7 @@ class XMLTelegramOrderReceiver
   @BindingAnnotation
   @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
   @Retention(RetentionPolicy.RUNTIME)
-  static @interface InputTimeout {
+  public static @interface InputTimeout {
     // Nothing here.
   }
 
@@ -215,7 +213,7 @@ class XMLTelegramOrderReceiver
   @BindingAnnotation
   @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
   @Retention(RetentionPolicy.RUNTIME)
-  static @interface MaxInputLength {
+  public static @interface MaxInputLength {
     // Nothing here.
   }
 
@@ -257,7 +255,7 @@ class XMLTelegramOrderReceiver
         }
       }
       catch (IOException exc) {
-        log.log(Level.WARNING, "IOException closing server socket", exc);
+        LOG.warn("IOException closing server socket", exc);
       }
       finally {
         // Make sure we dispose of the used server socket.
@@ -279,18 +277,18 @@ class XMLTelegramOrderReceiver
       while (!terminated) {
         try {
           Socket clientSocket = serverSocket.accept();
-          log.info("Connection from "
-              + clientSocket.getInetAddress().getHostAddress() + ":"
-              + clientSocket.getPort());
+          LOG.info("Connection from {}:{}",
+                   clientSocket.getInetAddress().getHostAddress(),
+                   clientSocket.getPort());
           clientExecutor.execute(new ConnectionHandler(clientSocket));
         }
         catch (SocketException exc) {
           // Check if we're supposed to terminate.
           if (terminated) {
-            log.info("Received termination signal.");
+            LOG.info("Received termination signal.");
           }
           else {
-            log.warning("SocketException without termination flag set");
+            LOG.warn("SocketException without termination flag set");
             throw new IllegalStateException(
                 "SocketException without termination flag set", exc);
           }
@@ -300,7 +298,7 @@ class XMLTelegramOrderReceiver
               "IOException listening for connections", exc);
         }
       }
-      log.info("Terminated connection listener.");
+      LOG.info("Terminated connection listener.");
     }
   }
 
@@ -317,7 +315,7 @@ class XMLTelegramOrderReceiver
     /**
      * The connection to the client.
      */
-    private final Socket socket;
+    private final Socket clientSocket;
 
     /**
      * Creates a new ConnectionHandler.
@@ -325,15 +323,15 @@ class XMLTelegramOrderReceiver
      * @param clientSocket The socket for communication with the client.
      */
     ConnectionHandler(Socket clientSocket) {
-      socket = requireNonNull(clientSocket, "clientSocket");
-      if (!clientSocket.isConnected()) {
-        throw new IllegalArgumentException("clientSocket is not connected");
-      }
+      this.clientSocket = requireNonNull(clientSocket, "clientSocket");
     }
 
     @Override
     public void run() {
-      try {
+      try (Socket socket = clientSocket) {
+        if (!socket.isConnected()) {
+          throw new IllegalArgumentException("socket is not connected");
+        }
         // Set a timeout for read() operations.
         socket.setSoTimeout(inputTimeout);
         InputStream inStream = socket.getInputStream();
@@ -353,7 +351,7 @@ class XMLTelegramOrderReceiver
           bufferStream.write(buffer, 0, bytesRead);
           telegram = bufferStream.toString();
           // If we did NOT receive the end of telegram marker, yet, read on.
-          if (telegram.indexOf(END_OF_TELEGRAM) == -1) {
+          if (!telegram.contains(END_OF_TELEGRAM)) {
             bytesRead = inStream.read(buffer);
           }
           // If we did find the end of the telegram, stop reading.
@@ -361,31 +359,18 @@ class XMLTelegramOrderReceiver
             foundEndOfTelegram = true;
           }
         }
-        log.fine("Reached end of telegram, processing input");
+        LOG.debug("Reached end of telegram, processing input");
         TCSOrderSet orderSet = TCSOrderSet.fromXml(telegram);
-        log.fine("Constructed order set");
+        LOG.debug("Constructed order set");
         TCSResponseSet responseSet = processOrderSet(orderSet);
         OutputStream outStream = socket.getOutputStream();
-        log.fine("Sending response");
+        LOG.debug("Sending response");
         outStream.write(responseSet.toXml().getBytes());
         outStream.flush();
-        log.fine("Sent response, finishing.");
+        LOG.debug("Sent response, finishing.");
       }
-      catch (IOException | IllegalStateException exc) {
-        log.log(Level.WARNING, "Unexpected exception, aborting communication",
-                exc);
-      }
-      finally {
-        // Try to clean up if possible.
-        if (!socket.isClosed()) {
-          log.fine("Closing socket.");
-          try {
-            socket.close();
-          }
-          catch (IOException exc) {
-            log.log(Level.WARNING, "Exception closing socket", exc);
-          }
-        }
+      catch (Exception exc) {
+        LOG.warn("Unexpected exception, aborting communication", exc);
       }
     }
 
@@ -400,18 +385,18 @@ class XMLTelegramOrderReceiver
       TCSResponseSet responseSet = new TCSResponseSet();
       for (TCSOrder curOrder : orderSet.getOrders()) {
         if (curOrder instanceof Transport) {
-          log.fine("Processing 'Transport' element");
+          LOG.debug("Processing 'Transport' element");
           TCSResponse response = processTransport((Transport) curOrder);
           responseSet.getResponses().add(response);
         }
         else if (curOrder instanceof TransportScript) {
-          log.fine("Processing 'TransportScript' element");
+          LOG.debug("Processing 'TransportScript' element");
           TransportScript curScript = (TransportScript) curOrder;
           ScriptResponse response = processScriptFile(curScript);
           responseSet.getResponses().add(response);
         }
         else {
-          log.warning("Unhandled order type: " + curOrder.getClass().getName());
+          LOG.warn("Unhandled order type: " + curOrder.getClass().getName());
           // Create a negative response for this order.
           TransportResponse response = new TransportResponse();
           response.setId(curOrder.getId());
@@ -455,7 +440,7 @@ class XMLTelegramOrderReceiver
         response.setExecutionSuccessful(true);
       }
       catch (ObjectUnknownException | CredentialsException exc) {
-        log.log(Level.WARNING, "Unexpected exception", exc);
+        LOG.warn("Unexpected exception", exc);
         response.setExecutionSuccessful(false);
       }
       return response;
@@ -479,7 +464,7 @@ class XMLTelegramOrderReceiver
             = scriptFileManager.getScriptFile(transportScript.getFileName());
       }
       catch (IOException exc) {
-        log.log(Level.WARNING, "Exception parsing script file", exc);
+        LOG.warn("Exception parsing script file", exc);
         result.setParsingSuccessful(false);
         return result;
       }
@@ -508,7 +493,7 @@ class XMLTelegramOrderReceiver
           }
         }
         catch (ObjectUnknownException | CredentialsException exc) {
-          log.log(Level.WARNING, "Unexpected exception", exc);
+          LOG.warn("Unexpected exception", exc);
           response.setExecutionSuccessful(false);
           // XXX With sequential dependencies, we should stop here, not add
           // another order without any dependencies!
