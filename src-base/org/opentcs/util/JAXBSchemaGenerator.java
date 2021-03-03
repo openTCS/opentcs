@@ -74,8 +74,9 @@ public class JAXBSchemaGenerator {
     @Override
     public Result createOutput(String namespaceURI, String suggestedFileName)
         throws IOException {
-      StreamResult result = new StreamResult(outputFile);
-      result.setSystemId(outputFile.toURI().toURL().toString());
+      StreamResult result = new StreamResult(outputFile.getPath());
+      //StreamResult result = new StreamResult(outputFile);
+      //result.setSystemId(outputFile.toURI().toURL().toString());
       return result;
     }
   }

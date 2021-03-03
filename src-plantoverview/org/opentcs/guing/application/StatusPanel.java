@@ -73,6 +73,14 @@ public class StatusPanel
     gridBagConstraints.weightx = 0.8;
     add(textFieldStatus, gridBagConstraints);
   }
+  
+  /**
+   * Clears the status textfield, removing any logged messages.
+   */
+  public void clear() {
+    textFieldStatus.setForeground(Color.black);
+    textFieldStatus.setText("");
+  }
 
   /**
    * Text display in the status bar (at the bottom).

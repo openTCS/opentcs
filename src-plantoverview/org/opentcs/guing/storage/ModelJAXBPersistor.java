@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import static java.util.Objects.requireNonNull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -72,11 +73,12 @@ public class ModelJAXBPersistor
     try (OutputStream outStream = new FileOutputStream(file)) {
       JAXBContext jc = JAXBContext.newInstance(CourseModel.class);
       Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
       StringWriter stringWriter = new StringWriter();
       marshaller.marshal(courseModel, stringWriter);
 
-      outStream.write(stringWriter.toString().getBytes());
+      outStream.write(stringWriter.toString().getBytes(Charset.forName("UTF-8")));
       outStream.flush();
       outStream.close();
     }

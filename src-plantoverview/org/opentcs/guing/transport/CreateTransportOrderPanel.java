@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -590,9 +591,12 @@ public class CreateTransportOrderPanel
                                       contentPanel);
       dialog.setVisible(true);
 
-      if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-        location = contentPanel.getSelectedLocation();
-        action = contentPanel.getSelectedAction();
+      Optional<LocationModel> locModel = contentPanel.getSelectedLocation();
+      Optional<String> act = contentPanel.getSelectedAction();
+      if (dialog.getReturnStatus() == StandardContentDialog.RET_OK
+          && locModel.isPresent() && act.isPresent()) {
+        location = locModel.get();
+        action = act.get();
 
         driveOrdersTable.setValueAt(location.getName(), index, 0);
         driveOrdersTable.setValueAt(action, index, 1);
@@ -614,11 +618,14 @@ public class CreateTransportOrderPanel
                                       contentPanel);
       dialog.setVisible(true);
 
-      if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
+      Optional<LocationModel> locModel = contentPanel.getSelectedLocation();
+      Optional<String> act = contentPanel.getSelectedAction();
+      if (dialog.getReturnStatus() == StandardContentDialog.RET_OK
+          && locModel.isPresent() && act.isPresent()) {
         int index = driveOrdersTable.getRowCount();
 
-        LocationModel location = contentPanel.getSelectedLocation();
-        String action = contentPanel.getSelectedAction();
+        LocationModel location = locModel.get();
+        String action = act.get();
 
         String[] row = new String[2];
         row[0] = location.getName();

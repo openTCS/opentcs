@@ -95,7 +95,9 @@ public abstract class AbstractUserObject
   @Override // UserObject
   public void rightClicked(JComponent component, int x, int y) {
     JPopupMenu popupMenu = getPopupMenu();
-    popupMenu.show(component, x, y);
+    if (popupMenu != null) {
+      popupMenu.show(component, x, y);
+    }
   }
 
   @Override // UserObject

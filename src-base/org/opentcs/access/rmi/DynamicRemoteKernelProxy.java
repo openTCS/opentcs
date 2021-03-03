@@ -25,7 +25,7 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * </p>
  * <pre>
  * Kernel kernel = DynamicRemoteKernelProxy.getProxy("localhost",
- *                                                   AllOrNothingTCSEventFilter.acceptingInstance);
+ *                                                   new AcceptingTCSEventFilter());
  * </pre>
  * <p>
  * You can then use <code>kernel</code> to call methods on the proxy, which
@@ -38,8 +38,8 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * <p>
  * The proxy will immediately start polling periodically for
  * events with the remote kernel; you can use custom intervals and timeouts for
- * polling by calling one of the other <code>getProxy()</code> methods. Using
- * {@link org.opentcs.util.eventsystem.AllOrNothingTCSEventFilter#acceptingInstance AllOrNothingTCSEventFilter.acceptingInstance}
+ * polling by calling one of the other <code>getProxy()</code> methods. Using an
+ * {@link org.opentcs.util.eventsystem.AcceptingTCSEventFilter AcceptingTCSEventFilter}
  * as its event filter as shown above will let the proxy receive every event
  * generated inside the kernel without filtering out any of them. To receive all
  * or some of these events in your own code, register an event listener with the

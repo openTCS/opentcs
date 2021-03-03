@@ -27,10 +27,10 @@ And I create a new model
 And I load test123
 Then the model should have one point.
 
-Scenario: Save/load model in Kernel
-When I create a new model
-And I add one point
-And I persist the model in the kernel with name test123
-And I create a new model
-And I load test123 from the kernel
-Then the model should have one point.
+//Scenario: Save/load model in Kernel
+//When I create a new model
+//And I add one point
+//And I persist the model in the kernel with name test123
+//And I create a new model
+//And I load test123 from the kernel
+//Then the model should have one point.

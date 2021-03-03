@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model.elements;
 
 import java.util.LinkedList;
@@ -25,7 +24,9 @@ import org.opentcs.guing.model.ModelComponent;
 /**
  * Abstract implementation for connections:
  * <ol>
- * <li>between two points {@see PathModel}</li>
+ * <li>between two points {
+ *
+ * @see PathModel}</li>
  * <li>between a point and a location {@link LinkModel}</li>
  * </ol>
  *
@@ -35,7 +36,7 @@ import org.opentcs.guing.model.ModelComponent;
 public abstract class AbstractConnection
     extends AbstractFigureComponent
     implements AttributesChangeListener {
-  
+
   /**
    * Key for the start component.
    */
@@ -99,10 +100,6 @@ public abstract class AbstractConnection
         || !Objects.equals(fEndComponent, endComponent)) {
       fStartComponent = startComponent;
       fEndComponent = endComponent;
-      StringProperty stringProperty = (StringProperty) getProperty(START_COMPONENT);
-      stringProperty.setText(startComponent.getName());
-      stringProperty = (StringProperty) getProperty(END_COMPONENT);
-      stringProperty.setText(endComponent.getName());
       updateName();
       connectionChanged();
     }
@@ -162,10 +159,11 @@ public abstract class AbstractConnection
   }
 
   @Override
-  public AbstractConnection clone() throws CloneNotSupportedException {
+  public AbstractConnection clone()
+      throws CloneNotSupportedException {
     AbstractConnection clone = (AbstractConnection) super.clone();
     clone.fConnectionChangeListeners = new LinkedList<>();
-    
+
     return clone;
   }
 
@@ -247,5 +245,9 @@ public abstract class AbstractConnection
 
       propertiesChanged(new NullAttributesChangeListener());
     }
+    StringProperty stringProperty = (StringProperty) getProperty(START_COMPONENT);
+    stringProperty.setText(fStartComponent.getName());
+    stringProperty = (StringProperty) getProperty(END_COMPONENT);
+    stringProperty.setText(fEndComponent.getName());
   }
 }

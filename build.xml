@@ -4,7 +4,7 @@
   <tstamp>
     <format property="opentcs.builddate" pattern="yyyyMMdd" timezone=""/>
   </tstamp>
-  <property name="opentcs.version" value="3.0"/>
+  <property name="opentcs.version" value="3.1"/>
   <property name="src.base" value="${basedir}/src-base"/>
   <property name="src.kernel" value="${basedir}/src-kernel"/>
   <property name="src.plantoverview" value="${basedir}/src-plantoverview"/>

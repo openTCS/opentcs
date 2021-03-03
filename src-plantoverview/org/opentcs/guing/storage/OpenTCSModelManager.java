@@ -192,6 +192,7 @@ public class OpenTCSModelManager
       ModelJAXBReader reader = new ModelJAXBReader(modelToLoad);
       try {
         systemModel = reader.deserialize(file);
+        statusPanel.clear();
         return true;
       }
       catch (IOException | IllegalArgumentException ex) {
@@ -212,6 +213,7 @@ public class OpenTCSModelManager
       fModelName = systemModel.getName();
       ModelPersistor persistor = new ModelKernelPersistor(
           systemModel.getEventDispatcher(), kernel, fModelName);
+      statusPanel.clear();
       return persistModel(systemModel, persistor);
     }
     catch (IOException | CredentialsException e) {
@@ -1276,7 +1278,7 @@ public class OpenTCSModelManager
     }
     JFileChooser fileChooser
         = new JFileChooser(dataDir);
-    int returnVal = fileChooser.showOpenDialog(null);
+    int returnVal = fileChooser.showSaveDialog(null);
 
     File selectedFile;
     if (returnVal == JFileChooser.APPROVE_OPTION) {

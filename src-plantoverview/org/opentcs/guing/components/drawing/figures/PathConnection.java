@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
+import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.DrawingView;
@@ -467,6 +468,16 @@ public class PathConnection
           set(AttributeKeys.STROKE_DASHES, unlockedDash);
         }
       }
+    }
+  }
+  
+  @Override
+  public <T> void set(AttributeKey<T> key, T newValue) {
+    super.set(key, newValue);
+    // if the ModelComponent is set we update the decorations, because
+    // properties like maxReverseVelocity could have changed
+    if (key.equals(FigureConstants.MODEL)) {
+      updateDecorations();
     }
   }
 

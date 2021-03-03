@@ -15,10 +15,8 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
@@ -56,9 +54,6 @@ import org.opentcs.guing.model.elements.PointModel;
 public class LabeledPointFigure
     extends LabeledFigure {
 
-  // Die Anschlusspunkte für Verbinder - ggf. erweitern
-  private final List<Connector> connectors = new LinkedList<>();
-
   /**
    * Creates a new instance.
    *
@@ -69,7 +64,6 @@ public class LabeledPointFigure
     requireNonNull(figure, "figure");
 
     setPresentationFigure(figure);
-    createConnectors();
   }
 
   @Override
@@ -80,22 +74,6 @@ public class LabeledPointFigure
   @Override
   public Shape getShape() {
     return getPresentationFigure().getShape();
-  }
-
-  protected final void createConnectors() {
-    connectors.clear();
-    // Anschlusspunkte für Verbinder an den Seiten
-//		connectors.add(new LocatorConnector(this, RelativeLocator.north()));
-//		connectors.add(new LocatorConnector(this, RelativeLocator.east()));
-//		connectors.add(new LocatorConnector(this, RelativeLocator.west()));
-//		connectors.add(new LocatorConnector(this, RelativeLocator.south()));
-    connectors.add(new ChopEllipseConnector(this));
-  }
-
-  // AbstractFigure
-  @Override
-  public Collection<Connector> getConnectors(ConnectionFigure prototype) {
-    return Collections.unmodifiableList(connectors);
   }
 
   // TODO: Diese Methode überschreiben, damit keine Resize-Handles angezeigt werden
@@ -160,8 +138,6 @@ public class LabeledPointFigure
     if (that.getChildCount() > 0) {
       that.basicRemoveAllChildren();
     }
-
-    that.createConnectors();
 
     return that;
   }

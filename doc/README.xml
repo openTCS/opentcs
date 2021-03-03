@@ -3,7 +3,7 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <article>
   <articleinfo>
-    <title>openTCS version 3.0</title>
+    <title>openTCS version 3.1</title>
   </articleinfo>
 
   <section>
@@ -189,6 +189,47 @@
 
   <section>
     <title>Changelog</title>
+
+    <section>
+      <title>Version 3.1 (2015-03-23)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Fix the encoding of model files written by the plant overview
+          client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fix a problem with renaming points that resulted in broken model
+          files.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fix a crash that happened when trying to open a context menu on
+          a vehicle in modelling mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Properly set the scale factor when loading a model from a
+          file.</para>
+        </listitem>
+
+        <listitem>
+          <para>Avoid a crash when trying to create a transport order with a
+          model that does not contain any locations/transport order
+          destinations.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fix direction indicators of paths not being displayed properly
+          after loading a model from a file.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fix outdated documentation in a couple of places.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
 
     <section>
       <title>Version 3.0 (2014-11-25)</title>

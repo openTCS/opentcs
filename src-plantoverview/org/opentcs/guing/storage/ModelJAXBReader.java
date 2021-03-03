@@ -15,6 +15,7 @@ import static java.util.Objects.requireNonNull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
@@ -103,6 +104,12 @@ public class ModelJAXBReader
                : model.getProperties().entrySet()) {
         layoutComponent.setProperty(property.getKey(), property.getValue());
       }
+      double scaleX = (double)
+          ((LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_X)).getValue();
+      double scaleY = (double)
+          ((LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_Y)).getValue();
+      systemModel.getDrawingMethod().getOrigin().setScale(
+                scaleX, scaleY);
     }
     if (model instanceof LinkModel) {
       systemModel.getMainFolder(FolderKey.LINKS).add(model);

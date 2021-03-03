@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.dialogs;
 
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.model.elements.LocationModel;
@@ -28,132 +28,117 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class EditDriveOrderPanel
-		extends DialogContent {
+    extends DialogContent {
 
-	/**
-	 * Die zur Auswahl stehenden Stationen.
-	 */
-	protected List<LocationModel> fLocations;
-	/**
-	 * Die ausgewählte Station.
-	 */
-	protected LocationModel fSelectedLocation;
-	/**
-	 * Die ausgewählte Aktion.
-	 */
-	protected String fSelectedAction;
+  /**
+   * Die zur Auswahl stehenden Stationen.
+   */
+  protected List<LocationModel> fLocations;
+  /**
+   * Die ausgewählte Station.
+   */
+  protected LocationModel fSelectedLocation;
+  /**
+   * Die ausgewählte Aktion.
+   */
+  protected String fSelectedAction;
 
-	/**
-	 * Creates new form EditDriveOrderPanel
-	 *
-	 * @param locations die zur Auswahl stehenden Stationen
-	 */
-	public EditDriveOrderPanel(List<LocationModel> locations) {
-		initComponents();
-		fLocations = sortLocations(locations);
-		setDialogTitle(ResourceBundleUtil.getBundle().getString("EditDriverOrderPanel.create"));
-	}
+  /**
+   * Creates new form EditDriveOrderPanel
+   *
+   * @param locations die zur Auswahl stehenden Stationen
+   */
+  public EditDriveOrderPanel(List<LocationModel> locations) {
+    initComponents();
+    fLocations = sortLocations(locations);
+    setDialogTitle(ResourceBundleUtil.getBundle().getString("EditDriverOrderPanel.create"));
+  }
 
-	/**
-	 * Creates new form EditDriveOrderPanel
-	 *
-	 * @param locations die zur Auswahl stehenden Stationen
-	 * @param location die Station
-	 * @param action die Aktion
-	 */
-	public EditDriveOrderPanel(List<LocationModel> locations, LocationModel location, String action) {
-		initComponents();
-		fLocations = sortLocations(locations);
-		fSelectedLocation = location;
-		fSelectedAction = action;
-		setDialogTitle(ResourceBundleUtil.getBundle().getString("EditDriverOrderPanel.edit"));
-	}
+  /**
+   * Creates new form EditDriveOrderPanel
+   *
+   * @param locations die zur Auswahl stehenden Stationen
+   * @param location die Station
+   * @param action die Aktion
+   */
+  public EditDriveOrderPanel(List<LocationModel> locations,
+                             LocationModel location, String action) {
+    initComponents();
+    fLocations = sortLocations(locations);
+    fSelectedLocation = location;
+    fSelectedAction = action;
+    setDialogTitle(ResourceBundleUtil.getBundle().getString("EditDriverOrderPanel.edit"));
+  }
 
-	/**
-	 * Sortiert eine Liste mit Stationen anhand des Namens.
-	 *
-	 * @param locations die zu sortierende Liste
-	 * @return die sortierte Liste
-	 */
-	private List<LocationModel> sortLocations(List<LocationModel> locations) {
-		Comparator<LocationModel> c = new Comparator<LocationModel>() {
+  /**
+   * Sortiert eine Liste mit Stationen anhand des Namens.
+   *
+   * @param locations die zu sortierende Liste
+   * @return die sortierte Liste
+   */
+  private List<LocationModel> sortLocations(List<LocationModel> locations) {
+    Comparator<LocationModel> c = new Comparator<LocationModel>() {
 
       @Override
-			public int compare(LocationModel o1, LocationModel o2) {
-				String s1 = o1.getName().toLowerCase();
-				String s2 = o2.getName().toLowerCase();
-				return s1.compareTo(s2);
-			}
-		};
+      public int compare(LocationModel o1, LocationModel o2) {
+        String s1 = o1.getName().toLowerCase();
+        String s2 = o2.getName().toLowerCase();
+        return s1.compareTo(s2);
+      }
+    };
 
-		List<LocationModel> result = new ArrayList<>(locations);
-		Collections.sort(result, c);
+    List<LocationModel> result = new ArrayList<>(locations);
+    Collections.sort(result, c);
 
-		return result;
-	}
-
-  @Override
-	public void update() {
-	}
+    return result;
+  }
 
   @Override
-	public void initFields() {
-		Iterator<LocationModel> e = fLocations.iterator();
+  public void update() {
+  }
 
-		while (e.hasNext()) {
-			LocationModel s = e.next();
-			locationComboBox.addItem(s.getName());
-		}
+  @Override
+  public void initFields() {
+    for (LocationModel s : fLocations) {
+      locationComboBox.addItem(s.getName());
+    }
 
-		if (fSelectedLocation != null) {
-			locationComboBox.setSelectedItem(fSelectedLocation.getName());
-		}
-		else {
-			locationComboBox.setSelectedIndex(0);	/// Das gibt eine IllegalArgumentException!
-		}
+    if (fSelectedLocation != null) {
+      locationComboBox.setSelectedItem(fSelectedLocation.getName());
+    }
+    else if (locationComboBox.getItemCount() > 0) {
+      locationComboBox.setSelectedIndex(0);
+    }
 
-		if (fSelectedAction != null) {
-			actionComboBox.setSelectedItem(fSelectedAction);
-		}
-	}
+    if (fSelectedAction != null) {
+      actionComboBox.setSelectedItem(fSelectedAction);
+    }
+  }
 
-	/**
-	 * Liefert die ausgewählte Station.
-	 *
-	 * @return die ausgewählte Station
-	 */
-	public LocationModel getSelectedLocation() {
-		int index = locationComboBox.getSelectedIndex();
+  /**
+   * Liefert die ausgewählte Station.
+   *
+   * @return die ausgewählte Station
+   */
+  public Optional<LocationModel> getSelectedLocation() {
+    return Optional.ofNullable((LocationModel) locationComboBox.getSelectedItem());
+  }
 
-		if (index == -1) {
-			return null;
-		}
-
-		return fLocations.get(index);
-	}
-
-	/**
-	 * Liefert die ausgewählte Aktion.
-	 *
-	 * @return die ausgewählte Aktion
-	 */
-	public String getSelectedAction() {
-		int index = actionComboBox.getSelectedIndex();
-
-		if (index == -1) {
-			return "";
-		}
-		else {
-			return (String) actionComboBox.getSelectedItem();
-		}
-	}
+  /**
+   * Liefert die ausgewählte Aktion.
+   *
+   * @return die ausgewählte Aktion
+   */
+  public Optional<String> getSelectedAction() {
+    return Optional.ofNullable((String) actionComboBox.getSelectedItem());
+  }
 
   // CHECKSTYLE:OFF
-	/**
-	 * This method is called from within the constructor to initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is always
-	 * regenerated by the Form Editor.
-	 */
+  /**
+   * This method is called from within the constructor to initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -212,33 +197,29 @@ public class EditDriveOrderPanel
     }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
 
-	/**
-	 * Aktualisiert den Inhalt der ComboBox mit den Aktionen. Wird aufgerufen,
-	 * wenn in der ComboBox mit den Stationen ein anderes Element ausgewählt
-	 * wurde.
-	 *
-	 * @param evt das auslösende Ereignis
-	 */
+  /**
+   * Aktualisiert den Inhalt der ComboBox mit den Aktionen. Wird aufgerufen,
+   * wenn in der ComboBox mit den Stationen ein anderes Element ausgewählt
+   * wurde.
+   *
+   * @param evt das auslösende Ereignis
+   */
     private void locationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboBoxActionPerformed
-			DefaultComboBoxModel model = (DefaultComboBoxModel) actionComboBox.getModel();
-			model.removeAllElements();
+      DefaultComboBoxModel model = (DefaultComboBoxModel) actionComboBox.getModel();
+      model.removeAllElements();
 
-			LocationModel sel = getSelectedLocation();
+      getSelectedLocation().ifPresent(location -> {
+        LocationTypeModel type = location.getLocationType();
+        StringSetProperty p = (StringSetProperty) type.getProperty(
+            LocationTypeModel.ALLOWED_OPERATIONS);
+        for (String item : new LinkedList<>(p.getItems())) {
+          model.addElement(item);
+        }
 
-			if (sel != null) {
-				LocationTypeModel type = sel.getLocationType();
-				StringSetProperty p = (StringSetProperty) type.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
-				List<String> items = new LinkedList<>(p.getItems());
-				Iterator<String> e = items.iterator();
-
-				while (e.hasNext()) {
-					model.addElement(e.next());
-				}
-
-				if (model.getSize() > 0) {
-					actionComboBox.setSelectedIndex(0);
-				}
-			}
+        if (model.getSize() > 0) {
+          actionComboBox.setSelectedIndex(0);
+        }
+      });
     }//GEN-LAST:event_locationComboBoxActionPerformed
 
   // CHECKSTYLE:OFF

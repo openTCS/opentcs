@@ -3,14 +3,14 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book lang="en">
   <bookinfo>
-    <title>openTCS 3.0</title>
+    <title>openTCS 3.1</title>
 
     <subtitle>User manual</subtitle>
 
-    <pubdate>November 2014</pubdate>
+    <pubdate>March 2015</pubdate>
 
     <copyright>
-      <year>2009-2014</year>
+      <year>2009-2015</year>
 
       <holder>Fraunhofer IML</holder>
     </copyright>
@@ -195,19 +195,24 @@
           <para><firstterm>Points</firstterm> are logical mappings of discrete
           positions reported by a vehicle. In plant operation mode, vehicles
           move from one point to another in the model. A point can have one of
-          the following types:<itemizedlist>
-              <listitem>
-                <para>Reporting position: Indicates a position at which a
-                vehicle is expected to report in. Halting or even parking at
-                such a position is not allowed.</para>
-              </listitem>
+          the following types:</para>
 
+          <para><itemizedlist>
               <listitem>
                 <para>Halt position: Indicates a position at which a vehicle may
                 halt temporarily, e.g. for executing an operation. The vehicle
                 is also expected to report in when it arrives at such a
                 position. It may not park here for longer than necessary,
-                though.</para>
+                though. Halt position is the default type for points when
+                modelling with the plant overview client.</para>
+              </listitem>
+
+              <listitem>
+                <para>Reporting position: Indicates a position at which a
+                vehicle is expected to report in. Halting or even parking at
+                such a position is not allowed. Therefore a route that only
+                consists of reporting points will be unroutable because the
+                vehicle is not able to halt at any position.</para>
               </listitem>
 
               <listitem>
@@ -249,8 +254,8 @@
       </itemizedlist>
 
       <para>The attributes of these elements that are relevant for the driving
-      course model, e.g. the coordinates of a reporting point or the length of a
-      path, can be edited using the plant overview client.</para>
+      course model, e.g. the coordinates of a point or the length of a path, can
+      be edited using the plant overview client.</para>
 
       <note>
         <para>A point has two sets of coordinates: layout coordinates and model
@@ -264,7 +269,9 @@
         from the presentation; for example, you may want to provide a distorted
         view on the driving course simply because some paths in your plant are
         very long and you mainly want to view all points/locations closely
-        together.</para>
+        together. Dragging points and therefore changing their position in the
+        graphical presentation only affects the corresponding layout
+        coordinates.</para>
 
         <para>To synchronize layout with model coordinates or the other way
         around you have two options:</para>
@@ -513,8 +520,8 @@
 
         <orderedlist>
           <listitem>
-            <para>Create three reporting points by selecting the point tool from
-            the driving course elements toolbar (see red frame in <xref
+            <para>Create three points by selecting the point tool from the
+            driving course elements toolbar (see red frame in <xref
             linkend="screenshot.modelling"/>) and click on three positions on
             the drawing area.</para>
           </listitem>
@@ -1895,6 +1902,35 @@
                 instead of <filename>modelA</filename>.</emphasis></para>
               </listitem>
             </orderedlist>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>I have only reporting points in my model. Why are all
+            transport orders marked <literal>UNROUTABLE</literal>?</para>
+          </question>
+
+          <answer>
+            <para>Vehicles are not allowed to halt at reporting points. Hence at
+            least the starting point and the endpoint (maybe linked to a
+            location) of a route must be halt points to make routing
+            possible.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>How can I create curved paths between two points?</para>
+          </question>
+
+          <answer>
+            <para>Select Bezier from the path tools and connect two points by
+            clicking on the first point, dragging the mouse to the second point
+            and releasing the mouse button there. Then activate the selection
+            tool and click on the previously created bezier path. Two blue
+            control points will appear. Drag the control points to change the
+            shape of the path.</para>
           </answer>
         </qandaentry>
       </qandadiv>
