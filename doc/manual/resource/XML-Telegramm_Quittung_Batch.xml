@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tcsResponseSet>
+    <response xsi:type="scriptResponse" parsingSuccessful="false"
+              id="test.tcs"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <transport orderName="TOrder-0003" executionSuccessful="true"
+                   id="test.tcs"/>
+        <transport orderName="TOrder-0004" executionSuccessful="true"
+                   id="test.tcs"/>
+    </response>
+</tcsResponseSet>

@@ -1,0 +1,19 @@
+syntax: glob
+
+*~
+build/*
+config/docbook/custom/opentcs-fo-titlepage.xsl
+config/docbook/unpacked
+config/openTCS*.xml
+config/plantoverview-docking-layout.xml
+data/accounts.xml
+data/backups
+dist
+lib/openTCS-Base.jar
+lib/openTCS-Kernel.jar
+lib/openTCS-PlantOverview.jar
+log/*.log
+log/statistics/*.txt
+nbproject/private
+reports
+

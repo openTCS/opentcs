@@ -1,0 +1,1704 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book lang="en">
+  <bookinfo>
+    <title>openTCS 2.7</title>
+
+    <subtitle>User manual</subtitle>
+
+    <pubdate>June 2014</pubdate>
+
+    <copyright>
+      <year>2009-2014</year>
+
+      <holder>Fraunhofer IML</holder>
+    </copyright>
+
+    <authorgroup>
+      <author>
+        <firstname>Stefan</firstname>
+
+        <surname>Walter</surname>
+
+        <affiliation>
+          <address><email>stefan.walter@iml.fraunhofer.de</email></address>
+        </affiliation>
+
+        <email>stefan.walter@iml.fraunhofer.de</email>
+      </author>
+    </authorgroup>
+  </bookinfo>
+
+  <chapter>
+    <title>Introduction</title>
+
+    <sect1>
+      <title>Purpose of the software</title>
+
+      <para>openTCS is a control system software for track-guided vehicles, with
+      tracks possibly being virtual. It was primarily developed for the
+      coordination of automated guided vehicles (AGV), but it is generally
+      conceivable to use it with other automatic vehicles like mobile robots or
+      quadrocopters, as openTCS controls the vehicles independent of their
+      specific characteristics like track guidance system or load handling
+      device.</para>
+    </sect1>
+
+    <sect1>
+      <title>System requirements</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Standard PC with at least 512 MB main memory (required
+          processing power of the CPU and actual memory requirement depending on
+          size and complexity of the system to be controlled)</para>
+        </listitem>
+
+        <listitem>
+          <para>Java Runtime Environment (JRE), at least version 1.7 (The
+          directory <filename>bin</filename> of the installed JRE, for example
+          <filename>C:/Program Files/Java/jre1.7.0/bin</filename>, should be
+          included in the enviroment variable <varname>PATH</varname> to be able
+          to use the included start scripts.)</para>
+        </listitem>
+      </itemizedlist>
+    </sect1>
+
+    <sect1>
+      <title>Further documentation</title>
+
+      <para>For information about the respective openTCS version you use -
+      including a changelog for comparison with earlier versions -, please refer
+      to the file <filename>README.html</filename> included in the openTCS
+      distribution.</para>
+
+      <para>If you want to extend and customize openTCS, please also see the
+      JavaDoc documentation that is part of the openTCS distribution. In
+      addition to the API documentation of the openTCS classes, it contains
+      multiple short tutorials aiming primarily at developers.</para>
+    </sect1>
+
+    <sect1>
+      <title>Questions and problem reports</title>
+
+      <para>If you have questions about this manual, the openTCS project or
+      about using or extending openTCS, please contact the development team by
+      using the discussion forums at
+      <uri>http://sourceforge.net/projects/opentcs/</uri> or by sending an
+      e-mail to <email>info@opentcs.org</email>.</para>
+
+      <para>If you encounter technical problems using openTCS, please remember
+      to include the following data in your problem report:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The applications' log files, contained in the subdirectory
+          <filename>log/</filename> of both the kernel and the plant overview
+          application</para>
+        </listitem>
+
+        <listitem>
+          <para>The driving course model you are working with, contained in the
+          subdirectory <filename>data/</filename> of the kernel
+          application</para>
+        </listitem>
+      </itemizedlist>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>System overview</title>
+
+    <sect1>
+      <title>System components and structure</title>
+
+      <para>openTCS consists of the following components running as separate
+      processes and working together in a client-server architecture:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Kernel (server process), running vehicle-independent strategies
+          and drivers for controlled vehicles</para>
+        </listitem>
+
+        <listitem>
+          <para>Clients</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>Plant overview for modelling and visualizing the course
+              layout</para>
+            </listitem>
+
+            <listitem>
+              <para>Arbitrary clients for comunicating with other systems, e.g.
+              for process control or warehouse management</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+
+      <figure>
+        <title>The structure of openTCS</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resource/openTCS_system_structure.png"
+                       format="PNG" scalefit="1" width="100%"/>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>The purpose of the openTCS kernel is to provide an abstract driving
+      course model of a transportation system/plant, to manage transport orders
+      and to compute routes for the vehicles. Clients can communicate with this
+      server process to, for instance, modify the driving course model, to
+      visualize the driving course and the processing of transport orders and to
+      create new transport orders. For user interaction, the kernel provides a
+      graphical user interface titled <guilabel>Kernel Control
+      Center</guilabel>.</para>
+
+      <para>The driver framework that is part of the openTCS kernel manages
+      communication channels and associates vehicle drivers with vehicles. A
+      vehicle driver is an adapter between kernel and vehicle and translates
+      each vehicle-specific communication protocol to the kernel's internal
+      communication schemes and vice versa. Furthermore, a driver may offer
+      low-level functionality to the user via the kernel's graphical user
+      interface, e.g. manually sending telegrams to the associated vehicle. By
+      using suitable vehicle drivers, vehicles of different types can be managed
+      simultaneously by a single openTCS instance.</para>
+
+      <para>The plant overview client that is part of the openTCS distribution
+      allows editing of driving course models while the kernel is running in
+      modelling mode. This includes, for instance, the definition of load-change
+      stations, driving tracks and vehicles. In the kernel's plant operation
+      mode, the plant overview client is used to display the transportation
+      system's general state and any active transport processes, and to create
+      new transport orders interactively.</para>
+
+      <para>Other clients, e.g. to control higher-level plant processes, can be
+      implemented and attached. For Java clients, the openTCS kernel provides an
+      interface based on Java RMI (Remote Method Invocation). A host interface
+      for creating transport orders using XML telegrams sent via TCP/IP
+      connections is also available.</para>
+    </sect1>
+
+    <sect1>
+      <title>Elements of driving course models</title>
+
+      <para>In openTCS, a driving course model consists of the following
+      elements:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><firstterm>Points</firstterm> are logical mappings of discrete
+          positions (reporting points) reported by a vehicle. In plant operation
+          mode, vehicles move from reporting point to reporting point in the
+          model.</para>
+        </listitem>
+
+        <listitem>
+          <para><firstterm>Paths</firstterm> are connections between reporting
+          points that are navigable for vehicles.</para>
+        </listitem>
+
+        <listitem>
+          <para><firstterm>Locations</firstterm> are places at which vehicles
+          may execute special operations (change their load, charge their
+          battery etc.). To be reachable for any vehicle in the model, a
+          location needs to be linked to at least one point.</para>
+        </listitem>
+
+        <listitem>
+          <para><firstterm>Vehicles</firstterm> map real vehicles for the
+          purpose of visualizing their positions and other
+          characteristics.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Furthermore, there is an abstract element that is only used
+      indirectly:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><firstterm>Location types</firstterm> group stations and define
+          operations that can be executed by vehicles at these stations.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The attributes of these elements that are relevant for the driving
+      course model, e.g. the coordinates of a reporting point or the length of a
+      path, can be edited using the plant overview client. Furthermore, it is
+      possible to define arbitrary additional attributes as key-value pairs for
+      all driving course elements, which for example can be read and evaluated
+      by vehicle drivers or client software. Both the key and the value can be
+      arbitrary character strings.</para>
+
+      <para>For example, a key-value pair <literal>"IP
+      address"</literal>:<literal>"192.168.23.42"</literal> could be defined for
+      a vehicle in the model, stating which IP address is to be used to
+      communicate with the vehicle; a vehicle driver could now check during
+      runtime whether a value for the key <literal>"IP address"</literal> was
+      defined, and if yes, use it to automatically configure the communication
+      channel to the vehicle. Another use for these generic attributes can be
+      vehicle-specific actions to be executed on certain paths in the model. If
+      a vehicle should, for instance, issue an acoustic warning and/or turn on
+      the right-hand direction indicator when currently on a certain path,
+      attributes with the keys <literal>"acoustic warning"</literal> and/or
+      <literal>"right-hand direction indicator"</literal> could be defined for
+      this path and evaluated by the respective vehicle driver.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Operating the system</title>
+
+    <sect1>
+      <title>Starting the system</title>
+
+      <para>To create or to edit the model of a transport system, openTCS has to
+      be started in modelling mode. To use it as a transportation control system
+      based on an existing plant model, it has to be started in plant operation
+      mode. Starting a component is done by executing the respective shell
+      script (Unix) or batch file (Windows).</para>
+
+      <sect2>
+        <title>Starting in modelling mode</title>
+
+        <orderedlist>
+          <listitem>
+            <para>Start the kernel
+            (<filename>startKernel.bat</filename>).</para>
+
+            <orderedlist>
+              <listitem>
+                <para>Select existing model (that should be edited) from the
+                list in the dialog window shown, select modelling mode and click
+                <guibutton>OK</guibutton>, or click
+                <guibutton>Cancel</guibutton> to work with a new, empty
+                model.</para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+
+          <listitem>
+            <para>Start the plant overview client
+            (<filename>startPlantOverview.bat</filename>).</para>
+          </listitem>
+
+          <listitem>
+            <para>Use the graphical user interface of the plant overview client
+            to create an arbitrary driving course for your respective
+            application/project. How you can add elements like points, paths and
+            vehicles to your driving course is explained in detail in <xref
+            linkend="section.creating_course"/>.</para>
+          </listitem>
+        </orderedlist>
+      </sect2>
+
+      <sect2>
+        <title>Starting in plant operation mode</title>
+
+        <figure>
+          <title>Plant overview client displaying driving course model</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="resource/screenshot_plant_overview.png"
+                           format="PNG" scalefit="1" width="100%"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <orderedlist>
+          <listitem>
+            <para>Start the kernel
+            (<filename>startKernel.bat</filename>).</para>
+
+            <orderedlist>
+              <listitem>
+                <para>Select an existing model from the list in the dialog
+                window shown, select plant operation mode and click
+                <guibutton>OK</guibutton>.</para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+
+          <listitem>
+            <para>Start the plant overview client
+            (<filename>startPlantOverview.bat</filename>).</para>
+          </listitem>
+
+          <listitem>
+            <para>Select the tab <guilabel>Vehicle drivers</guilabel> in the
+            kernel control center. Then select, configure and start driver for
+            each vehicle in the model.</para>
+
+            <orderedlist>
+              <listitem>
+                <para>The list on the left-hand side of the window shows all
+                vehicles in the chosen model.</para>
+              </listitem>
+
+              <listitem>
+                <para>A detailed view for a vehicle can be seen on the
+                right-hand side of the driver panel after double-clicking on the
+                vehicle in the list. The specific design of this detailed view
+                depends on the driver associated with the vehicle. Usually,
+                status information sent by the vehicle (e.g. current position
+                and mode of operation) is displayed and low-level settings (e.g.
+                for the vehicle's IP address) are provided here.</para>
+              </listitem>
+
+              <listitem>
+                <para>Right-clicking on the list of vehicles shows a popup menu
+                that allows to attach or detach drivers for selected
+                vehicles.</para>
+              </listitem>
+
+              <listitem>
+                <para>For a vehicle to be controlled by the system, a driver
+                needs to be attached to the vehicle and enabled. (For testing
+                purposes without real vehicles that could communicate with the
+                system, the so-called loopback driver can be used, which
+                provides a virtual vehicle or simulates a real one.) How you
+                attach and enable a vehicle driver is explained in detail in
+                <xref linkend="section.configuredriver"/>.</para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+        </orderedlist>
+
+        <figure>
+          <title>Driver panel with detailed view of a vehicle</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="resource/screenshot_driver_panel.png"
+                           format="PNG" scalefit="1" width="100%"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+      </sect2>
+    </sect1>
+
+    <sect1 id="section.creating_course">
+      <title>Constructing a new driving course</title>
+
+      <para>These instructions roughly show how a new driving course model is
+      created and filled with driving course elements so that it can eventually
+      be used in plant operation mode.</para>
+
+      <sect2>
+        <title>Starting components for driving course modelling</title>
+
+        <para><orderedlist>
+            <listitem>
+              <para>Start the kernel
+              (<filename>startKernel.bat</filename>).</para>
+            </listitem>
+
+            <listitem>
+              <para>Wait until a dialog for selecting a driving course model is
+              shown.</para>
+            </listitem>
+
+            <listitem>
+              <para>Click <guibutton>Cancel</guibutton> to open a new, empty
+              model instead of loading an existing one, and to leave the kernel
+              running in modelling mode.</para>
+            </listitem>
+
+            <listitem>
+              <para>Start the plant overview client
+              (<filename>startPlantOverview.bat</filename>).</para>
+            </listitem>
+
+            <listitem>
+              <para>Wait until the graphical user interface of the plant
+              overview client is shown.</para>
+            </listitem>
+          </orderedlist></para>
+      </sect2>
+
+      <sect2>
+        <title>Adding elements to the driving course model</title>
+
+        <figure id="screenshot.modelling">
+          <title>Control elements in the plant overview client (modelling
+          mode)</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="resource/screenshot_modelling.png"
+                           format="PNG" scalefit="1" width="100%"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <orderedlist>
+          <listitem>
+            <para>Create three reporting points by selecting the point tool from
+            the driving course elements toolbar (see red frame in <xref
+            linkend="screenshot.modelling"/>) and click on three positions on
+            the drawing area.</para>
+          </listitem>
+
+          <listitem>
+            <para>Link the three points with paths to a closed loop by</para>
+
+            <orderedlist>
+              <listitem>
+                <para>selecting the path tool by double-click.</para>
+              </listitem>
+
+              <listitem>
+                <para>clicking on a point, dragging the path to the next point
+                and releasing the mouse button there.</para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+
+          <listitem>
+            <para>Create two stations by double-clicking the station tool and
+            clicking on any two free positions on the drawing area. As a station
+            type does not yet exist in the course model, a new one is created
+            implicitly when creating the first station, which can be seen in the
+            tree view to the left of the drawing area.</para>
+          </listitem>
+
+          <listitem>
+            <para>Link the two stations with (different) points by</para>
+
+            <orderedlist>
+              <listitem>
+                <para>double-clicking on the link tool.</para>
+              </listitem>
+
+              <listitem>
+                <para>clicking on a station, dragging the link to a point and
+                releasing the mouse button.</para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+
+          <listitem>
+            <para>Create a new vehicle by clicking on the vehicle button in the
+            course elements toolbar.</para>
+          </listitem>
+
+          <listitem>
+            <para>Define the allowed operations for vehicles at the newly
+            created stations by</para>
+
+            <orderedlist>
+              <listitem>
+                <para>selecting the stations' type in the tree view to the left
+                of the drawing area (see blue frame in <xref
+                linkend="screenshot.modelling"/>).</para>
+              </listitem>
+
+              <listitem>
+                <para>clicking the value cell <literal>"Actions"</literal> in
+                the property window below the tree view.</para>
+              </listitem>
+
+              <listitem>
+                <para>entering the allowed actions as arbitrary text in the
+                dialog shown, for instance <literal>"Load cargo"</literal> and
+                <literal>"Unload cargo"</literal>.</para>
+              </listitem>
+
+              <listitem>
+                <para>Optionally, you can choose a symbol for stations of the
+                selected type by editing the property
+                <literal>"Symbol"</literal>.</para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+        </orderedlist>
+
+        <note>
+          <para>You will not be able to create any transport orders and assign
+          them to vehicles unless you create stations in your plant model, link
+          these stations to points in the driving course and define the
+          operations that vehicles can execute at the respective station
+          types.</para>
+        </note>
+      </sect2>
+
+      <sect2>
+        <title>Saving the driving course model</title>
+
+        <orderedlist>
+          <listitem>
+            <para>Select the menu entry <menuchoice>
+                <guimenu>File</guimenu>
+
+                <guimenuitem>Save Model As...</guimenuitem>
+              </menuchoice> and enter an arbitrary name for the model.</para>
+          </listitem>
+
+          <listitem>
+            <para>Close the plant overview client.</para>
+          </listitem>
+
+          <listitem>
+            <para>Shut down the kernel.</para>
+          </listitem>
+        </orderedlist>
+
+        <para>The newly created driving course model now contains a minimum of
+        elements and can be used in operation mode.</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Operating the system</title>
+
+      <para>These instructions explain how the newly created model can be used
+      in plant operation mode, how vehicle drivers are used and how transport
+      orders can be created and processed by a vehicle.</para>
+
+      <sect2>
+        <title>Starting components for system operation</title>
+
+        <para><orderedlist>
+            <listitem>
+              <para>Start the kernel
+              (<filename>startKernel.bat</filename>).</para>
+            </listitem>
+
+            <listitem>
+              <para>Wait until the dialog for selecting a driving course model
+              is shown.</para>
+            </listitem>
+
+            <listitem>
+              <para>Select the model you created, select plant operation mode,
+              and click <guibutton>OK</guibutton>.</para>
+            </listitem>
+
+            <listitem>
+              <para>Start the plant overview client
+              (<filename>startPlantOverview.bat</filename>) and wait until its
+              graphical user interface is shown.</para>
+            </listitem>
+          </orderedlist></para>
+      </sect2>
+
+      <sect2 id="section.configuredriver">
+        <title>Configuring vehicle drivers</title>
+
+        <para><orderedlist>
+            <listitem>
+              <para>Associate the vehicle with the loopback driver by
+              right-clicking on the vehicle in the vehicle list of the driver
+              panel and selecting the menu entry <menuchoice>
+                  <guimenu>Driver</guimenu>
+
+                  <guimenuitem>Loopback adapter (virtual vehicle)</guimenuitem>
+                </menuchoice>.</para>
+            </listitem>
+
+            <listitem>
+              <para>Open the detailed view of the vehicle by double-clicking on
+              the vehicle's name in the list.</para>
+            </listitem>
+
+            <listitem>
+              <para>In the detailed view of the vehicle that is now shown to the
+              right of the vehicle list, select the tab <guilabel>Loopback
+              options</guilabel>.</para>
+            </listitem>
+
+            <listitem>
+              <para>Enable the driver by ticking the checkbox <guilabel>Enable
+              loopback adapter</guilabel> in the <guilabel>Loopback
+              options</guilabel> tab or the checkbox in the
+              <guilabel>Enabled?</guilabel> column of the vehicle list.</para>
+            </listitem>
+
+            <listitem>
+              <para>In the <guilabel>Loopback options</guilabel> tab or in the
+              vehicles list, select a point from the driving course model to
+              have the loopback adapter report this point to the kernel as the
+              (virtual) vehicle's current position. (In a real-world
+              application, a vehicle driver communicating with a real vehicle
+              would automatically report the vehicle's current position to the
+              kernel as soon as it is known.)</para>
+            </listitem>
+
+            <listitem>
+              <para>In the vehicle driver's <guilabel>Loopback
+              options</guilabel> tab, set the vehicle's state to
+              <code>IDLE</code> to let the kernel know that the vehicle is now
+              in a state that allows it to receive and process orders.</para>
+            </listitem>
+
+            <listitem>
+              <para>Switch to the plant overview client. An icon representing
+              the vehicle should now be shown at the point on which you placed
+              it using the loopback driver.</para>
+            </listitem>
+
+            <listitem>
+              <para>Right-click on the vehicle and select <menuchoice>
+                  <guimenuitem>Dispatch Vehicle</guimenuitem>
+                </menuchoice> in the menu shown to allow the kernel to dispatch
+              the vehicle. The vehicle is then available for processing orders,
+              which is indicated by the <guilabel>Processing state</guilabel>
+              <code>IDLE</code> in the property panel at the bottom left of the
+              plant overview client's window. (You can revert this by
+              right-clicking on the vehicle and selecting <menuchoice>
+                  <guimenuitem>Withdraw TO and Disable Vehicle</guimenuitem>
+                </menuchoice> in the context menu. The processing state shown is
+              now <code>UNAVAILABLE</code> and the vehicle will not be
+              dispatched for transport orders any more.)</para>
+            </listitem>
+          </orderedlist></para>
+      </sect2>
+
+      <sect2>
+        <title>Creating a transport order</title>
+
+        <para>To create a transport order, the plant overview client provides a
+        dialog window presented when selecting <menuchoice>
+            <guimenu>Actions</guimenu>
+
+            <guimenuitem>Transport Order</guimenuitem>
+          </menuchoice> in the menu. Transport orders are defined as a sequence
+        of destination locations at which actions are to be performed by the
+        vehicle processing the order. You can select a destination station and
+        action from a dropdown menu. You may also optionally choose the vehicle
+        intended to process this order. If none is explicitly chosen, the
+        control system automatically assigns the order to a vehicle according to
+        its internal strategies - in most cases, it will pick the vehicle that
+        will most likely finish the transport order the soonest. Furthermore, a
+        transport order can be given a deadline specifying the point of time at
+        which the order should be finished at the latest. This deadline will
+        primarily be considered when there are multiple transport orders in the
+        pool and openTCS needs to decide which to assign next.</para>
+
+        <para>To create a new transport order, do the following:</para>
+
+        <para><orderedlist>
+            <listitem>
+              <para>Select the menu entry <menuchoice>
+                  <guimenu>Actions</guimenu>
+
+                  <guimenuitem>Transport Order</guimenuitem>
+                </menuchoice>.</para>
+            </listitem>
+
+            <listitem>
+              <para>In the dialog shown, click on the <guibutton>Add</guibutton>
+              button and select a station as the destination and an operation
+              which the vehicle should execute there. You can add an arbitrary
+              number of destinations to the order this way. They will be
+              processed in the given order.</para>
+            </listitem>
+
+            <listitem>
+              <para>After creating the transport order with the given
+              destinations by clicking <guibutton>OK</guibutton>, the kernel
+              will check for a vehicle that can process the order. If a vehicle
+              is found, it is assigned the order immediately and the route
+              computed for it will be highlighted in the plant overview client.
+              The loopback driver simulates the vehicle's movement to the
+              destinations and the execution of the operations.</para>
+            </listitem>
+          </orderedlist></para>
+      </sect2>
+
+      <sect2>
+        <title>Withdrawing transport orders using the plant overview
+        client</title>
+
+        <para>A transport order can be withdrawn from a vehicle that is
+        currently processing it. This can be done by right-clicking on the
+        respective vehicle in the plant overview client and selecting
+        <menuchoice>
+            <guimenuitem>Withdraw Transport Order</guimenuitem>
+          </menuchoice> in the context menu shown. The processing of the order
+        will be cancelled and the vehicle (driver) will not receive any further
+        drive orders. Processing of this transport order
+        <emphasis>cannot</emphasis> be resumed later. Instead, a new transport
+        order will have to be created.</para>
+      </sect2>
+
+      <sect2>
+        <title>Continuous creation of transport orders</title>
+
+        <note>
+          <para>The plant overview client can easily be extended via custom
+          plugins. As a reference, a simple load generator plugin is included
+          which also serves as a demonstration of how the system looks like
+          during operation here. Details about how custom plugins can be created
+          and integrated into the plant overview client can be found in <xref
+          linkend="section.plugins"/>.</para>
+        </note>
+
+        <orderedlist>
+          <listitem>
+            <para>In the plant overview client, select <menuchoice>
+                <guimenu>View</guimenu>
+
+                <guisubmenu>Plugins</guisubmenu>
+
+                <guimenuitem>Continuous load</guimenuitem>
+              </menuchoice> from the menu.</para>
+          </listitem>
+
+          <listitem>
+            <para>Choose a trigger for creating new transport orders: New orders
+            will either be created once only, or if the number of active orders
+            in the system drops below a specified limit, or after a specified
+            timeout has expired.</para>
+          </listitem>
+
+          <listitem>
+            <para>By using an <guilabel>Order profile</guilabel> you may decide
+            if the transport orders' destinations should be chosen randomly or
+            if you want to choose them yourself.</para>
+
+            <para>Using <guilabel>Create orders randomly</guilabel>, you define
+            the number of transport orders that are to be generated at a time,
+            and the number of destinations a single transport order should
+            contain. Since the destinations will be selected randomly, the
+            orders created might not necessarily make sense for a real-world
+            system.</para>
+
+            <para>Using <guilabel>Create orders according to
+            definition</guilabel>, you can define an arbitrary number of
+            transport orders, each with an arbitrary number of destinations and
+            properties, and save and load your list of transport orders.</para>
+          </listitem>
+
+          <listitem>
+            <para>Start the order generator by activating the corresponding
+            checkbox at the bottom of the <guilabel>Continuous load</guilabel>
+            panel. The load generator will then generate transport orders
+            according to its configuration until the checkbox is deactivated or
+            the panel is closed.</para>
+          </listitem>
+        </orderedlist>
+      </sect2>
+
+      <sect2>
+        <title>Statistics reports about transport orders and vehicles</title>
+
+        <para>While running in plant operation mode, the openTCS kernel collects
+        data about processed, finished and failed transport orders as well as
+        busy and idle vehicles. It writes this data to log files in the
+        <filename>log/statistics/</filename> subdirectory. To see a basic
+        statistics report for the order processing in a plant operation session,
+        you can use another plugin for the plant overview client that comes with
+        the openTCS distribution:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>In the plant overview client, select <menuchoice>
+                <guimenu>View</guimenu>
+
+                <guisubmenu>Plugins</guisubmenu>
+
+                <guimenuitem>Statistics</guimenuitem>
+              </menuchoice> from the menu.</para>
+          </listitem>
+
+          <listitem>
+            <para>Click the <guibutton>Read input file</guibutton> button and
+            select a log file from <filename>log/statistics/</filename> in the
+            kernel application's directory.</para>
+          </listitem>
+
+          <listitem>
+            <para>The panel will then show an accumulation of the data collected
+            in the statistics log file you opened.</para>
+          </listitem>
+        </orderedlist>
+
+        <note>
+          <para>As the steps above should indicate, the statistics plugin
+          currently does not provide a live view on statistical data in a
+          running plant operation session. The report is an offline report that
+          can be generated only after a plant operation session has ended.
+          Future versions of openTCS may include a live report plugin that
+          collects data directly from the openTCS kernel instead of reading the
+          data from a log file.</para>
+        </note>
+      </sect2>
+
+      <sect2>
+        <title>Removing a vehicle from a running system</title>
+
+        <para>There may be situations in which you want to remove a single
+        vehicle from a system, e.g. because the vehicle temporarily cannot be
+        controlled by openTCS due to a hardware defect that has to be dealt with
+        first. The following steps will ensure that no further transport orders
+        are assigned to the vehicle and that the resources it might still be
+        occupying are freed for use by other vehicles.</para>
+
+        <orderedlist>
+          <listitem>
+            <para>In the plant overview client, right-click on the vehicle and
+            select <menuchoice>
+                <guimenuitem>Withdraw TO and Disable Vehicle</guimenuitem>
+              </menuchoice> to disable the vehicle for transport order
+            processing.</para>
+          </listitem>
+
+          <listitem>
+            <para>In the kernel control center, disable the vehicle's driver by
+            unticking the checkbox <guilabel>Enable loopback adapter</guilabel>
+            in the <guilabel>Loopback options tab</guilabel> or the checkbox in
+            the <guilabel>Enabled?</guilabel> column of the vehicle list.</para>
+          </listitem>
+
+          <listitem>
+            <para>In the kernel control center, right-click on the vehicle in
+            the vehicle list and select <menuchoice>
+                <guimenuitem>Reset vehicle position</guimenuitem>
+              </menuchoice> from the context menu to free the point in the
+            driving course that the vehicle is occupying.</para>
+          </listitem>
+        </orderedlist>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Advanced usage</title>
+
+    <sect1>
+      <title>Attaching vehicle drivers automatically on startup</title>
+
+      <para>Manually attaching drivers to the vehicles in a plant model allows
+      you to explicitly select the driver for each vehicle from the list of
+      available drivers, which can be useful during development. In a productive
+      environment, however, such manual steps are usually undesired. In order to
+      automatically attach matching drivers to all vehicles in a plant model,
+      you can do the following:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Start the kernel.</para>
+        </listitem>
+
+        <listitem>
+          <para>Select a driving course model.</para>
+        </listitem>
+
+        <listitem>
+          <para>Select plant operation mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Switch to the <guilabel>Vehicle drivers</guilabel> tab in the
+          kernel control center.</para>
+        </listitem>
+
+        <listitem>
+          <para>Right-click on the vehicles list and select <menuchoice>
+              <guimenu>Startup options</guimenu>
+
+              <guimenuitem>Auto-attach all</guimenuitem>
+            </menuchoice>. This will let openTCS automatically attach drivers to
+          all vehicles in the list when you start the kernel for plant
+          operation.</para>
+        </listitem>
+
+        <listitem>
+          <para>Right-click on the vehicles list again and select <menuchoice>
+              <guimenu>Startup options</guimenu>
+
+              <guimenuitem>Enable all</guimenuitem>
+            </menuchoice>. This will result in the vehicle drivers also being
+          enabled automatically on startup.</para>
+        </listitem>
+
+        <listitem>
+          <para>From the kernel control center's main menu, select <menuchoice>
+              <guimenu>Settings</guimenu>
+
+              <guimenuitem>Save settings</guimenuitem>
+            </menuchoice> to persist the selected startup options.</para>
+        </listitem>
+      </orderedlist>
+    </sect1>
+
+    <sect1>
+      <title>Initializing a virtual vehicle's position automatically on
+      startup</title>
+
+      <para>Even during the development or simulation phase of a project,
+      repeatedly setting a virtual vehicle's initial position manually via the
+      loopback driver's user interface can be tiresome and possibly error-prone.
+      To automatically set a vehicle's initial position when the loopback driver
+      is enabled, you can store the initial position in the respective plant
+      model by doing the following:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Start the kernel.</para>
+        </listitem>
+
+        <listitem>
+          <para>Select a driving course model.</para>
+        </listitem>
+
+        <listitem>
+          <para>Select course modelling mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Start the plant overview client.</para>
+        </listitem>
+
+        <listitem>
+          <para>In the plant overview client's tree view of the plant model,
+          select a vehicle.</para>
+        </listitem>
+
+        <listitem>
+          <para>In the table showing the vehicle's properties, click into the
+          value field for <guilabel>Initial position</guilabel>. In the dialog
+          shown, select the initial position for this vehicle from the model's
+          list of points.</para>
+        </listitem>
+
+        <listitem>
+          <para>Save the model.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Whenever you attach the loopback driver to the modified vehicle
+      after doing this, it will automatically report the vehicle's position to
+      be the one that you selected.</para>
+    </sect1>
+
+    <sect1>
+      <title>Using model element properties for project-specific data</title>
+
+      <para>Every object in the plant model - i.e. points, paths, locations,
+      location types and vehicles - can be augmented with arbitrary
+      project-specific data that can be used, for instance, by vehicle drivers,
+      custom client applications, etc.. Possible uses for such data could be
+      informing the vehicle driver about additional actions to be performed by a
+      vehicle when moving along a path in the model (e.g. flashing direction
+      indicators, displaying a text string on a display, giving an acoustic
+      warning) or controlling the behaviour of peripheral systems (e.g.
+      automatic fire protection gates).</para>
+
+      <para>The data can be stored in properties, i.e. key-value pairs attached
+      to the model elements, where both the key and the corresponding value are
+      text strings. These key-value pairs can be created and edited using the
+      plant overview client: Simply select the model element you want to add a
+      key-value pair to and click into the value field for
+      <guilabel>Miscellaneous</guilabel> in the properties table. In the dialog
+      shown, set the key-value pairs you need to store your project-specific
+      information.</para>
+
+      <note>
+        <para>For your key-value pairs, you may specify arbitrary keys. openTCS
+        itself will not make any use of this data; it will merely store it and
+        provide it for custom vehicle drivers and/or other extensions. You
+        should, however, not use any keys starting with
+        <literal>"tcs:"</literal>. Any keys with this prefix are reserved for
+        official openTCS features, and using them could lead to
+        collisions.</para>
+      </note>
+    </sect1>
+
+    <sect1>
+      <title>Manipulating the system configuration</title>
+
+      <para>These instructions demonstrate how system parameters that influence
+      e.g. the routing or parking strategies, can be manipulated.</para>
+
+      <sect2>
+        <title>Selecting the cost function used for routing</title>
+
+        <para><orderedlist>
+            <listitem>
+              <para>Switch to the kernel control center's
+              <guilabel>Configuration</guilabel> tab.</para>
+            </listitem>
+
+            <listitem>
+              <para>Find and select the configuration entry
+              <literal>org.opentcs.kernel.module.routing​.BasicRouter.costType</literal>
+              and click the <guibutton>Configure</guibutton> button.</para>
+            </listitem>
+
+            <listitem>
+              <para>In the dialog shown, set the configuration item's value to
+              one of the following:</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para><literal>LENGTH_BASED</literal> (default): Routing costs
+                  are based on the lengths of paths travelled.</para>
+                </listitem>
+
+                <listitem>
+                  <para><literal>TIME_BASED</literal>: Routing costs are based
+                  on the time required for travelling. The time is computed
+                  using the length of a path and the maximum speed with which a
+                  vehicle may move on it.</para>
+                </listitem>
+
+                <listitem>
+                  <para><literal>HOP_BASED</literal>: Routing costs are measured
+                  based on the number of hops/paths travelled along the
+                  route.</para>
+                </listitem>
+
+                <listitem>
+                  <para><literal>EXPLICIT</literal>: Routing costs are
+                  explicitly specified by the modelling user. They can be
+                  specified for every single path in the model using the plant
+                  overview client. (Select a path and set its
+                  <guilabel>Costs</guilabel> property to an arbitrary integer
+                  value.)</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+
+            <listitem>
+              <para>Shut down and restart the kernel for the changes to take
+              effect.</para>
+            </listitem>
+          </orderedlist></para>
+      </sect2>
+
+      <sect2>
+        <title>Configuring automatic parking</title>
+
+        <sect3>
+          <title>Activating/deactivating automatic parking of idle
+          vehicles</title>
+
+          <orderedlist>
+            <listitem>
+              <para>Switch to the kernel control center's
+              <guilabel>Configuration</guilabel> tab.</para>
+            </listitem>
+
+            <listitem>
+              <para>Find and select the configuration entry
+              <literal>org.opentcs.kernel.module.dispatching​.OrderSequenceDispatcher.parkIdleVehicles</literal>
+              and click the <guibutton>Configure</guibutton> button.</para>
+            </listitem>
+
+            <listitem>
+              <para>Set the configuration item's value to
+              <literal>true</literal> (activated) or <literal>false</literal>
+              (deactivated).</para>
+            </listitem>
+          </orderedlist>
+        </sect3>
+      </sect2>
+
+      <sect2>
+        <title>Configuring order pool cleanup</title>
+
+        <para>By default, openTCS checks in intervals of ten minutes if the
+        number of finished transport orders in the pool exceeds 200. If this is
+        the case, the oldest of these orders are removed from the pool until
+        only 200 are left. To customize this behaviour, the following steps are
+        required:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Switch to the kernel control center's
+            <guilabel>Configuration</guilabel> tab.</para>
+          </listitem>
+
+          <listitem>
+            <para>Find and select the configuration entry
+            <code>org.opentcs.kernel.OrderCleanerTask​.orderSweepInterval</code>.
+            The default value is 600000 (milliseconds, corresponding to an
+            interval of 10 minutes). Set this value according to your
+            needs.</para>
+          </listitem>
+
+          <listitem>
+            <para>Find and select the configuration entry
+            <code>org.opentcs.kernel.OrderCleanerTask​.orderSweepType</code>.
+            Its default value is <literal>BY_AMOUNT</literal>, which means that
+            orders will be cleaned up when reaching a certain amount. Changing
+            this value to <literal>BY_AGE</literal> will remove finished
+            transport orders once they have passed a certain age.</para>
+
+            <itemizedlist>
+              <listitem>
+                <para>If you selected <literal>BY_AMOUNT</literal>, find and
+                select the configuration entry
+                <code>org.opentcs.kernel.OrderCleanerTaskByAmount​.orderSweepThreshold</code>.
+                The default value is 200 (orders to be kept in the pool). Set
+                this value according to your needs.</para>
+              </listitem>
+
+              <listitem>
+                <para>If you selected <literal>BY_AGE</literal>, find and select
+                the configuration entry
+                <code>org.opentcs.kernel.OrderCleanerTask​ByAge.orderSweepAge</code>
+                to change the maximum age of finished orders. The default value
+                is 3600000 (milliseconds, corresponding to one hour that a
+                finished order should be kept in the pool). Set this value
+                according to your needs.</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </orderedlist>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter id="chapter.hostinterface">
+    <title>Interfaces to other systems</title>
+
+    <para>openTCS offers the following interfaces for communication with other
+    systems:<itemizedlist>
+        <listitem>
+          <para>An RMI interface providing access to all functions of the
+          kernel</para>
+        </listitem>
+
+        <listitem>
+          <para>A bidirectional interface via a TCP/IP connection for the
+          creation of transport orders</para>
+        </listitem>
+
+        <listitem>
+          <para>An unidirectional interface via a TCP/IP connection for
+          receiving status messages, e.g. about transport orders being
+          processed</para>
+        </listitem>
+      </itemizedlist>The RMI interface is described in the API documentation of
+    the openTCS distribution. The descriptions of the interface
+    <classname>org.opentcs.access.Kernel</classname> and the class
+    <classname>org.opentcs.access.rmi.DynamicRemoteKernelProxy</classname> as
+    well as the package <package>org.opentcs.data.order</package> are good
+    points to get started.</para>
+
+    <para>The TCP/IP interfaces are described in the following sections.</para>
+
+    <sect1>
+      <title>Creating orders via TCP/IP</title>
+
+      <para>For creating transport orders, the openTCS kernel accepts
+      connections to a TCP port (default: port 55555). The communication between
+      openTCS and the host works as follows:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>The host establishes a new TCP/IP connection to openTCS.</para>
+        </listitem>
+
+        <listitem>
+          <para>The host sends a single XML telegram (described in detail in
+          <xref linkend="section.xmlorders"/> and <xref
+          linkend="section.xmlbatches"/>) which either describes the transport
+          orders to be created or identifies batch files that are available with
+          the kernel and that contain the transport order descriptions.</para>
+        </listitem>
+
+        <listitem>
+          <para>The host closes its output stream of the TCP/IP connection or
+          sends two consecutive line breaks (i.e.
+          "<literal>\r\n\r\n</literal>"), letting the kernel know that no
+          further data will follow.</para>
+        </listitem>
+
+        <listitem>
+          <para>openTCS interprets the telegram sent by the host, creates the
+          corresponding transport orders and activates them.</para>
+        </listitem>
+
+        <listitem>
+          <para>openTCS sends an XML telegram (described in detail in <xref
+          linkend="section.xmlreceipts"/>) to confirm processing of the
+          telegram.</para>
+        </listitem>
+
+        <listitem>
+          <para>openTCS closes the TCP/IP connection.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>The following points should be respected:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Multiple sets of transport orders are not intended to be
+          transferred via the same TCP connection. After processing a set and
+          sending the response, openTCS closes the connection. To transfer
+          further sets new TCP/IP connections need to be established by the peer
+          system.</para>
+        </listitem>
+
+        <listitem>
+          <para>openTCS only waits a limited amount of time (default: ten
+          seconds) for incoming data. If there is no incoming data from the peer
+          system over a longer period of time, the connection will be closed by
+          openTCS without any transport orders being created.</para>
+        </listitem>
+
+        <listitem>
+          <para>The maximum length of a single XML telegram is limited to 100
+          kilobytes by default. If more data is transferred, the connection will
+          be closed without any transport orders being created.</para>
+        </listitem>
+      </itemizedlist>
+
+      <sect2 id="section.xmlorders">
+        <title>XML telegrams for creating orders</title>
+
+        <para>Every XML telegram sent to openTCS via the interface described
+        above can describe multiple transport orders to be created. Every order
+        element must contain the following data:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>A string identifying the order element. This string is
+            required for unambiguous matching of receipts (see <xref
+            linkend="section.xmlreceipts"/>) and orders.</para>
+          </listitem>
+
+          <listitem>
+            <para>A sequence of destinations and destination operations defining
+            the actual order.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Furthermore, each order element may contain the following
+        data:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>A deadline/point of time at which the order should be
+            finished.</para>
+          </listitem>
+
+          <listitem>
+            <para>The name of a vehicle in the system that the order should be
+            assigned to. If this information is missing, any vehicle in the
+            system may process the order.</para>
+          </listitem>
+
+          <listitem>
+            <para>A set of names of existing transport orders that have to be
+            finished before the new order may be assigned to a vehicle.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para><xref linkend="figure.xmlorders"/> shows how an XML telegram for
+        the creation of two transport orders could look like.</para>
+
+        <figure id="figure.xmlorders">
+          <title>XML telegram for the creation of two transport orders</title>
+
+          <mediaobject>
+            <textobject>
+              <programlisting><xi:include
+                  href="resource/XML-Telegramm_zwei_Auftraege.xml" parse="text"
+                  xmlns:xi="http://www.w3.org/2001/XInclude"/></programlisting>
+            </textobject>
+          </mediaobject>
+        </figure>
+      </sect2>
+
+      <sect2 id="section.xmlbatches">
+        <title>XML telegrams referencing order batches</title>
+
+        <para>Alternatively, an XML telegram may also reference order batches
+        which are kept in files on the openTCS system. The (parameters of the)
+        transport orders to be created will then be read from the referenced
+        batch files. A batch file may contain/create an arbitrary number of
+        transport orders and needs to be placed in the kernel application's
+        subdirectory <filename>scripts</filename>. In the openTCS distribution,
+        this directory already contains a couple of templates for batch files
+        (<filename>template.tcs</filename> and
+        <filename>test.tcs</filename>).</para>
+
+        <para><xref linkend="figure.xmlbatch"/> shows an example of an XML
+        telegram referencing a batch file.</para>
+
+        <figure id="figure.xmlbatch">
+          <title>XML telegram referencing a batch file</title>
+
+          <mediaobject>
+            <textobject>
+              <programlisting><xi:include
+                  href="resource/XML-Telegramm_Batch.xml" parse="text"
+                  xmlns:xi="http://www.w3.org/2001/XInclude"/></programlisting>
+            </textobject>
+          </mediaobject>
+        </figure>
+      </sect2>
+
+      <sect2 id="section.xmlreceipts">
+        <title>Receipts for created orders</title>
+
+        <para>In response to an XML telegram for the creation of transport
+        orders, an XML telegram will be sent back to the peer, reporting the
+        operation's outcome. In the response telegram, every order element of
+        the original telegram will be referenced by a response element with the
+        same ID. Furthermore, every response element contains:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>A flag reflecting the success of creating the respective
+            order</para>
+          </listitem>
+
+          <listitem>
+            <para>The name that openTCS internally assigned to the created
+            order. (This name is relevant for interpreting the messages on the
+            status channel - see <xref
+            linkend="section.statuschannel"/>.)</para>
+          </listitem>
+        </itemizedlist>
+
+        <para><xref linkend="figure.xmlreceipts"/> shows how a response to the
+        telegram in <xref linkend="figure.xmlorders"/> could look like.</para>
+
+        <figure id="figure.xmlreceipts">
+          <title>XML telegram with receipts for created orders</title>
+
+          <mediaobject>
+            <textobject>
+              <programlisting><xi:include
+                  href="resource/XML-Telegramm_Quittung_Auftraege.xml"
+                  parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                  </programlisting>
+            </textobject>
+          </mediaobject>
+        </figure>
+      </sect2>
+
+      <sect2>
+        <title>Receipts for order batches</title>
+
+        <para>For referenced order batches, receipts will be sent back to the
+        peer, too. The response contains an element for every batch file
+        referenced by the peer. If the batch file was successfully read and
+        processed, a response for every single order definition it contains will
+        be included.</para>
+
+        <para><xref linkend="figure.xmlreceiptsbatch"/> shows a possible
+        response to the batch file reference in <xref
+        linkend="figure.xmlbatch"/>. In this case, the batch file contains two
+        transport order definitions which have been processed
+        successfully.</para>
+
+        <figure id="figure.xmlreceiptsbatch">
+          <title>XML telegram with receipts for orders in batch file</title>
+
+          <mediaobject>
+            <textobject>
+              <programlisting><xi:include
+                  href="resource/XML-Telegramm_Quittung_Batch.xml" parse="text"
+                  xmlns:xi="http://www.w3.org/2001/XInclude"/></programlisting>
+            </textobject>
+          </mediaobject>
+        </figure>
+      </sect2>
+    </sect1>
+
+    <sect1 id="section.statuschannel">
+      <title>Status messages via TCP/IP</title>
+
+      <para>To receive status messages for transport orders in the system,
+      connections to another TCP port (default: port 44444) may be established.
+      Whenever the state of a transport order changes, an XML telegram will be
+      sent to each connnected client, describing the new state of the order.
+      Each of these telegrams is followed by a string that does not appear in
+      the telegrams themselves (by default, a single pipe symbol: "|"), marking
+      the end of the respective telegram. Status messages will be sent until the
+      peer closes the TCP connection.</para>
+
+      <para>The following points should be respected:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>From the peer's point of view, connections to this status
+          channel are purely passive, i.e. openTCS does not expect any messages
+          from the peer and will not process any data received via this
+          connection.</para>
+        </listitem>
+
+        <listitem>
+          <para>A peer needs to filter the received telegrams for relevant data
+          itself. The openTCS kernel does not provide any filtering of status
+          messages for clients.</para>
+        </listitem>
+
+        <listitem>
+          <para>Due to concurrent processes within openTCS, it is possible that
+          the creation and activation of a transport order and its assignment to
+          a vehicle is reported via the status channel before the peer that
+          created the order receives the corresponding receipt.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para><xref linkend="figure.statusmessage"/> shows a status message as it
+      would be sent via the status channel after the first of the two transport
+      orders defined in <xref linkend="figure.xmlorders"/> has been created and
+      activated.</para>
+
+      <figure id="figure.statusmessage">
+        <title>Status message for the generated order</title>
+
+        <mediaobject>
+          <textobject>
+            <programlisting><xi:include href="resource/XML-Telegramm_Status.xml"
+                parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+                </programlisting>
+          </textobject>
+        </mediaobject>
+      </figure>
+    </sect1>
+
+    <sect1>
+      <title>XML schemas for telegrams and scripts</title>
+
+      <para>XML schemas describing the expected structure of XML order telegrams
+      and order batch files as well as the structure of receipt telegrams as
+      sent by openTCS are part of the openTCS distribution and can be found in
+      the directory containing the documentation.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Customizing and integrating openTCS</title>
+
+    <sect1>
+      <title>Integrating custom vehicle drivers</title>
+
+      <para>openTCS supports dynamic integration of vehicle drivers that
+      implement vehicle-specific communication protocols and thus mediate
+      between the kernel and the vehicle. Due to its function, a vehicle driver
+      is also called a communication adapter. The following sections describe
+      which requirements must be met by a driver and which steps are necessary
+      to create and use it. A basic prerequisite for the integration of drivers
+      is their implementation in the Java programming language. Therefore, these
+      instructions are directed primarily at developers who are familiar with
+      programming in Java. They are also primarily a rough guide, while the
+      implementation details can be found in the API documentation.</para>
+
+      <sect2>
+        <title>Important classes and interfaces</title>
+
+        <para><figure id="figure.driverarch">
+            <title>Structure of driver classes</title>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="resource/Treiberstruktur.png" format="PNG"
+                           scalefit="1" width="100%"/>
+              </imageobject>
+            </mediaobject>
+          </figure></para>
+
+        <para>openTCS defines some Java classes and interfaces that are relevant
+        for the development of vehicle drivers. These classes and interfaces are
+        part of every openTCS distribution and are (among others) included in
+        the JAR file <filename>openTCS-Base.jar</filename>. The most important
+        classes and interfaces are the following:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><classname>org.opentcs.drivers.CommunicationAdapter</classname>
+            declares methods that every driver must implement. These methods are
+            called by the kernel, for instance when a vehicle is supposed to
+            move to the next position in the driving course.</para>
+          </listitem>
+
+          <listitem>
+            <para><classname>org.opentcs.drivers.VehicleManager</classname>
+            offers methods that the driver may call when certain events occur,
+            e.g. to report a change of the vehicle's position.</para>
+          </listitem>
+
+          <listitem>
+            <para><classname>org.opentcs.drivers.BasicCommunicationAdapter</classname>
+            is the base class for all drivers. Every driver implemented needs to
+            be derived from this class. It allows the integration of the driver
+            into the driver framework and the graphical user interface.
+            Furthermore, it includes sensible default implementations for some
+            of the methods declared by
+            <classname>CommunicationAdapter</classname>. Only those methods
+            concerning the vehicle-specific communication protocol are declared
+            as abstract and thus must be implemented by subclasses.</para>
+          </listitem>
+
+          <listitem>
+            <para><classname>org.opentcs.drivers.CommunicationAdapterView</classname>
+            needs to be implemented by all driver-specific panels that are to be
+            shown in the driver application and whose contents depend on the
+            state of the respective <classname>CommunicationAdapter</classname>.
+            Calls to the method <methodname>update()</methodname> inform the
+            panel that the state of the driver or of the vehicle has changed and
+            the graphical user interface may need to be updated.</para>
+          </listitem>
+
+          <listitem>
+            <para><classname>org.opentcs.drivers.CommunicationAdapterFactory</classname>
+            declares methods that have to be implemented by the factory class of
+            the driver. The factory class creates and configures instances of
+            the actual <classname>CommunicationAdapter</classname>
+            implementation before they are made available to the driver
+            application.</para>
+          </listitem>
+
+          <listitem>
+            <para><classname>org.opentcs.drivers.CommunicationAdapterRegistry</classname>
+            is the central registry for all factory classes. A factory class is
+            found automatically by the registry if it is in the Java class path
+            and has been declared as an implementation of the service
+            <classname>org.opentcs.drivers.CommunicationAdapterFactory</classname>.
+            Only factory classes that are declared as service implementations
+            and found in the class path will be offered for association with a
+            vehicle by the driver framework. (See also the documentation for the
+            class <classname>java.util.ServiceLoader</classname> in the Java
+            standard class library.)</para>
+
+            <para><xref linkend="figure.driverarch"/> shows the classes'
+            relations in a concrete driver implementation, the loopback
+            driver.</para>
+          </listitem>
+        </itemizedlist>
+      </sect2>
+
+      <sect2>
+        <title>Creating a new vehicle driver</title>
+
+        <para>See the API documentation for package
+        <package>org.opentcs.drivers</package>. It lists the implementation
+        steps to create a new vehicle driver.</para>
+      </sect2>
+
+      <sect2>
+        <title>Requirements for using a vehicle driver</title>
+
+        <para>See the API documentation for package
+        <package>org.opentcs.drivers</package>. It contains a detailed
+        description about what to do for a custom vehicle driver to be
+        recognized and integrated at runtime.</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Customizing the appearance of locations and vehicles</title>
+
+      <para>Locations and vehicles are visualized in the plant overview client
+      using pluggable themes. To customize the appearance of locations and
+      vehicles, new theme implementations can be created and integrated into the
+      plant overview client. Detailed instructions for creating such a location
+      or vehicle theme can be found in the API documentation for package
+      <package>org.opentcs.util.gui.plugins</package>.</para>
+    </sect1>
+
+    <sect1 id="section.plugins">
+      <title>Adding custom plugins</title>
+
+      <para>The plant overview client also offers to integrate third-party
+      panels providing custom functionality. The detailed requirements and
+      instructions for creating plugin panels can be found in the API
+      documentation for package <package>org.opentcs.util.gui.plugins</package>.
+      The classes of the load generator panel included in the openTCS
+      distribution can be used as a reference for your own plugin panel
+      implementations. You can find them in the package
+      <package>org.opentcs.guing.plugins.panels.loadgenerator</package>.</para>
+    </sect1>
+
+    <sect1>
+      <title>Loading a model on kernel startup</title>
+
+      <para>When running the kernel using the startup script that is part of the
+      openTCS distribution (<filename>startKernel.bat</filename> or
+      <filename>startKernel.sh</filename>, depending on the operating system), a
+      dialog is shown that allows you to select the driving course model to be
+      loaded and the desired kernel mode (modelling or operating the system).
+      Alternatively, you can let the kernel load a specific model on startup
+      without any user interaction by doing the following:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Open the kernel's startup script in a text editor.</para>
+        </listitem>
+
+        <listitem>
+          <para>Find the line containing the kernel startup parameter
+          <literal>-choosemodel</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para>Replace <literal>-choosemodel</literal> with <literal>-loadmodel
+          MODELNAME</literal>, where <literal>MODELNAME</literal> is the name of
+          the model you want the kernel to load on startup.</para>
+        </listitem>
+      </orderedlist>
+    </sect1>
+
+    <sect1>
+      <title>Running kernel and plant overview on separate systems</title>
+
+      <para>The kernel and the plant overview client communicate via Java's
+      Remote Method Invocation (RMI) mechanism. This makes it possible to run
+      the kernel and the plant overview client on separate systems, as long as a
+      network connection between these systems exists and is usable.</para>
+
+      <para>To connect a plant overview client to a kernel running on a remote
+      system, do the following:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Open the plant overview client's startup script that comes with
+          the openTCS distribution (<filename>startPlantOverview.bat</filename>
+          or <filename>startPlantOverview.sh</filename>, depending on the
+          operating system) in a text editor.</para>
+        </listitem>
+
+        <listitem>
+          <para>Find the line containing the Java VM startup parameter
+          <literal>-Dopentcs.kernel.host=localhost</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para>With this parameter, change <literal>localhost</literal> to one
+          of the following:</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>If you want the plant overview client to always connect to a
+              kernel on a specific host, replace <literal>localhost</literal>
+              with the host name or IP address of this host.</para>
+            </listitem>
+
+            <listitem>
+              <para>If you do not know the host name or IP address of the system
+              the kernel will be running on in advance, simply remove
+              <literal>localhost</literal> from the parameter, leaving only
+              <literal>-Dopentcs.kernel.host=</literal>. This will result in a
+              dialog being shown every time the plant overview client is
+              started, allowing you to enter the host name or IP address to be
+              used for that session.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </orderedlist>
+    </sect1>
+  </chapter>
+</book>

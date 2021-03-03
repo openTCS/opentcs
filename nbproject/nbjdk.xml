@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="openTCS-HEAD">
+    <property file="nbproject/nbjdk.properties"/>
+    <property location="${netbeans.user}/build.properties" name="user.properties.file"/>
+    <property file="${user.properties.file}"/>
+    <import file="jdk.xml"/>
+    <target depends="-jdk-init" name="buildall">
+        <ant inheritall="false" target="buildall"/>
+    </target>
+    <target depends="-jdk-init" name="cleanall">
+        <ant inheritall="false" target="cleanall"/>
+    </target>
+    <target depends="-jdk-init" name="buildapidocs">
+        <ant inheritall="false" target="buildapidocs"/>
+    </target>
+</project>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tcsScriptFile sequentialDependencies="false">
+    <order>
+        <destination operation="NOP" locationName="TST11"/>
+        <destination operation="NOP" locationName="TST8"/>
+    </order>
+    <order>
+        <destination operation="NOP" locationName="TST12"/>
+        <destination operation="NOP" locationName="TST9"/>
+    </order>
+</tcsScriptFile>

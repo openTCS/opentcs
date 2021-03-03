@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tcsScriptFile sequentialDependencies="false">
+    <order intendedVehicle="Some vehicle">
+        <destination operation="Op" locationName="La Locanda"/>
+        <destination operation="Op2" locationName="Another loc"/>
+    </order>
+</tcsScriptFile>

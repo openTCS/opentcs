@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <articleinfo>
+    <title>openTCS version 2.7.1</title>
+  </articleinfo>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>openTCS (short for "open Transportation Control System") is a free
+    platform for controlling vehicles in an Automated Guided Vehicle System
+    (AGVS). (It should generally be possible to control any track-guided vehicle
+    with it, but AGVS are the main target.) It is being maintained at the
+    Fraunhofer Institute for Material Flow and Logistics in Dortmund,
+    Germany.</para>
+
+    <para>The software runs on the Java platform (JDK 1.7 or later). All
+    libraries required for compiling and/or using it are included in the
+    distribution.</para>
+
+    <para>openTCS itself is not a complete product you can use "out-of-the-box"
+    to control an AGVS with. It is an implementation of the basic data
+    structures and algorithms (routing, dispatching, scheduling) needed for
+    running an AGVS with more than one vehicle. It tries to be as generic as
+    possible to allow interoperation with track-guided vehicles of practically
+    any vendor. Thus it is usually necessary to at least create and integrate a
+    vehicle driver (called "communication adapter" in openTCS-speak) that
+    translates between the abstract interface of the openTCS kernel and the
+    communication protocol your vehicle understands. Depending on your needs, it
+    might also be necessary to adapt algorithms or add project-specific
+    strategies.</para>
+
+    <para>The openTCS source code is licensed partly under the terms of the MIT
+    License and partly under the terms of the GNU Lesser General Public License.
+    A copy of the licenses is included in the distribution. For details on the
+    licensing, see the file <filename>LICENSE.txt</filename>.</para>
+
+    <para>Please note that openTCS is distributed without any warranty - without
+    even the implied warranty of merchantibility or fitness for a particular
+    purpose. Please refer to the license for details.</para>
+
+    <para>We are grateful to any developers that have contributed to openTCS. A
+    list of all contributors can be found at the end of this document.</para>
+
+    <para>To download the latest version and/or read news about openTCS, please
+    see its web site at <ulink
+    url="http://www.opentcs.org/">http://www.opentcs.org/</ulink>.</para>
+  </section>
+
+  <section>
+    <title>System requirements</title>
+
+    <para>The openTCS source code is written in Java. To compile it, you need a
+    Java Development Kit (JDK) 1.7 or later. To run the resulting binaries, you
+    need a Java Runtime Environment (JRE) 1.7 or later. All other required
+    libraries are included in the openTCS distribution.</para>
+
+    <para>The openTCS build process is automated based on Apache Ant. To build
+    openTCS, you need Apache Ant 1.8 or later. (For more information about Ant,
+    please see <ulink
+    url="http://ant.apache.org/">http://ant.apache.org/</ulink>.) The whole
+    build process is programmed in the Ant build script - see the file
+    <filename>build.xml</filename> in the main directory.</para>
+
+    <para>These are the main build targets you need to know to get
+    started:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>buildall: Compiles the source code to a runnable state, i.e. after
+        running this target you can use the included shell scripts/batch files
+        to start all system components.</para>
+      </listitem>
+
+      <listitem>
+        <para>builddocs: Generates the documentation (manual, API documentation
+        and XML Schema files) in <filename>build/</filename>.</para>
+      </listitem>
+
+      <listitem>
+        <para>distall: Build and packages all system components for production
+        use in <filename>dist/</filename>.</para>
+      </listitem>
+
+      <listitem>
+        <para>runtests: Builds everything and runs all JUnit tests (located in
+        <filename>tests/</filename>). Test results can be found in
+        <filename>reports/junit/</filename>.</para>
+      </listitem>
+
+      <listitem>
+        <para>cleanall: Cleans up everything produced by the other
+        targets.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>NetBeans project</title>
+
+    <para>The openTCS project team mainly uses NetBeans for development. The
+    NetBeans project data is included in every openTCS release, so if you happen
+    to use NetBeans, too, all you have to do is load the openTCS project in
+    it.</para>
+
+    <para>After loading the project in NetBeans, you can run e.g. the 'buildall'
+    target in the <filename>build.xml</filename> file to build the whole
+    system.</para>
+  </section>
+
+  <section>
+    <title>Getting started</title>
+
+    <para>To get started with openTCS, please refer to the introductory
+    documentation that should be included in the distribution.</para>
+
+    <para>To start developing with openTCS, the file
+    <filename>openTCS-Base.jar</filename> should be included in your class path.
+    Please refer to the JavaDoc API documentation that should also be included
+    in the distribution, especially:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>The interface documentation of
+        <classname>org.opentcs.access.Kernel</classname> describes the main
+        interface of the openTCS kernel that accepts calls from clients.</para>
+      </listitem>
+
+      <listitem>
+        <para>The class documentation of
+        <classname>org.opentcs.access.rmi.DynamicRemoteKernelProxy</classname>
+        describes how to get an instance of org.opentcs.kernel.Kernel from a
+        separate JVM/process.</para>
+      </listitem>
+
+      <listitem>
+        <para>The package documentation of
+        <classname>org.opentcs.data.order</classname> describes how to create
+        transport orders programmatically via the kernel interface.</para>
+      </listitem>
+
+      <listitem>
+        <para>The package documentation of
+        <classname>org.opentcs.drivers</classname> describes the basic steps
+        needed to create your own vehicle driver.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Limitations</title>
+
+    <para>openTCS has some known limitations that we hope we can address in the
+    future. Here's a (probably incomplete) list:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>The complete API of the kernel with all features is currently only
+        available via RMI/the Kernel interface. This limits clients that need or
+        want to use all of these features to the Java platform (and RMI).</para>
+      </listitem>
+
+      <listitem>
+        <para>There is practically no code for deadlock avoidance for
+        concurrently scheduled vehicles, i.e. it's possible that two or more
+        vehicle moving in the same area run into a deadlock, which then needs to
+        be resolved manually. This can be avoided by taking it into account when
+        designing the layout of the vehicles' tracks.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Support</title>
+
+    <para>Please note that, while we are happy to be able to release openTCS to
+    the public as free software and would like to see it used and improved
+    continuously, the development team cannot provide unlimited free support for
+    it. Supporting, fixing bugs and improving the software requires funding, and
+    we depend on providing commercial openTCS-related services for that.</para>
+
+    <para>If you have technical/support questions, you can send them via e-mail
+    to <ulink url="mailto:info@opentcs.org">info@opentcs.org</ulink> or use the
+    project's forum at sourceforge.net. The developers involved will respond as
+    soon as possible.</para>
+  </section>
+
+  <section>
+    <title>Changelog</title>
+
+    <section>
+      <title>Version 2.7.1 (2014-06-30)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Fixed a potential crash with switching to plant operation mode
+          when the model contained static routes.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.7 (2014-06-25)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Updated library Docking Frames to 1.1.2p11.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added library Google Guava 16.0.1 for better code readability
+          via small utility methods.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added position coordinates to locations.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added synchronization of model and layout coordinates for points
+          and locations.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fixed reconstruction of routing tables when locking/unlocking
+          paths in plant operation mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Reimplemented the former Dijkstra-based routing table
+          construction, now providing one based on breadth-first search and an
+          alternative based on depth-first search, and use pluggable routing
+          cost functions.</para>
+        </listitem>
+
+        <listitem>
+          <para>Implemented a proper life cycle for plant overview plugin
+          panels.</para>
+        </listitem>
+
+        <listitem>
+          <para>Modified model management to not allow model names to differ in
+          the case of their spelling only to prevent inconsistencies on Windows
+          systems.</para>
+        </listitem>
+
+        <listitem>
+          <para>Replaced the reference on a Location in a MovementCommand with
+          the Location itself to provide more information to the vehicle
+          driver.</para>
+        </listitem>
+
+        <listitem>
+          <para>Made more wide-spread use of dependency injection via Guice and
+          refactored, cleaned up and simplified source code in many places,
+          primarily in the plant overview client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Many small bugfixes and improvements.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.6.1 (2014-03-14)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Properly color the route for vehicles that have just been
+          created and not loaded from an existing plant model.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fix loading plant models created by older versions of openTCS
+          that contained certain path liner types.</para>
+        </listitem>
+
+        <listitem>
+          <para>Properly set point types as read from the plant model in the
+          plant overview client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Do not provide a clickable graphical figure in the plant
+          overview client for vehicles that should actually be invisible.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.6 (2014-02-28)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Updated library Docking Frames to 1.1.2p10e.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated library JDOM to 2.0.5.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated library JFreeChart to 1.0.17, including an update of
+          JCommon to 1.0.21.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated library JUnit to 4.11, including the addition of
+          Hamcrest 1.3.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated DocBook style sheets to 1.78.1.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added library Google Guice 3.0 for dependency injection and thus
+          better modularity.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added library Mockito 1.9.5 to simplify and improve the included
+          unit tests.</para>
+        </listitem>
+
+        <listitem>
+          <para>Downgraded the Saxon XSL processor to version 6.5.5, as more
+          recent versions seem to have deficiencies with DocBook to FO
+          transformations.</para>
+        </listitem>
+
+        <listitem>
+          <para>Merged the experimental generic client application into the
+          plant overview client, which can now be extended with plugin-like
+          panels providing custom functionality.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added plugin panels for load generation and statistics reports
+          into the plant overview client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved the undo/redo functionality of the plant overview
+          client in modelling mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Temporarily disabled the copy-and-paste functionality of the
+          plant overview client in modelling mode until some major usability
+          issues have been sorted out.</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved editing of multiple driving course elements at the same
+          time.</para>
+        </listitem>
+
+        <listitem>
+          <para>Temporarily disabled the possibility to add background graphics
+          until this works more reliably.</para>
+        </listitem>
+
+        <listitem>
+          <para>Unified look-and-feel and fonts in the kernel control center and
+          the plant overview client and removed the selection menu for different
+          Swing look-and-feels from the kernel control center.</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved localization of the plant overview client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Removed the kernel's explicit "simulation" mode, which was never
+          fully implemented or used and provided practically no advantages over
+          the normal mode of operation, in which vehicles can be simulated using
+          the loopback driver.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fixed/improved GUI layout in multiple places of the kernel
+          control center.</para>
+        </listitem>
+
+        <listitem>
+          <para>Many bugfixes and improvements to code and documentation.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.5 (2013-12-18)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Added library Docking Frames 1.1.2-P8c.</para>
+        </listitem>
+
+        <listitem>
+          <para>Made some panels in the plant overview client
+          (un)dockable.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added a panel with an overview of all vehicles and their
+          respective states to the plant overview client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added a pause button to the plant overview client to pause/stop
+          all active vehicles at once.</para>
+        </listitem>
+
+        <listitem>
+          <para>Introduced pluggable themes to customize the appearance of
+          locations and vehicles in the plant overview.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added generic grouping of driving course elements, primarily to
+          support visualization in the plant overview.</para>
+        </listitem>
+
+        <listitem>
+          <para>Translated the user manual to English.</para>
+        </listitem>
+
+        <listitem>
+          <para>Many small bugfixes and improvements to both the code and the
+          documentation.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.4.2 (2013-07-29)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Updated the XML Schema definitions for the host
+          interface.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.4.1 (2013-05-30)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Updated the visualization client, including many bug fixes,
+          usability improvements and internationalization (English and German
+          language).</para>
+        </listitem>
+
+        <listitem>
+          <para>Properly included a vehicle's length when
+          persisting/materializing a course model.</para>
+        </listitem>
+
+        <listitem>
+          <para>Removed an erroneous JAXB annotation that led to an exception
+          when trying to persist load generator input data in the generic
+          client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Changed the startup scripts/batch files to look for extension
+          JARs in <filename>lib/openTCS-extensions/</filename> instead of
+          <filename>lib/</filename>.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.4 (2013-02-07)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Updated JDOM to 2.0.4.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated JHotDraw to 7.6.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated Checkstyle to 5.6.</para>
+        </listitem>
+
+        <listitem>
+          <para>Integrated Saxon 9.4 and Apache FOP 1.1 into the build for
+          processing the DocBook manual.</para>
+        </listitem>
+
+        <listitem>
+          <para>Major overhaul of the visualization client, including:
+          Integration of both modes (modelling and visualization) into a single
+          application, preparation for proper localization and integration of
+          the course layout information into model data structures, making it
+          easier to create complete models including course layout via the
+          kernel API. (This basically allows to implement other clients that can
+          create new models or import/convert existing models from other
+          applications.) Using models containing "old" layout data is still
+          supported but deprecated.</para>
+        </listitem>
+
+        <listitem>
+          <para>Changed license of the visualization client to LGPL.</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved support for vehicle energy management: For each
+          vehicle, a specific charging operation may be specified (default:
+          "CHARGE"), which will be used by the dispatcher to automatically
+          create orders to recharge the vehicle's energy source.</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved strategies for selecting parking positions and charging
+          locations.</para>
+        </listitem>
+
+        <listitem>
+          <para>Changed initial processing state of a vehicle to UNAVAILABLE,
+          preventing immediate dispatching of vehicles on startup.</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved kernel methods for withdrawing orders from vehicles and
+          allow setting a vehicle's processing state to UNAVAILABLE to prevent
+          it being dispatched again immediately.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added kernel method dispatchVehicle() to allow vehicles in state
+          UNAVAILABLE to be dispatched again.</para>
+        </listitem>
+
+        <listitem>
+          <para>(Re-)Added 'dispensable' flag to class TransportOrder to
+          indicate that an order may be withdrawn automatically by the
+          dispatcher. (Primarily used to make parking orders abortable.)</para>
+        </listitem>
+
+        <listitem>
+          <para>Improved handling of order sequences.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added a simple, preliminary implementation of data collection
+          for statistics based on event data in
+          org.opentcs.util.statistics.</para>
+        </listitem>
+
+        <listitem>
+          <para>Removed class VehicleType and all references to it completely.
+          All information about the vehicles themselves is stored in Vehicle,
+          now, simplifying the code in which VehicleType was used.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added Vehicle.State.UNAVAILABLE for vehicles that are not in an
+          ERROR state but currently remotely usable, either. (Examples: manual
+          or semi-automatic modes)</para>
+        </listitem>
+
+        <listitem>
+          <para>Added methods Kernel.sendCommAdapterMessage() and
+          CommunicationAdapter.processMessage() to allow clients to send generic
+          messages to communication adapters associated with vehicles.</para>
+        </listitem>
+
+        <listitem>
+          <para>Removed methods stop(), pause() and resume() from communication
+          adapter interface as they had not served any purpose for long
+          time.</para>
+        </listitem>
+
+        <listitem>
+          <para>Removed kernel method getInfoText(), for which the query()
+          method has served as a replacement for a while, now.</para>
+        </listitem>
+
+        <listitem>
+          <para>Properly propagate exceptions to clients connected via the RMI
+          proxy.</para>
+        </listitem>
+
+        <listitem>
+          <para>Small bug fixes and improvements to code and
+          documentation.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.3 (2012-09-17)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Moved sources of the generic client into the main project's
+          source tree.</para>
+        </listitem>
+
+        <listitem>
+          <para>Updated JFreeChart to 1.0.14.</para>
+        </listitem>
+
+        <listitem>
+          <para>Use JFreeChart for drawing the velocity graph of a communication
+          adapter.</para>
+        </listitem>
+
+        <listitem>
+          <para>Instead of emitting an event only after the kernel's state
+          changed, emit an additional one before the state transition.</para>
+        </listitem>
+
+        <listitem>
+          <para>Implemented org.opentcs.data.order.OrderSequence for processes
+          spanning more than one transport order that should be processed by a
+          single vehicle.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added a set of properties to DriveOrder.Destination and
+          MovementCommand, allowing an order/command to carry additional
+          information for a communication adapter or vehicle, if
+          necessary.</para>
+        </listitem>
+
+        <listitem>
+          <para>(Re-)Added State.CHARGING and merged State.DRIVING and
+          State.OPERATING into State.EXECUTING in
+          org.opentcs.data.model.Vehicle.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added a settable threshold for critical and good energy levels
+          of a vehicle.</para>
+        </listitem>
+
+        <listitem>
+          <para>Added a vehicle specific charging operation to Vehicle, settable
+          by the communication adapter.</para>
+        </listitem>
+
+        <listitem>
+          <para>Recompute routing tables when (un)locking a path.</para>
+        </listitem>
+
+        <listitem>
+          <para>Remove org.opentcs.data.model.Path.Action, which wasn't really
+          used anywhere and doesn't provide any benefit over a Path's
+          properties.</para>
+        </listitem>
+
+        <listitem>
+          <para>Remove a lot of deprecated methods in the kernel
+          interface.</para>
+        </listitem>
+
+        <listitem>
+          <para>Replace the existing dispatcher with one that is aware of order
+          sequences and vehicles' energy levels and automatically creates orders
+          to recharge vehicles.</para>
+        </listitem>
+
+        <listitem>
+          <para>Deprecated and largely removed references to
+          org.opentcs.data.model.VehicleType, simplifying some code.</para>
+        </listitem>
+
+        <listitem>
+          <para>Bug fix in KernelStateOperating.activateTransportOrder(): Use
+          our own references to the transport order, not the one we received as
+          a parameter, as that causes problems if the order has been renamed but
+          a reference with the old name is being used by the calling
+          client.</para>
+        </listitem>
+
+        <listitem>
+          <para>Moved classes to packages properly separated by functionality,
+          and removed a few utility classes that were not used and didn't
+          provide much. (This effectively means the API provided by the base JAR
+          changed. Fixing any resulting broken imports should be the only thing
+          required to use the new version.)</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Version 2.2 (2012-07-10)</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Published as free open source software (license: the MIT
+          license, see <filename>LICENSE.txt</filename>) - Requires Java
+          1.7</para>
+        </listitem>
+
+        <listitem>
+          <para>Update JDOM to 2.0.2.</para>
+        </listitem>
+
+        <listitem>
+          <para>Integrated kernel and driver GUI into a single
+          application.</para>
+        </listitem>
+
+        <listitem>
+          <para>Basic support for energy management</para>
+        </listitem>
+
+        <listitem>
+          <para>Support for dynamic load handling devices reported by
+          vehicles/vehicle drivers to the kernel</para>
+        </listitem>
+
+        <listitem>
+          <para>Simplified integration of vehicle drivers: Vehicle drivers in
+          the class path are found automatically using
+          java.util.ServiceLoader.</para>
+        </listitem>
+
+        <listitem>
+          <para>Automatic backup copies (in
+          <filename>$KERNEL/data/backups/</filename>) when saving models</para>
+        </listitem>
+
+        <listitem>
+          <para>Switched from properties to XML for configuration files</para>
+        </listitem>
+
+        <listitem>
+          <para>Simplified and more consistent kernel API</para>
+        </listitem>
+
+        <listitem>
+          <para>Many small bug fixes and adjustments of the included
+          strategies</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </section>
+
+  <section id="section.contributors">
+    <title>Contributors</title>
+
+    <para>We are grateful for anyone helping us to improve openTCS by
+    contributing code or documentation. So far, the developers involved were/are
+    (in alphabetical order by last name):</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Hubert Buechter</para>
+      </listitem>
+
+      <listitem>
+        <para>Iryna Felko</para>
+      </listitem>
+
+      <listitem>
+        <para>Preity Gupta</para>
+      </listitem>
+
+      <listitem>
+        <para>Heinz Huber</para>
+      </listitem>
+
+      <listitem>
+        <para>Olaf Krause</para>
+      </listitem>
+
+      <listitem>
+        <para>Tobias Marquardt</para>
+      </listitem>
+
+      <listitem>
+        <para>Sebastian Naumann</para>
+      </listitem>
+
+      <listitem>
+        <para>Volkmar Pontow</para>
+      </listitem>
+
+      <listitem>
+        <para>Philipp Seifert</para>
+      </listitem>
+
+      <listitem>
+        <para>Andreas Trautmann</para>
+      </listitem>
+
+      <listitem>
+        <para>Stefan Walter</para>
+      </listitem>
+
+      <listitem>
+        <para>Youssef Zaki</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>If you have contributed to openTCS and we have missed you on this
+    list, please accept our apologies and send us an e-mail (to <ulink
+    url="mailto:info@opentcs.org">info@opentcs.org</ulink>).</para>
+  </section>
+</article>

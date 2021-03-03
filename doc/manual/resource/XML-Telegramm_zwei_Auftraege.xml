@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tcsOrderSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <order deadline="2008-10-30T12:14:48.717+01:00" id="TransportOrder-01"
+         intendedVehicle="Vehicle-01" xsi:type="transport">
+    <destination locationName="Storage 01" operation="Load cargo"/>
+    <destination locationName="Storage 02" operation="Unload cargo"/>
+  </order>
+  <order id="TransportOrder-02" xsi:type="transport">
+    <destination locationName="Working station 01" operation="Drill"/>
+    <destination locationName="Working station 02" operation="Drill"/>
+    <destination locationName="Working station 03" operation="Cut"/>
+  </order>
+</tcsOrderSet>
