@@ -34,8 +34,7 @@ public abstract class RoutingTableBuilderAbstract {
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(RoutingTableBuilderAbstract.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderAbstract.class);
   /**
    * The kernel providing the model data.
    */
@@ -95,7 +94,7 @@ public abstract class RoutingTableBuilderAbstract {
     requireNonNull(staticRoute, "staticRoute");
     // Ignore incomplete static routes.
     if (!staticRoute.isValid()) {
-      log.warn("Skipping invalid static route " + staticRoute);
+      LOG.warn("Skipping invalid static route " + staticRoute);
       return;
     }
     Point startPoint = kernel.getTCSObjectOriginal(Point.class,
@@ -105,7 +104,7 @@ public abstract class RoutingTableBuilderAbstract {
     // required direction.
     for (Route.Step step : steps) {
       if (!step.getPath().isNavigableTo(step.getDestinationPoint().getReference())) {
-        log.warn("Skipping static route " + staticRoute + " because path "
+        LOG.warn("Skipping static route " + staticRoute + " because path "
             + step.getPath() + " is not navigable.");
         return;
       }
@@ -153,7 +152,7 @@ public abstract class RoutingTableBuilderAbstract {
           = Objects.equals(hopPath.getSourcePoint(), previousHop)
               ? Vehicle.Orientation.FORWARD
               : Vehicle.Orientation.BACKWARD;
-      result.add(new Route.Step(hopPath, hop, orientation, result.size()));
+      result.add(new Route.Step(hopPath, previousHop, hop, orientation, result.size()));
       previousHop = hop;
     }
     return result;

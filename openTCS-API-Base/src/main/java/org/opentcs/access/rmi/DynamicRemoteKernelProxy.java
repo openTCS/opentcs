@@ -8,49 +8,52 @@
  */
 package org.opentcs.access.rmi;
 
-import java.lang.reflect.Proxy;
 import java.rmi.registry.Registry;
 import org.opentcs.access.CredentialsException;
-import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
+import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventFilter;
+import org.opentcs.util.eventsystem.EventListener;
+import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
- * Creates proxies that hide the details of communication with a remote kernel,
- * so a client can call methods of the proxy as if it was a local kernel
- * instance.
- * 
+ * Creates proxies that hide the details of communication with a remote kernel, so a client can call
+ * methods of the proxy as if it was a kernel instance within the same JVM.
+ *
  * <p>
- * If the kernel you want to connect to is running on the same system as your
- * client, you usually only have to do the following:
+ * If the kernel you want to connect to is running on a host named "foobar", you usually only have
+ * to do the following:
  * </p>
  * <pre>
- * Kernel kernel = DynamicRemoteKernelProxy.getProxy("localhost",
- *                                                   new AcceptingTCSEventFilter());
+ * Kernel kernel = DynamicRemoteKernelProxy.getProxy("foobar");
  * </pre>
  * <p>
- * You can then use <code>kernel</code> to call methods on the proxy, which
- * will be wrapped by RMI calls internally and forwarded to the kernel you
- * connected to. This interface to the kernel can e.g. be used to create
- * transport orders from clients - see the developer's guide for some code examples.
+ * You can then use <code>kernel</code> to call methods on the proxy, which will be wrapped by RMI
+ * calls internally and forwarded to the remote kernel you connected to.
+ * This interface to the kernel can e.g. be used to create transport orders from clients - see the
+ * developer's guide for code examples.
  * </p>
- * 
+ *
  * <p>
- * The proxy will immediately start polling periodically for
- * events with the remote kernel; you can use custom intervals and timeouts for
- * polling by calling one of the other <code>getProxy()</code> methods. Using an
- * {@code AcceptingTCSEventFilter}
- * as its event filter as shown above will let the proxy receive every event
- * generated inside the kernel without filtering out any of them. To receive all
- * or some of these events in your own code, register an event listener with the
+ * The proxy will immediately start polling periodically for events with the remote kernel.
+ * You can use a custom event filter and custom intervals and timeouts for polling by calling one of
+ * the other <code>getProxy()</code> methods.
+ * Using an instance of {@link AcceptingTCSEventFilter} as its event filter (which is the default)
+ * will let the proxy receive every event generated inside the kernel without filtering out any of
+ * them.
+ * To receive all or some of these events in your client code, register an event listener with the
  * proxy by calling its
- * {@link org.opentcs.util.eventsystem.EventSource#addEventListener(org.opentcs.util.eventsystem.EventListener, org.opentcs.util.eventsystem.EventFilter) addEventListener()}
- * method; the proxy will then forward all events that it received and that are
- * not filtered by your event filter to your registered listener.
+ * {@link EventSource#addEventListener(EventListener, EventFilter) addEventListener()} method.
+ * The proxy will then forward all events that it received and that are not filtered by your event
+ * filter to your registered listener.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link KernelProxyBuilder} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public final class DynamicRemoteKernelProxy {
 
   /**
@@ -99,22 +102,15 @@ public final class DynamicRemoteKernelProxy {
                                      long eventPollInterval,
                                      long eventPollTimeout)
       throws KernelUnavailableException, CredentialsException {
-    // Create an invocation handler that does the actual work.
-    ProxyInvocationHandler handler =
-        new ProxyInvocationHandler(host,
-                                   port,
-                                   userName,
-                                   password,
-                                   eventFilter,
-                                   eventPollInterval,
-                                   eventPollTimeout);
-    // Return a proxy instance with the created handler.
-    // Create a proxy instance with the handler and return it.
-    KernelProxy proxy =
-        (KernelProxy) Proxy.newProxyInstance(Kernel.class.getClassLoader(),
-                                             new Class<?>[] {KernelProxy.class},
-                                             handler);
-    return proxy;
+    return new KernelProxyBuilder()
+        .setHost(host)
+        .setPort(port)
+        .setUserName(userName)
+        .setPassword(password)
+        .setEventFilter(eventFilter)
+        .setEventPollInterval(eventPollInterval)
+        .setEventPollTimeout(eventPollTimeout)
+        .build();
   }
 
   /**
@@ -212,6 +208,30 @@ public final class DynamicRemoteKernelProxy {
                     RemoteKernel.GUEST_USER,
                     RemoteKernel.GUEST_PASSWORD,
                     eventFilter,
+                    DEFAULT_POLL_INTERVAL,
+                    DEFAULT_POLL_TIMEOUT);
+  }
+
+  /**
+   * Creates a proxy for a remote kernel registered with a RMI registry on the
+   * given host at the default RMI port, using a standard user name and
+   * password, an {@link AcceptingTCSEventFilter}, a poll interval of 1 ms and a poll timeout of 1000 ms.
+   * After the proxy is created, it implicitly logs in with the remote kernel.
+   *
+   * @param host The host running the RMI registry.
+   * @return A proxy for the remote kernel.
+   * @throws KernelUnavailableException If the remote kernel is not reachable
+   * for some reason.
+   * @throws CredentialsException If the client login with the remote kernel
+   * failed, e.g. because the standard user name and password are not accepted.
+   * @see RemoteKernel#pollEvents(ClientID, long)
+   */
+  public static KernelProxy getProxy(String host) {
+    return getProxy(host,
+                    Registry.REGISTRY_PORT,
+                    RemoteKernel.GUEST_USER,
+                    RemoteKernel.GUEST_PASSWORD,
+                    new AcceptingTCSEventFilter(),
                     DEFAULT_POLL_INTERVAL,
                     DEFAULT_POLL_TIMEOUT);
   }

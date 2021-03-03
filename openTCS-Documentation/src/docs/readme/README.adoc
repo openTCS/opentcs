@@ -49,6 +49,18 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.1 (2017-04-20)
+
+* Added functionality for reading and writing the kernel's plant model file format to the plant overview client.
+* Added bezier paths with three control points to the plant overview client.
+* Added a panel to observe resource allocations to the plant overview client.
+* Added a dialog requiring user confirmation before changing the driver associated with a vehicle to prevent accidental changes.
+* Improved performance for transferring model data from the plant overview client to the kernel.
+* Improved selection of colors used for marking vehicles' routes in the plant overview client.
+* Improved performance of routing table computation by computing only one table shared by all vehicles by default.
+  (Computation of separate tables for vehicles is optionally possible.)
+* Many small bugfixes and improvements to code and documentation.
+
 === Version 4.0.1 (2017-02-25)
 
 * Fix a potential deadlock in the default scheduler.

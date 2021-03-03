@@ -4,9 +4,9 @@
 package org.opentcs.guing.storage;
 
 import com.google.common.base.Strings;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
@@ -44,29 +44,35 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
- * Validator for a {@link SystemModel} and its {@link ModelComponent}'s.
+ * Validator for a {@link SystemModel} and its {@link ModelComponent}s.
  * Validates if the model component can safely be added to a system model.
  *
  * @author Mats Wilhelm (Fraunhofer IML)
  */
-public class ModelJAXBValidator {
+public class ModelValidator {
 
   /**
    * The collection of errors which happened after the last reset.
    */
-  private final Collection<String> errors = new LinkedList<>();
+  private final List<String> errors = new LinkedList<>();
 
   /**
    * This class' logger.
    */
-  private static final Logger log = LoggerFactory.getLogger(ModelJAXBValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ModelValidator.class);
+
+  /**
+   * Creates a new instance.
+   */
+  public ModelValidator() {
+  }
 
   /**
    * Returns all errors which happened after the last reset.
    *
    * @return the collection of errors as string
    */
-  public final Collection<String> getErrors() {
+  public final List<String> getErrors() {
     return new LinkedList<>(errors);
   }
 
@@ -141,7 +147,7 @@ public class ModelJAXBValidator {
       valid = validateVehicle(model, (VehicleModel) component);
     }
     else {
-      log.warn("Unknown model component {} - skipping validation.", component.getClass());
+      LOG.warn("Unknown model component {} - skipping validation.", component.getClass());
     }
     return valid;
   }
@@ -162,7 +168,7 @@ public class ModelJAXBValidator {
     }
 
     String message = MessageFormatter.arrayFormat(format, arguments).getMessage();
-    log.info(message);
+    LOG.info(message);
     errors.add(message);
   }
 
@@ -241,7 +247,7 @@ public class ModelJAXBValidator {
     //Validate the vehicle orientation angle
     AngleProperty orientationProperty = (AngleProperty) point.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
     if (orientationProperty == null || orientationProperty.getValue() == null) {
-      errorOccurred(point, "Invalid vehicle orientation angle.");
+      errorOccurred(point, "Vehicle orientation angle does not exist or null.");
       return false; //Return because the next if would be a NPE
     }
     double angle = 0;
@@ -253,8 +259,10 @@ public class ModelJAXBValidator {
       valid = false;
     }
     if (angle < 0) {
-      errorOccurred(point, "Invalid vehicle orientation angle {}.", angle);
-      valid = false;
+      errorOccurred(point, "Negative vehicle orientation angle {} not allowed. Transformed to "
+                    + "positive.", angle);
+      angle = 360 + angle % 360;
+      orientationProperty.setValue(angle);
     }
     //Validate the point type
     SelectionProperty<PointModel.PointType> typeProperty
@@ -419,8 +427,9 @@ public class ModelJAXBValidator {
       return false; //Return because the next if would be a NPE
     }
 
-    if (typeProperty.getValue().equals(PathModel.LinerType.BEZIER) && (controlPointsProperty.getText() == null
-                                                                       || controlPointsProperty.getText().equals(""))) {
+    if ((typeProperty.getValue().equals(PathModel.LinerType.BEZIER)
+         || typeProperty.getValue().equals(PathModel.LinerType.BEZIER_3))
+        && (controlPointsProperty.getText() == null || controlPointsProperty.getText().equals(""))) {
       errorOccurred(path, "Invalid path control points for bezier curve \"{}\".", controlPointsProperty.getText());
       valid = false;
     }
@@ -956,12 +965,8 @@ public class ModelJAXBValidator {
     if (Strings.isNullOrEmpty(component.getName())) {
       return false;
     }
-    for (ModelComponent cmp : model.getAll()) {
-      if (cmp.getName().equals(component.getName()) && !cmp.equals(component)) {
-        return true;
-      }
-    }
-    return false;
+    ModelComponent foundComponent = model.getModelComponent(component.getName());
+    return foundComponent != null && foundComponent != component;
   }
 
   /**
@@ -975,11 +980,6 @@ public class ModelJAXBValidator {
     if (Strings.isNullOrEmpty(name)) {
       return false;
     }
-    for (ModelComponent cmp : model.getAll()) {
-      if (cmp.getName().equals(name)) {
-        return true;
-      }
-    }
-    return false;
+    return model.getModelComponent(name) != null;
   }
 }

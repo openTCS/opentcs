@@ -9,12 +9,9 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -25,7 +22,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
@@ -40,8 +36,11 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for points.
@@ -112,12 +111,11 @@ public class PointAdapter
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     Point point = kernel.createPoint();
     TCSObjectReference<Point> reference = point.getReference();
 
-    StringProperty pName
-        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
     String name = pName.getText();
 
     try {
@@ -126,14 +124,14 @@ public class PointAdapter
       updateProcessPosition(kernel, reference);
 
       // Write new position into the layout element
-      Set<VisualLayout> layouts = kernel.getTCSObjects(VisualLayout.class);
-
-      for (VisualLayout layout : layouts) {
-        updateLayoutElement(kernel, layout, reference);
+      for (VisualLayout layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout, reference);
       }
       updateProcessAngle(kernel, reference);
       updateProcessType(kernel, reference);
       updateMiscProcessProperties(kernel, reference);
+      
+      plantModel.getPoints().put(name, point);
     }
     catch (KernelRuntimeException e) {
       log.warn("", e);
@@ -249,8 +247,7 @@ public class PointAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(Kernel kernel,
-                                   VisualLayout layout,
+  private void updateLayoutElement(VisualLayout layout,
                                    TCSObjectReference<?> ref) {
     StringProperty spx
         = (StringProperty) getModel().getProperty(ElementPropKeys.POINT_POS_X);
@@ -274,23 +271,14 @@ public class PointAdapter
 
     ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
 
-    Map<String, String> layoutProperties = layoutElement.getProperties();
-
-    layoutProperties.put(ElementPropKeys.POINT_POS_X, xPos + "");
-    layoutProperties.put(ElementPropKeys.POINT_POS_Y, yPos + "");
-    layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_X,
-                         (int) offset.x + "");
-    layoutProperties.put(ElementPropKeys.POINT_LABEL_OFFSET_Y,
-                         (int) offset.y + "");
+    layoutElement.getProperties().put(ElementPropKeys.POINT_POS_X, xPos + "");
+    layoutElement.getProperties().put(ElementPropKeys.POINT_POS_Y, yPos + "");
+    layoutElement.getProperties().put(ElementPropKeys.POINT_LABEL_OFFSET_X, (int) offset.x + "");
+    layoutElement.getProperties().put(ElementPropKeys.POINT_LABEL_OFFSET_Y, (int) offset.y + "");
     // TODO:
 //    layoutProperties.put(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, ...);
-    layoutElement.setProperties(layoutProperties);
 
-    Set<LayoutElement> layoutElements = layout.getLayoutElements();
-    Iterables.removeIf(layoutElements, layoutElementFor(ref));
-    layoutElements.add(layoutElement);
-
-    kernel.setVisualLayoutElements(layout.getReference(), layoutElements);
+    layout.getLayoutElements().add(layoutElement);
 
     spx.unmarkChanged();
     spy.unmarkChanged();

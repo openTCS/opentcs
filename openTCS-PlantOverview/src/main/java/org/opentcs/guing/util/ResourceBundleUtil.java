@@ -95,15 +95,14 @@ public class ResourceBundleUtil
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(ResourceBundleUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceBundleUtil.class);
   /**
    * The global verbose property.
    */
-  private static final boolean isVerbose = true;
+  private static final boolean IS_VERBOSE = true;
   private static final String RES_LABELS = "org.opentcs.guing.res.labels";
   // Nicht "org.jhotdraw.draw.Labels" verwenden!
-  private static final Set<String> acceleratorKeys = new HashSet<>(
+  private static final Set<String> ACCELERATOR_KEYS = new HashSet<>(
       Arrays.asList(new String[] {
         "shift", "control", "ctrl", "meta", "alt", "altGraph"
       }));
@@ -111,7 +110,7 @@ public class ResourceBundleUtil
    * The global map of property name modifiers. The key of this map is the name
    * of the property name modifier, the value of this map is a fallback chain.
    */
-  private static final Map<String, String[]> propertyNameModifiers = new HashMap<>();
+  private static final Map<String, String[]> PROPERTY_NAME_MODIFIERS = new HashMap<>();
   /**
    * The wrapped resource bundle.
    */
@@ -143,7 +142,7 @@ public class ResourceBundleUtil
       os = "other";
     }
 
-    propertyNameModifiers.put("os", new String[] {os, "default"});
+    PROPERTY_NAME_MODIFIERS.put("os", new String[] {os, "default"});
   }
 
   /**
@@ -183,8 +182,8 @@ public class ResourceBundleUtil
     }
     catch (MissingResourceException e) {
       // System.out.println("ResourceBundleUtil "+baseName+" get("+key+"):***MISSING***");
-      if (isVerbose) {
-        log.warn("baseName: " + baseName + ", \"" + key + "\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("baseName: " + baseName + ", \"" + key + "\" not found.", e);
       }
 
       return key;
@@ -243,7 +242,7 @@ public class ResourceBundleUtil
         StringBuilder b = new StringBuilder();
 
         for (String s : placeholderValue.split(" ")) {
-          if (acceleratorKeys.contains(s)) {
+          if (ACCELERATOR_KEYS.contains(s)) {
             b.append(getString("accelerator." + s));
           }
           else {
@@ -279,7 +278,7 @@ public class ResourceBundleUtil
       }
 
       String modifierKey = key.substring(p1 + 2, p2);
-      String[] modifierValues = propertyNameModifiers.get(modifierKey);
+      String[] modifierValues = PROPERTY_NAME_MODIFIERS.get(modifierKey);
 
       if (modifierValues == null) {
         modifierValues = new String[] {"default"};
@@ -326,8 +325,8 @@ public class ResourceBundleUtil
       return Integer.valueOf(getStringRecursive(key));
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("baseName: " + baseName + ", \"" + key + "\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("baseName: " + baseName + ", \"" + key + "\" not found.", e);
       }
 
       return -1;
@@ -351,16 +350,16 @@ public class ResourceBundleUtil
 
       URL url = baseClass.getResource(rsrcName);
 
-      if (isVerbose && url == null) {
-        log.warn("[" + baseName + "]. getIconProperty \"" + key + ".icon\" resource:" + rsrcName + " not found.",
+      if (IS_VERBOSE && url == null) {
+        LOG.warn("[" + baseName + "]. getIconProperty \"" + key + ".icon\" resource:" + rsrcName + " not found.",
                  new Exception("Exception just for tracing"));
       }
 
       return (url == null) ? null : new ImageIcon(url);
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("[" + baseName + "].getIconProperty \"" + key + ".icon\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("[" + baseName + "].getIconProperty \"" + key + ".icon\" not found.", e);
       }
 
       return null;
@@ -381,16 +380,16 @@ public class ResourceBundleUtil
 
       URL url = baseClass.getResource(rsrcName);
 
-      if (isVerbose && url == null) {
-        log.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" resource:" + rsrcName + " not found.",
+      if (IS_VERBOSE && url == null) {
+        LOG.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" resource:" + rsrcName + " not found.",
                  new Exception("Exception just for tracing"));
       }
 
       return (url == null) ? null : new ImageIcon(url);
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" not found.", e);
       }
 
       return null;
@@ -426,8 +425,8 @@ public class ResourceBundleUtil
       s = getStringRecursive(key + ".mnemonic");
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("[" + baseName + "] \"" + key + ".mnemonic\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("[" + baseName + "] \"" + key + ".mnemonic\" not found.", e);
       }
 
       s = null;
@@ -451,8 +450,8 @@ public class ResourceBundleUtil
       return value;
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("[" + baseName + "] \"" + key + ".toolTipText\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("[" + baseName + "] \"" + key + ".toolTipText\" not found.", e);
       }
 
       return null;
@@ -473,8 +472,8 @@ public class ResourceBundleUtil
       return value;
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("[" + baseName + "] \"" + key + ".text\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("[" + baseName + "] \"" + key + ".text\" not found.", e);
       }
 
       return null;
@@ -521,8 +520,8 @@ public class ResourceBundleUtil
       ks = (s == null) ? (KeyStroke) null : KeyStroke.getKeyStroke(s);
     }
     catch (MissingResourceException e) {
-      if (isVerbose) {
-        log.warn("[" + baseName + "] \"" + key + ".accelerator\" not found.", e);
+      if (IS_VERBOSE) {
+        LOG.warn("[" + baseName + "] \"" + key + ".accelerator\" not found.", e);
       }
     }
     catch (NoSuchElementException e) {
@@ -711,7 +710,7 @@ public class ResourceBundleUtil
    * @param fallbackChain The fallback chain of the modifier.
    */
   public static void putPropertyNameModifier(String name, String... fallbackChain) {
-    propertyNameModifiers.put(name, fallbackChain);
+    PROPERTY_NAME_MODIFIERS.put(name, fallbackChain);
   }
 
   /**
@@ -719,7 +718,7 @@ public class ResourceBundleUtil
    * @param name
    */
   public static void removePropertyNameModifier(String name) {
-    propertyNameModifiers.remove(name);
+    PROPERTY_NAME_MODIFIERS.remove(name);
   }
 
   /**

@@ -159,7 +159,7 @@ public interface VehicleCommAdapter
   /**
    * Defines the possible states of a communication adapter.
    */
-  public static enum State {
+  public enum State {
 
     /**
      * Indicates the state of this communication adapter is currently not known.

@@ -11,18 +11,18 @@ package org.opentcs.util.eventsystem;
 import java.io.Serializable;
 
 /**
- * An event filter for <code>TCSEvent</code>s that accepts all events.
+ * An event filter for {@link TCSEvent}s that accepts all events.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public final class AcceptingTCSEventFilter
-    implements EventFilter<TCSEvent>, Serializable {
+public class AcceptingTCSEventFilter
+    implements EventFilter<TCSEvent>,
+               Serializable {
 
   /**
    * Creates a new instance.
    */
   public AcceptingTCSEventFilter() {
-    // Do nada.
   }
 
   @Override

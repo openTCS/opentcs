@@ -149,7 +149,5 @@ include::{samples}/xml-telegram-status.xml[]
 
 === XML Schema definitions for telegrams and scripts
 
-XML Schema defintions describing the expected structure of XML order telegrams and order batch files as well as the structure of receipt telegrams as
-sent by openTCS are part of the openTCS distribution and can be found in the directory containing the documentation.
-
-
+XML schemas describing the expected structure of XML order telegrams and order batch files as well as the structure of receipt telegrams as
+sent by openTCS are part of the openTCS distribution and can be found in the directory containing the developer documentation.

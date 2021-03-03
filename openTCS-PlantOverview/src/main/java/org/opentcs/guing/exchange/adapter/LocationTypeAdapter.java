@@ -11,7 +11,6 @@ package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
-import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -31,8 +30,11 @@ import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationTypeModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for location types.
@@ -102,12 +104,11 @@ public class LocationTypeAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     LocationType locType = kernel.createLocationType();
     TCSObjectReference<LocationType> reference = locType.getReference();
-
-    StringProperty pName
-        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    
+    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
     String name = pName.getText();
 
     try {
@@ -116,6 +117,8 @@ public class LocationTypeAdapter
       updateProcessActions(kernel, reference);
 
       updateMiscProcessProperties(kernel, reference);
+      
+      plantModel.getLocationTypes().put(name, locType);
     }
     catch (KernelRuntimeException e) {
       log.warn("", e);

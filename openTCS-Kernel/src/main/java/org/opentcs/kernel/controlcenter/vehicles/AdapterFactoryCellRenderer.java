@@ -27,14 +27,12 @@ final class AdapterFactoryCellRenderer
   /**
    * A default renderer for creating the label.
    */
-  private final DefaultListCellRenderer defaultRenderer =
-      new DefaultListCellRenderer();
+  private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
   
   /**
    * Creates a new instance.
    */
   AdapterFactoryCellRenderer() {
-    // Do nada.
   }
 
   @Override

@@ -67,6 +67,37 @@ This is required in integration projects customizing these applications, e.g. ad
 Note that only the basic API libraries provide a documented API that the openTCS developers try to keep compatible between releases.
 All other artifacts' contents can and will change regardless of any compatibility concerns, so if you use these and switch to a different version of openTCS, you may have to adjust and recompile your code.
 
+=== Third-party dependencies
+
+Both the kernel and the plant overview application depend on the following external frameworks and libraries:
+
+* SLF4J (https://www.slf4j.org/):
+  A simple logging facade to keep the actual logging implementation replaceable.
+* Google Guice (https://github.com/google/guice):
+  A light-weight dependency injection framework.
+* Google Guava (https://github.com/google/guava):
+  A collection of small helper classes and methods.
+* MBassador (https://github.com/bennidi/mbassador):
+  A light-weight event bus implementation.
+* JUnit (http://junit.org/junit4/):
+  A simple unit-testing framework.
+* Mockito (http://mockito.org/):
+  A mocking framework for unit tests.
+
+The kernel application also depends on the following libraries:
+
+* JDOM (http://www.jdom.org/):
+  A library for reading and writing XML data.
+
+The plant overview application has the following additional dependencies:
+
+* JHotDraw (http://www.jhotdraw.org/):
+  A framework for drawing graph structures (like driving course models).
+* Docking Frames (http://www.docking-frames.org/):
+  A framework for docking and undocking of GUI panels
+
+The artifacts for these dependencies are either downloaded automatically when building the applications or are included in the source distribution's `lib/` directory.
+
 === Modularity and extensibility
 
 The openTCS project heavily relies on link:https://github.com/google/guice[Guice] for dependency injection and wiring of components as well as for providing plugin-like extension mechanisms.

@@ -17,6 +17,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.TCSKernelStateEvent;
@@ -35,11 +36,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles method invocations for the RMI proxy and forwards them to the remote
  * kernel.
- * 
+ *
  * @author Stefan Walter (Fraunhofer IML)
  */
 class ProxyInvocationHandler
-    implements InvocationHandler, RemoteKernelConnection,
+    implements InvocationHandler,
+               RemoteKernelConnection,
                EventSource<TCSEvent> {
 
   /**
@@ -116,11 +118,11 @@ class ProxyInvocationHandler
    * failed, e.g. because of incorrect login data.
    * @see RemoteKernel#pollEvents(ClientID, long)
    */
-  public ProxyInvocationHandler(String hostName,
+  public ProxyInvocationHandler(@Nonnull String hostName,
                                 int port,
-                                String userName,
-                                String password,
-                                EventFilter<TCSEvent> eventFilter,
+                                @Nonnull String userName,
+                                @Nonnull String password,
+                                @Nonnull EventFilter<TCSEvent> eventFilter,
                                 long eventPollInterval,
                                 long eventPollTimeout)
       throws CredentialsException {
@@ -131,8 +133,6 @@ class ProxyInvocationHandler
     this.eventFilter = requireNonNull(eventFilter, "eventFilter");
     this.eventPollInterval = eventPollInterval;
     this.eventPollTimeout = eventPollTimeout;
-    // Initial login.
-    login();
   }
 
   // Implementation of interface InvocationHandler starts here.
@@ -187,8 +187,7 @@ class ProxyInvocationHandler
 
   // Implementation of interface EventSource<TCSObjectEvent> starts here.
   @Override
-  public void addEventListener(EventListener<TCSEvent> listener,
-                               EventFilter<TCSEvent> filter) {
+  public void addEventListener(EventListener<TCSEvent> listener, EventFilter<TCSEvent> filter) {
     eventHub.addEventListener(listener, filter);
   }
 
@@ -197,9 +196,9 @@ class ProxyInvocationHandler
     eventHub.removeEventListener(listener);
   }
 
-  // Class-specific code starts here.
+  // Implementation of interface RemoteKernelConnection starts here.
   @Override
-  public final void login()
+  public void login()
       throws CredentialsException {
     if (loggedIn()) {
       LOG.warn("Already logged in, doing nothing.");
@@ -208,27 +207,24 @@ class ProxyInvocationHandler
     try {
       // Look up the remote kernel with the RMI registry.
       Registry registry = LocateRegistry.getRegistry(hostName, port);
-      RemoteKernel kernel =
-          (RemoteKernel) registry.lookup(RemoteKernel.REGISTRATION_NAME);
+      RemoteKernel kernel = (RemoteKernel) registry.lookup(RemoteKernel.REGISTRATION_NAME);
       // Login, save the client ID and set the event filter.
       clientID = kernel.login(userName, password);
       kernel.setEventFilter(clientID, eventFilter);
       remoteKernel = kernel;
       // Start polling for events.
-      eventPollerTask = new EventPollerTask(eventPollInterval,
-                                            eventPollTimeout);
+      eventPollerTask = new EventPollerTask(eventPollInterval, eventPollTimeout);
       Thread eventPollerThread = new Thread(eventPollerTask, "eventPoller");
       eventPollerThread.start();
     }
     catch (RemoteException | NotBoundException exc) {
-      throw new KernelUnavailableException(
-          "Exception logging in with remote kernel", exc);
+      throw new KernelUnavailableException("Exception logging in with remote kernel", exc);
     }
     setConnectionState(State.LOGGED_IN);
   }
 
   @Override
-  public final void logout() {
+  public void logout() {
     if (!loggedIn()) {
       LOG.warn("Not logged in, doing nothing.");
       return;
@@ -242,7 +238,7 @@ class ProxyInvocationHandler
   }
 
   @Override
-  public final State getConnectionState() {
+  public State getConnectionState() {
     return currentState;
   }
 
@@ -262,8 +258,7 @@ class ProxyInvocationHandler
    * @param newState The new state.
    */
   private void setConnectionState(State newState) {
-    assert newState != null;
-    currentState = newState;
+    currentState = requireNonNull(newState, "newState");
     emitStateEvent(newState);
   }
 
@@ -273,8 +268,7 @@ class ProxyInvocationHandler
    * @param newState The state entered.
    */
   private void emitStateEvent(RemoteKernelConnection.State newState) {
-    TCSProxyStateEvent event = new TCSProxyStateEvent(newState);
-    eventHub.processEvent(event);
+    eventHub.processEvent(new TCSProxyStateEvent(newState));
   }
 
   /**

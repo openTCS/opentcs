@@ -12,6 +12,7 @@ import java.util.Comparator;
 import org.opentcs.access.ConfigurationItemTO;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.data.TCSObject;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.TransportOrder;
 
@@ -35,6 +36,12 @@ public final class Comparators {
    */
   private static final Comparator<TCSObject<?>> OBJECTS_BY_NAME
       = (TCSObject<?> o1, TCSObject<?> o2) -> o1.getName().compareTo(o2.getName());
+  /**
+   * A <code>Comparator</code> for ordering <code>TCSObjectReference</code>s ascendingly
+   * by their names.
+   */
+  private static final Comparator<TCSObjectReference<?>> REFERENCES_BY_NAME
+      = (TCSObjectReference<?> o1, TCSObjectReference<?> o2) -> o1.getName().compareTo(o2.getName());
   /**
    * A comparator for sorting transport orders by their age, with the oldest ones coming first.
    */
@@ -128,6 +135,17 @@ public final class Comparators {
    */
   public static Comparator<TCSObject<?>> objectsByName() {
     return OBJECTS_BY_NAME;
+  }
+
+  /**
+   * Returns a comparator for ordering <code>TCSObjectReference</code>s ascendingly
+   * by their names.
+   *
+   * @return A comparator for ordering <code>TCSObjectReference</code>s ascendingly
+   * by their names.
+   */
+  public static Comparator<TCSObjectReference<?>> referencesByName() {
+    return REFERENCES_BY_NAME;
   }
 
   /**

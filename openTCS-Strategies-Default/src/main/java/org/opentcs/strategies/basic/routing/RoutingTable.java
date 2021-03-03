@@ -106,7 +106,7 @@ public class RoutingTable {
   /**
    * An entry in the routing table.
    */
-  static class Entry {
+  public static class Entry {
 
     /**
      * The source point.

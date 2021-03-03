@@ -25,6 +25,7 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,15 +69,13 @@ public class LinkAdapter
   }
 
   @Override
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     PointModel point = getModel().getPoint();
     LocationModel location = getModel().getLocation();
 
     try {
-      TCSObjectReference<Point> pointRef
-          = kernel.getTCSObject(Point.class, point.getName()).getReference();
-      TCSObjectReference<Location> locRef
-          = kernel.getTCSObject(Location.class, location.getName()).getReference();
+      TCSObjectReference<Point> pointRef = plantModel.getPoints().get(point.getName()).getReference();
+      TCSObjectReference<Location> locRef = plantModel.getLocations().get(location.getName()).getReference();
 
       kernel.connectLocationToPoint(locRef, pointRef);
 

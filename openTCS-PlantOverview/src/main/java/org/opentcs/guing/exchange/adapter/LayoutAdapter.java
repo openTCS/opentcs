@@ -33,10 +33,12 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.plugins.themes.StandardLocationTheme;
 import org.opentcs.guing.plugins.themes.StandardVehicleTheme;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.VehicleThemeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for VisualLayout instances.
@@ -107,7 +109,7 @@ public class LayoutAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     VisualLayout layout = kernel.createVisualLayout();
     TCSObjectReference<VisualLayout> reference = layout.getReference();
 
@@ -128,6 +130,8 @@ public class LayoutAdapter
       updateProcessThemes();
 
       updateMiscProcessProperties(kernel, reference);
+      
+      plantModel.getVisualLayouts().add(layout);
     }
     catch (KernelRuntimeException e) {
       log.warn("", e);

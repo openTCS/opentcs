@@ -42,6 +42,12 @@ public class RunPlantOverview {
   private static final Logger LOG = LoggerFactory.getLogger(RunPlantOverview.class);
 
   /**
+   * Prevents external instantiation.
+   */
+  private RunPlantOverview() {
+  }
+
+  /**
    * The plant overview client's main entry point.
    *
    * @param args the command line arguments

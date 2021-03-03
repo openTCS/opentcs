@@ -8,6 +8,8 @@
  */
 package org.opentcs.util.eventsystem;
 
+import javax.annotation.Nonnull;
+
 /**
  * This interfaces declares the method that is called to notify an object of an
  * event that has happened.
@@ -16,11 +18,11 @@ package org.opentcs.util.eventsystem;
  * @param <E> The actual event implementation.
  */
 public interface EventListener<E extends Event> {
+
   /**
    * Called when an event has happened.
    *
    * @param event The event that has happened.
-   * @throws NullPointerException If <code>event</code> is <code>null</code>.
    */
-  void processEvent(E event);
+  void processEvent(@Nonnull E event);
 }

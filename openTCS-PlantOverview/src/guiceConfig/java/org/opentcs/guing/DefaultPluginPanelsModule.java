@@ -9,6 +9,7 @@
 package org.opentcs.guing;
 
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
+import org.opentcs.guing.plugins.panels.allocation.ResourceAllocationPanelFactory;
 import org.opentcs.guing.plugins.panels.loadgenerator.ContinuousLoadPanelFactory;
 import org.opentcs.guing.plugins.panels.statistics.StatisticsPanelFactory;
 
@@ -25,6 +26,7 @@ public class DefaultPluginPanelsModule
   protected void configure() {
     pluggablePanelFactoryBinder().addBinding().to(ContinuousLoadPanelFactory.class);
     pluggablePanelFactoryBinder().addBinding().to(StatisticsPanelFactory.class);
+    pluggablePanelFactoryBinder().addBinding().to(ResourceAllocationPanelFactory.class);
   }
 }
 // end::documentation_createPluginPanelModule[]

@@ -15,6 +15,12 @@ import javax.swing.JOptionPane;
 public class JOptionPaneUtil {
 
   /**
+   * Prevents external instantiation.
+   */
+  private JOptionPaneUtil() {
+  }
+
+  /**
    * Shows a dialog with a text area as content and an ok button.
    *
    * @param parent the parent frame

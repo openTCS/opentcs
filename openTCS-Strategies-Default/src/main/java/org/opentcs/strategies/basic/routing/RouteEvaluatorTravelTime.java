@@ -24,22 +24,16 @@ import static org.opentcs.strategies.basic.routing.RoutingTable.INFINITE_COSTS;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class RouteEvaluatorTravelTime
-    extends RouteEvaluator {
+    implements RouteEvaluator {
 
   /**
    * Creates a new instance.
-   *
-   * @param augmentingEvaluator An additional evaluator augmenting the computed
-   * costs of this one.
    */
-  public RouteEvaluatorTravelTime(RouteEvaluator augmentingEvaluator) {
-    super(augmentingEvaluator);
+  public RouteEvaluatorTravelTime() {
   }
 
   @Override
-  public long computeCosts(Vehicle vehicle,
-                           Point startPoint,
-                           List<Route.Step> steps) {
+  public long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(startPoint, "startPoint");
     requireNonNull(steps, "steps");
@@ -53,12 +47,10 @@ public class RouteEvaluatorTravelTime
       }
       result += travelTime;
     }
-    return result + augmentingEvaluator.computeCosts(vehicle, startPoint, steps);
+    return result;
   }
 
-  private long travelTime(Vehicle vehicle,
-                          Path path,
-                          Vehicle.Orientation orientation) {
+  private long travelTime(Vehicle vehicle, Path path, Vehicle.Orientation orientation) {
     int maxVelocity;
     if (Objects.equals(Vehicle.Orientation.BACKWARD, orientation)) {
       maxVelocity = Math.min(vehicle.getMaxReverseVelocity(),

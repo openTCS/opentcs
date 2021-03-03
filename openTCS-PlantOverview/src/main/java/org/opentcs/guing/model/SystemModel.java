@@ -107,6 +107,14 @@ public interface SystemModel
    * @return
    */
   DrawingMethod getDrawingMethod();
+  
+  /**
+   * Returns the component with the given name, if it exists.
+   *
+   * @param name The name.
+   * @return The component with the given name, or {@code null}, if it does not exist.
+   */
+  ModelComponent getModelComponent(String name);
 
   /**
    * Liefert eine Liste aller Fahrzeuge.

@@ -9,6 +9,8 @@
 package org.opentcs.data.order;
 
 import java.io.Serializable;
+import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 
@@ -43,15 +45,9 @@ public class Rejection
    * @param vehicle The vehicle that rejected the transport order.
    * @param reason The reason given for rejecting the transport order.
    */
-  public Rejection(TCSObjectReference<Vehicle> vehicle, String reason) {
-    if (vehicle == null) {
-      throw new NullPointerException("vehicle is null");
-    }
-    if (reason == null) {
-      throw new NullPointerException("reason is null");
-    }
-    this.vehicle = vehicle;
-    this.reason = reason;
+  public Rejection(@Nonnull TCSObjectReference<Vehicle> vehicle, @Nonnull String reason) {
+    this.vehicle = requireNonNull(vehicle, "vehicle");
+    this.reason = requireNonNull(reason, "reason");
     this.timestamp = System.currentTimeMillis();
   }
 
@@ -60,6 +56,7 @@ public class Rejection
    *
    * @return The reason given for rejecting the transport order.
    */
+  @Nonnull
   public String getReason() {
     return reason;
   }
@@ -79,6 +76,7 @@ public class Rejection
    *
    * @return The vehicle that rejected the transport order.
    */
+  @Nonnull
   public TCSObjectReference<Vehicle> getVehicle() {
     return vehicle;
   }

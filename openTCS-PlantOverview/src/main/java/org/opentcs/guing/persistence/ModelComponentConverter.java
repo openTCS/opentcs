@@ -9,10 +9,10 @@
 package org.opentcs.guing.persistence;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.AbstractModelComponent;
@@ -38,6 +38,7 @@ import org.opentcs.guing.persistence.CourseElement.Path;
 import org.opentcs.guing.persistence.CourseElement.Point;
 import org.opentcs.guing.persistence.CourseElement.StaticRoute;
 import org.opentcs.guing.persistence.CourseElement.Vehicle;
+import org.opentcs.guing.util.Comparators;
 
 /**
  * Converts <code>ModelComponents</code> to JAXB classes.
@@ -46,17 +47,15 @@ import org.opentcs.guing.persistence.CourseElement.Vehicle;
  */
 public class ModelComponentConverter {
 
-  private final PropertyConverter propertyConverter;
+  private final PropertyConverter propertyConverter = new PropertyConverter();
   /**
    * A list that contains the possible values for location models.
    * LocationTypeModels are deparsed before LocationModels and we have
    * to set the possible values for the location.
    */
-  private final List<String> locationTypeNames;
+  private final List<String> locationTypeNames = new ArrayList<>();
 
   public ModelComponentConverter() {
-    propertyConverter = new PropertyConverter();
-    locationTypeNames = new ArrayList<>();
   }
 
   public ModelComponent revertCourseElement(CourseElement element)
@@ -315,7 +314,8 @@ public class ModelComponentConverter {
 
   private Set<CourseObjectProperty> convertProperties(
       Map<String, Property> modelProperties) {
-    Set<CourseObjectProperty> courseProperties = new HashSet<>(modelProperties.size());
+    Set<CourseObjectProperty> courseProperties
+        = new TreeSet<>(Comparators.courseObjectPropertiesByName());
     for (String key : modelProperties.keySet()) {
       CourseObjectProperty property
           = propertyConverter.convert(key, modelProperties.get(key));

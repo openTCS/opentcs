@@ -39,8 +39,7 @@ public class RoutingTableBuilderDfs
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(RoutingTableBuilderDfs.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderDfs.class);
   /**
    * The maximum search depth.
    */
@@ -88,9 +87,9 @@ public class RoutingTableBuilderDfs
       descendSuccessors(curPoint, curPoint, new LinkedList<>());
     }
     double timePassed = (System.currentTimeMillis() - timeStampBefore) / 1000.0;
-    log.debug("Computed routing table for {} in {} seconds.", vehicle.getName(), timePassed);
+    LOG.debug("Computed routing table for {} in {} seconds.", vehicle.getName(), timePassed);
     for (StaticRoute staticRoute
-         : kernel.getTCSObjectsOriginal(StaticRoute.class)) {
+             : kernel.getTCSObjectsOriginal(StaticRoute.class)) {
       integrateStaticRoute(staticRoute);
     }
     return new RoutingTable(routingTable);
@@ -152,10 +151,12 @@ public class RoutingTableBuilderDfs
                                                     outPath.getDestinationPoint());
       if (!visitedPointOnRoute(nextPoint, steps)
           && outPath.isNavigableForward()) {
-        steps.addLast(new Route.Step(outPath,
-                                     nextPoint,
-                                     Vehicle.Orientation.FORWARD,
-                                     steps.size()));
+        steps.addLast(
+            new Route.Step(outPath,
+                           kernel.getTCSObjectOriginal(Point.class, outPath.getSourcePoint()),
+                           nextPoint,
+                           Vehicle.Orientation.FORWARD,
+                           steps.size()));
         computeTableEntries(startPoint, nextPoint, steps);
         steps.removeLast();
       }
@@ -172,10 +173,12 @@ public class RoutingTableBuilderDfs
                                                     inPath.getSourcePoint());
       if (!visitedPointOnRoute(nextPoint, steps)
           && inPath.isNavigableReverse()) {
-        steps.addLast(new Route.Step(inPath,
-                                     nextPoint,
-                                     Vehicle.Orientation.BACKWARD,
-                                     steps.size()));
+        steps.addLast(
+            new Route.Step(inPath,
+                           kernel.getTCSObjectOriginal(Point.class, inPath.getDestinationPoint()),
+                           nextPoint,
+                           Vehicle.Orientation.BACKWARD,
+                           steps.size()));
         computeTableEntries(startPoint, nextPoint, steps);
         steps.removeLast();
       }

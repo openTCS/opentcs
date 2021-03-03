@@ -39,8 +39,7 @@ abstract class OrderCleanerTask
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(OrderCleanerTaskByAmount.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OrderCleanerTask.class);
   /**
    * The kernel we scan regularly.
    */
@@ -157,12 +156,12 @@ abstract class OrderCleanerTask
      */
     protected int removeSingleOrder(TCSObjectReference<TransportOrder> orderRef) {
       try {
-        log.info("Removing order: " + orderRef);
+        LOG.info("Removing order: " + orderRef);
         kernel().removeTCSObject(orderRef);
         return 1;
       }
       catch (ObjectUnknownException exc) {
-        log.warn("Order vanished", exc);
+        LOG.warn("Order vanished", exc);
         return 0;
       }
     }
@@ -251,7 +250,7 @@ abstract class OrderCleanerTask
         kernel().removeTCSObject(sequence.getReference());
       }
       catch (ObjectUnknownException exc) {
-        log.warn("Sequence vanished", exc);
+        LOG.warn("Sequence vanished", exc);
       }
       return result;
     }

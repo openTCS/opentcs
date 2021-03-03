@@ -14,25 +14,21 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 
 /**
- * Always returns 0, for every given route, and doesn't call any augmenting
- * instance.
+ * Always returns 0, for every given route.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class RouteEvaluatorNull
-    extends RouteEvaluator {
+    implements RouteEvaluator {
 
   /**
    * Creates a new instance.
    */
   public RouteEvaluatorNull() {
-    super(null);
   }
 
   @Override
-  public long computeCosts(Vehicle vehicle,
-                           Point startPoint,
-                           List<Route.Step> steps) {
+  public long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps) {
     return 0;
   }
 }

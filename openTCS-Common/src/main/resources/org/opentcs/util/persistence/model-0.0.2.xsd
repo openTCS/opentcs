@@ -81,8 +81,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -126,8 +125,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -230,8 +228,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -250,8 +247,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -283,8 +279,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -305,8 +300,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -357,8 +351,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -382,8 +375,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -407,8 +399,7 @@
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
@@ -439,8 +430,7 @@
     </xsd:sequence>
 	
     <xsd:attribute name="id"
-                   type="xsd:unsignedInt"
-                   use="required"/>
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>

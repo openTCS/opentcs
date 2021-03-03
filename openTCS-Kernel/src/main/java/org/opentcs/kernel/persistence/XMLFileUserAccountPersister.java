@@ -53,7 +53,7 @@ public class XMLFileUserAccountPersister
    * The URL of the schema for XML model validataion.
    */
   private static final URL schemaUrl = XMLFileUserAccountPersister.class.getResource(
-      "/org/opentcs/kernel/persistence/useraccounts.xsd");
+      "/org/opentcs/util/persistence/useraccounts.xsd");
   /**
    * The directory in which the account file resides.
    */

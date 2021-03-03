@@ -43,8 +43,7 @@ public class RoutingTableBuilderBfs
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(RoutingTableBuilderBfs.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderBfs.class);
   /**
    * Whether to terminate the BFS early when a cheaper route to a point has
    * already been found.
@@ -94,7 +93,7 @@ public class RoutingTableBuilderBfs
       }
     }
     double timePassed = (System.currentTimeMillis() - timeStampBefore) / 1000.0;
-    log.debug("Computed routing table for {} in {} seconds.", vehicle.getName(), timePassed);
+    LOG.debug("Computed routing table for {} in {} seconds.", vehicle.getName(), timePassed);
     for (StaticRoute staticRoute : kernel.getTCSObjectsOriginal(StaticRoute.class)) {
       integrateStaticRoute(staticRoute);
     }
@@ -120,6 +119,7 @@ public class RoutingTableBuilderBfs
       }
       LinkedList<Route.Step> steps = new LinkedList<>(entry.steps);
       steps.add(new Route.Step(outPath,
+                               kernel.getTCSObjectOriginal(Point.class, outPath.getSourcePoint()),
                                nextPoint,
                                Vehicle.Orientation.FORWARD,
                                steps.size()));
@@ -141,10 +141,12 @@ public class RoutingTableBuilderBfs
         continue;
       }
       LinkedList<Route.Step> steps = new LinkedList<>(entry.steps);
-      steps.add(new Route.Step(inPath,
-                               nextPoint,
-                               Vehicle.Orientation.BACKWARD,
-                               steps.size()));
+      steps.add(
+          new Route.Step(inPath,
+                         kernel.getTCSObjectOriginal(Point.class, inPath.getDestinationPoint()),
+                         nextPoint,
+                         Vehicle.Orientation.BACKWARD,
+                         steps.size()));
       long costs = routeEvaluator.computeCosts(vehicle, startPoint, steps);
       checkForTableAndQueueUpdate(startPoint, nextPoint, steps, costs);
     }

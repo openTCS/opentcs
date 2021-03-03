@@ -11,8 +11,11 @@ package org.opentcs.data.model;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
+import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A Point is a node/position in the model graph.
@@ -21,7 +24,8 @@ import org.opentcs.data.TCSObjectReference;
  */
 public class Point
     extends TCSResource<Point>
-    implements Serializable, Cloneable {
+    implements Serializable,
+               Cloneable {
 
   /**
    * This point's coordinates in mm.
@@ -77,14 +81,10 @@ public class Point
   /**
    * Sets the physical coordinates of this point in mm.
    *
-   * @param newPosition The new physical coordinates of this point. May not be
-   * <code>null</code>.
+   * @param position The new physical coordinates of this point.
    */
-  public void setPosition(Triple newPosition) {
-    if (newPosition == null) {
-      throw new NullPointerException("newPosition is null");
-    }
-    position = newPosition;
+  public void setPosition(@Nonnull Triple position) {
+    this.position = requireNonNull(position, "position");
   }
 
   /**
@@ -124,13 +124,10 @@ public class Point
   /**
    * Sets this point's type.
    *
-   * @param newType This point's new type.
+   * @param type This point's new type.
    */
-  public void setType(Type newType) {
-    if (newType == null) {
-      throw new NullPointerException("newType is null");
-    }
-    type = newType;
+  public void setType(@Nonnull Type type) {
+    this.type = requireNonNull(type, "type");
   }
 
   /**
@@ -195,13 +192,11 @@ public class Point
    * If the referenced path is already among the incoming paths of this point,
    * nothing happens.
    *
-   * @param newPath A reference to the path to be added.
+   * @param path A reference to the path to be added.
    */
-  public void addIncomingPath(TCSObjectReference<Path> newPath) {
-    if (newPath == null) {
-      throw new NullPointerException("newPath is null");
-    }
-    incomingPaths.add(newPath);
+  public void addIncomingPath(@Nonnull TCSObjectReference<Path> path) {
+    requireNonNull(path, "path");
+    incomingPaths.add(path);
   }
 
   /**
@@ -212,9 +207,6 @@ public class Point
    * @param rmPath A reference to the path to be removed.
    */
   public void removeIncomingPath(TCSObjectReference<Path> rmPath) {
-    if (rmPath == null) {
-      throw new NullPointerException("rmPath is null");
-    }
     incomingPaths.remove(rmPath);
   }
 
@@ -232,13 +224,11 @@ public class Point
    * If the referenced path is already among the outgoing paths of this point,
    * nothing happens.
    *
-   * @param newPath A reference to the path to be added.
+   * @param path A reference to the path to be added.
    */
-  public void addOutgoingPath(TCSObjectReference<Path> newPath) {
-    if (newPath == null) {
-      throw new NullPointerException("newPath is null");
-    }
-    outgoingPaths.add(newPath);
+  public void addOutgoingPath(@Nonnull TCSObjectReference<Path> path) {
+    requireNonNull(path, "path");
+    outgoingPaths.add(path);
   }
 
   /**
@@ -249,9 +239,6 @@ public class Point
    * @param rmPath A reference to the path to be removed.
    */
   public void removeOutgoingPath(TCSObjectReference<Path> rmPath) {
-    if (rmPath == null) {
-      throw new NullPointerException("rmPath is null");
-    }
     outgoingPaths.remove(rmPath);
   }
 
@@ -267,20 +254,17 @@ public class Point
   /**
    * Attaches a link to this point.
    *
-   * @param newLink The link to be attached to this point.
+   * @param link The link to be attached to this point.
    * @return <code>true</code> if, and only if, the given link was not already
    * attached to this point.
    * @throws IllegalArgumentException If the point end of the given link is not
    * this point.
    */
-  public boolean attachLink(Location.Link newLink) {
-    if (newLink == null) {
-      throw new NullPointerException("newLink is null");
-    }
-    if (!newLink.getPoint().equals(this.getReference())) {
-      throw new IllegalArgumentException("point end of link is not this point");
-    }
-    return attachedLinks.add(newLink);
+  public boolean attachLink(@Nonnull Location.Link link) {
+    requireNonNull(link, "link");
+    checkArgument(link.getPoint().equals(this.getReference()),
+                  "point end of link is not this point");
+    return attachedLinks.add(link);
   }
 
   /**
@@ -290,10 +274,8 @@ public class Point
    * @return <code>true</code> if, and only if, there was a link to the given
    * location attached to this point.
    */
-  public boolean detachLink(TCSObjectReference<Location> locRef) {
-    if (locRef == null) {
-      throw new NullPointerException("locRef is null");
-    }
+  public boolean detachLink(@Nonnull TCSObjectReference<Location> locRef) {
+    requireNonNull(locRef, "locRef");
     Iterator<Location.Link> linkIter = attachedLinks.iterator();
     while (linkIter.hasNext()) {
       Location.Link curLink = linkIter.next();
@@ -309,8 +291,8 @@ public class Point
   public Point clone() {
     Point clone = (Point) super.clone();
     clone.position = (position == null) ? null : position.clone();
-    clone.occupyingVehicle =
-        (occupyingVehicle == null) ? null : occupyingVehicle.clone();
+    clone.occupyingVehicle
+        = (occupyingVehicle == null) ? null : occupyingVehicle.clone();
     clone.incomingPaths = new HashSet<>();
     for (TCSObjectReference<Path> curRef : incomingPaths) {
       clone.incomingPaths.add(curRef.clone());

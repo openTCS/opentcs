@@ -9,9 +9,8 @@
 package org.opentcs.data;
 
 import java.io.Serializable;
-import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Instances of this class provide transient references to business objects.
@@ -25,11 +24,6 @@ import org.slf4j.LoggerFactory;
 public class TCSObjectReference<E extends TCSObject<E>>
     implements Serializable, Cloneable {
 
-  /**
-   * This class's Logger.
-   */
-  private static final Logger log =
-      LoggerFactory.getLogger(TCSObjectReference.class);
   /**
    * The referenced object.
    * (Transient to prevent serialization of whole object graphs.)
@@ -58,9 +52,8 @@ public class TCSObjectReference<E extends TCSObject<E>>
    *
    * @param newReferent The object this reference references.
    */
-  protected TCSObjectReference(TCSObject<E> newReferent) {
-    log.debug("method entry");
-    referent = Objects.requireNonNull(newReferent, "newReferent is null");
+  protected TCSObjectReference(@Nonnull TCSObject<E> newReferent) {
+    referent = requireNonNull(newReferent, "newReferent");
     referentClass = referent.getClass();
     id = referent.getId();
     name = referent.getName();
@@ -73,10 +66,9 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * @param clazz The class of the object being referenced.
    * @param newName The new reference's name.
    */
-  private TCSObjectReference(Class<?> clazz, String newName) {
-    log.debug("method entry");
-    name = Objects.requireNonNull(newName, "newName is null");
-    referentClass = Objects.requireNonNull(clazz, "clazz is null");
+  private TCSObjectReference(@Nonnull Class<?> clazz, @Nonnull String newName) {
+    name = requireNonNull(newName, "newName");
+    referentClass = requireNonNull(clazz, "clazz");
     referent = null;
     id = Integer.MAX_VALUE;
     dummy = true;
@@ -97,7 +89,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * @return The referenced object's ID.
    */
   public final int getId() {
-    log.debug("method entry");
     return id;
   }
 
@@ -107,7 +98,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * @return The referenced object's name.
    */
   public final String getName() {
-    log.debug("method entry");
     return name;
   }
 
@@ -119,9 +109,8 @@ public class TCSObjectReference<E extends TCSObject<E>>
    *
    * @param newName The referenced object's new name.
    */
-  public final void setName(String newName) {
-    log.debug("method entry");
-    name = Objects.requireNonNull(newName, "newName is null");
+  public final void setName(@Nonnull String newName) {
+    name = requireNonNull(newName, "newName");
   }
 
   /**
@@ -151,7 +140,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
    */
   @Override
   public boolean equals(Object otherObj) {
-    log.debug("method entry");
     if (otherObj instanceof TCSObjectReference) {
       TCSObjectReference<?> otherRef = (TCSObjectReference<?>) otherObj;
       return id == otherRef.id;
@@ -171,7 +159,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
    */
   @Override
   public int hashCode() {
-    log.debug("method entry");
     return id;
   }
 
@@ -191,7 +178,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
   @SuppressWarnings("unchecked")
   @Override
   public TCSObjectReference<E> clone() {
-    log.debug("method entry");
     TCSObjectReference<E> clone = null;
     try {
       clone = (TCSObjectReference<E>) super.clone();

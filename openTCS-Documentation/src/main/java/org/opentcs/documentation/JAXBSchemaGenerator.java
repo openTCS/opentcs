@@ -25,6 +25,12 @@ import javax.xml.transform.stream.StreamResult;
 public class JAXBSchemaGenerator {
 
   /**
+   * Prevents external instantiation.
+   */
+  private JAXBSchemaGenerator() {
+  }
+
+  /**
    * Generates an XML Schema file for the given list of classes and writes it to
    * the file with the given name.
    *

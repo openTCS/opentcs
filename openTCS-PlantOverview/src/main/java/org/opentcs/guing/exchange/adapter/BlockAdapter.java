@@ -9,11 +9,7 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.assistedinject.Assisted;
-import java.util.Map;
-import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -22,12 +18,8 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.ColorProperty;
@@ -38,8 +30,10 @@ import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for blocks.
@@ -98,7 +92,7 @@ public class BlockAdapter
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     requireNonNull(kernel, "kernel");
 
     Block block = kernel.createBlock();
@@ -111,7 +105,7 @@ public class BlockAdapter
     try {
       kernel.renameTCSObject(reference, name);
 
-      updateProcessBlock(kernel, block);
+      updateProcessBlock(kernel, block, plantModel);
 
       updateMiscProcessProperties(kernel, reference);
     }
@@ -120,7 +114,7 @@ public class BlockAdapter
     }
   }
 
-  private void updateProcessBlock(Kernel kernel, Block block)
+  private void updateProcessBlock(Kernel kernel, Block block, PlantModelCache plantModel)
       throws KernelRuntimeException {
 
     for (TCSResourceReference<?> resRef : block.getMembers()) {
@@ -130,16 +124,13 @@ public class BlockAdapter
     for (ModelComponent model : getModel().getChildComponents()) {
       TCSResourceReference<?> memberRef;
       if (model instanceof PointModel) {
-        memberRef
-            = kernel.getTCSObject(Point.class, model.getName()).getReference();
+        memberRef = plantModel.getPoints().get(model.getName()).getReference();
       }
       else if (model instanceof PathModel) {
-        memberRef
-            = kernel.getTCSObject(Path.class, model.getName()).getReference();
+        memberRef = plantModel.getPaths().get(model.getName()).getReference();
       }
       else if (model instanceof LocationModel) {
-        memberRef = kernel.getTCSObject(Location.class, model.getName())
-            .getReference();
+        memberRef = plantModel.getLocations().get(model.getName()).getReference();
       }
       else {
         throw new IllegalArgumentException("Unhandled model type "
@@ -153,8 +144,8 @@ public class BlockAdapter
       }
     }
     // Write the block color into the model layout element
-    for (VisualLayout layout : kernel.getTCSObjects(VisualLayout.class)) {
-      updateLayoutElement(kernel, layout, block.getReference());
+    for (VisualLayout layout : plantModel.getVisualLayouts()) {
+      updateLayoutElement(layout, block.getReference());
     }
   }
 
@@ -163,23 +154,15 @@ public class BlockAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(Kernel kernel,
-                                   VisualLayout layout,
+  private void updateLayoutElement(VisualLayout layout,
                                    TCSObjectReference<?> ref) {
     ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
-    Map<String, String> layoutProperties = layoutElement.getProperties();
 
     ColorProperty pColor
         = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
     int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
-    layoutProperties.put(ElementPropKeys.BLOCK_COLOR,
-                         String.format("#%06X", rgb));
-    layoutElement.setProperties(layoutProperties);
+    layoutElement.getProperties().put(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb));
 
-    Set<LayoutElement> layoutElements = layout.getLayoutElements();
-    Iterables.removeIf(layoutElements, layoutElementFor(ref));
-    layoutElements.add(layoutElement);
-
-    kernel.setVisualLayoutElements(layout.getReference(), layoutElements);
+    layout.getLayoutElements().add(layoutElement);
   }
 }

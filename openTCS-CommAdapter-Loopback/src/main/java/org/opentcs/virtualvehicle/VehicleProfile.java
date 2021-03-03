@@ -38,7 +38,7 @@ public class VehicleProfile {
   /**
    * A resource bundle for internationalization.
    */
-  private static final ResourceBundle bundle
+  private static final ResourceBundle BUNDLE
       = ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle");
   /**
    * Name of the profile.
@@ -97,13 +97,28 @@ public class VehicleProfile {
   private List<OperationSpec> opSpecs = new LinkedList<>();
 
   /**
+   * Create the default profile.
+   */
+  public VehicleProfile() {
+    this(BUNDLE.getString("defaultVehicleProfile"));
+  }
+
+  /**
    * Creates a new VehicleProfile.
    *
    * @param name name of the profile
    */
   public VehicleProfile(String name) {
-    this();
     this.name = name;
+    capacity = 1000;
+    idlePower = 0;
+    movementPower = 0;
+    operationPower = 0;
+    fwdVelocity = 1000;
+    revVelocity = -1000;
+    acceleration = 500;
+    deceleration = -500;
+    defaultOpTime = 1000;
   }
 
   /**
@@ -126,22 +141,6 @@ public class VehicleProfile {
     for (OperationSpec spec : otherOpSpecList) {
       opSpecs.add(new OperationSpec(spec));
     }
-  }
-
-  /**
-   * Create the default profile.
-   */
-  public VehicleProfile() {
-    name = bundle.getString("defaultVehicleProfile");
-    capacity = 1000;
-    idlePower = 0;
-    movementPower = 0;
-    operationPower = 0;
-    fwdVelocity = 1000;
-    revVelocity = -1000;
-    acceleration = 500;
-    deceleration = -500;
-    defaultOpTime = 1000;
   }
 
   @Override
@@ -183,23 +182,21 @@ public class VehicleProfile {
     else if (defaultOpTime != other.defaultOpTime) {
       return false;
     }
-    else {
-      return true;
-    }
+    return true;
   }
 
   @Override
   public int hashCode() {
     int hash = 7;
     hash = 29 * hash + Objects.hashCode(this.name);
-    hash = 29 * hash + (int) (Double.doubleToLongBits(this.capacity) 
-        ^ (Double.doubleToLongBits(this.capacity) >>> 32));
-    hash = 29 * hash + (int) (Double.doubleToLongBits(this.idlePower) 
-        ^ (Double.doubleToLongBits(this.idlePower) >>> 32));
-    hash = 29 * hash + (int) (Double.doubleToLongBits(this.movementPower) 
-        ^ (Double.doubleToLongBits(this.movementPower) >>> 32));
-    hash = 29 * hash + (int) (Double.doubleToLongBits(this.operationPower) 
-        ^ (Double.doubleToLongBits(this.operationPower) >>> 32));
+    hash = 29 * hash + (int) (Double.doubleToLongBits(this.capacity)
+                              ^ (Double.doubleToLongBits(this.capacity) >>> 32));
+    hash = 29 * hash + (int) (Double.doubleToLongBits(this.idlePower)
+                              ^ (Double.doubleToLongBits(this.idlePower) >>> 32));
+    hash = 29 * hash + (int) (Double.doubleToLongBits(this.movementPower)
+                              ^ (Double.doubleToLongBits(this.movementPower) >>> 32));
+    hash = 29 * hash + (int) (Double.doubleToLongBits(this.operationPower)
+                              ^ (Double.doubleToLongBits(this.operationPower) >>> 32));
     hash = 29 * hash + this.fwdVelocity;
     hash = 29 * hash + this.revVelocity;
     hash = 29 * hash + this.acceleration;
@@ -247,7 +244,7 @@ public class VehicleProfile {
   /**
    * Set the vehicle's idle power.
    *
-   * @param idlePower the idle power 
+   * @param idlePower the idle power
    */
   public void setIdlePower(double idlePower) {
     this.idlePower = idlePower;
@@ -256,7 +253,7 @@ public class VehicleProfile {
   /**
    * Get the vehicle's idle power.
    *
-   * @return the idle power 
+   * @return the idle power
    */
   public double getIdlePower() {
     return idlePower;
@@ -265,7 +262,7 @@ public class VehicleProfile {
   /**
    * Set the vehicle's movement power.
    *
-   * @param movementPower the movement power 
+   * @param movementPower the movement power
    */
   public void setMovementPower(double movementPower) {
     this.movementPower = movementPower;
@@ -274,7 +271,7 @@ public class VehicleProfile {
   /**
    * Get the vehicle's movement power.
    *
-   * @return the movement power 
+   * @return the movement power
    */
   public double getMovementPower() {
     return movementPower;
@@ -283,7 +280,7 @@ public class VehicleProfile {
   /**
    * Set the vehicle's operation power.
    *
-   * @param operationPower the operation power 
+   * @param operationPower the operation power
    */
   public void setOperationPower(double operationPower) {
     this.operationPower = operationPower;
@@ -292,7 +289,7 @@ public class VehicleProfile {
   /**
    * Get the vehicle's operation power.
    *
-   * @return the operation power 
+   * @return the operation power
    */
   public double getOperationPower() {
     return operationPower;

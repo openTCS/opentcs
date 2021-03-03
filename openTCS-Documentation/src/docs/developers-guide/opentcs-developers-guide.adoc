@@ -5,14 +5,16 @@ openTCS {project-version}
 ifdef::backend-pdf[:imagesdir: {imagesoutdir}]
 ifdef::backend-html5[:imagesdir: images]
 
-include::general-development.adoc[]
+include::01_general-development.adoc[]
 
-include::kernel-api.adoc[]
+include::02_kernel-api.adoc[]
 
-include::tcp-host-interface.adoc[]
+include::03_tcp-host-interface.adoc[]
 
-include::extending-kernel.adoc[]
+include::04_default-strategies.adoc[]
 
-include::extending-plantoverview.adoc[]
+include::05_extending-kernel.adoc[]
 
-include::appendix.adoc[]
+include::06_extending-plantoverview.adoc[]
+
+include::99_appendix.adoc[]

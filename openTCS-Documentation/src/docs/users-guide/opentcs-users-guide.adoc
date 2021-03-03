@@ -5,14 +5,14 @@ openTCS {project-version}
 
 // TIP: Always have the comprehensive http://asciidoctor.org/docs/asciidoc-syntax-quick-reference[QuickReference] handy.
 
-include::introduction.adoc[]
+include::01_introduction.adoc[]
 
-include::system-overview.adoc[]
+include::02_system-overview.adoc[]
 
-include::operating-opentcs.adoc[]
+include::03_operating-opentcs.adoc[]
 
-include::advanced-usage.adoc[]
+include::04_advanced-usage.adoc[]
 
-include::customizing-and-integrating.adoc[]
+include::05_customizing-and-integrating.adoc[]
 
-include::appendix.adoc[]
+include::99_appendix.adoc[]

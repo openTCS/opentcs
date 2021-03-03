@@ -23,8 +23,7 @@ import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basic implementation of a central event dispatcher between the kernel
- * and the plant overview.
+ * Basic implementation of a central event dispatcher between the kernel and the plant overview.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -37,8 +36,7 @@ public abstract class AbstractEventDispatcher
    * its ProcessAdapter. Furthermore there can be models with ProcessAdapters,
    * for which no kernel object exists.
    */
-  protected final Map<ModelComponent, ProcessAdapter> fAdaptersByModel
-      = new HashMap<>();
+  private final Map<ModelComponent, ProcessAdapter> fAdaptersByModel = new HashMap<>();
   /**
    * Provides access to a kernel.
    */
@@ -49,7 +47,7 @@ public abstract class AbstractEventDispatcher
    *
    * @param kernelProvider Provides a access to a kernel.
    */
-  protected AbstractEventDispatcher(SharedKernelProvider kernelProvider) {
+  public AbstractEventDispatcher(SharedKernelProvider kernelProvider) {
     this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
   }
 
@@ -84,8 +82,7 @@ public abstract class AbstractEventDispatcher
     // XXX We look up the object by its name here, assuming that the name does
     // XXX not change during runtime. This is true for model objects in
     // XXX operating mode now, but the assumption may not hold forever.
-    for (Map.Entry<ModelComponent, ProcessAdapter> entry
-         : fAdaptersByModel.entrySet()) {
+    for (Map.Entry<ModelComponent, ProcessAdapter> entry : fAdaptersByModel.entrySet()) {
       if (Objects.equals(entry.getKey().getName(), processObject.getName())) {
         return entry.getValue();
       }

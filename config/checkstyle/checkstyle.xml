@@ -87,6 +87,7 @@
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="LineLength">
       <property name="max" value="100"/>
+      <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
       <property name="severity" value="warning"/>
     </module>
     <module name="MethodLength"/>
@@ -104,7 +105,8 @@
       <property name="severity" value="info"/>
     </module>
     <module name="RedundantModifier">
-      <property name="severity" value="warning"/>
+      <property name="tokens" value="METHOD_DEF, VARIABLE_DEF, ANNOTATION_FIELD_DEF, INTERFACE_DEF, CLASS_DEF, ENUM_DEF"/>
+      <property name="severity" value="info"/>
     </module>
 
 
@@ -169,7 +171,7 @@
     </module>
     <module name="DefaultComesLast"/>
     <module name="MissingCtor">
-      <property name="severity" value="warning"/>
+      <property name="severity" value="info"/>
     </module>
     <module name="FallThrough"/>
     <module name="MultipleVariableDeclarations"/>
@@ -179,7 +181,9 @@
 
     <!-- Checks for class design                         -->
     <!-- See http://checkstyle.sf.net/config_design.html -->
-    <module name="VisibilityModifier"/>
+    <module name="VisibilityModifier">
+      <property name="protectedAllowed" value="true"/>
+    </module>
     <!--module name="FinalClass"/-->
     <module name="InterfaceIsType">
       <property name="severity" value="info"/>

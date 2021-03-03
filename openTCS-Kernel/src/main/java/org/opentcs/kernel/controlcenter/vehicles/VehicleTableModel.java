@@ -165,8 +165,7 @@ final class VehicleTableModel
       case STATE_COLUMNN:
         return entry.getVehicle().getState().name();
       case ADAPTER_COLUMN:
-        VehicleCommAdapterFactory factory = entry.getCommAdapterFactory();
-        return factory == null ? null : factory.getAdapterDescription();
+        return entry.getCommAdapterFactory();
       case ENABLED_COLUMN:
         VehicleCommAdapter commAdapter = entry.getCommAdapter();
         return commAdapter != null && commAdapter.isEnabled();
@@ -227,7 +226,7 @@ final class VehicleTableModel
     if (!isRelevantUpdate(evt.getPropertyName())) {
       return;
     }
-    
+
     VehicleEntry entry = (VehicleEntry) evt.getSource();
 
     for (int index = 0; index < entries.size(); index++) {

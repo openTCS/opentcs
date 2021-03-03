@@ -15,6 +15,7 @@ import org.opentcs.access.Kernel;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.storage.PlantModelCache;
 
 /**
  * Receives messages from a <code>ModelComponent</code> and its kernel
@@ -57,6 +58,7 @@ public interface ProcessAdapter
    * kernel object.
    *
    * @param kernel The kernel to synchronize the local model data to.
+   * @param plantModelCache A cache for elements a plant model contains of.
    */
-  void updateProcessProperties(Kernel kernel);
+  void updateProcessProperties(Kernel kernel, PlantModelCache plantModelCache);
 }

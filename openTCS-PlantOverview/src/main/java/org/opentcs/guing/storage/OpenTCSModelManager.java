@@ -15,11 +15,13 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
@@ -98,8 +100,8 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.Colors;
 import org.opentcs.guing.util.CourseObjectFactory;
-import org.opentcs.guing.util.JOptionPaneUtil;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.guing.util.SynchronizedFileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,8 +115,7 @@ public class OpenTCSModelManager
     implements ModelManager {
 
   /**
-   * Identifier f�r das Layout-Objekt, welches das standardm��ige Fahrkursmodell
-   * enth�lt.
+   * Identifier for the default layout object.
    */
   public static final String DEFAULT_LAYOUT = "Default";
   /**
@@ -122,14 +123,9 @@ public class OpenTCSModelManager
    */
   public static final String MODEL_DIRECTORY = "data/";
   /**
-   * File ending of locally saved models.
-   */
-  public static final String FILE_ENDING = ".opentcs";
-  /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(OpenTCSModelManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OpenTCSModelManager.class);
   /**
    * The StatusPanel at the bottom to log messages.
    */
@@ -151,17 +147,25 @@ public class OpenTCSModelManager
    */
   private final ProcessAdapterUtil procAdapterUtil;
   /**
-   * A file chooser for selecting model files to be opened/saved.
+   * A file chooser for selecting model files to be opened.
    */
-  private final JFileChooser modelFileChooser;
+  private final JFileChooser modelReaderFileChooser;
   /**
-   * Provides new instances to validate a system model.
+   * A file chooser for selecting model files to be saved.
    */
-  private final Provider<ModelJAXBValidator> validatorProvider;
+  private final JFileChooser modelPersistorFileChooser;
   /**
-   * Provides new instances to read models from a file.
+   * Persists a model to a kernel.
    */
-  private final Provider<ModelJAXBReader> readerProvider;
+  private final ModelKernelPersistor kernelPersistor;
+  /**
+   * The file filters for different model readers that can be used to load models from a file.
+   */
+  private final Map<FileFilter, ModelReader> modelReaderFilter = new HashMap<>();
+  /**
+   * The file filters for different model persistors that can be used to save models to a file.
+   */
+  private final Map<FileFilter, ModelFilePersistor> modelPersistorFilter = new HashMap<>();
   /**
    * The model currently loaded.
    */
@@ -184,8 +188,9 @@ public class OpenTCSModelManager
    * @param systemModelProvider Provides instances of SystemModel.
    * @param statusPanel StatusPanel to log messages.
    * @param homeDir The application's home directory.
-   * @param validatorProvider Provider for the system model validator
-   * @param modelReader the provider for a file reader for models
+   * @param kernelPersistor Persists a model to a kernel.
+   * @param modelReaders The set of model readers
+   * @param modelPersistors The set of model persistors
    */
   @Inject
   public OpenTCSModelManager(CourseObjectFactory crsObjFactory,
@@ -194,21 +199,41 @@ public class OpenTCSModelManager
                              Provider<SystemModel> systemModelProvider,
                              StatusPanel statusPanel,
                              @ApplicationHome File homeDir,
-                             Provider<ModelJAXBValidator> validatorProvider,
-                             Provider<ModelJAXBReader> modelReader) {
+                             ModelKernelPersistor kernelPersistor,
+                             Set<ModelReader> modelReaders,
+                             Set<ModelFilePersistor> modelPersistors) {
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
-    this.procAdapterFactory = requireNonNull(procAdapterFactory,
-                                             "procAdapterFactory");
+    this.procAdapterFactory = requireNonNull(procAdapterFactory, "procAdapterFactory");
     this.procAdapterUtil = requireNonNull(procAdapterUtil, "procAdapterUtil");
-    this.systemModelProvider = requireNonNull(systemModelProvider,
-                                              "systemModelProvider");
+    this.systemModelProvider = requireNonNull(systemModelProvider, "systemModelProvider");
     this.systemModel = systemModelProvider.get();
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     requireNonNull(homeDir, "homeDir");
-    this.modelFileChooser = new JFileChooser(new File(homeDir, "data"));
-    this.modelFileChooser.setFileFilter(new ModelFileFilter(FILE_ENDING));
-    this.validatorProvider = requireNonNull(validatorProvider, "validatorProvider");
-    this.readerProvider = requireNonNull(modelReader, "modelReader");
+    this.kernelPersistor = requireNonNull(kernelPersistor, "kernelPersistor");
+    this.modelReaderFileChooser = new SynchronizedFileChooser(new File(homeDir, "data"));
+    this.modelReaderFileChooser.setAcceptAllFileFilterUsed(false);
+    modelReaders.stream().forEach(o -> {
+      FileFilter filter = o.getDialogFileFilter();
+      if (o instanceof ModelJAXBReader) {
+        this.modelReaderFileChooser.setFileFilter(filter);
+      }
+      else {
+        this.modelReaderFileChooser.addChoosableFileFilter(filter);
+      }
+      modelReaderFilter.put(filter, o);
+    });
+    this.modelPersistorFileChooser = new SynchronizedFileChooser(new File(homeDir, "data"));
+    this.modelPersistorFileChooser.setAcceptAllFileFilterUsed(false);
+    modelPersistors.stream().forEach(o -> {
+      FileFilter filter = o.getDialogFileFilter();
+      if (o instanceof ModelJAXBPersistor) {
+        this.modelPersistorFileChooser.setFileFilter(filter);
+      }
+      else {
+        this.modelPersistorFileChooser.addChoosableFileFilter(filter);
+      }
+      modelPersistorFilter.put(filter, o);
+    });
   }
 
   @Override
@@ -218,35 +243,43 @@ public class OpenTCSModelManager
 
   @Override
   public boolean loadModel(@Nullable File modelFile) {
-    return loadModel(modelFile, readerProvider.get());
+    File file = modelFile != null ? modelFile : showOpenDialog();
+    if (file == null) {
+      return false;
+    }
+
+    FileFilter chosenFileFilter = modelReaderFileChooser.getFileFilter();
+    return loadModel(file, modelReaderFilter.get(chosenFileFilter));
   }
 
   @Override
-  public boolean loadModel(File modelFile, ModelReader reader) {
-    return loadModel(modelFile, reader, FILE_ENDING);
-  }
-
-  @Override
-  public boolean loadModel(File modelFile, ModelReader reader, String fileEnding) {
-    File file = modelFile != null ? modelFile : showOpenDialog(fileEnding);
+  public boolean loadModel(@Nullable File modelFile, ModelReader reader) {
+    requireNonNull(reader, "reader");
+    File file = modelFile != null ? modelFile : showOpenDialog();
     if (file == null) {
       return false;
     }
 
     try {
-      systemModel = reader.deserialize(file);
-      currentModelFile = file;
-      statusPanel.clear();
-      return true;
+      Optional<SystemModel> opt = reader.deserialize(file);
+      if (opt.isPresent()) {
+        systemModel = opt.get();
+        currentModelFile = file;
+        initializeDefaultSystemModel(systemModel);
+        return true;
+      }
+      else {
+        LOG.debug("Loading model canceled.");
+        return false;
+      }
     }
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle()
-                                .getFormatted("modelManager.persistence.notLoaded",
-                                              file.getName()));
-      log.info("Error reading file", ex);
+                                    .getFormatted("modelManager.persistence.notLoaded",
+                                                  file.getName()));
+      LOG.info("Error reading file", ex);
     }
-
     return false;
   }
 
@@ -254,15 +287,13 @@ public class OpenTCSModelManager
   public boolean persistModel(Kernel kernel) {
     try {
       fModelName = systemModel.getName();
-      ModelPersistor persistor = new ModelKernelPersistor(
-          systemModel.getEventDispatcher(), kernel, fModelName);
       statusPanel.clear();
-      return persistModel(systemModel, persistor, false);
+      return persistModel(systemModel, kernel, kernelPersistor, false);
     }
     catch (IOException | CredentialsException e) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
-      log.warn("Exception persisting model", e);
+      LOG.warn("Exception persisting model", e);
       return false;
     }
     catch (IllegalArgumentException e) {
@@ -289,14 +320,18 @@ public class OpenTCSModelManager
       currentModelFile = selectedFile;
     }
     try {
-      ModelJAXBPersistor persistor = new ModelJAXBPersistor(currentModelFile);
       statusPanel.clear();
-      return persistModel(systemModel, persistor, true);
+
+      return persistModel(systemModel,
+                          currentModelFile,
+                          modelPersistorFilter.get(modelPersistorFileChooser.getFileFilter()),
+                          true);
+
     }
     catch (IOException e) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
-      log.warn("Exception persisting model", e);
+      LOG.warn("Exception persisting model", e);
       return false;
     }
     catch (IllegalArgumentException e) {
@@ -308,28 +343,10 @@ public class OpenTCSModelManager
   @Override
   public void createEmptyModel() {
     systemModel = systemModelProvider.get();
-    List<LayoutModel> layoutModels = systemModel.getLayoutModels();
-    if (!layoutModels.isEmpty()) {
-      double scaleX = Origin.DEFAULT_SCALE;
-      double scaleY = Origin.DEFAULT_SCALE;
-      LayoutModel layoutModel = layoutModels.get(0);
-      LengthProperty pScaleX = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_X);
-      if (pScaleX.getValueByUnit(LengthProperty.Unit.MM) == 0) {
-        pScaleX.setValueAndUnit(scaleX, LengthProperty.Unit.MM);
-      }
-      LengthProperty pScaleY = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_Y);
-      if (pScaleY.getValueByUnit(LengthProperty.Unit.MM) == 0) {
-        pScaleY.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
-      }
-    }
+    initializeDefaultSystemModel(systemModel);
     systemModel.setName(Kernel.DEFAULT_MODEL_NAME);
     fModelName = systemModel.getName();
-    LayoutModel layoutComponent
-        = (LayoutModel) systemModel.getMainFolder(SystemModel.FolderKey.LAYOUT);
 
-    LayoutAdapter adapter = procAdapterFactory.createLayoutAdapter(
-        layoutComponent, systemModel.getEventDispatcher());
-    adapter.register();
   }
 
   /**
@@ -340,85 +357,43 @@ public class OpenTCSModelManager
    * @param ignoreError whether the model should be persisted when duplicates exist
    * @return Whether the model was actually saved.
    */
-  private boolean persistModel(SystemModel systemModel, ModelPersistor persistor,
+  private boolean persistModel(SystemModel systemModel,
+                               File file,
+                               ModelFilePersistor persistor,
                                boolean ignoreError)
       throws IOException, KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
 
-    ModelJAXBValidator validator = validatorProvider.get();
-    boolean valid = true;
-    for (ModelComponent component : systemModel.getAll()) {
-      valid &= validator.isValidWith(systemModel, component);
-    }
-    //Report possible duplicates if we persist to the kernel
-    if (!valid) {
-      if (!ignoreError) {
-        //Use a hash set to avoid duplicate errors
-        Set<String> errors = new HashSet<>(validator.getErrors());
-        ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-        JOptionPaneUtil.showDialogWithTextArea(
-            statusPanel,
-            bundle.getString("ValidationWarning.title"),
-            bundle.getString("ValidationWarning.descriptionSavingKernel"),
-            errors);
-        return false;
-      }
+    if (!persistor.serialize(systemModel, fModelName, file, ignoreError)) {
+      return false;
     }
 
-    persistor.init();
-
-    for (LayoutModel model : systemModel.getLayoutModels()) {
-      persistor.persist(model);
-    }
-    for (PointModel model : systemModel.getPointModels()) {
-      persistor.persist(model);
-    }
-    for (PathModel model : systemModel.getPathModels()) {
-      // XXX PathAdapter needs to be changed: connectionChanged() should not do
-      // anything while modelling. establishPath() should only be called in
-      // updateProcessProperties(), or even better, moved to createProcessObject().
-      // XXX Registering/Unregistering of ConnectionChangeListener in PathAdapter still correct?
-      persistor.persist(model);
-    }
-    for (LocationTypeModel model : systemModel.getLocationTypeModels()) {
-      persistor.persist(model);
-    }
-    for (LocationModel model : systemModel.getLocationModels()) {
-      persistor.persist(model);
-    }
-    for (LinkModel model : systemModel.getLinkModels()) {
-      // XXX LinkAdapter needs to be changed: connectionChanged() should not do
-      // anything while modelling. establishLink() should only be called in
-      // updateProcessProperties(), or even better, moved to createProcessObject().
-      // XXX Registering/Unregistering of ConnectionChangeListener in LinkAdapter still correct?
-      persistor.persist(model);
-    }
-    for (BlockModel model : systemModel.getBlockModels()) {
-      persistor.persist(model);
-    }
-    for (GroupModel model : systemModel.getGroupModels()) {
-      persistor.persist(model);
-    }
-    for (StaticRouteModel model : systemModel.getStaticRouteModels()) {
-      persistor.persist(model);
-    }
-    for (VehicleModel model : systemModel.getVehicleModels()) {
-      persistor.persist(model);
-    }
-
-    persistor.close();
     systemModel.setName(fModelName);
-    //If there are errors while persisting to a file, show the dialog for errors
-    if (!valid) {
-      Set<String> errors = new HashSet<>(validator.getErrors());
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-      JOptionPaneUtil.showDialogWithTextArea(
-          statusPanel,
-          bundle.getString("ValidationWarning.title"),
-          bundle.getString("ValidationWarning.descriptionSavingFile"),
-          errors);
+    return true;
+  }
+
+  /**
+   * Persist model with the persistor.
+   *
+   * @param systemModel The system model to be persisted.
+   * @param persistor The persistor to be used.
+   * @param ignoreError whether the model should be persisted when duplicates exist
+   * @return Whether the model was actually saved.
+   */
+  private boolean persistModel(SystemModel systemModel,
+                               Kernel kernel,
+                               ModelKernelPersistor persistor,
+                               boolean ignoreError)
+      throws IOException, KernelRuntimeException {
+    requireNonNull(systemModel, "systemModel");
+    requireNonNull(persistor, "persistor");
+
+    if (!persistor.persist(systemModel, kernel, ignoreError)) {
+      return false;
     }
+
+    systemModel.setName(fModelName);
     return true;
   }
 
@@ -456,8 +431,7 @@ public class OpenTCSModelManager
   }
 
   @Override
-  public void restoreModel(Kernel kernel
-  ) {
+  public void restoreModel(Kernel kernel) {
     createEmptyModel();
     fModelName = kernel.getLoadedModelName();
     ((StringProperty) systemModel.getProperty(ModelComponent.NAME)).setText(fModelName);
@@ -508,7 +482,7 @@ public class OpenTCSModelManager
         scale.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
       }
       catch (IllegalArgumentException ex) {
-        log.warn("Exception in setValueAndUnit()", ex);
+        LOG.warn("Exception in setValueAndUnit()", ex);
       }
 
       adapter = procAdapterFactory.createLayoutAdapter(
@@ -553,7 +527,7 @@ public class OpenTCSModelManager
           groupModel.add(modelComponent);
           procAdapterUtil.createProcessAdapter(modelComponent,
                                                systemModel
-                                               .getEventDispatcher());
+                                                   .getEventDispatcher());
         }
       }
     }
@@ -615,7 +589,7 @@ public class OpenTCSModelManager
       }
       procAdapterUtil.createProcessAdapter(staticRouteModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -671,7 +645,7 @@ public class OpenTCSModelManager
       }
       procAdapterUtil.createProcessAdapter(blockModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -801,7 +775,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(locationModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
       locationModel.propertiesChanged(new NullAttributesChangeListener());
       origin.addListener(llf);
       llf.set(FigureConstants.ORIGIN, origin);
@@ -958,7 +932,7 @@ public class OpenTCSModelManager
     for (LocationTypeModel locTypeModel : locTypeModels) {
       procAdapterUtil.createProcessAdapter(locTypeModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -987,7 +961,7 @@ public class OpenTCSModelManager
     for (LinkModel linkModel : linkModels) {
       procAdapterUtil.createProcessAdapter(linkModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -995,7 +969,7 @@ public class OpenTCSModelManager
     for (VehicleModel vehModel : vehicles) {
       procAdapterUtil.createProcessAdapter(vehModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -1052,7 +1026,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(pathModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
       pathModel.setFigure(pathFigure);
       pathModel.addAttributesChangeListener(pathFigure);
       restoredFigures.add(pathFigure);
@@ -1121,22 +1095,38 @@ public class OpenTCSModelManager
   private void initPathControlPoints(PathModel.LinerType connectionType,
                                      String sControlPoints,
                                      PathConnection pathFigure) {
-    if (connectionType.equals(PathModel.LinerType.BEZIER)) {
+    if (connectionType.equals(PathModel.LinerType.BEZIER)
+        || connectionType.equals(PathModel.LinerType.BEZIER_3)) {
       // Format: x1,y1 or x1,y1;x2,y2
       if (sControlPoints != null && !sControlPoints.isEmpty()) {
         String[] values = sControlPoints.split("[,;]");
 
         try {
           if (values.length >= 2) {
-            int xcp1 = Integer.parseInt(values[0]);
-            int ycp1 = Integer.parseInt(values[1]);
+            int xcp1 = (int) Double.parseDouble(values[0]);
+            int ycp1 = (int) Double.parseDouble(values[1]);
             Point2D.Double cp1 = new Point2D.Double(xcp1, ycp1);
 
             if (values.length >= 4) {
-              int xcp2 = Integer.parseInt(values[2]);
-              int ycp2 = Integer.parseInt(values[3]);
+              int xcp2 = (int) Double.parseDouble(values[2]);
+              int ycp2 = (int) Double.parseDouble(values[3]);
               Point2D.Double cp2 = new Point2D.Double(xcp2, ycp2);
-              pathFigure.addControlPoints(cp1, cp2);  // Cubic curve
+
+              if (values.length >= 10) {
+                int xcp3 = (int) Double.parseDouble(values[4]);
+                int ycp3 = (int) Double.parseDouble(values[5]);
+                int xcp4 = (int) Double.parseDouble(values[6]);
+                int ycp4 = (int) Double.parseDouble(values[7]);
+                int xcp5 = (int) Double.parseDouble(values[8]);
+                int ycp5 = (int) Double.parseDouble(values[9]);
+                Point2D.Double cp3 = new Point2D.Double(xcp3, ycp3);
+                Point2D.Double cp4 = new Point2D.Double(xcp4, ycp4);
+                Point2D.Double cp5 = new Point2D.Double(xcp5, ycp5);
+                pathFigure.addControlPoints(cp1, cp2, cp3, cp4, cp5);
+              }
+              else {
+                pathFigure.addControlPoints(cp1, cp2);  // Cubic curve
+              }
             }
             else {
               pathFigure.addControlPoints(cp1, cp1);  // Quadratic curve
@@ -1144,6 +1134,7 @@ public class OpenTCSModelManager
           }
         }
         catch (NumberFormatException nfex) {
+          LOG.info("Error while parsing bezier control points.", nfex);
         }
       }
     }
@@ -1216,7 +1207,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(pointModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
       // Koordinaten der Punkte �ndern sich, wenn der Ma�stab ver�ndert wird
       origin.addListener(lpf);
       lpf.set(FigureConstants.ORIGIN, origin);
@@ -1317,19 +1308,16 @@ public class OpenTCSModelManager
   /**
    * Shows a dialog to select a model to load.
    *
-   * @param fileEnding The ending format of the allowed model file.
-   *
    * @return The selected file or <code>null</code>, if nothing was selected.
    */
-  private File showOpenDialog(String fileEnding) {
-    if (!modelFileChooser.getCurrentDirectory().isDirectory()) {
-      modelFileChooser.getCurrentDirectory().mkdir();
+  private File showOpenDialog() {
+    if (!modelReaderFileChooser.getCurrentDirectory().isDirectory()) {
+      modelReaderFileChooser.getCurrentDirectory().mkdir();
     }
-    modelFileChooser.setFileFilter(new ModelFileFilter(fileEnding));
-    if (modelFileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+    if (modelReaderFileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
       return null;
     }
-    return modelFileChooser.getSelectedFile();
+    return modelReaderFileChooser.getSelectedFile();
   }
 
   /**
@@ -1338,20 +1326,16 @@ public class OpenTCSModelManager
    * @return The selected file or <code>null</code>, if nothing was selected.
    */
   private File showSaveDialog() {
-    if (!modelFileChooser.getCurrentDirectory().isDirectory()) {
-      modelFileChooser.getCurrentDirectory().mkdir();
+    if (!modelPersistorFileChooser.getCurrentDirectory().isDirectory()) {
+      modelPersistorFileChooser.getCurrentDirectory().mkdir();
     }
-    if (modelFileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
+    if (modelPersistorFileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
       fModelName = Kernel.DEFAULT_MODEL_NAME;
       return null;
     }
 
-    File selectedFile = modelFileChooser.getSelectedFile();
-    // Add the correct extension to the file name if it's missing.
-    if (!selectedFile.getName().endsWith(FILE_ENDING)) {
-      selectedFile = new File(selectedFile.getParentFile(),
-                              selectedFile.getName() + FILE_ENDING);
-    }
+    File selectedFile = modelPersistorFileChooser.getSelectedFile();
+
     // Extract the model name from the file name, but without the extension.
     fModelName = selectedFile.getName().replaceFirst("[.][^.]+$", "");
     if (fModelName.isEmpty()) {
@@ -1502,30 +1486,30 @@ public class OpenTCSModelManager
   }
 
   /**
-   * A file filter for course model files.
+   * Sets some default properties in the given system model.
+   *
+   * @param model The system model
    */
-  private static class ModelFileFilter
-      extends FileFilter {
-
-    private final String fileEnding;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param fileEnding The allowed file ending for this filter.
-     */
-    public ModelFileFilter(String fileEnding) {
-      this.fileEnding = requireNonNull(fileEnding, "fileEnding");
+  private void initializeDefaultSystemModel(SystemModel model) {
+    List<LayoutModel> layoutModels = model.getLayoutModels();
+    if (!layoutModels.isEmpty()) {
+      double scaleX = Origin.DEFAULT_SCALE;
+      double scaleY = Origin.DEFAULT_SCALE;
+      LayoutModel layoutModel = layoutModels.get(0);
+      LengthProperty pScaleX = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_X);
+      if (pScaleX.getValueByUnit(LengthProperty.Unit.MM) == 0) {
+        pScaleX.setValueAndUnit(scaleX, LengthProperty.Unit.MM);
+      }
+      LengthProperty pScaleY = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_Y);
+      if (pScaleY.getValueByUnit(LengthProperty.Unit.MM) == 0) {
+        pScaleY.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
+      }
     }
+    LayoutModel layoutComponent
+        = (LayoutModel) model.getMainFolder(SystemModel.FolderKey.LAYOUT);
 
-    @Override
-    public boolean accept(File f) {
-      return f.isDirectory() || f.getName().endsWith(fileEnding);
-    }
-
-    @Override
-    public String getDescription() {
-      return String.format("*%s", fileEnding);
-    }
+    LayoutAdapter adapter = procAdapterFactory.createLayoutAdapter(
+        layoutComponent, model.getEventDispatcher());
+    adapter.register();
   }
 }

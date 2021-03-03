@@ -1,0 +1,31 @@
+= openTCS: Distribution Documentation
+The openTCS developers <info@opentcs.org>
+openTCS {project-version}
+:last-update-label!:
+
+// This file is intended to be placed in the top-level directory of the documentation distribution.
+
+== Content
+
+* Release notes and change log: link:./README.html[HTML]
+* User's Guide:
+  link:./user/opentcs-users-guide.html[HTML],
+  link:./user/opentcs-users-guide.pdf[PDF]
+* Developer's Guide:
+  link:./developer/developers-guide/opentcs-developers-guide.html[HTML],
+  link:./developer/developers-guide/opentcs-developers-guide.pdf[PDF]
+* Base API:
+  link:./developer/api-base/index.html[JavaDoc documentation],
+  link:./developer/compatibility-reports/japicmp-opentcs-api-base.html[Compatibility report against previous major release]
+* Injection API:
+  link:./developer/api-injection/index.html[JavaDoc documentation],
+  link:./developer/compatibility-reports/japicmp-opentcs-api-injection.html[Compatibility report against previous major release]
+* XML schemas for the TCP/IP-based host interface:
+** Transport orders (sent from host to openTCS):
+   link:./developer/xml-schemas/opentcs-host-order.xsd[XSD]
+** Responses to transport orders (sent from openTCS to host):
+   link:./developer/xml-schemas/opentcs-host-response.xsd[XSD]
+** Transport order scripts (files in openTCS file system):
+   link:./developer/xml-schemas/opentcs-host-orderscript.xsd[XSD]
+** Status channel (sent from openTCS to host):
+   link:./developer/xml-schemas/opentcs-host-statuschannel.xsd[XSD]

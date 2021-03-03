@@ -34,8 +34,9 @@ import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.guing.components.drawing.figures.liner.BezierLiner;
+import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerControlPointHandle;
+import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
@@ -75,6 +76,18 @@ public class PathConnection
    * Control point 2.
    */
   private Point2D.Double cp2;
+  /**
+   * Control point 3.
+   */
+  private Point2D.Double cp3;
+  /**
+   * Control point 4.
+   */
+  private Point2D.Double cp4;
+  /**
+   * Control point 5.
+   */
+  private Point2D.Double cp5;
 
   /**
    * Creates a new instance.
@@ -112,9 +125,14 @@ public class PathConnection
       case 2: // DIRECT Liner: 2 Punkte (Start / Ende)
         ep = path.get(1, BezierPath.C0_MASK);
         break;
-
+      case 3: //2 Bezier control points
+        ep = path.get(2, BezierPath.C0_MASK);
+        break;
       case 4: // ELBOW/Slanted: zusï¿½tzlich 2 Stï¿½tzpunkte
         ep = path.get(3, BezierPath.C0_MASK);
+        break;
+      case 7: // 3 Bezier control points
+        ep = path.get(6, BezierPath.C0_MASK);
         break;
 
       default:
@@ -125,7 +143,7 @@ public class PathConnection
     path.clear();
     path.add(new BezierPath.Node(sp));
     path.add(new BezierPath.Node(ep));
-    cp1 = cp2 = null;
+    cp1 = cp2 = cp3 = cp4 = cp5 = null;
     getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
   }
 
@@ -137,9 +155,11 @@ public class PathConnection
 
   /**
    * Bei Umwandlung von DIRECT/ELBOW/SLANTED in BEZIER-Kurve:
-   * Initiale Kontrollpunkte bei 1/3 und 2/3 der Strecke setzen.
+   * Initiale Kontrollpunkte bei 1/n, 2/n, ... der Strecke setzen.
+   *
+   * @param type the type of the curve
    */
-  private void initControlPoints() {
+  private void initControlPoints(PathModel.LinerType type) {
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
     Point2D.Double ep;
     int size = path.size();
@@ -148,7 +168,9 @@ public class PathConnection
       case 2: // DIRECT Liner: 2 Punkte (Start / Ende)
         ep = path.get(1, BezierPath.C0_MASK);
         break;
-
+      case 3: //2 or 3 Bezier control points
+        ep = path.get(2, BezierPath.C0_MASK);
+        break;
       case 4: // ELBOW/Slanted: zusï¿½tzlich 2 Stï¿½tzpunkte
         ep = path.get(3, BezierPath.C0_MASK);
         break;
@@ -160,11 +182,46 @@ public class PathConnection
 
     if (sp.x != ep.x || sp.y != ep.y) {
       path.clear();
-      cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) / 3, sp.y + (ep.y - sp.y) / 3);
-      cp2 = new Point2D.Double(ep.x - (ep.x - sp.x) / 3, ep.y - (ep.y - sp.y) / 3);
-      path.add(new BezierPath.Node(BezierPath.C2_MASK, sp.x, sp.y, sp.x, sp.y, cp1.x, cp1.y));
-      path.add(new BezierPath.Node(BezierPath.C1_MASK, ep.x, ep.y, cp2.x, cp2.y, ep.x, ep.y));
+      if (type == PathModel.LinerType.BEZIER_3) { //BEZIER curve with 3 control points);
+        //Add the scaled vector between start and endpoint to the startpoint
+        cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) * 1 / 6, sp.y + (ep.y - sp.y) * 1 / 6); //point at 1/6
+        cp2 = new Point2D.Double(sp.x + (ep.x - sp.x) * 2 / 6, sp.y + (ep.y - sp.y) * 2 / 6); //point at 2/6
+        cp3 = new Point2D.Double(sp.x + (ep.x - sp.x) * 3 / 6, sp.y + (ep.y - sp.y) * 3 / 6); //point at 3/6
+        cp4 = new Point2D.Double(sp.x + (ep.x - sp.x) * 4 / 6, sp.y + (ep.y - sp.y) * 4 / 6); //point at 4/6
+        cp5 = new Point2D.Double(sp.x + (ep.x - sp.x) * 5 / 6, sp.y + (ep.y - sp.y) * 5 / 6); //point at 5/6
+        path.add(new BezierPath.Node(BezierPath.C2_MASK,
+                                     sp.x, sp.y, //Current point
+                                     sp.x, sp.y, //Previous point - not in use because of C2_MASK
+                                     cp1.x, cp1.y)); //Next point
+        //Use cp1 and cp2 to draw between sp and cp3
+        path.add(new BezierPath.Node(BezierPath.C1C2_MASK,
+                                     cp3.x, cp3.y, //Current point
+                                     cp2.x, cp2.y, //Previous point
+                                     cp4.x, cp4.y)); //Next point
+        //Use cp4 and cp5 to draw between cp3 and ep
+        path.add(new BezierPath.Node(BezierPath.C1_MASK,
+                                     ep.x, ep.y, //Current point
+                                     cp5.x, cp5.y, //Previous point
+                                     ep.x, ep.y)); //Next point - not in use because of C1_MASK
+      }
+      else {
+        cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) / 3, sp.y + (ep.y - sp.y) / 3); //point at 1/3
+        cp2 = new Point2D.Double(ep.x - (ep.x - sp.x) / 3, ep.y - (ep.y - sp.y) / 3); //point at 2/3
+        cp3 = null;
+        cp4 = null;
+        cp5 = null;
+        path.add(new BezierPath.Node(BezierPath.C2_MASK,
+                                     sp.x, sp.y, //Current point
+                                     sp.x, sp.y, //Previous point - not in use because of C2_MASK
+                                     cp1.x, cp1.y)); //Next point
+        path.add(new BezierPath.Node(BezierPath.C1_MASK,
+                                     ep.x, ep.y, //Current point
+                                     cp2.x, cp2.y, //Previous point
+                                     ep.x, ep.y)); //Next point - not in use because of C1_MASK
+      }
+
       getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+      path.invalidatePath();
     }
   }
 
@@ -178,12 +235,67 @@ public class PathConnection
   public void addControlPoints(Point2D.Double cp1, Point2D.Double cp2) {
     this.cp1 = cp1;
     this.cp2 = cp2;
+    this.cp3 = null;
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
     Point2D.Double ep = path.get(1, BezierPath.C0_MASK);
     path.clear();
-    path.add(new BezierPath.Node(BezierPath.C2_MASK, sp.x, sp.y, sp.x, sp.y, cp1.x, cp1.y));
-    path.add(new BezierPath.Node(BezierPath.C1_MASK, ep.x, ep.y, cp2.x, cp2.y, ep.x, ep.y));
-    getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+    path.add(new BezierPath.Node(BezierPath.C2_MASK,
+                                 sp.x, sp.y, //Current point
+                                 sp.x, sp.y, //Previous point
+                                 cp1.x, cp1.y)); //Next point
+    path.add(new BezierPath.Node(BezierPath.C1_MASK,
+                                 ep.x, ep.y, //Current point
+                                 cp2.x, cp2.y, //Previous point
+                                 ep.x, ep.y)); //Next point
+    //getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+  }
+
+  /**
+   * Bezier-Kurve mit 3 Kontrollpunkten.
+   *
+   * @param cp1 Kontrollpunkt 1
+   * @param cp2 Kontrollpunkt 2
+   * @param cp3 Kontrollpunkt 3
+   * @param cp4 Kontrollpunkt 4
+   * @param cp5 Kontrollpunkt 5
+   */
+  public void addControlPoints(Point2D.Double cp1,
+                               Point2D.Double cp2,
+                               Point2D.Double cp3,
+                               Point2D.Double cp4,
+                               Point2D.Double cp5) {
+    this.cp1 = cp1;
+    this.cp2 = cp2;
+    this.cp3 = cp3;
+    this.cp4 = cp4;
+    this.cp5 = cp5;
+    Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
+    Point2D.Double ep = path.get(path.size() - 1, BezierPath.C0_MASK);
+    path.clear();
+    path.add(new BezierPath.Node(BezierPath.C2_MASK,
+                                 sp.x, sp.y, //Current point
+                                 sp.x, sp.y, //Previous point
+                                 cp1.x, cp1.y)); //Next point
+    //Use cp1 and cp2 to draw between sp and cp3
+    path.add(new BezierPath.Node(BezierPath.C1C2_MASK,
+                                 cp3.x, cp3.y, //Current point
+                                 cp2.x, cp2.y, //Previous point
+                                 cp4.x, cp4.y)); //Next point
+    //Use cp4 and cp5 to draw between cp3 and ep
+    path.add(new BezierPath.Node(BezierPath.C1_MASK,
+                                 ep.x, ep.y, //Current point
+                                 cp5.x, cp5.y, //Previous point
+                                 ep.x, ep.y)); //Next point
+    StringProperty sProp
+        = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
+    sProp.setText(String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d;",
+                                (int) cp1.x, (int) cp1.y,
+                                (int) cp2.x, (int) cp2.y,
+                                (int) cp3.x, (int) cp3.y,
+                                (int) cp4.x, (int) cp4.y,
+                                (int) cp5.x, (int) cp5.y));
+    sProp.markChanged();
+    getModel().propertiesChanged(this);
   }
 
   public Point2D.Double getCp1() {
@@ -192,6 +304,18 @@ public class PathConnection
 
   public Point2D.Double getCp2() {
     return cp2;
+  }
+
+  public Point2D.Double getCp3() {
+    return cp3;
+  }
+
+  public Point2D.Double getCp4() {
+    return cp4;
+  }
+
+  public Point2D.Double getCp5() {
+    return cp5;
   }
 
   @Override // BezierFigure
@@ -204,7 +328,13 @@ public class PathConnection
 
     p1 = (cp1 == null ? path.get(0, BezierPath.C0_MASK) : cp1);
     p2 = (cp2 == null ? path.get(1, BezierPath.C0_MASK) : cp2);
-    pc = new Point2D.Double((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    if (cp3 == null) {
+      pc = new Point2D.Double((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    }
+    else {
+      //Use cp3 for 3-bezier as center because the curve goes through it at 50%
+      pc = (cp3 == null ? path.get(3, BezierPath.C0_MASK) : cp3);
+    }
 
     return pc;
   }
@@ -213,21 +343,43 @@ public class PathConnection
    * Die BEZIER-Kontrollpunkte aktualisieren
    */
   public void updateControlPoints() {
-    if (cp1 != null) {
-      cp1 = path.get(0, BezierPath.C2_MASK);
-    }
-
-    if (cp2 != null) {
-      cp2 = path.get(1, BezierPath.C1_MASK);
+    if (cp1 != null && cp2 != null) {
+      if (cp3 != null) {
+        cp1 = path.get(0, BezierPath.C2_MASK);
+        cp2 = path.get(1, BezierPath.C1_MASK);
+        cp3 = path.get(1, BezierPath.C0_MASK);
+        cp4 = path.get(2, BezierPath.C2_MASK);
+        cp5 = path.get(2, BezierPath.C1_MASK);
+      }
+      else {
+        cp1 = path.get(0, BezierPath.C2_MASK);
+        cp2 = path.get(1, BezierPath.C1_MASK);
+      }
     }
 
     String sControlPoints = "";
     if (cp1 != null) {
       if (cp2 != null) {
-        // Format: x1,y1;x2,y2
-        sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
-                                       (int) (cp1.y), (int) (cp2.x),
-                                       (int) (cp2.y));
+        if (cp3 != null) {
+          // Format: x1,y1;x2,y2;x3,y3;x4,y4;x5,y5
+          sControlPoints = String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d",
+                                         (int) (cp1.x),
+                                         (int) (cp1.y),
+                                         (int) (cp2.x),
+                                         (int) (cp2.y),
+                                         (int) (cp3.x),
+                                         (int) (cp3.y),
+                                         (int) (cp4.x),
+                                         (int) (cp4.y),
+                                         (int) (cp5.x),
+                                         (int) (cp5.y));
+        }
+        else {
+          // Format: x1,y1;x2,y2
+          sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
+                                         (int) (cp1.y), (int) (cp2.x),
+                                         (int) (cp2.y));
+        }
       }
       else {
         // Format: x1,y1
@@ -239,6 +391,7 @@ public class PathConnection
         = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     sProp.setText(sControlPoints);
     sProp.markChanged();
+    getModel().propertiesChanged(this);
   }
 
   /**
@@ -303,16 +456,20 @@ public class PathConnection
         break;
 
       case BEZIER:
-        if (!(getLiner() instanceof BezierLiner)) {
-          setLiner(new BezierLiner());
+        if (!(getLiner() instanceof TupelBezierLiner)) {
+          setLiner(new TupelBezierLiner());
+          initControlPoints(type);
+          getModel().propertiesChanged(this);
         }
-
-        if (cp1 == null) {
-          initControlPoints();
+        break;
+      case BEZIER_3:
+        if (!(getLiner() instanceof TripleBezierLiner)) {
+          setLiner(new TripleBezierLiner());
+          initControlPoints(type);
+          getModel().propertiesChanged(this);
         }
 
         break;
-
       default:
         setLiner(null);
     }
@@ -374,15 +531,16 @@ public class PathConnection
         break;
 
       case 0:  // Mouse clicked
-//      handles.add(new BezierLinerHandle(this));
-
         if (cp1 != null) {
           // Startpunkt: Handle nach CP2
-          handles.add(new BezierLinerControlPointHandle(this, 0, 2));
-
+          handles.add(new BezierLinerControlPointHandle(this, 0, BezierPath.C2_MASK));
           if (cp2 != null) {
-            // Endpunkt: Handle nach CP1
-            handles.add(new BezierLinerControlPointHandle(this, 1, 1));
+            // Endpunkt: Handle für CP3
+            handles.add(new BezierLinerControlPointHandle(this, 1, BezierPath.C1_MASK));
+            if (cp3 != null) {
+              // Endpunkt: Handle nach EP
+              handles.add(new BezierLinerControlPointHandle(this, 2, BezierPath.C1_MASK));
+            }
           }
         }
 
@@ -525,9 +683,11 @@ public class PathConnection
   public PathConnection clone() {
     PathConnection clone = (PathConnection) super.clone();
     SelectionProperty pConnType = (SelectionProperty) clone.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
-
-    if (getLiner() instanceof BezierLiner) {
+    if (getLiner() instanceof TupelBezierLiner) {
       pConnType.setValue(PathModel.LinerType.BEZIER);
+    }
+    else if (getLiner() instanceof TripleBezierLiner) {
+      pConnType.setValue(PathModel.LinerType.BEZIER_3);
     }
     else if (getLiner() instanceof ElbowLiner) {
       pConnType.setValue(PathModel.LinerType.ELBOW);

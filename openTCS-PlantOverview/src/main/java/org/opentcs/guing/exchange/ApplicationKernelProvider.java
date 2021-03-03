@@ -29,8 +29,7 @@ public class ApplicationKernelProvider
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(ApplicationKernelProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ApplicationKernelProvider.class);
   /**
    * The registered clients.
    */
@@ -55,8 +54,7 @@ public class ApplicationKernelProvider
   @Inject
   public ApplicationKernelProvider(KernelProxyManager kernelProxyManager,
                                    Provider<ConnectToServerDialog> dialogProvider) {
-    this.kernelProxyManager = requireNonNull(kernelProxyManager,
-                                             "kernelProxyManager");
+    this.kernelProxyManager = requireNonNull(kernelProxyManager, "kernelProxyManager");
     this.dialogProvider = requireNonNull(dialogProvider, "dialogProvider");
   }
 
@@ -65,7 +63,7 @@ public class ApplicationKernelProvider
     requireNonNull(client, "client");
 
     if (!kernelShared()) {
-      log.debug("Initiating kernel connection for new client...");
+      LOG.debug("Initiating kernel connection for new client...");
       connectKernel();
     }
     return clients.add(client);
@@ -77,7 +75,7 @@ public class ApplicationKernelProvider
 
     if (clients.remove(client)) {
       if (clients.isEmpty()) {
-        log.debug("Last client left. Terminating kernel connection...");
+        LOG.debug("Last client left. Terminating kernel connection...");
         kernelProxyManager.disconnect();
       }
       return true;
@@ -96,7 +94,7 @@ public class ApplicationKernelProvider
   }
 
   @Override
-  public String getKernelDescription() {
+  public synchronized String getKernelDescription() {
     return kernelShared()
         ? kernelProxyManager.getHost() + ":" + kernelProxyManager.getPort()
         : "-";
@@ -110,8 +108,7 @@ public class ApplicationKernelProvider
   private boolean connectKernel() {
     // If connection parameters are given in the system properties, try
     // connecting with them.
-    ConnectionParamSet connParamSet
-        = ConnectionParamSet.getParamSet(System.getProperties());
+    ConnectionParamSet connParamSet = ConnectionParamSet.getParamSet(System.getProperties());
     if (connParamSet != null) {
       boolean didConnect = kernelProxyManager.connect(connParamSet);
       if (didConnect) {

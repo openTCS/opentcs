@@ -10,7 +10,10 @@ package org.opentcs.virtualvehicle;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.slf4j.Logger;
@@ -18,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A table model for LoadHandlingDevices.
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 final class LoadHandlingDeviceTableModel
@@ -26,19 +30,19 @@ final class LoadHandlingDeviceTableModel
   /**
    * This class's Logger.
    */
-  private static final Logger log =
-      LoggerFactory.getLogger(LoadHandlingDeviceTableModel.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(LoadHandlingDeviceTableModel.class);
   /**
    * This class's resource bundle.
    */
-  private static final ResourceBundle bundle =
-      ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle");
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle");
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
     "Name",
-    bundle.getString("Full?")};
+    BUNDLE.getString("Full?")};
   /**
    * The column classes.
    */
@@ -67,12 +71,15 @@ final class LoadHandlingDeviceTableModel
 
   /**
    * Updates the list of devices.
-   * 
+   *
    * @param newDevices The new list of devices
    */
-  public void updateLoadHandlingDevices(List<LoadHandlingDevice> newDevices) {
-    this.devices = newDevices;
-    fireTableDataChanged();
+  public void updateLoadHandlingDevices(@Nonnull List<LoadHandlingDevice> newDevices) {
+    requireNonNull(newDevices, "newDevices");
+    if (!Objects.equals(this.devices, newDevices)) {
+      this.devices = newDevices;
+      fireTableDataChanged();
+    }
   }
 
   @Override
@@ -91,7 +98,7 @@ final class LoadHandlingDeviceTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.warn("Invalid columnIndex", exc);
+      LOG.warn("Invalid columnIndex", exc);
       return "ERROR";
     }
   }
@@ -142,7 +149,7 @@ final class LoadHandlingDeviceTableModel
 
   /**
    * Returns the list containing the LoadHandlingDevices associated with his model.
-   * 
+   *
    * @return The list containing the LoadHandlingDevices associated with his model.
    */
   public List<LoadHandlingDevice> getLoadHandlingDevices() {

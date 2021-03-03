@@ -12,12 +12,11 @@ import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -28,7 +27,8 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 /**
  * Dialog for adding operating time and load handling devices to an operation.
  * An <code>OperationSpec</code> instance will be created as a result.
- * @author Tobias Marquardt (Fraunhofer IML) 
+ *
+ * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class EditOperationSpecDialog
     extends JDialog {
@@ -45,11 +45,11 @@ public class EditOperationSpecDialog
 
   /**
    * Creates new EditOperationSpecDialog.
+   *
    * @param adapter Communication adapter of the vehicle this dialog belongs to.
    */
   public EditOperationSpecDialog(LoopbackCommunicationAdapter adapter) {
-    super();
-    this.commAdapter = Objects.requireNonNull(adapter, "adapter is null");
+    this.commAdapter = requireNonNull(adapter, "adapter");
     initComponents();
     setLocationRelativeTo(null);
     // Add some listeners to control button states according to user input
@@ -60,11 +60,7 @@ public class EditOperationSpecDialog
         new ListSelectionListener() {
       @Override
       public void valueChanged(ListSelectionEvent e) {
-        // As the user can't deselect, a selection change means, 
-        // there is a selection! 
-        if (!deleteDeviceButton.isEnabled()) {
-          deleteDeviceButton.setEnabled(true);
-        }
+        deleteDeviceButton.setEnabled(!deviceTable.getSelectionModel().isSelectionEmpty());
       }
     });
     // Add input verifier to avoid invalid input
@@ -74,8 +70,9 @@ public class EditOperationSpecDialog
   /**
    * Creates a dialog and presets it's input fields according to the
    * given operationSpec.
-   * @param adapter CommunicationAdapter of the vehicle the created 
-   *                <code>OperationSpec</code> will belong to.
+   *
+   * @param adapter CommunicationAdapter of the vehicle the created
+   * <code>OperationSpec</code> will belong to.
    * @param operationSpec OperationSpec used to preset the values in the dialog.
    */
   public EditOperationSpecDialog(LoopbackCommunicationAdapter adapter,
@@ -85,8 +82,8 @@ public class EditOperationSpecDialog
     opTimeTextField.setText(new Integer(operationSpec.getOperatingTime()).toString());
     if (operationSpec.changesLoadCondition()) {
       deviceCheckBox.setSelected(true);
-      LoadHandlingDeviceTableModel model =
-          (LoadHandlingDeviceTableModel) deviceTable.getModel();
+      LoadHandlingDeviceTableModel model
+          = (LoadHandlingDeviceTableModel) deviceTable.getModel();
       model.updateLoadHandlingDevices(
           new LinkedList<>(operationSpec.getLoadCondition()));
     }
@@ -94,8 +91,9 @@ public class EditOperationSpecDialog
 
   /**
    * Returns an <code>OperationSpec</code> instance as the result of this dialog.
-   * Will be <code>null</code> if the user has not finished the dialog by 
+   * Will be <code>null</code> if the user has not finished the dialog by
    * clicking the ok-button or if the user has cancelled the dialog.
+   *
    * @return <code>OperationSpec</code> instance
    */
   public OperationSpec getOperationSpec() {
@@ -103,16 +101,16 @@ public class EditOperationSpecDialog
   }
 
   /**
-   * Load the current load handling devices into the table. 
+   * Load the current load handling devices into the table.
    */
   private void loadDeviceTable() {
     TableModel tableModel = deviceTable.getModel();
     if (tableModel instanceof LoadHandlingDeviceTableModel) {
-      LoadHandlingDeviceTableModel deviceTableModel =
-          (LoadHandlingDeviceTableModel) tableModel;
+      LoadHandlingDeviceTableModel deviceTableModel
+          = (LoadHandlingDeviceTableModel) tableModel;
       // Get a deep copy of the current device list of the vehicle
-      List<LoadHandlingDevice> currentDevices =
-          commAdapter.getProcessModel().getVehicleLoadHandlingDevices();
+      List<LoadHandlingDevice> currentDevices
+          = commAdapter.getProcessModel().getVehicleLoadHandlingDevices();
       List<LoadHandlingDevice> currentDevicesClone = new LinkedList<>();
       for (LoadHandlingDevice d : currentDevices) {
         currentDevicesClone.add(d);
@@ -128,8 +126,8 @@ public class EditOperationSpecDialog
   private void clearDeviceTable() {
     TableModel tableModel = deviceTable.getModel();
     if (tableModel instanceof LoadHandlingDeviceTableModel) {
-      LoadHandlingDeviceTableModel deviceTableModel =
-          (LoadHandlingDeviceTableModel) tableModel;
+      LoadHandlingDeviceTableModel deviceTableModel
+          = (LoadHandlingDeviceTableModel) tableModel;
       // Set device list to an empty list
       deviceTableModel.updateLoadHandlingDevices(new LinkedList<LoadHandlingDevice>());
     }
@@ -147,7 +145,8 @@ public class EditOperationSpecDialog
   }
 
   // CHECKSTYLE:OFF
-  /** This method is called from within the constructor to
+  /**
+   * This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
    * always regenerated by the Form Editor.
@@ -373,8 +372,8 @@ public class EditOperationSpecDialog
     if (deviceCheckBox.isSelected()) {
       devicesSpecified = true;
       if (deviceTable.getModel() instanceof LoadHandlingDeviceTableModel) {
-        LoadHandlingDeviceTableModel model =
-            (LoadHandlingDeviceTableModel) deviceTable.getModel();
+        LoadHandlingDeviceTableModel model
+            = (LoadHandlingDeviceTableModel) deviceTable.getModel();
         devices = model.getLoadHandlingDevices();
       }
     }
@@ -406,44 +405,29 @@ public class EditOperationSpecDialog
   }//GEN-LAST:event_deviceCheckBoxItemStateChanged
 
   private void deleteDeviceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteDeviceButtonActionPerformed
-    if (deviceTable.getModel() instanceof LoadHandlingDeviceTableModel) {
-      LoadHandlingDeviceTableModel tableModel =
-          (LoadHandlingDeviceTableModel) deviceTable.getModel();
-      List<LoadHandlingDevice> deviceList = tableModel.getLoadHandlingDevices();
-      ListSelectionModel selectionModel = deviceTable.getSelectionModel();
-      int firstSelectedRow = selectionModel.getMinSelectionIndex();
-      if (firstSelectedRow != -1) {
-        int lastSelectedRow = selectionModel.getMaxSelectionIndex();
-        List<LoadHandlingDevice> selectedDevices = new LinkedList<>();
-        // Delete every selected row between first and last selected row
-        for (int i = firstSelectedRow; i <= lastSelectedRow; ++i) {
-          if (selectionModel.isSelectedIndex(i)) {
-            selectedDevices.add(deviceList.get(i));
-          }
-        }
-        deviceList.removeAll(selectedDevices);
-        tableModel.updateLoadHandlingDevices(deviceList);
-        // Reset selection
-        int newRowCount = deviceTable.getRowCount();
-        if (newRowCount > 0) {
-          int newSelectedRow = Math.min(firstSelectedRow, newRowCount - 1);
-          deviceTable.changeSelection(newSelectedRow, 0, false, false);
-        }
-        else {
-          deleteDeviceButton.setEnabled(false);
-        }
+    List<LoadHandlingDevice> newList = new LinkedList<>();
+    LoadHandlingDeviceTableModel model = (LoadHandlingDeviceTableModel) deviceTable.getModel();
+    List<LoadHandlingDevice> oldList = model.getLoadHandlingDevices();
+    int j = 0;
+    for (int i : deviceTable.getSelectedRows()) {
+      while (j < i) {
+        newList.add(oldList.get(j));
+        j++;
       }
+      j++;
     }
+    while (j < oldList.size()) {
+      newList.add(oldList.get(j));
+      j++;
+    }
+    model.updateLoadHandlingDevices(newList);
   }//GEN-LAST:event_deleteDeviceButtonActionPerformed
 
   private void addDeviceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addDeviceButtonActionPerformed
-    if (deviceTable.getModel() instanceof LoadHandlingDeviceTableModel) {
-      LoadHandlingDeviceTableModel model =
-          (LoadHandlingDeviceTableModel) deviceTable.getModel();
-      model.getLoadHandlingDevices().add(new LoadHandlingDevice("", false));
-      int newIndex = model.getLoadHandlingDevices().size() - 1;
-      model.fireTableRowsInserted(newIndex, newIndex);
-    }
+    LoadHandlingDeviceTableModel model = (LoadHandlingDeviceTableModel) deviceTable.getModel();
+    model.getLoadHandlingDevices().add(new LoadHandlingDevice("", false));
+    int newIndex = model.getLoadHandlingDevices().size() - 1;
+    model.fireTableRowsInserted(newIndex, newIndex);
   }//GEN-LAST:event_addDeviceButtonActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addDeviceButton;
@@ -496,7 +480,7 @@ public class EditOperationSpecDialog
   /**
    * An <code>InputVerifier</code> for <code>JTextField</code> that accepts
    * only decimal numbers (0-9).
-   * If the text field contains invalid input, the background color is changed 
+   * If the text field contains invalid input, the background color is changed
    * and the focus is hold.
    */
   private class DecimalInputVerifier

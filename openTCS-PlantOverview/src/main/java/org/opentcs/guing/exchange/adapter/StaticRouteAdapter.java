@@ -9,11 +9,7 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.assistedinject.Assisted;
-import java.util.Map;
-import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -24,7 +20,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.ColorProperty;
@@ -33,8 +28,10 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for static routes.
@@ -95,7 +92,7 @@ public class StaticRouteAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     StaticRoute staticRoute = kernel.createStaticRoute();
     TCSObjectReference<StaticRoute> reference = staticRoute.getReference();
 
@@ -109,13 +106,12 @@ public class StaticRouteAdapter
       kernel.clearStaticRouteHops(reference);
 
       for (ModelComponent model : getModel().getChildComponents()) {
-        Point hop = kernel.getTCSObject(Point.class, model.getName());
+        Point hop = plantModel.getPoints().get(model.getName());
         kernel.addStaticRouteHop(reference, hop.getReference());
       }
-      Set<VisualLayout> layouts = kernel.getTCSObjects(VisualLayout.class);
 
-      for (VisualLayout layout : layouts) {
-        updateLayoutElement(kernel, layout, reference);
+      for (VisualLayout layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout, reference);
       }
 
       updateMiscProcessProperties(kernel, reference);
@@ -125,23 +121,14 @@ public class StaticRouteAdapter
     }
   }
 
-  private void updateLayoutElement(Kernel kernel,
-                                   VisualLayout layout,
+  private void updateLayoutElement(VisualLayout layout,
                                    TCSObjectReference<?> ref) {
     ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
-    Map<String, String> layoutProperties = layoutElement.getProperties();
 
-    ColorProperty pColor
-        = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
+    ColorProperty pColor = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
     int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
-    layoutProperties.put(ElementPropKeys.BLOCK_COLOR,
-                         String.format("#%06X", rgb));
-    layoutElement.setProperties(layoutProperties);
+    layoutElement.getProperties().put(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb));
 
-    Set<LayoutElement> layoutElements = layout.getLayoutElements();
-    Iterables.removeIf(layoutElements, layoutElementFor(ref));
-    layoutElements.add(layoutElement);
-
-    kernel.setVisualLayoutElements(layout.getReference(), layoutElements);
+    layout.getLayoutElements().add(layoutElement);
   }
 }

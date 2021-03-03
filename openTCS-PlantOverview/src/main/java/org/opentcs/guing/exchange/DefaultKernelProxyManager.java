@@ -7,16 +7,15 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.exchange;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.rmi.DynamicRemoteKernelProxy;
 import org.opentcs.access.rmi.KernelProxy;
+import org.opentcs.access.rmi.KernelProxyBuilder;
 import org.opentcs.access.rmi.KernelUnavailableException;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +32,11 @@ class DefaultKernelProxyManager
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(DefaultKernelProxyManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultKernelProxyManager.class);
+  /**
+   * Builds kernel proxies.
+   */
+  private final KernelProxyBuilder kernelProxyBuilder;
   /**
    * A reference to the kernel connected to.
    * <code>null</code> if no connection is currently established.
@@ -54,24 +56,23 @@ class DefaultKernelProxyManager
   /**
    * Creates a new instance of KernelProxy.
    */
-  DefaultKernelProxyManager() {
-    // Do nada
+  @Inject
+  DefaultKernelProxyManager(KernelProxyBuilder kernelProxyBuilder) {
+    this.kernelProxyBuilder = requireNonNull(kernelProxyBuilder, "kernelProxyBuilder");
   }
 
   @Override
   public boolean connect(String host, int port) {
     try {
-      kernelProxy = null;
-      this.host = null;
-      this.port = -1;
-      kernelProxy = DynamicRemoteKernelProxy.getProxy(host,
-                                                      port,
-                                                      new AcceptingTCSEventFilter());
+      kernelProxy = kernelProxyBuilder.setHost(host).setPort(port).build();
       this.host = host;
       this.port = port;
     }
     catch (CredentialsException | KernelUnavailableException e) {
-      log.warn("Exception trying to connect to remote kernel", e);
+      LOG.warn("Exception trying to connect to remote kernel", e);
+      kernelProxy = null;
+      this.host = null;
+      this.port = -1;
       return false;
     }
 
@@ -80,18 +81,19 @@ class DefaultKernelProxyManager
 
   @Override
   public boolean connect(ConnectionParamSet connParamSet) {
-    Objects.requireNonNull(connParamSet);
+    requireNonNull(connParamSet);
 
     return connect(connParamSet.getHost(), connParamSet.getPort());
   }
 
   @Override
   public void disconnect() {
-    if (kernelProxy != null) {
-      KernelProxy kp = kernelProxy;
-      kernelProxy = null;
-      kp.logout();
+    if (kernelProxy == null) {
+      return;
     }
+    KernelProxy kp = kernelProxy;
+    kernelProxy = null;
+    kp.logout();
   }
 
   @Override

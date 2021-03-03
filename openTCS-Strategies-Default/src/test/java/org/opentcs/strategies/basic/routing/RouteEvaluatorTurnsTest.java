@@ -26,7 +26,7 @@ public class RouteEvaluatorTurnsTest {
 
   @Before
   public void setUp() {
-    evaluator = new RouteEvaluatorTurns(new RouteEvaluatorNull(), PENALTY);
+    evaluator = new RouteEvaluatorTurns(PENALTY);
   }
 
   @After
@@ -44,13 +44,13 @@ public class RouteEvaluatorTurnsTest {
     Path path1 = new Path(10, "path1", startPoint.getReference(), hop1.getReference());
     path1.setLength(34);
     path1.setProperty(PATH_TRAVEL_ORIENTATION, SAME_ORIENTATION);
-    steps.add(new Route.Step(path1, hop1, Vehicle.Orientation.FORWARD, 0));
+    steps.add(new Route.Step(path1, null, hop1, Vehicle.Orientation.FORWARD, 0));
 
     Point hop2 = new Point(3, "hop2");
     Path path2 = new Path(11, "path2", hop1.getReference(), hop2.getReference());
     path2.setLength(77);
     path2.setProperty(PATH_TRAVEL_ORIENTATION, SAME_ORIENTATION);
-    steps.add(new Route.Step(path2, hop2, Vehicle.Orientation.FORWARD, 0));
+    steps.add(new Route.Step(path2, null, hop2, Vehicle.Orientation.FORWARD, 0));
 
     Vehicle vehicle = new Vehicle(21, "dummyvehicle");
     long computedCosts = evaluator.computeCosts(vehicle, startPoint, steps);
@@ -67,13 +67,13 @@ public class RouteEvaluatorTurnsTest {
     Path path1 = new Path(10, "path1", startPoint.getReference(), hop1.getReference());
     path1.setLength(34);
     path1.setProperty(PATH_TRAVEL_ORIENTATION, "any orientation");
-    steps.add(new Route.Step(path1, hop1, Vehicle.Orientation.FORWARD, 0));
+    steps.add(new Route.Step(path1, null, hop1, Vehicle.Orientation.FORWARD, 0));
 
     Point hop2 = new Point(3, "hop2");
     Path path2 = new Path(11, "path2", hop1.getReference(), hop2.getReference());
     path2.setLength(77);
     path2.setProperty(PATH_TRAVEL_ORIENTATION, "another orientation");
-    steps.add(new Route.Step(path2, hop2, Vehicle.Orientation.FORWARD, 0));
+    steps.add(new Route.Step(path2, null, hop2, Vehicle.Orientation.FORWARD, 0));
 
     Vehicle vehicle = new Vehicle(21, "dummyvehicle");
     long computedCosts = evaluator.computeCosts(vehicle, startPoint, steps);

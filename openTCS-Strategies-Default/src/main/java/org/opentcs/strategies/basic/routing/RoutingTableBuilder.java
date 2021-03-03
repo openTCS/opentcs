@@ -20,7 +20,6 @@ public interface RoutingTableBuilder {
   /**
    * Computes a routing table for the given vehicle in the given model.
    *
-   * @param model The model.
    * @param vehicle The vehicle.
    * @return The computed routing table.
    */

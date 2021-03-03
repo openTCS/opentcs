@@ -1055,16 +1055,36 @@ public class OpenTCSView
       handleKernelInModellingMode();
       return;
     }
+    restoreModelFromKernel(kernel);
+  }
+
+  /**
+   * Shows a file chooser and restores the model from the selected openTCS-file.
+   */
+  private void restoreModelFromFile() {
+    if (!fModelManager.loadModel(null)) {
+      return;
+    }
+    restoreModel(null);
+  }
+
+  /**
+   * Restores the model from the kernel.
+   *
+   * @param kernel
+   */
+  private void restoreModelFromKernel(Kernel kernel) {
     restoreModel(kernel);
   }
 
+  /**
+   * Initializes the model stored in the kernel or in the model manager.
+   *
+   * @param kernel If not null, the model from the given kernel will be loaded, else the model from
+   * the model manager
+   */
   private void restoreModel(@Nullable Kernel kernel) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    if (kernel == null) {
-      if (!fModelManager.loadModel(null)) {
-        return;
-      }
-    }
     progressIndicator.initialize();
 
     // Step 1: Clean up currently loaded model data.
@@ -1677,7 +1697,7 @@ public class OpenTCSView
         return;
       }
     }
-    restoreModel(null);
+    restoreModelFromFile();
     setHasUnsavedChanges(false);
   }
 

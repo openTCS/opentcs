@@ -42,7 +42,7 @@ import org.opentcs.guing.model.elements.PointModel;
  * @author Mats Wilhelm (Fraunhofer IML)
  */
 @SuppressWarnings("unchecked")
-public class ModelJAXBValidatorTest {
+public class ModelValidatorTest {
 
   private static final String LAYOUT_NAME = "VLayout-001";
 
@@ -68,7 +68,7 @@ public class ModelJAXBValidatorTest {
   /**
    * The validator for this test.
    */
-  private ModelJAXBValidator validator;
+  private ModelValidator validator;
 
   /**
    * Stores the properties for every model component.
@@ -83,7 +83,7 @@ public class ModelJAXBValidatorTest {
   @Before
   public void setUp() {
     model = mock(SystemModel.class);
-    validator = new ModelJAXBValidator();
+    validator = new ModelValidator();
     objectPropertiesMap = new HashMap<>();
     components = new HashMap<>();
 
@@ -119,7 +119,9 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void shouldInvalidateIfExists() {
-    components.put(POINT_NAME, createComponentWithName(ModelComponent.class, POINT_NAME));
+    ModelComponent component = createComponentWithName(ModelComponent.class, POINT_NAME);
+    components.put(POINT_NAME, component);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(component);
 
     Assert.assertFalse("Validator said valid for duplicate names in the components list",
                        validator.isValidWith(model, createComponentWithName(ModelComponent.class, POINT_NAME)));
@@ -143,7 +145,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testLayoutInvalidScaleX() {
     LayoutModel layoutModel = createLayoutModel(LAYOUT_NAME);
-    addPropperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_X, "abc");
+    addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_X, "abc");
     Assert.assertFalse("Validator said valid for corrupt scale x.",
                        validator.isValidWith(model, layoutModel));
   }
@@ -159,7 +161,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testLayoutInvalidScaleY() {
     LayoutModel layoutModel = createLayoutModel(LAYOUT_NAME);
-    addPropperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_Y, "abc");
+    addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_Y, "abc");
     Assert.assertFalse("Validator said valid for corrupt scale y.",
                        validator.isValidWith(model, layoutModel));
   }
@@ -205,7 +207,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointInvalidOrientationAngle() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "abc");
+    addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "abc");
     Assert.assertFalse("Validator said valid for corrupt orientation angle.",
                        validator.isValidWith(model, point));
   }
@@ -213,9 +215,9 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointNegativeOrientationAngle() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "-5");
-    Assert.assertFalse("Validator said valid for invalid orientation angle.",
-                       validator.isValidWith(model, point));
+    addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "-5");
+    Assert.assertTrue("Validator said invalid for negative orientation angle.",
+                      validator.isValidWith(model, point));
   }
 
   @Test
@@ -229,7 +231,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointInvalidType() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, SelectionProperty.class, PointModel.TYPE, "abc");
+    addProperty(point, SelectionProperty.class, PointModel.TYPE, "abc");
     Assert.assertFalse("Validator said valid for corrupt point type.",
                        validator.isValidWith(model, point));
   }
@@ -245,7 +247,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointInvalidModelXPosition() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, CoordinateProperty.class, PointModel.MODEL_X_POSITION, "");
+    addProperty(point, CoordinateProperty.class, PointModel.MODEL_X_POSITION, "");
     Assert.assertFalse("Validator said valid for corrupt model x position.",
                        validator.isValidWith(model, point));
   }
@@ -261,7 +263,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointInvalidModelYPosition() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "");
+    addProperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "");
     Assert.assertFalse("Validator said valid for corrupt model y position.",
                        validator.isValidWith(model, point));
   }
@@ -277,7 +279,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointInvalidXPosition() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "");
+    addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "");
     Assert.assertFalse("Validator said valid for corrupt point x position.",
                        validator.isValidWith(model, point));
   }
@@ -293,7 +295,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testPointInvalidYPosition() {
     PointModel point = createPointModel(POINT_NAME);
-    addPropperty(point, StringProperty.class, ElementPropKeys.POINT_POS_Y, "");
+    addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_Y, "");
     Assert.assertFalse("Validator said valid for corrupt point y position.",
                        validator.isValidWith(model, point));
   }
@@ -307,7 +309,7 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathMissingLength() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.LENGTH);
     Assert.assertFalse("Validator said valid for missing path length.",
                        validator.isValidWith(model, path));
@@ -315,23 +317,23 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidLength() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, LengthProperty.class, PathModel.LENGTH, "abc");
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, LengthProperty.class, PathModel.LENGTH, "abc");
     Assert.assertFalse("Validator said valid for invalid path length.",
                        validator.isValidWith(model, path));
   }
 
   @Test
   public void testPathNegativeLength() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, LengthProperty.class, PathModel.LENGTH, "-5");
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, LengthProperty.class, PathModel.LENGTH, "-5");
     Assert.assertFalse("Validator said valid for negative path length.",
                        validator.isValidWith(model, path));
   }
 
   @Test
   public void testPathMissingRoutingCost() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.ROUTING_COST);
     Assert.assertFalse("Validator said valid for missing route cost.",
                        validator.isValidWith(model, path));
@@ -339,15 +341,15 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidRoutingCost() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, IntegerProperty.class, PathModel.ROUTING_COST, "abc");
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, IntegerProperty.class, PathModel.ROUTING_COST, "abc");
     Assert.assertFalse("Validator said valid for invalid route cost.",
                        validator.isValidWith(model, path));
   }
 
   @Test
   public void testPathMissingMaxVelocity() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.MAX_VELOCITY);
     Assert.assertFalse("Validator said valid for missing max velocity.",
                        validator.isValidWith(model, path));
@@ -355,15 +357,15 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidMaxVelocity() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, "abc");
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, "abc");
     Assert.assertFalse("Validator said valid for invalid max velocity.",
                        validator.isValidWith(model, path));
   }
 
   @Test
   public void testPathMissingMaxReverseVelocity() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.MAX_REVERSE_VELOCITY);
     Assert.assertFalse("Validator said valid for missing max reverse velocity.",
                        validator.isValidWith(model, path));
@@ -371,15 +373,15 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidMaxReverseVelocity() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, "abc");
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, "abc");
     Assert.assertFalse("Validator said valid for invalid max reverse velocity.",
                        validator.isValidWith(model, path));
   }
 
   @Test
   public void testPathMissingConnType() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, ElementPropKeys.PATH_CONN_TYPE);
     Assert.assertFalse("Validator said valid for missing connection type.",
                        validator.isValidWith(model, path));
@@ -387,23 +389,31 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidConnType() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, "abc");
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, "abc");
     Assert.assertFalse("Validator said valid for invalid connection type.",
                        validator.isValidWith(model, path));
   }
 
   @Test
-  public void testPathInvalidControlPoints() {
-    PathModel path = createPathModel(PATH_NAME);
-    addPropperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.BEZIER);
+  public void testPathInvalidTwoControlPoints() {
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.BEZIER);
+    Assert.assertFalse("Validator said valid for invalid end point.",
+                       validator.isValidWith(model, path));
+  }
+
+  @Test
+  public void testPathInvalidThreeControlPoints() {
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.BEZIER_3);
     Assert.assertFalse("Validator said valid for invalid end point.",
                        validator.isValidWith(model, path));
   }
 
   @Test
   public void testPathMissingControlPoints() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, ElementPropKeys.PATH_CONTROL_POINTS);
     Assert.assertFalse("Validator said valid for missing path control points.",
                        validator.isValidWith(model, path));
@@ -411,7 +421,7 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathMissingEndPoint() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.END_COMPONENT);
     Assert.assertFalse("Validator said valid for missing end point.",
                        validator.isValidWith(model, path));
@@ -419,7 +429,7 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathMissingLocked() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.LOCKED);
     Assert.assertFalse("Validator said valid for missing locked property.",
                        validator.isValidWith(model, path));
@@ -427,7 +437,7 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidStartPoint() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     components.remove(POINT_NAME);
     Assert.assertFalse("Validator said valid for invalid start point.",
                        validator.isValidWith(model, path));
@@ -435,7 +445,7 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathInvalidEndPoint() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     components.remove(POINT_NAME_2);
     Assert.assertFalse("Validator said valid for invalid end point.",
                        validator.isValidWith(model, path));
@@ -443,7 +453,9 @@ public class ModelJAXBValidatorTest {
 
   @Test
   public void testPathValid() {
-    PathModel path = createPathModel(PATH_NAME);
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
     Assert.assertTrue("Validator said invalid for valid path model.",
                       validator.isValidWith(model, path));
   }
@@ -474,7 +486,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testLocationInvalidModelPositionX() {
     LocationModel location = createLocation(LOCATION_NAME);
-    addPropperty(location, CoordinateProperty.class, LocationModel.MODEL_X_POSITION, "abc");
+    addProperty(location, CoordinateProperty.class, LocationModel.MODEL_X_POSITION, "abc");
     Assert.assertFalse("Validator said valid for invalid model position x.",
                        validator.isValidWith(model, location));
   }
@@ -490,7 +502,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testLocationInvalidModelPositionY() {
     LocationModel location = createLocation(LOCATION_NAME);
-    addPropperty(location, CoordinateProperty.class, LocationModel.MODEL_Y_POSITION, "abc");
+    addProperty(location, CoordinateProperty.class, LocationModel.MODEL_Y_POSITION, "abc");
     Assert.assertFalse("Validator said valid for invalid model position x.",
                        validator.isValidWith(model, location));
   }
@@ -506,7 +518,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testLocationInvalidPositionX() {
     LocationModel location = createLocation(LOCATION_NAME);
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_POS_X, "abc");
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_POS_X, "abc");
     Assert.assertFalse("Validator said valid for invalid location position x.",
                        validator.isValidWith(model, location));
   }
@@ -522,7 +534,7 @@ public class ModelJAXBValidatorTest {
   @Test
   public void testLocationInvalidPositionY() {
     LocationModel location = createLocation(LOCATION_NAME);
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_POS_Y, "abc");
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_POS_Y, "abc");
     Assert.assertFalse("Validator said valid for invalid location position y.",
                        validator.isValidWith(model, location));
   }
@@ -602,10 +614,10 @@ public class ModelJAXBValidatorTest {
    */
   private LayoutModel createLayoutModel(String name) {
     LayoutModel layoutModel = createComponentWithName(LayoutModel.class, name);
-    addPropperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_X, 0d);
-    addPropperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_Y, 0d);
-    addPropperty(layoutModel, LocationThemeProperty.class, LayoutModel.LOCATION_THEME, LOCATION_THEME_NAME);
-    addPropperty(layoutModel, VehicleThemeProperty.class, LayoutModel.VEHICLE_THEME, VEHICLE_THEME_NAME);
+    addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_X, 0d);
+    addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_Y, 0d);
+    addProperty(layoutModel, LocationThemeProperty.class, LayoutModel.LOCATION_THEME, LOCATION_THEME_NAME);
+    addProperty(layoutModel, VehicleThemeProperty.class, LayoutModel.VEHICLE_THEME, VEHICLE_THEME_NAME);
     return layoutModel;
   }
 
@@ -617,12 +629,12 @@ public class ModelJAXBValidatorTest {
    */
   private PointModel createPointModel(String name) {
     PointModel point = createComponentWithName(PointModel.class, name);
-    addPropperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "5");
-    addPropperty(point, SelectionProperty.class, PointModel.TYPE, PointModel.PointType.HALT);
-    addPropperty(point, CoordinateProperty.class, PointModel.MODEL_X_POSITION, "0");
-    addPropperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "0");
-    addPropperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "0");
-    addPropperty(point, StringProperty.class, ElementPropKeys.POINT_POS_Y, "0");
+    addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "5");
+    addProperty(point, SelectionProperty.class, PointModel.TYPE, PointModel.PointType.HALT);
+    addProperty(point, CoordinateProperty.class, PointModel.MODEL_X_POSITION, "0");
+    addProperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "0");
+    addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "0");
+    addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_Y, "0");
     return point;
   }
 
@@ -632,19 +644,19 @@ public class ModelJAXBValidatorTest {
    * @param name the name of the path model
    * @return the path model
    */
-  private PathModel createPathModel(String name) {
+  private PathModel createPathModel(String name, String pointName1, String pointName2) {
     PathModel path = createComponentWithName(PathModel.class, name);
-    addPropperty(path, LengthProperty.class, PathModel.LENGTH, 0d);
-    addPropperty(path, IntegerProperty.class, PathModel.ROUTING_COST, 0);
-    addPropperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, 0d);
-    addPropperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, 0d);
-    addPropperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.DIRECT);
-    addPropperty(path, StringProperty.class, ElementPropKeys.PATH_CONTROL_POINTS, "");
-    addPropperty(path, StringProperty.class, PathModel.START_COMPONENT, POINT_NAME);
-    addPropperty(path, StringProperty.class, PathModel.END_COMPONENT, POINT_NAME_2);
-    addPropperty(path, BooleanProperty.class, PathModel.LOCKED, false);
-    components.put(POINT_NAME, createPointModel(POINT_NAME));
-    components.put(POINT_NAME_2, createPointModel(POINT_NAME_2));
+    addProperty(path, LengthProperty.class, PathModel.LENGTH, 0d);
+    addProperty(path, IntegerProperty.class, PathModel.ROUTING_COST, 0);
+    addProperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, 0d);
+    addProperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, 0d);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.DIRECT);
+    addProperty(path, StringProperty.class, ElementPropKeys.PATH_CONTROL_POINTS, "");
+    addProperty(path, StringProperty.class, PathModel.START_COMPONENT, pointName1);
+    addProperty(path, StringProperty.class, PathModel.END_COMPONENT, pointName2);
+    addProperty(path, BooleanProperty.class, PathModel.LOCKED, false);
+    components.put(pointName1, createPointModel(pointName1));
+    components.put(pointName2, createPointModel(pointName2));
     return path;
   }
 
@@ -656,7 +668,7 @@ public class ModelJAXBValidatorTest {
    */
   private LocationTypeModel createLocationType(String name) {
     LocationTypeModel locationType = createComponentWithName(LocationTypeModel.class, name);
-    addPropperty(locationType, StringSetProperty.class, LocationTypeModel.ALLOWED_OPERATIONS, new HashSet<>());
+    addProperty(locationType, StringSetProperty.class, LocationTypeModel.ALLOWED_OPERATIONS, new HashSet<>());
     return locationType;
   }
 
@@ -668,14 +680,14 @@ public class ModelJAXBValidatorTest {
    */
   private LocationModel createLocation(String name) {
     LocationModel location = createComponentWithName(LocationModel.class, name);
-    addPropperty(location, CoordinateProperty.class, LocationModel.MODEL_X_POSITION, "0");
-    addPropperty(location, CoordinateProperty.class, LocationModel.MODEL_Y_POSITION, "0");
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_POS_X, "0");
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_POS_Y, "0");
-    addPropperty(location, LocationTypeProperty.class, LocationModel.TYPE, LOCATION_TYPE_NAME);
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_OFFSET_X, "0");
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_OFFSET_Y, "0");
-    addPropperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, "");
+    addProperty(location, CoordinateProperty.class, LocationModel.MODEL_X_POSITION, "0");
+    addProperty(location, CoordinateProperty.class, LocationModel.MODEL_Y_POSITION, "0");
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_POS_X, "0");
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_POS_Y, "0");
+    addProperty(location, LocationTypeProperty.class, LocationModel.TYPE, LOCATION_TYPE_NAME);
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_OFFSET_X, "0");
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_OFFSET_Y, "0");
+    addProperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, "");
     components.put(LOCATION_TYPE_NAME, createLocationType(LOCATION_TYPE_NAME));
     return location;
   }
@@ -687,8 +699,8 @@ public class ModelJAXBValidatorTest {
    */
   private LinkModel createLink(String name) {
     LinkModel link = createComponentWithName(LinkModel.class, name);
-    addPropperty(link, StringProperty.class, LinkModel.START_COMPONENT, POINT_NAME);
-    addPropperty(link, StringProperty.class, LinkModel.END_COMPONENT, LOCATION_NAME);
+    addProperty(link, StringProperty.class, LinkModel.START_COMPONENT, POINT_NAME);
+    addProperty(link, StringProperty.class, LinkModel.END_COMPONENT, LOCATION_NAME);
     components.put(POINT_NAME, createPointModel(POINT_NAME));
     components.put(LOCATION_NAME, createLocation(LOCATION_NAME));
 
@@ -704,7 +716,7 @@ public class ModelJAXBValidatorTest {
    * @param propName the property key
    * @param propValue the property value
    */
-  private <T extends AbstractProperty> void addPropperty(ModelComponent component,
+  private <T extends AbstractProperty> void addProperty(ModelComponent component,
                                                          Class<T> clazz,
                                                          String propName,
                                                          Object propValue) {

@@ -10,7 +10,7 @@ package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.TreeMap;
 
 /**
@@ -24,7 +24,7 @@ public abstract class LayoutElement
   /**
    * A set of generic key-value pairs associated with this layout element.
    */
-  private final Map<String, String> properties = new TreeMap<>();
+  private Map<String, String> properties = new TreeMap<>();
   /**
    * The layer on which this layout element is to be displayed.
    */
@@ -62,7 +62,7 @@ public abstract class LayoutElement
    * @return This layout element's properties.
    */
   public Map<String, String> getProperties() {
-    return new TreeMap<>(properties);
+    return properties;
   }
 
   /**
@@ -71,9 +71,6 @@ public abstract class LayoutElement
    * @param properties The new properties.
    */
   public void setProperties(Map<String, String> properties) {
-    Objects.requireNonNull(properties, "properties is null");
-
-    this.properties.clear();
-    this.properties.putAll(properties);
+    this.properties = requireNonNull(properties, "properties");
   }
 }

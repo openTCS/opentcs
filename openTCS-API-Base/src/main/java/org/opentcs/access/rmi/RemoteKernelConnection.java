@@ -8,6 +8,7 @@
  */
 package org.opentcs.access.rmi;
 
+import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 
 /**
@@ -20,11 +21,12 @@ public interface RemoteKernelConnection {
   /**
    * Logs in with/establishes a connection to the remote kernel.
    *
-   * @throws CredentialsException If the credentials used (user name and
-   * passoword) were not accepted by the remote kernel.
+   * @throws CredentialsException If the credentials used (user name and password) were not accepted
+   * by the remote kernel.
+   * @throws KernelUnavailableException If there was a problem logging in with the remote kernel.
    */
   void login()
-      throws CredentialsException;
+      throws CredentialsException, KernelUnavailableException;
 
   /**
    * Logs out from/drops the connection to the remote kernel.
@@ -36,6 +38,7 @@ public interface RemoteKernelConnection {
    *
    * @return This connection's state.
    */
+  @Nonnull
   State getConnectionState();
 
   /**

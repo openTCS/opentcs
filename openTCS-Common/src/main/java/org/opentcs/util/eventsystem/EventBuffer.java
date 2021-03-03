@@ -10,6 +10,9 @@ package org.opentcs.util.eventsystem;
 
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Stores events and keeps them until a client fetches them.
@@ -18,7 +21,8 @@ import java.util.List;
  * @param <E> The actual event implementation.
  */
 public class EventBuffer<E extends Event>
-implements EventListener<E> {
+    implements EventListener<E> {
+
   /**
    * The buffered events.
    */
@@ -32,26 +36,20 @@ implements EventListener<E> {
    * for an event.
    */
   private boolean waitingClient;
-  
+
   /**
    * Creates a new EventBuffer.
    *
    * @param eventFilter This buffer's initial event filter.
    */
-  public EventBuffer(EventFilter<E> eventFilter) {
-    if (eventFilter == null) {
-      throw new NullPointerException("eventFilter is null");
-    }
-    filter = eventFilter;
+  public EventBuffer(@Nonnull EventFilter<E> eventFilter) {
+    filter = requireNonNull(eventFilter, "eventFilter");
   }
-  
-  // Methods declared in interface EventListener start here
 
+  // Methods declared in interface EventListener start here
   @Override
   public void processEvent(E event) {
-    if (event == null) {
-      throw new NullPointerException("event is null");
-    }
+    requireNonNull(event, "event");
     synchronized (events) {
       if (filter.accept(event)) {
         events.add(event);
@@ -63,9 +61,8 @@ implements EventListener<E> {
       }
     }
   }
-  
+
   // Methods not declared in any interface start here
-  
   /**
    * Returns a list of events that are currently stored in this buffer and
    * clears the buffer.
@@ -79,10 +76,8 @@ implements EventListener<E> {
    * @throws IllegalArgumentException If <code>timeout</code> is less than 0.
    */
   public List<E> getEvents(long timeout)
-  throws IllegalArgumentException {
-    if (timeout < 0) {
-      throw new IllegalArgumentException("timeout must be at least 0");
-    }
+      throws IllegalArgumentException {
+    checkArgument(timeout >= 0, "timeout < 0: %s", timeout);
     synchronized (events) {
       if (timeout > 0 && events.isEmpty()) {
         waitingClient = true;
@@ -101,7 +96,7 @@ implements EventListener<E> {
       return result;
     }
   }
-  
+
   /**
    * Checks whether a client is currently waiting for events arriving in this
    * buffer.
@@ -114,18 +109,15 @@ implements EventListener<E> {
       return waitingClient;
     }
   }
-  
+
   /**
    * Sets this buffer's event filter.
    *
    * @param eventFilter This buffer's new event filter.
    */
-  public void setFilter(EventFilter<E> eventFilter) {
-    if (eventFilter == null) {
-      throw new NullPointerException("eventFilter is null");
-    }
+  public void setFilter(@Nonnull EventFilter<E> eventFilter) {
     synchronized (events) {
-      filter = eventFilter;
+      filter = requireNonNull(eventFilter, "eventFilter");
     }
   }
 }

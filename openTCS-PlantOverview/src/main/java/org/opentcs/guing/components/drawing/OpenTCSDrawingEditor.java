@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.DefaultDrawingEditor;
 import org.jhotdraw.draw.Drawing;
@@ -138,8 +139,10 @@ public class OpenTCSDrawingEditor
    */
   public void addVehicle(VehicleModel vehicleModel) {
     VehicleFigure vehicleFigure = crsObjectFactory.createVehicleFigure(vehicleModel);
-    getDrawing().add(vehicleFigure);
 
+    SwingUtilities.invokeLater(() -> {
+      getDrawing().add(vehicleFigure);
+    });
     vehicleModel.addAttributesChangeListener(vehicleFigure);
     vehicleModel.setFigure(vehicleFigure);
 
@@ -444,6 +447,9 @@ public class OpenTCSDrawingEditor
 
   public enum OffsetIdenticator {
 
-    TOP, BOTTOM, LEFT, RIGHT;
+    TOP,
+    BOTTOM,
+    LEFT,
+    RIGHT;
   }
 }

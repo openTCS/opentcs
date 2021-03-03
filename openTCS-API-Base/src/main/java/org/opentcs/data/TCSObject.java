@@ -91,9 +91,8 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @param newName This object's new name.
    */
   public final void setName(String newName) {
-    requireNonNull(newName, "newName is null. Current name: " + name);
-    checkArgument(!newName.isEmpty(),
-                  "newName is empty String. Current name: " + name);
+    requireNonNull(newName, "newName");
+    checkArgument(!newName.isEmpty(), "newName is empty string");
     name = newName;
     reference.setName(newName);
   }
@@ -157,8 +156,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    */
   @Override
   public String toString() {
-//    return getClass() + "[id=" + id + ", name=" + name + "]";
-    return name;
+    return getClass() + "[id=" + id + ", name=" + name + "]";
   }
 
   /**

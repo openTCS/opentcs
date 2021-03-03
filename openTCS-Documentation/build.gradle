@@ -7,14 +7,18 @@ evaluationDependsOn(':openTCS-PlantOverview')
 apply plugin: 'distribution'
 // To use AsciiDoctor for documentation
 apply plugin: 'org.asciidoctor.convert'
+// For API backwards-compatibility checks with the last major release
+apply plugin: 'me.champeau.gradle.japicmp'
 
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
+def apiCmpDir = file("$buildDir/compatibility-reports")
 def schemasDir = file("$buildDir/schemagen")
 def samplesDir = file("$buildDir/samples")
 def userManualDir = file("$buildDir/users-guide")
 def devManualDir = file("$buildDir/developers-guide")
 def devManualImagesDir = file("$devManualDir/images")
+def indexDir = file("$buildDir/index")
 def readmeDir = file("$buildDir/readme")
 
 ext.collectableDistDir = file("$buildDir/install")
@@ -38,6 +42,9 @@ distributions {
     contents.from(injectionApiDir) {
       into('developer/api-injection')
     }
+    contents.from(apiCmpDir) {
+      into('developer/compatibility-reports')
+    }
     contents.from(schemasDir) {
       into('developer/xml-schemas')
     }
@@ -47,6 +54,7 @@ distributions {
     contents.from(userManualDir) {
       into('user')
     }
+    contents.from(indexDir)
     contents.from(readmeDir)
   }
 }
@@ -54,6 +62,7 @@ distributions {
 task renderDocs {
   dependsOn 'apiBase'
   dependsOn 'apiInjection'
+  dependsOn 'jApiCmpAll'
   dependsOn 'schemagen'
   dependsOn 'asciidoctor'
 }
@@ -99,11 +108,129 @@ task apiInjection(type: Javadoc, description: 'Creates Javadoc for injection API
   }
 }
 
+task jApiCmpBase(type: me.champeau.gradle.ArtifactJapicmpTask) {
+  dependsOn project(':openTCS-API-Base').jar
+  baseline = 'org.opentcs:opentcs-api-base:4.0.0@jar'
+  to = project(':openTCS-API-Base').jar.archivePath
+  accessModifier = 'protected'
+  onlyModified = true
+  htmlOutputFile = file("$apiCmpDir/japicmp-opentcs-api-base.html")
+}
+
+task jApiCmpInjection(type: me.champeau.gradle.ArtifactJapicmpTask) {
+  dependsOn project(':openTCS-API-Injection').jar
+  baseline = 'org.opentcs:opentcs-api-injection:4.0.0@jar'
+  to = project(':openTCS-API-Injection').jar.archivePath
+  accessModifier = 'protected'
+  onlyModified = true
+  htmlOutputFile = file("$apiCmpDir/japicmp-opentcs-api-injection.html")
+}
+
+task jApiCmpAll {
+  dependsOn jApiCmpBase
+  dependsOn jApiCmpInjection
+}
+
 asciidoctor {
   dependsOn 'asciidoctorUsersGuide'
   dependsOn 'asciidoctorDevelopersGuide'
+  dependsOn 'asciidoctorIndex'
   dependsOn 'asciidoctorReadme'
   enabled = false
+}
+
+task asciidoctorIndex(type: org.asciidoctor.gradle.AsciidoctorTask) {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'article'
+
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/index")
+  
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = indexDir
+  
+  // Whether to put backends' outputs into separate subdirectories  
+  separateOutputDirs = false
+	
+  sources {
+    include 'index.adoc'
+  }
+  
+  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+	backends = ['html5']
+	
+  attributes 'source-highlighter': 'coderay',
+             'coderay-linenums-mode': 'table',
+  //           'imagesdir': 'images',
+  // Include a table of contents (on the left side, when rendering to HTML)
+  // toc: 'left',
+  // toclevels: '3',
+  // Turn on section numbering.
+  // sectnums: '1',
+  // Whether to use icons for admonitions. Possible values: 'font' to use
+  // FontAwesome glyphs or anything else to use graphics files.
+  // Note: FontAwesome requires internet connectivity for viewing the resulting
+  // HTML output...
+  //  icons: '1',
+  icons: 'font',
+  // Where to find the icons. Default: ./images/icons.
+  // iconsdir: './images/icons',
+  // The type of the icons.
+  // icontype: 'png',
+  // Allow attributes in links (target="_blank" etc.) to be used.
+  linkattrs: true,
+  // Document encoding.
+  encoding: 'utf-8',
+  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
+  experimental: true
+}
+
+task asciidoctorReadme(type: org.asciidoctor.gradle.AsciidoctorTask) {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/readme")
+  
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = readmeDir
+  
+  // Whether to put backends' outputs into separate subdirectories  
+  separateOutputDirs = false
+	
+  sources {
+    include 'README.adoc'
+  }
+  
+  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+	backends = ['html5']
+	
+  attributes 'source-highlighter': 'coderay',
+             'coderay-linenums-mode': 'table',
+  //           'imagesdir': 'images',
+  // Include a table of contents (on the left side, when rendering to HTML)
+  toc: 'left',
+  toclevels: '3',
+  // Turn on section numbering.
+  sectnums: '1',
+  // Whether to use icons for admonitions. Possible values: 'font' to use
+  // FontAwesome glyphs or anything else to use graphics files.
+  // Note: FontAwesome requires internet connectivity for viewing the resulting
+  // HTML output...
+//  icons: '1',
+  icons: 'font',
+  // Where to find the icons. Default: ./images/icons.
+  // iconsdir: './images/icons',
+  // The type of the icons.
+  // icontype: 'png',
+  // Allow attributes in links (target="_blank" etc.) to be used.
+  linkattrs: true,
+  // Document encoding.
+  encoding: 'utf-8',
+  // Render page numbers in the PDF
+  pagenums: '1',
+  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
+  experimental: true
 }
 
 task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
@@ -170,54 +297,6 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
       exclude 'themes'
     }
   }
-}
-
-task asciidoctorReadme(type: org.asciidoctor.gradle.AsciidoctorTask) {
-  // Document type: article (default), book, inline, manpage)
-  options doctype: 'book'
-
-  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/readme")
-  
-  // Where to put the rendered documents. Default: $buildDir/asciidoc.
-  outputDir = readmeDir
-  
-  // Whether to put backends' outputs into separate subdirectories  
-  separateOutputDirs = false
-	
-  sources {
-    include 'README.adoc'
-  }
-  
-  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-	backends = ['html5']
-	
-  attributes 'source-highlighter': 'coderay',
-             'coderay-linenums-mode': 'table',
-  //           'imagesdir': 'images',
-  // Include a table of contents (on the left side, when rendering to HTML)
-  toc: 'left',
-  toclevels: '3',
-  // Turn on section numbering.
-  sectnums: '1',
-  // Whether to use icons for admonitions. Possible values: 'font' to use
-  // FontAwesome glyphs or anything else to use graphics files.
-  // Note: FontAwesome requires internet connectivity for viewing the resulting
-  // HTML output...
-//  icons: '1',
-  icons: 'font',
-  // Where to find the icons. Default: ./images/icons.
-  // iconsdir: './images/icons',
-  // The type of the icons.
-  // icontype: 'png',
-  // Allow attributes in links (target="_blank" etc.) to be used.
-  linkattrs: true,
-  // Document encoding.
-  encoding: 'utf-8',
-  // Render page numbers in the PDF
-  pagenums: '1',
-  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
-  experimental: true
 }
 
 task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {

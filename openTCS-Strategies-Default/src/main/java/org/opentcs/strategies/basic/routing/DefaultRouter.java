@@ -16,13 +16,13 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Router;
@@ -41,13 +41,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A basic <code>Router</code> implementation.
+ * A basic {@link Router} implementation.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultRouter
     implements Router {
 
+  /**
+   * The key of a vehicle property defining the group of vehicles that sharing the same routing
+   * table.
+   * <p>
+   * The value is expected to be an integer, the default value is {@link #DEFAULT_ROUTING_GROUP}.
+   * </p>
+   */
+  public static final String PROPKEY_ROUTING_GROUP = "tcs:routingGroup";
+  /**
+   * The default value of a vehicle's routing group.
+   */
+  public static final int DEFAULT_ROUTING_GROUP = 0;
   /**
    * This class's Logger.
    */
@@ -62,18 +74,17 @@ public class DefaultRouter
    */
   private final LocalKernel kernel;
   /**
-   * The routes selected for each vehicle.
-   */
-  private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new HashMap<>();
-  /**
    * A builder for constructing our routing tables.
    */
   private final RoutingTableBuilder tableBuilder;
   /**
-   * The routing nets by vehicle.
-   * XXX Access to this should probably be synchronized!
+   * The routes selected for each vehicle.
    */
-  private final Map<Vehicle, RoutingTable> netsByVehicle = new HashMap<>();
+  private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new ConcurrentHashMap<>();
+  /**
+   * The routing nets by vehicle routing group.
+   */
+  private final Map<Integer, RoutingTable> netsByVehicle = new ConcurrentHashMap<>();
   /**
    * Indicates whether this component is enabled.
    */
@@ -88,9 +99,9 @@ public class DefaultRouter
    * computed) route even if the destination position is the source position.
    */
   @Inject
-  DefaultRouter(LocalKernel kernel,
-                RoutingTableBuilder tableBuilder,
-                @RouteToCurrentPos boolean routeToCurrentPosition) {
+  public DefaultRouter(LocalKernel kernel,
+                       RoutingTableBuilder tableBuilder,
+                       @RouteToCurrentPos boolean routeToCurrentPosition) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.tableBuilder = requireNonNull(tableBuilder, "tableBuilder");
     this.routeToCurrentPosition = routeToCurrentPosition;
@@ -116,20 +127,34 @@ public class DefaultRouter
   }
 
   @Override
+  @Deprecated
+  public void updateRoutingTables() {
+    netsByVehicle.clear();
+    for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
+      int currentGroup = getRoutingGroupOfVehicle(curVehicle);
+      if (!netsByVehicle.containsKey(currentGroup)) {
+        RoutingTable routingNet = tableBuilder.computeTable(curVehicle);
+        netsByVehicle.put(currentGroup, routingNet);
+      }
+    }
+    LOG.debug("Number of nets computed: {}", netsByVehicle.size());
+  }
+
+  @Override
   public Set<Vehicle> checkRoutability(TransportOrder order) {
-    requireNonNull(order, "order is null");
+    requireNonNull(order, "order");
 
     Set<Vehicle> result = new HashSet<>();
     List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
     DriveOrder[] driveOrders
         = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-    for (Map.Entry<Vehicle, RoutingTable> curEntry : netsByVehicle.entrySet()) {
+    for (Map.Entry<Integer, RoutingTable> curEntry : netsByVehicle.entrySet()) {
       // Get all points at the first location at which a vehicle of the current
       // type can execute the desired operation and check if an acceptable route
       // originating in one of them exists.
       for (Point curStartPoint : getDestinationPoints(driveOrders[0])) {
         if (isRoutable(curStartPoint, driveOrders, 1, curEntry.getValue())) {
-          result.add(curEntry.getKey());
+          result.addAll(getVehiclesByRoutingGroup(curEntry.getKey()));
           break;
         }
       }
@@ -141,13 +166,13 @@ public class DefaultRouter
   public Optional<List<DriveOrder>> getRoute(Vehicle vehicle,
                                              Point sourcePoint,
                                              TransportOrder transportOrder) {
-    requireNonNull(vehicle, "vehicle is null");
-    requireNonNull(sourcePoint, "sourcePoint is null");
-    requireNonNull(transportOrder, "transportOrder is null");
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(transportOrder, "transportOrder");
 
     List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
     DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-    RoutingTable net = netsByVehicle.get(vehicle);
+    RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
     OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, net);
     OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
     computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
@@ -160,16 +185,21 @@ public class DefaultRouter
   public Optional<Route> getRoute(Vehicle vehicle,
                                   Point sourcePoint,
                                   Point destinationPoint) {
-    requireNonNull(vehicle, "vehicle is null");
-    requireNonNull(sourcePoint, "sourcePoint is null");
-    requireNonNull(destinationPoint, "destinationPoint is null");
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(destinationPoint, "destinationPoint");
 
-    RoutingTable net = netsByVehicle.get(vehicle);
+    RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
     long costs = net.getCosts(sourcePoint, destinationPoint);
     if (costs == INFINITE_COSTS) {
       return Optional.empty();
     }
     List<Route.Step> steps = net.getRouteSteps(sourcePoint, destinationPoint);
+    if (steps.isEmpty()) {
+      // If the list of steps is empty, we're already at the destination point
+      // Create a single step without a path.
+      steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
+    }
     return Optional.of(new Route(steps, costs));
   }
 
@@ -177,31 +207,33 @@ public class DefaultRouter
   public long getCosts(Vehicle vehicle,
                        Point sourcePoint,
                        Point destinationPoint) {
-    requireNonNull(vehicle, "vehicle is null");
-    requireNonNull(sourcePoint, "sourcePoint is null");
-    requireNonNull(destinationPoint, "destinationPoint is null");
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(destinationPoint, "destinationPoint");
 
-    return netsByVehicle.get(vehicle).getCosts(sourcePoint, destinationPoint);
+    return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
+        .getCosts(sourcePoint, destinationPoint);
   }
 
   @Override
   public long getCostsByPointRef(Vehicle vehicle,
                                  TCSObjectReference<Point> srcPointRef,
                                  TCSObjectReference<Point> dstPointRef) {
-    requireNonNull(vehicle, "vehicle is null");
-    requireNonNull(srcPointRef, "srcPointRef is null");
-    requireNonNull(dstPointRef, "dstPointRef is null");
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(srcPointRef, "srcPointRef");
+    requireNonNull(dstPointRef, "dstPointRef");
 
-    return netsByVehicle.get(vehicle).getCosts(srcPointRef, dstPointRef);
+    return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
+        .getCosts(srcPointRef, dstPointRef);
   }
 
   @Override
   public long getCosts(Vehicle vehicle,
                        TCSObjectReference<Location> srcRef,
                        TCSObjectReference<Location> destRef) {
-    requireNonNull(vehicle, "vehicle is null");
-    requireNonNull(srcRef, "srcRef is null");
-    requireNonNull(destRef, "destRef is null");
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(srcRef, "srcRef");
+    requireNonNull(destRef, "destRef");
 
     // Get all attached links for source and destination
     Set<Link> srcLinks = kernel.getTCSObject(Location.class, srcRef).getAttachedLinks();
@@ -222,7 +254,7 @@ public class DefaultRouter
 
   @Override
   public void selectRoute(Vehicle vehicle, List<DriveOrder> driveOrders) {
-    requireNonNull(vehicle, "vehicle is null");
+    requireNonNull(vehicle, "vehicle");
 
     if (driveOrders == null) {
       // XXX Should we remember the vehicle's current position, maybe?
@@ -246,16 +278,6 @@ public class DefaultRouter
       result.add(finalOrder.getRoute().getFinalDestinationPoint());
     }
     return result;
-  }
-
-  @Override
-  public void updateRoutingTables() {
-    netsByVehicle.clear();
-    for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
-      RoutingTable routingNet = tableBuilder.computeTable(curVehicle);
-      netsByVehicle.put(curVehicle, routingNet);
-    }
-    LOG.debug("Number of nets computed: " + netsByVehicle.size());
   }
 
   @Override
@@ -316,7 +338,6 @@ public class DefaultRouter
                                          OrderRouteParameterStruct params,
                                          int hopIndex,
                                          OrderRouteResultStruct result) {
-    LOG.debug("method entry");
     assert startPoint != null;
     assert params != null;
     assert result != null;
@@ -329,7 +350,7 @@ public class DefaultRouter
       // If the set of destination points contains the starting point, keep only
       // that one. This is just a shortcut - it is the cheapest way to go.
       if (!routeToCurrentPosition && destPoints.contains(startPoint)) {
-        LOG.debug("Shortcutting route to " + startPoint);
+        LOG.debug("Shortcutting route to {}", startPoint);
         destPoints.clear();
         destPoints.add(startPoint);
       }
@@ -348,6 +369,7 @@ public class DefaultRouter
           // without a path.
           steps = new ArrayList<>(1);
           steps.add(new Route.Step(null,
+                                   null,
                                    startPoint,
                                    Vehicle.Orientation.UNDEFINED,
                                    0));
@@ -374,11 +396,10 @@ public class DefaultRouter
     // If we have reached the final drive order, ...
     else // If the route computed is cheaper than the best route found so far,
     // replace the latter.
-     if (result.currentCosts < result.bestCosts) {
-        System.arraycopy(result.currentRoute, 0, result.bestRoute, 0,
-                         result.currentRoute.length);
-        result.bestCosts = result.currentCosts;
-      }
+    if (result.currentCosts < result.bestCosts) {
+      System.arraycopy(result.currentRoute, 0, result.bestRoute, 0, result.currentRoute.length);
+      result.bestCosts = result.currentCosts;
+    }
   }
 
   /**
@@ -403,7 +424,7 @@ public class DefaultRouter
             || Destination.OP_PARK.equals(operation))) {
       // Route the vehicle to an user selected point if halting is allowed there.
       Point destPoint = kernel.getTCSObject(Point.class, destLocRef.getName());
-      requireNonNull(destPoint, "destPoint is null");
+      requireNonNull(destPoint, "destPoint");
       final Set<Point> result = new HashSet<>();
       if (destPoint.isHaltingPosition()) {
         result.add(destPoint);
@@ -436,6 +457,43 @@ public class DefaultRouter
       }
       return result;
     }
+  }
+
+  /**
+   * Returns all vehicles within the given routing group.
+   *
+   * @param routingGroup The routint group all vehicles should be in
+   * @return The vehicles which have the given routing group
+   */
+  private Set<Vehicle> getVehiclesByRoutingGroup(int routingGroup) {
+    Set<Vehicle> result = new HashSet<>();
+    for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
+      if (getRoutingGroupOfVehicle(curVehicle) == routingGroup) {
+        result.add(curVehicle);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns the routing group of the vehicle or {@link #DEFAULT_ROUTING_GROUP} if the property
+   * does not exist or is invalid.
+   *
+   * @param vehicle The vehicle
+   * @return The routing group of the vehicle
+   */
+  private int getRoutingGroupOfVehicle(Vehicle vehicle) {
+    int routingGroup = DEFAULT_ROUTING_GROUP;
+    try {
+      routingGroup = Integer.parseInt(vehicle.getProperty(PROPKEY_ROUTING_GROUP));
+    }
+    catch (NumberFormatException e) {
+      LOG.debug("Invalid routing group '{}' for vehicle {}, using default ({}).",
+                routingGroup,
+                vehicle,
+                DEFAULT_ROUTING_GROUP);
+    }
+    return routingGroup;
   }
 
   /**
@@ -472,8 +530,8 @@ public class DefaultRouter
      */
     public OrderRouteParameterStruct(DriveOrder[] driveOrders,
                                      RoutingTable net) {
-      this.driveOrders = requireNonNull(driveOrders, "driveOrders is null");
-      this.net = requireNonNull(net, "net is null");
+      this.driveOrders = requireNonNull(driveOrders, "driveOrders");
+      this.net = requireNonNull(net, "net");
     }
   }
 

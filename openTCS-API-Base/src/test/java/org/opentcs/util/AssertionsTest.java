@@ -20,7 +20,7 @@ public class AssertionsTest {
   }
   
   @Test
-  public void checkArgument_shouldFormatIntegerMessageTemplateArgument() {
+  public void checkArgumentShouldFormatIntegerMessageTemplateArgument() {
     try {
       Assertions.checkArgument(false, "%s", 123);
     }
@@ -30,19 +30,19 @@ public class AssertionsTest {
   }
   
   @Test
-  public void checkInRange_shouldIncludeBoundaries() {
+  public void checkInRangeShouldIncludeBoundaries() {
     Assert.assertEquals(22, Assertions.checkInRange(22, 22, 24));
     Assert.assertEquals(23, Assertions.checkInRange(23, 22, 24));
     Assert.assertEquals(24, Assertions.checkInRange(24, 22, 24));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void checkInRange_shouldFailOnLessThanMinimum() {
+  public void checkInRangeShouldFailOnLessThanMinimum() {
     Assertions.checkInRange(21, 22, 24);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void checkInRange_shouldFailOnMoreThanMaximum() {
+  public void checkInRangeShouldFailOnMoreThanMaximum() {
     Assertions.checkInRange(25, 22, 24);
   }
 }

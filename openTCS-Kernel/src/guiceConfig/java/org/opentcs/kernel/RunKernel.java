@@ -36,6 +36,12 @@ public class RunKernel {
   private static final Logger LOG = LoggerFactory.getLogger(RunKernel.class);
 
   /**
+   * Prevents external instantiation.
+   */
+  private RunKernel() {
+  }
+
+  /**
    * Initializes the system and starts the openTCS kernel including modules.
    *
    * @param args The command line arguments.

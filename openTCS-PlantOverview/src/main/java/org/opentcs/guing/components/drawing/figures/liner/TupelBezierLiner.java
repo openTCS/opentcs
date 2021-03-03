@@ -25,7 +25,7 @@ import org.jhotdraw.xml.DOMOutput;
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
-public class BezierLiner
+public class TupelBezierLiner
     implements 
     org.jhotdraw.draw.liner.Liner, 
     org.jhotdraw.xml.DOMStorable {
@@ -33,7 +33,7 @@ public class BezierLiner
   /**
    * Creates a new instance.
    */
-  public BezierLiner() {
+  public TupelBezierLiner() {
   }
 
   @Override  // Liner

@@ -34,7 +34,7 @@ public class VehicleEntry
 
   private VehicleProcessModel processModel;
 
-  private VehicleCommAdapterFactory commAdapterFactory;
+  private VehicleCommAdapterFactory commAdapterFactory = new NullVehicleCommAdapterFactory();
 
   private VehicleCommAdapter commAdapter;
 

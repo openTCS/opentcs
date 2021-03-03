@@ -40,7 +40,7 @@ import org.opentcs.strategies.basic.scheduling.DummyScheduler;
  * @author Philipp Seifert (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class StandardVehicleControllerTest {
+public class DefaultVehicleControllerTest {
 
   private static final String RECHARGE_OP = "recharge";
   /**
@@ -109,7 +109,7 @@ public class StandardVehicleControllerTest {
 
   // Test cases for implementation of interface VehicleManager start here.
   @Test
-  public void should_foward_position_change_to_kernel() {
+  public void shouldFowardPositionChangeToKernel() {
     Point point = dataObjectFactory.createPoint();
     doReturn(point).when(localKernel).getTCSObject(Point.class, point.getName());
 
@@ -120,7 +120,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_precise_position_change_to_kernel() {
+  public void shouldForwardPrecisePositionChangeToKernel() {
     Triple newPos = new Triple(211, 391, 0);
     vehicleModel.setVehiclePrecisePosition(newPos);
 
@@ -129,7 +129,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_angle_change_to_kernel() {
+  public void shouldForwardAngleChangeToKernel() {
     double newAngle = 7.5;
     vehicleModel.setVehicleOrientationAngle(newAngle);
 
@@ -138,7 +138,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_energy_level_change_to_kernel() {
+  public void shouldForwardEnergyLevelChangeToKernel() {
     int newLevel = 80;
     vehicleModel.setVehicleEnergyLevel(newLevel);
     verify(localKernel).setVehicleEnergyLevel(vehicle.getReference(),
@@ -146,7 +146,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_load_handling_devices_change_to_kernel() {
+  public void shouldForwardLoadHandlingDevicesChangeToKernel() {
     List<LoadHandlingDevice> devices = new LinkedList<>();
     devices.add(new LoadHandlingDevice("MyLoadHandlingDevice", true));
     vehicleModel.setVehicleLoadHandlingDevices(devices);
@@ -156,7 +156,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_vehicle_state_change_to_kernel() {
+  public void shouldForwardVehicleStateChangeToKernel() {
     vehicleModel.setVehicleState(Vehicle.State.EXECUTING);
 
     verify(localKernel).setVehicleState(vehicle.getReference(),
@@ -164,7 +164,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_adapter_state_change_to_kernel() {
+  public void shouldForwardAdapterStateChangeToKernel() {
     vehicleModel.setVehicleAdapterState(VehicleCommAdapter.State.UNKNOWN);
 
     verify(localKernel).setVehicleAdapterState(vehicle.getReference(),
@@ -172,7 +172,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test
-  public void should_forward_event_to_bus() {
+  public void shouldForwardEventToBus() {
     final String adapterName = "myAdapter";
     final String eventString = "myString";
     final List<VehicleCommAdapterEvent> eventsReceived = new LinkedList<>();
@@ -196,7 +196,7 @@ public class StandardVehicleControllerTest {
 
   // Test cases for implementation of interface VehicleController start here.
   @Test
-  public void should_have_idempotent_enabled_state() {
+  public void shouldHaveIdempotentEnabledState() {
     stdVehicleController.initialize();
     assertTrue(stdVehicleController.isInitialized());
     stdVehicleController.initialize();
@@ -208,7 +208,7 @@ public class StandardVehicleControllerTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void should_not_accept_multiple_drive_orders() {
+  public void shouldNotAcceptMultipleDriveOrders() {
     Location location = dataObjectFactory.createLocation();
     DriveOrder driveOrder = new DriveOrder(new DriveOrder.Destination(
         location.getReference(), DriveOrder.Destination.OP_NOP));
@@ -216,7 +216,7 @@ public class StandardVehicleControllerTest {
     Point dstPoint = dataObjectFactory.createPoint();
     Path stepPath = dataObjectFactory.createPath(dstPoint.getReference());
     List<Route.Step> steps = Collections.singletonList(
-        new Route.Step(stepPath, dstPoint, Vehicle.Orientation.FORWARD, 0));
+        new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0));
 
     driveOrder.setRoute(new Route(steps, 1));
 

@@ -1,0 +1,36 @@
+
+== Default strategies
+
+openTCS comes with a default implementation for each of the strategy modules.
+These implementations can easily be replaced to adapt to project-specific requirements.
+(See <<Replacing default kernel components>>.)
+Since the classes of the default implementations are part of the openTCS distribution, they are available for use in replacement strategies, of course.
+Note, however, that these classes are not considered part of openTCS's official API -- they might change even between minor releases without maintaining backwards-compatibility.
+(See <<Available artifacts and API compatibility>>.)
+
+=== Default router
+
+At runtime, the default router uses precomputed routing tables to look up the route a vehicle should take to get from one position in the driving course to another one.
+These routing tables are prepared upon initialization or when a relevant part of the driving course changes, e.g. when a path has been locked or unlocked.
+
+A routing table is built by performing a search (a breadth-first search (BFS), by default) for each point in the driving course once.
+A single search run fills a row in the routing table with reachability and costs information from the starting point to every other point.
+ 
+For every point reached during a search run, the route on which this point was reached from the starting point is evaluated, i.e. costs are computed by a function for the route as a whole.
+(Points that are already part of the route so far are excluded, so routes containing loops are not possible.)
+If a cheaper route from the starting point to the reached point wasn't previously found, the newly found route is stored in the routing table as the route to take.
+If a previously found route is cheaper than the new one, the former remains in the table, and if the search is configured to terminate early (which it is by default), paths from the reached point to other neighbours (if present) are not followed.
+
+The result of the default cost function is the sum of the lengths of all paths on the route.
+
+It is possible to build a separate routing table for each vehicle.
+This may be desirable if the vehicles in a plant have different characteristics and the cost function used reflects this, so the resulting optimal routes of vehicles through the driving course may differ.
+Since bulding a routing table can be computationally expensive, however, this isn't done by default -- the default router only computes a single routing table unless told otherwise.
+To let the router know that it should compute a separate routing table for a vehicle, set a property with the key `tcs:routingGroup` to an integer value other than zero.
+(Vehicles that have the same integer value set share the same routing table, and zero is the default for all vehicles.)
+
+NOTE: This approach is a generic one that apparently does not focus on maximum performance (in terms of complexity).
+Instead, it is built to allow an arbitrary cost function to evaluate every route found as a whole, making it possible to experiment with cost functions based on completely different information sets easily.
+This implementation is considered sufficient for a lot of use cases -- especially those that are related to classic AGVs, since the topology in such systems usually changes rather infrequently.
+For concrete, more demanding use cases, using a different implementation, e.g. one based on Dijkstra's algorithm, to compute the routing tables may provide better performance with less memory usage.
+Future versions of openTCS may thus provide alternative router implementations to choose from.

@@ -14,9 +14,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.util.Assertions.checkArgument;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A route for a vehicle, consisting of a sequence of steps (pairs of paths and
@@ -28,8 +32,7 @@ public class Route
     implements Serializable {
 
   /**
-   * The sequence of steps this route consists of, in the order they are to be
-   * processed.
+   * The sequence of steps this route consists of, in the order they are to be processed.
    */
   private final List<Step> steps;
   /**
@@ -44,23 +47,18 @@ public class Route
    * @param routeCosts The costs for travelling this route.
    */
   public Route(List<Step> routeSteps, long routeCosts) {
-    if (routeSteps == null) {
-      throw new NullPointerException("routeSteps is null");
-    }
-    if (routeSteps.isEmpty()) {
-      steps = Collections.unmodifiableList(new ArrayList<Step>());
-    }
-    else {
-      steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
-    }
+    requireNonNull(routeSteps, "routeSteps");
+    checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
+    steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
     costs = routeCosts;
   }
 
   /**
    * Returns the sequence of steps this route consists of.
    *
-   * @return The sequence of steps this route consists of. The returned
-   * <code>List</code> is unmodifiable.
+   * @return The sequence of steps this route consists of.
+   * May be empty.
+   * The returned <code>List</code> is unmodifiable.
    */
   public List<Step> getSteps() {
     return steps;
@@ -76,19 +74,19 @@ public class Route
   }
 
   /**
-   * Returns the final destination point that is reached by travelling this
-   * route (i.e. the destination point of this route's last step).
+   * Returns the final destination point that is reached by travelling this route.
+   * (I.e. returns the destination point of this route's last step.)
    *
-   * @return The final destination point that is reached by travelling this
-   * route.
+   * @return The final destination point that is reached by travelling this route.
    */
+  @Nullable
   public Point getFinalDestinationPoint() {
     return steps.get(steps.size() - 1).getDestinationPoint();
   }
 
   @Override
   public String toString() {
-    return steps.toString();
+    return "Route{" + "steps=" + steps + ", costs=" + costs + '}';
   }
 
   /**
@@ -102,6 +100,10 @@ public class Route
      * The path to travel.
      */
     private final Path path;
+    /**
+     * The point that the vehicle is starting from.
+     */
+    private final Point sourcePoint;
     /**
      * The point that is reached by travelling the path.
      */
@@ -119,18 +121,39 @@ public class Route
      * Creates a new instance.
      *
      * @param path The path to travel.
+     * @param srcPoint The point that the vehicle is starting from.
      * @param destPoint The point that is reached by travelling the path.
      * @param orientation The vehicle's orientation on this step.
      * @param routeIndex This step's index in the vehicle's route.
      */
-    public Step(Path path,
-                Point destPoint,
-                Vehicle.Orientation orientation,
+    public Step(@Nullable Path path,
+                @Nullable Point srcPoint,
+                @Nonnull Point destPoint,
+                @Nonnull Vehicle.Orientation orientation,
                 int routeIndex) {
       this.path = path;
+      this.sourcePoint = srcPoint;
       this.destinationPoint = requireNonNull(destPoint, "destPoint");
       vehicleOrientation = requireNonNull(orientation, "orientation");
       this.routeIndex = routeIndex;
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param path The path to travel.
+     * @param destPoint The point that is reached by travelling the path.
+     * @param orientation The vehicle's orientation on this step.
+     * @param routeIndex This step's index in the vehicle's route.
+     * @deprecated Use other constructor instead.
+     */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
+    public Step(@Nullable Path path,
+                @Nonnull Point destPoint,
+                @Nonnull Vehicle.Orientation orientation,
+                int routeIndex) {
+      this(path, null, destPoint, orientation, routeIndex);
     }
 
     /**
@@ -139,8 +162,20 @@ public class Route
      * @return The path to travel. May be <code>null</code> if the vehicle does
      * not really have to move.
      */
+    @Nullable
     public Path getPath() {
       return path;
+    }
+
+    /**
+     * Returns the point that the vehicle is starting from.
+     *
+     * @return The point that the vehicle is starting from.
+     * May be <code>null</code> if the vehicle does not really have to move.
+     */
+    @Nullable
+    public Point getSourcePoint() {
+      return sourcePoint;
     }
 
     /**
@@ -148,6 +183,7 @@ public class Route
      *
      * @return The point that is reached by travelling the path.
      */
+    @Nonnull
     public Point getDestinationPoint() {
       return destinationPoint;
     }
@@ -157,6 +193,7 @@ public class Route
      *
      * @return The direction into which the vehicle is supposed to travel.
      */
+    @Nonnull
     public Vehicle.Orientation getVehicleOrientation() {
       return vehicleOrientation;
     }
@@ -177,6 +214,7 @@ public class Route
       }
       Step other = (Step) o;
       return Objects.equals(path, other.path)
+          && Objects.equals(sourcePoint, other.sourcePoint)
           && Objects.equals(destinationPoint, other.destinationPoint)
           && Objects.equals(vehicleOrientation, other.vehicleOrientation)
           && routeIndex == other.routeIndex;
@@ -184,7 +222,7 @@ public class Route
 
     @Override
     public int hashCode() {
-      return Objects.hash(path, destinationPoint, vehicleOrientation);
+      return Objects.hash(path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex);
     }
 
     @Override

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model.elements;
 
 import java.util.Arrays;
@@ -24,7 +23,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * A connection between two points.
- * 
+ *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PathModel
@@ -161,9 +160,13 @@ public class PathModel
      */
     SLANTED,
     /**
-     * A bezier curve.
+     * A bezier curve with 2 control points.
      */
-    BEZIER;
+    BEZIER,
+    /**
+     * A bezier curve with 3 control points.
+     */
+    BEZIER_3;
 
     /**
      * Returns the <code>LinerType</code> constant matching the name in the

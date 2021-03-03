@@ -10,7 +10,6 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
-import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -20,9 +19,6 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Group;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.StringProperty;
@@ -32,8 +28,11 @@ import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for Groups.
@@ -86,7 +85,7 @@ public class GroupAdapter
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     Group group = kernel.createGroup();
     TCSObjectReference<Group> reference = group.getReference();
 
@@ -98,7 +97,7 @@ public class GroupAdapter
       // Neuer Name
       kernel.renameTCSObject(reference, name);
 
-      updateProcessGroup(kernel, group);
+      updateProcessGroup(kernel, group, plantModel);
 
       updateMiscProcessProperties(kernel, reference);
     }
@@ -107,7 +106,7 @@ public class GroupAdapter
     }
   }
 
-  private void updateProcessGroup(Kernel kernel, Group group)
+  private void updateProcessGroup(Kernel kernel, Group group, PlantModelCache plantModel)
       throws ObjectUnknownException, CredentialsException {
     for (TCSObjectReference<?> resRef : group.getMembers()) {
       kernel.removeGroupMember(group.getReference(), resRef);
@@ -116,16 +115,13 @@ public class GroupAdapter
     for (ModelComponent model : getModel().getChildComponents()) {
       TCSObjectReference<?> memberRef;
       if (model instanceof PointModel) {
-        memberRef
-            = kernel.getTCSObject(Point.class, model.getName()).getReference();
+        memberRef = plantModel.getPoints().get(model.getName()).getReference();
       }
       else if (model instanceof PathModel) {
-        memberRef
-            = kernel.getTCSObject(Path.class, model.getName()).getReference();
+        memberRef = plantModel.getPaths().get(model.getName()).getReference();
       }
       else if (model instanceof LocationModel) {
-        memberRef = kernel.getTCSObject(Location.class, model.getName())
-            .getReference();
+        memberRef = plantModel.getLocations().get(model.getName()).getReference();
       }
       else {
         throw new IllegalArgumentException("Unhandled model type "
@@ -138,7 +134,7 @@ public class GroupAdapter
       }
     }
 
-    for (VisualLayout layout : kernel.getTCSObjects(VisualLayout.class)) {
+    for (VisualLayout layout : plantModel.getVisualLayouts()) {
       updateLayoutElement(layout, group.getReference());
     }
   }

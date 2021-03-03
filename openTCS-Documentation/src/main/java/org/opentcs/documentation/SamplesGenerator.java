@@ -31,9 +31,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Generates the sample xml files for the documentation.
  *
- * @author Mats Wilhelm (Fraunhofer IML 2017)
+ * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class SamplesGenerator {
+
+  /**
+   * Prevents external instantiation.
+   */
+  private SamplesGenerator() {
+  }
 
   public static void main(String[] args) {
     checkArgument(args.length >= 2, "Need at least two argument for the task and target file");

@@ -100,8 +100,7 @@ public abstract class TreeViewManager {
         = ((TreeNode) getTreeView().getTree().getModel().getRoot()).children();
 
     while (eTreeNodes.hasMoreElements()) {
-      TreeNode node = eTreeNodes.nextElement();
-      getTreeView().sortItems(node);
+      getTreeView().sortItems(eTreeNodes.nextElement());
     }
   }
 
@@ -166,10 +165,9 @@ public abstract class TreeViewManager {
    * @return The currently selected items.
    */
   public Set<ModelComponent> getSelectedItems() {
-    Set<UserObject> objects = fTreeView.getSelectedItems();
     Set<ModelComponent> components = new HashSet<>();
 
-    for (UserObject object : objects) {
+    for (UserObject object : fTreeView.getSelectedItems()) {
       components.add(object.getModelComponent());
     }
 

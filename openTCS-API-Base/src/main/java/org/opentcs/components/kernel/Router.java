@@ -22,6 +22,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a router module for the openTCS
@@ -37,10 +38,20 @@ public interface Router
     extends Lifecycle {
 
   /**
-   * Initializes the router or notifies it of changes in the topology and
-   * triggers an update of its routing tables. Must be called before calling any
-   * other methods on the router instance.
+   * Notifies the router of changes in the topology.
    */
+  @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+  default void topologyChanged() {
+    updateRoutingTables();
+  }
+
+  /**
+   * Notifies the router of changes in the topology and triggers an update of its routing tables.
+   *
+   * @deprecated Implement and use {@link #topologyChanged()} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   void updateRoutingTables();
 
   /**

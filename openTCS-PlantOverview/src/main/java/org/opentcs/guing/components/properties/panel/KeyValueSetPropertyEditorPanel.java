@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.panel;
 
 import java.awt.Dimension;
@@ -16,8 +15,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -32,16 +33,18 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Benutzeroberfläche zum Bearbeiten einer Menge von Key-Value-Paaren.
- * {
  *
- * @see KeyValueSetProperty}
- *
+ * @see KeyValueSetProperty
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class KeyValueSetPropertyEditorPanel
     extends javax.swing.JPanel
     implements DetailsDialogContent {
 
+  /**
+   * A resource bundle.
+   */
+  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
   /**
    * Das zu bearbeitende Attribut.
    */
@@ -52,17 +55,23 @@ public class KeyValueSetPropertyEditorPanel
    */
   public KeyValueSetPropertyEditorPanel() {
     initComponents();
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     itemsTable.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {},
-      new String [] {
-        bundle.getString("KeyValueSetPropertyEditorPanel.key.text"),
-        bundle.getString("KeyValueSetPropertyEditorPanel.value.text")}) {
-      Class[] types = new Class [] {
+        new Object[][] {},
+        new String[] {
+          bundle.getString("KeyValueSetPropertyEditorPanel.key.text"),
+          bundle.getString("KeyValueSetPropertyEditorPanel.value.text")}) {
+      private final Class[] types = new Class[] {
         java.lang.String.class, java.lang.String.class
       };
-      public Class getColumnClass(int columnIndex) {
-        return types [columnIndex];
+
+      @Override
+      public Class<?> getColumnClass(int columnIndex) {
+        return types[columnIndex];
+      }
+
+      @Override
+      public boolean isCellEditable(int i, int i1) {
+        return false;
       }
     });
     setPreferredSize(new Dimension(350, 200));
@@ -195,16 +204,49 @@ public class KeyValueSetPropertyEditorPanel
    * @param key der Schlüssel
    * @param value der Wert
    */
-  private void setItem(String key, String value) {
+  private void addItem(String key, String value) {
     for (int i = 0; i < itemsTable.getRowCount(); i++) {
       if (itemsTable.getValueAt(i, 0).equals(key)) {
-        itemsTable.setValueAt(value, i, 1);
+        JOptionPane.showMessageDialog(
+            this,
+            bundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + key);
         return;
       }
     }
 
     DefaultTableModel model = (DefaultTableModel) itemsTable.getModel();
     model.addRow(new Object[] {key, value});
+  }
+
+  /**
+   * Searches the key-value list using the old key and updates the key-value pair with the new key
+   * and the (new) value.
+   * If the old key equals the new key, only the value will be updated.
+   *
+   * @param oldKey The old key of the key-value pair to be updated.
+   * @param newKey The new key of the key-value pair to be updated.
+   * @param value The new value.
+   */
+  private void updateItem(String oldKey, String newKey, String value) {
+    // Searching for the edited key-value pair...
+    for (int oldKeyRow = 0; oldKeyRow < itemsTable.getRowCount(); oldKeyRow++) {
+      if (Objects.equals(itemsTable.getValueAt(oldKeyRow, 0), oldKey)) {
+        // Searching for another key-value pair with the same key as newKey...
+        for (int newKeyRow = 0; newKeyRow < itemsTable.getRowCount(); newKeyRow++) {
+          // If there is already a different row with the new key, notify the user and abort.
+          if (oldKeyRow != newKeyRow
+              && Objects.equals(itemsTable.getValueAt(newKeyRow, 0), newKey)) {
+            JOptionPane.showMessageDialog(
+                this,
+                bundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + newKey);
+            return;
+          }
+        }
+        // If its a legit edit, update the key-value pair.
+        itemsTable.setValueAt(value, oldKeyRow, 1);
+        itemsTable.setValueAt(newKey, oldKeyRow, 0);
+      }
+    }
   }
 
   /**
@@ -216,7 +258,7 @@ public class KeyValueSetPropertyEditorPanel
     if (p == null) {
       return;
     }
-
+    KeyValueProperty pOld = new KeyValueProperty(p.getModel(), p.getKey(), p.getValue());
     JDialog parent = (JDialog) getTopLevelAncestor();
     KeyValuePropertyEditorPanel content = new KeyValuePropertyEditorPanel();
     content.setProperty(p);
@@ -227,7 +269,7 @@ public class KeyValueSetPropertyEditorPanel
     dialog.setVisible(true);
 
     if (dialog.getReturnStatus() == StandardDetailsDialog.RET_OK) {
-      setItem(p.getKey(), p.getValue());
+      updateItem(pOld.getKey(), p.getKey(), p.getValue());
       sortItems();
       selectItem(p.getKey());
 
@@ -249,7 +291,7 @@ public class KeyValueSetPropertyEditorPanel
     dialog.setVisible(true);
 
     if (dialog.getReturnStatus() == StandardDetailsDialog.RET_OK) {
-      setItem(p.getKey(), p.getValue());
+      addItem(p.getKey(), p.getValue());
       sortItems();
       selectItem(p.getKey());
 
@@ -271,7 +313,7 @@ public class KeyValueSetPropertyEditorPanel
   private void updateView() {
     final TableModel model = itemsTable.getModel();
     boolean selectedAreEditable = true;
-    
+
     for (int selRowIndex : itemsTable.getSelectedRows()) {
       String key = (String) model.getValueAt(selRowIndex, 0);
       // Sonderfall: Dieses Property wird indirekt über das Symbol einer Location

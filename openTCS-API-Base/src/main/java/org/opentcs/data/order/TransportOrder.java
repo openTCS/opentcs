@@ -521,7 +521,7 @@ public class TransportOrder
    * This enumeration defines the various states a transport order may be in.
    */
   @XmlType(name = "transportOrderState")
-  public static enum State {
+  public enum State {
 
     /**
      * A transport order's initial state.

@@ -58,14 +58,13 @@ public final class Streams {
     requireNonNull(endTag, "endTag");
     checkInRange(endTag.length, 1, Integer.MAX_VALUE, "endTag.length");
 
-    SearchableByteArrayOutputStream localBuffer
-        = new SearchableByteArrayOutputStream();
+    SearchableByteArrayOutputStream localBuffer = new SearchableByteArrayOutputStream();
     boolean endTagFound = false;
-    int currentByte;
-
-    while (!endTagFound && (currentByte = inStream.read()) != -1) {
+    int currentByte = inStream.read();
+    while (!endTagFound && currentByte != -1) {
       localBuffer.write(currentByte);
       endTagFound = localBuffer.endsWith(endTag);
+      currentByte = inStream.read();
     }
 
     if (endTagFound) {
@@ -76,8 +75,7 @@ public final class Streams {
         result = new ByteArrayInputStream(input);
       }
       else {
-        result
-            = new ByteArrayInputStream(input, 0, input.length - endTag.length);
+        result = new ByteArrayInputStream(input, 0, input.length - endTag.length);
       }
 
       return result;
@@ -105,11 +103,10 @@ public final class Streams {
 
     int bufferSize = INITIAL_BUFFER_SIZE;
     int offset = 0;
-    int bytesRead = 0;
     byte[] buffer = new byte[bufferSize];
 
     try {
-      bytesRead = inStream.read(buffer, offset, bufferSize - offset);
+      int bytesRead = inStream.read(buffer, offset, bufferSize - offset);
 
       while (bytesRead != -1) {
         offset += bytesRead;
@@ -144,7 +141,6 @@ public final class Streams {
      * Creates a new SearchableByteArrayOutputStream.
      */
     public SearchableByteArrayOutputStream() {
-      super();
     }
 
     /**

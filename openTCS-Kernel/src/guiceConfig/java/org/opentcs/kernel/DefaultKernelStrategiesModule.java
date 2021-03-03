@@ -8,7 +8,6 @@
  */
 package org.opentcs.kernel;
 
-import com.google.common.base.Strings;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
 import java.util.Objects;
@@ -20,10 +19,10 @@ import org.opentcs.strategies.basic.recharging.DefaultRechargePositionSupplier;
 import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluator;
 import org.opentcs.strategies.basic.routing.DefaultRouter;
 import org.opentcs.strategies.basic.routing.RouteEvaluator;
+import org.opentcs.strategies.basic.routing.RouteEvaluatorComposite;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorDistance;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorExplicit;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorHops;
-import org.opentcs.strategies.basic.routing.RouteEvaluatorNull;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorTravelTime;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorTurns;
 import org.opentcs.strategies.basic.routing.RoutingTableBuilder;
@@ -116,44 +115,29 @@ public class DefaultKernelStrategiesModule
 
   @Provides
   RouteEvaluator provideRouteEvaluator() {
-    ConfigurationStore routerConfig
-        = ConfigurationStore.getStore(DefaultRouter.class.getName());
-    // hops, distance, traveltime, turns, explicit (+null)
-    String costFactorsString = routerConfig.getString("routingCostFactors",
-                                                      "distance, turns");
-    String[] costFactors = costFactorsString.trim().toLowerCase().split("[, ]+");
-    RouteEvaluator result = new RouteEvaluatorNull();
-    for (String costFactor : costFactors) {
-      if (Strings.isNullOrEmpty(costFactor)) {
-        continue;
-      }
-      switch (costFactor) {
-        case "hops":
-          result = new RouteEvaluatorHops(result);
-          break;
-        case "distance":
-          result = new RouteEvaluatorDistance(result);
-          break;
-        case "traveltime":
-          result = new RouteEvaluatorTravelTime(result);
-          break;
-        case "turns":
-          ConfigurationStore turnsConfig
-              = ConfigurationStore.getStore(RouteEvaluatorTurns.class.getName());
-          result = new RouteEvaluatorTurns(
-              result, turnsConfig.getLong("penaltyPerTurn", 5000));
-          break;
-        case "explicit":
-          result = new RouteEvaluatorExplicit(result);
-          break;
-        default:
-          LOG.warn("Illegal cost factor '{}', ignored.", costFactor);
-      }
+    ConfigurationStore routerCfg = ConfigurationStore.getStore(DefaultRouter.class.getName());
+    RouteEvaluatorComposite result = new RouteEvaluatorComposite();
+    if (routerCfg.getBoolean("evaluateByDistance", true)) {
+      result.getComponents().add(new RouteEvaluatorDistance());
     }
-    // Make sure at least one cost factor is used.
-    if (result instanceof RouteEvaluatorNull) {
-      LOG.warn("No cost factor configured, falling back to distance.");
-      result = new RouteEvaluatorDistance(result);
+    if (routerCfg.getBoolean("evaluateByTravelTime", false)) {
+      result.getComponents().add(new RouteEvaluatorTravelTime());
+    }
+    if (routerCfg.getBoolean("evaluateByHops", false)) {
+      result.getComponents().add(new RouteEvaluatorHops());
+    }
+    if (routerCfg.getBoolean("evaluateByTurns", false)) {
+      ConfigurationStore turnsCfg
+          = ConfigurationStore.getStore(RouteEvaluatorTurns.class.getName());
+      result.getComponents().add(new RouteEvaluatorTurns(turnsCfg.getLong("penaltyPerTurn", 5000)));
+    }
+    if (routerCfg.getBoolean("evaluateExplicit", false)) {
+      result.getComponents().add(new RouteEvaluatorExplicit());
+    }
+    // Make sure at least one evaluator is used.
+    if (result.getComponents().isEmpty()) {
+      LOG.warn("No route evaluator enabled, falling back to distance.");
+      result.getComponents().add(new RouteEvaluatorDistance());
     }
     return result;
   }

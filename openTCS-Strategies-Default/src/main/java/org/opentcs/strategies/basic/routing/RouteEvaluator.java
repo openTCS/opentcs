@@ -14,27 +14,11 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 
 /**
- * Implementations of this interface compute costs for routes based on their
- * respective implementation criteria.
+ * Implementations of this interface compute costs for routes.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public abstract class RouteEvaluator {
-
-  /**
-   * An additional evaluator augmenting the computed costs of this one.
-   */
-  protected final RouteEvaluator augmentingEvaluator;
-
-  /**
-   * Creates a new instance.
-   *
-   * @param augmentingEvaluator An additional evaluator augmenting the computed
-   * costs of this one.
-   */
-  public RouteEvaluator(RouteEvaluator augmentingEvaluator) {
-    this.augmentingEvaluator = augmentingEvaluator;
-  }
+public interface RouteEvaluator {
 
   /**
    * Computes the costs for the given vehicle travelling from the given starting
@@ -46,7 +30,5 @@ public abstract class RouteEvaluator {
    * @return The costs for the given vehicle travelling from the given starting
    * position via the given list of route steps.
    */
-  public abstract long computeCosts(Vehicle vehicle,
-                                    Point startPoint,
-                                    List<Route.Step> steps);
+  long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps);
 }

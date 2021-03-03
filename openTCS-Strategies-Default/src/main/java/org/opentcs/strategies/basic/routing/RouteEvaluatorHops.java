@@ -20,16 +20,12 @@ import org.opentcs.data.order.Route;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class RouteEvaluatorHops
-    extends RouteEvaluator {
+    implements RouteEvaluator {
 
   /**
    * Creates a new instance.
-   *
-   * @param augmentingEvaluator An additional evaluator augmenting the computed
-   * costs of this one.
    */
-  public RouteEvaluatorHops(RouteEvaluator augmentingEvaluator) {
-    super(augmentingEvaluator);
+  public RouteEvaluatorHops() {
   }
 
   @Override
@@ -39,7 +35,6 @@ public class RouteEvaluatorHops
     requireNonNull(startPoint, "startPoint");
     requireNonNull(steps, "steps");
 
-    return steps.size()
-        + augmentingEvaluator.computeCosts(vehicle, startPoint, steps);
+    return steps.size();
   }
 }

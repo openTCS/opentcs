@@ -119,7 +119,7 @@ public class AttachmentManager {
       // Let the adapter know cleanup time is here.
       vehicleEntry.setCommAdapter(null);
       commAdapter.terminate();
-      vehicleEntry.setCommAdapterFactory(null);
+      vehicleEntry.setCommAdapterFactory(new NullVehicleCommAdapterFactory());
       vehicleEntry.setSelectedTabIndex(0);
       vehicleEntry.setProcessModel(new VehicleProcessModel(vehicleEntry.getVehicle()));
     }

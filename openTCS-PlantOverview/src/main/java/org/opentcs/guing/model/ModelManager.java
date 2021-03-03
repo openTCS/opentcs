@@ -54,18 +54,6 @@ public interface ModelManager {
   boolean loadModel(@Nullable File modelFile, ModelReader reader);
 
   /**
-   * Shows a dialog to select a model and loads it.
-   *
-   * @param modelFile The nullable model file to be loaded. If it
-   * is not present a dialog to select a file will be shown.
-   * @param reader The reader which reads and parses the file.
-   * @param fileEnding The file ending for custom formats.
-   * @return <code>true</code> if, and only if, a model was successfully
-   * loaded.
-   */
-  boolean loadModel(@Nullable File modelFile, ModelReader reader, String fileEnding);
-
-  /**
    * Persists the given system model with the kernel.
    *
    * @param kernel The kernel providing the list of existing models.

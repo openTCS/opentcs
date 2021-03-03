@@ -39,12 +39,12 @@ public class PropertyUndoActivity
    * Defaults to true; becomes false if this edit is undone, true
    * again if it is redone.
    */
-  boolean hasBeenDone = true;
+  private boolean hasBeenDone = true;
   /**
    * True if this edit has not received <code>die</code>; defaults
    * to <code>true</code>.
    */
-  boolean alive = true;
+  private boolean alive = true;
 
   /**
    * Creates a new instance of PropertiesUndoActivity

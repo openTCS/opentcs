@@ -22,6 +22,7 @@ import org.opentcs.guing.application.ApplicationInjectionModule;
 import org.opentcs.guing.components.ComponentsInjectionModule;
 import org.opentcs.guing.exchange.ExchangeInjectionModule;
 import org.opentcs.guing.model.ModelInjectionModule;
+import org.opentcs.guing.storage.DefaultStorageInjectionModule;
 import org.opentcs.guing.transport.TransportInjectionModule;
 import org.opentcs.guing.util.UtilInjectionModule;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class FixedPlantOverviewInjectionModule
     install(new ComponentsInjectionModule());
     install(new ExchangeInjectionModule());
     install(new ModelInjectionModule());
+    install(new DefaultStorageInjectionModule());
     install(new TransportInjectionModule());
     install(new UtilInjectionModule());
 

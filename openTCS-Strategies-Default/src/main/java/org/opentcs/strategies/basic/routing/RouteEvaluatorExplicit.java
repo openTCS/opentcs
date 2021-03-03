@@ -21,22 +21,16 @@ import org.opentcs.data.order.Route;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class RouteEvaluatorExplicit
-    extends RouteEvaluator {
+    implements RouteEvaluator {
 
   /**
    * Creates a new instance.
-   *
-   * @param augmentingEvaluator An additional evaluator augmenting the computed
-   * costs of this one.
    */
-  public RouteEvaluatorExplicit(RouteEvaluator augmentingEvaluator) {
-    super(augmentingEvaluator);
+  public RouteEvaluatorExplicit() {
   }
 
   @Override
-  public long computeCosts(Vehicle vehicle,
-                           Point startPoint,
-                           List<Route.Step> steps) {
+  public long computeCosts(Vehicle vehicle, Point startPoint, List<Route.Step> steps) {
     requireNonNull(startPoint, "startPoint");
     requireNonNull(steps, "steps");
 
@@ -44,6 +38,6 @@ public class RouteEvaluatorExplicit
     for (Route.Step step : steps) {
       result += step.getPath().getRoutingCost();
     }
-    return result + augmentingEvaluator.computeCosts(vehicle, startPoint, steps);
+    return result;
   }
 }

@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import static java.awt.image.ImageObserver.ABORT;
 import static java.awt.image.ImageObserver.ALLBITS;
@@ -29,6 +28,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.geom.BezierPath;
@@ -40,7 +40,8 @@ import org.opentcs.guing.application.menus.VehiclePopupMenu;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.figures.decoration.VehicleOutlineHandle;
-import org.opentcs.guing.components.drawing.figures.liner.BezierLiner;
+import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
+import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
@@ -58,7 +59,7 @@ import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.guing.util.VehicleThemeManager;
 
 /**
- * Die graphische Reprï¿½sentation eines Fahrzeugs.
+ * The graphical representation of a vehicle.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -355,7 +356,8 @@ public class VehicleFigure
             PathConnection pathFigure = (PathConnection) connection.getFigure();
             PointFigure cpf = currentPoint.getFigure().getPresentationFigure();
 
-            if (pathFigure.getLiner() instanceof BezierLiner) {
+            if (pathFigure.getLiner() instanceof TupelBezierLiner
+                || pathFigure.getLiner() instanceof TripleBezierLiner) {
               BezierPath bezierPath = pathFigure.getBezierPath();
               Point2D.Double cp = bezierPath.get(0, BezierPath.C2_MASK);
               double dx = cp.getX() - cpf.getZoomPoint().getX();
@@ -498,29 +500,32 @@ public class VehicleFigure
     Triple precisePosition = model.getPrecisePosition();
 
     if (point == null && precisePosition == null) {
-      // Wenn weder Punkt noch exakte Position bekannt: Figur nicht zeichnen
-      setVisible(false);
+      // If neither the point nor the precise position is known, don't draw the figure.
+      SwingUtilities.invokeLater(() -> setVisible(false));
     }
-    else // Wenn eine exakte Position existiert, wird diese in setBounds() gesetzt,
-    // benï¿½tigt also keine anderen Koordinaten
-    if (precisePosition != null && !ignorePrecisePosition) {
-      setVisible(true);
-      setBounds(new Point2D.Double(), null);
-      // Nur aufrufen, wenn Figure sichtbar - sonst gibt es in BoundsOutlineHandle eine NP-Exception!
-      fireFigureChanged();
+    else if (precisePosition != null && !ignorePrecisePosition) {
+      // If a precise position exists, it is set in setBounds(), so it doesn't need any coordinates.
+      SwingUtilities.invokeLater(() -> {
+        setVisible(true);
+        setBounds(new Point2D.Double(), null);
+        // Only call if the figure is visible - will cause NPE in BoundsOutlineHandle otherwise.
+        fireFigureChanged();
+      });
     }
     else if (point != null) {
-      setVisible(true);
-      Rectangle2D.Double r = point.getFigure().getBounds();
-      Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
-      // Figur an der Mitte des Knotens zeichnen.
-      // Die Winkelausrichtung wird in setBounds() bestimmt
-      setBounds(pCenter, null);
-      // Nur aufrufen, wenn Figure sichtbar - sonst gibt es in BoundsOutlineHandle eine NP-Exception!
-      fireFigureChanged();
+      SwingUtilities.invokeLater(() -> {
+        setVisible(true);
+        Rectangle2D.Double r = point.getFigure().getBounds();
+        Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
+        // Draw figure in the center of the node.
+        // Angle is set in setBounds().
+        setBounds(pCenter, null);
+        // Only call if the figure is visible - will cause NPE in BoundsOutlineHandle otherwise.
+        fireFigureChanged();
+      });
     }
     else {
-      setVisible(false);
+      SwingUtilities.invokeLater(() -> setVisible(false));
     }
   }
 
@@ -534,29 +539,4 @@ public class VehicleFigure
 
     return (infoflags & (ALLBITS | ABORT)) == 0;
   }
-
-  /**
-   * A dummy image to be used if no images/themes are available.
-   */
-  private static class DummyImage
-      extends BufferedImage {
-
-    /**
-     * Creates a new instance.
-     *
-     * @param width
-     * @param height
-     * @param imageType
-     */
-    public DummyImage(int width, int height) {
-      super(width, height, TYPE_INT_RGB);
-
-      for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-          setRGB(x, y, Color.GREEN.getRGB());
-        }
-      }
-    }
-  }
-
 }

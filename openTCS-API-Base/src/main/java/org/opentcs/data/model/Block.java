@@ -10,7 +10,9 @@ package org.opentcs.data.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 /**
  * An aggregation of resources that can never be used by more than one vehicle
@@ -50,10 +52,8 @@ implements Serializable, Cloneable {
    *
    * @param newMember The new member to be added to this block.
    */
-  public void addMember(TCSResourceReference<?> newMember) {
-    if (newMember == null) {
-      throw new NullPointerException("newMember is null");
-    }
+  public void addMember(@Nonnull TCSResourceReference<?> newMember) {
+    requireNonNull(newMember, "newMember");
     members.add(newMember);
   }
   
@@ -63,9 +63,6 @@ implements Serializable, Cloneable {
    * @param rmMember The member to be removed from this block.
    */
   public void removeMember(TCSResourceReference<?> rmMember) {
-    if (rmMember == null) {
-      throw new NullPointerException("rmMember is null");
-    }
     members.remove(rmMember);
   }
   
@@ -77,9 +74,6 @@ implements Serializable, Cloneable {
    * this block.
    */
   public boolean containsMember(TCSResourceReference<?> chkMember) {
-    if (chkMember == null) {
-      throw new NullPointerException("chkMember is null");
-    }
     return members.contains(chkMember);
   }
   

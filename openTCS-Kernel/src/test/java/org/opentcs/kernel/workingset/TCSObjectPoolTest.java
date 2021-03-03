@@ -201,7 +201,7 @@ public class TCSObjectPoolTest {
    * Test for method emitObjectEvent()
    */
   @Test
-  public void should_emit_event_for_created_object() {
+  public void shouldEmitEventForCreatedObject() {
     MBassador<Object> eventBus = new MBassador<>(BusConfiguration.Default());
 
     List<TCSEvent> receivedEvents = new LinkedList<>();

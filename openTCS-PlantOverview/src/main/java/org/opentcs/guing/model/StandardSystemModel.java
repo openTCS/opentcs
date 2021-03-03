@@ -12,7 +12,6 @@ package org.opentcs.guing.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ class StandardSystemModel
    * Class-Objekten von ModelComponent-Objekten. Hierdurch ist praktisch
    * konfigurierbar, welche ModelComponent-Objekte in welchen Ordner gehören.
    */
-  private final Map<Class, ModelComponent> fParentFolders = new HashMap<>();
+  private final Map<Class<?>, ModelComponent> fParentFolders = new HashMap<>();
   /**
    * Die Zeichnung.
    */
@@ -86,12 +85,11 @@ class StandardSystemModel
   /**
    * Die Map mit der Zuordnung der Model-Layout-Elemente zu den Kernel-Objekten
    */
-  private final Map<TCSObjectReference<?>, ModelLayoutElement> fLayoutMap
-      = new HashMap<>();
+  private final Map<TCSObjectReference<?>, ModelLayoutElement> fLayoutMap = new HashMap<>();
   /**
    * Die für das Modell verwendete Zeichenmethode.
    */
-  private final DrawingMethod fDrawingMethod;
+  private final DrawingMethod fDrawingMethod = new CoordinateBasedDrawingMethod();
   /**
    * Die Tabelle mit den Zuordnungen zwischen Modellkomponente und
    * Leitsteuerungsobjekt.
@@ -101,30 +99,18 @@ class StandardSystemModel
   private final CourseObjectFactory crsObjFactory;
 
   /**
-   * Creates a new instance.
-   *
-   * @param drawingMethod The drawing method.
+   * Creates a new instance with a default drawing method.
    */
-  public StandardSystemModel(DrawingMethod drawingMethod,
-                             EventDispatcher eventDispatcher,
+  @Inject
+  public StandardSystemModel(EventDispatcher eventDispatcher,
                              CourseObjectFactory crsObjFactory) {
     super("Model");
-    this.fDrawingMethod = requireNonNull(drawingMethod, "drawingMethod");
     this.fEventDispatcher = requireNonNull(eventDispatcher, "eventDispatcher");
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
 
     createMainFolders();
     setupParentFolders();
     createProperties();
-  }
-
-  /**
-   * Creates a new instance with a default drawing method.
-   */
-  @Inject
-  public StandardSystemModel(EventDispatcher eventDispatcher,
-                             CourseObjectFactory crsObjFactory) {
-    this(new CoordinateBasedDrawingMethod(), eventDispatcher, crsObjFactory);
   }
 
   @Override // SystemModel
@@ -143,7 +129,7 @@ class StandardSystemModel
       return null;
     }
 
-    for (Class c : fParentFolders.keySet()) {
+    for (Class<?> c : fParentFolders.keySet()) {
       if (item.getClass() == c || c.isInstance(item)) {
         return fParentFolders.get(c);
       }
@@ -193,15 +179,21 @@ class StandardSystemModel
     return fDrawingMethod;
   }
 
-  @Override // SystemModel
-  public List<VehicleModel> getVehicleModels() {
-    List<VehicleModel> vehicles = new ArrayList<>();
-
-    for (ModelComponent vComp : getMainFolder(FolderKey.VEHICLES).getChildComponents()) {
-      vehicles.add((VehicleModel) vComp);
+  @Override
+  public ModelComponent getModelComponent(String name) {
+    for (ModelComponent folder : fMainFolders.values()) {
+      ModelComponent component = getModelComponent(name, folder);
+      if (component != null) {
+        return component;
+      }
     }
 
-    return vehicles;
+    return null;
+  }
+
+  @Override // SystemModel
+  public List<VehicleModel> getVehicleModels() {
+    return getAll(FolderKey.VEHICLES, VehicleModel.class);
   }
 
   @Override // SystemModel
@@ -249,27 +241,15 @@ class StandardSystemModel
 
   @Override // SystemModel
   public List<LocationModel> getLocationModels() {
-    List<LocationModel> items = new ArrayList<>();
-
-    for (ModelComponent item : getMainFolder(FolderKey.LOCATIONS).getChildComponents()) {
-      if (item instanceof LocationModel) {
-        items.add((LocationModel) item);
-      }
-    }
-
-    return items;
+    return getAll(FolderKey.LOCATIONS, LocationModel.class);
   }
 
   @Override // SystemModel
   public List<LocationModel> getLocationModels(LocationTypeModel type) {
     List<LocationModel> items = new ArrayList<>();
-    Iterator<LocationModel> e = getLocationModels().iterator();
-
-    while (e.hasNext()) {
-      LocationModel s = e.next();
-
-      if (s.getLocationType() == type) {
-        items.add(s);
+    for (LocationModel location : getLocationModels()) {
+      if (location.getLocationType() == type) {
+        items.add(location);
       }
     }
 
@@ -289,19 +269,7 @@ class StandardSystemModel
 
   @Override // SystemModel
   public List<PathModel> getPathModels() {
-    List<PathModel> items = new ArrayList<>();
-
-    for (ModelComponent item : getMainFolder(FolderKey.PATHS).getChildComponents()) {
-      // XXX Why is this here? LinkModel is not a subclass of PathModel...
-      if (item instanceof LinkModel) {
-        continue;
-      }
-      if (item instanceof PathModel) {
-        items.add((PathModel) item);
-      }
-    }
-
-    return items;
+    return getAll(FolderKey.PATHS, PathModel.class);
   }
 
   @Override
@@ -317,22 +285,13 @@ class StandardSystemModel
 
   @Override // SystemModel
   public List<LinkModel> getLinkModels() {
-    List<LinkModel> items = new ArrayList<>();
-
-    for (ModelComponent item : getMainFolder(FolderKey.LINKS).getChildComponents()) {
-      if (item instanceof LinkModel) {
-        items.add((LinkModel) item);
-      }
-    }
-
-    return items;
+    return getAll(FolderKey.LINKS, LinkModel.class);
   }
 
   @Override // SystemModel
   public List<LinkModel> getLinkModels(LocationTypeModel locationType) {
     List<LinkModel> items = new ArrayList<>();
-
-    for (LinkModel ref : getAll(FolderKey.LINKS, LinkModel.class)) {
+    for (LinkModel ref : getLinkModels()) {
       if (ref.getLocation().getLocationType() == locationType) {
         items.add(ref);
       }
@@ -343,12 +302,7 @@ class StandardSystemModel
 
   @Override // SystemModel
   public List<LocationTypeModel> getLocationTypeModels() {
-    List<LocationTypeModel> result = new ArrayList<>();
-    for (ModelComponent component
-             : getMainFolder(FolderKey.LOCATION_TYPES).getChildComponents()) {
-      result.add((LocationTypeModel) component);
-    }
-    return result;
+    return getAll(FolderKey.LOCATION_TYPES, LocationTypeModel.class);
   }
 
   @Override // SystemModel
@@ -364,40 +318,22 @@ class StandardSystemModel
 
   @Override // SystemModel
   public List<BlockModel> getBlockModels() {
-    List<BlockModel> result = new ArrayList<>();
-    for (ModelComponent component : getMainFolder(FolderKey.BLOCKS).getChildComponents()) {
-      result.add((BlockModel) component);
-    }
-    return result;
+    return getAll(FolderKey.BLOCKS, BlockModel.class);
   }
 
   @Override // SystemModel
   public List<GroupModel> getGroupModels() {
-    List<GroupModel> result = new ArrayList<>();
-    for (ModelComponent component : getMainFolder(FolderKey.GROUPS).getChildComponents()) {
-      result.add((GroupModel) component);
-    }
-    return result;
+    return getAll(FolderKey.GROUPS, GroupModel.class);
   }
 
   @Override // SystemModel
   public List<StaticRouteModel> getStaticRouteModels() {
-    List<StaticRouteModel> result = new ArrayList<>();
-    for (ModelComponent component
-             : getMainFolder(FolderKey.STATIC_ROUTES).getChildComponents()) {
-      result.add((StaticRouteModel) component);
-    }
-    return result;
+    return getAll(FolderKey.STATIC_ROUTES, StaticRouteModel.class);
   }
 
   @Override // SystemModel
   public List<OtherGraphicalElement> getOtherGraphicalElements() {
-    List<OtherGraphicalElement> result = new ArrayList<>();
-    for (ModelComponent component
-             : getMainFolder(FolderKey.OTHER_GRAPHICAL_ELEMENTS).getChildComponents()) {
-      result.add((OtherGraphicalElement) component);
-    }
-    return result;
+    return getAll(FolderKey.OTHER_GRAPHICAL_ELEMENTS, OtherGraphicalElement.class);
   }
 
   @Override
@@ -448,6 +384,23 @@ class StandardSystemModel
       }
     }
     return result;
+  }
+
+  private ModelComponent getModelComponent(String name, ModelComponent root) {
+    if (root instanceof CompositeModelComponent) {
+      for (ModelComponent subComponent : root.getChildComponents()) {
+        ModelComponent result = getModelComponent(name, subComponent);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    else {
+      if (Objects.equals(name, root.getName())) {
+        return root;
+      }
+    }
+    return null;
   }
 
   private void mapLayoutElement(TCSObjectReference<?> reference,

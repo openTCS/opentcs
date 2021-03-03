@@ -15,10 +15,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -57,7 +59,7 @@ import org.slf4j.helpers.MessageFormatter;
  * Implementation of <code>ModelReader</code> to deserialize a
  * <code>SystemModel</code>.
  *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
+ * @author Philipp Seifert (Fraunhofer IML)
  */
 public class ModelJAXBReader
     implements ModelReader {
@@ -65,22 +67,16 @@ public class ModelJAXBReader
   /**
    * This class' logger.
    */
-  private static final Logger log = LoggerFactory.getLogger(ModelJAXBValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ModelValidator.class);
 
   /**
    * The <code>SystemModel</code> that will contain the read model.
    */
-  private final SystemModel systemModel;
-  /**
-   * Converts JAXB classes to ModelComponents.
-   */
-  private final ModelComponentConverter modelConverter;
-
+  private final Provider<SystemModel> systemModelProvider;
   /**
    * Validates model components and the system model.
    */
-  private final ModelJAXBValidator validator;
-
+  private final ModelValidator validator;
   /**
    * The status panel of the plant overview.
    */
@@ -89,24 +85,24 @@ public class ModelJAXBReader
   /**
    * Creates a new instance.
    *
-   * @param systemModel the system model
+   * @param systemModelProvider the system model
    * @param validator the validator
    * @param statusPanel the status panel
    */
   @Inject
-  public ModelJAXBReader(Provider<SystemModel> systemModel,
-                         ModelJAXBValidator validator,
+  public ModelJAXBReader(Provider<SystemModel> systemModelProvider,
+                         ModelValidator validator,
                          StatusPanel statusPanel) {
-    this.systemModel = requireNonNull(systemModel, "systemModel is null").get();
-    modelConverter = new ModelComponentConverter();
+    this.systemModelProvider = requireNonNull(systemModelProvider, "systemModelProvider");
     this.validator = requireNonNull(validator, "validator");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
   }
 
   @Override
-  public SystemModel deserialize(File file)
+  public Optional<SystemModel> deserialize(File file)
       throws IOException, IllegalArgumentException {
     requireNonNull(file, "file is null");
+    SystemModel systemModel = systemModelProvider.get();
     String modelName
         = file.getName().replaceFirst("[.][^.]+$", ""); //remove extension;
     if (modelName != null && !modelName.isEmpty()) {
@@ -127,10 +123,11 @@ public class ModelJAXBReader
 
       CourseModel courseModel = (CourseModel) jaxbUnmarshaller.unmarshal(xsr);
       Set<String> errors = new HashSet<>();
+      ModelComponentConverter modelConverter = new ModelComponentConverter();
       for (CourseElement courseElement : courseModel.getCourseElements()) {
         ModelComponent model = modelConverter.revertCourseElement(courseElement);
         if (validator.isValidWith(systemModel, model)) {
-          addToSystemModel(model);
+          addToSystemModel(model, systemModel);
         }
         else {
           //Gather log information and log/store it in the errors
@@ -143,7 +140,7 @@ public class ModelJAXBReader
           String message = MessageFormatter.arrayFormat(
               "[Row {},Column {}] Invalid {}: \n  " + validationErrors,
               args).getMessage();
-          log.warn(message);
+          LOG.warn(message);
           errors.add(message);
 
         }
@@ -164,16 +161,21 @@ public class ModelJAXBReader
       throw e;
     }
     catch (XMLStreamException e) {
-      log.warn("Exception while reading model file.", e);
+      LOG.warn("Exception while reading model file.", e);
     }
 
-    return systemModel;
+    return Optional.of(systemModel);
+  }
+
+  @Override
+  public FileFilter getDialogFileFilter() {
+    return ModelJAXBConstants.DIALOG_FILE_FILTER;
   }
 
   /**
    * Add the given model to the system model.
    */
-  private void addToSystemModel(ModelComponent model) {
+  private void addToSystemModel(ModelComponent model, SystemModel systemModel) {
     if (model instanceof BlockModel) {
       systemModel.getMainFolder(FolderKey.BLOCKS).add(model);
     }

@@ -301,7 +301,7 @@ class KernelStateOperating
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       getModel().setPathLocked(ref, locked);
-      router.updateRoutingTables();
+      router.topologyChanged();
       // XXX Check if we need to re-route any vehicles?
     }
   }

@@ -30,22 +30,14 @@ public class UtilInjectionModule
 
     bind(VehicleThemeRegistry.class)
         .in(Singleton.class);
-    // XXX There are still some classes that need to access the singleton via
-    // XXX getInstance(), so it also has to be set via setInstance() on startup
-    // XXX for now.
-    bind(DefaultVehicleThemeManager.class)
-        .in(Singleton.class);
     bind(VehicleThemeManager.class)
-        .to(DefaultVehicleThemeManager.class);
+        .to(DefaultVehicleThemeManager.class)
+        .in(Singleton.class);
 
     bind(LocationThemeRegistry.class)
         .in(Singleton.class);
-    // XXX There are still some classes that need to access the singleton via
-    // XXX getInstance(), so it also has to be set via setInstance() on startup
-    // XXX for now.
-    bind(DefaultLocationThemeManager.class)
-        .in(Singleton.class);
     bind(LocationThemeManager.class)
-        .to(DefaultLocationThemeManager.class);
+        .to(DefaultLocationThemeManager.class)
+        .in(Singleton.class);
   }
 }

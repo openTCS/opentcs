@@ -12,7 +12,7 @@ package org.opentcs.guing.model.elements;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
@@ -78,10 +78,6 @@ public class VehicleModel
    */
   private Color fDriveOrderColor = Color.BLACK;
   /**
-   * Flag, whether the colors will get darker or brighter.
-   */
-  private boolean driveOrderColorDesc = false;
-  /**
    * The state of the drive order.
    */
   private TransportOrder.State fDriveOrderState;
@@ -102,7 +98,6 @@ public class VehicleModel
    * Creates a new instance.
    */
   public VehicleModel() {
-    super();
     createProperties();
   }
 
@@ -198,53 +193,7 @@ public class VehicleModel
    * @param driveOrderComponents A list with the components.
    */
   public void setDriveOrderComponents(List<FigureComponent> driveOrderComponents) {
-    if (fDriveOrderComponents == null && driveOrderComponents != null) {
-      updateDriveOrderColor();
-    }
     fDriveOrderComponents = driveOrderComponents;
-  }
-
-  /**
-   * Updates the drive order color by making it darker or brighter.
-   * It depends on the current color and the flag <code>driveOrderColorDesc</code>.
-   */
-  private void updateDriveOrderColor() {
-    int red = fDriveOrderColor.getRed();
-    int green = fDriveOrderColor.getGreen();
-    int blue = fDriveOrderColor.getBlue();
-
-    if (red >= 240 || green >= 240 || blue >= 240) {
-      driveOrderColorDesc = true;
-    }
-    else if (red < 30 && red > 0 || green < 30 && green > 0 || blue < 30 && blue > 0) {
-      driveOrderColorDesc = false;
-    }
-
-    if (driveOrderColorDesc) {
-      red *= 0.8;
-      green *= 0.8;
-      blue *= 0.8;
-      fDriveOrderColor = new Color(red, green, blue);
-    }
-    else {
-      red *= 1.2;
-      green *= 1.2;
-      blue *= 1.2;
-
-      if (red > 240) {
-        red = 240;
-      }
-
-      if (green > 240) {
-        green = 240;
-      }
-
-      if (blue > 240) {
-        blue = 240;
-      }
-
-      fDriveOrderColor = new Color(red, green, blue);
-    }
   }
 
   /**
@@ -262,7 +211,7 @@ public class VehicleModel
    * @param color The color.
    */
   public void setDriveOrderColor(Color color) {
-    fDriveOrderColor = Objects.requireNonNull(color, "color is null");
+    fDriveOrderColor = requireNonNull(color, "color is null");
   }
 
   /**

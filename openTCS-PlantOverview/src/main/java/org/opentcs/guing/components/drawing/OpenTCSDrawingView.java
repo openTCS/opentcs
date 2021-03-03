@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -154,8 +155,7 @@ public abstract class OpenTCSDrawingView
   /**
    * This class's logger.
    */
-  private static final Logger logger
-      = LoggerFactory.getLogger(OpenTCSDrawingView.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OpenTCSDrawingView.class);
   /**
    * Decoration of paths, points and locations that are part of a block.
    */
@@ -318,8 +318,7 @@ public abstract class OpenTCSDrawingView
   /**
    * Handles edits of bezier liners.
    */
-  private final BezierLinerEditHandler bezierLinerEditHandler
-      = new BezierLinerEditHandler();
+  private final BezierLinerEditHandler bezierLinerEditHandler = new BezierLinerEditHandler();
   /**
    * Handles events for blocks.
    */
@@ -366,11 +365,20 @@ public abstract class OpenTCSDrawingView
     setOpaque(true);
     setAutoscrolls(true);
 
-    orderColorCycler = Iterators.cycle(Color.GRAY, Color.MAGENTA,
-                                       Color.BLUE, Color.CYAN,
-                                       Color.PINK, Color.RED,
-                                       Color.ORANGE, Color.YELLOW,
-                                       Color.GREEN, Color.DARK_GRAY);
+    orderColorCycler = Iterators.cycle(Color.DARK_GRAY,
+                                       Color.MAGENTA,
+                                       Color.BLUE,
+                                       Color.CYAN,
+                                       Color.PINK,
+                                       Color.RED,
+                                       Color.GREEN,
+                                       Color.GRAY,
+                                       new Color(255, 128, 0),
+                                       new Color(0, 128, 255),
+                                       new Color(128, 0, 255),
+                                       new Color(64, 64, 128),
+                                       new Color(64, 128, 64),
+                                       new Color(128, 64, 128));
   }
 
   @Override
@@ -757,12 +765,17 @@ public abstract class OpenTCSDrawingView
    *
    * @param model The vehicle model.
    */
-  public void followVehicle(final VehicleModel model) {
+  public void followVehicle(@Nonnull final VehicleModel model) {
+    requireNonNull(model, "model");
+
     stopFollowVehicle();
     fFocusVehicle = model;
     fFocusVehicle.setViewFollows(true);
-    model.getFigure().addPropertyChangeListener(this);
-    scrollTo(fFocusVehicle.getFigure());
+    VehicleFigure vFigure = fFocusVehicle.getFigure();
+    if (vFigure != null) {
+      vFigure.addPropertyChangeListener(this);
+      scrollTo(vFigure);
+    }
   }
 
   /**
@@ -774,7 +787,10 @@ public abstract class OpenTCSDrawingView
     }
 
     fFocusVehicle.setViewFollows(false);
-    fFocusVehicle.getFigure().removePropertyChangeListener(this);
+    VehicleFigure vFigure = fFocusVehicle.getFigure();
+    if (vFigure != null) {
+      vFigure.removePropertyChangeListener(this);
+    }
     fFocusVehicle = null;
     repaint();
   }
@@ -883,7 +899,7 @@ public abstract class OpenTCSDrawingView
       drawing.draw(g2d);
     }
     catch (ConcurrentModificationException e) {
-      logger.warn("Exception from JHotDraw caught while calling DefaultDrawing.draw(). "
+      LOG.warn("Exception from JHotDraw caught while calling DefaultDrawing.draw(). "
           + "Continuing drawing the course.");
       // TODO What to do when it is catched?
     }
@@ -1022,6 +1038,10 @@ public abstract class OpenTCSDrawingView
     }
 
     final Figure currentVehicleFigure = fFocusVehicle.getFigure();
+    if (currentVehicleFigure == null) {
+      return;
+    }
+
     Rectangle2D.Double bounds = currentVehicleFigure.getBounds();
     double xCenter = bounds.getCenterX();
     double yCenter = bounds.getCenterY();
@@ -1213,7 +1233,7 @@ public abstract class OpenTCSDrawingView
           }
         }
         catch (InterruptedException ex) {
-          logger.warn("Unexpected exception", ex);
+          LOG.warn("Unexpected exception", ex);
         }
 
         fFocusStaticRoute = null;
@@ -1365,7 +1385,7 @@ public abstract class OpenTCSDrawingView
     List<Handle> result = Collections.unmodifiableList(secondaryHandles);
 
     if (!result.isEmpty()) {
-      logger.info("Secondary handles: {}", result.size());
+      LOG.info("Secondary handles: {}", result.size());
     }
 
     return result;
@@ -1504,12 +1524,12 @@ public abstract class OpenTCSDrawingView
           cachedDrawingArea = drawing.getDrawingArea();
         }
         catch (NullPointerException ex) {
-          logger.warn("NullPointerException in OpenTCSDrawingView.getDrawingArea()", ex);
+          LOG.warn("NullPointerException in OpenTCSDrawingView.getDrawingArea()", ex);
           cachedDrawingArea = new Rectangle2D.Double();
         }
       }
       else {
-        logger.warn("No Drawing in OpenTCSDrawingView.getDrawingArea()");
+        LOG.warn("No Drawing in OpenTCSDrawingView.getDrawingArea()");
         cachedDrawingArea = new Rectangle2D.Double();
       }
     }
@@ -1712,18 +1732,7 @@ public abstract class OpenTCSDrawingView
     requireNonNull(vehicle, "vehicle");
 
     if (visible) {
-      Color color;
-      if (vehicle.getName().toLowerCase().contains("green")) {
-        color = Color.green;
-      }
-      else if (vehicle.getName().toLowerCase().contains("blue")) {
-        color = Color.blue;
-      }
-      else {
-        color = orderColorCycler.next();
-      }
-
-      vehicle.setDriveOrderColor(color);
+      vehicle.setDriveOrderColor(orderColorCycler.next());
 
       if (!fVehicles.contains(vehicle)) {
         fVehicles.add(vehicle);
@@ -2538,7 +2547,7 @@ public abstract class OpenTCSDrawingView
     // Abort, if not all of the selected figures may be removed from the drawing
     for (Figure figure : deletedFigures) {
       if (!figure.isRemovable()) {
-        logger.info("Figure is not removable: {}", figure);
+        LOG.info("Figure is not removable: {}", figure);
         getToolkit().beep();
         return;
       }

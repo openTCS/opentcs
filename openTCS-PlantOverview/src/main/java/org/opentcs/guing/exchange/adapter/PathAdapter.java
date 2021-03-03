@@ -9,13 +9,10 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import net.engio.mbassy.listener.Handler;
@@ -28,9 +25,10 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
@@ -43,8 +41,11 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for Path objects.
@@ -65,35 +66,52 @@ public class PathAdapter
   private final SharedKernelProvider kernelProvider;
 
   /**
+   * The state of the plant overview.
+   */
+  private final ApplicationState applicationState;
+
+  /**
    * Creates a new instance.
    *
    * @param kernelProvider A kernel provider.
+   * @param applicationState The plant overviews mode.
    * @param model The corresponding model component.
    * @param eventDispatcher The event dispatcher.
    */
   @Inject
   public PathAdapter(SharedKernelProvider kernelProvider,
+                     ApplicationState applicationState,
                      @Assisted PathModel model,
                      @Assisted EventDispatcher eventDispatcher) {
     super(model, eventDispatcher);
     this.kernelProvider = Objects.requireNonNull(kernelProvider, "kernelProvider");
+    this.applicationState = Objects.requireNonNull(applicationState, "applicationState");
   }
 
   @Handler
   public void handlePathLocked(PathLockedEvent event) {
+    if (applicationState.getOperationMode() != OperationMode.OPERATING) {
+      LOG.debug("Ignore PathLockedEvent because the application is not in operating mode.");
+      return;
+    }
     Object localKernelClient = new Object();
+    PathConnection pathConnection = (PathConnection) event.getSource();
+    ModelComponent modelComponent = pathConnection.getModel();
     try {
-      kernelProvider.register(localKernelClient);
-      if (kernelProvider.kernelShared()) {
-        Kernel kernel = kernelProvider.getKernel();
-        boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
-        if (kernelInOperating) {
-          PathConnection pathConnection = (PathConnection) event.getSource();
-          ModelComponent modelComponent = pathConnection.getModel();
-          if (modelComponent.equals(getModel())) {
+      //If the event is from the adapters model we have to update the kernel
+      //else ignore it because another adapter is responsible
+      if (modelComponent.equals(getModel())) {
+        //Try to connect to the kernel
+        kernelProvider.register(localKernelClient);
+        if (kernelProvider.kernelShared()) {
+          Kernel kernel = kernelProvider.getKernel();
+          //Check if the kernel is in operating mode too
+          boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
+          if (kernelInOperating) {
+            //Update the path in the kernel if it exists
             TCSObjectReference<Path> ref
                 = kernel.getTCSObject(Path.class, modelComponent.getName())
-                .getReference();
+                    .getReference();
             if (ref != null) {
               BooleanProperty locked = (BooleanProperty) modelComponent.getProperty(PathModel.LOCKED);
               kernel.setPathLocked(ref, (boolean) locked.getValue());
@@ -157,19 +175,19 @@ public class PathAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel) {
+  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
     requireNonNull(kernel, "kernel");
     ModelComponent srcPoint = getModel().getStartComponent();
     ModelComponent dstPoint = getModel().getEndComponent();
-    
+
     LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.", getModel().getName(), srcPoint, dstPoint);
 
-    Point startPoint = kernel.getTCSObject(Point.class, srcPoint.getName());
+    Point startPoint = plantModel.getPoints().get(srcPoint.getName());
     if (startPoint == null) {
       LOG.warn("Start point with name {} does not exist in kernel, ignored.", srcPoint.getName());
       return;
     }
-    Point endPoint = kernel.getTCSObject(Point.class, dstPoint.getName());
+    Point endPoint = plantModel.getPoints().get(dstPoint.getName());
     if (endPoint == null) {
       LOG.warn("End point with name {} does not exist in kernel, ignored.", dstPoint.getName());
       return;
@@ -190,17 +208,17 @@ public class PathAdapter
       updateProcessVelocity(kernel, reference);
       updateProcessRoutingCost(kernel, reference);
 
-      // Write liner type and position of the control points into
-      // the model layout element
-      Set<VisualLayout> layouts = kernel.getTCSObjects(VisualLayout.class);
+      // Write liner type and position of the control points into the model layout element
 
-      for (VisualLayout layout : layouts) {
-        updateLayoutElement(kernel, layout, reference);
+      for (VisualLayout layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout, reference);
       }
 
       // MISCELLANEOUS
       updateMiscProcessProperties(kernel, reference);
       updateProcessLocked(kernel, reference);
+      
+      plantModel.getPaths().put(name, path);
     }
     catch (KernelRuntimeException e) {
       LOG.warn("", e);
@@ -301,42 +319,34 @@ public class PathAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(Kernel kernel,
-                                   VisualLayout layout,
+  private void updateLayoutElement(VisualLayout layout,
                                    TCSObjectReference<?> ref) {
 
     ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
-    Map<String, String> layoutProperties = layoutElement.getProperties();
 
     AbstractConnection model = (AbstractConnection) getModel();
     // Connection type
     SelectionProperty pType
         = (SelectionProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
     PathModel.LinerType type = (PathModel.LinerType) pType.getValue();
-    layoutProperties.put(ElementPropKeys.PATH_CONN_TYPE, type.name());
+    layoutElement.getProperties().put(ElementPropKeys.PATH_CONN_TYPE, type.name());
 
     // BEZIER control points
     String sControlPoints = "";
 
-    if (type.equals(PathModel.LinerType.BEZIER)) {
+    if (type.equals(PathModel.LinerType.BEZIER) || type.equals(PathModel.LinerType.BEZIER_3)) {
       sControlPoints
-          = buildBezierControlPoints(model, sControlPoints, layoutProperties);
+          = buildBezierControlPoints(model, sControlPoints, layoutElement.getProperties());
     }
     else {
-      layoutProperties.remove(ElementPropKeys.PATH_CONTROL_POINTS);
+      layoutElement.getProperties().remove(ElementPropKeys.PATH_CONTROL_POINTS);
     }
 
     StringProperty pControlPoints = (StringProperty) model.getProperty(
         ElementPropKeys.PATH_CONTROL_POINTS);
     pControlPoints.setText(sControlPoints);
 
-    layoutElement.setProperties(layoutProperties);
-
-    Set<LayoutElement> layoutElements = layout.getLayoutElements();
-    Iterables.removeIf(layoutElements, layoutElementFor(ref));
-    layoutElements.add(layoutElement);
-
-    kernel.setVisualLayoutElements(layout.getReference(), layoutElements);
+    layout.getLayoutElements().add(layoutElement);
   }
 
   private String buildBezierControlPoints(AbstractConnection model,
@@ -346,12 +356,30 @@ public class PathAdapter
     Point2D.Double cp1 = figure.getCp1();
     if (cp1 != null) {
       Point2D.Double cp2 = figure.getCp2();
-
       if (cp2 != null) {
-        // Format: x1,y1;x2,y2
-        sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
-                                       (int) (cp1.y), (int) (cp2.x),
-                                       (int) (cp2.y));
+        Point2D.Double cp3 = figure.getCp3();
+        Point2D.Double cp4 = figure.getCp4();
+        Point2D.Double cp5 = figure.getCp5();
+        if (cp3 != null && cp4 != null && cp5 != null) {
+          // Format: x1,y1;x2,y2;x3,y3;x4,y4;x5,y5
+          sControlPoints = String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d",
+                                         (int) (cp1.x),
+                                         (int) (cp1.y),
+                                         (int) (cp2.x),
+                                         (int) (cp2.y),
+                                         (int) (cp3.x),
+                                         (int) (cp3.y),
+                                         (int) (cp4.x),
+                                         (int) (cp4.y),
+                                         (int) (cp5.x),
+                                         (int) (cp5.y));
+        }
+        else {
+          // Format: x1,y1;x2,y2
+          sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
+                                         (int) (cp1.y), (int) (cp2.x),
+                                         (int) (cp2.y));
+        }
       }
       else {
         // Format: x1,y1
