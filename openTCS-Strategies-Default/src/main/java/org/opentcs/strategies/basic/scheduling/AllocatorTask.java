@@ -93,8 +93,7 @@ class AllocatorTask
       retryWaitingAllocations();
     }
     else {
-      LOG.warn("Unhandled AllocatorCommand implementation {}, ignored.",
-               command.getClass().getName());
+      LOG.warn("Unhandled AllocatorCommand implementation {}, ignored.", command.getClass());
     }
   }
 
@@ -107,35 +106,55 @@ class AllocatorTask
   }
 
   private void processAllocate(AllocatorCommand.Allocate command) {
+    if (!doAllocate(command)) {
+      LOG.debug("{}: Resources unavailable, deferring allocation...", command.getClient().getId());
+      deferredAllocations.add(command);
+      return;
+    }
+
+    LOG.debug("{}: Allocation successful, calling back client...", command.getClient().getId());
+    if (!command.getClient().allocationSuccessful(command.getResources())) {
+      LOG.warn("{}: Client didn't want allocated resources ({}), unallocating them...",
+               command.getClient().getId(),
+               command.getResources());
+      undoAllocate(command);
+      enqueue(new AllocatorCommand.RetryAllocates(command.getClient()));
+    }
+  }
+
+  /**
+   * Allocates the given set of resources, if possible.
+   *
+   * @param command Describes the requested allocation.
+   * @return <code>true</code> if, and only if, the given resources were allocated.
+   */
+  private boolean doAllocate(AllocatorCommand.Allocate command) {
     Set<TCSResource<?>> resourcesExpanded = expandResources(command.getResources());
     synchronized (reservationPool) {
       LOG.debug("{}: Checking if all resources are available...", command.getClient().getId());
-      // Check if the resources in the expanded set are all available and
-      // if we may actually allocate them.
-      boolean allocationAdmissible
-          = reservationPool.resourcesAvailableForUser(resourcesExpanded, command.getClient())
-          && allocationAdvisor.mayAllocate(command.getClient(), command.getResources());
-      if (allocationAdmissible) {
-        LOG.debug("{}: All resources available", command.getClient().getId());
-        // Allocate resources.
-        for (TCSResource<?> curRes : command.getResources()) {
-          reservationPool.getReservationEntry(curRes).allocate(command.getClient());
-        }
-        // Notify the client about the allocation.
-        // If it doesn't want the resources any more, free them.
-        LOG.debug("{}: Allocation successful, calling back client", command.getClient().getId());
-        if (!command.getClient().allocationSuccessful(command.getResources())) {
-          LOG.warn("{}: client didn't want allocated resources ({}), releasing them",
-                   command.getClient().getId(),
-                   command.getResources());
-          reservationPool.free(command.getClient(), command.getResources());
-          enqueue(new AllocatorCommand.RetryAllocates(command.getClient()));
-        }
+      if (!(reservationPool.resourcesAvailableForUser(resourcesExpanded, command.getClient())
+            && allocationAdvisor.mayAllocate(command.getClient(), command.getResources()))) {
+        LOG.debug("{}: Resources unavailable.", command.getClient().getId());
+        return false;
       }
-      else {
-        LOG.debug("{}: Resources unavailable, deferring allocation", command.getClient().getId());
-        deferredAllocations.add(command);
+
+      LOG.debug("{}: All resources available, allocating...", command.getClient().getId());
+      // Allocate resources.
+      for (TCSResource<?> curRes : command.getResources()) {
+        reservationPool.getReservationEntry(curRes).allocate(command.getClient());
       }
+      return true;
+    }
+  }
+
+  /**
+   * Unallocates the given set of resources.
+   *
+   * @param command Describes the allocated resources.
+   */
+  private void undoAllocate(AllocatorCommand.Allocate command) {
+    synchronized (reservationPool) {
+      reservationPool.free(command.getClient(), command.getResources());
     }
   }
 

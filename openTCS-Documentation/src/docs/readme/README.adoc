@@ -49,6 +49,10 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.0.1 (2017-02-25)
+
+* Fix a potential deadlock in the default scheduler.
+
 === Version 4.0 (2017-02-11)
 
 * Split the base library into a base API, an injection API and a library with commonly used utility classes to reduce the load of transitive dependencies for API users.

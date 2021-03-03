@@ -14,7 +14,7 @@ For creating transport orders, the openTCS kernel accepts connections to a TCP p
 The communication between openTCS and the host works as follows:
 
 . The host establishes a new TCP/IP connection to openTCS.
-. The host sends a single XML telegram (described in detail in <<XML telegrams for creating orders>> and <<XML telegrams referencing order batches) which either describes the transport orders to be created or identifies batch files that are available with the kernel and that contain the transport order descriptions.
+. The host sends a single XML telegram (described in detail in <<XML telegrams for creating orders>> and <<XML telegrams referencing order batches>>) which either describes the transport orders to be created or identifies batch files that are available with the kernel and that contain the transport order descriptions.
 . The host closes its output stream of the TCP/IP connection or sends two consecutive line breaks (i.e. \"``\r\n\r\n``"), letting the kernel know that no further data will follow.
 . openTCS interprets the telegram sent by the host, creates the corresponding transport orders and activates them.
 . openTCS sends an XML telegram (described in detail in <<Receipts for created orders>>) to confirm processing of the telegram.

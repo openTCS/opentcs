@@ -74,3 +74,11 @@ The kernel only sends as many ``MovementCommands``s in advance as is required fo
 A vehicle driver may set the maximum number of ``MovementCommand``s it gets in advance by adjusting its command queue capacity.
 . As soon as a `DriveOrder` is finished, the `Route` of the next `DriveOrder` is mapped to ``MovementCommand``s.
 . Once the last `DriveOrder` of a `TransportOrder` is finished, the whole `TransportOrder` is finished, as well.
+
+== Questions and answers
+
+=== Networking
+
+==== How do I enable access to the RMI interface for clients when the kernel is running on a host with multiple IP addresses?
+
+See https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.

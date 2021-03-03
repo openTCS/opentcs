@@ -30,7 +30,6 @@ ${JAVA} -enableassertions \
     -Djava.security.policy=file:${OPENTCS_CONFIGDIR}/java.policy \
     -Dorg.opentcs.util.configuration.xml.file="${OPENTCS_CONFIGDIR}/openTCS-plantoverview-config.xml" \
     -Dorg.opentcs.util.configuration.saveonexit=true \
-    -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n \
     -XX:-OmitStackTraceInFastThrow \
     -classpath "${OPENTCS_CP}" \
     -splash:bin/splash-image.gif \
