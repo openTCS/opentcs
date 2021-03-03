@@ -1,0 +1,76 @@
+//
+// This file is to be applied to every subproject.
+//
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'checkstyle'
+
+apply from: "${rootDir}/versioning.gradle"
+
+String mavenGroupId = 'org.opentcs'
+String mavenVersion = version
+
+String configDir = new File(rootProject.projectDir, 'config').absolutePath
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-15'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+  compile group: 'com.google.guava', name: 'guava', version: '18.0'
+  // compile group: 'com.google.guava', name: 'guava', version: '18.0', classifier: 'sources'
+
+  testCompile group: 'junit', name: 'junit', version: '4.11'
+  testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+}
+
+checkstyle {
+  toolVersion = '6.5'
+  configFile = rootProject.file('config/checkstyle-openTCS.xml')
+  configProperties = [config:configDir]
+  ignoreFailures = true
+  showViolations = false
+}
+
+String mavenArtifactId = name.toLowerCase()
+archivesBaseName = name.toLowerCase()
+
+group = mavenGroupId
+version = mavenVersion
+
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+test {
+  ignoreFailures = true
+  systemProperties.put("java.awt.headless", "true")
+}
+
+artifacts {
+  archives jar
+  archives sourcesJar
+}
+
+configure(install.repositories.mavenInstaller) {
+  pom.project {
+    groupId = mavenGroupId
+    artifactId = mavenArtifactId
+    version = mavenVersion
+  }
+}
+
+task createFolders(description: 'Creates the source folders if they do not exist.') doLast {
+  sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+    if (!srcDir.isDirectory()) {
+      println "Creating source folder: ${srcDir}"
+      srcDir.mkdirs()
+    }
+  }
+}

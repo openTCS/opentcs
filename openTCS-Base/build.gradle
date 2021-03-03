@@ -1,0 +1,40 @@
+apply plugin: 'java-library-distribution'
+
+dependencies {
+  compile group: 'com.google.inject', name: 'guice', version: '3.0'
+  compile group: 'org.jdom', name: 'jdom2', version: '2.0.5'
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+  options.compilerArgs << "-Xlint:-rawtypes"
+}
+
+compileTestJava {
+  options.compilerArgs << "-Xlint:all"
+}
+
+processResources {
+  doLast {
+    // Write a properties file with the build version and date so base library
+    // clients can use this information.
+    def props = new Properties()
+    props.setProperty('opentcs.version', version)
+    props.setProperty('opentcs.builddate', project.ext.buildDate)
+  
+    def propsWriter = new FileWriter(new File(sourceSets.main.output.resourcesDir, 'opentcs.properties'))
+    try {
+      props.store(propsWriter, null)
+      propsWriter.flush()
+    }
+    finally {
+      propsWriter.close()
+    }
+  }
+}
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}

@@ -1,0 +1,196 @@
+// Add dependencies for the JDocBook plugin
+buildscript {
+  repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+      name "jboss"
+      url "http://repository.jboss.org/nexus/content/groups/public/"
+    }
+  }
+  dependencies {
+    classpath group: 'org.jboss.jdocbook', name: 'gradle-jdocbook', version: '1.2.2'
+    classpath group: 'net.sf.docbook', name: 'docbook-xsl', version: '1.78.1', classifier: 'ns-resources', ext: 'zip'
+  }
+}
+
+apply plugin: "distribution"
+apply plugin: "jdocbook"
+
+def baseApiDir = new File(buildDir, 'base-api')
+def schemasDir = new File(buildDir, 'schemagen')
+def manualDir = file(buildDir.absolutePath + '/docbook/publish')
+
+ext.collectableDistDir = new File(buildDir, 'install')
+
+configurations {
+  schemagen
+}
+
+dependencies {
+  schemagen project(':openTCS-Base')
+  schemagen project(':openTCS-PlantOverview')
+  schemagen jar.outputs.files
+
+  // Add the JAR containing the stylesheets for DocBook rendering.
+  jdocbookStyles jar.outputs.files
+}
+
+distributions {
+  main {
+    contents.from(baseApiDir) {
+      into('Base-API')
+    }
+    contents.from(schemasDir) {
+      into('XML-Schemas')
+    }
+    contents.from( { filesInSubdirs(manualDir) } ) {
+      into('Manual')
+    }
+  }
+}
+
+installDist {
+  dependsOn 'baseApi'
+  dependsOn 'schemagen'
+  dependsOn 'buildDocs'
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+}
+
+compileTestJava {
+  options.compilerArgs << "-Xlint:all"
+}
+
+// Make sure the JAR containing the stylesheets are built before building
+// DocBook documents.
+// This shouldn't be required any more once the JDocBook plugin is fixed.
+// See http://discuss.gradle.org/t/how-to-declare-a-dependency-on-another-configurations-artifact-in-the-same-project/8814
+afterEvaluate {
+  tasks.findAll() { task ->
+    if (task.name.startsWith('stageStyles_')) {
+      task.dependsOn('assemble')
+    }
+  }
+}
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+task baseApi(type: Javadoc, description: 'Creates Javadoc for base lib.') {
+  title = "openTCS ${project.version} Base API documentation"
+  destinationDir = baseApiDir
+
+  source = project(':openTCS-Base').sourceSets.main.allJava
+  classpath = project(':openTCS-Base').sourceSets.main.compileClasspath
+  options {
+    encoding = 'ISO-8859-15'
+    header = "openTCS ${project.version}"
+    footer = "openTCS ${project.version}"
+    overview = "${project(':openTCS-Base').projectDir}/src/main/java/overview.html"
+    group("Basic data structures", "org.opentcs.data*")
+    group("Interfaces and supporting classes for accessing the kernel", "org.opentcs.access*")
+    group("Pluggable kernel algorithms and strategies", "org.opentcs.algorithms*")
+    group("Vehicle driver framework", "org.opentcs.drivers*")
+    group("Utility classes", "org.opentcs.util*")
+  }
+}
+
+jdocbook {
+  manual {
+    masterSourceDocumentName = 'openTCS-manual-en.xml'
+    format {
+      name = 'pdf'
+      finalName = "openTCS-manual-en.pdf"
+      stylesheet = "classpath:/opentcs-jdocbook-style/xslt/opentcs-fo.xsl"
+    }
+  }
+  
+  readme {
+    masterSourceDocumentName = 'README.xml'
+    format {
+      name = 'xhtml'
+      finalName = "README.html"
+      stylesheet = "classpath:/opentcs-jdocbook-style/xslt/opentcs-xhtml.xsl"
+    }
+  }
+}
+
+task schemagen(dependsOn: ['assemble', ':openTCS-Base:assemble', ':openTCS-PlantOverview:assemble']) {
+  File schemagenDir = schemasDir
+
+  project(':openTCS-Base').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+    inputs.dir srcDir
+  }
+  project(':openTCS-PlantOverview').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+    inputs.dir srcDir
+  }
+  outputs.dir schemagenDir
+
+  doLast {
+    mkdir(schemagenDir)
+    
+    javaexec {
+      classpath configurations.schemagen
+      main = "org.opentcs.documentation.JAXBSchemaGenerator"
+      args = [ "${schemagenDir}/openTCS-host-order.xsd",
+             "org.opentcs.access.xmlorders.TCSOrderSet",
+             "org.opentcs.access.xmlorders.Transport",
+             "org.opentcs.access.xmlorders.TransportScript" ]
+    }
+    javaexec {
+      classpath configurations.schemagen
+      main = "org.opentcs.documentation.JAXBSchemaGenerator"
+      args = [ "${schemagenDir}/openTCS-host-orderscript.xsd",
+             "org.opentcs.access.xmlorders.TCSScriptFile",
+             "org.opentcs.access.xmlorders.Transport",
+             "org.opentcs.access.xmlorders.TransportScript" ]
+    }
+    javaexec {
+      classpath configurations.schemagen
+      main = "org.opentcs.documentation.JAXBSchemaGenerator"
+      args = [ "${schemagenDir}/openTCS-host-response.xsd",
+             "org.opentcs.access.xmlorders.TCSResponseSet",
+             "org.opentcs.access.xmlorders.TransportResponse",
+             "org.opentcs.access.xmlorders.ScriptResponse" ]
+    }
+    javaexec {
+      classpath configurations.schemagen
+      main = "org.opentcs.documentation.JAXBSchemaGenerator"
+      args = [ "${schemagenDir}/openTCS-host-statuschannel.xsd",
+             "org.opentcs.access.xmlstatus.TCSStatusMessageSet",
+             "org.opentcs.access.xmlstatus.OrderStatusMessage",
+             "org.opentcs.access.xmlstatus.VehicleStatusMessage" ]
+    }
+    javaexec {
+      classpath configurations.schemagen
+      main = "org.opentcs.documentation.JAXBSchemaGenerator"
+      args = [ "${schemagenDir}/openTCS-plantoverview-persistence.xsd",
+             "org.opentcs.guing.persistence.CourseModel",
+             "org.opentcs.guing.persistence.CourseElement",
+             "org.opentcs.guing.persistence.CourseObjectProperty",
+             "org.opentcs.guing.persistence.KeyValueSetListWrapper" ]
+    }
+  }
+}
+
+Set<File> filesInSubdirs(File dir) {
+  Set<File> result = new HashSet<>()
+  if (!dir.isDirectory()) {
+    return result;
+  }
+  for (File curFile in dir.listFiles()) {
+    if (curFile.isDirectory()) {
+      result.addAll(filesInSubdirs(curFile))
+    }
+    else if (curFile.isFile()) {
+      result.addAll(curFile)
+    }
+  }
+  return result;
+}

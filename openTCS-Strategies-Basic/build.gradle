@@ -1,0 +1,20 @@
+apply plugin: 'java-library-distribution'
+
+dependencies {
+  compile project(':openTCS-Base')
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+  options.compilerArgs << "-Xlint:-rawtypes"
+}
+
+compileTestJava {
+  options.compilerArgs << "-Xlint:all"
+}
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}

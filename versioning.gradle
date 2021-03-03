@@ -1,0 +1,18 @@
+// Semantic versioning:
+// - The major version number should be incremented with major API-breaking
+//   changes.
+// - The minor version number should be incremented when new feature were added.
+// - The patch level should be incremented with every small change to the code
+//   (e.g. bugfixes).
+def versionMajor = 3
+def versionMinor = 2
+def versionPatch = 0
+def versionBuild = System.env.BUILD_NUMBER
+// If we do not have a build number, we're building on a developer's system, so
+// mark the artifact as a snapshot build.
+if (!versionBuild) {
+  versionBuild = "0-SNAPSHOT"
+}
+
+version = "$versionMajor.$versionMinor.$versionPatch.$versionBuild"
+project.ext.buildDate = new Date().format('yyyy-MM-dd HH:mm:ss')

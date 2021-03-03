@@ -1,0 +1,70 @@
+import org.gradle.api.artifacts.*
+
+apply plugin: 'base' // To add "clean" task to the root project.
+apply plugin: 'distribution'
+
+apply from: "${rootDir}/versioning.gradle"
+
+subprojects {
+  apply from: rootProject.file('common.gradle')
+}
+evaluationDependsOnChildren()
+
+distributions {
+  main {
+    contents.from {
+      project(':openTCS-Kernel').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-PlantOverview').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-Documentation').ext.collectableDistDir
+    }
+  }
+}
+
+installDist {
+  dependsOn(':openTCS-Kernel:installApp')
+  dependsOn(':openTCS-PlantOverview:installApp')
+  dependsOn(':openTCS-Documentation:installDist')
+}
+
+distZip {
+  classifier = 'bin'
+  dependsOn installDist
+}
+
+task distSrcZip(type: Zip) {
+  classifier = 'src'
+  from "${rootDir}"
+
+  includes << 'config/**'
+  includes << 'gradle/**'
+  includes << 'lib/**'
+  includes << 'openTCS-*/**'
+  includes << 'src/**'
+  includes << '.nb-gradle-properties'
+  includes << '*.gradle'
+  includes << 'gradlew'
+  includes << 'gradlew.bat'
+
+  excludes << '.gradle'
+  excludes << '**/build'
+}
+
+task build {
+  dependsOn subprojects*.build
+}
+
+task release {
+  dependsOn build
+  dependsOn subprojects*.release
+  dependsOn installDist
+  dependsOn distZip
+  dependsOn distSrcZip
+}
+
+task wrapper(type: Wrapper, description: 'Creates and deploys the Gradle wrapper to the current directory.') {
+  gradleVersion = '2.1'
+}

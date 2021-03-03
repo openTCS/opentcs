@@ -1,0 +1,14 @@
+openTCS is released as free software and is available for licensing under Open
+Source conditions (see below). Copyright holders of the original software are
+Fraunhofer IML and ifak e.V.. Additional contributors may hold copyright of
+parts of the software, which is then documented in the respective source code
+files.
+
+openTCS is available for licensing under the following conditions:
+
+- All parts of the openTCS software that are not explicitly mentioned as
+  exceptions here are subject to the MIT license; see the file LICENSE-MIT.txt
+  for the license text.
+- The openTCS visualization client software, consisting of the Java classes in
+  package org.opentcs.guing, is subject to the GNU Lesser General Public
+  License (LGPL); see the file LICENSE-LGPL.txt for the license text.
