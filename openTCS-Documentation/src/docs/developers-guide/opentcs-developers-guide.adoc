@@ -16,5 +16,3 @@ include::04_default-strategies.adoc[]
 include::05_extending-kernel.adoc[]
 
 include::06_extending-plantoverview.adoc[]
-
-include::99_appendix.adoc[]

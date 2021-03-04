@@ -41,6 +41,7 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
+import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OrderSequenceEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.util.IconToolkit;
@@ -126,6 +127,14 @@ public class OrderSequencesContainerPanel
         break;
       default:
       // Do nada.
+    }
+  }
+
+  @Handler
+  public void processEvent(KernelStateChangeEvent event) {
+    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
+      fTableModel.setRowCount(0);
+      fTableModel.fireTableDataChanged();
     }
   }
 

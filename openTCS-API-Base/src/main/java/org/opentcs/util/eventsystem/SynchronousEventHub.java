@@ -9,6 +9,8 @@ package org.opentcs.util.eventsystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An <code>EventHub</code> implementation that dispatches events synchronously,
@@ -21,17 +23,28 @@ public class SynchronousEventHub<E extends Event>
     extends EventHub<E> {
 
   /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(SynchronousEventHub.class);
+
+  /**
    * Creates a new SynchronousEventHub.
    */
   public SynchronousEventHub() {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void processEvent(E event) {
     for (Map.Entry<EventListener<E>, EventFilter<E>> curEntry
              : new HashMap<>(getEventListeners()).entrySet()) {
-      if (curEntry.getValue().accept(event)) {
-        curEntry.getKey().processEvent(event);
+      try {
+        if (curEntry.getValue().accept(event)) {
+          curEntry.getKey().processEvent(event);
+        }
+      }
+      catch (Exception exc) {
+        LOG.warn("Exception thrown by event handler", exc);
       }
     }
   }

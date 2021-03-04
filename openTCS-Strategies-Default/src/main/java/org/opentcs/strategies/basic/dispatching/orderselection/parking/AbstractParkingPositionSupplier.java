@@ -5,14 +5,14 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching.parking;
+package org.opentcs.strategies.basic.dispatching.orderselection.parking;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.TCSObjectReference;
@@ -41,7 +41,7 @@ public abstract class AbstractParkingPositionSupplier
    * A map containing all points in the model that are parking positions as keys
    * and sets of all points sharing the same block(s) as values.
    */
-  private final Map<Point, Set<Point>> parkingPositions = new HashMap<>();
+  private final Map<Point, Set<Point>> parkingPositions = new ConcurrentHashMap<>();
   /**
    * Indicates whether this component is initialized.
    */

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -459,6 +461,14 @@ public class LoopbackCommunicationAdapterPanel
   private void clearOpSpecDetailPanel() {
     setOpSpecDetailPanel(null);
   }
+
+  private Set<OperationSpec> opSpecListModeltoSet(ListModel<OperationSpec> listModel) {
+    Set<OperationSpec> opSpecSet = new HashSet<>();
+    for (int i = 0; i < listModel.getSize(); i++) {
+      opSpecSet.add(listModel.getElementAt(i));
+    }
+    return opSpecSet;
+  }
   // CHECKSTYLE:OFF
 
   /**
@@ -472,6 +482,7 @@ public class LoopbackCommunicationAdapterPanel
 
     modeButtonGroup = new javax.swing.ButtonGroup();
     fileChooser = new javax.swing.JFileChooser();
+    propertyEditorGroup = new javax.swing.ButtonGroup();
     vehicleBahaviourPanel = new javax.swing.JPanel();
     PropsPowerOuterContainerPanel = new javax.swing.JPanel();
     PropsPowerInnerContainerPanel = new javax.swing.JPanel();
@@ -549,6 +560,14 @@ public class LoopbackCommunicationAdapterPanel
     stateTxt = new javax.swing.JTextField();
     jLabel3 = new javax.swing.JLabel();
     precisePosTextArea = new javax.swing.JTextArea();
+    propertySetterPanel = new javax.swing.JPanel();
+    keyLabel = new javax.swing.JLabel();
+    valueTextField = new javax.swing.JTextField();
+    propSetButton = new javax.swing.JButton();
+    removePropRadioBtn = new javax.swing.JRadioButton();
+    setPropValueRadioBtn = new javax.swing.JRadioButton();
+    jPanel3 = new javax.swing.JPanel();
+    keyTextField = new javax.swing.JTextField();
     eventPanel = new javax.swing.JPanel();
     includeAppendixCheckBox = new javax.swing.JCheckBox();
     appendixTxt = new javax.swing.JTextField();
@@ -1325,6 +1344,79 @@ public class LoopbackCommunicationAdapterPanel
     stateContainerPanel.add(curPosPanel);
     curPosPanel.getAccessibleContext().setAccessibleName("Change");
 
+    propertySetterPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("PropertySetterPanelTitel"))); // NOI18N
+    propertySetterPanel.setLayout(new java.awt.GridBagLayout());
+
+    keyLabel.setText(bundle.getString("keyPanelText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+    propertySetterPanel.add(keyLabel, gridBagConstraints);
+
+    valueTextField.setMaximumSize(new java.awt.Dimension(4, 18));
+    valueTextField.setMinimumSize(new java.awt.Dimension(4, 18));
+    valueTextField.setPreferredSize(new java.awt.Dimension(100, 20));
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    propertySetterPanel.add(valueTextField, gridBagConstraints);
+
+    propSetButton.setText(bundle.getString("setPropertyButtonText")); // NOI18N
+    propSetButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        propSetButtonActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridwidth = 2;
+    propertySetterPanel.add(propSetButton, gridBagConstraints);
+
+    propertyEditorGroup.add(removePropRadioBtn);
+    removePropRadioBtn.setText(bundle.getString("removePropertyRadioButtonText")); // NOI18N
+    removePropRadioBtn.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        removePropRadioBtnActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    propertySetterPanel.add(removePropRadioBtn, gridBagConstraints);
+
+    propertyEditorGroup.add(setPropValueRadioBtn);
+    setPropValueRadioBtn.setSelected(true);
+    setPropValueRadioBtn.setText(bundle.getString("setPropertyRadioButtonText")); // NOI18N
+    setPropValueRadioBtn.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        setPropValueRadioBtnActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    propertySetterPanel.add(setPropValueRadioBtn, gridBagConstraints);
+
+    jPanel3.setLayout(new java.awt.GridBagLayout());
+
+    keyTextField.setPreferredSize(new java.awt.Dimension(100, 20));
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    jPanel3.add(keyTextField, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    propertySetterPanel.add(jPanel3, gridBagConstraints);
+
+    stateContainerPanel.add(propertySetterPanel);
+
     eventPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Event_dispatching"))); // NOI18N
     eventPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -1532,7 +1624,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 private void addOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addOpSpecButtonActionPerformed
   // Get input from dialog
-  EditOperationSpecDialog dialog = new EditOperationSpecDialog(commAdapter);
+  EditOperationSpecDialog dialog = new EditOperationSpecDialog(commAdapter,
+                                                               opSpecListModeltoSet(operationSpecList.getModel()));
   dialog.setLocationRelativeTo(this);
   dialog.setVisible(true);
   OperationSpec newOpSpec = dialog.getOperationSpec();
@@ -1562,10 +1655,13 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     DefaultListModel<OperationSpec> model
         = (DefaultListModel<OperationSpec>) operationSpecList.getModel();
     int index = operationSpecList.getSelectedIndex();
+
     if (index != -1) {
       // Open dialog to edit the data 
       OperationSpec opSpec = model.get(index);
-      EditOperationSpecDialog dialog = new EditOperationSpecDialog(commAdapter, opSpec);
+      EditOperationSpecDialog dialog = new EditOperationSpecDialog(commAdapter,
+                                                                   opSpec,
+                                                                   opSpecListModeltoSet(model));
       dialog.setLocationRelativeTo(this);
       dialog.setVisible(true);
       // Update table data
@@ -2091,8 +2187,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
   }//GEN-LAST:event_includeAppendixCheckBoxItemStateChanged
 
   private void dispatchEventButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchEventButtonActionPerformed
-    String appendix
-        = includeAppendixCheckBox.isSelected() ? appendixTxt.getText() : null;
+    String appendix = includeAppendixCheckBox.isSelected() ? appendixTxt.getText() : null;
     vehicleModel.publishEvent(new VehicleCommAdapterEvent(commAdapter.getName(), appendix));
   }//GEN-LAST:event_dispatchEventButtonActionPerformed
 
@@ -2102,6 +2197,20 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       vehicleModel.commandFailed(commAdapter.getSentQueue().peek());
     }
   }//GEN-LAST:event_dispatchCommandFailedButtonActionPerformed
+
+  private void propSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_propSetButtonActionPerformed
+    this.vehicleModel.setVehicleProperty(
+        keyTextField.getText(),
+        setPropValueRadioBtn.isSelected() ? valueTextField.getText() : null);
+  }//GEN-LAST:event_propSetButtonActionPerformed
+
+  private void removePropRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removePropRadioBtnActionPerformed
+    valueTextField.setEnabled(false);
+  }//GEN-LAST:event_removePropRadioBtnActionPerformed
+
+  private void setPropValueRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setPropValueRadioBtnActionPerformed
+    valueTextField.setEnabled(true);
+  }//GEN-LAST:event_setPropValueRadioBtnActionPerformed
 
   /**
    * Set the specified precise position to the text area. The method takes care
@@ -2173,7 +2282,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
   private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel3;
   private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JLabel keyLabel;
+  private javax.swing.JTextField keyTextField;
   private javax.swing.JPanel loadDevicePanel;
   private javax.swing.JLabel loadHandlingDevicesLabel;
   private javax.swing.JButton loadProfilesButton;
@@ -2219,13 +2331,19 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
   private javax.swing.JLabel precisePosUnitLabel;
   private javax.swing.JPanel profilesContainerPanel;
   private javax.swing.JPanel profilesPanel;
+  private javax.swing.JButton propSetButton;
+  private javax.swing.ButtonGroup propertyEditorGroup;
+  private javax.swing.JPanel propertySetterPanel;
+  private javax.swing.JRadioButton removePropRadioBtn;
   private javax.swing.JButton rmOpSpecButton;
   private javax.swing.JButton saveDeviceButton;
   private javax.swing.JButton saveProfileButton;
+  private javax.swing.JRadioButton setPropValueRadioBtn;
   private javax.swing.JRadioButton singleModeRadioButton;
   private javax.swing.JPanel stateContainerPanel;
   private javax.swing.JTextField stateTxt;
   private javax.swing.JButton triggerButton;
+  private javax.swing.JTextField valueTextField;
   private javax.swing.JPanel vehicleBahaviourPanel;
   private javax.swing.JPanel vehiclePowerPanel;
   private javax.swing.JPanel vehiclePropsPanel;

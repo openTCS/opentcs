@@ -9,6 +9,7 @@
 package org.opentcs.guing.plugins.panels.allocation;
 
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.Kernel;
@@ -26,6 +27,11 @@ import org.opentcs.components.plantoverview.PluggablePanelFactory;
 public class ResourceAllocationPanelFactory
     implements PluggablePanelFactory {
 
+  /**
+   * This classe's bundle.
+   */
+  private final ResourceBundle bundle
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/allocation/Bundle");
   /**
    * The provider for the kernel.
    */
@@ -57,7 +63,7 @@ public class ResourceAllocationPanelFactory
 
   @Override
   public String getPanelDescription() {
-    return "Resource Allocation";
+    return bundle.getString("resource_allocation");
   }
 
   @Override

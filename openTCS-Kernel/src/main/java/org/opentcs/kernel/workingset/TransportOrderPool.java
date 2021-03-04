@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
@@ -1084,7 +1085,7 @@ public class TransportOrderPool {
     }
     checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
     checkArgument(Objects.equals(to.getIntendedVehicleName(),
-                                 sequence.getIntendedVehicle().getName()),
+                                 getIntendedVehicleName(sequence)),
                   "Order sequence %s has different intended vehicle than order %s: %s != %s",
                   sequence,
                   to.getName(),
@@ -1126,5 +1127,9 @@ public class TransportOrderPool {
     }
     return result;
   }
-
+  
+  @Nullable
+  private String getIntendedVehicleName(OrderSequence sequence) {
+    return sequence.getIntendedVehicle() == null ? null : sequence.getIntendedVehicle().getName();
+  }
 }

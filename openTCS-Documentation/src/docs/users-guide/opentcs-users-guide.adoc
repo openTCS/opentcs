@@ -14,5 +14,3 @@ include::03_operating-opentcs.adoc[]
 include::04_configuring-opentcs.adoc[]
 
 include::05_advanced-usage-examples.adoc[]
-
-include::99_appendix.adoc[]

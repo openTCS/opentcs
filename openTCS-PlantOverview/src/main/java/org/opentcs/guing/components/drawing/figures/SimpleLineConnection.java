@@ -126,6 +126,12 @@ public abstract class SimpleLineConnection
    * der Maï¿½stab des Layout geï¿½ndert hat
    */
   public abstract void updateModel();
+  /**
+   * Scales the model coodinates accodring to changes to the layout scale.
+   * 
+   * @param event The event containing the layout scale change.
+   */
+  public abstract void scaleModel(EventObject event);
 
   /**
    *
@@ -226,7 +232,7 @@ public abstract class SimpleLineConnection
 
   @Override // OriginChangeListener
   public void originScaleChanged(EventObject event) {
-    updateModel();
+    scaleModel(event);
   }
 
   @Override

@@ -22,7 +22,6 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.kernel.xmlhost.XMLHostInterfaceConfiguration;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +154,7 @@ public class StatusMessageDispatcher
           ConnectionHandler newHandler = new ConnectionHandler(clientSocket,
                                                                localKernel,
                                                                configuration.statusMessageSeparator());
-          localKernel.addEventListener(newHandler, new AcceptingTCSEventFilter());
+          localKernel.addEventListener(newHandler);
           clientExecutor.execute(newHandler);
           runningHandlers.add(newHandler);
           // Forget any handlers that have terminated since the last run.

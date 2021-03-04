@@ -47,7 +47,6 @@ import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.user.UserPermission;
-import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
@@ -152,9 +151,10 @@ public interface RemoteKernel
       throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException, RemoteException;
 
+  @Deprecated
   @CallPermissions({UserPermission.READ_DATA})
   void setEventFilter(ClientID clientID,
-                      EventFilter<TCSEvent> eventFilter)
+                      org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter)
       throws CredentialsException, RemoteException;
 
   /**
@@ -598,6 +598,10 @@ public interface RemoteKernel
                                                        String fileName)
       throws CredentialsException, ObjectUnknownException, IOException,
              RemoteException;
+  
+  @CallPermissions({UserPermission.MODIFY_MODEL})
+  void updateRoutingTopology(ClientID clientID)
+      throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.READ_DATA})
   <T extends Query<T>> T query(ClientID clientID, Class<T> clazz)

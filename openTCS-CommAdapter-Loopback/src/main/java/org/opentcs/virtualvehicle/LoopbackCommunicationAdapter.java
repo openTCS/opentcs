@@ -246,6 +246,10 @@ public class LoopbackCommunicationAdapter
       extends CyclicTask {
 
     /**
+     * The simulation time factor.
+     */
+    private final double simulationTimeFactor;
+    /**
      * The time that has passed for the velocity controller whenever
      * <em>advanceTime</em> has passed for real.
      */
@@ -261,6 +265,7 @@ public class LoopbackCommunicationAdapter
      */
     private VehicleSimulationTask() {
       super(0);
+      this.simulationTimeFactor = configuration.simulationTimeFactor();
     }
 
     /**
@@ -310,7 +315,7 @@ public class LoopbackCommunicationAdapter
         synchronized (LoopbackCommunicationAdapter.this) {
           curCommand = getSentQueue().peek();
         }
-        simAdvanceTime = (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
+        simAdvanceTime = (int) (ADVANCE_TIME * simulationTimeFactor);
         if (curCommand == null) {
           Thread.sleep(ADVANCE_TIME);
           dischargeEnergy(getProcessModel().getIdlePower());

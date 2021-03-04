@@ -133,6 +133,8 @@ public class TransportOrderService {
                  seq);
       kernel.setOrderSequenceFinishedIndex(seq.getReference(),
                                            seq.getFinishedIndex() + 1);
+      // Get an up-to-date copy of the order sequence
+      seq = kernel.getTCSObject(OrderSequence.class, seq.getReference());
       // If the sequence is complete and this was its last order, the sequence
       // is also finished.
       if (seq.isComplete() && seq.getNextUnfinishedOrder() == null) {
@@ -141,10 +143,6 @@ public class TransportOrderService {
         kernel.setVehicleOrderSequence(seq.getProcessingVehicle(), null);
       }
     }
-    // A transport order has been finished - look for others for which all
-    // dependencies have been finished now, mark them as dispatchable and put
-    // them into the queue.
-    findNewDispatchableOrders();
   }
 
   /**
@@ -187,6 +185,8 @@ public class TransportOrderService {
       kernel.setOrderSequenceFinishedIndex(sequence.getReference(),
                                            sequence.getFinishedIndex() + 1);
     }
+    // The sequence may have changed. Get an up-to-date copy.
+    sequence = kernel.getTCSObject(OrderSequence.class, failedOrder.getWrappingSequence());
     // Mark the sequence as finished if there's nothing more to do in it.
     if (sequence.isComplete() && sequence.getNextUnfinishedOrder() == null) {
       kernel.setOrderSequenceFinished(sequence.getReference());

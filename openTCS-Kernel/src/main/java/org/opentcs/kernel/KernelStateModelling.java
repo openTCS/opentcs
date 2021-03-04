@@ -15,7 +15,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInModellingMode;
 import org.opentcs.data.ObjectUnknownException;
@@ -92,10 +91,13 @@ class KernelStateModelling
       throw new IllegalStateException("Already initialized");
     }
     LOG.debug("Initializing modelling state...");
+
     // Start kernel extensions.
     for (KernelExtension extension : extensions) {
+      LOG.debug("Initializing kernel extension '{}'...", extension);
       extension.initialize();
     }
+    LOG.debug("Finished initializing kernel extensions.");
 
     initialized = true;
 
@@ -117,8 +119,10 @@ class KernelStateModelling
 
     // Terminate everything that may still use resources.
     for (KernelExtension extension : extensions) {
+      LOG.debug("Terminating kernel extension '{}'...", extension);
       extension.terminate();
     }
+    LOG.debug("Terminated kernel extensions.");
 
     initialized = false;
 
@@ -212,13 +216,6 @@ class KernelStateModelling
   public VisualLayout createVisualLayout() {
     synchronized (getGlobalSyncObject()) {
       return getModel().createVisualLayout((Integer) null).clone();
-    }
-  }
-
-  @Override
-  public VisualLayout createVisualLayout(VisualLayoutCreationTO to) {
-    synchronized (getGlobalSyncObject()) {
-      return getModel().createVisualLayout(to).clone();
     }
   }
 

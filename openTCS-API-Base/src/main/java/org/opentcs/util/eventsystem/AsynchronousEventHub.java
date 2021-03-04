@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An <code>EventHub</code> implementation that dispatches events
@@ -22,6 +24,10 @@ import java.util.Queue;
 public class AsynchronousEventHub<E extends Event>
     extends EventHub<E> {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(SynchronousEventHub.class);
   /**
    * The received events, in chronological order.
    */
@@ -80,6 +86,7 @@ public class AsynchronousEventHub<E extends Event>
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void run() {
       Queue<E> outgoingEvents = new LinkedList<>();
       while (!terminated) {
@@ -104,9 +111,14 @@ public class AsynchronousEventHub<E extends Event>
           E curEvent = eventIter.next();
           // Dispatch the event to all listeners whose filter accepts it.
           for (Map.Entry<EventListener<E>, EventFilter<E>> curEntry
-               : getEventListeners().entrySet()) {
-            if (curEntry.getValue().accept(curEvent)) {
-              curEntry.getKey().processEvent(curEvent);
+                   : getEventListeners().entrySet()) {
+            try {
+              if (curEntry.getValue().accept(curEvent)) {
+                curEntry.getKey().processEvent(curEvent);
+              }
+            }
+            catch (Exception exc) {
+              LOG.warn("Exception thrown by event handler", exc);
             }
           }
           eventIter.remove();

@@ -23,7 +23,7 @@ import org.opentcs.access.TCSKernelStateEvent;
 import org.opentcs.access.UnsupportedKernelOpException;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.CyclicTask;
-import org.opentcs.util.eventsystem.EventFilter;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.eventsystem.EventHub;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.EventSource;
@@ -66,7 +66,8 @@ class ProxyInvocationHandler
   /**
    * An event filter for the remote kernel.
    */
-  private final EventFilter<TCSEvent> eventFilter;
+  @SuppressWarnings("deprecation")
+  private final org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter;
   /**
    * The time to wait between event polls with the remote kernel (in ms).
    */
@@ -97,33 +98,32 @@ class ProxyInvocationHandler
   private State currentState = State.DISCONNECTED;
 
   /**
-   * Creates a new ProxyInvocationHandler.
+   * Creates a new instance.
    *
-   * @param hostName The host on which the RMI registry listing the remote
-   * kernel is running.
+   * @param hostName The host on which the RMI registry listing the remote kernel is running.
    * @param port The port on which the RMI registry is listening.
-   * @param userName The user name to use when logging in with the remote
-   * kernel.
+   * @param userName The user name to use when logging in with the remote kernel.
    * @param password The password to use when logging in.
-   * @param eventFilter An event filter for filtering events with the remote
-   * kernel.
-   * @param eventPollInterval The time to wait between event polls with the
-   * remote kernel (in ms).
-   * @param eventPollTimeout The time to wait for events to arrive when polling
-   * (in ms).
-   * @throws KernelUnavailableException If the remote kernel is not reachable
-   * for some reason.
-   * @throws CredentialsException If the client login with the remote kernel
-   * failed, e.g. because of incorrect login data.
+   * @param eventFilter An event filter for filtering events with the remote kernel.
+   * @param eventPollInterval The time to wait between event polls with the remote kernel (in ms).
+   * @param eventPollTimeout The time to wait for events to arrive when polling (in ms).
+   * @throws KernelUnavailableException If the remote kernel is not reachable for some reason.
+   * @throws CredentialsException If the client login with the remote kernel failed, e.g. because of
+   * incorrect login data.
    * @see RemoteKernel#pollEvents(ClientID, long)
+   * @deprecated Use {@link #ProxyInvocationHandler(java.lang.String, int, java.lang.String, java.lang.String, long, long)}
+   * instead.
    */
-  public ProxyInvocationHandler(@Nonnull String hostName,
-                                int port,
-                                @Nonnull String userName,
-                                @Nonnull String password,
-                                @Nonnull EventFilter<TCSEvent> eventFilter,
-                                long eventPollInterval,
-                                long eventPollTimeout)
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  ProxyInvocationHandler(
+      @Nonnull String hostName,
+      int port,
+      @Nonnull String userName,
+      @Nonnull String password,
+      @Nonnull org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter,
+      long eventPollInterval,
+      long eventPollTimeout)
       throws CredentialsException {
     this.hostName = requireNonNull(hostName, "hostName");
     this.port = checkInRange(port, 0, 65535, "port");
@@ -132,6 +132,38 @@ class ProxyInvocationHandler
     this.eventFilter = requireNonNull(eventFilter, "eventFilter");
     this.eventPollInterval = eventPollInterval;
     this.eventPollTimeout = eventPollTimeout;
+  }
+
+  /**
+   * Creates a new instance.
+   *
+   * @param hostName The host on which the RMI registry listing the remote kernel is running.
+   * @param port The port on which the RMI registry is listening.
+   * @param userName The user name to use when logging in with the remote kernel.
+   * @param password The password to use when logging in.
+   * @param eventPollInterval The time to wait between event polls with the remote kernel (in ms).
+   * @param eventPollTimeout The time to wait for events to arrive when polling (in ms).
+   * @throws KernelUnavailableException If the remote kernel is not reachable for some reason.
+   * @throws CredentialsException If the client login with the remote kernel failed, e.g. because of
+   * incorrect login data.
+   * @see RemoteKernel#pollEvents(ClientID, long)
+   */
+  @SuppressWarnings("deprecation")
+  ProxyInvocationHandler(
+      @Nonnull String hostName,
+      int port,
+      @Nonnull String userName,
+      @Nonnull String password,
+      long eventPollInterval,
+      long eventPollTimeout)
+      throws CredentialsException {
+    this(hostName,
+         port,
+         userName,
+         password,
+         new org.opentcs.util.eventsystem.AcceptingTCSEventFilter(),
+         eventPollInterval,
+         eventPollTimeout);
   }
 
   // Implementation of interface InvocationHandler starts here.
@@ -186,8 +218,15 @@ class ProxyInvocationHandler
 
   // Implementation of interface EventSource<TCSObjectEvent> starts here.
   @Override
-  public void addEventListener(EventListener<TCSEvent> listener, EventFilter<TCSEvent> filter) {
+  @Deprecated
+  public void addEventListener(EventListener<TCSEvent> listener,
+                               org.opentcs.util.eventsystem.EventFilter<TCSEvent> filter) {
     eventHub.addEventListener(listener, filter);
+  }
+
+  @Override
+  public void addEventListener(EventListener<TCSEvent> listener) {
+    eventHub.addEventListener(listener);
   }
 
   @Override
@@ -197,6 +236,7 @@ class ProxyInvocationHandler
 
   // Implementation of interface RemoteKernelConnection starts here.
   @Override
+  @SuppressWarnings("deprecation")
   public void login()
       throws CredentialsException {
     if (loggedIn()) {

@@ -5,13 +5,14 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching;
+package org.opentcs.strategies.basic.dispatching.orderselection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,10 @@ public class NoOrderSelectionStrategy
    */
   private boolean initialized;
 
+  @Inject
+  public NoOrderSelectionStrategy() {
+  }
+
   @Override
   public void initialize() {
     if (initialized) {
@@ -51,10 +56,6 @@ public class NoOrderSelectionStrategy
       return;
     }
     initialized = false;
-  }
-
-  @Inject
-  public NoOrderSelectionStrategy() {
   }
 
   @Nullable

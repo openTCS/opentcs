@@ -12,9 +12,12 @@ import java.awt.event.ItemEvent;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -41,15 +44,33 @@ public class EditOperationSpecDialog
    * The communication adapter this dialog belongs to.
    */
   private final LoopbackCommunicationAdapter commAdapter;
+  /**
+   * Model of the opSpec List
+   */
+  private Set<OperationSpec> opSpecs;
+
+  /**
+   * The operation specification to be edited.
+   */
+  private OperationSpec oldOpSpec;
+  /**
+   * A resource bundle for internationalization.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle");
 
   /**
    * Creates new EditOperationSpecDialog.
    *
    * @param adapter Communication adapter of the vehicle this dialog belongs to.
+   * @param opSpecs The Set of already existing operation specifications.
    */
-  public EditOperationSpecDialog(LoopbackCommunicationAdapter adapter) {
+  public EditOperationSpecDialog(LoopbackCommunicationAdapter adapter,
+                                 Set<OperationSpec> opSpecs) {
     this.commAdapter = requireNonNull(adapter, "adapter");
+    this.opSpecs = requireNonNull(opSpecs, "opSpecs");
     initComponents();
+
     setLocationRelativeTo(null);
     // Add some listeners to control button states according to user input
     opNameTextField.getDocument().addDocumentListener(new RequiredTextFieldListener());
@@ -72,13 +93,16 @@ public class EditOperationSpecDialog
    *
    * @param adapter CommunicationAdapter of the vehicle the created
    * <code>OperationSpec</code> will belong to.
-   * @param operationSpec OperationSpec used to preset the values in the dialog.
+   * @param operationSpec OperationSpec the operation the user intends to edit.
+   * @param opSpecs the set of already existing operation specifications.
    */
   public EditOperationSpecDialog(LoopbackCommunicationAdapter adapter,
-                                 OperationSpec operationSpec) {
-    this(adapter);
+                                 OperationSpec operationSpec, Set<OperationSpec> opSpecs) {
+    this(adapter, opSpecs);
+    oldOpSpec = requireNonNull(operationSpec, "operationSpec");
     opNameTextField.setText(operationSpec.getOperationName());
-    opTimeTextField.setText(new Integer(operationSpec.getOperatingTime()).toString());
+    opTimeTextField.setText(Integer.toString(operationSpec.getOperatingTime()));
+
     if (operationSpec.changesLoadCondition()) {
       deviceCheckBox.setSelected(true);
       LoadHandlingDeviceTableModel model
@@ -128,7 +152,7 @@ public class EditOperationSpecDialog
       LoadHandlingDeviceTableModel deviceTableModel
           = (LoadHandlingDeviceTableModel) tableModel;
       // Set device list to an empty list
-      deviceTableModel.updateLoadHandlingDevices(new LinkedList<LoadHandlingDevice>());
+      deviceTableModel.updateLoadHandlingDevices(new LinkedList<>());
     }
   }
 
@@ -141,6 +165,15 @@ public class EditOperationSpecDialog
     inputComplete = !opNameTextField.getText().trim().isEmpty()
         && !opTimeTextField.getText().trim().isEmpty();
     okButton.setEnabled(inputComplete);
+  }
+
+  private boolean isNameValid(String newName) {
+    for (OperationSpec ops : opSpecs) {
+      if (ops != oldOpSpec && ops.getOperationName().equals(newName)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   // CHECKSTYLE:OFF
@@ -356,8 +389,17 @@ public class EditOperationSpecDialog
     dispose();
   }//GEN-LAST:event_cancelButtonActionPerformed
 
+
   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
     String operation = opNameTextField.getText();
+    if (!isNameValid(operation)) {
+      JOptionPane.showMessageDialog(this,
+                                    BUNDLE.getString("warningUniqueSpecificationName"),
+                                    BUNDLE.getString("warningUniqueSpecificationNameTitle"),
+                                    JOptionPane.WARNING_MESSAGE);
+      return;
+
+    }
     int operatingTime;
     try {
       operatingTime = Integer.parseInt(opTimeTextField.getText());
@@ -385,6 +427,7 @@ public class EditOperationSpecDialog
     }
     dispose();
   }//GEN-LAST:event_okButtonActionPerformed
+
 
   private void deviceCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_deviceCheckBoxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -513,4 +556,5 @@ public class EditOperationSpecDialog
       }
     }
   }
+
 }

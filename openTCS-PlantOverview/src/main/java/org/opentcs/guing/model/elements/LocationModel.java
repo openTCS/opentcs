@@ -172,7 +172,6 @@ public class LocationModel
     pSymbol.setDescription(bundle.getString("location.symbol.text"));
     pSymbol.setHelptext(bundle.getString("location.symbol.helptext"));
     pSymbol.setCollectiveEditable(true);
-    pSymbol.setOperatingEditable(true);
     setProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION, pSymbol);
     // Position x im Layout
     StringProperty pLocPosX = new StringProperty(this);
@@ -208,8 +207,6 @@ public class LocationModel
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("location.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("location.miscellaneous.helptext"));
-    // HH 2014-02-17: Miscellaneous Properties vorerst nicht collective editable
-//  pMiscellaneous.setCollectiveEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 }

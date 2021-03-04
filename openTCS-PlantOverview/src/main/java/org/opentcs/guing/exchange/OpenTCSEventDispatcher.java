@@ -16,25 +16,17 @@ import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.TCSKernelStateEvent;
-import org.opentcs.access.TCSModelTransitionEvent;
 import org.opentcs.access.TCSNotificationEvent;
 import org.opentcs.access.rmi.RemoteKernelConnection;
 import org.opentcs.access.rmi.TCSProxyStateEvent;
 import org.opentcs.data.TCSObjectEvent;
 import static org.opentcs.data.TCSObjectEvent.Type.OBJECT_MODIFIED;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.util.MessageDisplay;
-import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.slf4j.Logger;
@@ -105,77 +97,9 @@ public class OpenTCSEventDispatcher
     }
 
     // Listener for TCSObjectEvents on TransportOrders
-    EventFilter<TCSEvent> filter = new EventFilter<TCSEvent>() {
-      @Override
-      public boolean accept(TCSEvent event) {
-        if (event instanceof TCSObjectEvent) {
-          TCSObjectEvent objectEvent = (TCSObjectEvent) event;
-
-          if (objectEvent.getCurrentOrPreviousObjectState() instanceof TransportOrder) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-    };
-
-    kernel.addEventListener(fTransportOrderDispatcher, filter);
-
-    // Listener for TCSObjectEvents on OrderSequences
-    filter = new EventFilter<TCSEvent>() {
-      @Override
-      public boolean accept(TCSEvent event) {
-        if (event instanceof TCSObjectEvent) {
-          TCSObjectEvent objectEvent = (TCSObjectEvent) event;
-
-          if (objectEvent.getCurrentOrPreviousObjectState() instanceof OrderSequence) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-    };
-
-    kernel.addEventListener(fOrderSequenceDispatcher, filter);
-
-    // Listener for TCSObjectEvents on Vehicle, Location, Point...
-    filter = new EventFilter<TCSEvent>() {
-      @Override
-      public boolean accept(TCSEvent event) {
-        if (event instanceof TCSKernelStateEvent) {
-          return true;
-        }
-
-        if (event instanceof TCSProxyStateEvent) {
-          return true;
-        }
-
-        if (event instanceof TCSObjectEvent) {
-          TCSObjectEvent objectEvent = (TCSObjectEvent) event;
-
-          if (objectEvent.getCurrentOrPreviousObjectState() instanceof Vehicle
-              || objectEvent.getCurrentOrPreviousObjectState() instanceof Location
-              || objectEvent.getCurrentOrPreviousObjectState() instanceof Point
-              || objectEvent.getCurrentOrPreviousObjectState() instanceof Path) {
-            return true;
-          }
-        }
-
-        if (event instanceof TCSModelTransitionEvent) {
-          return true;
-        }
-
-        if (event instanceof TCSNotificationEvent) {
-          return true;
-        }
-
-        return false;
-      }
-    };
-
-    kernel.addEventListener(this, filter);
+    kernel.addEventListener(fTransportOrderDispatcher);
+    kernel.addEventListener(fOrderSequenceDispatcher);
+    kernel.addEventListener(this);
   }
 
   @Override
@@ -254,7 +178,10 @@ public class OpenTCSEventDispatcher
   }
 
   private void processObjectEvent(TCSObjectEvent objectEvent) {
-    logObjectEvent(objectEvent);
+    LOG.debug("TCSObjectEvent received. ID: {} Name: {} Event type: {}",
+              objectEvent.getCurrentOrPreviousObjectState().getId(),
+              objectEvent.getCurrentOrPreviousObjectState().getName(),
+              objectEvent.getType().name());
 
     if (objectEvent.getType() == OBJECT_MODIFIED) {
       ProcessAdapter adapter
@@ -268,13 +195,6 @@ public class OpenTCSEventDispatcher
                                     objectEvent.getCurrentObjectState(),
                                     null);
     }
-  }
-
-  private void logObjectEvent(TCSObjectEvent objectEvent) {
-    LOG.debug("TCSObjectEvent received. ID: {} Name: {} Event type: {}",
-              objectEvent.getCurrentOrPreviousObjectState().getId(),
-              objectEvent.getCurrentOrPreviousObjectState().getName(),
-              objectEvent.getType().name());
   }
 
 }

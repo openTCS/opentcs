@@ -14,9 +14,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
-import org.opentcs.util.eventsystem.EventFilter;
-import org.opentcs.util.eventsystem.EventListener;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
 
@@ -39,16 +37,11 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * <p>
  * After being built, the proxy will immediately start polling periodically for events with the
  * remote kernel.
- * You can use a custom event filter and custom intervals and timeouts for polling by setting the
- * respective build parameters.
- * Using an instance of {@link AcceptingTCSEventFilter} as its event filter (which is the default)
- * will let the proxy receive every event generated inside the kernel without filtering out any of
- * them.
- * To receive all or some of these events in your client code, register an event listener with the
- * proxy by calling its
- * {@link EventSource#addEventListener(EventListener, EventFilter) addEventListener()} method.
- * The proxy will then forward all events that it received and that are not filtered by your event
- * filter to your registered listener.
+ * You can use a custom intervals and timeouts for polling by setting the respective build
+ * parameters.
+ * To receive these events in your client code, register an event listener with the proxy by calling
+ * its {@link EventSource#addEventListener(org.opentcs.util.eventsystem.EventListener)} method.
+ * The proxy will then forward events to your registered listener.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
@@ -74,7 +67,9 @@ public class KernelProxyBuilder {
   /**
    * An event filter for filtering events with the remote kernel.
    */
-  private EventFilter<TCSEvent> eventFilter = new AcceptingTCSEventFilter();
+  @SuppressWarnings("deprecation")
+  private org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter
+      = new org.opentcs.util.eventsystem.AcceptingTCSEventFilter();
   /**
    * The time to wait between event polls with the remote kernel (in ms).
    */
@@ -176,11 +171,13 @@ public class KernelProxyBuilder {
 
   /**
    * Returns the event filter used for filtering events on the remote kernel.
-   * The default value is an instance of {@link AcceptingTCSEventFilter}.
    *
    * @return The event filter used for filtering events on the remote kernel.
+   * @deprecated {@link org.opentcs.util.eventsystem.EventFilter} is deprecated.
    */
-  public EventFilter<TCSEvent> getEventFilter() {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  public org.opentcs.util.eventsystem.EventFilter<TCSEvent> getEventFilter() {
     return eventFilter;
   }
 
@@ -189,8 +186,12 @@ public class KernelProxyBuilder {
    *
    * @param eventFilter The event filter.
    * @return This instance.
+   * @deprecated {@link org.opentcs.util.eventsystem.EventFilter} is deprecated.
    */
-  public KernelProxyBuilder setEventFilter(@Nonnull EventFilter<TCSEvent> eventFilter) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  public KernelProxyBuilder setEventFilter(
+      @Nonnull org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter) {
     this.eventFilter = requireNonNull(eventFilter, "eventFilter");
     return this;
   }
@@ -246,6 +247,7 @@ public class KernelProxyBuilder {
    * incorrect login data.
    * @see RemoteKernel#pollEvents(ClientID, long)
    */
+  @SuppressWarnings("deprecation")
   public KernelProxy build()
       throws KernelUnavailableException, CredentialsException {
     // Create an invocation handler that does the actual work.

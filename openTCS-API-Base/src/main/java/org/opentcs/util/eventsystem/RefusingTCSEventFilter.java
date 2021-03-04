@@ -8,12 +8,16 @@
 package org.opentcs.util.eventsystem;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An event filter for {@link TCSEvent}s that does not accept any events.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated {@link org.opentcs.util.eventsystem.EventFilter} is deprecated.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class RefusingTCSEventFilter
     implements EventFilter<TCSEvent>,
                Serializable {

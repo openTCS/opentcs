@@ -29,6 +29,12 @@ public interface PlantOverviewApplicationConfiguration {
   String PREFIX = "plantoverviewapp";
 
   @ConfigurationEntry(
+      type = "String",
+      description = {"The plant overview application's mode on startup.",
+                     "Valid values: 'MODELLING', 'OPERATING', 'ASK'"})
+  InitialMode initialMode();
+
+  @ConfigurationEntry(
       type = "Boolean",
       description = "Whether reported precise positions should be ignored displaying vehicles."
   )
@@ -87,4 +93,10 @@ public interface PlantOverviewApplicationConfiguration {
       description = {"The name of the class to be used for the vehicle theme.",
                      "Must be a class extending org.opentcs.components.plantoverview.VehicleTheme"})
   Class<? extends VehicleTheme> vehicleThemeClass();
+
+  enum InitialMode {
+    MODELLING,
+    OPERATING,
+    ASK
+  }
 }

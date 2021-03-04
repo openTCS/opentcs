@@ -8,11 +8,11 @@
  */
 package org.opentcs.guing.components.properties;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import javax.inject.Singleton;
+import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.panel.CoursePointPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
@@ -36,7 +36,7 @@ import org.opentcs.guing.components.properties.type.SymbolProperty;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class PropertiesInjectionModule
-    extends AbstractModule {
+    extends PlantOverviewInjectionModule {
 
   @Override
   protected void configure() {
@@ -47,9 +47,9 @@ public class PropertiesInjectionModule
     MapBinder<Class<? extends AbstractComplexProperty>, DetailsDialogContent> dialogContentMapBinder
         = MapBinder.newMapBinder(binder(),
                                  new TypeLiteral<Class<? extends AbstractComplexProperty>>() {
-                                 },
+                             },
                                  new TypeLiteral<DetailsDialogContent>() {
-                                 });
+                             });
     dialogContentMapBinder
         .addBinding(CoursePointProperty.class)
         .to(CoursePointPropertyEditorPanel.class);
@@ -71,5 +71,7 @@ public class PropertiesInjectionModule
 
     bind(SelectionPropertiesComponent.class)
         .in(Singleton.class);
+
   }
+
 }

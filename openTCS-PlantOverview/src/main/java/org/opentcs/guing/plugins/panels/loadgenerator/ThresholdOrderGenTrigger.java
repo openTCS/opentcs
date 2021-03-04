@@ -15,7 +15,6 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.slf4j.Logger;
@@ -28,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 class ThresholdOrderGenTrigger
-    implements EventListener<TCSEvent>, OrderGenerationTrigger {
+    implements EventListener<TCSEvent>,
+               OrderGenerationTrigger {
 
   /**
    * This class's Logger.
@@ -79,7 +79,7 @@ class ThresholdOrderGenTrigger
             knownOrders.add(curOrder);
           }
         }
-        kernel.addEventListener(this, new OrderEventFilter());
+        kernel.addEventListener(this);
         if (knownOrders.size() <= threshold) {
           triggerOrderGeneration();
         }
@@ -99,7 +99,14 @@ class ThresholdOrderGenTrigger
 
   @Override
   public void processEvent(TCSEvent event) {
+    if (!(event instanceof TCSObjectEvent)) {
+      return;
+    }
     TCSObjectEvent objEvent = (TCSObjectEvent) event;
+    if (!(objEvent.getCurrentOrPreviousObjectState() instanceof TransportOrder)) {
+      return;
+    }
+
     synchronized (knownOrders) {
       TransportOrder eventOrder
           = (TransportOrder) objEvent.getCurrentOrPreviousObjectState();
@@ -132,29 +139,8 @@ class ThresholdOrderGenTrigger
     catch (KernelRuntimeException exc) {
       log.warn("Exception triggering order generation, terminating triggering", exc);
       setTriggeringEnabled(false);
+
     }
   }
 
-  /**
-   * An event filter that only accepts events for transport orders.
-   */
-  private static class OrderEventFilter
-      implements EventFilter<TCSEvent> {
-
-    /**
-     * Creates a new instance.
-     */
-    public OrderEventFilter() {
-      // Do nada.
-    }
-
-    @Override
-    public boolean accept(TCSEvent event) {
-      if (event instanceof TCSObjectEvent) {
-        TCSObjectEvent objEvent = (TCSObjectEvent) event;
-        return objEvent.getCurrentOrPreviousObjectState() instanceof TransportOrder;
-      }
-      return false;
-    }
-  }
 }

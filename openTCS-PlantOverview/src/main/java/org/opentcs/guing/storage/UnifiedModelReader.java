@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.filechooser.FileFilter;
 import org.opentcs.guing.application.StatusPanel;
-import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
@@ -230,11 +229,6 @@ public class UnifiedModelReader
       for (Map.Entry<String, Property> property : component.getProperties().entrySet()) {
         layoutComponent.setProperty(property.getKey(), property.getValue());
       }
-      double scaleX
-          = (double) ((LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_X)).getValue();
-      double scaleY
-          = (double) ((LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_Y)).getValue();
-      model.getDrawingMethod().getOrigin().setScale(scaleX, scaleY);
     }
   }
 }

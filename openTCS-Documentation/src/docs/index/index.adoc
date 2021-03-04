@@ -14,6 +14,7 @@ openTCS {project-version}
 * Developer's Guide:
   link:./developer/developers-guide/opentcs-developers-guide.html[HTML],
   link:./developer/developers-guide/opentcs-developers-guide.pdf[PDF]
+* Frequently Asked Questions: link:./faq.html[HTML]
 * Base API:
   link:./developer/api-base/index.html[JavaDoc documentation],
   link:./developer/compatibility-reports/japicmp-opentcs-api-base.html[Compatibility report against previous major release]

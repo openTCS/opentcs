@@ -12,6 +12,7 @@ package org.opentcs.guing.components.drawing.figures;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
+import java.util.EventObject;
 import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
@@ -132,6 +133,10 @@ public class LinkConnection
   @Override // SimpleLineConnection
   public void updateModel() {
     // Bei Link Connection ist nichts zu tun
+  }
+
+  @Override
+  public void scaleModel(EventObject event) {
   }
 
   @Override // LineConnectionFigure

@@ -35,7 +35,7 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  */
 public interface Router
     extends Lifecycle {
-
+  
   /**
    * Notifies the router of changes in the topology.
    */

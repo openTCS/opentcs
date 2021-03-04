@@ -12,6 +12,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import static org.opentcs.util.Assertions.checkArgument;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Stores events and keeps them until a client fetches them.
@@ -29,6 +30,7 @@ public class EventBuffer<E extends Event>
   /**
    * This buffer's event filter.
    */
+  @SuppressWarnings("deprecation")
   private EventFilter<E> filter;
   /**
    * A flag indicating whether this event buffer's client is currently waiting
@@ -37,12 +39,22 @@ public class EventBuffer<E extends Event>
   private boolean waitingClient;
 
   /**
-   * Creates a new EventBuffer.
+   * Creates a new instance.
    *
    * @param eventFilter This buffer's initial event filter.
+   * @deprecated Use {@link #EventBuffer()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public EventBuffer(@Nonnull EventFilter<E> eventFilter) {
     filter = requireNonNull(eventFilter, "eventFilter");
+  }
+
+  /**
+   * Creates a new instance accepting all events.
+   */
+  public EventBuffer() {
+    this((event) -> true);
   }
 
   // Methods declared in interface EventListener start here
@@ -113,7 +125,10 @@ public class EventBuffer<E extends Event>
    * Sets this buffer's event filter.
    *
    * @param eventFilter This buffer's new event filter.
+   * @deprecated Use of event filters is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public void setFilter(@Nonnull EventFilter<E> eventFilter) {
     synchronized (events) {
       filter = requireNonNull(eventFilter, "eventFilter");

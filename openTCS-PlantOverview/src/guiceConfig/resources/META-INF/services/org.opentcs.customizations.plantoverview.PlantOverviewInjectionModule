@@ -1,1 +1,2 @@
 org.opentcs.guing.DefaultPluginPanelsModule
+org.opentcs.guing.PropertySuggestionsModule

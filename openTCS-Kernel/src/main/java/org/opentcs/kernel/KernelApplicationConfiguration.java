@@ -52,4 +52,9 @@ public interface KernelApplicationConfiguration {
       type = "Boolean",
       description = "Whether to implicitly save the model when leaving operating state.")
   boolean saveModelOnTerminateOperating();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to implicitly update the router's topology when a path is (un)locked.")
+  boolean updateRoutingTopologyOnPathLockChange();
 }

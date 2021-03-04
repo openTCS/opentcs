@@ -14,6 +14,7 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
@@ -160,6 +161,24 @@ public class LabeledLocationFigure
 
     // Update the image of the actual Location type
     getPresentationFigure().propertiesChanged(event);
+    // Auch das Label aktualisieren
+    fireFigureChanged();
+  }
+
+  @Override
+  public void scaleModel(EventObject event) {
+    Origin origin = get(FigureConstants.ORIGIN);
+
+    if (origin != null) {
+      LocationFigure lf = getPresentationFigure();
+      StringProperty xLayout = (StringProperty) lf.getModel().getProperty(ElementPropKeys.LOC_POS_X);
+      StringProperty yLayout = (StringProperty) lf.getModel().getProperty(ElementPropKeys.LOC_POS_Y);
+
+      Point2D exact = origin.calculatePixelPositionExactly(xLayout, yLayout);
+      Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
+      setBounds(anchor, anchor);
+    }
+
     // Auch das Label aktualisieren
     fireFigureChanged();
   }

@@ -9,7 +9,7 @@ package org.opentcs.data;
 
 import java.io.Serializable;
 import java.util.regex.Pattern;
-import org.opentcs.util.eventsystem.EventFilter;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
@@ -40,20 +40,24 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated {@link org.opentcs.util.eventsystem.EventFilter} is deprecated.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class TCSObjectEventFilter
-    implements EventFilter<TCSEvent>, Serializable {
+    implements org.opentcs.util.eventsystem.EventFilter<TCSEvent>,
+               Serializable {
 
   /**
    * A filter instance that does not accept any events.
    */
-  public static final TCSObjectEventFilter ACCEPT_NONE =
-      new TCSObjectEventFilter(null, null);
+  public static final TCSObjectEventFilter ACCEPT_NONE
+      = new TCSObjectEventFilter(null, null);
   /**
    * A filter instance that accepts all TCSObjectEvents.
    */
-  public static final TCSObjectEventFilter ACCEPT_ALL =
-      new TCSObjectEventFilter(Pattern.compile(".*"), null);
+  public static final TCSObjectEventFilter ACCEPT_ALL
+      = new TCSObjectEventFilter(Pattern.compile(".*"), null);
   /**
    * The pattern for matching class names of objects associated with events.
    */

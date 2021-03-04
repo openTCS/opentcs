@@ -7,7 +7,9 @@
  */
 package org.opentcs.util.gui;
 
+import java.awt.Canvas;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.util.Optional;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
@@ -54,13 +56,21 @@ public class WideComboBox<E>
   }
 
   /**
-   * Creates a new instance with the given content.
+   * Creates a new instance with the given content and adapts the
+   * popupWitdth to the longest item in items using it's string value.
    *
    * @param items The values in the new combo box.
    */
   public WideComboBox(final E[] items) {
     super(items);
-    this.popupWidth = Optional.empty();
+    int tmpPopupWidth = 1;
+    Canvas c = new Canvas();
+    FontMetrics fontMetrics = c.getFontMetrics(this.getFont());
+    for (E item : items) {
+      tmpPopupWidth = Integer.max(fontMetrics.stringWidth(item.toString()), tmpPopupWidth);
+    }
+    tmpPopupWidth += 5;
+    this.popupWidth = Optional.of(tmpPopupWidth);
   }
 
   /**

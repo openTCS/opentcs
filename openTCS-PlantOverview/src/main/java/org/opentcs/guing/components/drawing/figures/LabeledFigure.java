@@ -150,10 +150,16 @@ public abstract class LabeledFigure
 
   @Override
   public void originScaleChanged(EventObject event) {
-    updateModel();
+    scaleModel(event);
   }
 
   public abstract void updateModel();
+  /**
+   * Scales the model coodinates accodring to changes to the layout scale.
+   * 
+   * @param event The event containing the layout scale change.
+   */
+  public abstract void scaleModel(EventObject event);
 
   @Override
   public LabeledFigure clone() {

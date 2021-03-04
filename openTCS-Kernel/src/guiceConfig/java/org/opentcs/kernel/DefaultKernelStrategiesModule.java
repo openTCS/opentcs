@@ -16,17 +16,21 @@ import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcher;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
-import org.opentcs.strategies.basic.dispatching.NoOrderSelectionStrategy;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
-import org.opentcs.strategies.basic.dispatching.ParkingOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.RechargeOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.ReservedOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.TransportOrderSelectionStrategy;
 import org.opentcs.strategies.basic.dispatching.TransportOrderSelector;
 import org.opentcs.strategies.basic.dispatching.TransportOrderService;
 import org.opentcs.strategies.basic.dispatching.VehicleSelector;
-import org.opentcs.strategies.basic.dispatching.parking.DefaultParkingPositionSupplier;
-import org.opentcs.strategies.basic.dispatching.recharging.DefaultRechargePositionSupplier;
+import org.opentcs.strategies.basic.dispatching.orderselection.NoOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.ParkingOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.RechargeOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.ReservedOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.TransportOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.parking.DefaultParkingPositionSupplier;
+import org.opentcs.strategies.basic.dispatching.orderselection.recharging.DefaultRechargePositionSupplier;
+import org.opentcs.strategies.basic.dispatching.vehicleselection.AssignedVehicleSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.vehicleselection.AvailableVehicleSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.vehicleselection.ClosestVehicleComparator;
+import org.opentcs.strategies.basic.dispatching.vehicleselection.VehicleCandidate;
 import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluator;
 import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluatorConfiguration;
 import org.opentcs.strategies.basic.routing.DefaultRouter;
@@ -151,6 +155,14 @@ public class DefaultKernelStrategiesModule
         .to(DefaultRechargePositionSupplier.class)
         .in(Singleton.class);
 
+    bind(new TypeLiteral<Comparator<VehicleCandidate>>() {
+    })
+        .annotatedWith(AvailableVehicleSelectionStrategy.VehicleCandidateComparator.class)
+        .toInstance(new ClosestVehicleComparator());
+    bind(AssignedVehicleSelectionStrategy.class)
+        .in(Singleton.class);
+    bind(AvailableVehicleSelectionStrategy.class)
+        .in(Singleton.class);
     bind(VehicleSelector.class)
         .in(Singleton.class);
 

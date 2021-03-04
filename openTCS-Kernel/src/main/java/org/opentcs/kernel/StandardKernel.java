@@ -65,7 +65,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.user.UserPermission;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
-import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventHub;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
@@ -1216,6 +1215,14 @@ final class StandardKernel
   }
 
   @Override
+  public void updateRoutingTopology()
+      throws CredentialsException {
+    LOG.debug("method entry");
+    kernelState.updateRoutingTopology();
+  }
+
+  @Override
+  @Deprecated
   public List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws ObjectUnknownException, IOException {
     LOG.debug("method entry");
@@ -1279,10 +1286,16 @@ final class StandardKernel
 
   // Event management methods start here.
   @Override
+  @Deprecated
   public void addEventListener(EventListener<TCSEvent> listener,
-                               EventFilter<TCSEvent> filter) {
+                               org.opentcs.util.eventsystem.EventFilter<TCSEvent> filter) {
     LOG.debug("method entry");
     eventHub.addEventListener(listener, filter);
+  }
+
+  @Override
+  public void addEventListener(EventListener<TCSEvent> listener) {
+    eventHub.addEventListener(listener);
   }
 
   @Override

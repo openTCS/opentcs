@@ -132,6 +132,8 @@ public class DefaultDispatcher
     }
     vehiclesToDisable.clear();
     orderReservationPool.clear();
+    orderSelector.initialize();
+    vehicleSelector.initialize();
     // Initialize the dispatching thread.
     dispatcherTask = new DispatcherTask();
     new Thread(dispatcherTask, getClass().getName() + "-DispatcherTask").start();
@@ -150,6 +152,8 @@ public class DefaultDispatcher
       return;
     }
     LOG.info("Terminating...");
+    orderSelector.terminate();
+    vehicleSelector.terminate();
     dispatcherTask.terminate();
     initialized = false;
   }

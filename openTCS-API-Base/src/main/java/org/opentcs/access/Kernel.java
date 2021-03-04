@@ -1513,9 +1513,23 @@ public interface Kernel
    * execute this method.
    * @throws IOException If there was a problem reading or parsing the file with
    * the given name.
+   * @deprecated Parsing and evaluating scripts/batch files is out of scope for the kernel. Such
+   * files should be handled outside the kernel, e.g. in a kernel extension, and lead to calls of
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)}, instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws ObjectUnknownException, CredentialsException, IOException;
+  
+  /**
+   * Notifies the router that the topology has changed in a significant way and needs to be
+   * re-evaluated.
+   *
+   * @throws CredentialsException If the calling client is not allowed to execute this method.
+   */
+  void updateRoutingTopology()
+      throws CredentialsException;
 
   /**
    * Returns the costs for travelling from one location to a given set of

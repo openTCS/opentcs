@@ -9,6 +9,8 @@
  */
 package org.opentcs.guing.components.properties.panel;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,9 +53,18 @@ public class KeyValueSetPropertyEditorPanel
   private KeyValueSetProperty fProperty;
 
   /**
-   * Creates a new instance.
+   * A provider that provides new instances of KeyValuePropertyEditorPanels
    */
-  public KeyValueSetPropertyEditorPanel() {
+  private final Provider<KeyValuePropertyEditorPanel> editorProvider;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param editorProvider a guice injected provider of KeyValuePropertyEditorPanel Instances
+   */
+  @Inject
+  public KeyValueSetPropertyEditorPanel(Provider<KeyValuePropertyEditorPanel> editorProvider) {
+    this.editorProvider = Objects.requireNonNull(editorProvider, "editorProvider");
     initComponents();
     itemsTable.setModel(new javax.swing.table.DefaultTableModel(
         new Object[][] {},
@@ -260,7 +271,7 @@ public class KeyValueSetPropertyEditorPanel
     }
     KeyValueProperty pOld = new KeyValueProperty(p.getModel(), p.getKey(), p.getValue());
     JDialog parent = (JDialog) getTopLevelAncestor();
-    KeyValuePropertyEditorPanel content = new KeyValuePropertyEditorPanel();
+    KeyValuePropertyEditorPanel content = editorProvider.get();
     content.setProperty(p);
 
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
@@ -284,7 +295,7 @@ public class KeyValueSetPropertyEditorPanel
     JDialog parent = (JDialog) getTopLevelAncestor();
 
     KeyValueProperty p = new KeyValueProperty(null);
-    KeyValuePropertyEditorPanel content = new KeyValuePropertyEditorPanel();
+    KeyValuePropertyEditorPanel content = editorProvider.get();
     content.setProperty(p);
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);

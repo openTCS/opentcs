@@ -10,8 +10,6 @@ package org.opentcs.access.rmi;
 import java.rmi.registry.Registry;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
-import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
@@ -38,12 +36,13 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * The proxy will immediately start polling periodically for events with the remote kernel.
  * You can use a custom event filter and custom intervals and timeouts for polling by calling one of
  * the other <code>getProxy()</code> methods.
- * Using an instance of {@link AcceptingTCSEventFilter} as its event filter (which is the default)
+ * Using an instance of {@code AcceptingTCSEventFilter} as its event filter (which is the default)
  * will let the proxy receive every event generated inside the kernel without filtering out any of
  * them.
  * To receive all or some of these events in your client code, register an event listener with the
  * proxy by calling its
- * {@link EventSource#addEventListener(EventListener, EventFilter) addEventListener()} method.
+ * {@link EventSource#addEventListener(EventListener, org.opentcs.util.eventsystem.EventFilter) addEventListener()}
+ * method.
  * The proxy will then forward all events that it received and that are not filtered by your event
  * filter to your registered listener.
  * </p>
@@ -97,7 +96,7 @@ public final class DynamicRemoteKernelProxy {
                                      int port,
                                      String userName,
                                      String password,
-                                     EventFilter<TCSEvent> eventFilter,
+                                     org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter,
                                      long eventPollInterval,
                                      long eventPollTimeout)
       throws KernelUnavailableException, CredentialsException {
@@ -137,7 +136,7 @@ public final class DynamicRemoteKernelProxy {
   public static KernelProxy getProxy(String host,
                                      String userName,
                                      String password,
-                                     EventFilter<TCSEvent> eventFilter,
+                                     org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter,
                                      long eventPollInterval,
                                      long eventPollTimeout)
       throws KernelUnavailableException, CredentialsException {
@@ -171,7 +170,7 @@ public final class DynamicRemoteKernelProxy {
    * @see RemoteKernel#pollEvents(ClientID, long)
    */
   public static KernelProxy getProxy(String host,
-                                     EventFilter<TCSEvent> eventFilter,
+                                     org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter,
                                      long eventPollInterval,
                                      long eventPollTimeout)
       throws KernelUnavailableException, CredentialsException {
@@ -200,8 +199,9 @@ public final class DynamicRemoteKernelProxy {
    * failed, e.g. because the standard user name and password are not accepted.
    * @see RemoteKernel#pollEvents(ClientID, long)
    */
-  public static KernelProxy getProxy(String host,
-                                     EventFilter<TCSEvent> eventFilter) {
+  public static KernelProxy getProxy(
+      String host,
+      org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter) {
     return getProxy(host,
                     Registry.REGISTRY_PORT,
                     RemoteKernel.GUEST_USER,
@@ -214,7 +214,8 @@ public final class DynamicRemoteKernelProxy {
   /**
    * Creates a proxy for a remote kernel registered with a RMI registry on the
    * given host at the default RMI port, using a standard user name and
-   * password, an {@link AcceptingTCSEventFilter}, a poll interval of 1 ms and a poll timeout of 1000 ms.
+   * password, an {@code AcceptingTCSEventFilter}, a poll interval of 1 ms and a poll timeout of
+   * 1000 ms.
    * After the proxy is created, it implicitly logs in with the remote kernel.
    *
    * @param host The host running the RMI registry.
@@ -230,7 +231,7 @@ public final class DynamicRemoteKernelProxy {
                     Registry.REGISTRY_PORT,
                     RemoteKernel.GUEST_USER,
                     RemoteKernel.GUEST_PASSWORD,
-                    new AcceptingTCSEventFilter(),
+                    new org.opentcs.util.eventsystem.AcceptingTCSEventFilter(),
                     DEFAULT_POLL_INTERVAL,
                     DEFAULT_POLL_TIMEOUT);
   }
@@ -252,9 +253,10 @@ public final class DynamicRemoteKernelProxy {
    * failed, e.g. because the standard user name and password are not accepted.
    * @see RemoteKernel#pollEvents(ClientID, long)
    */
-  public static KernelProxy getProxy(String host,
-                                     int port,
-                                     EventFilter<TCSEvent> eventFilter) {
+  public static KernelProxy getProxy(
+      String host,
+      int port,
+      org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter) {
     return getProxy(host,
                     port,
                     RemoteKernel.GUEST_USER,

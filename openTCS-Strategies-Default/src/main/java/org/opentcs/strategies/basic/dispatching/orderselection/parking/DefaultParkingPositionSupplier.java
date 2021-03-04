@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching.parking;
+package org.opentcs.strategies.basic.dispatching.orderselection.parking;
 
 import java.util.HashSet;
 import java.util.Map;

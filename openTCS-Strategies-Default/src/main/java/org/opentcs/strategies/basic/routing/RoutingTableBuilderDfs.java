@@ -35,9 +35,13 @@ public class RoutingTableBuilderDfs
    */
   private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderDfs.class);
   /**
-   * This class's configuration.
+   * Whether to terminate early.
    */
-  private final DefaultRouterConfiguration configuration;
+  private final boolean terminateEarly;
+  /**
+   * The maximum search depth.
+   */
+  private final int maxDepth;
 
   /**
    * Creates a new instance.
@@ -51,7 +55,9 @@ public class RoutingTableBuilderDfs
                          RouteEvaluator routeEvaluator,
                          DefaultRouterConfiguration configuration) {
     super(kernel, routeEvaluator);
-    this.configuration = requireNonNull(configuration, "configuration");
+    requireNonNull(configuration, "configuration");
+    this.terminateEarly = configuration.terminateSearchEarly();
+    this.maxDepth = configuration.dfsMaxDepth();
   }
 
   @Override
@@ -105,11 +111,11 @@ public class RoutingTableBuilderDfs
     // (Not knowing the cost function applied to the route, terminating here
     // might mean that a shorter route to one of the successors will not be
     // found. An exhaustive search might take much longer, however.)
-    else if (configuration.terminateSearchEarly()) {
+    else if (terminateEarly) {
       return;
     }
     // If we have reached the maximum search depth, terminate the recursion.
-    if (steps.size() > configuration.dfsMaxDepth()) {
+    if (steps.size() > maxDepth) {
       return;
     }
     descendSuccessors(startPoint, curPoint, steps);

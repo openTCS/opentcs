@@ -44,7 +44,15 @@ public class OrderSequenceDispatcher
 
   @Override
   public void processEvent(TCSEvent event) {
+    if (!(event instanceof TCSObjectEvent)) {
+      return;
+    }
     TCSObjectEvent objEvent = (TCSObjectEvent) event;
+
+    if (!(objEvent.getCurrentOrPreviousObjectState() instanceof OrderSequence)) {
+      return;
+    }
+
     OrderSequence os = (OrderSequence) objEvent.getCurrentOrPreviousObjectState();
 
     switch (objEvent.getType()) {
@@ -59,7 +67,7 @@ public class OrderSequenceDispatcher
       case OBJECT_REMOVED:
         eventBus.publish(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_REMOVED));
         break;
-        
+
       default:
     }
   }

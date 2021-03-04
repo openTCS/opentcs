@@ -22,11 +22,9 @@ import javax.annotation.Nonnull;
 import org.opentcs.access.Kernel.State;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.access.UnsupportedKernelOpException;
-import org.opentcs.access.queries.Queries;
 import org.opentcs.access.queries.Query;
 import org.opentcs.access.queries.QueryTopologyInfo;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.Lifecycle;
@@ -296,10 +294,6 @@ abstract class KernelState
 
   @Deprecated
   public VisualLayout createVisualLayout() {
-    throw new UnsupportedKernelOpException(unsupportedMsg());
-  }
-
-  public VisualLayout createVisualLayout(VisualLayoutCreationTO to) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
@@ -857,6 +851,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public List<TransportOrder> createTransportOrdersFromScript(
       String fileName)
       throws ObjectUnknownException, IOException {
@@ -868,6 +863,10 @@ abstract class KernelState
     synchronized (getGlobalSyncObject()) {
       return getModel().expandResources(resources);
     }
+  }
+  
+  public void updateRoutingTopology() {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   public List<TravelCosts> getTravelCosts(

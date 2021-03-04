@@ -42,11 +42,8 @@ import org.opentcs.kernel.persistence.UserAccountPersister;
 import org.opentcs.kernel.persistence.XMLFileUserAccountPersister;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.RMIRegistries;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventBuffer;
-import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.RefusingTCSEventFilter;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,7 +182,7 @@ class StandardRemoteKernel
     }
     // Register as event listener with the kernel.
     LOG.debug("Registering as event listener with local kernel...");
-    localKernel.addEventListener(this, new AcceptingTCSEventFilter());
+    localKernel.addEventListener(this);
     // Start the thread that periodically cleans up the list of known clients
     // and event buffers.
     LOG.debug("Starting cleanerThread...");
@@ -459,8 +456,9 @@ class StandardRemoteKernel
     }
   }
 
+  @SuppressWarnings("deprecation")
   public void setEventFilter(ClientID clientID,
-                             EventFilter<TCSEvent> eventFilter)
+                             org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter)
       throws CredentialsException {
     requireNonNull(eventFilter, "eventFilter");
     synchronized (knownClients) {
@@ -615,8 +613,9 @@ class StandardRemoteKernel
     /**
      * The client's event buffer.
      */
+    @SuppressWarnings("deprecation")
     private final EventBuffer<TCSEvent> eventBuffer
-        = new EventBuffer<>(new RefusingTCSEventFilter());
+        = new EventBuffer<>(new org.opentcs.util.eventsystem.RefusingTCSEventFilter());
     /**
      * The client's alive flag.
      */

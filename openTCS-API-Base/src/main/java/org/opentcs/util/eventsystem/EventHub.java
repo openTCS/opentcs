@@ -7,9 +7,11 @@
  */
 package org.opentcs.util.eventsystem;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ConcurrentHashMap;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An <code>EventHub</code> dispatches events to registered listeners.
@@ -29,27 +31,32 @@ public abstract class EventHub<E extends Event>
   /**
    * The registered event listeners.
    */
-  private final Map<EventListener<E>, EventFilter<E>> eventListeners
-      = new ConcurrentHashMap<>();
+  @SuppressWarnings("deprecation")
+  private final Map<EventListener<E>, EventFilter<E>> eventListeners = new ConcurrentHashMap<>();
 
   /**
    * Creates a new instance.
    */
   protected EventHub() {
-    // Do nada.
   }
 
   @Override
-  public void addEventListener(EventListener<E> listener,
-                               EventFilter<E> filter) {
-    Objects.requireNonNull(listener, "listener is null");
-    Objects.requireNonNull(filter, "filter is null");
+  @Deprecated
+  public void addEventListener(EventListener<E> listener, EventFilter<E> filter) {
+    requireNonNull(listener, "listener");
+    requireNonNull(filter, "filter");
     eventListeners.put(listener, filter);
   }
 
   @Override
+  public void addEventListener(EventListener<E> listener) {
+    requireNonNull(listener, "listener");
+    eventListeners.put(listener, (event) -> true);
+  }
+
+  @Override
   public void removeEventListener(EventListener<E> listener) {
-    Objects.requireNonNull(listener, "listener is null");
+    requireNonNull(listener, "listener");
     eventListeners.remove(listener);
   }
 
@@ -57,8 +64,20 @@ public abstract class EventHub<E extends Event>
    * Returns a map of registered event listeners.
    *
    * @return A map of registered event listeners.
+   * @deprecated Use {@link #eventListeners()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   protected Map<EventListener<E>, EventFilter<E>> getEventListeners() {
     return eventListeners;
+  }
+
+  /**
+   * Returns a collection of registered event listeners.
+   *
+   * @return A collection of registered event listeners.
+   */
+  protected Collection<EventListener<E>> eventListeners() {
+    return eventListeners.keySet();
   }
 }

@@ -5,15 +5,15 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching.recharging;
+package org.opentcs.strategies.basic.dispatching.orderselection.recharging;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
@@ -51,7 +51,7 @@ public class DefaultRechargePositionSupplier
   /**
    * Maps locations' access points to points sharing the same block(s).
    */
-  private final Map<Point, Set<Point>> accessPoints = new HashMap<>();
+  private final Map<Point, Set<Point>> accessPoints = new ConcurrentHashMap<>();
   /**
    * Indicates whether this component is enabled.
    */

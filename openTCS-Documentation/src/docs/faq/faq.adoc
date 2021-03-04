@@ -1,10 +1,11 @@
+= openTCS: Frequently Asked Questions
+The openTCS developers <info@opentcs.org>
+openTCS {project-version}
+:last-update-label!:
 
-[appendix]
-== Questions and Answers
+== Plant models
 
-=== Plant models
-
-==== How can I migrate plant models created with openTCS before version 3.0?
+=== How can I migrate plant models created with openTCS before version 3.0?
 
 . Backup the contents of the kernel directory's `data/` subdirectory.
 It contains subdirectories with a plant model in a `model.xml` file each.
@@ -27,19 +28,19 @@ The migration of this plant model is finished.
 +
 _Example: Follow steps 3 - 7 with `modelB` and `modelC` instead of `modelA`._
 
-==== Why are all transport orders marked `UNROUTABLE` when I only have reporting points in my model?
+=== Why are all transport orders marked `UNROUTABLE` when I only have reporting points in my model?
 
 Vehicles are not allowed to stop at reporting points.
 Hence at least the starting point and the endpoint (usually linked to a location) of a route must be halt points to make routing possible.
 
-==== How can I create curved paths between two points?
+=== How can I create curved paths between two points?
 
 Select btn:[Bezier] from the path tools and connect two points by clicking on the first point, dragging the mouse to the second point and releasing the mouse button there.
 Then activate the selection tool and click on the previously created bezier path.
 Two blue control points will appear.
 Drag the control points to change the shape of the path.
 
-==== Why do points have two sets of coordinates (model and layout)?
+=== Why do points have two sets of coordinates (model and layout)?
 
 The openTCS kernel itself works with a logical driving course model - geometric attributes of e.g. points and paths are not relevant for its core functionality.
 It may, however, have to provide (real/physical) coordinates of a destination point to a vehicle, depending on the way the vehicle's navigation works.
@@ -48,9 +49,9 @@ With openTCS, these are called the __model coordinates__.
 The __layout coordinates__, on the other hand, are coordinates that are used merely for visualizing the driving course in the plant overview.
 These coordinates will probably be the same as the model coordinates in most cases, but they may differ, e.g. in cases where the driving course is supposed to be modelled/displayed in a distorted way.
 
-=== Transport orders
+== Transport orders
 
-==== How can I set priorities for transport orders?
+=== How can I set priorities for transport orders?
 
 With openTCS, transport orders do not have a priority attribute.
 That is because a transport order's priority may change over time or when other transport orders are added.
@@ -58,3 +59,16 @@ That is because a transport order's priority may change over time or when other 
 In the end, a single transport order's effective priority depends on the dispatcher implementation used.
 With openTCS's default dispatcher, transport orders' __deadline__ attributes are intended to be used for prioritizing - the sooner the deadline, the higher an order's effective priority.
 To give a transport order a higher priority from the beginning, you can set its deadline to something earlier than all other orders' deadlines, e.g. to "right now" or a point of time in the past.
+
+== Vehicle drivers
+
+=== Which side (driver or vehicle) should be the client/server?
+
+This should be decided based on project-specific requirements.
+You are free to implement it either way.
+
+== Networking
+
+=== How do I enable access to the RMI interface for clients when the kernel is running on a host with multiple IP addresses?
+
+See https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.

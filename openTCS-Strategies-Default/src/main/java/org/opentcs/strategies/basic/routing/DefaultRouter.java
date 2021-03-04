@@ -9,7 +9,7 @@ package org.opentcs.strategies.basic.routing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Router;
@@ -79,6 +81,10 @@ public class DefaultRouter
    */
   private final Map<Integer, RoutingTable> netsByVehicle = new ConcurrentHashMap<>();
   /**
+   * Prevents reading from the routing tables and planned routes while updating them.
+   */
+  private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
@@ -101,9 +107,15 @@ public class DefaultRouter
 
   @Override
   public void initialize() {
-    routesByVehicle.clear();
-    updateRoutingTables();
-    initialized = true;
+    try {
+      rwLock.writeLock().lock();
+      routesByVehicle.clear();
+      updateRoutingTables();
+      initialized = true;
+    }
+    finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
@@ -113,45 +125,63 @@ public class DefaultRouter
 
   @Override
   public void terminate() {
-    routesByVehicle.clear();
-    netsByVehicle.clear();
-    initialized = false;
+    try {
+      rwLock.writeLock().lock();
+      routesByVehicle.clear();
+      netsByVehicle.clear();
+      initialized = false;
+    }
+    finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
   @Deprecated
   public void updateRoutingTables() {
-    netsByVehicle.clear();
-    for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
-      int currentGroup = getRoutingGroupOfVehicle(curVehicle);
-      if (!netsByVehicle.containsKey(currentGroup)) {
-        RoutingTable routingNet = tableBuilder.computeTable(curVehicle);
-        netsByVehicle.put(currentGroup, routingNet);
+    try {
+      rwLock.writeLock().lock();
+      netsByVehicle.clear();
+      for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
+        int currentGroup = getRoutingGroupOfVehicle(curVehicle);
+        if (!netsByVehicle.containsKey(currentGroup)) {
+          RoutingTable routingNet = tableBuilder.computeTable(curVehicle);
+          netsByVehicle.put(currentGroup, routingNet);
+        }
       }
+      LOG.debug("Number of nets computed: {}", netsByVehicle.size());
     }
-    LOG.debug("Number of nets computed: {}", netsByVehicle.size());
+    finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
   public Set<Vehicle> checkRoutability(TransportOrder order) {
     requireNonNull(order, "order");
 
-    Set<Vehicle> result = new HashSet<>();
-    List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
-    DriveOrder[] driveOrders
-        = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-    for (Map.Entry<Integer, RoutingTable> curEntry : netsByVehicle.entrySet()) {
-      // Get all points at the first location at which a vehicle of the current
-      // type can execute the desired operation and check if an acceptable route
-      // originating in one of them exists.
-      for (Point curStartPoint : getDestinationPoints(driveOrders[0])) {
-        if (isRoutable(curStartPoint, driveOrders, 1, curEntry.getValue())) {
-          result.addAll(getVehiclesByRoutingGroup(curEntry.getKey()));
-          break;
+    try {
+      rwLock.readLock().lock();
+      Set<Vehicle> result = new HashSet<>();
+      List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
+      DriveOrder[] driveOrders
+          = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
+      for (Map.Entry<Integer, RoutingTable> curEntry : netsByVehicle.entrySet()) {
+        // Get all points at the first location at which a vehicle of the current
+        // type can execute the desired operation and check if an acceptable route
+        // originating in one of them exists.
+        for (Point curStartPoint : getDestinationPoints(driveOrders[0])) {
+          if (isRoutable(curStartPoint, driveOrders, 1, curEntry.getValue())) {
+            result.addAll(getVehiclesByRoutingGroup(curEntry.getKey()));
+            break;
+          }
         }
       }
+      return result;
     }
-    return result;
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
@@ -162,15 +192,21 @@ public class DefaultRouter
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(transportOrder, "transportOrder");
 
-    List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
-    DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-    RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
-    OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, net);
-    OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
-    computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
-    return (resultStruct.bestCosts == Long.MAX_VALUE)
-        ? Optional.empty()
-        : Optional.of(Arrays.asList(resultStruct.bestRoute));
+    try {
+      rwLock.readLock().lock();
+      List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
+      DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
+      RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
+      OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, net);
+      OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
+      computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
+      return (resultStruct.bestCosts == Long.MAX_VALUE)
+          ? Optional.empty()
+          : Optional.of(Arrays.asList(resultStruct.bestRoute));
+    }
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
@@ -181,18 +217,24 @@ public class DefaultRouter
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(destinationPoint, "destinationPoint");
 
-    RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
-    long costs = net.getCosts(sourcePoint, destinationPoint);
-    if (costs == INFINITE_COSTS) {
-      return Optional.empty();
+    try {
+      rwLock.readLock().lock();
+      RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
+      long costs = net.getCosts(sourcePoint, destinationPoint);
+      if (costs == INFINITE_COSTS) {
+        return Optional.empty();
+      }
+      List<Route.Step> steps = net.getRouteSteps(sourcePoint, destinationPoint);
+      if (steps.isEmpty()) {
+        // If the list of steps is empty, we're already at the destination point
+        // Create a single step without a path.
+        steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
+      }
+      return Optional.of(new Route(steps, costs));
     }
-    List<Route.Step> steps = net.getRouteSteps(sourcePoint, destinationPoint);
-    if (steps.isEmpty()) {
-      // If the list of steps is empty, we're already at the destination point
-      // Create a single step without a path.
-      steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
+    finally {
+      rwLock.readLock().unlock();
     }
-    return Optional.of(new Route(steps, costs));
   }
 
   @Override
@@ -203,8 +245,14 @@ public class DefaultRouter
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(destinationPoint, "destinationPoint");
 
-    return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
-        .getCosts(sourcePoint, destinationPoint);
+    try {
+      rwLock.readLock().lock();
+      return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
+          .getCosts(sourcePoint, destinationPoint);
+    }
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
@@ -215,8 +263,14 @@ public class DefaultRouter
     requireNonNull(srcPointRef, "srcPointRef");
     requireNonNull(dstPointRef, "dstPointRef");
 
-    return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
-        .getCosts(srcPointRef, dstPointRef);
+    try {
+      rwLock.readLock().lock();
+      return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
+          .getCosts(srcPointRef, dstPointRef);
+    }
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
@@ -227,54 +281,84 @@ public class DefaultRouter
     requireNonNull(srcRef, "srcRef");
     requireNonNull(destRef, "destRef");
 
-    // Get all attached links for source and destination
-    Set<Link> srcLinks = kernel.getTCSObject(Location.class, srcRef).getAttachedLinks();
-    Set<Link> destLinks = kernel.getTCSObject(Location.class, destRef).getAttachedLinks();
+    try {
+      rwLock.readLock().lock();
+      // Get all attached links for source and destination
+      Set<Link> srcLinks = kernel.getTCSObject(Location.class, srcRef).getAttachedLinks();
+      Set<Link> destLinks = kernel.getTCSObject(Location.class, destRef).getAttachedLinks();
 
-    // Find the cheapest destination link to be used
-    long costs = Long.MAX_VALUE;
-    for (Link srcLink : srcLinks) {
-      for (Link destLink : destLinks) {
-        long linkCosts = getCosts(vehicle,
-                                  kernel.getTCSObject(Point.class, srcLink.getPoint()),
-                                  kernel.getTCSObject(Point.class, destLink.getPoint()));
-        costs = Math.min(costs, linkCosts);
+      // Find the cheapest destination link to be used
+      long costs = Long.MAX_VALUE;
+      for (Link srcLink : srcLinks) {
+        for (Link destLink : destLinks) {
+          long linkCosts = getCosts(vehicle,
+                                    kernel.getTCSObject(Point.class, srcLink.getPoint()),
+                                    kernel.getTCSObject(Point.class, destLink.getPoint()));
+          costs = Math.min(costs, linkCosts);
+        }
       }
+      return costs;
     }
-    return costs;
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
   public void selectRoute(Vehicle vehicle, List<DriveOrder> driveOrders) {
     requireNonNull(vehicle, "vehicle");
 
-    if (driveOrders == null) {
-      // XXX Should we remember the vehicle's current position, maybe?
-      routesByVehicle.remove(vehicle);
+    try {
+      rwLock.writeLock().lock();
+      if (driveOrders == null) {
+        // XXX Should we remember the vehicle's current position, maybe?
+        routesByVehicle.remove(vehicle);
+      }
+      else {
+        routesByVehicle.put(vehicle, driveOrders);
+      }
     }
-    else {
-      routesByVehicle.put(vehicle, driveOrders);
+    finally {
+      rwLock.writeLock().unlock();
     }
   }
 
   @Override
   public Map<Vehicle, List<DriveOrder>> getSelectedRoutes() {
-    return Collections.unmodifiableMap(routesByVehicle);
+    try {
+      rwLock.readLock().lock();
+      return new HashMap<>(routesByVehicle);
+    }
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
   public Set<Point> getTargetedPoints() {
-    Set<Point> result = new HashSet<>();
-    for (List<DriveOrder> curOrderList : routesByVehicle.values()) {
-      DriveOrder finalOrder = curOrderList.get(curOrderList.size() - 1);
-      result.add(finalOrder.getRoute().getFinalDestinationPoint());
+    try {
+      rwLock.readLock().lock();
+      Set<Point> result = new HashSet<>();
+      for (List<DriveOrder> curOrderList : routesByVehicle.values()) {
+        DriveOrder finalOrder = curOrderList.get(curOrderList.size() - 1);
+        result.add(finalOrder.getRoute().getFinalDestinationPoint());
+      }
+      return result;
     }
-    return result;
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
   public String getInfo() {
-    return "Computed nets/routing tables: " + netsByVehicle.size();
+    try {
+      rwLock.readLock().lock();
+      return "Computed nets/routing tables: " + netsByVehicle.size();
+    }
+    finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   /**

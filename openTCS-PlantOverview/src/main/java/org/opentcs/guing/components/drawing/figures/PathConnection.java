@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.data.model.visualization.ElementPropKeys;
+import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerControlPointHandle;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
@@ -88,6 +90,8 @@ public class PathConnection
    * Control point 5.
    */
   private Point2D.Double cp5;
+
+  private Origin previousOrigin;
 
   /**
    * Creates a new instance.
@@ -343,12 +347,18 @@ public class PathConnection
    * Die BEZIER-Kontrollpunkte aktualisieren
    */
   public void updateControlPoints() {
+    if (previousOrigin == null) {
+      Origin origin = get(FigureConstants.ORIGIN);
+      previousOrigin = new Origin();
+      previousOrigin.setScale(origin.getScaleX(), origin.getScaleY());
+    }
+
     if (cp1 != null && cp2 != null) {
       if (cp3 != null) {
         cp1 = path.get(0, BezierPath.C2_MASK);
         cp2 = path.get(1, BezierPath.C1_MASK);
         cp3 = path.get(1, BezierPath.C0_MASK);
-        cp4 = path.get(2, BezierPath.C2_MASK);
+        cp4 = path.get(1, BezierPath.C2_MASK);
         cp5 = path.get(2, BezierPath.C1_MASK);
       }
       else {
@@ -677,6 +687,56 @@ public class PathConnection
     pSpeed.markChanged();
 
     getModel().propertiesChanged(this);
+  }
+
+  @Override
+  public void scaleModel(EventObject event) {
+    if (!(event.getSource() instanceof Origin)) {
+      return;
+    }
+
+    Origin origin = (Origin) event.getSource();
+    if (previousOrigin.getScaleX() == origin.getScaleX()
+        && previousOrigin.getScaleY() == origin.getScaleY()) {
+      return;
+    }
+
+    if (isTupelBezier()) { // BEZIER
+      Point2D.Double scaledControlPoint = scaleControlPoint(cp1, origin);
+      path.set(0, BezierPath.C2_MASK, scaledControlPoint);
+      scaledControlPoint = scaleControlPoint(cp2, origin);
+      path.set(1, BezierPath.C1_MASK, scaledControlPoint);
+    }
+    else if (isTripleBezier()) { // BEZIER_3
+      Point2D.Double scaledControlPoint = scaleControlPoint(cp1, origin);
+      path.set(0, BezierPath.C2_MASK, scaledControlPoint);
+      scaledControlPoint = scaleControlPoint(cp2, origin);
+      path.set(1, BezierPath.C1_MASK, scaledControlPoint);
+      scaledControlPoint = scaleControlPoint(cp3, origin);
+      path.set(1, BezierPath.C0_MASK, scaledControlPoint);
+      scaledControlPoint = scaleControlPoint(cp4, origin);
+      path.set(1, BezierPath.C2_MASK, scaledControlPoint);
+      path.set(2, BezierPath.C2_MASK, scaledControlPoint);
+      scaledControlPoint = scaleControlPoint(cp5, origin);
+      path.set(2, BezierPath.C1_MASK, scaledControlPoint);
+    }
+
+    // Remember the new scale
+    previousOrigin.setScale(origin.getScaleX(), origin.getScaleY());
+    updateControlPoints();
+  }
+
+  private Point2D.Double scaleControlPoint(Point2D.Double p, Origin newScale) {
+    return new Double((p.x * previousOrigin.getScaleX()) / newScale.getScaleX(),
+                      (p.y * previousOrigin.getScaleY()) / newScale.getScaleY());
+  }
+
+  private boolean isTupelBezier() {
+    return cp1 != null && cp2 != null && cp3 == null && cp4 == null && cp5 == null;
+  }
+
+  private boolean isTripleBezier() {
+    return cp1 != null && cp2 != null && cp3 != null && cp4 != null && cp5 != null;
   }
 
   @Override // LineConnectionFigure

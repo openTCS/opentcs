@@ -276,8 +276,8 @@ public class OpenTCSModelManager
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle()
-                                    .getFormatted("modelManager.persistence.notLoaded",
-                                                  file.getName()));
+                                .getFormatted("modelManager.persistence.notLoaded",
+                                              file.getName()));
       LOG.info("Error reading file", ex);
     }
     return false;
@@ -529,7 +529,7 @@ public class OpenTCSModelManager
           groupModel.add(modelComponent);
           procAdapterUtil.createProcessAdapter(modelComponent,
                                                systemModel
-                                                   .getEventDispatcher());
+                                               .getEventDispatcher());
         }
       }
     }
@@ -591,7 +591,7 @@ public class OpenTCSModelManager
       }
       procAdapterUtil.createProcessAdapter(staticRouteModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
     }
   }
 
@@ -647,7 +647,7 @@ public class OpenTCSModelManager
       }
       procAdapterUtil.createProcessAdapter(blockModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
     }
   }
 
@@ -777,7 +777,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(locationModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
       locationModel.propertiesChanged(new NullAttributesChangeListener());
       origin.addListener(llf);
       llf.set(FigureConstants.ORIGIN, origin);
@@ -934,7 +934,7 @@ public class OpenTCSModelManager
     for (LocationTypeModel locTypeModel : locTypeModels) {
       procAdapterUtil.createProcessAdapter(locTypeModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
     }
   }
 
@@ -963,7 +963,7 @@ public class OpenTCSModelManager
     for (LinkModel linkModel : linkModels) {
       procAdapterUtil.createProcessAdapter(linkModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
     }
   }
 
@@ -971,7 +971,7 @@ public class OpenTCSModelManager
     for (VehicleModel vehModel : vehicles) {
       procAdapterUtil.createProcessAdapter(vehModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
     }
   }
 
@@ -1028,7 +1028,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(pathModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
       pathModel.setFigure(pathFigure);
       pathModel.addAttributesChangeListener(pathFigure);
       restoredFigures.add(pathFigure);
@@ -1209,7 +1209,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(pointModel,
                                            systemModel
-                                               .getEventDispatcher());
+                                           .getEventDispatcher());
       // Koordinaten der Punkte �ndern sich, wenn der Ma�stab ver�ndert wird
       origin.addListener(lpf);
       lpf.set(FigureConstants.ORIGIN, origin);
@@ -1506,6 +1506,9 @@ public class OpenTCSModelManager
       if (pScaleY.getValueByUnit(LengthProperty.Unit.MM) == 0) {
         pScaleY.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
       }
+      model.getDrawingMethod().getOrigin()
+          .setScale(pScaleX.getValueByUnit(LengthProperty.Unit.MM),
+                    pScaleY.getValueByUnit(LengthProperty.Unit.MM));
     }
     LayoutModel layoutComponent
         = (LayoutModel) model.getMainFolder(SystemModel.FolderKey.LAYOUT);

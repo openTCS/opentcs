@@ -44,7 +44,14 @@ public class TransportOrderDispatcher
 
   @Override
   public void processEvent(TCSEvent event) {
+    if (!(event instanceof TCSObjectEvent)) {
+      return;
+    }
     TCSObjectEvent objEvent = (TCSObjectEvent) event;
+    if (!(objEvent.getCurrentOrPreviousObjectState() instanceof TransportOrder)) {
+      return;
+    }
+
     TransportOrder t = (TransportOrder) objEvent.getCurrentOrPreviousObjectState();
 
     switch (objEvent.getType()) {
@@ -59,7 +66,7 @@ public class TransportOrderDispatcher
       case OBJECT_REMOVED:
         eventBus.publish(new TransportOrderEvent(this, t, TransportOrderEvent.Type.ORDER_REMOVED));
         break;
-        
+
       default:
     }
   }

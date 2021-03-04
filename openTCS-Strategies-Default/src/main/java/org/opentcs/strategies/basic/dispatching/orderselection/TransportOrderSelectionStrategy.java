@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching;
+package org.opentcs.strategies.basic.dispatching.orderselection;
 
 import com.google.inject.BindingAnnotation;
 import java.lang.annotation.ElementType;
@@ -33,6 +33,9 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
+import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
+import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +114,7 @@ public class TransportOrderSelectionStrategy
   @Nullable
   @Override
   public VehicleOrderSelection selectOrder(@Nonnull Vehicle vehicle) {
-    Set<TransportOrder> transportOrders = getOrdersForVehicle(vehicle);
+    Set<TransportOrder> transportOrders = findOrdersFor(vehicle);
     if (transportOrders == null) {
       // The vehicle should not get ANY order.
       return new VehicleOrderSelection(null, vehicle, null);
@@ -166,23 +169,6 @@ public class TransportOrderSelectionStrategy
     return new VehicleOrderSelection(selectedOrder, vehicle, driveOrders.get());
   }
 
-  private boolean isPartOfActiveSequence(TransportOrder order) {
-    // Check if the selected order MUST be assigned right now or if an order for
-    // recharging would be possible. If the selected order is part of an order
-    // sequence that is already being processed, we cannot shove in another order
-    // but have to finish the sequence first.
-    if (order.getWrappingSequence() == null) {
-      return false;
-    }
-    for (OrderSequence seq : kernel.getTCSObjects(OrderSequence.class)) {
-      if (order.getWrappingSequence().equals(seq.getReference())
-          && seq.getProcessingVehicle() != null) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   /**
    * Finds a set of orders in the given set of orders that are available for dispatching to the
    * given vehicle.
@@ -197,14 +183,26 @@ public class TransportOrderSelectionStrategy
    * @return The next order(s) to be processed, or an empty set, if no orders for the vehicle were
    * found, or <code>null</code>, if the vehicle shouln't do anything.
    */
-  private SortedSet<TransportOrder> getOrdersForVehicle(Vehicle vehicle) {
+  @Nullable
+  private SortedSet<TransportOrder> findOrdersFor(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
-    Set<OrderSequence> sequences = kernel.getTCSObjects(OrderSequence.class);
     Set<TransportOrder> orders = kernel.getTCSObjects(TransportOrder.class);
 
+    SortedSet<TransportOrder> result = findNextOrderInSameSequence(orders, vehicle);
+    if (result == null || !result.isEmpty()) {
+      return result;
+    }
+
+    // If we didn't find any sequence to be processed first, try to find another order.
+    return findDispatchableOrders(orders, vehicle);
+  }
+
+  private SortedSet<TransportOrder> findNextOrderInSameSequence(Set<TransportOrder> orders,
+                                                                Vehicle vehicle) {
     SortedSet<TransportOrder> result = new TreeSet<>(orderComparator);
 
+    Set<OrderSequence> sequences = kernel.getTCSObjects(OrderSequence.class);
     // Check if there's an order sequence being processed by the given
     // vehicle that is not finished, yet. We have to finish that first, so the
     // next order in that sequence has priority.
@@ -230,14 +228,7 @@ public class TransportOrderSelectionStrategy
       }
     }
 
-    // If we didn't find any sequence to be processed first, try to find another
-    // order to take care of.
-    if (result.isEmpty()) {
-      return getOrdersForVehicle(orders, vehicle);
-    }
-    else {
-      return result;
-    }
+    return result;
   }
 
   /**
@@ -251,7 +242,8 @@ public class TransportOrderSelectionStrategy
    * @param vehicle The vehicle to select dispatchable orders for.
    * @return A set of orders that are available for dispatching to the given vehicle.
    */
-  private SortedSet<TransportOrder> getOrdersForVehicle(Set<TransportOrder> orders, Vehicle vehicle) {
+  private SortedSet<TransportOrder> findDispatchableOrders(Set<TransportOrder> orders,
+                                                           Vehicle vehicle) {
     requireNonNull(orders, "orders");
     requireNonNull(vehicle, "vehicle");
 
@@ -260,16 +252,16 @@ public class TransportOrderSelectionStrategy
     SortedSet<TransportOrder> vehicleSpecificOrders = new TreeSet<>(orderComparator);
     // Get all transport orders that are ready to be dispatched.
     for (TransportOrder curOrder : orders) {
-      if (curOrder.hasState(TransportOrder.State.DISPATCHABLE)) {
-        TCSObjectReference<Vehicle> intendedVehicle = curOrder.getIntendedVehicle();
+      if (curOrder.hasState(TransportOrder.State.DISPATCHABLE)
+          && !isPartOfActiveSequence(curOrder)) {
         // If the order is free for processing by any vehicle, add it to the
         // set of 'usual' orders.
-        if (intendedVehicle == null) {
+        if (curOrder.getIntendedVehicle() == null) {
           transportOrders.add(curOrder);
         }
         // If the order is intended to be processed by the vehicle being
         // dispatched, add it to the set of specific orders.
-        else if (vehicleRef.equals(intendedVehicle)) {
+        else if (vehicleRef.equals(curOrder.getIntendedVehicle())) {
           vehicleSpecificOrders.add(curOrder);
         }
       }
@@ -282,6 +274,17 @@ public class TransportOrderSelectionStrategy
     else {
       return transportOrders;
     }
+  }
+
+  private boolean isPartOfActiveSequence(TransportOrder order) {
+    if (order.getWrappingSequence() == null) {
+      return false;
+    }
+    OrderSequence seq = kernel.getTCSObject(OrderSequence.class, order.getWrappingSequence());
+    if (seq != null && seq.getProcessingVehicle() != null) {
+      return true;
+    }
+    return false;
   }
 
   /**

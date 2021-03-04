@@ -12,6 +12,11 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.orderselection.NoOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.ParkingOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.RechargeOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.ReservedOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.orderselection.TransportOrderSelectionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

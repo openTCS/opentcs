@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching;
+package org.opentcs.strategies.basic.dispatching.orderselection;
 
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -20,6 +20,9 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
+import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
+import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
 
 /**
  *

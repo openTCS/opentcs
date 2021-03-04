@@ -7,6 +7,8 @@
  */
 package org.opentcs.util.eventsystem;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * This interface declares methods for registering and unregistering event
  * listeners with a source of events.
@@ -15,6 +17,7 @@ package org.opentcs.util.eventsystem;
  * @param <E> The actual event implementation.
  */
 public interface EventSource<E extends Event> {
+
   /**
    * Registers an event listener.
    *
@@ -22,10 +25,22 @@ public interface EventSource<E extends Event> {
    * registered, it is re-registered with the given event filter.
    * @param filter The filter deciding which events to deliver to the given
    * listener.
+   * @deprecated Use {@link #addEventListener(org.opentcs.util.eventsystem.EventListener)} instead,
+   * and filter out unwanted events in
+   * {@link EventListener#processEvent(org.opentcs.util.eventsystem.Event)}. (Note that you should
+   * do that, anyway, which is why a separate event filter is superfluous.)
    */
-  void addEventListener(EventListener<E> listener,
-        EventFilter<E> filter);
-  
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  void addEventListener(EventListener<E> listener, EventFilter<E> filter);
+
+  /**
+   * Registers an event listener.
+   *
+   * @param listener The event listener to add.
+   */
+  void addEventListener(EventListener<E> listener);
+
   /**
    * Unregisters an event listener.
    *

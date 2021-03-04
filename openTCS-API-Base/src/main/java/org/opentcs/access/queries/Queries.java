@@ -12,12 +12,16 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Convenience methods for working with queries.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Not really an API class.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Method will be removed.")
 public final class Queries {
 
   /**

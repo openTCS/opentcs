@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
@@ -15,6 +14,7 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
@@ -141,14 +141,16 @@ public class LabeledPointFigure
   }
 
   @Override
-  public void read(DOMInput in) throws IOException {
+  public void read(DOMInput in)
+      throws IOException {
     double x = in.getAttribute("x", 0d);
     double y = in.getAttribute("y", 0d);
     setBounds(new Point2D.Double(x, y), new Point2D.Double(x, y));
   }
 
   @Override
-  public void write(DOMOutput out) throws IOException {
+  public void write(DOMOutput out)
+      throws IOException {
     PointFigure pf = getPresentationFigure();
     out.addAttribute("x", pf.getZoomPoint().getX());
     out.addAttribute("y", pf.getZoomPoint().getY());
@@ -192,6 +194,28 @@ public class LabeledPointFigure
         setBounds(anchor, anchor);
         getLabel().changed();
       }
+    }
+
+    invalidate();
+    // Auch das Label aktualisieren
+    fireFigureChanged();
+  }
+
+  @Override
+  public void scaleModel(EventObject event) {
+    Origin origin = get(FigureConstants.ORIGIN);
+
+    if (origin != null) {
+      PointFigure pf = getPresentationFigure();
+
+      StringProperty xLayout = (StringProperty) pf.getModel().getProperty(ElementPropKeys.POINT_POS_X);
+      StringProperty yLayout = (StringProperty) pf.getModel().getProperty(ElementPropKeys.POINT_POS_Y);
+
+//      getLabel().willChange();
+      Point2D exact = origin.calculatePixelPositionExactly(xLayout, yLayout);
+      Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
+      setBounds(anchor, anchor);
+//      getLabel().changed();
     }
 
     invalidate();

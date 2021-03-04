@@ -42,9 +42,6 @@ run {
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
                     'opentcs.home':'.',\
-                    'opentcs.kernel.host':'localhost',\
-                    'opentcs.kernel.port':'1099',\
-                    'opentcs.dockinglayout':'./config/plantoverview-docking-layout.xml',\
                     'org.opentcs.util.configuration.xml.file':'./config/openTCS-config.xml',\
                     'org.opentcs.util.configuration.saveonexit':'true'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\

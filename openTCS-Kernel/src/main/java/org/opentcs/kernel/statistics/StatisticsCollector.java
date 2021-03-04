@@ -18,7 +18,6 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.ApplicationHome;
-import org.opentcs.data.TCSObjectEventFilter;
 import org.opentcs.util.statistics.StatisticsEventLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,8 +108,7 @@ public class StatisticsCollector
         loggerThread.start();
         // Create event listener and register it with the kernel.
         statisticsListener = new StatisticsEventListener(statisticsLogger);
-        kernel.addEventListener(statisticsListener,
-                                TCSObjectEventFilter.ACCEPT_ALL);
+        kernel.addEventListener(statisticsListener);
         // Remember we're plugged in.
         enabled = true;
         LOG.debug("Statistics collector enabled");

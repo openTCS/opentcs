@@ -11,6 +11,7 @@ package org.opentcs.guing.application;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.jhotdraw.app.Application;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
 /**
  * The plant overview application's entry point.
@@ -21,9 +22,9 @@ import org.jhotdraw.app.Application;
 public class PlantOverviewStarter {
 
   /**
-   * The key of the (optional) system property for the initial mode.
+   * The application's configuration.
    */
-  private static final String PROP_INITIAL_MODE = "opentcs.initialmode";
+  private final PlantOverviewApplicationConfiguration configuration;
   /**
    * Our startup progress indicator.
    */
@@ -40,23 +41,25 @@ public class PlantOverviewStarter {
   /**
    * Creates a new instance.
    *
+   * @param configuration The application's configuration.
    * @param progressIndicator The progress indicator to be used.
    * @param application The application to be used.
    * @param opentcsView The view to be used.
    */
   @Inject
-  public PlantOverviewStarter(ProgressIndicator progressIndicator,
+  public PlantOverviewStarter(PlantOverviewApplicationConfiguration configuration,
+                              ProgressIndicator progressIndicator,
                               Application application,
                               OpenTCSView opentcsView) {
-    this.progressIndicator = requireNonNull(progressIndicator,
-                                            "progressIndicator");
+    this.configuration = requireNonNull(configuration, "configuration");
+    this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
     this.application = requireNonNull(application, "application");
     this.opentcsView = requireNonNull(opentcsView, "opentcsView");
   }
 
   public void startPlantOverview() {
     opentcsView.init();
-    setInitialMode();
+    opentcsView.switchPlantOverviewState(initialMode());
     progressIndicator.initialize();
     progressIndicator.setProgress(0, "Start openTCS visualization");
     // XXX We currently do this to iteratively eliminate (circular) references
@@ -69,29 +72,16 @@ public class PlantOverviewStarter {
     progressIndicator.terminate();
   }
 
-  /**
-   * Sets the application's initial mode of operation, either by reading it from
-   * the system properties, or, failing that, by letting the user select it in a
-   * dialog.
-   */
-  private void setInitialMode() {
-    final OperationMode initialMode;
-
-    String modeProp = System.getProperty(PROP_INITIAL_MODE);
-    if (modeProp != null) {
-      if (modeProp.toLowerCase().equals("operating")) {
-        initialMode = OperationMode.OPERATING;
-      }
-      else {
-        initialMode = OperationMode.MODELLING;
-      }
+  private OperationMode initialMode() {
+    switch (configuration.initialMode()) {
+      case MODELLING:
+        return OperationMode.MODELLING;
+      case OPERATING:
+        return OperationMode.OPERATING;
+      default:
+        ChooseStateDialog chooseStateDialog = new ChooseStateDialog();
+        chooseStateDialog.setVisible(true);
+        return chooseStateDialog.getSelection();
     }
-    else {
-      ChooseStateDialog chooseStateDialog = new ChooseStateDialog();
-      chooseStateDialog.setVisible(true);
-      initialMode = chooseStateDialog.getSelection();
-    }
-
-    opentcsView.switchPlantOverviewState(initialMode);
   }
 }

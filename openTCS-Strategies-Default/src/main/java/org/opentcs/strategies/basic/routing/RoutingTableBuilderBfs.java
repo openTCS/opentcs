@@ -39,9 +39,9 @@ public class RoutingTableBuilderBfs
    */
   private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderBfs.class);
   /**
-   * This class's configuration.
+   * Whether to terminate early.
    */
-  private final DefaultRouterConfiguration configuration;
+  private final boolean terminateEarly;
   /**
    * The queue of nodes/points in the model that still need to be visited by the
    * BFS algorithm.
@@ -60,7 +60,8 @@ public class RoutingTableBuilderBfs
                          RouteEvaluator routeEvaluator,
                          DefaultRouterConfiguration configuration) {
     super(kernel, routeEvaluator);
-    this.configuration = requireNonNull(configuration, "configuration");
+    requireNonNull(configuration, "configuration");
+    this.terminateEarly = configuration.terminateSearchEarly();
   }
 
   @Override
@@ -158,7 +159,7 @@ public class RoutingTableBuilderBfs
     // (Not knowing the cost function applied to the route, terminating here
     // might mean that a shorter route to one of the successors will not be
     // found. An exhaustive search might take much longer, however.)
-    else if (configuration.terminateSearchEarly()) {
+    else if (terminateEarly) {
       return;
     }
     queue.add(new QueueEntry(currentPoint, steps, costs));

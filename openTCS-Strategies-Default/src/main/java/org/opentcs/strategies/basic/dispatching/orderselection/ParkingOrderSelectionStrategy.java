@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching;
+package org.opentcs.strategies.basic.dispatching.orderselection;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +24,9 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
+import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 @SuppressWarnings("deprecation")
-public class RechargeOrderSelectionStrategy
+public class ParkingOrderSelectionStrategy
     implements VehicleOrderSelectionStrategy,
                Lifecycle {
 
@@ -53,29 +56,29 @@ public class RechargeOrderSelectionStrategy
    */
   private final ProcessabilityChecker processabilityChecker;
   /**
-   * The strategy used for finding suitable recharge locations.
-   */
-  private final org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier;
-  /**
    * The dispatcher configuration.
    */
   private final DefaultDispatcherConfiguration configuration;
+  /**
+   * The strategy used for finding suitable parking positions.
+   */
+  private final org.opentcs.components.kernel.ParkingPositionSupplier parkingPosSupplier;
   /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
 
   @Inject
-  public RechargeOrderSelectionStrategy(
+  public ParkingOrderSelectionStrategy(
       LocalKernel kernel,
       Router router,
+      org.opentcs.components.kernel.ParkingPositionSupplier parkingPosSupplier,
       ProcessabilityChecker processabilityChecker,
-      org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier,
       DefaultDispatcherConfiguration configuration) {
     this.router = requireNonNull(router, "router");
     this.kernel = requireNonNull(kernel, "kernel");
     this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
-    this.rechargePosSupplier = requireNonNull(rechargePosSupplier, "rechargePosSupplier");
+    this.parkingPosSupplier = requireNonNull(parkingPosSupplier, "parkingPosSupplier");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -84,7 +87,9 @@ public class RechargeOrderSelectionStrategy
     if (initialized) {
       return;
     }
-    rechargePosSupplier.initialize();
+    parkingPosSupplier.initialize();
+    
+    initialized = true;
   }
 
   @Override
@@ -92,7 +97,9 @@ public class RechargeOrderSelectionStrategy
     if (!initialized) {
       return;
     }
-    rechargePosSupplier.terminate();
+    parkingPosSupplier.terminate();
+    
+    initialized = false;
   }
 
   @Override
@@ -103,47 +110,41 @@ public class RechargeOrderSelectionStrategy
   @Nullable
   @Override
   public VehicleOrderSelection selectOrder(@Nonnull Vehicle vehicle) {
-    if (!configuration.rechargeIdleVehicles()) {
+    if (!configuration.parkIdleVehicles()) {
       return null;
     }
-    if (!vehicle.isEnergyLevelDegraded()) {
-      return null;
-    }
-    if (vehicle.hasState(Vehicle.State.CHARGING) && vehicle.getEnergyLevel() < 100) {
-      LOG.debug("{}: Charging and energy < 100% - leaving it alone.", vehicle.getName());
+    Point vehiclePosition = kernel.getTCSObject(Point.class, vehicle.getCurrentPosition());
+    if (vehiclePosition.isParkingPosition()) {
       return new VehicleOrderSelection(null, vehicle, null);
     }
-    LOG.debug("{}: Looking for recharge location...", vehicle.getName());
-    List<DriveOrder.Destination> rechargeDests = rechargePosSupplier.findRechargeSequence(vehicle);
-    if (rechargeDests.isEmpty()) {
-      LOG.warn("{}: Did not find a suitable recharge sequence for vehicle", vehicle.getName());
+
+    LOG.debug("{}: Looking for a parking position...", vehicle.getName());
+    // Get a suitable parking position for the vehicle.
+    Optional<Point> parkPos = parkingPosSupplier.findParkingPosition(vehicle);
+    LOG.debug("Parking position for {}: {}", vehicle, parkPos);
+    // If we could not find a suitable parking position at all, just leave the
+    // vehicle where it is.
+    if (!parkPos.isPresent()) {
+      LOG.warn("{}: Did not find a suitable parking position.", vehicle.getName());
       return null;
     }
-    List<DestinationCreationTO> chargeDests = new LinkedList<>();
-    for (DriveOrder.Destination dest : rechargeDests) {
-      chargeDests.add(
-          new DestinationCreationTO(dest.getLocation().getName(), dest.getOperation())
-              .setProperties(dest.getProperties())
-      );
-    }
-    // Create a transport order for recharging and verify its processability.
-    // The recharge order may be withdrawn unless its energy level is critical.
-    TransportOrder rechargeOrder = kernel.createTransportOrder(
-        new TransportOrderCreationTO("Recharge-" + UUID.randomUUID(), chargeDests)
+    // Create a destination for the point.
+    List<DestinationCreationTO> parkDests = new LinkedList<>();
+    parkDests.add(new DestinationCreationTO(parkPos.get().getName(),
+                                            DriveOrder.Destination.OP_PARK));
+    // Create a transport order for parking and verify its processability.
+    TransportOrder parkOrder = kernel.createTransportOrder(
+        new TransportOrderCreationTO("Park-" + UUID.randomUUID(), parkDests)
+            .setDispensable(true)
             .setIntendedVehicleName(vehicle.getName())
-            .setDispensable(!vehicle.isEnergyLevelCritical())
     );
-
-    Point vehiclePosition = kernel.getTCSObject(Point.class, vehicle.getCurrentPosition());
-    Optional<List<DriveOrder>> driveOrders
-        = router.getRoute(vehicle, vehiclePosition, rechargeOrder);
-    if (processabilityChecker.checkProcessability(vehicle, rechargeOrder)
-        && driveOrders.isPresent()) {
-      return new VehicleOrderSelection(rechargeOrder, vehicle, driveOrders.get());
+    Optional<List<DriveOrder>> driveOrders = router.getRoute(vehicle, vehiclePosition, parkOrder);
+    if (processabilityChecker.checkProcessability(vehicle, parkOrder) && driveOrders.isPresent()) {
+      return new VehicleOrderSelection(parkOrder, vehicle, driveOrders.get());
     }
     else {
       // Mark the order as failed, since the vehicle does not want to execute it.
-      kernel.setTransportOrderState(rechargeOrder.getReference(), TransportOrder.State.FAILED);
+      kernel.setTransportOrderState(parkOrder.getReference(), TransportOrder.State.FAILED);
       return null;
     }
   }

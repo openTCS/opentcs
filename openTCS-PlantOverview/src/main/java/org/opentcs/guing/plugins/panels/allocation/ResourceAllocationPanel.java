@@ -16,7 +16,6 @@ import org.opentcs.access.queries.QuerySchedulerAllocations;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.slf4j.Logger;
@@ -74,7 +73,7 @@ public class ResourceAllocationPanel
     }
     //Register event listener in the kernel
     Kernel kernel = kernelProvider.getKernel();
-    kernel.addEventListener(this, new AcceptingTCSEventFilter());
+    kernel.addEventListener(this);
 
     //Trigger an update to the table model
     handleVehicleStateChange(kernel);

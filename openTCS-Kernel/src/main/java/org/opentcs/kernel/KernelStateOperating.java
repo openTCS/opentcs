@@ -73,6 +73,10 @@ class KernelStateOperating
    */
   private static final Logger LOG = LoggerFactory.getLogger(KernelStateOperating.class);
   /**
+   * The kernel application's configuration.
+   */
+  private final KernelApplicationConfiguration configuration;
+  /**
    * The order facade to the object pool.
    */
   private final TransportOrderPool orderPool;
@@ -145,6 +149,7 @@ class KernelStateOperating
           modelPersister,
           configuration.saveModelOnTerminateOperating());
     this.orderPool = requireNonNull(orderPool, "orderPool");
+    this.configuration = requireNonNull(configuration, "configuration");
     this.recoveryEvaluator = requireNonNull(recoveryEvaluator, "recoveryEvaluator");
     this.router = requireNonNull(router, "router");
     this.scheduler = requireNonNull(scheduler, "scheduler");
@@ -172,11 +177,15 @@ class KernelStateOperating
       setVehicleOrderSequence(curVehicle.getReference(), null);
     }
 
+    LOG.debug("Initializing scheduler '{}'...", scheduler);
     scheduler.initialize();
+    LOG.debug("Initializing router '{}'...", router);
     router.initialize();
+    LOG.debug("Initializing dispatcher '{}'...", dispatcher);
     dispatcher.initialize();
+    LOG.debug("Initializing recovery evaluator '{}'...", recoveryEvaluator);
     recoveryEvaluator.initialize();
-
+    LOG.debug("Initializing vehicle controller pool '{}'...", vehicleControllerPool);
     vehicleControllerPool.initialize();
 
     // Start a task for cleaning up orders regularly.
@@ -184,8 +193,10 @@ class KernelStateOperating
 
     // Start kernel extensions.
     for (KernelExtension extension : extensions) {
+      LOG.debug("Initializing kernel extension '{}'...", extension);
       extension.initialize();
     }
+    LOG.debug("Finished initializing kernel extensions.");
 
     initialized = true;
 
@@ -208,17 +219,22 @@ class KernelStateOperating
 
     // Terminate everything that may still use resources.
     for (KernelExtension extension : extensions) {
+      LOG.debug("Terminating kernel extension '{}'...", extension);
       extension.terminate();
     }
+    LOG.debug("Terminated kernel extensions.");
 
     // No need to clean up any more - it's all going to be cleaned up very soon.
     orderCleanerTask.terminate();
     // Terminate strategies.
     recoveryEvaluator.terminate();
+    LOG.debug("Terminating dispatcher '{}'...", dispatcher);
     dispatcher.terminate();
+    LOG.debug("Terminating router '{}'...", router);
     router.terminate();
+    LOG.debug("Terminating scheduler '{}'...", scheduler);
     scheduler.terminate();
-    // Terminate communication adapters, too.
+    LOG.debug("Terminating vehicle controller pool '{}'...", vehicleControllerPool);
     vehicleControllerPool.terminate();
     // Grant communication adapters etc. some time to settle things.
     Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
@@ -304,8 +320,9 @@ class KernelStateOperating
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       getModel().setPathLocked(ref, locked);
-      router.topologyChanged();
-      // XXX Check if we need to re-route any vehicles?
+      if (configuration.updateRoutingTopologyOnPathLockChange()) {
+        updateRoutingTopology();
+      }
     }
   }
 
@@ -789,6 +806,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws ObjectUnknownException, IOException {
     synchronized (getGlobalSyncObject()) {
@@ -800,6 +818,14 @@ class KernelStateOperating
         result.add(curOrder.clone());
       }
       return result;
+    }
+  }
+
+  @Override
+  public void updateRoutingTopology() {
+    synchronized (getGlobalSyncObject()) {
+      router.topologyChanged();
+      // XXX Check if we need to re-route any vehicles?
     }
   }
 

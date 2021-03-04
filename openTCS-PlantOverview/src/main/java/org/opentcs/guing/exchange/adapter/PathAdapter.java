@@ -12,7 +12,6 @@ package org.opentcs.guing.exchange.adapter;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -64,7 +63,6 @@ public class PathAdapter
    * Provides access to a kernel.
    */
   private final SharedKernelProvider kernelProvider;
-
   /**
    * The state of the plant overview.
    */
@@ -84,37 +82,35 @@ public class PathAdapter
                      @Assisted PathModel model,
                      @Assisted EventDispatcher eventDispatcher) {
     super(model, eventDispatcher);
-    this.kernelProvider = Objects.requireNonNull(kernelProvider, "kernelProvider");
-    this.applicationState = Objects.requireNonNull(applicationState, "applicationState");
+    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.applicationState = requireNonNull(applicationState, "applicationState");
   }
 
   @Handler
   public void handlePathLocked(PathLockedEvent event) {
     if (applicationState.getOperationMode() != OperationMode.OPERATING) {
-      LOG.debug("Ignore PathLockedEvent because the application is not in operating mode.");
+      LOG.debug("Ignoring PathLockedEvent because the application is not in operating mode.");
       return;
     }
     Object localKernelClient = new Object();
-    PathConnection pathConnection = (PathConnection) event.getSource();
-    ModelComponent modelComponent = pathConnection.getModel();
+    PathModel pathModel = ((PathConnection) event.getSource()).getModel();
     try {
       //If the event is from the adapters model we have to update the kernel
       //else ignore it because another adapter is responsible
-      if (modelComponent.equals(getModel())) {
+      if (pathModel.equals(getModel())) {
         //Try to connect to the kernel
         kernelProvider.register(localKernelClient);
         if (kernelProvider.kernelShared()) {
           Kernel kernel = kernelProvider.getKernel();
           //Check if the kernel is in operating mode too
-          boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
-          if (kernelInOperating) {
+          if (kernel.getState() == Kernel.State.OPERATING) {
             //Update the path in the kernel if it exists
             TCSObjectReference<Path> ref
-                = kernel.getTCSObject(Path.class, modelComponent.getName())
-                    .getReference();
+                = kernel.getTCSObject(Path.class, pathModel.getName()).getReference();
             if (ref != null) {
-              BooleanProperty locked = (BooleanProperty) modelComponent.getProperty(PathModel.LOCKED);
+              BooleanProperty locked = (BooleanProperty) pathModel.getProperty(PathModel.LOCKED);
               kernel.setPathLocked(ref, (boolean) locked.getValue());
+              kernel.updateRoutingTopology();
             }
           }
         }
@@ -138,36 +134,30 @@ public class PathAdapter
 
     try {
       // NAME: Name of the path
-      StringProperty pName
-          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
       pName.setText(path.getName());
       // LENGTH: Length in [mm]
-      LengthProperty pLength
-          = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
+      LengthProperty pLength = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
       pLength.setValueAndUnit(path.getLength(), LengthProperty.Unit.MM);
       // ROUTING_COST:
-      IntegerProperty pCost
-          = (IntegerProperty) getModel().getProperty(PathModel.ROUTING_COST);
+      IntegerProperty pCost = (IntegerProperty) getModel().getProperty(PathModel.ROUTING_COST);
       pCost.setValue((int) path.getRoutingCost());
       // MAX_VELOCITY: Maximum forward speed in [m/s]
-      SpeedProperty pSpeed
-          = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
-      pSpeed.setValueAndUnit(path.getMaxVelocity() * 0.001,
-                             SpeedProperty.Unit.M_S);
+      SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
+      pSpeed.setValueAndUnit(path.getMaxVelocity() * 0.001, SpeedProperty.Unit.M_S);
       // MAX_REVERSE_VELOCITY: Maximum backward speed in [m/s]
-      pSpeed = (SpeedProperty) getModel().getProperty(
-          PathModel.MAX_REVERSE_VELOCITY);
+      pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
       pSpeed.setValueAndUnit(path.getMaxReverseVelocity() * 0.001,
                              SpeedProperty.Unit.M_S);
       // LOCKED: Is the path locked?
-      BooleanProperty pLocked
-          = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
+      BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
       pLocked.setValue(path.isLocked());
       // MISCELLANEOUS:
       updateMiscModelProperties(path);
       if (layoutElement != null) {
         updateModelLayoutProperties(layoutElement);
       }
+      getModel().propertiesChanged(getModel());
     }
     catch (CredentialsException e) {
       LOG.warn("", e);
@@ -184,12 +174,12 @@ public class PathAdapter
     try {
       plantModel.getPaths().add(
           new PathCreationTO(getModel().getName(), srcPoint.getName(), dstPoint.getName())
-              .setLength(getLength())
-              .setMaxVelocity(getMaxVelocity())
-              .setMaxReverseVelocity(getMaxReverseVelocity())
-              .setRoutingCost(getRoutingCost())
-              .setProperties(getKernelProperties())
-              .setLocked(getLocked()));
+          .setLength(getLength())
+          .setMaxVelocity(getMaxVelocity())
+          .setMaxReverseVelocity(getMaxReverseVelocity())
+          .setRoutingCost(getRoutingCost())
+          .setProperties(getKernelProperties())
+          .setLocked(getLocked()));
 
       // Write liner type and position of the control points into the model layout element
       for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
@@ -207,8 +197,8 @@ public class PathAdapter
     Map<String, String> properties = layoutElement.getProperties();
 
     // PATH_CONN_TYPE: DIRECT, BEZIER, ...
-    SelectionProperty pConnectionType = (SelectionProperty) getModel()
-        .getProperty(ElementPropKeys.PATH_CONN_TYPE);
+    SelectionProperty pConnectionType
+        = (SelectionProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
     String sConnectionType = properties.get(ElementPropKeys.PATH_CONN_TYPE);
 
     if (sConnectionType != null) {
@@ -216,8 +206,8 @@ public class PathAdapter
     }
 
     // PATH_CONTROL_POINTS: Only when PATH_CONN_TYPE BEZIER
-    StringProperty pControlPoints = (StringProperty) getModel().getProperty(
-        ElementPropKeys.PATH_CONTROL_POINTS);
+    StringProperty pControlPoints
+        = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     String sControlPoints = properties.get(ElementPropKeys.PATH_CONTROL_POINTS);
 
     if (sControlPoints != null) {
@@ -288,8 +278,8 @@ public class PathAdapter
 
     layout.getModelElements().add(
         new ModelLayoutElementCreationTO(model.getName())
-            .setProperty(ElementPropKeys.PATH_CONN_TYPE, type.name())
-            .setProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints)
+        .setProperty(ElementPropKeys.PATH_CONN_TYPE, type.name())
+        .setProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints)
     );
   }
 

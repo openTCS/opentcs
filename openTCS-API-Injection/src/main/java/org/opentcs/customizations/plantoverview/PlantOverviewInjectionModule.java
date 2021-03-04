@@ -10,6 +10,7 @@ package org.opentcs.customizations.plantoverview;
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
+import org.opentcs.components.plantoverview.PropertySuggestions;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -53,5 +54,14 @@ public abstract class PlantOverviewInjectionModule
    */
   protected Multibinder<PluggablePanelFactory> pluggablePanelFactoryBinder() {
     return Multibinder.newSetBinder(binder(), PluggablePanelFactory.class);
+  }
+
+  /**
+   * returns a multibinder that can be used to register classes that provide suggested properties.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<PropertySuggestions> propertySuggestionsBinder() {
+    return Multibinder.newSetBinder(binder(), PropertySuggestions.class);
   }
 }

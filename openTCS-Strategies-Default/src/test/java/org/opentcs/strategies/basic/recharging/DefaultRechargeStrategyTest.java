@@ -29,7 +29,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.strategies.basic.dispatching.recharging.DefaultRechargePositionSupplier;
+import org.opentcs.strategies.basic.dispatching.orderselection.recharging.DefaultRechargePositionSupplier;
 
 /**
  * Test for the SimpleRechargeStrategy.

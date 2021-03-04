@@ -49,6 +49,16 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.4 (2017-07-17)
+
+* Fixed a performance issue with building routing tables in the default router caused by excessive calling of methods on a configuration binding interface.
+* Introduced a method to explicitly trigger routing topology updates via the `Kernel` interface instead of explicitly updating it whenever a path was locked/unlocked to avoid redundant computations.
+* Improved behaviour with scaling the course model in the plant overview.
+* Added a mechanism to provide project-specific suggestions for keys and values when editing object properties in the plant overview.
+* Added GUI components to set vehicle properties from the loopback driver's panel.
+* Deprecated explicit event filters, which make the code more verbose without adding any value.
+* Some small bugfixes and improvements.
+
 === Version 4.3 (2017-06-30)
 
 * Introduced configuration based on binding interfaces and cfg4j to provide implementations for these, and deprecated the previously used configuration classes.

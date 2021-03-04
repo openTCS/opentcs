@@ -28,13 +28,11 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.TCSKernelStateEvent;
 import org.opentcs.access.TCSModelTransitionEvent;
-import org.opentcs.access.TCSNotificationEvent;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInModellingMode;
 import org.opentcs.customizations.kernel.ActiveInOperatingMode;
-import org.opentcs.util.eventsystem.AcceptingTCSEventFilter;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.opentcs.util.gui.Icons;
@@ -146,7 +144,7 @@ public class KernelControlCenter
       return;
     }
 
-    kernel.addEventListener(this, new AcceptingTCSEventFilter());
+    kernel.addEventListener(this);
 
     try {
       EventQueue.invokeAndWait(() -> setVisible(true));
@@ -283,7 +281,7 @@ public class KernelControlCenter
    */
   private void registerControlCenterInfoHandler() {
     infoHandler = controlCenterInfoHandlerFactoy.createHandler(loggingTextArea);
-    kernel.addEventListener(infoHandler, (event) -> event instanceof TCSNotificationEvent);
+    kernel.addEventListener(infoHandler);
   }
 
   /**
