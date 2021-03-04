@@ -339,8 +339,7 @@ public class UnifiedModelComponentConverter {
       }
       LocationTO.Link link = new LocationTO.Link();
 
-      StringProperty linkPoint = (StringProperty) linkModel.getProperty(LinkModel.START_COMPONENT);
-      link.setPoint(linkPoint.getText());
+      link.setPoint(linkModel.getPoint().getName());
 
       StringSetProperty ssp
           = (StringSetProperty) linkModel.getProperty(LinkModel.ALLOWED_OPERATIONS);
