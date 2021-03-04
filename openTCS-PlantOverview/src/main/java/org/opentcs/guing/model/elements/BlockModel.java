@@ -178,24 +178,24 @@ public class BlockModel
 
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("block.name.text"));
     pName.setHelptext(bundle.getString("block.name.helptext"));
     setProperty(NAME, pName);
-    // Color
+
     ColorProperty pColor = new ColorProperty(this, Color.red);
     pColor.setDescription(bundle.getString("element.blockColor.text"));
     pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
-    // Block elements
+
     StringSetProperty pElements = new StringSetProperty(this);
     pElements.setDescription(bundle.getString("block.elements.text"));
     pElements.setHelptext(bundle.getString("block.elements.helptext"));
     pElements.setModellingEditable(false);
     pElements.setOperatingEditable(false);
     setProperty(ELEMENTS, pElements);
-    // Miscellaneous
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("block.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("block.miscellaneous.helptext"));

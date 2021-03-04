@@ -9,13 +9,13 @@ package org.opentcs.util.gui;
 
 import java.awt.Component;
 import javax.swing.JLabel;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import org.junit.*;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 /**
  *

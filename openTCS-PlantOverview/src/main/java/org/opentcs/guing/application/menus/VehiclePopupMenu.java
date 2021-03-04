@@ -12,6 +12,7 @@ import com.google.inject.assistedinject.Assisted;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.application.action.ActionFactory;
@@ -69,20 +70,27 @@ public class VehiclePopupMenu
 
     addSeparator();
 
+    JMenu withdrawSubMenu = new JMenu(ResourceBundleUtil.getBundle().getString(
+        "course.vehicle.withdrawTransportOrderSubMenu.text"));
+
     vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER, model);
     vehicleAction.setEnabled(model.isAvailableForOrder());
-    add(vehicleAction);
+    withdrawSubMenu.add(vehicleAction);
     vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE, model);
     vehicleAction.setEnabled(model.isAvailableForOrder());
-    add(vehicleAction);
+    withdrawSubMenu.add(vehicleAction);
     vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY, model);
     vehicleAction.setEnabled(model.isAvailableForOrder());
-    add(vehicleAction);
+    withdrawSubMenu.add(vehicleAction);
+    
+    withdrawSubMenu.addSeparator();
+    
+    withdrawSubMenu.add(actionFactory.createVehicleAction(VehicleAction.RELEASE_VEHICLE, model));
+
+    add(withdrawSubMenu);
+
     add(actionFactory.createVehicleAction(VehicleAction.DISPATCH_VEHICLE, model));
-    
-    addSeparator();
-    
-    add(actionFactory.createVehicleAction(VehicleAction.RELEASE_VEHICLE, model));
+
   }
 
 }

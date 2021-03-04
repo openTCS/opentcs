@@ -133,7 +133,9 @@ class AllocatorTask
       return;
     }
 
-    LOG.debug("{}: Preparation of resoruces successful, calling back client...", client.getId());
+    LOG.debug("Preparation of resources '{}' successful, calling back client '{}'...",
+              resources,
+              client.getId());
     if (!client.allocationSuccessful(resources)) {
       LOG.warn("{}: Client didn't want allocated resources ({}), unallocating them...",
                client.getId(),
@@ -176,7 +178,7 @@ class AllocatorTask
       return true;
     }
   }
-  
+
   private void allocationsReleased(AllocatorCommand.AllocationsReleased command) {
     allocationAdvisor.allocationReleased(command.getClient(), command.getResources());
   }

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
@@ -53,7 +54,6 @@ import org.opentcs.virtualvehicle.inputcomponents.SingleTextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TripleTextInputPanel;
-import static java.util.Objects.requireNonNull;
 
 /**
  * The LoopbackCommunicationAdapterPanel corresponding to the LoopbackCommunicationAdapter.

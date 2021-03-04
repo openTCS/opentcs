@@ -33,8 +33,7 @@ class ThresholdOrderGenTrigger
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(ThresholdOrderGenTrigger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ThresholdOrderGenTrigger.class);
   /**
    * The kernel we talk to.
    */
@@ -126,7 +125,7 @@ class ThresholdOrderGenTrigger
       // Now let's check if the number of orders "in progress" has dropped below
       // the threshold. If so, create a new batch of orders.
       if (knownOrders.size() <= threshold) {
-        log.debug("orderCount = " + knownOrders.size() + ", triggering...");
+        LOG.debug("orderCount = " + knownOrders.size() + ", triggering...");
         trigger();
       }
     }
@@ -137,7 +136,7 @@ class ThresholdOrderGenTrigger
       triggerOrderGeneration();
     }
     catch (KernelRuntimeException exc) {
-      log.warn("Exception triggering order generation, terminating triggering", exc);
+      LOG.warn("Exception triggering order generation, terminating triggering", exc);
       setTriggeringEnabled(false);
 
     }

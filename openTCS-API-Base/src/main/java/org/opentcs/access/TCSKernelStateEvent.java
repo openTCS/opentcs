@@ -78,7 +78,10 @@ public class TCSKernelStateEvent
 
   @Override
   public String toString() {
-    return "TCSKernelStateEvent(" + leftState + "->" + enteredState
-        + ", transition finished: " + transitionFinished + ")";
+    return "TCSKernelStateEvent{"
+        + "leftState=" + leftState
+        + ", enteredState=" + enteredState
+        + ", transitionFinished=" + transitionFinished
+        + '}';
   }
 }

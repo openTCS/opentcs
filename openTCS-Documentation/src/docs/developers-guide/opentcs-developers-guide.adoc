@@ -11,8 +11,6 @@ include::02_kernel-api.adoc[]
 
 include::03_tcp-host-interface.adoc[]
 
-include::04_default-strategies.adoc[]
+include::04_extending-kernel.adoc[]
 
-include::05_extending-kernel.adoc[]
-
-include::06_extending-plantoverview.adoc[]
+include::05_extending-plantoverview.adoc[]

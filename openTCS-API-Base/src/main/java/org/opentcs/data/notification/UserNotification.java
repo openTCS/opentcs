@@ -125,7 +125,12 @@ public class UserNotification
 
   @Override
   public String toString() {
-    return "UserNotification(" + level + ": " + text + ")";
+    return "UserNotification{"
+        + "source=" + source
+        + ", timestamp=" + timestamp
+        + ", level=" + level
+        + ", text=" + text
+        + '}';
   }
 
   /**

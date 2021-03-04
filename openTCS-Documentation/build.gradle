@@ -496,31 +496,37 @@ task samplesgen {
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = "org.opentcs.documentation.SamplesGenerator"
-      args "TELEGRAM_TWO_ORDERS", "${samplesDir}/xml-telegram-two-orders.xml"
+      args "TELEGRAM_TO_TWO_ORDERS", "${samplesDir}/xml-telegram-to-two-orders.xml"
     }
     
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_STATUS", "${samplesDir}/xml-telegram-status.xml"
+      args "TELEGRAM_TO_STATUS", "${samplesDir}/xml-telegram-to-status.xml"
     }
     
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_RECEIPT_ORDERS", "${samplesDir}/xml-telegram-receipt-orders.xml"
+      args "TELEGRAM_TO_RECEIPT_ORDERS", "${samplesDir}/xml-telegram-to-receipt-orders.xml"
     }
     
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_RECEIPT_BATCH", "${samplesDir}/xml-telegram-receipt-batch.xml"
+      args "TELEGRAM_TO_RECEIPT_BATCH", "${samplesDir}/xml-telegram-to-receipt-batch.xml"
     }
     
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_BATCH", "${samplesDir}/xml-telegram-batch.xml"
+      args "TELEGRAM_TO_BATCH", "${samplesDir}/xml-telegram-to-batch.xml"
+    }
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.SamplesGenerator'
+      args "TELEGRAM_VEHICLE_STATUS", "${samplesDir}/xml-telegram-vehicle-status.xml"
     }
   }
 }

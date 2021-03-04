@@ -12,13 +12,14 @@ package org.opentcs.guing.model.elements;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
+import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
@@ -75,10 +76,6 @@ public class VehicleModel
    * The current drive order.
    */
   private List<FigureComponent> fDriveOrderComponents;
-  /*
-   * The color the drive order will be painted in.
-   */
-  private Color fDriveOrderColor = Color.BLACK;
   /**
    * The state of the drive order.
    */
@@ -204,16 +201,9 @@ public class VehicleModel
    * @return The color.
    */
   public Color getDriveOrderColor() {
-    return fDriveOrderColor;
-  }
+    ColorProperty property = (ColorProperty) getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
 
-  /**
-   * Sets the drive order color.
-   *
-   * @param color The color.
-   */
-  public void setDriveOrderColor(Color color) {
-    fDriveOrderColor = requireNonNull(color, "color is null");
+    return property.getColor();
   }
 
   /**
@@ -314,101 +304,105 @@ public class VehicleModel
 
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("vehicle.name.text"));
     pName.setHelptext(bundle.getString("vehicle.name.helptext"));
     setProperty(NAME, pName);
-    // Fahrzeuglänge
+
     LengthProperty pLength = new LengthProperty(this);
     pLength.setDescription(bundle.getString("vehicle.length.text"));
     pLength.setHelptext(bundle.getString("vehicle.length.helptext"));
     setProperty(LENGTH, pLength);
-    // Unterer Schwellwert für "kritischen" Batterie-Ladezustand
+
+    ColorProperty pColor = new ColorProperty(this, Color.red);
+    pColor.setDescription(bundle.getString("vehicle.routeColor.text"));
+    pColor.setHelptext(bundle.getString("vehicle.routeColor.helptext"));
+    setProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR, pColor);
+
     PercentProperty pEnergyLevelCritical = new PercentProperty(this, true);
     pEnergyLevelCritical.setDescription(bundle.getString("vehicle.energyLevelCritical.text"));
     pEnergyLevelCritical.setHelptext(bundle.getString("vehicle.energyLevelCritical.helptext"));
     setProperty(ENERGY_LEVEL_CRITICAL, pEnergyLevelCritical);
-    // Obererer Schwellwert für "guten" Batterie-Ladezustand
+
     PercentProperty pEnergyLevelGood = new PercentProperty(this, true);
     pEnergyLevelGood.setDescription(bundle.getString("vehicle.energyLevelGood.text"));
     pEnergyLevelGood.setHelptext(bundle.getString("vehicle.energyLevelGood.helptext"));
     setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
-    // Initiale Fahrzeugposition
+
     CoursePointProperty pInitialPosition = new CoursePointProperty(this);
     pInitialPosition.setDescription(bundle.getString("vehicle.initialPosition.text"));
     pInitialPosition.setHelptext(bundle.getString("vehicle.initialPosition.helptext"));
     setProperty(INITIAL_POSITION, pInitialPosition);
-    // Diese Größen werden vom Fahrzeugtreiber gesetzt und sind nicht editierbar
-    // Aktueller Batterie-Ladezustand
+
     PercentProperty pEnergyLevel = new PercentProperty(this, true);
     pEnergyLevel.setDescription(bundle.getString("vehicle.energyLevel.text"));
     pEnergyLevel.setHelptext(bundle.getString("vehicle.energyLevel.helptext"));
     pEnergyLevel.setModellingEditable(false);
     setProperty(ENERGY_LEVEL, pEnergyLevel);
-    // Bewertung: Gut, ausreichend, kritisch
+
     SelectionProperty<EnergyState> pEnergyState
         = new SelectionProperty<>(this, Arrays.asList(EnergyState.values()), EnergyState.CRITICAL);
     pEnergyState.setDescription(bundle.getString("vehicle.energyState.text"));
     pEnergyState.setHelptext(bundle.getString("vehicle.energyState.helptext"));
     pEnergyState.setModellingEditable(false);
     setProperty(ENERGY_STATE, pEnergyState);
-    // Ist mindestens ein LAM beladen?
+
     BooleanProperty pLoaded = new BooleanProperty(this);
     pLoaded.setDescription(bundle.getString("vehicle.loaded.text"));
     pLoaded.setHelptext(bundle.getString("vehicle.loaded.helptext"));
     pLoaded.setModellingEditable(false);
     setProperty(LOADED, pLoaded);
-    // State
+
     SelectionProperty<Vehicle.State> pState
         = new SelectionProperty<>(this, Arrays.asList(Vehicle.State.values()), Vehicle.State.UNKNOWN);
     pState.setDescription(bundle.getString("vehicle.state.text"));
     pState.setHelptext(bundle.getString("vehicle.state.helptext"));
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
-    // Process state
+
     SelectionProperty<Vehicle.ProcState> pProcState
         = new SelectionProperty<>(this, Arrays.asList(Vehicle.ProcState.values()), Vehicle.ProcState.UNAVAILABLE);
     pProcState.setDescription(bundle.getString("vehicle.procState.text"));
     pProcState.setHelptext(bundle.getString("vehicle.procState.helptext"));
     pProcState.setModellingEditable(false);
     setProperty(PROC_STATE, pProcState);
-    // Position: Current Point
+
     StringProperty pPoint = new StringProperty(this);
     pPoint.setDescription(bundle.getString("vehicle.point.text"));
     pPoint.setHelptext(bundle.getString("vehicle.point.helptext"));
     pPoint.setModellingEditable(false);
     setProperty(POINT, pPoint);
-    // Position: Next Point
+
     StringProperty pNextPoint = new StringProperty(this);
     pNextPoint.setDescription(bundle.getString("vehicle.nextPoint.text"));
     pNextPoint.setHelptext(bundle.getString("vehicle.nextPoint.helptext"));
     pNextPoint.setModellingEditable(false);
     setProperty(NEXT_POINT, pNextPoint);
-    // Precise position
+
     TripleProperty pPrecisePosition = new TripleProperty(this);
     pPrecisePosition.setDescription(bundle.getString("vehicle.precisePosition.text"));
     pPrecisePosition.setHelptext(bundle.getString("vehicle.precisePosition.helptext"));
     pPrecisePosition.setModellingEditable(false);
     setProperty(PRECISE_POSITION, pPrecisePosition);
-    // Angle orientation
+
     AngleProperty pOrientationAngle = new AngleProperty(this);
     pOrientationAngle.setDescription(bundle.getString("vehicle.orientationAngle.text"));
     pOrientationAngle.setHelptext(bundle.getString("vehicle.orientationAngle.helptext"));
     pOrientationAngle.setModellingEditable(false);
     setProperty(ORIENTATION_ANGLE, pOrientationAngle);
-    // Miscellaneous properties
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("vehicle.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("vehicle.miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
-    //The name of the current transport order
+
     StringProperty curTransportOrderName = new StringProperty(this);
     curTransportOrderName.setDescription(bundle.getString("vehicle.currentTransportOrder.text"));
     curTransportOrderName.setHelptext(bundle.getString("vehicle.currentTransportOrder.helptext"));
     curTransportOrderName.setModellingEditable(false);
     setProperty(CURRENT_TRANSPORT_ORDER_NAME, curTransportOrderName);
-    //Current order sequence name
+
     StringProperty curOrderSequenceName = new StringProperty(this);
     curOrderSequenceName.setDescription(bundle.getString("vehicle.currentOrderSequence.text"));
     curOrderSequenceName.setHelptext(bundle.getString("vehicle.currentOrderSequence.helptext"));

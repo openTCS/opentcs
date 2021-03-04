@@ -11,7 +11,6 @@
 package org.opentcs.guing.exchange;
 
 import java.util.Set;
-import org.opentcs.access.Kernel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.model.ModelComponent;
@@ -38,13 +37,6 @@ public interface EventDispatcher {
    * @param processAdapter The {@link ProcessAdapter} to remove.
    */
   void removeProcessAdapter(ProcessAdapter processAdapter);
-
-  /**
-   * Returns the kernel.
-   *
-   * @return The kernel.
-   */
-  Kernel getKernel();
 
   /**
    * Finds the process adapter to the given model.

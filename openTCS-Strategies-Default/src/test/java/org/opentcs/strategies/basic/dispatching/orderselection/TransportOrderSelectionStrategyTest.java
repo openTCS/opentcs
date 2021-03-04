@@ -12,10 +12,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.mockito.ArgumentMatchers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -91,7 +93,10 @@ public class TransportOrderSelectionStrategyTest {
     TransportOrder unavailableOrder = createTransportOrder("UnavailableOrder");
     Set<TransportOrder> orders = new HashSet<>(Arrays.asList(availableOrder, unavailableOrder));
 
-    when(kernel.getTCSObjects(TransportOrder.class)).thenReturn(orders);
+    when(kernel.getTCSObjects(eq(TransportOrder.class),
+                              ArgumentMatchers.<Predicate<TransportOrder>>any()))
+        .thenReturn(orders);
+
     when(kernel.getTCSObjects(OrderSequence.class)).thenReturn(new HashSet<>());
     when(router.getRoute(any(Vehicle.class), nullable(Point.class), eq(availableOrder)))
         .thenReturn(Optional.of(new ArrayList<>()));

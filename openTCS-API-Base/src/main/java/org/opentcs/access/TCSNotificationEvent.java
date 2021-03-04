@@ -46,6 +46,6 @@ public class TCSNotificationEvent
 
   @Override
   public String toString() {
-    return "TCSNotificationEvent(" + notification + ")";
+    return "TCSNotificationEvent{" + "notification=" + notification + '}';
   }
 }

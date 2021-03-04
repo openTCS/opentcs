@@ -7,6 +7,7 @@
  */
 package org.opentcs.util;
 
+import static org.opentcs.util.Assertions.checkInRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,11 +57,7 @@ public abstract class CyclicTask
    * task (in milliseconds).
    */
   public CyclicTask(final long tSleep) {
-    if (tSleep < 0) {
-      throw new IllegalArgumentException("tSleep < 0 (" + tSleep + ")");
-    }
-
-    this.sleepTime = tSleep;
+    this.sleepTime = checkInRange(tSleep, 0, Long.MAX_VALUE, "tSleep");
   }
 
   /**
@@ -81,7 +78,7 @@ public abstract class CyclicTask
    */
   public void terminate() {
     synchronized (syncObject) {
-      if (terminated) {
+      if (isTerminated()) {
         LOG.warn("Already terminated");
       }
 
@@ -101,7 +98,7 @@ public abstract class CyclicTask
     Thread joinThread;
 
     synchronized (syncObject) {
-      if (terminated) {
+      if (isTerminated()) {
         LOG.warn("Already terminated");
         return;
       }
@@ -152,17 +149,17 @@ public abstract class CyclicTask
     // Save the executing thread for use in terminateAndWait().
     taskThread = Thread.currentThread();
     // Execute the actual task until terminated.
-    while (!terminated) {
+    while (!isTerminated()) {
       LOG.debug("Running actual task...");
       runActualTask();
       // Only sleep if this task is not terminated and the sleep time is not 0.
-      if (!terminated && sleepTime > 0) {
+      if (!isTerminated() && sleepTime > 0) {
         synchronized (syncObject) {
           try {
             syncObject.wait(sleepTime);
           }
           catch (InterruptedException exc) {
-            if (!ignoringInterrupts || terminated) {
+            if (!isIgnoringInterrupts() || isTerminated()) {
               LOG.error("Unexpectedly interrupted", exc);
               throw new IllegalStateException("Unexpectedly interrupted", exc);
             }

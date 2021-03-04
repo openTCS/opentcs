@@ -15,7 +15,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,7 @@ public class ApplicationKernelProvider
   }
 
   @Override
+  @Deprecated
   public synchronized boolean register(Object client) {
     requireNonNull(client, "client");
 
@@ -77,6 +80,19 @@ public class ApplicationKernelProvider
   }
 
   @Override
+  public SharedKernelClient register()
+      throws KernelUnavailableException {
+    Object token = new Object();
+    register(token);
+    if (!kernelShared()) {
+      unregister(token);
+      throw new KernelUnavailableException("Could not connect to kernel");
+    }
+    return new ApplicationKernelClient(getKernel(), this, token);
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
   public synchronized boolean unregister(Object client) {
     requireNonNull(client, "client");
 
@@ -91,6 +107,7 @@ public class ApplicationKernelProvider
   }
 
   @Override
+  @Deprecated
   public synchronized Kernel getKernel() {
     return kernelProxyManager.kernel();
   }

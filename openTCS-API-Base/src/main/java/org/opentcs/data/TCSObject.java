@@ -239,7 +239,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
 
   @Override
   public String toString() {
-    return getClass() + "[id=" + id + ", name=" + name + "]";
+    return getClass().getSimpleName() + "{id=" + id + ", name=" + name + '}';
   }
 
   /**
@@ -256,7 +256,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
   public boolean equals(Object obj) {
     if (obj instanceof TCSObject) {
       TCSObject<?> other = (TCSObject<?>) obj;
-      return this.name.equals(other.name) && this.getClass().equals(other.getClass());
+      return this.getName().equals(other.getName()) && this.getClass().equals(other.getClass());
     }
     else {
       return false;
@@ -272,7 +272,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    */
   @Override
   public int hashCode() {
-    return Long.valueOf(id).hashCode()
+    return getName().hashCode()
         ^ this.getClass().getName().hashCode();
   }
 

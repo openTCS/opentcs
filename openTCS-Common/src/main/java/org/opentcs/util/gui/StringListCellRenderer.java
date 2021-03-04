@@ -10,6 +10,7 @@ package org.opentcs.util.gui;
 import java.awt.Component;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Function;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -21,9 +22,12 @@ import javax.swing.ListCellRenderer;
  * @param <E> The type of the values to be rendered.
  */
 public class StringListCellRenderer<E>
-    extends JLabel
     implements ListCellRenderer<E> {
 
+  /**
+   * A default renderer for creating the label.
+   */
+  private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
   /**
    * Returns a String representation of E.
    */
@@ -38,17 +42,21 @@ public class StringListCellRenderer<E>
    */
   public StringListCellRenderer(Function<E, String> representer) {
     this.representer = requireNonNull(representer, "representer");
-    setOpaque(true);
   }
 
   @Override
-  public Component getListCellRendererComponent(
-      JList<? extends E> list,
-      E value,
-      int index,
-      boolean isSelected,
-      boolean cellHasFocus) {
-    setText(representer.apply(value));
-    return this;
+  public Component getListCellRendererComponent(JList<? extends E> list,
+                                                E value,
+                                                int index,
+                                                boolean isSelected,
+                                                boolean cellHasFocus) {
+    JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(list,
+                                                                         value,
+                                                                         index,
+                                                                         isSelected,
+                                                                         cellHasFocus);
+    label.setOpaque(true);
+    label.setText(representer.apply(value));
+    return label;
   }
 }

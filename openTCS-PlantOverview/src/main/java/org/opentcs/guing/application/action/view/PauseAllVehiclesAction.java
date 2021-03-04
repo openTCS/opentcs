@@ -13,12 +13,15 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -34,6 +37,10 @@ public class PauseAllVehiclesAction
    * This action's ID.
    */
   public final static String ID = "openTCS.pauseAllVehicles";
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(PauseAllVehiclesAction.class);
   /**
    * Provides the current system model.
    */
@@ -62,15 +69,12 @@ public class PauseAllVehiclesAction
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    final Object kernelClient = new Object();
-    try {
-      kernelProvider.register(kernelClient);
-
+    try (SharedKernelClient kernelClient = kernelProvider.register()) {
       paused = !paused;
-      setVehicleSpeedMultiplier(paused ? 0 : 100, kernelProvider.getKernel());
+      setVehicleSpeedMultiplier(paused ? 0 : 100, kernelClient.getKernel());
     }
-    finally {
-      kernelProvider.unregister(kernelClient);
+    catch (KernelUnavailableException exc) {
+      LOG.warn("Could not connect to kernel", exc);
     }
   }
 
@@ -78,7 +82,7 @@ public class PauseAllVehiclesAction
     if (kernel == null) {
       return;
     }
-    LoggerFactory.getLogger(PauseAllVehiclesAction.class).debug("Limiting to " + speed);
+    LOG.debug("Limiting to {}", speed);
     ModelComponent folder
         = modelManager.getModel().getMainFolder(SystemModel.FolderKey.VEHICLES);
 

@@ -7,6 +7,8 @@
  */
 package org.opentcs.data.model.visualization;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * Defines some reserved/commonly used property keys of
  * {@link LayoutElement LayoutElements}.
@@ -93,7 +95,11 @@ public interface ElementPropKeys {
    * Position of the driving direction arrows (in percent).
    * Type: int [0..100].
    * Default value: 50.
+   *
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed")
   String PATH_ARROW_POSITION = "ARROW_POSITION";
   /**
    * Color in which block elements are to be emphasized.
@@ -101,4 +107,10 @@ public interface ElementPropKeys {
    * Default value: Automatically assigned.
    */
   String BLOCK_COLOR = "COLOR";
+  /**
+   * Color in which vehicle routes are to be emphasized.
+   * Type: String (pattern: #rrggbb).
+   * Default value: Color.RED
+   */
+  String VEHICLE_ROUTE_COLOR = "ROUTE_COLOR";
 }

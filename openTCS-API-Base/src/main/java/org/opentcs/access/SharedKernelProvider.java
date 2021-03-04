@@ -7,9 +7,11 @@
  */
 package org.opentcs.access;
 
+import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
- * Implementations of this interface pool access to a kernel for multiple
- * clients.
+ * Pools access to a kernel for multiple clients.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -21,8 +23,26 @@ public interface SharedKernelProvider {
    * @param client The client to be registered.
    * @return <code>true</code> if, and only if, the client was successfully
    * registered and wasn't registered before.
+   * @deprecated Use {@link #register()} to register and returned {@link SharedKernelClient}
+   * to provide kernel and unregister instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   boolean register(Object client);
+
+  /**
+   * Creates and registers a new client with this access pool.
+   * This is a convenience method that supports try-with-ressources and does not require a
+   * preexisting client.
+   *
+   * @return the new client
+   * @throws RuntimeException in case of connection falure with Kernel.
+   */
+  @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+  default SharedKernelClient register()
+      throws KernelUnavailableException {
+    throw new KernelUnavailableException("No default implementation.");
+  }
 
   /**
    * Unregisters the given client object with this access pool.
@@ -30,14 +50,22 @@ public interface SharedKernelProvider {
    * @param client The client to be unregistered.
    * @return <code>true</code> if, and only if, the client was successfully
    * unregistered and was registered before.
+   * @deprecated Use {@link #register()} to register and returned {@link SharedKernelClient}
+   * to provide kernel and unregister instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   boolean unregister(Object client);
 
   /**
    * Returns a reference to the pooled kernel.
    *
    * @return A reference to the pooled kernel.
+   * @deprecated Use {@link #register()} to register and returned {@link SharedKernelClient}
+   * to provide kernel and unregister instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Kernel getKernel();
 
   /**
@@ -48,7 +76,7 @@ public interface SharedKernelProvider {
    * kernel reference exists.
    */
   boolean kernelShared();
-  
+
   /**
    * Returns a description for the kernel currently being shared.
    *

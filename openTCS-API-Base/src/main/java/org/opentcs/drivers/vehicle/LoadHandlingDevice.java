@@ -72,7 +72,7 @@ public class LoadHandlingDevice
 
   @Override
   public String toString() {
-    return label + ":" + full;
+    return "LoadHandlingDevice{" + "label=" + label + ", full=" + full + '}';
   }
 
   @Override

@@ -259,6 +259,7 @@ public class MovementCommand {
         + ", opLocation=" + opLocation
         + ", finalMovement=" + finalMovement
         + ", finalDestination=" + finalDestination
+        + ", finalDestinationLocation=" + finalDestinationLocation
         + ", finalOperation=" + finalOperation
         + ", properties=" + properties
         + '}';

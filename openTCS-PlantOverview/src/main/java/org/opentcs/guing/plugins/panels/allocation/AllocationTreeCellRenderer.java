@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.plugins.panels.allocation;
 
 import java.awt.Component;
@@ -18,8 +17,6 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.guing.util.IconToolkit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Changes the icons of the different tree levels to the standard vehicle, point and path icons
@@ -31,26 +28,19 @@ public class AllocationTreeCellRenderer
     extends DefaultTreeCellRenderer {
 
   /**
-   * This class' logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(AllocationTreeCellRenderer.class);
-
-  /**
    * The icon for vehicles in the tree view.
    */
-  private static final ImageIcon vehicleIcon
+  private static final ImageIcon VEHICLE_ICON
       = IconToolkit.instance().createImageIcon("tree/vehicle.18x18.png");
-
   /**
    * The icon for points in the tree view.
    */
-  private static final ImageIcon pointIcon
+  private static final ImageIcon POINT_ICON
       = IconToolkit.instance().createImageIcon("tree/point.18x18.png");
-
   /**
    * The icon for paths in the tree view.
    */
-  private static final ImageIcon pathIcon
+  private static final ImageIcon PATH_ICON
       = IconToolkit.instance().createImageIcon("tree/path.18x18.png");
 
   /**
@@ -69,17 +59,17 @@ public class AllocationTreeCellRenderer
       DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) node;
       //User object is of type string only if the node contains a vehicle or is the root node
       if (treeNode.getUserObject() instanceof String) {
-        setIcon(vehicleIcon);
+        setIcon(VEHICLE_ICON);
       }
       //User object is of type TCSResource only if the node contains a path or a point
       else if (treeNode.getUserObject() instanceof TCSResource) {
         TCSResource<?> resource = (TCSResource<?>) treeNode.getUserObject();
         setText(resource.getName());
         if (resource instanceof Path) {
-          setIcon(pathIcon);
+          setIcon(PATH_ICON);
         }
         else if (resource instanceof Point) {
-          setIcon(pointIcon);
+          setIcon(POINT_ICON);
         }
       }
     }

@@ -9,7 +9,9 @@ package org.opentcs.guing.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.data.model.Path;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OperationMode;
@@ -90,25 +92,21 @@ public class PathLockAdapter
   }
 
   private void updateLockInKernel(boolean locked) {
-    Object localKernelClient = new Object();
-    try {
-      // Try to connect to the kernel.
-      kernelProvider.register(localKernelClient);
-      if (kernelProvider.kernelShared()) {
-        Kernel kernel = kernelProvider.getKernel();
-        // Check if the kernel is in operating mode, too.
-        if (kernel.getState() == Kernel.State.OPERATING) {
-          // Update the path in the kernel if it exists and its locked state is different.
-          Path path = kernel.getTCSObject(Path.class, model.getName());
-          if (path != null && path.isLocked() != locked) {
-            kernel.setPathLocked(path.getReference(), locked);
-            kernel.updateRoutingTopology();
-          }
+    try (SharedKernelClient localKernelClient = kernelProvider.register()) {
+      Kernel kernel = localKernelClient.getKernel();
+      // Check if the kernel is in operating mode, too.
+      if (kernel.getState() == Kernel.State.OPERATING) {
+        // Update the path in the kernel if it exists and its locked state is different.
+        Path path = kernel.getTCSObject(Path.class, model.getName());
+        if (path != null && path.isLocked() != locked) {
+          kernel.setPathLocked(path.getReference(), locked);
+          kernel.updateRoutingTopology();
         }
       }
+
     }
-    finally {
-      kernelProvider.unregister(localKernelClient);
+    catch (KernelUnavailableException exc) {
+      LOG.warn("Could not connect to kernel", exc);
     }
   }
 

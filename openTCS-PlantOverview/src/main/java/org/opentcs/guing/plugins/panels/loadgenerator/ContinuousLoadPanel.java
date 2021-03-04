@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -31,7 +32,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -44,7 +47,6 @@ import org.opentcs.util.gui.StringListCellRenderer;
 import org.opentcs.util.gui.StringTableCellRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A panel for continously creating transport orders.
@@ -58,13 +60,11 @@ public class ContinuousLoadPanel
    * The unique string generator, that can be useful for creating of
    * transport order names.
    */
-  private static final UniqueStringGenerator<?> nameGenerator
-      = new UniqueStringGenerator<>();
+  private static final UniqueStringGenerator<?> NAME_GENERATOR = new UniqueStringGenerator<>();
   /**
    * This class' logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(ContinuousLoadPanel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ContinuousLoadPanel.class);
   /**
    * This classe's bundle.
    */
@@ -75,9 +75,9 @@ public class ContinuousLoadPanel
    */
   private final SharedKernelProvider kernelProvider;
   /**
-   * The kernel we talk to.
+   * The client that is registered at the kernel.
    */
-  private Kernel kernel;
+  private SharedKernelClient kernelClient;
   /**
    * The instance trigger creation of new orders.
    */
@@ -116,12 +116,16 @@ public class ContinuousLoadPanel
   @Override
   public void initialize() {
     // Get a kernel reference.
-    kernelProvider.register(this);
-    // XXX Check if the kernel is actually available. If not...do something.
-    kernel = kernelProvider.getKernel();
+    try {
+      kernelClient = kernelProvider.register();
+    }
+    catch (KernelUnavailableException exc) {
+      LOG.warn("Kernel unavailable", exc);
+      return;
+    }
 
     Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    vehicles.addAll(kernel.getTCSObjects(Vehicle.class));
+    vehicles.addAll(kernelClient.getKernel().getTCSObjects(Vehicle.class));
     JComboBox<TCSObjectReference<Vehicle>> vehiclesComboBox = new JComboBox<>();
     vehiclesComboBox.addItem(null);
     vehiclesComboBox.setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()));
@@ -147,9 +151,7 @@ public class ContinuousLoadPanel
     // Disable order generation
     orderGenChkBox.setSelected(false);
 
-    // Free kernel reference.
-    kernel = null;
-    kernelProvider.unregister(this);
+    kernelClient.close();
     initialized = false;
   }
 
@@ -230,7 +232,7 @@ public class ContinuousLoadPanel
     if (randomOrderSpecButton.isSelected()) {
       int orderCount = (Integer) randomOrderCountSpinner.getValue();
       int orderSize = (Integer) randomOrderSizeSpinner.getValue();
-      return new RandomOrderBatchCreator(kernel, orderCount, orderSize);
+      return new RandomOrderBatchCreator(kernelClient.getKernel(), orderCount, orderSize);
     }
     else if (explicitOrderSpecButton.isSelected()) {
       saveCurrentTableData();
@@ -255,7 +257,7 @@ public class ContinuousLoadPanel
           }
         }
       }
-      return new ExplicitOrderBatchGenerator(kernel, tableModel.getList());
+      return new ExplicitOrderBatchGenerator(kernelClient.getKernel(), tableModel.getList());
     }
     else {
       throw new UnsupportedOperationException("Unsupported order spec.");
@@ -273,7 +275,7 @@ public class ContinuousLoadPanel
       return null;
     }
     if (thresholdTriggerRadioButton.isSelected()) {
-      return new ThresholdOrderGenTrigger(kernel,
+      return new ThresholdOrderGenTrigger(kernelClient.getKernel(),
                                           (Integer) thresholdSpinner.getValue(),
                                           batchCreator);
     }
@@ -285,7 +287,7 @@ public class ContinuousLoadPanel
       return new SingleOrderGenTrigger(batchCreator);
     }
     else {
-      log.warn("No trigger selected");
+      LOG.warn("No trigger selected");
       return null;
     }
   }
@@ -334,7 +336,7 @@ public class ContinuousLoadPanel
         operationTypesComboBox.removeAllItems();
         SortedSet<Location> sortedLocationSet
             = new TreeSet<>(Comparators.objectsByName());
-        sortedLocationSet.addAll(kernel.getTCSObjects(Location.class));
+        sortedLocationSet.addAll(kernelClient.getKernel().getTCSObjects(Location.class));
         for (Location i : sortedLocationSet) {
           locationsComboBox.addItem(i.getReference());
         }
@@ -865,7 +867,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
   private void orderGenChkBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_orderGenChkBoxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
-      if (kernel.getState().equals(Kernel.State.OPERATING)) {
+      if (kernelClient.getKernel().getState().equals(Kernel.State.OPERATING)) {
         // Start order generation.
         orderGenTrigger = createOrderGenTrigger();
         if (orderGenTrigger == null) {
@@ -886,8 +888,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
   }//GEN-LAST:event_orderGenChkBoxItemStateChanged
 
   private void addToTOTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToTOTableButtonActionPerformed
-    String name = nameGenerator.getUniqueString(bundle.getString("TransportOrder-"), "00");
-    nameGenerator.addString(name);
+    String name = NAME_GENERATOR.getUniqueString(bundle.getString("TransportOrder-"), "00");
+    NAME_GENERATOR.addString(name);
     TransportOrderData telegram = new TransportOrderData();
     telegram.setName(name);
     TransportOrderTableModel model
@@ -903,7 +905,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         = (TransportOrderTableModel) toTable.getModel();
     TransportOrderData selectedOrder
         = model.getDataAt(toTable.getSelectedRow());
-    nameGenerator.removeString(selectedOrder.getName());
+    NAME_GENERATOR.removeString(selectedOrder.getName());
     // Removes the selected row from the table.
     int selectedIndex = toTable.getSelectedRow();
     model.removeData(selectedIndex);
@@ -963,10 +965,10 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     operationTypesComboBox.removeAllItems();
     if (locationsComboBox.getSelectedItem() != null) {
       TCSObjectReference<Location> loc = (TCSObjectReference<Location>) locationsComboBox.getSelectedItem();
-      Location location = kernel.getTCSObject(Location.class, loc);
+      Location location = kernelClient.getKernel().getTCSObject(Location.class, loc);
       TCSObjectReference<LocationType> locationRef = location.getType();
-      LocationType locationType = kernel.getTCSObject(LocationType.class,
-                                                      locationRef);
+      LocationType locationType = kernelClient.getKernel().getTCSObject(LocationType.class,
+                                                                        locationRef);
       Set<String> operationTypes
           = new TreeSet<>(locationType.getAllowedOperations());
       for (String j : operationTypes) {
@@ -1045,7 +1047,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         model.toFile(targetFile);
       }
       catch (Exception exc) {
-        log.warn("Exception saving property set to " + targetFile.getPath(), exc);
+        LOG.warn("Exception saving property set to " + targetFile.getPath(), exc);
         JOptionPane.showMessageDialog(this,
                                       "Exception saving property set: " + exc.getMessage(),
                                       "Exception saving property set", JOptionPane.ERROR_MESSAGE);
@@ -1054,7 +1056,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
   }//GEN-LAST:event_saveButtonActionPerformed
 
   private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-    nameGenerator.clear();
+    NAME_GENERATOR.clear();
     int dialogResult = fileChooser.showOpenDialog(this);
     if (dialogResult == JFileChooser.APPROVE_OPTION) {
       File targetFile = fileChooser.getSelectedFile();
@@ -1096,13 +1098,13 @@ toTable.getSelectionModel().addListSelectionListener(listener);
               break;
           }
           data.setIntendedVehicle(curStruc.getIntendedVehicle() == null ? null
-              : kernel.getTCSObject(Vehicle.class, curStruc.getIntendedVehicle()).getReference());
+              : kernelClient.getKernel().getTCSObject(Vehicle.class, curStruc.getIntendedVehicle()).getReference());
           for (TransportOrderXMLStructure.XMLMapEntry curEntry : curStruc.getProperties()) {
             data.addProperty(curEntry.getKey(), curEntry.getValue());
           }
           for (DriveOrderXMLStructure curDOXMLS : curStruc.getDriveOrders()) {
             DriveOrderStructure newDOS
-                = new DriveOrderStructure(kernel.getTCSObject(
+                = new DriveOrderStructure(kernelClient.getKernel().getTCSObject(
                     Location.class, curDOXMLS.getDriveOrderLocation()).getReference(),
                                           curDOXMLS.getDriveOrderVehicleOperation());
             data.addDriveOrder(newDOS);
@@ -1115,12 +1117,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         TransportOrderTableModel model = new TransportOrderTableModel();
         for (TransportOrderData curData : newOrders) {
           model.addData(curData);
-          nameGenerator.addString(curData.getName());
+          NAME_GENERATOR.addString(curData.getName());
         }
         toTable.setModel(model);
       }
       catch (IOException | CredentialsException exc) {
-        log.warn("Exception reading property set from " + targetFile.getPath(), exc);
+        LOG.warn("Exception reading property set from " + targetFile.getPath(), exc);
         JOptionPane.showMessageDialog(this, "Exception reading property set:\n"
                                       + exc.getMessage(),
                                       "Exception reading property set",

@@ -21,12 +21,12 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import javax.inject.Inject;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
@@ -104,40 +104,40 @@ public class TransportOrderUtil {
         .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
                   "destModels have to be a PointModel or a Locationmodel");
 
-    List<DestinationCreationTO> destinations = new ArrayList<>();
-    for (int i = 0; i < destModels.size(); i++) {
-      AbstractFigureComponent locModel = destModels.get(i);
-      String action = actions.get(i);
-      Map<String, String> properties = new HashMap<>();
-      if (!propertiesList.isEmpty()) {
-        properties = propertiesList.get(i);
+    try (SharedKernelClient client = kernelProvider.register()) {
+      List<DestinationCreationTO> destinations = new ArrayList<>();
+      for (int i = 0; i < destModels.size(); i++) {
+        AbstractFigureComponent locModel = destModels.get(i);
+        String action = actions.get(i);
+        Map<String, String> properties = new HashMap<>();
+        if (!propertiesList.isEmpty()) {
+          properties = propertiesList.get(i);
+        }
+        Location location = client.getKernel().getTCSObject(Location.class, locModel.getName());
+        DestinationCreationTO destination;
+        if (location == null) {
+          Point point = client.getKernel().getTCSObject(Point.class, locModel.getName());
+          destination = new DestinationCreationTO(point.getName(), action)
+              .setDestLocationName(point.getName());
+        }
+        else {
+          destination = new DestinationCreationTO(location.getName(), action)
+              .setDestLocationName(location.getName())
+              .setProperties(properties);
+        }
+        destinations.add(destination);
       }
-      Location location = getKernel().getTCSObject(Location.class, locModel.getName());
-      DestinationCreationTO destination;
-      if (location == null) {
-        Point point = getKernel().getTCSObject(Point.class, locModel.getName());
-        destination = new DestinationCreationTO(point.getName(), action)
-            .setDestLocationName(point.getName());
-      }
-      else {
-        destination = new DestinationCreationTO(location.getName(), action)
-            .setDestLocationName(location.getName())
-            .setProperties(properties);
-      }
-      destinations.add(destination);
-    }
 
-    try {
-      TransportOrder tOrder = getKernel()
+      TransportOrder tOrder = client.getKernel()
           .createTransportOrder(new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
                                                              destinations)
               .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(deadline),
                                                    ZoneId.systemDefault()))
               .setIntendedVehicleName(vModel == null ? null : vModel.getName()));
 
-      getKernel().activateTransportOrder(tOrder.getReference());
+      client.getKernel().activateTransportOrder(tOrder.getReference());
     }
-    catch (CredentialsException | ObjectUnknownException e) {
+    catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
     }
   }
@@ -150,8 +150,8 @@ public class TransportOrderUtil {
   public void createTransportOrder(TransportOrder pattern) {
     requireNonNull(pattern, "pattern");
 
-    try {
-      TransportOrder tOrder = getKernel().createTransportOrder(
+    try (SharedKernelClient client = kernelProvider.register()) {
+      TransportOrder tOrder = client.getKernel().createTransportOrder(
           new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(), copyDestinations(pattern))
               .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(pattern.getDeadline()),
                                                    ZoneId.systemDefault()))
@@ -160,9 +160,9 @@ public class TransportOrderUtil {
                   : pattern.getIntendedVehicle().getName())
               .setProperties(pattern.getProperties()));
 
-      getKernel().activateTransportOrder(tOrder.getReference());
+      client.getKernel().activateTransportOrder(tOrder.getReference());
     }
-    catch (CredentialsException | ObjectUnknownException e) {
+    catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
     }
   }
@@ -178,13 +178,13 @@ public class TransportOrderUtil {
     requireNonNull(pointModel, "point");
     requireNonNull(vModel, "vehicle");
 
-    // This is only allowed in operating mode.
-    if (getKernel().getState() != Kernel.State.OPERATING) {
-      return;
-    }
+    try (SharedKernelClient client = kernelProvider.register()) {
+      // This is only allowed in operating mode.
+      if (client.getKernel().getState() != Kernel.State.OPERATING) {
+        return;
+      }
 
-    try {
-      TransportOrder t = getKernel().createTransportOrder(
+      TransportOrder t = client.getKernel().createTransportOrder(
           new TransportOrderCreationTO(
               "TOrder-" + UUID.randomUUID(),
               Collections.singletonList(new DestinationCreationTO(pointModel.getName(),
@@ -193,9 +193,9 @@ public class TransportOrderUtil {
               .setIntendedVehicleName(vModel.getName())
       );
 
-      getKernel().activateTransportOrder(t.getReference());
+      client.getKernel().activateTransportOrder(t.getReference());
     }
-    catch (CredentialsException | ObjectUnknownException e) {
+    catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
     }
   }
@@ -213,14 +213,4 @@ public class TransportOrderUtil {
                                      driveOrder.getDestination().getOperation())
         .setProperties(driveOrder.getDestination().getProperties());
   }
-
-  /**
-   * Returns the kernel.
-   *
-   * @return The kernel.
-   */
-  private Kernel getKernel() {
-    return kernelProvider.getKernel();
-  }
-
 }

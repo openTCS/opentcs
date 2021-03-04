@@ -79,4 +79,13 @@ public class Rejection
   public TCSObjectReference<Vehicle> getVehicle() {
     return vehicle;
   }
+
+  @Override
+  public String toString() {
+    return "Rejection{"
+        + "vehicle=" + vehicle
+        + ", reason=" + reason
+        + ", timestamp=" + timestamp
+        + '}';
+  }
 }

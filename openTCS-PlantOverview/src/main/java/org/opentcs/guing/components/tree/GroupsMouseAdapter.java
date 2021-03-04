@@ -9,9 +9,11 @@
 package org.opentcs.guing.components.tree;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.swing.JCheckBoxMenuItem;
@@ -19,6 +21,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.application.ViewManager;
+import org.opentcs.guing.components.drawing.DrawingViewScrollPane;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.tree.elements.FigureUserObject;
 import org.opentcs.guing.components.tree.elements.LocationUserObject;
 import org.opentcs.guing.components.tree.elements.PathUserObject;
@@ -36,14 +41,17 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class GroupsMouseAdapter
     extends TreeMouseAdapter {
 
+  private final ViewManager viewManager;
+
   @Inject
-  public GroupsMouseAdapter(TreeView treeView) {
+  public GroupsMouseAdapter(TreeView treeView, ViewManager viewManager) {
     super(treeView);
+    this.viewManager = requireNonNull(viewManager, "viewManager");
   }
 
   @Override
   protected void evaluateRightClick(MouseEvent e,
-                                    UserObject userObject, 
+                                    UserObject userObject,
                                     Set<UserObject> oldSelection) {
     JTree objectTree = treeView.getTree();
     if (userObject instanceof PointUserObject
@@ -84,54 +92,73 @@ public class GroupsMouseAdapter
 
     final JCheckBoxMenuItem cbItemAll = new JCheckBoxMenuItem(
         labels.getString("tree.group.showInAll"), groupFolder.isGroupVisible());
-    cbItemAll.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        openTCSView.setGroupVisibilityInAllDrawingViews(groupFolder,
-                                                        cbItemAll.isSelected());
-      }
-    });
+    cbItemAll.addActionListener((ActionEvent e)
+        -> setGroupVisibilityInAllDrawingViews(groupFolder, cbItemAll.isSelected())
+    );
     menu.add(cbItemAll);
 
-    for (final String title : openTCSView.getDrawingViewNames()) {
+    for (final String title : viewManager.getDrawingViewNames()) {
       final JCheckBoxMenuItem cbItem = new JCheckBoxMenuItem(
           labels.getFormatted("tree.group.show", title),
           groupFolder.isGroupInDrawingViewVisible(title));
-      cbItem.addActionListener(new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          openTCSView.setGroupVisibilityInDrawingView(title,
-                                                      groupFolder,
-                                                      cbItem.isSelected());
-        }
-      });
+      cbItem.addActionListener((ActionEvent e)
+          -> setGroupVisibilityInDrawingView(title, groupFolder, cbItem.isSelected()));
       menu.add(cbItem);
     }
 
     menu.addSeparator();
 
     JMenuItem item = new JMenuItem(labels.getString("tree.group.add"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        OpenTCSView.instance().addSelectedItemsToGroup(groupFolder);
-      }
-    });
+    item.addActionListener((ActionEvent e) -> openTCSView.addSelectedItemsToGroup(groupFolder));
     menu.add(item);
 
     item = new JMenuItem(labels.getString("tree.group.delete"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        OpenTCSView.instance().deleteGroup(groupFolder);
-      }
-    });
+    item.addActionListener((ActionEvent e) -> openTCSView.deleteGroup(groupFolder));
 
     menu.add(item);
     menu.show(treeView.getTree(), x, y);
-  }  
+  }
+
+  /**
+   * Toggles the visibility of the group members.
+   *
+   * @param gm The folder that contains the elements of the group.
+   * @param visible Visible or not.
+   */
+  public void setGroupVisibilityInAllDrawingViews(GroupModel gm, boolean visible) {
+    gm.setGroupVisible(visible);
+
+    for (OpenTCSDrawingView drawingView : getDrawingViews()) {
+      drawingView.setGroupVisible(gm.getChildComponents(), gm.isGroupVisible());
+    }
+  }
+
+  /**
+   * Toggles the visibility of the group members for a specific
+   * <code>OpenTCSDrawingView</code>.
+   *
+   * @param title The title of the drawing view.
+   * @param sf The group folder containing the elements to hide.
+   * @param visible Visible or not.
+   */
+  public void setGroupVisibilityInDrawingView(String title, GroupModel sf, boolean visible) {
+    sf.setDrawingViewVisible(title, visible);
+    viewManager.setGroupVisibilityInDrawingView(title, sf, visible);
+  }
+
+  /**
+   * Returns all drawing views (including the modelling view)
+   *
+   * @return List with all known <code>OpenTCSDrawingViews</code>.
+   */
+  private List<OpenTCSDrawingView> getDrawingViews() {
+    List<OpenTCSDrawingView> views = new ArrayList<>();
+
+    for (DrawingViewScrollPane scrollPane : viewManager.getDrawingViewMap().values()) {
+      views.add(scrollPane.getDrawingView());
+    }
+
+    return views;
+  }
+
 }

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model.elements;
 
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
@@ -40,25 +39,25 @@ public class LayoutModel
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("layout.description");
   }
-  
+
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("layout.name.text"));
     pName.setHelptext(bundle.getString("layout.name.helptext"));
     setProperty(NAME, pName);
-    // Scale of x-axis
+
     LengthProperty pScaleX = new LengthProperty(this);
     pScaleX.setDescription(bundle.getString("layout.scaleX.text"));
     pScaleX.setHelptext(bundle.getString("layout.scaleX.helptext"));
     setProperty(SCALE_X, pScaleX);
-    // Scale of y-axis
+
     LengthProperty pScaleY = new LengthProperty(this);
     pScaleY.setDescription(bundle.getString("layout.scaleY.text"));
     pScaleY.setHelptext(bundle.getString("layout.scaleY.helptext"));
     setProperty(SCALE_Y, pScaleY);
-    // Miscellaneous
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("layout.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("layout.miscellaneous.helptext"));

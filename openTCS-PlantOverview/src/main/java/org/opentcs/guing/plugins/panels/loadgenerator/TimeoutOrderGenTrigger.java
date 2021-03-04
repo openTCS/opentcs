@@ -25,8 +25,7 @@ class TimeoutOrderGenTrigger
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(TimeoutOrderGenTrigger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TimeoutOrderGenTrigger.class);
   /**
    * The timeout after which to trigger (in ms).
    */
@@ -95,7 +94,7 @@ class TimeoutOrderGenTrigger
         triggerOrderGeneration();
       }
       catch (KernelRuntimeException exc) {
-        log.warn("Exception triggering order generation, terminating trigger task", exc);
+        LOG.warn("Exception triggering order generation, terminating trigger task", exc);
         this.terminate();
       }
     }

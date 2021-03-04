@@ -19,8 +19,10 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.ObjectPropConstants;
 import static org.opentcs.data.ObjectPropConstants.VEHICLE_INITIAL_POSITION;
 import org.opentcs.data.TCSObject;
@@ -29,6 +31,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
@@ -38,6 +41,7 @@ import org.opentcs.guing.components.properties.event.NullAttributesChangeListene
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
+import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
@@ -130,6 +134,20 @@ public class VehicleAdapter
             .setEnergyLevelCritical(getEnergyLevelCritical())
             .setEnergyLevelGood(getEnergyLevelGood())
             .setProperties(getKernelProperties())
+    );
+    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+      updateLayoutElement(layout);
+    }
+  }
+
+  private void updateLayoutElement(VisualLayoutCreationTO layout) {
+    ColorProperty pColor
+        = (ColorProperty) getModel().getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
+    int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
+
+    layout.getModelElements().add(
+        new ModelLayoutElementCreationTO(getModel().getName())
+            .setProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR, String.format("#%06X", rgb))
     );
   }
 

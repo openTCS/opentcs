@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -197,9 +196,8 @@ public class TransportOrderSelectionStrategy
   private SortedSet<TransportOrder> findOrdersFor(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
-    Set<TransportOrder> orders = kernel.getTCSObjects(TransportOrder.class).stream()
-        .filter(transportOrderSelectionVeto.negate())
-        .collect(Collectors.toSet());
+    Set<TransportOrder> orders = kernel.getTCSObjects(TransportOrder.class,
+                                                      transportOrderSelectionVeto.negate());
 
     SortedSet<TransportOrder> result = findNextOrderInSameSequence(orders, vehicle);
     if (result == null || !result.isEmpty()) {

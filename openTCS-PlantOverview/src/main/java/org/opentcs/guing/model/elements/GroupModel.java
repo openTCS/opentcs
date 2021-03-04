@@ -155,23 +155,18 @@ public class GroupModel
    */
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("group.name.text"));
     pName.setHelptext(bundle.getString("group.name.helptext"));
     setProperty(NAME, pName);
-//    // Color
-//    ColorProperty pColor = new ColorProperty(this, Color.red);
-//    pColor.setDescription(bundle.getString("element.blockColor.text"));
-//    pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
-//    setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
-    // Elements
+
     StringSetProperty pElements = new StringSetProperty(this);
     pElements.setDescription(bundle.getString("group.elements.text"));
     pElements.setModellingEditable(false);
     pElements.setOperatingEditable(false);
     setProperty(ELEMENTS, pElements);
-    // Miscellaneous
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("group.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("group.miscellaneous.helptext"));

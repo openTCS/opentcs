@@ -99,7 +99,11 @@ public class TCSModelTransitionEvent
 
   @Override
   public String toString() {
-    return "TCSModelTransitionEvent(" + oldModelName + "->" + newModelName
-        + ", transition finished: " + transitionFinished + ")";
+    return "TCSModelTransitionEvent{"
+        + "oldModelName=" + oldModelName
+        + ", newModelName=" + newModelName
+        + ", modelContentChanged=" + modelContentChanged
+        + ", transitionFinished=" + transitionFinished
+        + '}';
   }
 }

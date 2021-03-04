@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -35,7 +36,6 @@ import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.StringListCellRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A Frame containing all vehicles and detailed information.

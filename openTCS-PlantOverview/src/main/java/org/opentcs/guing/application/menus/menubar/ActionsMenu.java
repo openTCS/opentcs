@@ -9,19 +9,19 @@
 package org.opentcs.guing.application.menus.menubar;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import org.opentcs.guing.application.OpenTCSView;
+import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -57,31 +57,24 @@ public class ActionsMenu
    * A menu item for assuming the layout coordinates from the model coordinates.
    */
   private final JMenuItem cbiAlignModelWithLayout;
-  /**
-   * The application's configuration.
-   */
-  private final PlantOverviewApplicationConfiguration appConfig;
 
   /**
    * Creates a new instance.
    *
    * @param actionMap The application's action map.
-   * @param view The application's main view.
    * @param drawingEditor The application's drawing editor.
    * @param menuFactory A factory for menu items.
    * @param appConfig The application's configuration.
    */
   @Inject
   public ActionsMenu(ViewActionMap actionMap,
-                     final OpenTCSView view,
                      OpenTCSDrawingEditor drawingEditor,
                      MenuFactory menuFactory,
                      PlantOverviewApplicationConfiguration appConfig) {
     requireNonNull(actionMap, "actionMap");
-    requireNonNull(view, "view");
     requireNonNull(drawingEditor, "drawingEditor");
     requireNonNull(menuFactory, "menuFactory");
-    this.appConfig = requireNonNull(appConfig, "appConfig");
+    requireNonNull(appConfig, "appConfig");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
@@ -101,11 +94,11 @@ public class ActionsMenu
     labels.configureMenu(cbiIgnorePrecisePosition, "actions.ignorePrecisePosition");
     add(cbiIgnorePrecisePosition);
     cbiIgnorePrecisePosition.setSelected(appConfig.ignoreVehiclePrecisePosition());
-    cbiIgnorePrecisePosition.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        view.ignorePrecisePosition(cbiIgnorePrecisePosition.isSelected());
+    cbiIgnorePrecisePosition.addActionListener((ActionEvent e) -> {
+      for (Figure figure : drawingEditor.getDrawing().getChildren()) {
+        if (figure instanceof VehicleFigure) {
+          ((VehicleFigure) figure).setIgnorePrecisePosition(cbiIgnorePrecisePosition.isSelected());
+        }
       }
     });
 
@@ -114,11 +107,11 @@ public class ActionsMenu
     labels.configureMenu(cbiIgnoreOrientationAngle, "actions.ignoreOrientationAngle");
     add(cbiIgnoreOrientationAngle);
     cbiIgnoreOrientationAngle.setSelected(appConfig.ignoreVehicleOrientationAngle());
-    cbiIgnoreOrientationAngle.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        view.ignoreOrientationAngle(cbiIgnoreOrientationAngle.isSelected());
+    cbiIgnoreOrientationAngle.addActionListener((ActionEvent e) -> {
+      for (Figure figure : drawingEditor.getDrawing().getChildren()) {
+        if (figure instanceof VehicleFigure) {
+          ((VehicleFigure) figure).setIgnoreOrientationAngle(cbiIgnoreOrientationAngle.isSelected());
+        }
       }
     });
 

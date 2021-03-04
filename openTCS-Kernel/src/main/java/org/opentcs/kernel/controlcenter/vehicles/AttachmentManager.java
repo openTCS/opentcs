@@ -217,8 +217,7 @@ public class AttachmentManager
     }
     else {
       if (!Strings.isNullOrEmpty(prefAdapter)) {
-        LOG.info("Couldn't autoattach preferred adapter {} to {}, as the adapter doesn't exist. "
-            + "Attaching the first adapter that is available.",
+        LOG.warn("Couldn't attach preferred adapter {} to {}.  Attaching first available adapter.",
                  prefAdapter,
                  vehicleEntry.getVehicle().getName());
       }

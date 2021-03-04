@@ -24,8 +24,7 @@ class SingleOrderGenTrigger
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(SingleOrderGenTrigger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SingleOrderGenTrigger.class);
   /**
    * The instance actually creating the new orders.
    */
@@ -57,7 +56,7 @@ class SingleOrderGenTrigger
       }
     }
     catch (KernelRuntimeException exc) {
-      log.warn("Exception triggering order generation, terminating triggering", exc);
+      LOG.warn("Exception triggering order generation, terminating triggering", exc);
     }
   }
 }

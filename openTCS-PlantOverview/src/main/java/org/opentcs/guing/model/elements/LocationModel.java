@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model.elements;
 
 import java.util.ArrayList;
@@ -141,69 +140,63 @@ public class LocationModel
 
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("location.name.text"));
     pName.setHelptext(bundle.getString("location.name.helptext"));
     setProperty(NAME, pName);
-    // Position x
+
     CoordinateProperty pPosX = new CoordinateProperty(this);
     pPosX.setDescription(bundle.getString("location.x.text"));
     pPosX.setHelptext(bundle.getString("location.x.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
-    // Position y
+
     CoordinateProperty pPosY = new CoordinateProperty(this);
     pPosY.setDescription(bundle.getString("location.y.text"));
     pPosY.setHelptext(bundle.getString("location.y.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
-    // Location type
+
     LocationTypeProperty pType = new LocationTypeProperty(this);
     pType.setDescription(bundle.getString("location.type.text"));
     pType.setHelptext(bundle.getString("location.type.helptext"));
     setProperty(TYPE, pType);
-//    // Beschriftung
-//    StringProperty pLabel = new StringProperty(this);
-//    pLabel.setDescription(bundle.getString("location.label.text"));
-//    pLabel.setHelptext(bundle.getString("location.label.helptext"));
-//    pLabel.setCollectiveEditable(true);
-//    setProperty(LABEL, pLabel);
-    // Symbol - der gehörige Enum-Wert wird unter Miscellaneous Properies gespeichert
+
     SymbolProperty pSymbol = new SymbolProperty(this);
     pSymbol.setDescription(bundle.getString("location.symbol.text"));
     pSymbol.setHelptext(bundle.getString("location.symbol.helptext"));
     pSymbol.setCollectiveEditable(true);
     setProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION, pSymbol);
-    // Position x im Layout
+
     StringProperty pLocPosX = new StringProperty(this);
     pLocPosX.setDescription(bundle.getString("element.locPosX.text"));
     pLocPosX.setHelptext(bundle.getString("element.locPosX.helptext"));
     pLocPosX.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_POS_X, pLocPosX);
-    // Position y im Layout
+
     StringProperty pLocPosY = new StringProperty(this);
     pLocPosY.setDescription(bundle.getString("element.locPosY.text"));
     pLocPosY.setHelptext(bundle.getString("element.locPosY.helptext"));
     pLocPosY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_POS_Y, pLocPosY);
-    // Position x des zugehörigen Labels im Layout
+
     StringProperty pLocLabelOffsetX = new StringProperty(this);
     pLocLabelOffsetX.setDescription(bundle.getString("element.locLabelOffsetX.text"));
     pLocLabelOffsetX.setHelptext(bundle.getString("element.locLabelOffsetX.helptext"));
     pLocLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, pLocLabelOffsetX);
-    // Position y des zugehörigen Labels im Layout
+
     StringProperty pLocLabelOffsetY = new StringProperty(this);
     pLocLabelOffsetY.setDescription(bundle.getString("element.locLabelOffsetY.text"));
     pLocLabelOffsetY.setHelptext(bundle.getString("element.locLabelOffsetY.helptext"));
     pLocLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, pLocLabelOffsetY);
-    // Winkelausrichtung des zugehörigen Labels im Layout
+
     StringProperty pLocLabelOrientationAngle = new StringProperty(this);
     pLocLabelOrientationAngle.setDescription(bundle.getString("element.locLabelOrientationAngle.text"));
     pLocLabelOrientationAngle.setHelptext(bundle.getString("element.locLabelOrientationAngle.helptext"));
     pLocLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, pLocLabelOrientationAngle);
-    // Miscellaneous Properties 
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("location.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("location.miscellaneous.helptext"));

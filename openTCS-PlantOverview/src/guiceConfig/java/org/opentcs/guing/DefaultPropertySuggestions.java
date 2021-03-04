@@ -12,7 +12,6 @@ import java.util.Set;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.plantoverview.PropertySuggestions;
-import org.opentcs.data.ObjectPropConstants;
 
 /**
  * The default property suggestions of the baseline plant overview.
@@ -29,7 +28,6 @@ public class DefaultPropertySuggestions
    * Creates a new instance.
    */
   public DefaultPropertySuggestions() {
-    keySuggestions.add(ObjectPropConstants.PATH_TRAVEL_ORIENTATION);
     keySuggestions.add(Router.PROPKEY_ROUTING_GROUP);
     keySuggestions.add(Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION);
     keySuggestions.add(Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION);

@@ -34,7 +34,7 @@ public interface VehicleController
    * order is part of.
    * @throws IllegalStateException If this controller already has a drive order.
    */
-  void setDriveOrder(@Nullable DriveOrder newOrder, @Nonnull Map<String, String> orderProperties)
+  void setDriveOrder(@Nonnull DriveOrder newOrder, @Nonnull Map<String, String> orderProperties)
       throws IllegalStateException;
 
   /**

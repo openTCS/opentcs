@@ -29,7 +29,11 @@ public interface ObjectPropConstants {
    * <p>
    * Type String (any string - details currently not specified)
    * </p>
+   *
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   String PATH_TRAVEL_ORIENTATION = "tcs:travelOrientation";
   /**
    * A property key for {@link VisualLayout} instances used to provide a hint for which

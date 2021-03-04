@@ -89,7 +89,7 @@ public class DefaultScheduler
     reservationPool.clear();
     allocationAdvisor.initialize();
     allocatorTask = new AllocatorTask(localKernel, reservationPool, allocationAdvisor);
-    new Thread(allocatorTask, getClass().getName() + "-AllocatorTask").start();
+    new Thread(allocatorTask, "DefaultScheduler-allocatorTask").start();
     initialized = true;
   }
 

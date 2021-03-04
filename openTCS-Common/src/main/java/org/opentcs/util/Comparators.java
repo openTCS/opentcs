@@ -56,7 +56,7 @@ public final class Comparators {
           return 1;
         }
         else {
-          return 0;
+          return OBJECTS_BY_NAME.compare(o1, o2);
         }
       };
   /**

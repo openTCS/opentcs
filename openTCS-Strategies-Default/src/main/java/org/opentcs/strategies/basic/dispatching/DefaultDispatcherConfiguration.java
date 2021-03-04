@@ -46,4 +46,10 @@ public interface DefaultDispatcherConfiguration {
       description = "Whether unroutable incoming transport orders should be marked as UNROUTABLE.",
       orderKey = "1_misc")
   boolean dismissUnroutableTransportOrders();
+  
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The interval between redispatching of vehicles.",
+      orderKey = "1_misc")
+  long idleVehicleRedispatchingInterval();
 }

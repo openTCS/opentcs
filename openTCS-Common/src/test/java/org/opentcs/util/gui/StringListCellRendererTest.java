@@ -9,13 +9,14 @@ package org.opentcs.util.gui;
 
 import java.awt.Component;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import org.junit.*;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 /**
  *
@@ -23,10 +24,12 @@ import static org.hamcrest.Matchers.is;
  */
 public class StringListCellRendererTest {
 
+  private JList<TCSObjectReference<?>> list;
   private StringListCellRenderer<TCSObjectReference<?>> renderer;
 
   @Before
   public void setUp() {
+    list = new JList<>();
     renderer = new StringListCellRenderer<>(x -> x == null ? "" : x.getName());
   }
 
@@ -35,7 +38,7 @@ public class StringListCellRendererTest {
    */
   @Test
   public void returnsNullForNullValue() {
-    Component result = renderer.getListCellRendererComponent(null, null, 0, true, true);
+    Component result = renderer.getListCellRendererComponent(list, null, 0, true, true);
     assertThat(result, is(instanceOf(JLabel.class)));
     JLabel labelResult = (JLabel) result;
     assertThat(labelResult.getText(), is(equalTo("")));
@@ -45,7 +48,7 @@ public class StringListCellRendererTest {
   public void returnsLabelWithNameAsText() {
     Vehicle vehicle = new Vehicle("VehicleName");
     TCSObjectReference<Vehicle> vehicleReference = vehicle.getReference();
-    Component result = renderer.getListCellRendererComponent(null, vehicleReference, 0, true, true);
+    Component result = renderer.getListCellRendererComponent(list, vehicleReference, 0, true, true);
     assertThat(result, is(instanceOf(JLabel.class)));
     JLabel labelResult = (JLabel) result;
     assertThat(labelResult.getText(), is(equalTo("VehicleName")));

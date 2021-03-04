@@ -8,11 +8,14 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import java.util.HashMap;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.queries.QuerySchedulerAllocations;
+import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
@@ -35,17 +38,18 @@ public class ResourceAllocationPanel
    * This class' logger:
    */
   private static final Logger LOG = LoggerFactory.getLogger(ResourceAllocationPanel.class);
-
   /**
    * The kernel to query allocations from.
    */
   private final SharedKernelProvider kernelProvider;
-
+  /**
+   * The client that is registered with the kernel provider.
+   */
+  private SharedKernelClient kernelClient;
   /**
    * Whether this panel was initialized.
    */
   private boolean initialized;
-
   /**
    * If the table model should update its contents if an event arrives.
    */
@@ -68,15 +72,18 @@ public class ResourceAllocationPanel
       LOG.debug("Already initialized - skipping.");
       return;
     }
-    if (kernelProvider == null || !kernelProvider.kernelShared()) {
+    // Register event listener in the kernel.
+    try {
+      kernelClient = kernelProvider.register();
+    }
+    catch (KernelUnavailableException exc) {
+      LOG.warn("Kernel unavailable", exc);
       return;
     }
-    //Register event listener in the kernel
-    Kernel kernel = kernelProvider.getKernel();
-    kernel.addEventListener(this);
+    kernelClient.getKernel().addEventListener(this);
 
-    //Trigger an update to the table model
-    handleVehicleStateChange(kernel);
+    // Trigger an update to the table model.
+    handleVehicleStateChange(new QuerySchedulerAllocations(new HashMap<>()));
 
     initialized = true;
   }
@@ -92,11 +99,10 @@ public class ResourceAllocationPanel
       LOG.debug("Already terminated - skipping.");
       return;
     }
-    if (kernelProvider == null || !kernelProvider.kernelShared()) {
-      return;
-    }
-    //Remove event listener in the kernel
-    kernelProvider.getKernel().removeEventListener(this);
+    // Remove event listener in the kernel.
+    kernelClient.getKernel().removeEventListener(this);
+    kernelClient.close();
+
     initialized = false;
   }
 
@@ -124,16 +130,13 @@ public class ResourceAllocationPanel
       LOG.debug("No connection to the kernel but received an event.");
       return;
     }
-    //Retrieve the kernel from the provider
-    Kernel kernel = kernelProvider.getKernel();
 
     // Ignore events if we're not operating or connected. (Vehicle objects may change a lot in modelling mode.)
-    if (kernel.getState() != Kernel.State.OPERATING) {
+    if (kernelClient.getKernel().getState() != Kernel.State.OPERATING) {
       LOG.debug("Kernel is not in operating mode - skipping.");
       return;
     }
-
-    handleVehicleStateChange(kernel);
+    handleVehicleStateChange(kernelClient.getKernel().query(QuerySchedulerAllocations.class));
   }
 
   /**
@@ -142,9 +145,7 @@ public class ResourceAllocationPanel
    *
    * @param vehicle The vehicle which changed
    */
-  private void handleVehicleStateChange(Kernel kernel) {
-    //Query the kernel for allocated resources
-    QuerySchedulerAllocations query = kernel.query(QuerySchedulerAllocations.class);
+  private void handleVehicleStateChange(QuerySchedulerAllocations query) {
     if (query == null) {
       LOG.debug("Kernel did not answer to the scheduled allocations query.");
       return;

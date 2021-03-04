@@ -152,7 +152,11 @@ public class TCSObjectReference<E extends TCSObject<E>>
 
   @Override
   public String toString() {
-    return "[" + id + "]:" + name;
+    return "TCSObjectReference{"
+        + "referentClass=" + referentClass
+        + ", id=" + id
+        + ", name=" + name
+        + '}';
   }
 
   /**

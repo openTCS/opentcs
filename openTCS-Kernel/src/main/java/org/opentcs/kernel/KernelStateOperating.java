@@ -404,6 +404,7 @@ class KernelStateOperating
                                   Vehicle.ProcState newState)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
+      LOG.debug("Updating procState of vehicle {} to {}...", ref.getName(), newState);
       Vehicle vehicle = getModel().setVehicleProcState(ref, newState);
       switch (newState) {
         case IDLE:
@@ -816,8 +817,9 @@ class KernelStateOperating
   @Override
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef, Object message) {
     synchronized (getGlobalSyncObject()) {
-      Vehicle vehicle = getGlobalObjectPool().getObjectOrNull(Vehicle.class, vehicleRef);
-      vehicleControllerPool.getVehicleController(vehicle.getName()).sendCommAdapterMessage(message);
+      vehicleControllerPool
+          .getVehicleController(vehicleRef.getName())
+          .sendCommAdapterMessage(message);
     }
   }
 

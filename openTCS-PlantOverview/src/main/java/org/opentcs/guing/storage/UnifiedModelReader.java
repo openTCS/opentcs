@@ -121,8 +121,9 @@ public class UnifiedModelReader
           systemModel);
     }
     for (VehicleTO vehicle : plantModel.getVehicles()) {
-      validateAndAddModelComponent(modelConverter.convertVehicleTO(vehicle),
-                                   systemModel);
+      validateAndAddModelComponent(
+          modelConverter.convertVehicleTO(vehicle, plantModel.getVisualLayouts().get(0)),
+          systemModel);
     }
     for (LocationTypeTO locationType : plantModel.getLocationTypes()) {
       validateAndAddModelComponent(modelConverter.convertLocationTypeTO(locationType),
@@ -162,7 +163,6 @@ public class UnifiedModelReader
 
     // XXX get OtherGrapgicalElements from ModelLayoutElementTOs, ShapeLayoutElementTOs and 
     // ImageLayoutElementTOs
-    
     // If any errors occurred, show the dialog with all errors listed
     if (!deserializationErrors.isEmpty()) {
       ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();

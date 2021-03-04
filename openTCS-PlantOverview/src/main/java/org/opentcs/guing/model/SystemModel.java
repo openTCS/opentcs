@@ -19,6 +19,7 @@ import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.course.DrawingMethod;
@@ -267,12 +268,14 @@ public interface SystemModel
    * @param paths
    * @param locations
    * @param blocks
+   * @param vehicles
    */
   void createLayoutMap(VisualLayout layout,
                        Set<Point> points,
                        Set<Path> paths,
                        Set<Location> locations,
-                       Set<Block> blocks);
+                       Set<Block> blocks,
+                       Set<Vehicle> vehicles);
 
   /**
    * Returns the LayoutMap.

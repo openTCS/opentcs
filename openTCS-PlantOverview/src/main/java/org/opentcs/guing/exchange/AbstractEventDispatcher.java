@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.exchange;
 
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
@@ -66,11 +64,6 @@ public abstract class AbstractEventDispatcher
   }
 
   @Override // EventDispatcher
-  public Kernel getKernel() {
-    return kernelProvider.kernelShared() ? kernelProvider.getKernel() : null;
-  }
-
-  @Override // EventDispatcher
   public ProcessAdapter findProcessAdapter(ModelComponent model) {
     return fAdaptersByModel.get(model);
   }
@@ -94,5 +87,9 @@ public abstract class AbstractEventDispatcher
   @Override // EventDispatcher
   public Set<ProcessAdapter> getProcessAdapters() {
     return new HashSet<>(fAdaptersByModel.values());
+  }
+
+  protected SharedKernelProvider getKernelProvider() {
+    return kernelProvider;
   }
 }

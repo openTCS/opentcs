@@ -15,6 +15,7 @@ import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.model.elements.BlockModel;
+import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
  * Utility methods concerning colors/colored elements.
@@ -78,4 +79,28 @@ public class Colors {
     return colors.get(0);
   }
 
+  /**
+   * Returns a (preferredly unused) color for a new vehicle.
+   *
+   * @param vehicles The existing vehicles.
+   * @return The color to be used.
+   */
+  public static Color unusedVehicleColor(List<VehicleModel> vehicles) {
+    requireNonNull(vehicles, "vehicles");
+
+    List<Color> colors = defaultColors();
+
+    List<Color> usedColors = new ArrayList<>();
+    for (VehicleModel vehicle : vehicles) {
+      ColorProperty cp = (ColorProperty) vehicle.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
+      usedColors.add(cp.getColor());
+    }
+    for (Color color : colors) {
+      if (!usedColors.contains(color)) {
+        return color;
+      }
+    }
+
+    return colors.get(0);
+  }
 }

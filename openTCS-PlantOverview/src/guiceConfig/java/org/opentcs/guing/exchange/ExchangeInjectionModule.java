@@ -33,11 +33,6 @@ public class ExchangeInjectionModule
         .to(ApplicationKernelProvider.class)
         .in(Singleton.class);
 
-    bind(Object.class)
-        .annotatedWith(ApplicationKernelClient.class)
-        .to(Object.class)
-        .in(Singleton.class);
-
     bind(EventDispatcher.class).to(OpenTCSEventDispatcher.class);
     
     install(new FactoryModuleBuilder().build(ProcessAdapterFactory.class));

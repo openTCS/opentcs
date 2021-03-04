@@ -8,6 +8,30 @@
 . For automatic attachment of vehicle drivers to vehicles on startup, set the kernel application's configuration parameter `kernelapp.autoAttachDriversOnStartup` to `true`.
 . To automatically enable vehicle drivers on startup, set the kernel application's configuration parameter `kernelapp.autoEnableDriversOnStartup` to `true`.
 
+=== Automatically selecting a specific vehicle driver on startup
+
+Automatic attachment of vehicle drivers by default works as follows:
+The kernel asks every available vehicle driver if it can attach to a given vehicle and selects the first one that can.
+It asks the loopback driver last, as that one is always available and can attach to any vehicle, but should not prevent actual vehicle drivers to be attached.
+As a result, if there is only one driver for your vehicle(s), you usually do not have to do anything for it to be selected.
+
+In some less common cases, you may have multiple vehicle drivers registered with the kernel that can all attach to the vehicles in your plant model.
+To automatically select a specific driver in such cases, set a property with the key `tcs:preferredAdapterClass` on the vehicles, with its value being the name of the Java class implementing the driver's adapter factory.
+(If you do not know this class name, ask the developer who provided the vehicle driver to you for it.)
+
+=== Initializing a virtual vehicle's position automatically on startup
+
+Even during the development or simulation phase of a project, repeatedly setting a virtual vehicle's initial position manually via the loopback driver's user interface can be tiresome and possibly error-prone.
+To automatically set a vehicle's initial position when the loopback driver is enabled, you can store the initial position in the respective plant model by doing the following:
+
+. Start the plant overview client in modelling mode.
+. In the plant overview client's tree view of the plant model, select a vehicle.
+. In the table showing the vehicle's properties, click into the value field labelled btn:[Initial position].
+In the dialog shown, select the initial position for this vehicle from the model's list of points.
+. Save the model and persist it in the kernel as described in <<Saving the plant model>>.
+
+Whenever you attach the loopback driver to the modified vehicle after doing this, it will automatically report the vehicle's position to be the one that you selected.
+
 === Running kernel and plant overview on separate systems
 
 The kernel and the plant overview client communicate via Java's Remote Method Invocation (RMI) mechanism.
@@ -61,19 +85,6 @@ To customize this behaviour, do the following:
   The default value is 60.000 (milliseconds, corresponding to an interval of one minute).
 . Set the configuration entry `orderpool.sweepAge` to a maximum age of finished orders according to your needs.
   The default value is 86.400.000 (milliseconds, corresponding to 24 hours that a finished order should be kept in the pool).
-
-=== Initializing a virtual vehicle's position automatically on startup
-
-Even during the development or simulation phase of a project, repeatedly setting a virtual vehicle's initial position manually via the loopback driver's user interface can be tiresome and possibly error-prone.
-To automatically set a vehicle's initial position when the loopback driver is enabled, you can store the initial position in the respective plant model by doing the following:
-
-. Start the plant overview client in modelling mode.
-. In the plant overview client's tree view of the plant model, select a vehicle.
-. In the table showing the vehicle's properties, click into the value field labelled btn:[Initial position].
-In the dialog shown, select the initial position for this vehicle from the model's list of points.
-. Save the model and persist it in the kernel as described in <<Saving the plant model>>.
-
-Whenever you attach the loopback driver to the modified vehicle after doing this, it will automatically report the vehicle's position to be the one that you selected.
 
 === Using model element properties for project-specific data
 

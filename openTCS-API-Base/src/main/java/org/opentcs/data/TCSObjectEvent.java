@@ -110,21 +110,17 @@ public class TCSObjectEvent
 
   @Override
   public String toString() {
-    switch (type) {
-      case OBJECT_CREATED:
-      case OBJECT_MODIFIED:
-        return "TCSObjectEvent(" + type + ":" + currentObjectState + ")";
-      case OBJECT_REMOVED:
-        return "TCSObjectEvent(" + type + ":" + previousObjectState + ")";
-      default:
-        throw new IllegalArgumentException("Unhandled type: " + type);
-    }
+    return "TCSObjectEvent{"
+        + "type=" + type
+        + ", currentObjectState=" + currentObjectState
+        + ", previousObjectState=" + previousObjectState
+        + '}';
   }
 
   /**
    * Indicates the type of an event, which can be helpful with filtering events.
    */
-  public enum Type {
+  public static enum Type {
 
     /**
      * Indicates that the referenced object has been newly created.

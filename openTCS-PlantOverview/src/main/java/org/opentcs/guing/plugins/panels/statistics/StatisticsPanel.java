@@ -30,8 +30,7 @@ public class StatisticsPanel
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(StatisticsPanel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StatisticsPanel.class);
   /**
    * A file chooser for selecting the input file.
    */
@@ -146,7 +145,7 @@ public class StatisticsPanel
         }
       }
       catch (IOException exc) {
-        log.warn("Exception parsing input file " + inputFile, exc);
+        LOG.warn("Exception parsing input file " + inputFile, exc);
         inputFile = null;
         inputRecords = null;
         analysisData = null;

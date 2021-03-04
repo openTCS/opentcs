@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -472,6 +473,8 @@ public class UnifiedModelComponentConverter {
         .addAll(extractPointInformation(systemModel.getPointModels()));
     visualLayout.getModelLayoutElements()
         .addAll(extractPathInformation(systemModel.getPathModels()));
+    visualLayout.getModelLayoutElements()
+        .addAll(extractVehiclePathColorInformation(systemModel.getVehicleModels()));
     Collections.sort(visualLayout.getModelLayoutElements(), Comparators.modelLayoutelementsByName());
 
     KeyValueSetProperty kvsp
@@ -483,6 +486,27 @@ public class UnifiedModelComponentConverter {
     }
 
     return visualLayout;
+  }
+
+  private List<VisualLayoutTO.ModelLayoutElement> extractVehiclePathColorInformation(
+      List<VehicleModel> vehicleModels) {
+    List<VisualLayoutTO.ModelLayoutElement> result = new LinkedList<>();
+    for (VehicleModel vehicleModel : vehicleModels) {
+      VisualLayoutTO.ModelLayoutElement mle = new VisualLayoutTO.ModelLayoutElement();
+
+      StringProperty sp = (StringProperty) vehicleModel.getProperty(VehicleModel.NAME);
+      mle.setVisualizedObjectName(sp.getText());
+
+      ColorProperty cp = (ColorProperty) vehicleModel
+          .getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
+      int rgb = cp.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
+      mle.getProperties().add(new PropertyTO()
+          .setName(ElementPropKeys.VEHICLE_ROUTE_COLOR)
+          .setValue(String.format("#%06X", rgb)));
+
+      result.add(mle);
+    }
+    return result;
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> extractPointInformation(List<PointModel> points) {
@@ -713,7 +737,7 @@ public class UnifiedModelComponentConverter {
     return model;
   }
 
-  public VehicleModel convertVehicleTO(VehicleTO vehicleTO) {
+  public VehicleModel convertVehicleTO(VehicleTO vehicleTO, VisualLayoutTO visualLayoutTO) {
     VehicleModel model = new VehicleModel();
 
     StringProperty sp = (StringProperty) model.getProperty(VehicleModel.NAME);
@@ -737,8 +761,17 @@ public class UnifiedModelComponentConverter {
         // Don't add this to the vehicle's properties
         continue;
       }
-      
+
       kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+    }
+
+    // Gather information contained in visual layout
+    ColorProperty cp = (ColorProperty) model.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
+    String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
+                                                            vehicleTO.getName(),
+                                                            ElementPropKeys.VEHICLE_ROUTE_COLOR);
+    if (!Strings.isNullOrEmpty(propertyValue)) {
+      cp.setColor(Color.decode(propertyValue));
     }
 
     return model;

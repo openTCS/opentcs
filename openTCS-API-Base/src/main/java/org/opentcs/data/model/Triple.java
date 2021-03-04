@@ -168,11 +168,11 @@ public class Triple
 
   @Override
   public int hashCode() {
-    return super.hashCode();
+    return (int) (x ^ y ^ z);
   }
 
   @Override
   public String toString() {
-    return "(" + x + ", " + y + ", " + z + ")";
+    return "Triple{" + "x=" + x + ", y=" + y + ", z=" + z + '}';
   }
 }

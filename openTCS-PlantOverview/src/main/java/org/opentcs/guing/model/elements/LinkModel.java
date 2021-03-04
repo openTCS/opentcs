@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model.elements;
 
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
@@ -38,7 +37,7 @@ public class LinkModel
 
   /**
    * Returns the connected point.
-   * 
+   *
    * @return The model of the connected Point.
    */
   public PointModel getPoint() {
@@ -77,27 +76,25 @@ public class LinkModel
 
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("link.name.text"));
     pName.setHelptext(bundle.getString("link.name.helptext"));
-
     // The name of a link cannot be changed because it is not stored in the kernel model
-    pName.setModellingEditable(false);  // ??? Test HH 2014-03-21
-
+    pName.setModellingEditable(false);
     setProperty(NAME, pName);
-    // Allowed operations
+
     StringSetProperty pOperations = new LinkActionsProperty(this);
     pOperations.setDescription(bundle.getString("link.action.text"));
     pOperations.setHelptext(bundle.getString("link.action.helptext"));
     setProperty(ALLOWED_OPERATIONS, pOperations);
-    
-    // Components
+
     StringProperty startComponent = new StringProperty(this);
     startComponent.setDescription(bundle.getString("element.startComponent.text"));
     startComponent.setModellingEditable(false);
     startComponent.setOperatingEditable(false);
     setProperty(START_COMPONENT, startComponent);
+
     StringProperty endComponent = new StringProperty(this);
     endComponent.setDescription(bundle.getString("element.endComponent.text"));
     endComponent.setModellingEditable(false);

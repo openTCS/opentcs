@@ -34,8 +34,7 @@ class ExplicitOrderBatchGenerator
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(ExplicitOrderBatchGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExplicitOrderBatchGenerator.class);
   /**
    * The kernel we talk to.
    */

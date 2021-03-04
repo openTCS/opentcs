@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.TCSKernelStateEvent;
 import org.opentcs.access.TCSNotificationEvent;
@@ -62,6 +63,10 @@ public class OpenTCSEventDispatcher
    * The application's event bus.
    */
   private final MBassador<Object> eventBus;
+  /**
+   * A reference to a shared kernel instance.
+   */
+  private SharedKernelClient kernelClient;
 
   /**
    * Creates a new instance.
@@ -89,31 +94,33 @@ public class OpenTCSEventDispatcher
 
   @Override
   public void register() {
-    LOG.debug("Dispatcher {} registering with kernel...", this);
-    Kernel kernel = getKernel();
-    if (kernel == null) {
-      LOG.warn("No kernel to register with, aborting.");
+    LOG.debug("EventDispatcher {} registering with kernel...", this);
+    if (!getKernelProvider().kernelShared()) {
+      LOG.warn("No shared kernel to register with, aborting.");
       return;
     }
 
-    // Listener for TCSObjectEvents on TransportOrders
-    kernel.addEventListener(fTransportOrderDispatcher);
-    kernel.addEventListener(fOrderSequenceDispatcher);
-    kernel.addEventListener(this);
+    kernelClient = getKernelProvider().register();
+
+    kernelClient.getKernel().addEventListener(fTransportOrderDispatcher);
+    kernelClient.getKernel().addEventListener(fOrderSequenceDispatcher);
+    kernelClient.getKernel().addEventListener(this);
   }
 
   @Override
   public void release() {
-    LOG.debug("Dispatcher {} unregistering with kernel...", this);
-    Kernel kernel = getKernel();
-    if (kernel == null) {
-      LOG.warn("No kernel to unregister with, aborting.");
+    LOG.debug("EventDispatcher {} unregistering with kernel...", this);
+    if (!getKernelProvider().kernelShared() || kernelClient == null) {
+      LOG.warn("No shared kernel to unregister with, aborting.");
       return;
     }
 
-    kernel.removeEventListener(fTransportOrderDispatcher);
-    kernel.removeEventListener(fOrderSequenceDispatcher);
-    kernel.removeEventListener(this);
+    kernelClient.getKernel().removeEventListener(fTransportOrderDispatcher);
+    kernelClient.getKernel().removeEventListener(fOrderSequenceDispatcher);
+    kernelClient.getKernel().removeEventListener(this);
+
+    kernelClient.close();
+    kernelClient = null;
   }
 
   @Override
@@ -190,7 +197,7 @@ public class OpenTCSEventDispatcher
                   objectEvent.getCurrentOrPreviousObjectState().getName());
         return;
       }
-      adapter.updateModelProperties(getKernel(),
+      adapter.updateModelProperties(kernelClient.getKernel(),
                                     objectEvent.getCurrentObjectState(),
                                     null);
     }

@@ -58,7 +58,7 @@ The following example shows how an XML telegram for the creation of two transpor
 .Example {code-example-label}: XML telegram for the creation of two transport orders
 [source,xml]
 ----
-include::{samples}/xml-telegram-two-orders.xml[]
+include::{samples}/xml-telegram-to-two-orders.xml[]
 ----
 
 ==== XML telegrams referencing order batches
@@ -77,7 +77,7 @@ The following example shows how an XML telegram referencing a batch file could l
 .Example {code-example-label}: XML telegram referencing a batch file
 [source, xml] 
 ----
-include::{samples}/xml-telegram-batch.xml[]
+include::{samples}/xml-telegram-to-batch.xml[]
 ----
 
 ==== Receipts for created orders
@@ -99,7 +99,7 @@ The following example shows how a response to the telegram in <<example.xmlorder
 .Example {code-example-label}: XML telegram with receipts for created orders
 [source, xml]
 ----
-include::{samples}/xml-telegram-receipt-orders.xml[]
+include::{samples}/xml-telegram-to-receipt-orders.xml[]
 ----
 
 ==== Receipts for order batches
@@ -118,7 +118,7 @@ In this case, the batch file contains two transport order definitions which have
 .Example {code-example-label}: XML telegram with receipts for orders in batch file
 [source, xml]
 ----
-include::{samples}/xml-telegram-receipt-batch.xml[]
+include::{samples}/xml-telegram-to-receipt-batch.xml[]
 ----
 
 === Status messages via TCP/IP
@@ -144,7 +144,19 @@ The following example shows a status message as it would be sent via the status 
 .Example {code-example-label}: Status message for the generated order
 [source, xml]
 ----
-include::{samples}/xml-telegram-status.xml[]
+include::{samples}/xml-telegram-to-status.xml[]
+----
+
+:code-example-label: {counter:code-example}
+
+The following example shows a status message as it would be sent via the status channel for a vehicle state update.
+
+[#example.statusmessage, reftext='Example {code-example-label}']
+[[example.vehiclestatusmessage]]
+.Example {code-example-label}: Status message for vehicle update
+[source, xml]
+----
+include::{samples}/xml-telegram-vehicle-status.xml[]
 ----
 
 === XML Schema definitions for telegrams and scripts

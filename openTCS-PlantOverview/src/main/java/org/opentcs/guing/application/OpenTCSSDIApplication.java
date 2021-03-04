@@ -16,9 +16,7 @@ import javax.swing.JFrame;
 import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.app.SDIApplication;
 import org.jhotdraw.app.View;
-import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.guing.application.action.file.CloseFileAction;
-import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
@@ -37,10 +35,6 @@ public class OpenTCSSDIApplication
    */
   private final JFrame contentFrame;
   /**
-   * Provides access to a kernel.
-   */
-  private final SharedKernelProvider kernelProvider;
-  /**
    * Provides the current system model.
    */
   private final ModelManager modelManager;
@@ -53,30 +47,28 @@ public class OpenTCSSDIApplication
    * Creates a new instance.
    *
    * @param frame The frame in which the OpenTCSView is to be shown.
-   * @param kernelProvider Provides a access to a kernel.
    * @param modelManager Provides the current system model.
    * @param appConfig The application's configuration.
    */
   @Inject
   public OpenTCSSDIApplication(@ApplicationFrame JFrame frame,
-                               SharedKernelProvider kernelProvider,
                                ModelManager modelManager,
                                PlantOverviewApplicationConfiguration appConfig) {
     this.contentFrame = requireNonNull(frame, "frame");
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.appConfig = requireNonNull(appConfig, "appConfig");
   }
 
   @Override // SDIApplication
   public void show(final View view) {
-    requireNonNull(view, "view is null");
+    requireNonNull(view, "view");
 
-    final OpenTCSView opentcsView = (OpenTCSView) view;
-    if (opentcsView.isShowing()) {
+    if (view.isShowing()) {
       return;
     }
-    opentcsView.setShowing(true);
+    view.setShowing(true);
+
+    final OpenTCSView opentcsView = (OpenTCSView) view;
 
     if (contentFrame != null) {
       setupContentFrame(opentcsView);
@@ -97,8 +89,8 @@ public class OpenTCSSDIApplication
 
   @Override
   protected void updateViewTitle(View view, JFrame frame) {
-    requireNonNull(view, "view is null");
-    requireNonNull(frame, "frame is null");
+    requireNonNull(view, "view");
+    requireNonNull(frame, "frame");
 
     OpenTCSView opentcsView = (OpenTCSView) view;
     opentcsView.updateModelName();
@@ -197,15 +189,6 @@ public class OpenTCSSDIApplication
 
     @Override
     public void windowClosed(WindowEvent e) {
-//      appConfig.setFrameExtendedState(contentFrame.getExtendedState());
-//      appConfig.setFrameBounds(contentFrame.getBounds());
-//      appConfig.setLastLoadedModelName(modelManager.getModel().getName());
-      int n = 1;
-      for (OpenTCSDrawingView drawView : opentcsView.getOperatingDrawingViews()) {
-//        appConfig.setDrawingViewBookmark(n, drawView.bookmark());
-        n++;
-      }
-
       opentcsView.stop();
     }
 

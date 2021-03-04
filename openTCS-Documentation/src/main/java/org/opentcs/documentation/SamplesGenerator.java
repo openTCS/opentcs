@@ -11,11 +11,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
@@ -29,6 +32,7 @@ import org.opentcs.kernel.xmlhost.orders.binding.TransportResponse;
 import org.opentcs.kernel.xmlhost.orders.binding.TransportScript;
 import org.opentcs.kernel.xmlhost.status.binding.OrderStatusMessage;
 import org.opentcs.kernel.xmlhost.status.binding.TCSStatusMessageSet;
+import org.opentcs.kernel.xmlhost.status.binding.VehicleStatusMessage;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -51,24 +55,28 @@ public class SamplesGenerator {
     File file = new File(args[1]);
 
     switch (task) {
-      case TELEGRAM_TWO_ORDERS: {
+      case TELEGRAM_TO_TWO_ORDERS: {
         generateTwoTransportOrderSample(file);
         break;
       }
-      case TELEGRAM_STATUS: {
+      case TELEGRAM_TO_STATUS: {
         generateTelegramStatusSample(file);
         break;
       }
-      case TELEGRAM_RECEIPT_ORDERS: {
+      case TELEGRAM_TO_RECEIPT_ORDERS: {
         generateResponseSetSample(file);
         break;
       }
-      case TELEGRAM_RECEIPT_BATCH: {
+      case TELEGRAM_TO_RECEIPT_BATCH: {
         generateScriptResponseSetSample(file);
         break;
       }
-      case TELEGRAM_BATCH: {
+      case TELEGRAM_TO_BATCH: {
         generateTransportScriptOrderSample(file);
+        break;
+      }
+      case TELEGRAM_VEHICLE_STATUS: {
+        generateVehicleStatusSample(file);
         break;
       }
       default:
@@ -239,6 +247,37 @@ public class SamplesGenerator {
     storeInFile(xmlOutput, file);
   }
 
+  private static void generateVehicleStatusSample(File file) {
+    createFile(file);
+
+    Point currentPosition = new Point("Point-000");
+    Point nextPosition = new Point("Point-001");
+    TransportOrder order = new TransportOrder("TransportOrder-001", Collections.emptyList());
+
+    Vehicle vehicle = new Vehicle("Vehicle-000")
+        .withEnergyLevel(50)
+        .withCurrentPosition(currentPosition.getReference())
+        .withNextPosition(nextPosition.getReference())
+        .withPrecisePosition(new Triple(100, 110, 120))
+        .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        .withEnergyLevelCritical(30)
+        .withEnergyLevelGood(90)
+        .withLength(1)
+        .withMaxReverseVelocity(2)
+        .withMaxVelocity(2)
+        .withOrientationAngle(90)
+        .withRouteProgressIndex(3)
+        .withTransportOrder(order.getReference())
+        .withState(Vehicle.State.EXECUTING);
+
+    VehicleStatusMessage message = VehicleStatusMessage.fromVehicle(vehicle);
+    TCSStatusMessageSet messageSet = new TCSStatusMessageSet();
+    messageSet.getStatusMessages().add(message);
+
+    String xmlOutput = messageSet.toXml();
+    storeInFile(xmlOutput, file);
+  }
+
   /**
    * Deletes and creates the file.
    *
@@ -272,10 +311,12 @@ public class SamplesGenerator {
   }
 
   private static enum GeneratorTask {
-    TELEGRAM_TWO_ORDERS,
-    TELEGRAM_STATUS,
-    TELEGRAM_RECEIPT_ORDERS,
-    TELEGRAM_RECEIPT_BATCH,
-    TELEGRAM_BATCH;
+
+    TELEGRAM_TO_TWO_ORDERS,
+    TELEGRAM_TO_STATUS,
+    TELEGRAM_TO_RECEIPT_ORDERS,
+    TELEGRAM_TO_RECEIPT_BATCH,
+    TELEGRAM_TO_BATCH,
+    TELEGRAM_VEHICLE_STATUS;
   }
 }

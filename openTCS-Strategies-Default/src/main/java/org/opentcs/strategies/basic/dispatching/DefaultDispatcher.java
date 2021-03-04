@@ -80,6 +80,10 @@ public class DefaultDispatcher
    */
   private DispatcherTask dispatcherTask;
   /**
+   * Redispatches available vehicles periodically.
+   */
+  private PeriodicVehicleRedispatchingTask vehicleRedispatchingTask;
+  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
@@ -123,20 +127,23 @@ public class DefaultDispatcher
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
-  // Methods declared in interface Dispatcher start here.
   @Override
   public void initialize() {
-    if (initialized) {
-      LOG.debug("Already initialized, doing nothing.");
+    if (isInitialized()) {
       return;
     }
     vehiclesToDisable.clear();
     orderReservationPool.clear();
     orderSelector.initialize();
     vehicleSelector.initialize();
-    // Initialize the dispatching thread.
+    // Initialize the dispatching task.
     dispatcherTask = new DispatcherTask();
-    new Thread(dispatcherTask, getClass().getName() + "-DispatcherTask").start();
+    new Thread(dispatcherTask, "DefaultDispatcher-dispatcherTask").start();
+    // Initialize periodic redispatching of vehicles.
+    vehicleRedispatchingTask
+        = new PeriodicVehicleRedispatchingTask(kernel,
+                                               configuration.idleVehicleRedispatchingInterval());
+    new Thread(vehicleRedispatchingTask, "DefaultDispatcher-vehicleRedispatchingTask").start();
     initialized = true;
   }
 
@@ -147,26 +154,25 @@ public class DefaultDispatcher
 
   @Override
   public void terminate() {
-    if (!initialized) {
-      LOG.debug("Not initialized, doing nothing.");
+    if (!isInitialized()) {
       return;
     }
     LOG.info("Terminating...");
     orderSelector.terminate();
     vehicleSelector.terminate();
     dispatcherTask.terminate();
+    vehicleRedispatchingTask.terminate();
     initialized = false;
   }
 
   @Override
   public void dispatch(Vehicle incomingVehicle) {
     requireNonNull(incomingVehicle, "incomingVehicle");
-    checkState(initialized, "Not initialized");
+    checkState(isInitialized(), "Not initialized");
 
     LOG.debug("Dispatching vehicle {}", incomingVehicle.getName());
     // Get an up-to-date copy of the kernel's object first.
-    Vehicle vehicle = kernel.getTCSObject(Vehicle.class,
-                                          incomingVehicle.getReference());
+    Vehicle vehicle = kernel.getTCSObject(Vehicle.class, incomingVehicle.getReference());
     // Check if this vehicle is interesting for the dispatcher at all.
     if (!vehicleDispatchable(vehicle)) {
       LOG.debug("Vehicle {} not dispatchable.", vehicle.getName());
@@ -179,14 +185,13 @@ public class DefaultDispatcher
   @Override
   public void dispatch(TransportOrder incomingOrder) {
     requireNonNull(incomingOrder, "incomingOrder");
-    checkState(initialized, "Not initialized");
+    checkState(isInitialized(), "Not initialized");
 
     LOG.debug("Dispatching transport order {}", incomingOrder.getName());
     // Get an up-to-date copy of the kernel's object first.
-    TransportOrder order = kernel.getTCSObject(TransportOrder.class,
-                                               incomingOrder.getReference());
+    TransportOrder order = kernel.getTCSObject(TransportOrder.class, incomingOrder.getReference());
     if (order.getState().isFinalState()) {
-      LOG.info("Transport order {} already marked as {}, not dispatching it.",
+      LOG.warn("Transport order {} already marked as {}, not dispatching it.",
                order.getName(),
                order.getState());
       return;
@@ -204,21 +209,17 @@ public class DefaultDispatcher
   }
 
   @Override
-  public void withdrawOrder(TransportOrder order,
-                            boolean immediateAbort,
-                            boolean disableVehicle) {
+  public void withdrawOrder(TransportOrder order, boolean immediateAbort, boolean disableVehicle) {
     requireNonNull(order, "order");
-    checkState(initialized, "Not initialized");
+    checkState(isInitialized(), "Not initialized");
 
     dispatcherTask.addToQueue(new WithdrawalByOrder(order, immediateAbort, disableVehicle));
   }
 
   @Override
-  public void withdrawOrder(Vehicle vehicle,
-                            boolean fastAbort,
-                            boolean disableVehicle) {
+  public void withdrawOrder(Vehicle vehicle, boolean fastAbort, boolean disableVehicle) {
     requireNonNull(vehicle, "vehicle");
-    checkState(initialized, "Not initialized");
+    checkState(isInitialized(), "Not initialized");
 
     dispatcherTask.addToQueue(new WithdrawalByVehicle(vehicle, fastAbort, disableVehicle, false));
   }
@@ -226,6 +227,7 @@ public class DefaultDispatcher
   @Override
   public void releaseVehicle(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
+    checkState(isInitialized(), "Not initialized");
 
     dispatcherTask.addToQueue(new WithdrawalByVehicle(vehicle, true, true, true));
   }
@@ -235,17 +237,14 @@ public class DefaultDispatcher
     return "";
   }
 
-  // Class-specific methods start here.
   /**
    * Assigns a transport order to a vehicle, stores a route for the vehicle in
    * the transport order, adjusts the state of vehicle and transport order
    * and starts processing.
    *
-   * @param vehicle The vehicle that is supposed to process the transport
-   * order.
+   * @param vehicle The vehicle that is supposed to process the transport order.
    * @param transportOrder The transport order to be processed.
-   * @param driveOrders The list of drive orders describing the route for the
-   * vehicle.
+   * @param driveOrders The list of drive orders describing the route for the vehicle.
    */
   private void assignTransportOrder(Vehicle vehicle,
                                     TransportOrder transportOrder,
@@ -559,7 +558,7 @@ public class DefaultDispatcher
         finishAbortion(vehicleOrderRef, vehicle, vehiclesToDisable.contains(vehicleRef));
         return;
       }
-      
+
       // The vehicle is processing a transport order and has finished a drive order.
       // See if there's another drive order to be processed.
       kernel.setTransportOrderNextDriveOrder(vehicleOrderRef);

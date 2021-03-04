@@ -26,6 +26,7 @@ import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
@@ -341,7 +342,8 @@ class StandardSystemModel
                               Set<Point> points,
                               Set<Path> paths,
                               Set<Location> locations,
-                              Set<Block> blocks) {
+                              Set<Block> blocks,
+                              Set<Vehicle> vehicles) {
 
     Set<LayoutElement> elements = layout.getLayoutElements();
 
@@ -359,6 +361,10 @@ class StandardSystemModel
 
     for (Block block : blocks) {
       mapLayoutElement(block.getReference(), elements);
+    }
+    
+    for (Vehicle vehicle : vehicles) {
+      mapLayoutElement(vehicle.getReference(), elements);
     }
   }
 

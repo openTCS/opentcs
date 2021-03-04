@@ -24,17 +24,17 @@ class VehiclesTableModel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle bundle =
+  private static final ResourceBundle BUNDLE =
       ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    bundle.getString("Name"),
-    bundle.getString("Usage_to_runtime"),
-    bundle.getString("Waiting_time"),
-    bundle.getString("Orders_processed"),
-    bundle.getString("Charging_time")
+    BUNDLE.getString("Name"),
+    BUNDLE.getString("Usage_to_runtime"),
+    BUNDLE.getString("Waiting_time"),
+    BUNDLE.getString("Orders_processed"),
+    BUNDLE.getString("Charging_time")
   };
   /**
    * The column classes.

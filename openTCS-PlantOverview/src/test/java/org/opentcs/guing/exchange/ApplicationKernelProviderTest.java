@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
@@ -57,25 +58,22 @@ public class ApplicationKernelProviderTest {
 
   @Test
   public void shouldConnectOnClientRegistration() {
-    final Object client1 = new Object();
-    
-    when(kernelProxyManager.isConnected()).thenReturn(false);
+    when(kernelProxyManager.isConnected()).thenReturn(false, false, true);
+    when(kernelProxyManager.kernel()).thenReturn(mock(Kernel.class));
     when(dialogProvider.get()).thenReturn(dialog);
-    
-    kernelProvider.register(client1);
-    
+
+    kernelProvider.register();
+
     verify(dialog).setVisible(true);
   }
 
   @Test
   public void shouldNotConnectIfAlreadyConnected() {
-    final Object client1 = new Object();
-    
     when(kernelProxyManager.isConnected()).thenReturn(true);
-    when(dialogProvider.get()).thenReturn(dialog);
-    
-    kernelProvider.register(client1);
-    
+    when(kernelProxyManager.kernel()).thenReturn(mock(Kernel.class));
+
+    kernelProvider.register();
+
     verify(dialog, never()).setVisible(anyBoolean());
   }
 }

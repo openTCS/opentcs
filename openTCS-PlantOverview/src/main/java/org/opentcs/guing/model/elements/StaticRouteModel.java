@@ -221,22 +221,23 @@ public class StaticRouteModel
    */
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("staticRoute.name.text"));
     pName.setHelptext(bundle.getString("staticRoute.name.helptext"));
     setProperty(NAME, pName);
-    // Color
+
     ColorProperty pColor = new ColorProperty(this, Color.red);
     pColor.setDescription(bundle.getString("element.staticRouteColor.text"));
     pColor.setHelptext(bundle.getString("element.staticRouteColor.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
+
     StringSetProperty pElements = new StringSetProperty(this);
     pElements.setDescription(bundle.getString("staticroute.elements.text"));
     pElements.setModellingEditable(false);
     pElements.setOperatingEditable(false);
     setProperty(ELEMENTS, pElements);
-    // Miscellaneous properties
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("staticRoute.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("staticRoute.miscellaneous.helptext"));

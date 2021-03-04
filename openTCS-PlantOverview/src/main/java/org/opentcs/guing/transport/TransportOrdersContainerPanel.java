@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,8 +36,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import net.engio.mbassy.listener.Handler;
-import org.opentcs.access.CredentialsException;
-import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.DriveOrder;
@@ -138,10 +138,6 @@ public class TransportOrdersContainerPanel
     }
   }
 
-  private Kernel getKernel() {
-    return kernelProvider.getKernel();
-  }
-
   /**
    * Initializes this panel's contents.
    */
@@ -151,11 +147,15 @@ public class TransportOrdersContainerPanel
 
   private Set<TransportOrder> fetchOrdersIfOnline() {
     if (kernelProvider.kernelShared()) {
-      return kernelProvider.getKernel().getTCSObjects(TransportOrder.class);
+      try (SharedKernelClient kernelClient = kernelProvider.register()) {
+        return kernelClient.getKernel().getTCSObjects(TransportOrder.class);
+      }
+      catch (KernelRuntimeException exc) {
+        LOG.warn("Exception fetching transport orders", exc);
+      }
     }
-    else {
-      return new HashSet<>();
-    }
+
+    return new HashSet<>();
   }
 
   /**
@@ -203,15 +203,13 @@ public class TransportOrdersContainerPanel
     });
   }
 
-  /**
-   * Zeigt Details zum ausgewählten Transportauftrag.
-   */
   private void showTransportOrder() {
-    try {
+    try (SharedKernelClient kernelClient = kernelProvider.register()) {
       TransportOrder transportOrder = getSelectedTransportOrder();
 
       if (transportOrder != null) {
-        transportOrder = getKernel().getTCSObject(TransportOrder.class, transportOrder.getReference());
+        transportOrder = kernelClient.getKernel().getTCSObject(TransportOrder.class,
+                                                               transportOrder.getReference());
         DialogContent content = new TransportOrderView(transportOrder);
         StandardContentDialog dialog
             = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
@@ -222,18 +220,18 @@ public class TransportOrdersContainerPanel
         dialog.setVisible(true);
       }
     }
-    catch (CredentialsException e) {
+    catch (KernelRuntimeException exc) {
+      LOG.warn("Exception fetching transport order from kernel", exc);
     }
   }
 
-  /**
-   * Erzeugt auf der Vorlage eines existierenden Transportauftrags einen neuen
-   * Transportauftrag, der aber noch bearbeitet werden kann.
-   */
   private void createTransportOrderWithPattern() {
     TransportOrder to = getSelectedTransportOrder();
-    if (to != null) {
-      to = getKernel().getTCSObject(TransportOrder.class, to.getReference());
+    if (to == null) {
+      return;
+    }
+    try (SharedKernelClient kernelClient = kernelProvider.register()) {
+      to = kernelClient.getKernel().getTCSObject(TransportOrder.class, to.getReference());
       CreateTransportOrderPanel content = orderPanelProvider.get();
       content.setPattern(to);
       StandardContentDialog dialog
@@ -243,8 +241,15 @@ public class TransportOrdersContainerPanel
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-        orderUtil.createTransportOrder(content.getDestinationModels(), content.getActions(), content.getPropertiesList(), content.getSelectedDeadline(), content.getSelectedVehicle());
+        orderUtil.createTransportOrder(content.getDestinationModels(),
+                                       content.getActions(),
+                                       content.getPropertiesList(),
+                                       content.getSelectedDeadline(),
+                                       content.getSelectedVehicle());
       }
+    }
+    catch (KernelRuntimeException exc) {
+      LOG.warn("Exception creating transport order", exc);
     }
   }
 
@@ -314,17 +319,6 @@ public class TransportOrdersContainerPanel
 
     toolBar.add(new JToolBar.Separator());
 
-    // 2012-11-19 HH: Funktion "Auftrag löschen" im Client _nicht_ anbieten
-//    button = new JButton(iconkit.getImageIconByFullPath(fIconPath + "delete.16x16.gif"));
-//    button.addActionListener(new ActionListener() {
-//
-//      public void actionPerformed(ActionEvent e) {
-//        deleteSelectedTransportOrders();
-//      }
-//    });
-//
-//    button.setToolTipText("Löscht die markierten Transportaufträge.");
-//    toolBar.add(button);
     button = new JButton(iconkit.getImageIconByFullPath(fIconPath + "table-row-delete-2.16x16.png"));
     button.addActionListener(new ActionListener() {
 
@@ -545,19 +539,21 @@ public class TransportOrdersContainerPanel
 
   private void withdrawTransportOrder() {
     int[] indices = fTable.getSelectedRows();
-    Vector<TransportOrder> toWithdraw = new Vector<>();
+    List<TransportOrder> toWithdraw = new ArrayList<>();
 
     for (int i = 0; i < indices.length; i++) {
       int realIndex = fTableModel.realRowIndex(indices[i]);
       TransportOrder order = fTransportOrders.elementAt(realIndex);
-      toWithdraw.insertElementAt(order, 0);
+      toWithdraw.add(order);
     }
 
-    Enumeration<TransportOrder> e = toWithdraw.elements();
-
-    while (e.hasMoreElements()) {
-      TransportOrder order = e.nextElement();
-      getKernel().withdrawTransportOrder(order.getReference(), false, false);
+    try (SharedKernelClient kernelClient = kernelProvider.register()) {
+      for (TransportOrder order : toWithdraw) {
+        kernelClient.getKernel().withdrawTransportOrder(order.getReference(), false, false);
+      }
+    }
+    catch (KernelRuntimeException exc) {
+      LOG.warn("Exception withdrawing transport order", exc);
     }
   }
 }

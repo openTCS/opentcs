@@ -44,6 +44,7 @@ public class SelectionPropertyEditorPanel
   public void setProperty(Property property) {
     fProperty = (AbstractProperty) property;
 
+    @SuppressWarnings("unchecked")
     ComboBoxModel<Object> model
         = new DefaultComboBoxModel<>(((Selectable<Object>) fProperty).getPossibleValues().toArray());
     valueComboBox.setModel(model);

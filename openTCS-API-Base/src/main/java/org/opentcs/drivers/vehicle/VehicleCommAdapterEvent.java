@@ -71,7 +71,10 @@ public class VehicleCommAdapterEvent
 
   @Override
   public String toString() {
-    return getClass().getSimpleName()
-        + "(adapterName: " + adapterName + ", appendix: " + appendix + ")";
+    return "VehicleCommAdapterEvent{"
+        + "adapterName=" + adapterName
+        + ", appendix=" + appendix
+        + '}';
   }
+
 }

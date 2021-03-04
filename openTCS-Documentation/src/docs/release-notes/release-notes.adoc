@@ -49,6 +49,15 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.7 (2017-10-11)
+
+* Bugs fixed:
+** Ensure that scheduler modules are properly terminated.
+* New features:
+** Allow the colors used for vehicles' routes be defined in the plant model.
+** Have the default dispatcher periodically check for idle vehicles that could be dispatched.
+   This picks up vehicles that have not been in a dispatchable state when dispatching them was previously tried.
+
 === Version 4.6 (2017-09-25)
 
 * Bugs fixed:

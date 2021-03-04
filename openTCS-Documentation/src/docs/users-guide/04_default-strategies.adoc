@@ -3,10 +3,7 @@
 
 openTCS comes with a default implementation for each of the strategy modules.
 These implementations can easily be replaced to adapt to project-specific requirements.
-(See <<Replacing default kernel components>>.)
-Since the classes of the default implementations are part of the openTCS distribution, they are available for use in replacement strategies, of course.
-Note, however, that these classes are not considered part of openTCS's official API -- they might change even between minor releases without maintaining backwards-compatibility.
-(See <<Available artifacts and API compatibility>>.)
+(See developer's guide.)
 
 === Default dispatcher
 
@@ -23,27 +20,49 @@ When a vehicle becomes available, the dispatcher needs to decide which transport
 To make this decision, the default dispatcher takes the following steps:
 
 . If the vehicle's energy level is not _critical_ and transport orders are available, the default dispatcher will select the most urgent one (according to its deadline) for which a route can be computed.
-. If the vehicle's energy level is _degraded_ and automatic recharging is enabled, an order is created for the vehicle to recharge at the closest recharging location.
-. If the vehicle is not currently at a parking position and there are unoccupied parking positions, an order is created for the vehicle to move to the closest one.
+. If the vehicle's energy level is _degraded_ and automatic recharging is enabled, an order is created for the vehicle to recharge at a recharging location.
+. If the vehicle is not currently at a parking position and there are unoccupied parking positions, an order is created for the vehicle to move to one of them.
 . If none of the previous steps assigned an order to the vehicle, it is left at its current position.
+
+When sending a vehicle to a recharge location or parking position, the closest (according to the router) unoccupied position is selected by default.
+It is possible to assign fixed positions to vehicles instead, by setting properties with the following keys on them:
+
+* `tcs:preferredParkingPosition`:
+  Expected to be the name of a point in the model.
+  If this point is already occupied, the closest unoccupied parking position (if any) is selected instead.
+* `tcs:assignedParkingPosition`:
+  Expected to be the name of a point in the model.
+  If this point is already occupied, the vehicle is not sent to any other parking position, i.e. remains where it is.
+  Takes precedence over `tcs:preferredParkingPosition`.
+* `tcs:preferredRechargeLocation`:
+  Expected to be the name of a location.
+  If this location is already occupied, the closest unoccupied recharging location (if any) is selected instead.
+* `tcs:assignedRechargeLocation`:
+  Expected to be the name of a location.
+  If this location is already occupied, the vehicle is not sent to any other recharging location.
+  Takes precedence over `tcs:preferredRechargeLocation`.
 
 === Default router
 
-The default router uses an implementation of link:https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm[Dijkstra's algorithm] to find find the cheapest route from one position in the driving course to another one.
-It takes into account paths that have been locked (basically by ignoring them when building the directed graph from the course model).
+The default router finds the cheapest route from one position in the driving course to another one.
+(It uses an implementation of link:https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm[Dijkstra's algorithm] to do that.)
+It takes into account paths that have been locked, but not positions and/or assumed future behaviour of other vehicles.
+As a result, it does not route around slower or stopped vehicles blocking the way.
 
-The cost function used for evaluating the edges of the graph can be configured -- see the configuration entries described in the user's guide.
+The cost function used for evaluating the edges of the graph can be configured -- see <<Default router configuration entries>>.
 The default cost function for a path simply evaluates to the path's length, so the cheapest route by default is the shortest one.
 
-It is possible to route different vehicles differently.
-This may be desirable if the vehicles in a plant have different characteristics and the edges in the graph built or the cost function used reflect this, so the resulting optimal routes of vehicles through the driving course may differ.
+It is possible to treat vehicles in a plant differently when computing their routes.
+This may be desirable if they have different characteristics and actually have different optimal routes through the driving course.
+For this to work, the paths in the model or the cost function used need to reflect reflect this difference.
 This isn't done by default -- the default router computes routes for all vehicles the same way unless told otherwise.
 To let the router know that it should compute routes for a vehicle separately, set a property with the key `tcs:routingGroup` to an integer value other than zero.
 (Vehicles that have the same integer value set share the same routing table, and zero is the default value for all vehicles.)
 
 === Default scheduler
 
-The default scheduler implements a simple strategy for mutually exclusive use of resources in the plant model (points and paths, primarily):
+The default scheduler implements a simple strategy for traffic management.
+It does this by allowing only mutually exclusive use of resources in the plant model (points and paths, primarily):
 
 * When an allocation of a set of resources for a vehicle is requested, the scheduler expands this set to the effective resource set (in case any resources are part of a block area) and checks whether the allocation can be granted immediately.
   If yes, the allocation is made.

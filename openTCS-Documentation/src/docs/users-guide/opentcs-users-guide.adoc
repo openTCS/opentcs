@@ -11,6 +11,8 @@ include::02_system-overview.adoc[]
 
 include::03_operating-opentcs.adoc[]
 
-include::04_configuring-opentcs.adoc[]
+include::04_default-strategies.adoc[]
 
-include::05_advanced-usage-examples.adoc[]
+include::05_configuring-opentcs.adoc[]
+
+include::06_advanced-usage-examples.adoc[]

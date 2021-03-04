@@ -32,8 +32,8 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import net.engio.mbassy.listener.Handler;
-import org.opentcs.access.CredentialsException;
-import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -62,12 +62,11 @@ public class OrderSequencesContainerPanel
   /**
    * The path to the icons.
    */
-  private static final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
+  private static final String ICON_PATH = "/org/opentcs/guing/res/symbols/panel/";
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(OrderSequencesContainerPanel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OrderSequencesContainerPanel.class);
   /**
    * Provides access to a kernel.
    */
@@ -138,10 +137,6 @@ public class OrderSequencesContainerPanel
     }
   }
 
-  private Kernel getKernel() {
-    return kernelProvider.getKernel();
-  }
-
   /**
    * Initializes this panel's contents.
    */
@@ -151,11 +146,15 @@ public class OrderSequencesContainerPanel
 
   private Set<OrderSequence> fetchSequencesIfOnline() {
     if (kernelProvider.kernelShared()) {
-      return kernelProvider.getKernel().getTCSObjects(OrderSequence.class);
+      try (SharedKernelClient client = kernelProvider.register()) {
+        return client.getKernel().getTCSObjects(OrderSequence.class);
+      }
+      catch (KernelRuntimeException exc) {
+        LOG.warn("Exception fetching sequences from kernel", exc);
+      }
     }
-    else {
-      return new HashSet<>();
-    }
+
+    return new HashSet<>();
   }
 
   /**
@@ -213,16 +212,17 @@ public class OrderSequencesContainerPanel
   }
 
   private void showOrderSequence() {
-    try {
-      OrderSequence os = getKernel().getTCSObject(OrderSequence.class, getSelectedOrderSequence().getReference());
+    try (SharedKernelClient client = kernelProvider.register()) {
+      OrderSequence os = client.getKernel().getTCSObject(OrderSequence.class,
+                                                         getSelectedOrderSequence().getReference());
       DialogContent content = transportViewFactory.createOrderSequenceView(os);
       StandardContentDialog dialog
           = new StandardContentDialog(dialogParent, content, true, StandardContentDialog.CLOSE);
       dialog.setTitle(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.orderSequence"));
       dialog.setVisible(true);
     }
-    catch (CredentialsException e) {
-      log.warn("Exception fetching order sequences from kernel", e);
+    catch (KernelRuntimeException e) {
+      LOG.warn("Exception fetching order sequences from kernel", e);
     }
   }
 
@@ -317,7 +317,10 @@ public class OrderSequencesContainerPanel
     List<FilterButton> buttons = new LinkedList<>();
     IconToolkit iconkit = IconToolkit.instance();
 
-    FilterButton b1 = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFinished.16x16.gif"), fTableModel, Boolean.FALSE);
+    FilterButton b1
+        = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
+                           fTableModel,
+                           Boolean.FALSE);
     buttons.add(b1);
     b1.setToolTipText(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.filterOrderSequences"));
 

@@ -64,49 +64,48 @@ public class PathModel
 
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("path.name.text"));
     pName.setHelptext(bundle.getString("path.name.helptext"));
     setProperty(NAME, pName);
-    // Length
+
     LengthProperty pLength = new LengthProperty(this);
     pLength.setDescription(bundle.getString("path.length.text"));
     pLength.setHelptext(bundle.getString("path.length.helptext"));
     setProperty(LENGTH, pLength);
-    // Routing cost
+
     IntegerProperty pCost = new IntegerProperty(this, 1);
     pCost.setDescription(bundle.getString("path.routingCost.text"));
     pCost.setHelptext(bundle.getString("path.routingCost.helptext"));
     pCost.setCollectiveEditable(true);
     setProperty(ROUTING_COST, pCost);
-    // Max. velocity (forward)
+
     SpeedProperty pMaxVelocity = new SpeedProperty(this, 1.0, SpeedProperty.Unit.M_S);
     pMaxVelocity.setDescription(bundle.getString("path.maxVelocity.text"));
     pMaxVelocity.setHelptext(bundle.getString("path.maxVelocity.helptext"));
     pMaxVelocity.setCollectiveEditable(true);
     setProperty(MAX_VELOCITY, pMaxVelocity);
-    // Max. velocity (reverse)
+
     SpeedProperty pMaxReverseVelocity = new SpeedProperty(this, 0.0, SpeedProperty.Unit.M_S);
     pMaxReverseVelocity.setDescription(bundle.getString("path.maxReverseVelocity.text"));
     pMaxReverseVelocity.setHelptext(bundle.getString("path.maxReverseVelocity.helptext"));
     pMaxReverseVelocity.setCollectiveEditable(true);
     setProperty(MAX_REVERSE_VELOCITY, pMaxReverseVelocity);
-    // Type of path coonection
+
     SelectionProperty<LinerType> pPathConnType = new SelectionProperty<>(this, Arrays.asList(LinerType.values()), LinerType.values()[0]);
     pPathConnType.setDescription(bundle.getString("element.pathConnType.text"));
     pPathConnType.setHelptext(bundle.getString("element.pathConnType.helptext"));
     pPathConnType.setCollectiveEditable(true);
     setProperty(ElementPropKeys.PATH_CONN_TYPE, pPathConnType);
-    // Control points (for BEZIER paths)
+
     StringProperty pPathControlPoints = new StringProperty(this);
     pPathControlPoints.setDescription(bundle.getString("element.pathControlPoints.text"));
     pPathControlPoints.setHelptext(bundle.getString("element.pathControlPoints.helptext"));
-    // Control Points können nur in der Drawing verschoben werden.
-    // TODO: Auch in der Tabelle editieren?
+    // Control points may only be moved in the drawing.
     pPathControlPoints.setModellingEditable(false);
     setProperty(ElementPropKeys.PATH_CONTROL_POINTS, pPathControlPoints);
-    // Components
+
     StringProperty startComponent = new StringProperty(this);
     startComponent.setDescription(bundle.getString("element.startComponent.text"));
     startComponent.setModellingEditable(false);
@@ -117,28 +116,17 @@ public class PathModel
     endComponent.setModellingEditable(false);
     endComponent.setOperatingEditable(false);
     setProperty(END_COMPONENT, endComponent);
-    // Arrow position (relative)
-    // HH 2014-02-14: Verschieben der Pfeilspitze ist in der Figure noch nicht
-    // implementiert, daher dieses Property auch nicht anzeigen
-//    PercentProperty pPathArrowPosition = new PercentProperty();
-//    pPathArrowPosition.setDescription(bundle.getString("element.pathArrowPosition.text"));
-//    pPathArrowPosition.setHelptext(bundle.getString("element.pathArrowPosition.helptext"));
-//    pPathArrowPosition.setCollectiveEditable(true);
-//    setPropertyBag(ElementPropKeys.PATH_ARROW_POSITION, new PropertyBag(pPathArrowPosition, this));
-    // "Locked" state - also editable in Operating mode
+
     BooleanProperty pLocked = new BooleanProperty(this);
     pLocked.setDescription(bundle.getString("path.locked.text"));
     pLocked.setHelptext(bundle.getString("path.locked.helptext"));
     pLocked.setCollectiveEditable(true);
-    // Zustand "gesperrt" darf auch im Operating Mode geändert werden.
     pLocked.setOperatingEditable(true);
     setProperty(LOCKED, pLocked);
-    // Miscellaneous properties
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("path.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("path.miscellaneous.helptext"));
-    // HH 2014-02-17: Miscellaneous Properties vorerst nicht collective editable
-    // pMiscellaneous.setCollectiveEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 

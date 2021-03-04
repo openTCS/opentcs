@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -219,47 +220,50 @@ public class VehicleAction
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER + ".text"))) {
-      try {
-        kernel().withdrawTransportOrderByVehicle(vehicleReference(), false, false);
+      try (SharedKernelClient kernelClient = kernelProvider.register()) {
+        kernelClient.getKernel().withdrawTransportOrderByVehicle(
+            vehicleReference(kernelClient.getKernel()), false, false);
       }
       catch (KernelRuntimeException e) {
         LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY + ".text"))) {
-      try {
-        kernel().withdrawTransportOrderByVehicle(vehicleReference(), true, true);
+      try (SharedKernelClient kernelClient = kernelProvider.register()) {
+        kernelClient.getKernel().withdrawTransportOrderByVehicle(
+            vehicleReference(kernelClient.getKernel()), true, true);
       }
       catch (KernelRuntimeException e) {
         LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE + ".text"))) {
-      try {
-        kernel().withdrawTransportOrderByVehicle(vehicleReference(), false, true);
+      try (SharedKernelClient kernelClient = kernelProvider.register()) {
+        kernelClient.getKernel().withdrawTransportOrderByVehicle(
+            vehicleReference(kernelClient.getKernel()), false, true);
       }
       catch (KernelRuntimeException e) {
         LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(RELEASE_VEHICLE + ".text"))) {
-      if (JOptionPane.showConfirmDialog(
-          view,
-          labels.getString(MESSAGE_CONFIRM_RELEASE_TEXT) + " " + vehicleReference().getName(),
-          labels.getString(MESSAGE_CONFIRM_RELEASE_TITLE),
-          JOptionPane.YES_NO_OPTION)
-          == JOptionPane.YES_OPTION) {
-        try {
-          kernel().releaseVehicle(vehicleReference());
+      try (SharedKernelClient kernelClient = kernelProvider.register()) {
+        if (JOptionPane.showConfirmDialog(
+            view,
+            labels.getString(MESSAGE_CONFIRM_RELEASE_TEXT) + " " + vehicleReference(kernelClient.getKernel()).getName(),
+            labels.getString(MESSAGE_CONFIRM_RELEASE_TITLE),
+            JOptionPane.YES_NO_OPTION)
+            == JOptionPane.YES_OPTION) {
+          kernelClient.getKernel().releaseVehicle(vehicleReference(kernelClient.getKernel()));
         }
-        catch (KernelRuntimeException e) {
-          LOG.warn("Unexpected exception", e);
-        }
+      }
+      catch (KernelRuntimeException e) {
+        LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(DISPATCH_VEHICLE + ".text"))) {
-      try {
-        kernel().dispatchVehicle(vehicleReference(), true);
+      try (SharedKernelClient kernelClient = kernelProvider.register()) {
+        kernelClient.getKernel().dispatchVehicle(vehicleReference(kernelClient.getKernel()), true);
       }
       catch (KernelRuntimeException e) {
         LOG.warn("Unexpected exception", e);
@@ -267,12 +271,8 @@ public class VehicleAction
     }
   }
 
-  private Kernel kernel() {
-    return kernelProvider.getKernel();
-  }
-
-  private TCSObjectReference<Vehicle> vehicleReference() {
-    return kernel().getTCSObject(Vehicle.class, fVehicle.getName()).getReference();
+  private TCSObjectReference<Vehicle> vehicleReference(Kernel kernel) {
+    return kernel.getTCSObject(Vehicle.class, fVehicle.getName()).getReference();
   }
 
   private List<LocationModel> locationModels() {

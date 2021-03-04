@@ -460,7 +460,12 @@ public class OpenTCSModelManager
     VisualLayout visualLayout = null;
     for (VisualLayout visLayout : allVisualLayouts) {
       visualLayout = visLayout;  // Es sollte genau ein Layout geben
-      systemModel.createLayoutMap(visualLayout, allPoints, allPaths, allLocations, allBlocks);
+      systemModel.createLayoutMap(visualLayout,
+                                  allPoints,
+                                  allPaths,
+                                  allLocations,
+                                  allBlocks,
+                                  allVehicles);
       scaleX = visualLayout.getScaleX();
       scaleY = visualLayout.getScaleY();
 
@@ -980,6 +985,7 @@ public class OpenTCSModelManager
                                     SystemModel systemModel,
                                     Set<ProcessAdapter> createdAdapters,
                                     Kernel kernel) {
+    Iterator<Color> routeColorCycler = Iterators.cycle(Colors.defaultColors());
     // --- Alle Fahrzeuge, die der Kernel kennt ---
     for (Vehicle vehicle : allVehicles) {
       VehicleModel vehicleModel = crsObjFactory.createVehicleModel();
@@ -994,6 +1000,23 @@ public class OpenTCSModelManager
       adapter.updateModelProperties(kernel,
                                     vehicle,
                                     null);
+
+      // Neue Farbe suchen für Vehicles
+        ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
+            .setColor(routeColorCycler.next());
+      // Das zugeh�rige Model Layout Element suchen
+      ModelLayoutElement element = systemModel.getLayoutMap().get(vehicle.getReference());
+
+      if (element != null) {
+        Map<String, String> properties = element.getProperties();
+        // Im Layout Element gespeicherte Farbe �berschreibt den Default-Wert
+        String sColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR);
+        String srgb = sColor.substring(1);  // delete trailing "#"
+        Color color = new Color(Integer.parseInt(srgb, 16));
+        ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
+            .setColor(color);
+      }
+
       systemModel.getMainFolder(SystemModel.FolderKey.VEHICLES).add(vehicleModel);
       // Die VehicleFigures werden erst in OpenTCSDrawingView.setVehicles() erzeugt
     }

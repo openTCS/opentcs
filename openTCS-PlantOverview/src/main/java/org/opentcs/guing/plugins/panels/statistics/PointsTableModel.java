@@ -24,14 +24,14 @@ class PointsTableModel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle bundle =
+  private static final ResourceBundle BUNDLE =
       ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    bundle.getString("Course_point"),
-    bundle.getString("Time_occupied")
+    BUNDLE.getString("Course_point"),
+    BUNDLE.getString("Time_occupied")
   };
   /**
    * The column classes.

@@ -24,17 +24,17 @@ class OrdersTableModel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle bundle =
+  private static final ResourceBundle BUNDLE =
       ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    bundle.getString("Name"),
-    bundle.getString("Time_to_assignment"),
-    bundle.getString("Processing_time"),
-    bundle.getString("Successful"),
-    bundle.getString("Deadline_crossed")
+    BUNDLE.getString("Name"),
+    BUNDLE.getString("Time_to_assignment"),
+    BUNDLE.getString("Processing_time"),
+    BUNDLE.getString("Successful"),
+    BUNDLE.getString("Deadline_crossed")
   };
   /**
    * The column classes.

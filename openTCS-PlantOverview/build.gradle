@@ -27,7 +27,6 @@ dependencies {
 
 compileJava {
   options.compilerArgs << "-Xlint:-rawtypes"
-  options.compilerArgs << "-Xlint:-unchecked"
 }
 
 // For now, we're using hand-crafted start scripts, so disable the application

@@ -14,12 +14,16 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelClient;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Displays an order sequence.
@@ -30,6 +34,10 @@ import org.opentcs.guing.components.dialogs.DialogContent;
 public class OrderSequenceView
     extends DialogContent {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(OrderSequenceView.class);
   /**
    * The order sequence to be shown.
    */
@@ -314,8 +322,13 @@ public class OrderSequenceView
                                           JOptionPane.YES_NO_OPTION);
 
     if (n == JOptionPane.OK_OPTION) {
-      kernelProvider.getKernel().setOrderSequenceComplete(fOrderSequence.getReference());
-      checkBoxComplete.setEnabled(false);
+      try (SharedKernelClient client = kernelProvider.register()) {
+        client.getKernel().setOrderSequenceComplete(fOrderSequence.getReference());
+        checkBoxComplete.setEnabled(false);
+      }
+      catch (KernelRuntimeException exc) {
+        LOG.warn("Exception setting order sequence complete", exc);
+      }
     }
     else {
       checkBoxComplete.setSelected(false);

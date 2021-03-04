@@ -1726,12 +1726,10 @@ public abstract class OpenTCSDrawingView
    * @param vehicle The vehicle
    * @param visible <code>true</code> to set it to visible, <code>false</code> otherwise.
    */
-  void displayDriveOrders(VehicleModel vehicle, boolean visible) {
+  public void displayDriveOrders(VehicleModel vehicle, boolean visible) {
     requireNonNull(vehicle, "vehicle");
 
     if (visible) {
-      vehicle.setDriveOrderColor(orderColorCycler.next());
-
       if (!fVehicles.contains(vehicle)) {
         fVehicles.add(vehicle);
       }

@@ -179,6 +179,9 @@ public class PropertyConverter {
           case VehicleModel.LENGTH:
             revertLengthProperty(model, VehicleModel.LENGTH, property);
             break;
+          case ElementPropKeys.VEHICLE_ROUTE_COLOR:
+            revertRouteColorProperty(model,ElementPropKeys.VEHICLE_ROUTE_COLOR, property);
+            break;
           case ENERGY_LEVEL_CRITICAL:
             revertPercentProperty(model, ENERGY_LEVEL_CRITICAL, property);
             break;
@@ -492,6 +495,13 @@ public class PropertyConverter {
                                    CourseObjectProperty property) {
     Color color = new Color((int) property.getValue());
     ((ColorProperty) model.getProperty(BLOCK_COLOR)).setColor(color);
+  }
+
+  private void revertRouteColorProperty(ModelComponent model,String key,
+                                        CourseObjectProperty property) {
+    ColorProperty colorProp = (ColorProperty) model.getProperty(key);
+    colorProp.setColor(new Color((int)property.getValue()));
+
   }
 
   private void revertLengthProperty(ModelComponent model, String key,
