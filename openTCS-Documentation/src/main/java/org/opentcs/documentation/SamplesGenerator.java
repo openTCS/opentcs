@@ -230,7 +230,7 @@ public class SamplesGenerator {
 
     dest = new Destination();
     dest.setLocationName("Storage 02");
-    dest.setOperation("Unoad cargo");
+    dest.setOperation("Unload cargo");
     transport.getDestinations().add(dest);
 
     transport.getProperties().add(new Property("waitBefore", "Unload"));

@@ -293,23 +293,21 @@ public class XMLTelegramOrderReceiver
 
     private TCSOrderSet receiveOrder(InputStream inputStream)
         throws IOException, IllegalStateException {
-      try (Reader reader = new BufferedReader(new InputStreamReader(inputStream,
-                                                                    Charset.forName("UTF-8")))) {
-        String telegram = readTelegram(reader);
-        TCSOrderSet orderSet = TCSOrderSet.fromXml(new StringReader(telegram));
-        LOG.debug("Constructed order set");
-        return orderSet;
-      }
+      Reader reader = new BufferedReader(new InputStreamReader(inputStream,
+                                                               Charset.forName("UTF-8")));
+      String telegram = readTelegram(reader);
+      TCSOrderSet orderSet = TCSOrderSet.fromXml(new StringReader(telegram));
+      LOG.debug("Constructed order set");
+      return orderSet;
     }
 
     private void sendResponse(TCSResponseSet responseSet, OutputStream outputStream)
         throws IOException {
-      try (Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream,
-                                                                     Charset.forName("UTF-8")))) {
-        LOG.debug("Sending response");
-        responseSet.toXml(writer);
-        LOG.debug("Sent response, finishing.");
-      }
+      Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream,
+                                                                Charset.forName("UTF-8")));
+      LOG.debug("Sending response");
+      responseSet.toXml(writer);
+      LOG.debug("Sent response, finishing.");
     }
 
     private String readTelegram(Reader reader)
@@ -326,7 +324,7 @@ public class XMLTelegramOrderReceiver
         if (totalBytesRead > configuration.ordersInputLimit()) {
           throw new IllegalStateException("Input limit of exceeded.");
         }
-        telegram.append(buffer);
+        telegram.append(buffer, 0, bytesRead);
         // If we did NOT receive the end of telegram marker, yet, read on.
         if (!telegram.toString().contains(END_OF_TELEGRAM)) {
           bytesRead = reader.read(buffer);

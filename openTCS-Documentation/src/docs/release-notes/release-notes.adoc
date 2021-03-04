@@ -49,6 +49,11 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.8.3 (2018-01-24)
+
+* Bugs fixed:
+** Fix processing of XML messages received via the TCP-based host interface.
+
 === Version 4.8.2 (2017-12-15)
 
 * Bugs fixed:
