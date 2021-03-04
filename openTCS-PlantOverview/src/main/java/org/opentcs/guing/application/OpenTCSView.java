@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -2145,10 +2144,9 @@ public class OpenTCSView
 
         // If the name of a point changed, update the blocks this point is a member of
         if (model instanceof PointModel) {
-          List<BlockModel> blocksToUpdate = fModelManager.getModel().getBlockModels().stream()
-              .filter(block -> blockContainsPoint(block, model))
-              .collect(Collectors.toList());
-          updateBlockMembers(blocksToUpdate);
+          fModelManager.getModel().getBlockModels().stream()
+              .filter(block -> blockIsAffectedByPointRename(block, model))
+              .forEach(block -> updateBlockMembers(block));
         }
       }
 
@@ -2190,26 +2188,31 @@ public class OpenTCSView
       }
     }
 
-    private boolean blockContainsPoint(BlockModel block, ModelComponent pointModel) {
+    private boolean blockIsAffectedByPointRename(BlockModel block, ModelComponent pointModel) {
       for (ModelComponent member : block.getChildComponents()) {
-        PathModel path = (PathModel) member;
-        if (path.getStartComponent().equals(pointModel)
-            || path.getEndComponent().equals(pointModel)) {
-          return true;
+        if (member instanceof PointModel) {
+          if (member.equals(pointModel)) {
+            return true;
+          }
+        }
+        else if (member instanceof PathModel) {
+          PathModel path = (PathModel) member;
+          if (path.getStartComponent().equals(pointModel)
+              || path.getEndComponent().equals(pointModel)) {
+            return true;
+          }
         }
       }
       return false;
     }
 
-    private void updateBlockMembers(List<BlockModel> blocks) {
-      for (BlockModel block : blocks) {
-        List<String> members = new ArrayList<>();
-        for (ModelComponent component : block.getChildComponents()) {
-          members.add(component.getName());
-        }
-        StringSetProperty memberProp = (StringSetProperty) block.getProperty(BlockModel.ELEMENTS);
-        memberProp.setItems(members);
+    private void updateBlockMembers(BlockModel block) {
+      List<String> members = new ArrayList<>();
+      for (ModelComponent component : block.getChildComponents()) {
+        members.add(component.getName());
       }
+      StringSetProperty memberProp = (StringSetProperty) block.getProperty(BlockModel.ELEMENTS);
+      memberProp.setItems(members);
     }
   }
 
