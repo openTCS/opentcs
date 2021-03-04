@@ -166,10 +166,10 @@ public class OpenTCSDrawingEditor
   private void handleModeChange(OperationModeChangeEvent evt) {
     switch (evt.getNewMode()) {
       case MODELLING:
-        showVehicles(modelManager.getModel().getVehicleModels(), false);
+        showVehicles(false);
         break;
       case OPERATING:
-        showVehicles(modelManager.getModel().getVehicleModels(), true);
+        showVehicles(true);
         break;
       default:
       // XXX Unhandled mode. Do anything?
@@ -425,11 +425,10 @@ public class OpenTCSDrawingEditor
   /**
    * Shows/hides the given vehicle figures in the drawing.
    *
-   * @param vehicleModels A list of <code>VehicleModels</code>.
    * @param show <code>false</code> to hide them, <code>true</code> otherwise.
    */
-  private void showVehicles(List<VehicleModel> vehicleModels, boolean show) {
-    for (VehicleModel vehModel : vehicleModels) {
+  public void showVehicles(boolean show) {
+    for (VehicleModel vehModel : modelManager.getModel().getVehicleModels()) {
       vehModel.getFigure().setVisible(show);
     }
   }

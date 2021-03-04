@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -61,6 +62,7 @@ public class SecureSocketFactoryProvider
    *
    * @param sslParameterSet The parameter set to be used.
    */
+  @Inject
   public SecureSocketFactoryProvider(SslParameterSet sslParameterSet) {
     this.sslParameterSet = requireNonNull(sslParameterSet, "sslParameterSet");
   }

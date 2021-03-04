@@ -28,11 +28,11 @@ The plant overview client offers to integrate custom panels providing project-sp
 . Implement a `PluggablePanelFactory` that produces instances of your `PluggablePanel`.
 . Create a Guice module for your `PluggablePanelFactory` by subclassing `PlantOverviewInjectionModule`.
 Implement the `configure()` method and add a binding to your `PluggablePanelFactory` using `pluggablePanelFactoryBinder()`.
-The following example demonstrates how this module looks like for the panels that are part of the openTCS distribution:
+For example, the load generator panel that is part of the openTCS distribution is registered with the following line in its module's `configure()` method:
 +
 [source, java]
 ----
-include::{plantoverview-guiceSrc}/org/opentcs/guing/DefaultPluginPanelsModule.java[tags=documentation_createPluginPanelModule]
+include::{loadGeneratorPanel-guiceSrc}/org/opentcs/guing/plugins/panels/loadgenerator/LoadGeneratorPanelModule.java[tags=documentation_createPluginPanelModule]
 ----
 
 . Build and package the `PluggablePanel`, `PluggablePanelFactory` and Guice module into a JAR file.
@@ -42,7 +42,7 @@ This file should consist of a single line of text holding simply the name of the
 +
 [source]
 ----
-org.opentcs.guing.DefaultPluginPanelsModule
+org.opentcs.guing.plugins.panels.loadgenerator.LoadGeneratorPanelModule
 ----
 
 . Place the JAR file in the Plant Overview application's class path (subdirectory `lib/openTCS-extensions/` of the application's installation directory) and start the application.

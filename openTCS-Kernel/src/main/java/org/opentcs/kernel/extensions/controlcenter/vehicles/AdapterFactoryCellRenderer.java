@@ -35,6 +35,7 @@ final class AdapterFactoryCellRenderer
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public Component getListCellRendererComponent(JList<? extends VehicleCommAdapterFactory> list,
                                                 VehicleCommAdapterFactory value,
                                                 int index,

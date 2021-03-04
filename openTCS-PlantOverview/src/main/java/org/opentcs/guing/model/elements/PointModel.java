@@ -15,6 +15,7 @@ import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.AbstractFigureComponent;
@@ -36,6 +37,10 @@ public class PointModel
    * Key for the type.
    */
   public static final String TYPE = "Type";
+  /**
+   * The point's default position for both axes.
+   */
+  private static final int DEFAULT_XY_POSITION = 0;
 
   /**
    * Creates a new instance.
@@ -103,12 +108,16 @@ public class PointModel
     pName.setHelptext(bundle.getString("point.name.helptext"));
     setProperty(NAME, pName);
 
-    CoordinateProperty pPosX = new CoordinateProperty(this);
+    CoordinateProperty pPosX = new CoordinateProperty(this,
+                                                      DEFAULT_XY_POSITION,
+                                                      LengthProperty.Unit.MM);
     pPosX.setDescription(bundle.getString("point.x.text"));
     pPosX.setHelptext(bundle.getString("point.x.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
 
-    CoordinateProperty pPosY = new CoordinateProperty(this);
+    CoordinateProperty pPosY = new CoordinateProperty(this,
+                                                      DEFAULT_XY_POSITION,
+                                                      LengthProperty.Unit.MM);
     pPosY.setDescription(bundle.getString("point.y.text"));
     pPosY.setHelptext(bundle.getString("point.y.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
@@ -131,14 +140,14 @@ public class PointModel
     pMiscellaneous.setHelptext(bundle.getString("point.miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
 
-    StringProperty pPointPosX = new StringProperty(this);
+    StringProperty pPointPosX = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
     pPointPosX.setDescription(bundle.getString("element.pointPosX.text"));
     pPointPosX.setHelptext(bundle.getString("element.pointPosX.helptext"));
     // The position can only be changed in the drawing.
     pPointPosX.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_POS_X, pPointPosX);
 
-    StringProperty pPointPosY = new StringProperty(this);
+    StringProperty pPointPosY = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
     pPointPosY.setDescription(bundle.getString("element.pointPosY.text"));
     pPointPosY.setHelptext(bundle.getString("element.pointPosY.helptext"));
     // The position can only be changed in the drawing.

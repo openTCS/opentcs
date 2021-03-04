@@ -107,4 +107,13 @@ public class LengthPropertyTest {
     assertEquals(10.0, lp.getValue());
     assertEquals(Unit.CM, lp.getUnit());
   }
+  
+  @Test
+  public void lengthPropertyCharactersInValue() {
+    //Values mixed with text not allowed, changes musnt be saved to the property
+    textField.setText("55asd.5 km");
+    quantityCellEditor.getCellEditorValue();
+    assertEquals(10.0, lp.getValue());
+    assertEquals(Unit.CM, lp.getUnit());
+  }
 }

@@ -9,8 +9,6 @@
  */
 package org.opentcs.guing.components.tree;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -19,6 +17,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.swing.tree.TreeNode;
 import org.opentcs.guing.components.tree.elements.UserObject;
@@ -51,7 +50,7 @@ public abstract class TreeViewManager
   /**
    * This manager's component filter.
    */
-  private Predicate<ModelComponent> componentFilter = Predicates.alwaysTrue();
+  private Predicate<ModelComponent> componentFilter = (component) -> true;
 
   /**
    * Creates a new instance.
@@ -197,7 +196,7 @@ public abstract class TreeViewManager
   }
 
   public boolean accepts(ModelComponent component) {
-    return componentFilter.apply(component);
+    return componentFilter.test(component);
   }
 
   /**

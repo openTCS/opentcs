@@ -8,8 +8,8 @@
 package org.opentcs.strategies.basic.routing.jgrapht;
 
 import java.util.List;
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the shortest path algorithm.

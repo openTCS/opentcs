@@ -12,12 +12,14 @@ package org.opentcs.guing.model.elements;
 import com.google.common.collect.Lists;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.event.BlockChangeEvent;
@@ -37,6 +39,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class BlockModel
     extends FiguresFolder {
 
+  public static final String TYPE = "Type";
   /**
    * Key for the elements property.
    */
@@ -175,6 +178,11 @@ public class BlockModel
     return (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
   }
 
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<BlockType> getPropertyType() {
+    return (SelectionProperty<BlockType>) getProperty(TYPE);
+  }
+
   public StringSetProperty getPropertyElements() {
     return (StringSetProperty) getProperty(ELEMENTS);
   }
@@ -196,6 +204,14 @@ public class BlockModel
     pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
 
+    SelectionProperty<BlockType> pType = new SelectionProperty<>(this,
+                                                                 Arrays.asList(BlockType.values()),
+                                                                 BlockType.values()[0]);
+    pType.setDescription(bundle.getString("block.type.text"));
+    pType.setHelptext(bundle.getString("block.type.helptext"));
+    pType.setCollectiveEditable(true);
+    setProperty(TYPE, pType);
+
     StringSetProperty pElements = new StringSetProperty(this);
     pElements.setDescription(bundle.getString("block.elements.text"));
     pElements.setHelptext(bundle.getString("block.elements.helptext"));
@@ -207,5 +223,25 @@ public class BlockModel
     pMiscellaneous.setDescription(bundle.getString("block.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("block.miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
+  }
+
+  /**
+   * The supported point types.
+   */
+  public enum BlockType {
+
+    /**
+     * Single vehicle only allowed.
+     */
+    SINGLE_VEHICLE_ONLY,
+    /**
+     * Same direction only allowed.
+     */
+    SAME_DIRECTION_ONLY;
+
+    @Override
+    public String toString() {
+      return ResourceBundleUtil.getBundle().getString("block.type." + name() + ".text");
+    }
   }
 }

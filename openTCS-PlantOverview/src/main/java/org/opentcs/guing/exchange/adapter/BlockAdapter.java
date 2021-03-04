@@ -49,6 +49,8 @@ public class BlockAdapter
     model.getPropertyName().setText(block.getName());
     model.removeAllCourseElements();
 
+    updateModelType(model, block);
+
     for (TCSResourceReference<?> resRef : block.getMembers()) {
       ModelComponent blockMember = systemModel.getModelComponent(resRef.getName());
       model.addCourseElement(blockMember);
@@ -67,6 +69,7 @@ public class BlockAdapter
                                                 PlantModelCreationTO plantModel) {
     return plantModel
         .withBlock(new BlockCreationTO(modelComponent.getName())
+            .withType(getKernelBlockType((BlockModel) modelComponent))
             .withMemberNames(getMemberNames((BlockModel) modelComponent))
             .withProperties(getKernelProperties(modelComponent))
         )
@@ -80,6 +83,10 @@ public class BlockAdapter
     }
   }
 
+  private Block.Type getKernelBlockType(BlockModel model) {
+    return convertBlockType((BlockModel.BlockType) model.getPropertyType().getValue());
+  }
+
   private Set<String> getMemberNames(BlockModel blockModel) {
     Set<String> result = new HashSet<>();
     for (ModelComponent model : blockModel.getChildComponents()) {
@@ -89,6 +96,33 @@ public class BlockAdapter
     return result;
   }
 
+  private void updateModelType(BlockModel model, Block block) {
+    BlockModel.BlockType value;
+
+    switch (block.getType()) {
+      case SAME_DIRECTION_ONLY:
+        value = BlockModel.BlockType.SAME_DIRECTION_ONLY;
+        break;
+      case SINGLE_VEHICLE_ONLY:
+      default:
+        value = BlockModel.BlockType.SINGLE_VEHICLE_ONLY;
+    }
+
+    model.getPropertyType().setValue(value);
+  }
+
+  private Block.Type convertBlockType(BlockModel.BlockType type) {
+    requireNonNull(type, "type");
+    switch (type) {
+      case SINGLE_VEHICLE_ONLY:
+        return Block.Type.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY:
+        return Block.Type.SAME_DIRECTION_ONLY;
+      default:
+        throw new IllegalArgumentException("Unhandled block type: " + type);
+    }
+  }
+
   @Override
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
                                                  VisualLayoutCreationTO layout) {
@@ -96,7 +130,7 @@ public class BlockAdapter
 
     return layout.withModelElement(
         new ModelLayoutElementCreationTO(blockModel.getName())
-            .withProperty(ElementPropKeys.BLOCK_COLOR, 
+            .withProperty(ElementPropKeys.BLOCK_COLOR,
                           Colors.encodeToHexRGB(blockModel.getPropertyColor().getColor()))
     );
   }

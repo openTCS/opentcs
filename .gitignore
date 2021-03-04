@@ -15,3 +15,12 @@
 /buildSrc/.gradle/
 /openTCS-KernelControlCenter/.nb-gradle/
 /openTCS-KernelControlCenter/build/
+/openTCS-Impl-Configuration-cfg4j/build/
+/openTCS-Kernel-Extension-RMI-Services/build/
+/openTCS-Kernel-Extension-TCP-Host-Interface/build/
+/openTCS-Kernel-Extension-HTTP-Services/build/
+/openTCS-Kernel-Extension-Statistics/build/
+/openTCS-PlantOverview-Panel-LoadGenerator/build/
+/openTCS-PlantOverview-Panel-ResourceAllocation/build/
+/openTCS-PlantOverview-Panel-Statistics/build/
+/openTCS-PlantOverview-Themes-Default/build/

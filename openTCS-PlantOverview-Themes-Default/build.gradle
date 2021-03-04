@@ -1,0 +1,9 @@
+apply from: "${rootDir}/gradle/license-headers.gradle"
+
+dependencies {
+  compile project(':openTCS-API-Base')
+}
+
+task release {
+  dependsOn build
+}

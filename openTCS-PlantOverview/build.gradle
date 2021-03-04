@@ -1,4 +1,4 @@
-apply from: "${rootDir}/gradle/application-guice.gradle"
+apply from: "${rootDir}/gradle/guice-application.gradle"
 
 if (!hasProperty('mainClass')) {
   ext.mainClass = 'org.opentcs.guing.RunPlantOverview'
@@ -10,6 +10,12 @@ ext.collectableDistDir = new File(buildDir, 'install')
 dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
+  compile project(':openTCS-Impl-Configuration-cfg4j')
+  compile project(':openTCS-PlantOverview-Panel-LoadGenerator')
+  compile project(':openTCS-PlantOverview-Panel-ResourceAllocation')
+  compile project(':openTCS-PlantOverview-Panel-Statistics')
+  compile project(':openTCS-PlantOverview-Themes-Default')
+  
   // There does not seem to be an official binary release for JHotDraw...
   compile group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6'
   compileOnly group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6', classifier: 'sources'
@@ -18,9 +24,6 @@ dependencies {
   compileOnly group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11', classifier: 'sources'
   compile group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11'
   compileOnly group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11', classifier: 'sources'
-  
-  compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
-  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
   
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }

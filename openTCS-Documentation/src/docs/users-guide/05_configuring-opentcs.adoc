@@ -1,10 +1,15 @@
-
 == Configuring openTCS
 
 === Kernel configuration
 
-The kernel application reads its configuration data from two files -- `config/opentcs-kernel-defaults-baseline.properties` and `config/opentcs-kernel.properties`.
-It is good practice to leave the first one untouched and set overriding values and project-specific configuration data in the second one.
+The kernel application reads its configuration data from the following files:
+
+. `config/opentcs-kernel-defaults-baseline.properties`,
+. `config/opentcs-kernel-defaults-custom.properties` and
+. `config/opentcs-kernel.properties`.
+
+The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
+For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-kernel.properties` only.
 
 ==== Kernel application configuration entries
 
@@ -84,8 +89,14 @@ include::{configdoc}/VirtualVehicleConfigurationEntries.adoc[]
 
 === Kernel Control Center configuration
 
-The kernel control center application reads its configuration data from two files -- `config/opentcs-kernelcontrolcenter-defaults-baseline.properties` and `config/opentcs-kernelcontrolcenter.properties`.
-It is good practice to leave the first one untouched and set overriding values and project-specific configuration data in the second one.
+The kernel control center application reads its configuration data from the following files:
+
+. `config/opentcs-kernelcontrolcenter-defaults-baseline.properties`,
+. `config/opentcs-kernelcontrolcenter-defaults-custom.properties` and
+. `config/opentcs-kernelcontrolcenter.properties`.
+
+The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
+For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-kernelcontrolcenter.properties` only.
 
 ==== Kernel Control Center application configuration entries
 
@@ -101,8 +112,14 @@ include::{configdoc}/KccSslConfigurationEntries.adoc[]
 
 === Plant Overview configuration
 
-The plant overview application reads its configuration data from two files -- `config/opentcs-plantoverview-defaults-baseline.properties` and `config/opentcs-plantoverview.properties`.
-It is good practice to leave the first one untouched and set overriding values and project-specific configuration data in the second one.
+The plant overview application reads its configuration data from the following files:
+
+. `config/opentcs-plantoverview-defaults-baseline.properties`,
+. `config/opentcs-plantoverview-defaults-custom.properties`,
+. `config/opentcs-plantoverview.properties`.
+
+The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
+For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-plantoverview.properties` only.
 
 ==== Plant Overview application configuration entries
 

@@ -18,7 +18,9 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set the {@link LoadHandlingDevice}s attached to a vehicle.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Is specific to the loopback communication adapter and now implemented and used there.
  */
+@Deprecated
 public class SetLoadHandlingDevicesCommand
     implements AdapterCommand {
 

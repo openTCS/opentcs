@@ -51,7 +51,11 @@ public class AngleProperty
   @Override
   public void setValue(Object newValue) {
     if (newValue instanceof Double) {
-      super.setValue(((double) newValue) % 360);
+      if (getUnit() == Unit.DEG) {
+        super.setValue(((double) newValue) % 360);
+      }else{
+        super.setValue(((double) newValue) % (2*Math.PI));
+      }
     }
     else {
       super.setValue(newValue);

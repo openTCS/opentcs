@@ -1,4 +1,4 @@
-apply from: "${rootDir}/gradle/application-guice.gradle"
+apply from: "${rootDir}/gradle/guice-application.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
 
 if (!hasProperty('mainClass')) {
@@ -13,19 +13,11 @@ dependencies {
   compile project(':openTCS-Common')
   compile project(':openTCS-CommAdapter-Loopback')
   compile project(':openTCS-Strategies-Default')
-  
-  compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
-  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
-  
-  compile group: 'com.sparkjava', name: 'spark-core', version: '2.7.1'
-  compileOnly group: 'com.sparkjava', name: 'spark-core', version: '2.7.1', classifier: 'sources'
-  
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11'
-  compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11', classifier: 'sources'
-  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11'
-  compileOnly group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11', classifier: 'sources'
-  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11'
-  compileOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11', classifier: 'sources'
+  compile project(':openTCS-Impl-Configuration-cfg4j')
+  compile project(':openTCS-Kernel-Extension-HTTP-Services')
+  compile project(':openTCS-Kernel-Extension-RMI-Services')
+  compile project(':openTCS-Kernel-Extension-Statistics')
+  compile project(':openTCS-Kernel-Extension-TCP-Host-Interface')
   
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
@@ -52,6 +44,5 @@ run {
                     'java.security.policy':'file:./config/java.policy',\
                     'opentcs.base':'.',\
                     'opentcs.home':'.'])
-  jvmArgs('-XX:-OmitStackTraceInFastThrow',\
-          '-splash:bin/splash-image.gif')
+  jvmArgs('-XX:-OmitStackTraceInFastThrow')
 }

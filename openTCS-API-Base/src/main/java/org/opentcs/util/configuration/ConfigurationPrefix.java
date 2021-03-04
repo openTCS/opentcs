@@ -12,15 +12,19 @@ import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Marks an interface that provides some configuration for a specific class.
  * 
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Use {@link org.opentcs.configuration.ConfigurationPrefix} instead.
  */
 @Target({TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public @interface ConfigurationPrefix {
   
   /**

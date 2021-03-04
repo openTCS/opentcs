@@ -97,6 +97,15 @@ public class SpeedPropertyTest {
   }
   
   @Test
+  public void speedPropertyCharactersInValue() {
+    //Values mixed with text not allowed, changes musnt be saved to the property
+    textField.setText("55asd.5 rad");
+    quantityCellEditor.getCellEditorValue();
+    assertEquals(10.0, sp.getValue());
+    assertEquals(SpeedProperty.Unit.KM_H, sp.getUnit());
+  }
+  
+  @Test
   public void speedPropertyConversion() {
     textField.setText("10000 " + Unit.MM_S.toString());
     quantityCellEditor.getCellEditorValue();

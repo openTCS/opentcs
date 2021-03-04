@@ -26,6 +26,7 @@ class VehicleCommAdapterFactoryTableCellRenderer
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public Component getTableCellRendererComponent(JTable table,
                                                  Object value,
                                                  boolean isSelected,

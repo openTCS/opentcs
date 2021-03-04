@@ -151,7 +151,7 @@ final class StandardKernel
     }
     // First of all, start all kernel extensions that are already registered.
     for (KernelExtension extension : kernelExtensions) {
-      LOG.debug("Initializing extension: {}", extension.getName());
+      LOG.debug("Initializing extension: {}", extension.getClass().getName());
       extension.initialize();
     }
 

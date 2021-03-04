@@ -1,8 +1,8 @@
 
 == TCP/IP-based interfaces to other systems
 
-IMPORTANT: This interface is deprecated and will be removed in favour of the kernel's web API.
-Its specification is included in the openTCS distribution's documentation.
+IMPORTANT: This interface is *deprecated and scheduled for removal with openTCS 5.0* in favour of the kernel's web API.
+The web API specification is included in the openTCS distribution's documentation.
 
 In addition to the Java-specific kernel interface, openTCS offers the following interfaces for communication with other systems:
 

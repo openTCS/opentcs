@@ -14,7 +14,9 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * A test for an angle property. Min value is 0 and max value is 360.
+ * A test for an angle property.
+ * For Degrees, min value is 0 and max value is 360.
+ * For Radians, min value is 0 and max value is 2*PI ~ 6.283185
  *
  * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
@@ -40,7 +42,7 @@ public class AnglePropertyTest {
   }
 
   @Test
-  public void anglePropertyTest() {   
+  public void anglePropertyValueSouldChange() {   
     assertEquals(textField.getText(), "10.0 deg");
     textField.setText("50 deg");
     quantityCellEditor.getCellEditorValue();
@@ -51,9 +53,9 @@ public class AnglePropertyTest {
   @Test
   public void anglePropertyUnits() {
     for (AngleProperty.Unit unit : ap.getPossibleUnits()) {
-      textField.setText("100 " + unit.toString());
+      textField.setText("5 " + unit.toString());
       quantityCellEditor.getCellEditorValue();
-      assertEquals(100.0, ap.getValue());
+      assertEquals(5.0, ap.getValue());
       assertEquals(unit, ap.getUnit());
     }
   }
@@ -95,7 +97,16 @@ public class AnglePropertyTest {
   }
   
   @Test
-  public void anglePropertyModulo() {
+  public void anglePropertyCharactersInValue() {
+    //Values mixed with text not allowed, changes musnt be saved to the property
+    textField.setText("55asd.5 rad");
+    quantityCellEditor.getCellEditorValue();
+    assertEquals(10.0, ap.getValue());
+    assertEquals(AngleProperty.Unit.DEG, ap.getUnit());
+  }
+  
+  @Test
+  public void anglePropertyModuloDeg() {
     //value shall stay in [0,360]
     textField.setText("540 deg");
     quantityCellEditor.getCellEditorValue();
@@ -104,10 +115,29 @@ public class AnglePropertyTest {
   }
   
   @Test
-  public void anglePropertyConversion() {
+  public void anglePropertyModuloRad() {
+    //value shall stay in [0,2*pi] ~ [0,6.283185]
+    textField.setText("10 rad");
+    quantityCellEditor.getCellEditorValue();
+    assertEquals(3.716, (double)ap.getValue(),0.001);
+    assertEquals(AngleProperty.Unit.RAD, ap.getUnit());
+  }
+  
+  @Test
+  public void anglePropertyConversionRadToDeg() {
+    //10 rad = 3.7168 rad ~ 213 deg
     textField.setText("10 rad");
     quantityCellEditor.getCellEditorValue();
     assertEquals(213.0, ap.getValueByUnit(AngleProperty.Unit.DEG), 1.0);
     assertEquals(AngleProperty.Unit.RAD, ap.getUnit());
+  }
+  
+  @Test
+  public void anglePropertyConversionDegToRad() {
+    // 180 deg = pi
+    textField.setText("180 deg");
+    quantityCellEditor.getCellEditorValue();
+    assertEquals(Math.PI, ap.getValueByUnit(AngleProperty.Unit.RAD),0);
+    assertEquals(AngleProperty.Unit.DEG, ap.getUnit());
   }
 }

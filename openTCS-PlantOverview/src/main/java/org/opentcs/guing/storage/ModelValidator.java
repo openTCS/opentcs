@@ -674,6 +674,12 @@ public class ModelValidator {
   private boolean validateBlock(SystemModel model, BlockModel block) {
     boolean valid = true;
 
+    //Validate the block type
+    AbstractProperty typeProperty = (AbstractProperty) block.getProperty(BlockModel.TYPE);
+    if (typeProperty == null || typeProperty.getComparableValue() == null) {
+      errorOccurred(block, "ModelValidator.error.block.nullType");
+    }
+
     //Validate that all members of the block exists
     StringSetProperty elementsProperty = (StringSetProperty) block.getProperty(BlockModel.ELEMENTS);
     if (elementsProperty == null) {

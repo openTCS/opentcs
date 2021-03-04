@@ -42,10 +42,11 @@ public class TransportOrderComparatorDeadlineAtRiskFirstTest {
 
   @Test
   public void sortCriticalDeadlinesUp() {
+    Instant deadline = Instant.now();
     TransportOrder plainOrder = new TransportOrder("Some order ", new ArrayList<>());
-    TransportOrder order1 = plainOrder.withDeadline(Instant.now().plus(150, ChronoUnit.MINUTES));
-    TransportOrder order2 = plainOrder.withDeadline(Instant.now().plus(5, ChronoUnit.MINUTES));
-    TransportOrder order3 = plainOrder.withDeadline(Instant.now().plus(170, ChronoUnit.MINUTES));
+    TransportOrder order1 = plainOrder.withDeadline(deadline.plus(150, ChronoUnit.MINUTES));
+    TransportOrder order2 = plainOrder.withDeadline(deadline.plus(5, ChronoUnit.MINUTES));
+    TransportOrder order3 = plainOrder.withDeadline(deadline.plus(170, ChronoUnit.MINUTES));
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(order1);

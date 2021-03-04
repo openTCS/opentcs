@@ -7,20 +7,17 @@
  */
 package org.opentcs.customizations;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * A provider to get bindings (implementations) for configuration interfaces.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Use {@link org.opentcs.configuration.ConfigurationBindingProvider} instead.
  */
-public interface ConfigurationBindingProvider {
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
+public interface ConfigurationBindingProvider
+    extends org.opentcs.configuration.ConfigurationBindingProvider {
 
-  /**
-   * Returns a binding for a configuration interface.
-   *
-   * @param <T> The configuration interface to get an instance for.
-   * @param prefix Relative path to configuration values.
-   * @param type The class for {@literal <T>}.
-   * @return The corresponding binding.
-   */
-  <T> T get(String prefix, Class<T> type);
 }

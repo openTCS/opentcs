@@ -1,0 +1,21 @@
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/license-headers.gradle"
+
+dependencies {
+  compile project(':openTCS-API-Injection')
+  compile project(':openTCS-Common')
+  
+  compile group: 'com.sparkjava', name: 'spark-core', version: '2.7.1'
+  compileOnly group: 'com.sparkjava', name: 'spark-core', version: '2.7.1', classifier: 'sources'
+  
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11'
+  compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11', classifier: 'sources'
+  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11'
+  compileOnly group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11', classifier: 'sources'
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11'
+  compileOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11', classifier: 'sources'
+}
+
+task release {
+  dependsOn build
+}

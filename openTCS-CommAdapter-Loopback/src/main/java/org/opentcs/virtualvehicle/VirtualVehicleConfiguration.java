@@ -7,8 +7,8 @@
  */
 package org.opentcs.virtualvehicle;
 
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure to {@link LoopbackCommunicationAdapter}.
@@ -24,27 +24,27 @@ public interface VirtualVehicleConfiguration {
   String PREFIX = "virtualvehicle";
 
   @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to enable to register/enable the loopback driver.",
+      orderKey = "0_enable")
+  boolean enable();
+
+  @ConfigurationEntry(
       type = "Integer",
       description = "The adapter's command queue capacity.",
-      orderKey = "0_attributes_0")
+      orderKey = "1_attributes_1")
   int commandQueueCapacity();
 
   @ConfigurationEntry(
       type = "String",
       description = "The string to be treated as a recharge operation.",
-      orderKey = "0_attributes_1")
+      orderKey = "1_attributes_2")
   String rechargeOperation();
 
   @ConfigurationEntry(
       type = "Double",
       description = {"The simulation time factor.",
                      "1.0 is real time, greater values speed up simulation."},
-      orderKey = "1_behaviour_0")
+      orderKey = "1_behaviour_3")
   double simulationTimeFactor();
-
-  @ConfigurationEntry(
-      type = "Long",
-      description = "The maximum allowed size (in bytes) for a profiles description file.",
-      orderKey = "2_profiles")
-  long profilesMaxFileSize();
 }

@@ -8,8 +8,8 @@
 package org.opentcs.strategies.basic.dispatching;
 
 import java.util.List;
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the {@link DefaultDispatcher}
@@ -50,6 +50,7 @@ public interface DefaultDispatcherConfiguration {
       description = {"Keys by which to prioritize vehicle candidates for assignment.",
                      "Possible values:",
                      "BY_ENERGY_LEVEL: Sort by energy level of the vehicle, highest first.",
+                     "IDLE_FIRST: Sort vehicles with state IDLE first.",
                      "BY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.",
                      "BY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.",
                      "BY_VEHICLE_NAME: Sort by vehicle name, lexicographically."},

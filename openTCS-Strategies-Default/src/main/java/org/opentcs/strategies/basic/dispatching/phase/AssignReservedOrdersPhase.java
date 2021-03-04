@@ -119,7 +119,7 @@ public class AssignReservedOrdersPhase
   private boolean available(Vehicle vehicle) {
     return vehicle.hasProcState(Vehicle.ProcState.IDLE)
         && (vehicle.hasState(Vehicle.State.IDLE)
-            || vehicle.hasState(Vehicle.State.CHARGING) && vehicle.isEnergyLevelGood());
+            || vehicle.hasState(Vehicle.State.CHARGING));
   }
 
   private Optional<VehicleOrderSelection> computeRoute(Vehicle vehicle, TransportOrder order) {

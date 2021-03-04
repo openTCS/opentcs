@@ -35,7 +35,6 @@ import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Point;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.commands.ResetPositionCommand;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.util.Assertions.checkState;
@@ -347,28 +346,6 @@ public class DriverGUI
     }
   }
 
-  /**
-   * Resets selected vehicles' positions to null.
-   */
-  private void resetSelectedVehiclePositions() {
-    try {
-      for (String selectedVehicleName : getSelectedVehicleNames()) {
-        LocalVehicleEntry entry = vehicleEntryPool.getEntryFor(selectedVehicleName);
-        if (entry == null) {
-          LOG.warn("No entry for vehicle names '{}', ignoring.", selectedVehicleName);
-          continue;
-        }
-
-        callWrapper.call(() -> servicePortal.getVehicleService().sendCommAdapterCommand(
-            entry.getAttachmentInformation().getVehicleReference(),
-            new ResetPositionCommand()));
-      }
-    }
-    catch (Exception ex) {
-      LOG.warn("Error sending reset position command, canceling", ex);
-    }
-  }
-
   private String getSelectedVehicleName() {
     VehicleTableModel model = (VehicleTableModel) vehicleTable.getModel();
     return model.getDataAt(vehicleTable.getSelectedRow()).getVehicleName();
@@ -428,11 +405,6 @@ public class DriverGUI
     stateCounts = getCommAdapterStateCountsFor(getSelectedVehicleEntries());
     enableAllSelectedMenuItem.setEnabled(stateCounts.disabledCount > 0);
     disableAllSelectedMenuItem.setEnabled(stateCounts.enabledCount > 0);
-
-    long enabledCommAdapterCount = getSelectedVehicleEntries().stream()
-        .filter(entry -> entry.getProcessModel().isCommAdapterEnabled())
-        .count();
-    resetVehiclePositionMenuItem.setEnabled(enabledCommAdapterCount == 0);
   }
 
   private StatesCounts getCommAdapterStateCountsFor(Collection<LocalVehicleEntry> entries) {
@@ -469,8 +441,6 @@ public class DriverGUI
     jSeparator4 = new javax.swing.JSeparator();
     disableAllMenuItem = new javax.swing.JMenuItem();
     disableAllSelectedMenuItem = new javax.swing.JMenuItem();
-    jSeparator5 = new javax.swing.JSeparator();
-    resetVehiclePositionMenuItem = new javax.swing.JMenuItem();
     listDisplayPanel = new javax.swing.JPanel();
     jScrollPane1 = new javax.swing.JScrollPane();
     vehicleTable = new javax.swing.JTable();
@@ -537,15 +507,6 @@ public class DriverGUI
       }
     });
     vehicleListPopupMenu.add(disableAllSelectedMenuItem);
-    vehicleListPopupMenu.add(jSeparator5);
-
-    resetVehiclePositionMenuItem.setText(bundle.getString("DriverGui.ResetVehiclePosition")); // NOI18N
-    resetVehiclePositionMenuItem.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        resetVehiclePositionMenuItemActionPerformed(evt);
-      }
-    });
-    vehicleListPopupMenu.add(resetVehiclePositionMenuItem);
 
     setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.X_AXIS));
 
@@ -595,10 +556,6 @@ public class DriverGUI
     disableSelectedCommAdapters();
   }//GEN-LAST:event_disableAllSelectedMenuItemActionPerformed
 
-  private void resetVehiclePositionMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetVehiclePositionMenuItemActionPerformed
-    resetSelectedVehiclePositions();
-  }//GEN-LAST:event_resetVehiclePositionMenuItemActionPerformed
-
   private void vehicleListPopupMenuPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_vehicleListPopupMenuPopupMenuWillBecomeVisible
     createPopupMenu();
   }//GEN-LAST:event_vehicleListPopupMenuPopupMenuWillBecomeVisible
@@ -623,10 +580,8 @@ public class DriverGUI
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JSeparator jSeparator1;
   private javax.swing.JSeparator jSeparator4;
-  private javax.swing.JSeparator jSeparator5;
   private javax.swing.JPanel listDisplayPanel;
   private javax.swing.JMenuItem noDriversMenuItem;
-  private javax.swing.JMenuItem resetVehiclePositionMenuItem;
   private javax.swing.JPanel vehicleDetailPanel;
   private javax.swing.JPopupMenu vehicleListPopupMenu;
   private javax.swing.JTable vehicleTable;

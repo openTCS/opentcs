@@ -49,6 +49,27 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.11 (2018-12-04)
+
+* New features:
+** Introduce a _type_ property for blocks.
+   A block's type now determines the rules for entering it:
+*** Single vehicle only: The resources aggregated in this block can only be used by a single vehicle at the same time.
+*** Same direction only: The resources aggregated in this block can be used by multiple vehicles, but only if they enter the block in the same direction.
+* Bugs fixed:
+** Properly set a point's layout coordinates when it is placed exactly on an axis in the Plant Overview.
+** Properly select the correct/clicked-on tree entry in the Plant Overview's blocks tree view when the same element is a member of more than one block.
+** Prevent the Kernel application from freezing when loading some larger plant models.
+* Other changes:
+** Require the user to confirm _immediate_ withdrawals of transport orders in the plant overview, as they have some implications that may lead to collisions or deadlocks in certain situations.
+** Improve input validation of unit-based properties for plant model elements.
+** Remove the Kernel Control Center's function to reset the position of a vehicle.
+   Users should now set the vehicle's integration level to `TO_BE_IGNORED`, instead.
+** Allow the loopback driver to be disabled completely.
+** Minor improvements to the configuration interface API.
+** Mark all `AdapterCommand` implementations in the base API as deprecated.
+   These commands' functionality is specific to the respective communication adapter and should be implemented and used there.
+
 === Version 4.10 (2018-08-07)
 
 * New features:

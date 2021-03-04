@@ -252,8 +252,7 @@
     <vehicle name="Vehicle-04" length="1000" energyLevelCritical="30" energyLevelGood="90" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
     <locationType name="Recharge station">
         <allowedOperation name="NOP"/>
-        <allowedOperation name="Charge:100"/>
-        <allowedOperation name="Charge:50"/>
+        <allowedOperation name="CHARGE"/>
         <property name="tcs:defaultLocationSymbol" value="RECHARGE_GENERIC"/>
         <property name="tcs:defaultLocationTypeSymbol" value="RECHARGE_GENERIC"/>
         <property name="tcs:defaultLocationTypeSymbol" value="RECHARGE_GENERIC"/>
@@ -316,19 +315,19 @@
     <location name="Working station 03" xPosition="15000" yPosition="-3000" zPosition="0" type="Working station">
         <link point="Point-0053"/>
     </location>
-    <block name="Block-0001">
+    <block name="Block-0001" type="SINGLE_VEHICLE_ONLY">
         <member name="Point-0016 --- Point-0017"/>
         <member name="Point-0019 --- Point-0022"/>
     </block>
-    <block name="Block-0002">
+    <block name="Block-0002" type="SINGLE_VEHICLE_ONLY">
         <member name="Point-0037 --- Point-0028"/>
         <member name="Point-0039 --- Point-0040"/>
     </block>
-    <block name="Block-0003">
+    <block name="Block-0003" type="SINGLE_VEHICLE_ONLY">
         <member name="Point-0049 --- Point-0038"/>
         <member name="Point-0052 --- Point-0044"/>
     </block>
-    <block name="Block-0004">
+    <block name="Block-0004" type="SINGLE_VEHICLE_ONLY">
         <member name="Point-0015 --- Point-0050"/>
         <member name="Point-0045 --- Point-0016"/>
         <member name="Point-0045 --- Point-0055"/>
@@ -1010,7 +1009,6 @@
             <property name="POSITION_X" value="15000"/>
             <property name="POSITION_Y" value="-3000"/>
         </modelLayoutElement>
-        <property name="tcs:vehicleThemeClass" value="org.opentcs.guing.plugins.themes.StandardVehicleTheme"/>
-        <property name="tcs:locationThemeClass" value="org.opentcs.guing.plugins.themes.StandardLocationTheme"/>
     </visualLayout>
+    <property name="tcs:modelFileLastModified" value="2018-10-24T06:18:37.323Z"/>
 </model>

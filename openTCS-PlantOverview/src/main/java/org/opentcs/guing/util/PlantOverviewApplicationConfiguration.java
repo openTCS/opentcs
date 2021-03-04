@@ -11,8 +11,8 @@ package org.opentcs.guing.util;
 import java.util.List;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
 
 /**
@@ -77,7 +77,6 @@ public interface PlantOverviewApplicationConfiguration {
       description = "The configured connection bookmarks.",
       orderKey = "2_connection_0")
   List<ConnectionParamSet> connectionBookmarks();
-
 
   @ConfigurationEntry(
       type = "Boolean",

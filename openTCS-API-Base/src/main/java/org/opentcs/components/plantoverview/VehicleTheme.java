@@ -26,18 +26,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 public interface VehicleTheme {
 
   /**
-   * Returns an image for the given vehicle, representing its current state.
-   *
-   * @param vehicle The vehicle for which to return the image.
-   * @return An image for the given vehicle.
-   * @deprecated Use {@link #statefulImage(org.opentcs.data.model.Vehicle)}
-   * or {@link #statelessImage(org.opentcs.data.model.Vehicle)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  Image getImageFor(Vehicle vehicle);
-
-  /**
    * Returns an image for the given vehicle, disregarding its current state.
    *
    * @param vehicle The vehicle for which to return the image.
@@ -66,17 +54,36 @@ public interface VehicleTheme {
    * @return A default image for this theme.
    */
   @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  Image getThemeImage();
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  default Image getThemeImage() {
+    return statelessImage(new Vehicle(""));
+  }
+
+  /**
+   * Returns an image for the given vehicle, representing its current state.
+   *
+   * @param vehicle The vehicle for which to return the image.
+   * @return An image for the given vehicle.
+   * @deprecated Use {@link #statefulImage(org.opentcs.data.model.Vehicle)}
+   * or {@link #statelessImage(org.opentcs.data.model.Vehicle)} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  default Image getImageFor(Vehicle vehicle) {
+    return statefulImage(vehicle);
+  }
 
   /**
    * Returns a name/short description of this theme.
    *
    * @return A name/short description of this theme.
+   * @deprecated Unused. Will be removed.
    */
   @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  String getName();
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  default String getName() {
+    return getClass().getName();
+  }
 
   /**
    * Provides a label that describes this vehicle.

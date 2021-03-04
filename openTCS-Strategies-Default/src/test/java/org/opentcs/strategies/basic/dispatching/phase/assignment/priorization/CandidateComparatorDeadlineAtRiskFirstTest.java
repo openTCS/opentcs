@@ -8,7 +8,6 @@
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
 import java.time.Instant;
-import static java.time.Instant.now;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,9 +48,10 @@ public class CandidateComparatorDeadlineAtRiskFirstTest {
 
   @Test
   public void sortCriticalDeadlinesUp() {
-    AssignmentCandidate candidate1 = candidateWithDeadline(now().plus(270, ChronoUnit.MINUTES));
-    AssignmentCandidate candidate2 = candidateWithDeadline(now().plus(30, ChronoUnit.MINUTES));
-    AssignmentCandidate candidate3 = candidateWithDeadline(now().plus(180, ChronoUnit.MINUTES));
+    Instant deadline = Instant.now();
+    AssignmentCandidate candidate1 = candidateWithDeadline(deadline.plus(270, ChronoUnit.MINUTES));
+    AssignmentCandidate candidate2 = candidateWithDeadline(deadline.plus(30, ChronoUnit.MINUTES));
+    AssignmentCandidate candidate3 = candidateWithDeadline(deadline.plus(180, ChronoUnit.MINUTES));
 
     List<AssignmentCandidate> list = new ArrayList<>();
     list.add(candidate1);

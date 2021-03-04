@@ -373,7 +373,8 @@ public class XMLModel002Builder
         member.setName(curRef.getName());
         members.add(member);
       }
-      block.setMembers(members)
+      block.setType(curBlock.getType().name())
+          .setMembers(members)
           .setProperties(convertProperties(curBlock.getProperties()));
 
       result.add(block);
@@ -714,9 +715,14 @@ public class XMLModel002Builder
     for (BlockTO blockTO : blockTOs) {
       model.createBlock(
           new BlockCreationTO(blockTO.getName())
+              .withType(convertBlockType(blockTO))
               .withMemberNames(getMemberNames(blockTO.getMembers()))
               .withProperties(convertProperties(blockTO.getProperties())));
     }
+  }
+
+  private Block.Type convertBlockType(BlockTO blockTO) {
+    return Block.Type.valueOf(blockTO.getType());
   }
 
   private Set<String> getMemberNames(Collection<MemberTO> members) {

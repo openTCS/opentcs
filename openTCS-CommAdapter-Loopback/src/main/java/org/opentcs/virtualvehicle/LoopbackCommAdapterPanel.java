@@ -11,7 +11,6 @@ import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -29,22 +28,22 @@ import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
-import org.opentcs.drivers.vehicle.commands.PublishEventCommand;
-import org.opentcs.drivers.vehicle.commands.SetEnergyLevelCommand;
-import org.opentcs.drivers.vehicle.commands.SetLoadHandlingDevicesCommand;
-import org.opentcs.drivers.vehicle.commands.SetOrienatationAngleCommand;
-import org.opentcs.drivers.vehicle.commands.SetPercisePositionCommand;
-import org.opentcs.drivers.vehicle.commands.SetPositionCommand;
-import org.opentcs.drivers.vehicle.commands.SetStateCommand;
-import org.opentcs.drivers.vehicle.commands.SetVehiclePropertyCommand;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.StringListCellRenderer;
 import org.opentcs.virtualvehicle.commands.CurrentMovementCommandFailedCommand;
+import org.opentcs.virtualvehicle.commands.PublishEventCommand;
+import org.opentcs.virtualvehicle.commands.SetEnergyLevelCommand;
+import org.opentcs.virtualvehicle.commands.SetLoadHandlingDevicesCommand;
+import org.opentcs.virtualvehicle.commands.SetOrientationAngleCommand;
+import org.opentcs.virtualvehicle.commands.SetPositionCommand;
+import org.opentcs.virtualvehicle.commands.SetPrecisePositionCommand;
 import org.opentcs.virtualvehicle.commands.SetSingleStepModeEnabledCommand;
+import org.opentcs.virtualvehicle.commands.SetStateCommand;
 import org.opentcs.virtualvehicle.commands.SetVehiclePausedCommand;
+import org.opentcs.virtualvehicle.commands.SetVehiclePropertyCommand;
 import org.opentcs.virtualvehicle.commands.TriggerCommand;
 import org.opentcs.virtualvehicle.inputcomponents.DropdownListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.InputDialog;
@@ -195,8 +194,10 @@ public class LoopbackCommAdapterPanel
     if (devices.size() > 1) {
       LOG.warn("size of load handling devices greater than 1 ({})", devices.size());
     }
-    Iterator<LoadHandlingDevice> deviceIterator = devices.iterator();
-    boolean loaded = deviceIterator.hasNext() ? deviceIterator.next().isFull() : false;
+    boolean loaded = devices.stream()
+        .findFirst()
+        .map(lhd -> lhd.isFull())
+        .orElse(false);
     SwingUtilities.invokeLater(() -> lHDCheckbox.setSelected(loaded));
   }
 
@@ -237,17 +238,10 @@ public class LoopbackCommAdapterPanel
   }
 
   private void updatePrecisePosition(Triple precisePos) {
-    SwingUtilities.invokeLater(() -> {
-      if (precisePos == null) {
-        setPrecisePosText(null, null, null);
-      }
-      else {
-        setPrecisePosText(precisePos.getX(), precisePos.getY(), precisePos.getZ());
-      }
-    });
+    SwingUtilities.invokeLater(() -> setPrecisePosText(precisePos));
   }
 
-  private void updateOrientationAngle(Double orientation) {
+  private void updateOrientationAngle(double orientation) {
     SwingUtilities.invokeLater(() -> {
       if (Double.isNaN(orientation)) {
         orientationAngleTxt.setText(BUNDLE.getString("OrientationAngleNotSet"));
@@ -1053,7 +1047,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         if (dialog.getInput() == null) {
           // Clear precise position
-          sendCommAdapterCommand(new SetPercisePositionCommand(null));
+          sendCommAdapterCommand(new SetPrecisePositionCommand(null));
         }
         else {
           // Set new precise position
@@ -1068,121 +1062,124 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             return;
           }
 
-          sendCommAdapterCommand(new SetPercisePositionCommand(new Triple(x, y, z)));
+          sendCommAdapterCommand(new SetPrecisePositionCommand(new Triple(x, y, z)));
         }
       }
     }
   }//GEN-LAST:event_precisePosTextAreaMouseClicked
 
   private void stateTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stateTxtMouseClicked
-    if (stateTxt.isEnabled()) {
-      List<Vehicle.State> states
-          = new ArrayList<>(Arrays.asList(Vehicle.State.values()));
-      Vehicle.State currentState = processModel.getVehicleState();
-      // Create panel and dialog
-      InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("stateTitle"),
-                                                              states)
-          .setLabel(BUNDLE.getString("stateLabel"))
-          .setInitialSelection(currentState)
-          .build();
-      InputDialog dialog = new InputDialog(panel);
-      dialog.setVisible(true);
-      // Get dialog results and set vahicle stare
-      if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
-        Vehicle.State newState = (Vehicle.State) dialog.getInput();
-        if (newState != currentState) {
-          sendCommAdapterCommand(new SetStateCommand(newState));
-        }
+    if (!stateTxt.isEnabled()) {
+      return;
+    }
+
+    Vehicle.State currentState = processModel.getVehicleState();
+    // Create panel and dialog
+    InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("stateTitle"),
+                                                            Arrays.asList(Vehicle.State.values()))
+        .setLabel(BUNDLE.getString("stateLabel"))
+        .setInitialSelection(currentState)
+        .build();
+    InputDialog dialog = new InputDialog(panel);
+    dialog.setVisible(true);
+    // Get dialog results and set vahicle stare
+    if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
+      Vehicle.State newState = (Vehicle.State) dialog.getInput();
+      if (newState != currentState) {
+        sendCommAdapterCommand(new SetStateCommand(newState));
       }
     }
   }//GEN-LAST:event_stateTxtMouseClicked
 
   private void positionTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_positionTxtMouseClicked
-    if (positionTxt.isEnabled()) {
-      // Prepare list of model points
+    if (!positionTxt.isEnabled()) {
+      return;
+    }
 
-      Set<Point> pointSet;
-      try {
-        pointSet = callWrapper.call(() -> vehicleService.fetchObjects(Point.class));
-      }
-      catch (Exception ex) {
-        LOG.warn("Error fetching points", ex);
-        return;
-      }
+    // Prepare list of model points
+    Set<Point> pointSet;
+    try {
+      pointSet = callWrapper.call(() -> vehicleService.fetchObjects(Point.class));
+    }
+    catch (Exception ex) {
+      LOG.warn("Error fetching points", ex);
+      return;
+    }
 
-      List<Point> pointList = new ArrayList<>(pointSet);
-      Collections.sort(pointList, Comparators.objectsByName());
-      pointList.add(0, null);
-      // Get currently selected point
-      // TODO is there a better way to do this?
-      Point currentPoint = null;
-      String currentPointName = processModel.getVehiclePosition();
-      for (Point p : pointList) {
-        if (p != null && p.getName().equals(currentPointName)) {
-          currentPoint = p;
-          break;
-        }
+    List<Point> pointList = new ArrayList<>(pointSet);
+    Collections.sort(pointList, Comparators.objectsByName());
+    pointList.add(0, null);
+    // Get currently selected point
+    // TODO is there a better way to do this?
+    Point currentPoint = null;
+    String currentPointName = processModel.getVehiclePosition();
+    for (Point p : pointList) {
+      if (p != null && p.getName().equals(currentPointName)) {
+        currentPoint = p;
+        break;
       }
-      // Create panel and dialog
-      InputPanel panel = new DropdownListInputPanel.Builder<>(
-          BUNDLE.getString("positionTitle"), pointList)
-          .setLabel(BUNDLE.getString("positionLabel"))
-          .setEditable(true)
-          .setInitialSelection(currentPoint)
-          .setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()))
-          .build();
-      InputDialog dialog = new InputDialog(panel);
-      dialog.setVisible(true);
-      // Get result from dialog and set vehicle position
-      if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
-        Object item = dialog.getInput();
-        if (item == null) {
-          sendCommAdapterCommand(new SetPositionCommand(null));
-        }
-        else {
-          sendCommAdapterCommand(new SetPositionCommand(((Point) item).getName()));
-        }
+    }
+    // Create panel and dialog
+    InputPanel panel = new DropdownListInputPanel.Builder<>(
+        BUNDLE.getString("positionTitle"), pointList)
+        .setLabel(BUNDLE.getString("positionLabel"))
+        .setEditable(true)
+        .setInitialSelection(currentPoint)
+        .setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()))
+        .build();
+    InputDialog dialog = new InputDialog(panel);
+    dialog.setVisible(true);
+    // Get result from dialog and set vehicle position
+    if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
+      Object item = dialog.getInput();
+      if (item == null) {
+        sendCommAdapterCommand(new SetPositionCommand(null));
+      }
+      else {
+        sendCommAdapterCommand(new SetPositionCommand(((Point) item).getName()));
       }
     }
   }//GEN-LAST:event_positionTxtMouseClicked
 
   private void orientationAngleTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_orientationAngleTxtMouseClicked
-    if (orientationAngleTxt.isEnabled()) {
-      double currentAngle = processModel.getOrientationAngle();
-      String initialValue = (Double.isNaN(currentAngle) ? "" : Double.toString(currentAngle));
-      // Create dialog and panel
-      InputPanel panel = new SingleTextInputPanel.Builder(
-          BUNDLE.getString("orientationTitle"))
-          .setLabel(BUNDLE.getString("orientationLabel"))
-          .setUnitLabel(BUNDLE.getString("AngleUnit"))
-          .setInitialValue(initialValue)
-          .enableResetButton(null)
-          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT)
-          .build();
-      InputDialog dialog = new InputDialog(panel);
-      dialog.setVisible(true);
-      // Get input from dialog
-      InputDialog.ReturnStatus returnStatus = dialog.getReturnStatus();
-      if (returnStatus == InputDialog.ReturnStatus.ACCEPTED) {
-        String input = (String) dialog.getInput();
-        if (input == null) { // The reset button was pressed
-          if (!Double.isNaN(processModel.getOrientationAngle())) {
-            sendCommAdapterCommand(new SetOrienatationAngleCommand(Double.NaN));
-          }
-        }
-        else {
-          // Set orientation provided by the user
-          double angle;
-          try {
-            angle = Double.parseDouble(input);
-          }
-          catch (NumberFormatException e) {
-            //TODO log message?
-            return;
-          }
+    if (!orientationAngleTxt.isEnabled()) {
+      return;
+    }
 
-          sendCommAdapterCommand(new SetOrienatationAngleCommand(angle));
+    double currentAngle = processModel.getOrientationAngle();
+    String initialValue = (Double.isNaN(currentAngle) ? "" : Double.toString(currentAngle));
+    // Create dialog and panel
+    InputPanel panel = new SingleTextInputPanel.Builder(
+        BUNDLE.getString("orientationTitle"))
+        .setLabel(BUNDLE.getString("orientationLabel"))
+        .setUnitLabel(BUNDLE.getString("AngleUnit"))
+        .setInitialValue(initialValue)
+        .enableResetButton(null)
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT)
+        .build();
+    InputDialog dialog = new InputDialog(panel);
+    dialog.setVisible(true);
+    // Get input from dialog
+    InputDialog.ReturnStatus returnStatus = dialog.getReturnStatus();
+    if (returnStatus == InputDialog.ReturnStatus.ACCEPTED) {
+      String input = (String) dialog.getInput();
+      if (input == null) { // The reset button was pressed
+        if (!Double.isNaN(processModel.getOrientationAngle())) {
+          sendCommAdapterCommand(new SetOrientationAngleCommand(Double.NaN));
         }
+      }
+      else {
+        // Set orientation provided by the user
+        double angle;
+        try {
+          angle = Double.parseDouble(input);
+        }
+        catch (NumberFormatException e) {
+          //TODO log message?
+          return;
+        }
+
+        sendCommAdapterCommand(new SetOrientationAngleCommand(angle));
       }
     }
   }//GEN-LAST:event_orientationAngleTxtMouseClicked
@@ -1197,30 +1194,32 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
   }//GEN-LAST:event_pauseVehicleCheckBoxItemStateChanged
 
   private void energyLevelTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_energyLevelTxtMouseClicked
-    if (energyLevelTxt.isEnabled()) {
-      // Create panel and dialog
-      InputPanel panel = new SingleTextInputPanel.Builder(
-          BUNDLE.getString("energyLevelTitle"))
-          .setLabel(BUNDLE.getString("energyLevelLabel"))
-          .setUnitLabel("%")
-          .setInitialValue(energyLevelTxt.getText())
-          .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_RANGE_0_100)
-          .build();
-      InputDialog dialog = new InputDialog(panel);
-      dialog.setVisible(true);
-      // Get result from dialog and set energy level
-      if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
-        String input = (String) dialog.getInput();
-        int energy;
-        try {
-          energy = Integer.parseInt(input);
-        }
-        catch (NumberFormatException e) {
-          return;
-        }
+    if (!energyLevelTxt.isEnabled()) {
+      return;
+    }
 
-        sendCommAdapterCommand(new SetEnergyLevelCommand(energy));
+    // Create panel and dialog
+    InputPanel panel = new SingleTextInputPanel.Builder(
+        BUNDLE.getString("energyLevelTitle"))
+        .setLabel(BUNDLE.getString("energyLevelLabel"))
+        .setUnitLabel("%")
+        .setInitialValue(energyLevelTxt.getText())
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_RANGE_0_100)
+        .build();
+    InputDialog dialog = new InputDialog(panel);
+    dialog.setVisible(true);
+    // Get result from dialog and set energy level
+    if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
+      String input = (String) dialog.getInput();
+      int energy;
+      try {
+        energy = Integer.parseInt(input);
       }
+      catch (NumberFormatException e) {
+        return;
+      }
+
+      sendCommAdapterCommand(new SetEnergyLevelCommand(energy));
     }
   }//GEN-LAST:event_energyLevelTxtMouseClicked
 
@@ -1268,21 +1267,23 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
    * @param y y-position
    * @param z z-poition
    */
-  private void setPrecisePosText(Long x, Long y, Long z) {
-    // Convert values to srings
-    String xS, yS, zS;
-    try {
-      xS = x.toString();
-      yS = y.toString();
-      zS = z.toString();
+  private void setPrecisePosText(Triple precisePos) {
+    // Convert values to strings
+    String xS = BUNDLE.getString("PrecisePosNotSet");
+    String yS = BUNDLE.getString("PrecisePosNotSet");
+    String zS = BUNDLE.getString("PrecisePosNotSet");
+
+    if (precisePos != null) {
+      xS = String.valueOf(precisePos.getX());
+      yS = String.valueOf(precisePos.getX());
+      zS = String.valueOf(precisePos.getX());
     }
-    catch (NullPointerException e) {
-      xS = yS = zS = BUNDLE.getString("PrecisePosNotSet");
-    }
+
     // Clip extremely long string values
     xS = (xS.length() > 20) ? (xS.substring(0, 20) + "...") : xS;
     yS = (yS.length() > 20) ? (yS.substring(0, 20) + "...") : yS;
     zS = (zS.length() > 20) ? (zS.substring(0, 20) + "...") : zS;
+
     // Build formatted text
     StringBuilder text = new StringBuilder("");
     text.append("X: ").append(xS).append("\n")
@@ -1290,6 +1291,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         .append("Z: ").append(zS);
     precisePosTextArea.setText(text.toString());
   }
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel PropsPowerInnerContainerPanel;
   private javax.swing.JPanel PropsPowerOuterContainerPanel;

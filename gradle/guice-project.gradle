@@ -1,0 +1,26 @@
+sourceSets {
+  guiceConfig
+}
+
+configurations {
+  guiceConfigCompile.extendsFrom compile
+}
+
+dependencies {
+  guiceConfigCompile sourceSets.main.output
+}
+
+// Attributes for the AsciiDoc documentation to include code from source files
+ext.guiceSrcDir = sourceSets.guiceConfig.java.srcDirs[0]
+
+compileGuiceConfigJava {
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+}
+
+jar {
+  from sourceSets.guiceConfig.output
+  // This merely tells NetBeans where to look for classes in case of other
+  // subprojects depending on this one. By default, it only scans 'main'.
+  ext.netBeansSourceSets = [sourceSets.guiceConfig, sourceSets.main]
+}

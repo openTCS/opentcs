@@ -8,8 +8,8 @@
 package org.opentcs.kernelcontrolcenter.util;
 
 import java.util.List;
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
 
 /**

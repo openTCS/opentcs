@@ -34,10 +34,11 @@ public class TransportOrderComparatorByAgeTest {
 
   @Test
   public void sortOlderOrdersUp() {
+    Instant creationTime = Instant.now();
     TransportOrder plainOrder = new TransportOrder("Some order", new ArrayList<>());
-    TransportOrder order1 = plainOrder.withCreationTime(Instant.now());
-    TransportOrder order2 = plainOrder.withCreationTime(Instant.now().plus(2, ChronoUnit.HOURS));
-    TransportOrder order3 = plainOrder.withCreationTime(Instant.now().plus(1, ChronoUnit.HOURS));
+    TransportOrder order1 = plainOrder.withCreationTime(creationTime);
+    TransportOrder order2 = plainOrder.withCreationTime(creationTime.plus(2, ChronoUnit.HOURS));
+    TransportOrder order3 = plainOrder.withCreationTime(creationTime.plus(1, ChronoUnit.HOURS));
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(order1);

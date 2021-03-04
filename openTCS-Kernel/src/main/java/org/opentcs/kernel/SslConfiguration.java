@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel;
 
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the ssl connection.

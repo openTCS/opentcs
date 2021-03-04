@@ -25,7 +25,7 @@ import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ApplicationHome;
-import org.opentcs.customizations.ConfigurableInjectionModule;
+import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.drivers.vehicle.management.CommAdapterEvent;
 import org.opentcs.guing.application.ApplicationInjectionModule;
 import org.opentcs.guing.components.ComponentsInjectionModule;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultPlantOverviewInjectionModule
-    extends ConfigurableInjectionModule {
+    extends PlantOverviewInjectionModule {
 
   /**
    * This class's logger.
@@ -70,6 +70,9 @@ public class DefaultPlantOverviewInjectionModule
     install(new DefaultStorageInjectionModule());
     install(new TransportInjectionModule());
     install(new UtilInjectionModule());
+    
+    // Ensure there is at least an empty binder for pluggable panels.
+    pluggablePanelFactoryBinder();
   }
 
   private void configurePlantOverviewDependencies() {

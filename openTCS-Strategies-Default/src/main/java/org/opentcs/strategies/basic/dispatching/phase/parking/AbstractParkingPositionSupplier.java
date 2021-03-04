@@ -7,16 +7,14 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
-import java.util.HashSet;
-import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.components.kernel.services.TCSObjectService;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Block;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
@@ -30,18 +28,13 @@ public abstract class AbstractParkingPositionSupplier
     implements ParkingPositionSupplier {
 
   /**
-   * The object service.
+   * The plant model service.
    */
-  private final TCSObjectService objectService;
+  private final InternalPlantModelService plantModelService;
   /**
    * A router for computing distances to parking positions.
    */
   private final Router router;
-  /**
-   * A map containing all points in the model that are parking positions as keys
-   * and sets of all points sharing the same block(s) as values.
-   */
-  private final Map<Point, Set<Point>> parkingPositions = new ConcurrentHashMap<>();
   /**
    * Indicates whether this component is initialized.
    */
@@ -50,12 +43,12 @@ public abstract class AbstractParkingPositionSupplier
   /**
    * Creates a new instance.
    *
-   * @param objectService The system's kernel.
+   * @param plantModelService The plant model service.
    * @param router A router for computing distances to parking positions.
    */
-  protected AbstractParkingPositionSupplier(final TCSObjectService objectService,
-                                            final Router router) {
-    this.objectService = requireNonNull(objectService, "objectService");
+  protected AbstractParkingPositionSupplier(InternalPlantModelService plantModelService,
+                                            Router router) {
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
   }
 
@@ -64,16 +57,7 @@ public abstract class AbstractParkingPositionSupplier
     if (initialized) {
       return;
     }
-
-    Set<Block> allBlocks = objectService.fetchObjects(Block.class);
-    // Get all parking positions from the kernel.
-    for (Point curPoint : objectService.fetchObjects(Point.class)) {
-      if (curPoint.isParkingPosition()) {
-        // Gather all points from all blocks that this point is a member of.
-        parkingPositions.put(curPoint, getBlockedPoints(curPoint, allBlocks));
-      }
-    }
-
+    
     initialized = true;
   }
 
@@ -88,18 +72,16 @@ public abstract class AbstractParkingPositionSupplier
       return;
     }
 
-    parkingPositions.clear();
-
     initialized = false;
   }
 
   /**
-   * Returns the object service.
+   * Returns the plant model service.
    *
-   * @return The object service.
+   * @return The plant model service.
    */
-  public TCSObjectService getObjectService() {
-    return objectService;
+  public InternalPlantModelService getPlantModelService() {
+    return plantModelService;
   }
 
   /**
@@ -109,18 +91,6 @@ public abstract class AbstractParkingPositionSupplier
    */
   public Router getRouter() {
     return router;
-  }
-
-  /**
-   * Returns a map containing all points in the model that are parking
-   * positions as keys and sets of all points sharing the same block(s) as
-   * values.
-   *
-   * @return A map containing all points in the model that are parking
-   * positions and their corresponding blocked points.
-   */
-  protected final Map<Point, Set<Point>> getParkingPositions() {
-    return parkingPositions;
   }
 
   /**
@@ -140,52 +110,43 @@ public abstract class AbstractParkingPositionSupplier
       return null;
     }
 
-    Point vehiclePos = objectService.fetchObject(Point.class, vehicle.getCurrentPosition());
+    Point vehiclePos = plantModelService.fetchObject(Point.class, vehicle.getCurrentPosition());
 
-    long lowestCost = Long.MAX_VALUE;
-    Point nearestPoint = null;
-    for (Point curPoint : points) {
-      long curCost = router.getCosts(vehicle, vehiclePos, curPoint);
-      if (curCost < lowestCost) {
-        nearestPoint = curPoint;
-        lowestCost = curCost;
-      }
-    }
-    return nearestPoint;
+    return points.stream()
+        .map(point -> parkingPositionCandidate(vehicle, vehiclePos, point))
+        .filter(candidate -> candidate.costs < Long.MAX_VALUE)
+        .min(Comparator.comparingLong(candidate -> candidate.costs))
+        .map(candidate -> candidate.point)
+        .orElse(null);
   }
 
   /**
-   * Gathers a set of all points from all given blocks that the given point is a
-   * member of.
+   * Gathers a set of all points from all blocks that the given point is a member of.
    *
-   * @param point The parking position to check.
-   * @param blocks The blocks to scan for the parking position.
-   * @return A set of all points from all given blocks that the given point is a
-   * member of.
+   * @param point The point to check.
+   * @return A set of all points from all blocks that the given point is a member of.
    */
-  @SuppressWarnings("unchecked")
-  private Set<Point> getBlockedPoints(Point point, Set<Block> blocks) {
-    requireNonNull(point, "point");
-    requireNonNull(blocks, "blocks");
+  protected Set<Point> expandPoints(Point point) {
+    return plantModelService.expandResources(Collections.singleton(point.getReference())).stream()
+        .filter(resource -> Point.class.equals(resource.getReference().getReferentClass()))
+        .map(resource -> (Point) resource)
+        .collect(Collectors.toSet());
+  }
 
-    Set<Point> result = new HashSet<>();
+  private PointCandidate parkingPositionCandidate(Vehicle vehicle,
+                                               Point srcPosition,
+                                               Point destPosition) {
+    return new PointCandidate(destPosition, router.getCosts(vehicle, srcPosition, destPosition));
+  }
 
-    // The parking position itself is always required.
-    result.add(point);
+  private static class PointCandidate {
 
-    // Check for every block if the given point is part of it.
-    for (Block curBlock : blocks) {
-      if (curBlock.getMembers().contains(point.getReference())) {
-        // Check for every member of the block if it's a point. If it is, add it
-        // to the resulting set.
-        for (TCSObjectReference<?> memberRef : curBlock.getMembers()) {
-          if (Point.class.equals(memberRef.getReferentClass())) {
-            result.add(objectService.fetchObject(Point.class,
-                                                 (TCSObjectReference<Point>) memberRef));
-          }
-        }
-      }
+    private final Point point;
+    private final long costs;
+
+    public PointCandidate(Point point, long costs) {
+      this.point = point;
+      this.costs = costs;
     }
-    return result;
   }
 }

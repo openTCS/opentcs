@@ -26,6 +26,7 @@ import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.ObjectPropConstants;
+import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -283,8 +284,11 @@ public class PlantModelElementConverter {
 
   public BlockModel importBlock(BlockCreationTO blockTO, VisualLayoutCreationTO layoutTO) {
     BlockModel model = new BlockModel();
-
+    
     model.setName(blockTO.getName());
+    
+    model.getPropertyType().setValue(mapBlockType(blockTO.getType()));
+    
     for (String member : blockTO.getMemberNames()) {
       model.getPropertyElements().addItem(member);
     }
@@ -377,6 +381,17 @@ public class PlantModelElementConverter {
         return PointModel.PointType.REPORT;
       default:
         throw new IllegalArgumentException("Unhandled point type: " + type);
+    }
+  }
+
+  private BlockModel.BlockType mapBlockType(Block.Type type) {
+    switch (type) {
+      case SINGLE_VEHICLE_ONLY:
+        return BlockModel.BlockType.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY:
+        return BlockModel.BlockType.SAME_DIRECTION_ONLY;
+      default:
+        throw new IllegalArgumentException("Unhandled block type: " + type);
     }
   }
 

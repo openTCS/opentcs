@@ -113,21 +113,50 @@ public class FullDispatchTask
   }
 
   @Override
-  public void run() {
+  public final void run() {
     LOG.debug("Starting full dispatch run...");
 
     checkNewOrdersPhase.run();
     // Check what vehicles involved in a process should do.
     finishWithdrawalsPhase.run();
     assignNextDriveOrdersPhase.run();
-    assignReservedOrdersPhase.run();
     assignSequenceSuccessorsPhase.run();
     // Check what vehicles not already in a process should do.
-    assignFreeOrdersPhase.run();
-    rechargeIdleVehiclesPhase.run();
-    parkIdleVehiclesPhase.run();
+    assignOrders();
+    rechargeVehicles();
+    parkVehicles();
 
     LOG.debug("Finished full dispatch run.");
   }
+  
+  /**
+   * Assignment of orders to vehicles.
+   * <p>
+   * Default: Assigns reserved and then free orders to vehicles.
+   * </p>
+   */
+  protected void assignOrders() {
+    assignReservedOrdersPhase.run();
+    assignFreeOrdersPhase.run();
+  }
+  
+  /**
+   * Recharging of vehicles.
+   * <p>
+   * Default: Sends idle vehicles with a degraded energy level to recharge locations.
+   * </p>
+   */
+  protected void rechargeVehicles() {
+    rechargeIdleVehiclesPhase.run();
+  }
 
+  /**
+   * Parking of vehicles.
+   * <p>
+   * Default: Sends idle vehicles to parking positions.
+   * </p>
+   */
+  protected void parkVehicles() {
+    parkIdleVehiclesPhase.run();
+  }
 }

@@ -63,6 +63,7 @@ public class LoopbackCommunicationAdapterFactory
   }
 
   @Override
+  @Deprecated
   public String getAdapterDescription() {
     return ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle")
         .getString("AdapterFactoryDescription");

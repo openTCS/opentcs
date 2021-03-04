@@ -27,9 +27,14 @@ public interface VehicleCommAdapterFactory
    * choosing between multiple factories/adapter types for a vehicle.
    *
    * @return A string describing the factory/the adapters created.
+   * @deprecated Implement and use {@link #getDescription()} instead.
    */
   @Nonnull
-  String getAdapterDescription();
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  default String getAdapterDescription() {
+    return getClass().getName();
+  }
 
   /**
    * Returns a {@link VehicleCommAdapterDescription} for the factory/the adapters provided.

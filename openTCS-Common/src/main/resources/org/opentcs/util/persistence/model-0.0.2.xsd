@@ -364,6 +364,8 @@
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
+    <xsd:attribute name="type"
+                   type="xsd:string"/>
   </xsd:complexType>
   
   <!-- Data type for group elements -->

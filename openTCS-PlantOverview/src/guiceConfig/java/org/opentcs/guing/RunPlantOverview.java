@@ -12,14 +12,15 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
+import org.opentcs.configuration.ConfigurationBindingProvider;
+import org.opentcs.configuration.cfg4j.Cfg4jConfigurationBindingProvider;
 import org.opentcs.customizations.ConfigurableInjectionModule;
-import org.opentcs.customizations.ConfigurationBindingProvider;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.application.PlantOverviewStarter;
-import org.opentcs.guing.configuration.DefaultConfigurationBindingProvider;
 import org.opentcs.util.Environment;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class RunPlantOverview {
    * @return The custom configuration module.
    */
   private static Module customConfigurationModule() {
-    ConfigurationBindingProvider bindingProvider = new DefaultConfigurationBindingProvider();
+    ConfigurationBindingProvider bindingProvider = configurationBindingProvider();
     ConfigurableInjectionModule plantOverviewInjectionModule
         = new DefaultPlantOverviewInjectionModule();
     plantOverviewInjectionModule.setConfigBindingProvider(bindingProvider);
@@ -91,5 +92,22 @@ public class RunPlantOverview {
       registeredModules.add(module);
     }
     return registeredModules;
+  }
+
+  private static ConfigurationBindingProvider configurationBindingProvider() {
+    return new Cfg4jConfigurationBindingProvider(
+        Paths.get(System.getProperty("opentcs.base", "."),
+                  "config",
+                  "opentcs-plantoverview-defaults-baseline.properties")
+            .toAbsolutePath(),
+        Paths.get(System.getProperty("opentcs.base", "."),
+                  "config",
+                  "opentcs-plantoverview-defaults-custom.properties")
+            .toAbsolutePath(),
+        Paths.get(System.getProperty("opentcs.home", "."),
+                  "config",
+                  "opentcs-plantoverview.properties")
+            .toAbsolutePath()
+    );
   }
 }

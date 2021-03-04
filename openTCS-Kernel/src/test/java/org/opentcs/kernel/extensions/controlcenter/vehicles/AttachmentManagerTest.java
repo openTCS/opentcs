@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -106,6 +105,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldAttachAdapterToVehicle() {
     VehicleCommAdapter commAdapter = new SimpleCommAdapter(VEHICLE_1);
     when(commAdapterFactory.getAdapterFor(VEHICLE_1)).thenReturn(commAdapter);
@@ -126,6 +126,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldDetachAdapterFromVehicle() {
     VehicleCommAdapter commAdapter = new SimpleCommAdapter(VEHICLE_1);
     when(commAdapterFactory.getAdapterFor(VEHICLE_1)).thenReturn(commAdapter);
@@ -181,12 +182,6 @@ public class AttachmentManagerTest {
     }
 
     @Override
-    @Deprecated
-    protected List<org.opentcs.drivers.vehicle.VehicleCommAdapterPanel> createAdapterPanels() {
-      return new ArrayList<>();
-    }
-
-    @Override
     protected void connectVehicle() {
     }
 
@@ -211,11 +206,6 @@ public class AttachmentManagerTest {
 
   private class SimpleCommAdapterFactory
       implements VehicleCommAdapterFactory {
-
-    @Override
-    public String getAdapterDescription() {
-      return "";
-    }
 
     @Override
     public boolean providesAdapterFor(Vehicle vehicle) {

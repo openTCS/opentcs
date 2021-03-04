@@ -7,17 +7,16 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
-import java.util.HashSet;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;
@@ -42,12 +41,13 @@ public class DefaultParkingPositionSupplier
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service.
+   * @param plantModelService The plant model service.
    * @param router A router for computing travel costs to parking positions.
    */
   @Inject
-  public DefaultParkingPositionSupplier(TCSObjectService objectService, Router router) {
-    super(objectService, router);
+  public DefaultParkingPositionSupplier(InternalPlantModelService plantModelService,
+                                        Router router) {
+    super(plantModelService, router);
   }
 
   @Override
@@ -69,14 +69,14 @@ public class DefaultParkingPositionSupplier
     // If yes, return either that (if it's with the available points) or none.
     String assignedParkingPosName = vehicle.getProperty(PROPKEY_ASSIGNED_PARKING_POSITION);
     if (assignedParkingPosName != null) {
-      return Optional.ofNullable(selectPointWithName(assignedParkingPosName, parkingPosCandidates));
+      return Optional.ofNullable(pickPointWithName(assignedParkingPosName, parkingPosCandidates));
     }
 
     // Check if the vehicle has a preferred parking position.
     // If yes, and if it's with the available points, return that.
     String preferredParkingPosName = vehicle.getProperty(PROPKEY_PREFERRED_PARKING_POSITION);
     if (preferredParkingPosName != null) {
-      Point preferredPoint = selectPointWithName(preferredParkingPosName, parkingPosCandidates);
+      Point preferredPoint = pickPointWithName(preferredParkingPosName, parkingPosCandidates);
       if (preferredPoint != null) {
         return Optional.of(preferredPoint);
       }
@@ -87,11 +87,11 @@ public class DefaultParkingPositionSupplier
               nearestPoint,
               vehicle.getName(),
               parkingPosCandidates);
-    return Optional.ofNullable(nearestPoint(vehicle, parkingPosCandidates));
+    return Optional.ofNullable(nearestPoint);
   }
 
   @Nullable
-  private Point selectPointWithName(String name, Set<Point> points) {
+  private Point pickPointWithName(String name, Set<Point> points) {
     return points.stream()
         .filter(point -> name.equals(point.getName()))
         .findAny()
@@ -102,34 +102,43 @@ public class DefaultParkingPositionSupplier
     // Find out which points are destination points of the current routes of
     // all vehicles, and keep them. (Multiple lookups ahead.)
     Set<Point> targetedPoints = getRouter().getTargetedPoints();
+    Set<Point> parkingPositions
+        = getPlantModelService().fetchObjects(Point.class, point -> point.isParkingPosition());
 
-    Set<Point> parkingPosCandidates = new HashSet<>();
-    for (Map.Entry<Point, Set<Point>> curEntry : getParkingPositions().entrySet()) {
-      // Check if all points that are required to use the parking position are
-      // free (or occupied by the same vehicle that is to be parked) and not
-      // targeted by another vehicle.
-      boolean usable = true;
-      for (Point blockPoint : curEntry.getValue()) {
-        // Get an up-to-date copy of the point from the kernel first.
-        Point blockPointActu = getObjectService().fetchObject(Point.class,
-                                                              blockPoint.getReference());
-        // If the point is occupied by another vehicle, give up.
-        if (blockPointActu.getOccupyingVehicle() != null
-            && !blockPointActu.getOccupyingVehicle().equals(vehicle.getReference())) {
-          usable = false;
-          break;
-        }
-        // If the point is the destination of another vehicle, give up.
-        else if (targetedPoints.contains(blockPointActu)) {
-          usable = false;
-          break;
-        }
-      }
-      // If there's nothing keeping us from using the point, keep.
-      if (usable) {
-        parkingPosCandidates.add(curEntry.getKey());
-      }
+    return parkingPositions.stream()
+        .filter(point -> isPointUnoccupiedFor(point, vehicle, targetedPoints))
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Checks if ALL points within the same block as the given access point are NOT occupied or
+   * targeted by any other vehicle than the given one.
+   *
+   * @param accessPoint The point to be checked.
+   * @param vehicle The vehicle to be checked for.
+   * @param targetedPoints All currently known targeted points.
+   * @return <code>true</code> if, and only if, ALL points within the same block as the given access
+   * point are NOT occupied or targeted by any other vehicle than the given one.
+   */
+  private boolean isPointUnoccupiedFor(Point accessPoint,
+                                       Vehicle vehicle,
+                                       Set<Point> targetedPoints) {
+    return expandPoints(accessPoint).stream()
+        .allMatch(point -> !pointOccupiedOrTargetedByOtherVehicle(point,
+                                                                  vehicle,
+                                                                  targetedPoints));
+  }
+
+  private boolean pointOccupiedOrTargetedByOtherVehicle(Point pointToCheck,
+                                                        Vehicle vehicle,
+                                                        Set<Point> targetedPoints) {
+    if (pointToCheck.getOccupyingVehicle() != null
+        && !pointToCheck.getOccupyingVehicle().equals(vehicle.getReference())) {
+      return true;
     }
-    return parkingPosCandidates;
+    else if (targetedPoints.contains(pointToCheck)) {
+      return true;
+    }
+    return false;
   }
 }

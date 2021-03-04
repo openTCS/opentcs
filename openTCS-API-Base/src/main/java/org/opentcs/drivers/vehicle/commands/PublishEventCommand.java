@@ -17,7 +17,9 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
  * A command to publish {@link VehicleCommAdapterEvent}s.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Is specific to the loopback communication adapter and now implemented and used there.
  */
+@Deprecated
 public class PublishEventCommand
     implements AdapterCommand {
 

@@ -14,7 +14,9 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's energy level.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Is specific to the loopback communication adapter and now implemented and used there.
  */
+@Deprecated
 public class SetEnergyLevelCommand
     implements AdapterCommand {
 

@@ -15,6 +15,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
@@ -37,6 +38,10 @@ public class VehicleProcessModel {
    * A copy of the kernel's Vehicle instance.
    */
   private final Vehicle vehicle;
+  /**
+   * A reference to the vehicle.
+   */
+  private final TCSObjectReference<Vehicle> vehicleReference;
   /**
    * Used for implementing property change events.
    */
@@ -82,7 +87,8 @@ public class VehicleProcessModel {
    * @param attachedVehicle The vehicle attached to the new instance.
    */
   public VehicleProcessModel(@Nonnull Vehicle attachedVehicle) {
-    vehicle = requireNonNull(attachedVehicle, "attachedVehicle");
+    this.vehicle = requireNonNull(attachedVehicle, "attachedVehicle");
+    this.vehicleReference = vehicle.getReference();
   }
 
   public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -105,6 +111,16 @@ public class VehicleProcessModel {
   public Vehicle getVehicle() {
     return vehicle;
   }
+  
+  /**
+   * Returns a reference to the vehicle.
+   * 
+   * @return A reference to the vehicle.
+   */
+  @Nonnull
+  public TCSObjectReference<Vehicle> getVehicleReference() {
+    return vehicleReference;
+  }
 
   /**
    * Returns the vehicle's name.
@@ -113,7 +129,7 @@ public class VehicleProcessModel {
    */
   @Nonnull
   public String getName() {
-    return vehicle.getName();
+    return vehicleReference.getName();
   }
 
   /**

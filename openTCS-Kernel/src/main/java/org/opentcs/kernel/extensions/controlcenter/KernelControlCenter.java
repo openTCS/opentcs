@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public class KernelControlCenter
     extends JFrame
     implements KernelExtension,

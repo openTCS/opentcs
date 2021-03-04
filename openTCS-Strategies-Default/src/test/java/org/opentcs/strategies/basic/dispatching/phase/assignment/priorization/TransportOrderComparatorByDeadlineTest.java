@@ -34,10 +34,11 @@ public class TransportOrderComparatorByDeadlineTest {
 
   @Test
   public void sortEarlyDeadlinesUp() {
+    Instant creationTime = Instant.now();
     TransportOrder plainOrder = new TransportOrder("Some order ", new ArrayList<>());
-    TransportOrder order1 = plainOrder.withDeadline(Instant.now());
-    TransportOrder order2 = plainOrder.withDeadline(Instant.now().plus(2, ChronoUnit.HOURS));
-    TransportOrder order3 = plainOrder.withDeadline(Instant.now().plus(1, ChronoUnit.HOURS));
+    TransportOrder order1 = plainOrder.withDeadline(creationTime);
+    TransportOrder order2 = plainOrder.withDeadline(creationTime.plus(2, ChronoUnit.HOURS));
+    TransportOrder order3 = plainOrder.withDeadline(creationTime.plus(1, ChronoUnit.HOURS));
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(order1);

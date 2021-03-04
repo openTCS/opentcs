@@ -12,6 +12,7 @@ import java.util.Set;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
+import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.plantoverview.PropertySuggestions;
 
 /**
@@ -29,6 +30,7 @@ public class DefaultPropertySuggestions
    * Creates a new instance.
    */
   public DefaultPropertySuggestions() {
+    keySuggestions.add(Scheduler.PROPKEY_BLOCK_ENTRY_DIRECTION);
     keySuggestions.add(Router.PROPKEY_ROUTING_GROUP);
     keySuggestions.add(Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION);
     keySuggestions.add(Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION);
@@ -40,7 +42,6 @@ public class DefaultPropertySuggestions
     keySuggestions.add(LoopbackAdapterConstants.PROPKEY_UNLOAD_OPERATION);
     keySuggestions.add(LoopbackAdapterConstants.PROPKEY_ACCELERATION);
     keySuggestions.add(LoopbackAdapterConstants.PROPKEY_DECELERATION);
-
   }
 
   @Override

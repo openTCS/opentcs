@@ -15,8 +15,6 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import static org.opentcs.util.Assertions.checkArgument;
-import org.opentcs.util.configuration.ConfigurationEntry;
-import org.opentcs.util.configuration.ConfigurationPrefix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,32 +50,53 @@ public class ConfigDocGenerator {
     for (int i = 1; i < args.length; i++) {
       Class<?> clazz = ConfigDocGenerator.class.getClassLoader().loadClass(args[1]);
 
-      checkArgument(clazz.isAnnotationPresent(ConfigurationPrefix.class),
-                    "Missing prefix annotation in %s.",
-                    clazz.getName());
-
       SortedSet<Entry> configurationEntries = new TreeSet<>();
       for (Method method : clazz.getMethods()) {
-        if (!method.isAnnotationPresent(ConfigurationEntry.class)) {
-          continue;
-        }
-
-        ConfigurationEntry annotation = method.getAnnotation(ConfigurationEntry.class);
-        configurationEntries.add(new Entry(method.getName(),
-                                           annotation.type(),
-                                           annotation.description(),
-                                           annotation.orderKey())
-        );
+        configurationEntries.add(extractEntry(method));
       }
 
       checkArgument(!configurationEntries.isEmpty(),
                     "No configuration keys in {}.",
                     clazz.getName());
 
-      generateFile(args[0],
-                   clazz.getAnnotation(ConfigurationPrefix.class).value(),
-                   configurationEntries);
+      generateFile(args[0], extractPrefix(clazz), configurationEntries);
     }
+  }
+
+  @SuppressWarnings("deprecation")
+  private static String extractPrefix(Class<?> clazz) {
+    org.opentcs.configuration.ConfigurationPrefix newAnnotation
+        = clazz.getAnnotation(org.opentcs.configuration.ConfigurationPrefix.class);
+    if (newAnnotation != null) {
+      return newAnnotation.value();
+    }
+    org.opentcs.util.configuration.ConfigurationPrefix oldAnnotation
+        = clazz.getAnnotation(org.opentcs.util.configuration.ConfigurationPrefix.class);
+    if (oldAnnotation != null) {
+      return oldAnnotation.value();
+    }
+    throw new IllegalArgumentException("Missing prefix annotation at class " + clazz.getName());
+  }
+
+  @SuppressWarnings("deprecation")
+  private static Entry extractEntry(Method method) {
+    org.opentcs.configuration.ConfigurationEntry newAnnotation
+        = method.getAnnotation(org.opentcs.configuration.ConfigurationEntry.class);
+    if (newAnnotation != null) {
+      return new Entry(method.getName(),
+                       newAnnotation.type(),
+                       newAnnotation.description(),
+                       newAnnotation.orderKey());
+    }
+    org.opentcs.util.configuration.ConfigurationEntry oldAnnotation
+        = method.getAnnotation(org.opentcs.util.configuration.ConfigurationEntry.class);
+    if (oldAnnotation != null) {
+      return new Entry(method.getName(),
+                       oldAnnotation.type(),
+                       oldAnnotation.description(),
+                       oldAnnotation.orderKey());
+    }
+    throw new IllegalArgumentException("Missing entry annotation at method " + method.getName());
   }
 
   /**

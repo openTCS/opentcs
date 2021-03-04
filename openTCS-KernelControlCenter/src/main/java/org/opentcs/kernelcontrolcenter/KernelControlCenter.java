@@ -32,8 +32,8 @@ import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
 import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
 import static org.opentcs.common.PortalManager.ConnectionState.DISCONNECTED;
+import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.ControlCenterPanel;
-import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.customizations.controlcenter.ActiveInModellingMode;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class KernelControlCenter
     extends JFrame
-    implements KernelExtension,
+    implements Lifecycle,
                EventHandler {
 
   /**

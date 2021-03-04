@@ -10,7 +10,6 @@ package org.opentcs.kernel;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
 import java.io.File;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -19,9 +18,6 @@ import javax.inject.Singleton;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.SslParameterSet;
-import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.common.LoggingScheduledThreadPoolExecutor;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -41,16 +37,6 @@ import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
-import org.opentcs.kernel.extensions.rmi.KernelRemoteService;
-import org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration;
-import org.opentcs.kernel.extensions.rmi.StandardRemoteDispatcherService;
-import org.opentcs.kernel.extensions.rmi.StandardRemoteNotificationService;
-import org.opentcs.kernel.extensions.rmi.StandardRemotePlantModelService;
-import org.opentcs.kernel.extensions.rmi.StandardRemoteRouterService;
-import org.opentcs.kernel.extensions.rmi.StandardRemoteSchedulerService;
-import org.opentcs.kernel.extensions.rmi.StandardRemoteTransportOrderService;
-import org.opentcs.kernel.extensions.rmi.StandardRemoteVehicleService;
-import org.opentcs.kernel.extensions.rmi.UserManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
 import org.opentcs.kernel.persistence.XMLModel002Builder;
@@ -64,7 +50,6 @@ import org.opentcs.kernel.services.StandardSchedulerService;
 import org.opentcs.kernel.services.StandardTCSObjectService;
 import org.opentcs.kernel.services.StandardTransportOrderService;
 import org.opentcs.kernel.services.StandardVehicleService;
-import org.opentcs.kernel.util.RegistryProvider;
 import org.opentcs.kernel.vehicles.DefaultVehicleControllerPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
@@ -77,8 +62,6 @@ import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.SimpleEventBus;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Guice module for the openTCS kernel application.
@@ -87,11 +70,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultKernelInjectionModule
     extends KernelInjectionModule {
-
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultKernelInjectionModule.class);
 
   @Override
   protected void configure() {
@@ -123,8 +101,6 @@ public class DefaultKernelInjectionModule
 
     configureVehicleControllers();
 
-    bind(UserManager.class)
-        .in(Singleton.class);
     bind(AttachmentManager.class)
         .in(Singleton.class);
     bind(VehicleEntryPool.class)
@@ -137,9 +113,14 @@ public class DefaultKernelInjectionModule
 
     configureKernelStatesDependencies();
     configureKernelStarterDependencies();
-    configureStandardRemoteKernelDependencies();
-    configureSocketConnections();
+    configureSslParameters();
     configureKernelServicesDependencies();
+
+    // Ensure all of these binders are initialized.
+    extensionsBinderAllModes();
+    extensionsBinderModelling();
+    extensionsBinderOperating();
+    vehicleCommAdaptersBinder();
   }
 
   private void configureKernelServicesDependencies() {
@@ -169,16 +150,6 @@ public class DefaultKernelInjectionModule
 
     bind(StandardSchedulerService.class).in(Singleton.class);
     bind(SchedulerService.class).to(StandardSchedulerService.class);
-
-    Multibinder<KernelRemoteService> remoteServices
-        = Multibinder.newSetBinder(binder(), KernelRemoteService.class);
-    remoteServices.addBinding().to(StandardRemotePlantModelService.class);
-    remoteServices.addBinding().to(StandardRemoteTransportOrderService.class);
-    remoteServices.addBinding().to(StandardRemoteVehicleService.class);
-    remoteServices.addBinding().to(StandardRemoteNotificationService.class);
-    remoteServices.addBinding().to(StandardRemoteRouterService.class);
-    remoteServices.addBinding().to(StandardRemoteDispatcherService.class);
-    remoteServices.addBinding().to(StandardRemoteSchedulerService.class);
   }
 
   private void configureVehicleControllers() {
@@ -251,42 +222,16 @@ public class DefaultKernelInjectionModule
                                                    KernelApplicationConfiguration.class));
   }
 
-  private void configureSocketConnections() {
-    //Load and bind the encryption of the connections used within the kernel
+  private void configureSslParameters() {
     SslConfiguration configuration
         = getConfigBindingProvider().get(SslConfiguration.PREFIX,
                                          SslConfiguration.class);
-    RmiKernelInterfaceConfiguration rmiConfig
-        = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
-                                         RmiKernelInterfaceConfiguration.class);
     SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
                                                       new File(configuration.keystoreFile()),
                                                       configuration.keystorePassword(),
                                                       new File(configuration.truststoreFile()),
                                                       configuration.truststorePassword());
     bind(SslParameterSet.class).toInstance(sslParamSet);
-
-    SocketFactoryProvider provider;
-    if (rmiConfig.useSsl()) {
-      provider = new SecureSocketFactoryProvider(sslParamSet);
-    }
-    else {
-      LOG.warn("SSL encryption disabled, connections will not be secured!");
-      provider = new NullSocketFactoryProvider();
-    }
-    bind(SocketFactoryProvider.class).toInstance(provider);
-  }
-
-  private void configureStandardRemoteKernelDependencies() {
-    bind(RegistryProvider.class).in(Singleton.class);
-
-    //Load and bind the ports for the rmi connection
-    RmiKernelInterfaceConfiguration rmiConfiguration
-        = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
-                                         RmiKernelInterfaceConfiguration.class);
-    bind(RmiKernelInterfaceConfiguration.class)
-        .toInstance(rmiConfiguration);
-
   }
 
   private void configureKernelExecutor() {

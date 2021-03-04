@@ -8,7 +8,6 @@
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
 import java.time.Instant;
-import static java.time.Instant.now;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,10 +70,11 @@ public class CompositeOrderComparatorTest {
     Mockito.when(configuration.orderPriorities())
         .thenReturn(new LinkedList<>());
     comparator = new CompositeOrderComparator(configuration, availableComparators);
-
-    TransportOrder candidate1 = candidateWithNameAndCreationtime("AA", now().minusSeconds(1));
-    TransportOrder candidate2 = candidateWithNameAndCreationtime("CC", now().minusSeconds(2));
-    TransportOrder candidate3 = candidateWithNameAndCreationtime("BB", now().minusSeconds(2));
+    
+    Instant creationTime = Instant.now();
+    TransportOrder candidate1 = candidateWithNameAndCreationtime("AA", creationTime.minusSeconds(1));
+    TransportOrder candidate2 = candidateWithNameAndCreationtime("CC", creationTime.minusSeconds(2));
+    TransportOrder candidate3 = candidateWithNameAndCreationtime("BB", creationTime.minusSeconds(2));
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(candidate1);
@@ -98,22 +98,23 @@ public class CompositeOrderComparatorTest {
 
     comparator = new CompositeOrderComparator(configuration, availableComparators);
 
+    Instant currentTime = Instant.now();
     TransportOrder candidate1
         = candidateWithNameCreationtimeAndDeadline("AA",
-                                                   now().minusSeconds(2),//Creation
-                                                   now().plusSeconds(2));//Deadline
+                                                   currentTime.minusSeconds(2),//Creation
+                                                   currentTime.plusSeconds(2));//Deadline
     TransportOrder candidate2
         = candidateWithNameCreationtimeAndDeadline("CC",
-                                                   now().minusSeconds(2),//Creation
-                                                   now().plusSeconds(1));//Deadline
+                                                   currentTime.minusSeconds(2),//Creation
+                                                   currentTime.plusSeconds(1));//Deadline
     TransportOrder candidate3
         = candidateWithNameCreationtimeAndDeadline("BB",
-                                                   now().minusSeconds(2),//Creation
-                                                   now().plusSeconds(2));//Deadline
+                                                   currentTime.minusSeconds(2),//Creation
+                                                   currentTime.plusSeconds(2));//Deadline
     TransportOrder candidate4
         = candidateWithNameCreationtimeAndDeadline("DD",
-                                                   now().minusSeconds(1),//Creation
-                                                   now().plusSeconds(5));//Deadline
+                                                   currentTime.minusSeconds(1),//Creation
+                                                   currentTime.plusSeconds(5));//Deadline
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(candidate1);

@@ -79,14 +79,30 @@ To let the router know that it should compute routes for a vehicle separately, s
 === Default scheduler
 
 The default scheduler implements a simple strategy for traffic management.
-It does this by allowing only mutually exclusive use of resources in the plant model (points and paths, primarily):
+It does this by allowing only mutually exclusive use of resources in the plant model (points and paths, primarily), as described below.
 
-* When an allocation of a set of resources for a vehicle is requested, the scheduler expands this set to the effective resource set (in case any resources are part of a block area) and checks whether the allocation can be granted immediately.
-  If yes, the allocation is made.
-  If not, the allocation is queued for later.
-* Whenever resources are freed (e.g. when a vehicle has finished its movement to the next point and the vehicle driver reports this to the kernel), the allocations waiting in the queue are checked (in the order the requests happened).
-  Any allocations that can now be made are made.
-  Allocations that cannot be made are kept waiting.
+==== Allocating resources
+
+When an allocation of a set of resources for a vehicle is requested, the scheduler performs the following checks to determine whether the allocation can be granted immediately:
+
+. Check if the requested resources are generally available for the vehicle.
+. Check if the requested resources are part of a block with the type `SINGLE_VEHICLE_ONLY`.
+  If not, skip this check.
+  If yes, expand the requested resource set to the effective resource set and check if the expanded resources are available for the vehicle.
+. Check if the requested resources are part of a block with the type `SAME_DIRECTION_ONLY`.
+  If not, skip this check.
+  If yes, check if the direction in which the vehicle intends to traverse the block is the same the block is already being traversed by other vehicles.
+
+If all checks succeed, the allocation is made.
+If any of the checks fail, the allocation is queued for later.
+
+==== Freeing resources
+
+Whenever resources are freed (e.g. when a vehicle has finished its movement to the next point and the vehicle driver reports this to the kernel), the allocations waiting in the queue are checked (in the order the requests happened).
+Any allocations that can now be made are made.
+Allocations that cannot be made are kept waiting.
+
+==== Fairness of scheduling
 
 This strategy ensures that resources are used when they are available.
 It does not, however, strictly ensure fairness/avoid starvation:

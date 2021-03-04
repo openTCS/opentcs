@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.type;
 
 import java.util.Arrays;
@@ -73,9 +72,9 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * @param value
    * @param unit
    */
-  public AbstractQuantity(ModelComponent model, double value, U unit, Class<U> unitClass, List<Relation<U>> relations) {
+  public AbstractQuantity(ModelComponent model, double value, U unit, Class<U> unitClass,
+                          List<Relation<U>> relations) {
     super(model);
-    setValue(value);
     fUnit = requireNonNull(unit, "unit");
     fUnitClass = requireNonNull(unitClass, "unitClass");
     fPossibleUnits = Arrays.asList(unitClass.getEnumConstants());
@@ -83,6 +82,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
     fIsInteger = false;
     fIsUnsigned = false;
     initValidRange();
+    setValue(value);
   }
 
   /**
@@ -243,8 +243,9 @@ public abstract class AbstractQuantity<U extends Enum<U>>
     U upperUnit = fPossibleUnits.get(upperIndex);
 
     Relation<U> relation = new Relation<>(lowerUnit, upperUnit, relationValue);
-
     Relation.Operation operation = relation.getOperation(fUnit, unit);
+
+    fUnit = unit;
 
     switch (operation) {
       case DIVISION:
@@ -257,7 +258,6 @@ public abstract class AbstractQuantity<U extends Enum<U>>
         throw new IllegalArgumentException("Unhandled operation: " + operation);
     }
 
-    fUnit = unit;
   }
 
   /**
@@ -280,6 +280,21 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    */
   public boolean isPossibleUnit(U unit) {
     return fPossibleUnits.contains(unit);
+  }
+
+  /**
+   * Checks if the given string is a valid/possible unit.
+   *
+   * @param unitString The unit as a string.
+   * @return {@code true}, if the given string is a valid/possible unit, otherwise {@code false}.
+   */
+  public boolean isPossibleUnit(String unitString) {
+    for (U unit : fPossibleUnits) {
+      if (Objects.equals(unitString, unit.toString())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -309,8 +324,9 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       }
     }
 
-    setValue(value);
     fUnit = unit;
+
+    setValue(value);
 
     if (fIsUnsigned) {
       setValue(Math.abs(value));

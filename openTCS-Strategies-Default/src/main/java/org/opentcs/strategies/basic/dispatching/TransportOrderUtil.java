@@ -354,6 +354,9 @@ public class TransportOrderUtil
       if (!order.getState().isFinalState()) {
         updateTransportOrderState(order.getReference(),
                                   TransportOrder.State.FAILED);
+        // The order was not processed by any vehicle but there still might be a reservation for 
+        // that order.
+        orderReservationPool.removeReservation(order.getReference());
       }
     }
     else {

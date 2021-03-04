@@ -146,14 +146,24 @@ The loopback driver simulates the vehicle's movement to the destinations and the
 ==== Withdrawing transport orders using the plant overview client
 
 A transport order can be withdrawn from a vehicle that is currently processing it.
-This can be done by right-clicking on the respective vehicle in the plant overview client, selecting menu:Context menu[Withdraw transport order] and then selecting one of the following actions:
+When withdrawing a transport order, its processing will be cancelled and the vehicle (driver) will not receive any further movement commands for it.
+A withdrawal can be issued by right-clicking on the respective vehicle in the plant overview client, selecting menu:Context menu[Withdraw transport order] and then selecting one of the following actions:
 
 * '...and let the vehicle finish movement':
-  The vehicle will process any movement orders it has already received and will stop after processing them.
+  The vehicle will process any movement commands it has already received and will stop after processing them.
+  This type of withdrawal is what should normally be used for withdrawing a transport order from a vehicle.
 * '...and stop the vehicle immediately':
-  The vehicle is asked to discard all movement orders it has already received and to stop immediately/as soon as possible.
+  In addition to what happens in the case of a "normal" withdrawal, the vehicle is also asked to discard all movement commands it has already received.
+  (This _should_ make it come to a halt very soon in most cases.
+  However, if and how far exactly it will still move highly depends on the vehicle's type, its current situation and how communication between openTCS and this type of vehicle works.)
+  Furthermore, all reservations for resources on the withdrawn route (i.e. the next paths and points) except for the vehicle's currently reported position are cancelled, making these resources available to other vehicles.
+  This "immediate" withdrawal should be used with great care and usually only when the vehicle is currently _not moving_!
 
-When withdrawing a transport order, its processing will be cancelled and the vehicle (driver) will not receive any further movement orders for it.
+CAUTION: Since an "immediate" withdrawal frees paths and points previously reserved for the vehicle, it is possible that other vehicles acquire and use these resources themselves right after the withdrawal.
+At the same time, if the vehicle was moving when the withdrawal was issued, it may - depending on its type - not have come to a halt, yet, and still move along the route it had previously been ordered to follow.
+As the latter movement is not coordinated by openTCS, this can result in a _collision or deadlock_ between the vehicles!
+For this reason, it is highly recommended to issue an "immediate" withdrawal only if it is required for some reason, and only if the vehicle has already come to a halt on a position in the driving course or if other vehicles need not be taken into account.
+In all other cases, the "normal" withdrawal should be used.
 
 Processing of a withdrawn transport order _cannot_ be resumed later.
 To resume a transportation process that was interrupted by withdrawing a transport order, you need to create a new transport order, which may, of course, contain the same destinations as the withdrawn one.

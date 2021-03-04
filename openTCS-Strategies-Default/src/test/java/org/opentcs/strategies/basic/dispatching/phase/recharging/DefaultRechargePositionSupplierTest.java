@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
@@ -36,9 +36,9 @@ import org.opentcs.data.order.DriveOrder.Destination;
 public class DefaultRechargePositionSupplierTest {
 
   /**
-   * The object service used by the recharge strategy.
+   * The plant model service used by the recharge strategy.
    */
-  private TCSObjectService objectService;
+  private InternalPlantModelService plantModelService;
   /**
    * The router used by the recharge strategy.
    */
@@ -50,9 +50,9 @@ public class DefaultRechargePositionSupplierTest {
 
   @Before
   public void setUp() {
-    objectService = mock(TCSObjectService.class);
+    plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
-    rechargePosSupplier = new DefaultRechargePositionSupplier(objectService, router);
+    rechargePosSupplier = new DefaultRechargePositionSupplier(plantModelService, router);
   }
 
   @After
@@ -81,13 +81,13 @@ public class DefaultRechargePositionSupplierTest {
 
     locationAccessPoint = locationAccessPoint.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
 
-    when(objectService.fetchObjects(Location.class))
+    when(plantModelService.fetchObjects(Location.class))
         .thenReturn(Collections.singleton(location));
-    when(objectService.fetchObject(LocationType.class, rechargeLocType.getReference()))
+    when(plantModelService.fetchObject(LocationType.class, rechargeLocType.getReference()))
         .thenReturn(rechargeLocType);
-    when(objectService.fetchObject(Point.class, currentVehiclePoint.getReference()))
+    when(plantModelService.fetchObject(Point.class, currentVehiclePoint.getReference()))
         .thenReturn(currentVehiclePoint);
-    when(objectService.fetchObject(Point.class, locationAccessPoint.getReference()))
+    when(plantModelService.fetchObject(Point.class, locationAccessPoint.getReference()))
         .thenReturn(locationAccessPoint);
 
     rechargePosSupplier.initialize();
@@ -103,7 +103,7 @@ public class DefaultRechargePositionSupplierTest {
     Vehicle vehicle = new Vehicle("Some vehicle")
         .withCurrentPosition(currentVehiclePoint.getReference());
 
-    when(objectService.fetchObject(Point.class, currentVehiclePoint.getReference()))
+    when(plantModelService.fetchObject(Point.class, currentVehiclePoint.getReference()))
         .thenReturn(currentVehiclePoint);
 
     rechargePosSupplier.initialize();
@@ -134,13 +134,13 @@ public class DefaultRechargePositionSupplierTest {
 
     locationAccessPoint = locationAccessPoint.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
 
-    when(objectService.fetchObjects(Location.class))
+    when(plantModelService.fetchObjects(Location.class))
         .thenReturn(Collections.singleton(location));
-    when(objectService.fetchObject(LocationType.class, rechargeLocType.getReference()))
+    when(plantModelService.fetchObject(LocationType.class, rechargeLocType.getReference()))
         .thenReturn(rechargeLocType);
-    when(objectService.fetchObject(Point.class, currentVehiclePoint.getReference()))
+    when(plantModelService.fetchObject(Point.class, currentVehiclePoint.getReference()))
         .thenReturn(currentVehiclePoint);
-    when(objectService.fetchObject(Point.class, locationAccessPoint.getReference()))
+    when(plantModelService.fetchObject(Point.class, locationAccessPoint.getReference()))
         .thenReturn(locationAccessPoint);
 
     rechargePosSupplier.initialize();

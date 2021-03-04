@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class ReservationEntry {
+public class ReservationEntry {
 
   /**
    * This class's Logger.

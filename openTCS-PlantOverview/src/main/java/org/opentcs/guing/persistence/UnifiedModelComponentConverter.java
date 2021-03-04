@@ -317,6 +317,10 @@ public class UnifiedModelComponentConverter {
 
     block.setName(blockModel.getPropertyName().getText());
 
+    BlockModel.BlockType blockModelType
+        = (BlockModel.BlockType) blockModel.getPropertyType().getValue();
+    block.setType(blockModelType.name());
+
     for (String element : blockModel.getPropertyElements().getItems()) {
       MemberTO member = new MemberTO();
       member.setName(element);
@@ -778,6 +782,8 @@ public class UnifiedModelComponentConverter {
 
     model.getPropertyName().setText(blockTO.getName());
 
+    model.getPropertyType().setValue(convertBlockType(blockTO));
+
     for (MemberTO member : blockTO.getMembers()) {
       model.getPropertyElements().addItem(member.getName());
     }
@@ -799,6 +805,10 @@ public class UnifiedModelComponentConverter {
     }
 
     return model;
+  }
+
+  private BlockModel.BlockType convertBlockType(BlockTO blockTO) {
+    return BlockModel.BlockType.valueOf(blockTO.getType());
   }
 
   public StaticRouteModel convertStaticRouteTO(StaticRouteTO staticRouteTO,

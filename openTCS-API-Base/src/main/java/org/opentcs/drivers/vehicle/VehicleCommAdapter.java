@@ -7,6 +7,7 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import javax.annotation.Nonnull;
@@ -136,7 +137,9 @@ public interface VehicleCommAdapter
   @Nonnull
   @Deprecated
   @ScheduledApiChange(when = "5.0")
-  List<VehicleCommAdapterPanel> getAdapterPanels();
+  default List<VehicleCommAdapterPanel> getAdapterPanels() {
+    return new ArrayList<>();
+  }
 
   /**
    * Checks if the vehicle would be able to process the given sequence of operations, taking into

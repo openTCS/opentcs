@@ -92,4 +92,13 @@ public class PercentPropertyTest {
     assertEquals(10.0, pp.getValue());
     assertEquals(PercentProperty.Unit.PERCENT, pp.getUnit());
   }
+  
+  @Test
+  public void percentPropertyCharactersInValue() {
+    //Values mixed with text not allowed, changes musnt be saved to the property
+    textField.setText("55asd.5 %");
+    quantityCellEditor.getCellEditorValue();
+    assertEquals(10.0, pp.getValue());
+    assertEquals(PercentProperty.Unit.PERCENT, pp.getUnit());
+  }
 }

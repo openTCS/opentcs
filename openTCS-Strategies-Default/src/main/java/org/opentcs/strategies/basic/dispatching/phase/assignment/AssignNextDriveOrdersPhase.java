@@ -20,7 +20,6 @@ import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.DRIVE_ORDER_FINISHED;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.RerouteTask;
-import org.opentcs.strategies.basic.dispatching.RerouteUtil;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

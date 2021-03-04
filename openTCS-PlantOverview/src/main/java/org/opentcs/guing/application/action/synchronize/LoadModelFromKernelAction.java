@@ -10,8 +10,11 @@ package org.opentcs.guing.application.action.synchronize;
 
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.AbstractAction;
+import javax.swing.SwingUtilities;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -24,20 +27,35 @@ public class LoadModelFromKernelAction
 
   public static final String ID = "synchronize.loadModelFromKernel";
 
+  /**
+   * The OpenTCS view.
+   */
   private final OpenTCSView openTCSView;
+  /**
+   * The drawing editor.
+   */
+  private final OpenTCSDrawingEditor openTCSDrawingEditor;
 
   /**
    * Creates a new instance.
    *
    * @param openTCSView The openTCS view.
+   * @param openTCSDrawingEditor The editor and coordinator of drawings.
    */
-  public LoadModelFromKernelAction(OpenTCSView openTCSView) {
+  @Inject
+  public LoadModelFromKernelAction(OpenTCSView openTCSView,
+                                   OpenTCSDrawingEditor openTCSDrawingEditor) {
     this.openTCSView = requireNonNull(openTCSView);
+    this.openTCSDrawingEditor = requireNonNull(openTCSDrawingEditor);
     ResourceBundleUtil.getBundle().configureAction(this, ID, false);
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
     openTCSView.loadCurrentKernelModel();
+    //All loaded model figures are by default visible, including the vehicles.
+    //However the vehicles must not be shown in modelling mode.
+    //Therefore we hide we vehicles after the model is loaded and the triggered events are finished.
+    SwingUtilities.invokeLater(() -> openTCSDrawingEditor.showVehicles(false));
   }
 }

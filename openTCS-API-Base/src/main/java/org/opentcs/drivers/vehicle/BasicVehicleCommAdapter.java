@@ -9,6 +9,7 @@ package org.opentcs.drivers.vehicle;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -347,7 +348,9 @@ public abstract class BasicVehicleCommAdapter
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0")
-  protected abstract List<VehicleCommAdapterPanel> createAdapterPanels();
+  protected List<VehicleCommAdapterPanel> createAdapterPanels() {
+    return new ArrayList<>();
+  }
 
   /**
    * Initiates a communication channel to the vehicle.

@@ -30,5 +30,4 @@ start /b %JAVA% -enableassertions ^
     -Djava.security.policy="file:%OPENTCS_CONFIGDIR%\java.policy" ^
     -XX:-OmitStackTraceInFastThrow ^
     -classpath "%OPENTCS_CP%" ^
-    -splash:bin/splash-image.gif ^
     org.opentcs.kernel.RunKernel

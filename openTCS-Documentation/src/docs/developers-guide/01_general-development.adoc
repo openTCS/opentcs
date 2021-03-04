@@ -3,8 +3,8 @@
 === System requirements
 
 The openTCS source code is written in Java.
-To compile it, you need a Java Development Kit (JDK) 1.8 or later.
-To run the resulting binaries, you need a Java Runtime Environment (JRE) 1.8 or later.
+To compile it, you need a Java Development Kit (JDK) 1.8.
+To run the resulting binaries, you need a Java Runtime Environment (JRE) 1.8.
 All other required libraries are included in the openTCS distribution or will be downloaded automatically when building it from source code.
 
 === Available artifacts and API compatibility
@@ -33,37 +33,73 @@ Set the version number of the openTCS release you actually want to work with, an
 
 |`opentcs-api-base`
 |Yes
-|Contains the base API for clients and extensions.
-This is what most developer's probably want to use.
+|The base API for clients and extensions.
+This is what most developers probably want to use.
 
 |`opentcs-api-injection`
 |Yes
-|Contains API interfaces and classes used for dependency injection within the kernel and plant overview applications.
+|API interfaces and classes used for dependency injection within the kernel and plant overview applications.
 This is required in integration projects customizing these applications, e.g. adding components like vehicle driver implementations.
 
 |`opentcs-common`
 |No
-|Contains a collection of utility classes used by openTCS components.
+|A collection of utility classes used by openTCS components.
+
+|`opentcs-impl-configuration-cfg4j`
+|No
+|An implementation of the base API's configuration interfaces based on cfg4j.
+
+|`opentcs-kernel-extension-http-services`
+|No
+|A kernel extension providing the web API implementation.
+
+|`opentcs-kernel-extension-rmi-services`
+|No
+|A kernel extension providing the RMI interface implementation.
+
+|`opentcs-kernel-extension-statistics`
+|No
+|A kernel extension providing the statistics collection implementation.
+
+|`opentcs-kernel-extension-tcp-host-interface`
+|No
+|A kernel extension providing the (deprecated) TCP/IP host interface implementation.
+
+|`opentcs-plantoverview-panel-loadgenerator`
+|No
+|The load generator panel implementation for the plant overview.
+
+|`opentcs-plantoverview-panel-resourceallocation`
+|No
+|The resource allocation panel implemenation for the plant overview.
+
+|`opentcs-plantoverview-panel-statistics`
+|No
+|The statistics panel implementation for the plant overview.
+
+|`opentcs-plantoverview-themes-default`
+|No
+|The default themes implementation for the plant overview.
 
 |`opentcs-commadapter-loopback`
 |No
-|Contains a very basic vehicle driver simulating a virtual vehicle.
+|A very basic vehicle driver simulating a virtual vehicle.
 
 |`opentcs-strategies-default`
 |No
-|Contains the default implementations of strategies that are used by the kernel application.
+|The default implementations of strategies that are used by the kernel application.
 
 |`opentcs-kernel`
 |No
-|Contains the kernel application.
+|The kernel application.
 
 |`opentcs-kernelcontrolcenter`
 |No
-|Contains the kernel control center application.
+|The kernel control center application.
 
 |`opentcs-plantoverview`
 |No
-|Contains the plant overview application.
+|The plant overview application.
 
 |===
 

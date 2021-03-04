@@ -2323,6 +2323,7 @@ public class Model {
       members.add(((TCSResource) object).getReference());
     }
     Block newBlock = new Block(to.getName())
+        .withType(to.getType())
         .withMembers(members)
         .withProperties(to.getProperties());
     objectPool.addObject(newBlock);

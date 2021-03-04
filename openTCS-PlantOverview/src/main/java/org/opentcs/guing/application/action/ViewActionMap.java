@@ -20,7 +20,6 @@ import org.opentcs.guing.application.action.actions.CreateStaticRouteAction;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
 import org.opentcs.guing.application.action.app.AboutAction;
-import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.course.DispatchVehicleAction;
 import org.opentcs.guing.application.action.edit.ClearSelectionAction;
 import org.opentcs.guing.application.action.edit.CopyAction;
@@ -32,6 +31,7 @@ import org.opentcs.guing.application.action.edit.SelectAllAction;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.action.file.LoadModelAction;
+import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.NewModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAsAction;
@@ -69,6 +69,8 @@ public class ViewActionMap
    * @param aboutAction The action to show the about window
    * @param modellingAction The action to switch to modelling mode.
    * @param operatingingAction The action to switch to operating mode.
+   * @param modelPropertiesAction The action to show some model properties.
+   * @param loadModelFromKernelAction The action to load the current kernel model.
    */
   @Inject
   public ViewActionMap(OpenTCSView view,
@@ -82,7 +84,8 @@ public class ViewActionMap
                        AboutAction aboutAction,
                        SwitchToModellingAction modellingAction,
                        SwitchToOperatingAction operatingingAction,
-                       ModelPropertiesAction modelPropertiesAction) {
+                       ModelPropertiesAction modelPropertiesAction,
+                       LoadModelFromKernelAction loadModelFromKernelAction) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(actionFactory, "actionFactory");
@@ -105,7 +108,7 @@ public class ViewActionMap
 
     // --- Menu Synchronize ---
     put(PersistInKernelAction.ID, new PersistInKernelAction(view));
-    put(LoadModelFromKernelAction.ID, new LoadModelFromKernelAction(view));
+    put(LoadModelFromKernelAction.ID, loadModelFromKernelAction);
     put(SwitchToModellingAction.ID, modellingAction);
     put(SwitchToOperatingAction.ID, operatingingAction);
 

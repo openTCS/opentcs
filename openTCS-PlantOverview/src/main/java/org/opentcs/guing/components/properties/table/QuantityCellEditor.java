@@ -17,7 +17,6 @@ import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
-import org.slf4j.LoggerFactory;
 
 /**
  * Ein CellEditor fï¿½r Attribute vom Typ {
@@ -70,60 +69,63 @@ public class QuantityCellEditor
    *
    * @param text
    */
-  protected void extractQuantity(String text)
-      throws IllegalArgumentException {
-    int blankIndex = text.indexOf(' ');
+  protected void extractQuantity(String text) {
 
+    int blankIndex = text.indexOf(' ');
+    // No space means wrong format ( Number[SPACE]Unit )
     if (blankIndex == -1) {
-      userMessageHelper.showMessageDialog(
-          ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorMsg"),
-          ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorTitle"),
-          UserMessageHelper.Type.ERROR);
+      showCellEditingErrorMsg("QuantityCellEditor.errorFormat");
       return;
     }
 
     String valueString = text.substring(0, blankIndex);
     String unitString = text.substring(blankIndex + 1);
 
-    if (property().getModel() instanceof LayoutModel) {
-      if (valueString.equals("0.0") || valueString.equals("0")) {
-        userMessageHelper.showMessageDialog(
-            ResourceBundleUtil.getBundle().getString("VisualLayout.scaleInvalid.msg"),
-            ResourceBundleUtil.getBundle().getString("VisualLayout.scaleInvalid.title"),
-            UserMessageHelper.Type.ERROR);
-        return;
-      }
+    // Check if unitString is a valid unit
+    if (!property().isPossibleUnit(unitString)) {
+      showCellEditingErrorMsg("QuantityCellEditor.errorUnit", property().getPossibleUnits());
+      return;
     }
 
+    double newValue;
     try {
-      double newValue = Double.parseDouble(valueString);
-      if (!property().getValidRange().isValueValid(newValue)) {
-        return;
-      }
+      newValue = Double.parseDouble(valueString);
+    }
+    catch (NumberFormatException e) {
+      showCellEditingErrorMsg("QuantityCellEditor.errorNumber");
+      return;
+    }
 
+    // Check if value is inside the valid range
+    if (!property().getValidRange().isValueValid(newValue)) {
+      showCellEditingErrorMsg("QuantityCellEditor.errorRange",
+                              property().getValidRange().getMin(),
+                              property().getValidRange().getMax());
+      return;
+    }
+
+    // For the layoutModel the Scaling cannot be 0
+    if (property().getModel() instanceof LayoutModel && newValue == 0) {
+      showCellEditingErrorMsg("VisualLayout.scaleInvalid.msg");
+      return;
+    }
+
+    // Check if property will change
+    try {
       double oldValue = (double) property().getValue();
       String oldUnit = property().getUnit().toString();
-      property().setValueAndUnit(newValue, unitString);
 
       if (newValue != oldValue || !unitString.equals(oldUnit)) {
         markProperty();
       }
     }
-    catch (NumberFormatException e) {
-      // String remains "<different values>"
-      property().setValue(text);
-    }
-    catch (IllegalArgumentException e) {
-      // Caught if an illegal unit string is entered by the user.
-      // TODO Let the user know.
-      return;
-    }
     catch (ClassCastException e) {
-      // Change from "<different values>" to valid value
-      double newValue = Double.parseDouble(valueString);
-      property().setValueAndUnit(newValue, unitString);
       markProperty();
     }
+
+    // Change property
+    property().setValueAndUnit(newValue, unitString);
+
   }
 
   @Override
@@ -154,13 +156,19 @@ public class QuantityCellEditor
     JTextField textField = (JTextField) getComponent();
     String text = textField.getText();
 
-    try {
-      extractQuantity(text);
-    }
-    catch (IllegalArgumentException e) {
-      LoggerFactory.getLogger(QuantityCellEditor.class).error("Exception", e);
-    }
+    extractQuantity(text);
 
     return property();
+  }
+
+  private void showCellEditingErrorMsg(String resourceName, Object... arguments) {
+    userMessageHelper.showMessageDialog(
+        ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorTitle"),
+        ResourceBundleUtil.getBundle().getFormatted(resourceName, arguments),
+        UserMessageHelper.Type.ERROR);
+  }
+
+  private void showCellEditingErrorMsg(String resourceName) {
+    showCellEditingErrorMsg(resourceName, "");
   }
 }

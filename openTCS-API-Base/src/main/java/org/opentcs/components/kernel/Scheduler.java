@@ -25,6 +25,12 @@ public interface Scheduler
     extends Lifecycle {
 
   /**
+   * The key of a path property defining the direction in which a vehicle is entering a block when
+   * it's taking the path.
+   */
+  String PROPKEY_BLOCK_ENTRY_DIRECTION = "tcs:blockEntryDirection";
+
+  /**
    * Claims a set of resources for a vehicle.
    *
    * @param client The client claiming the resources.

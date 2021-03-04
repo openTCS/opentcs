@@ -21,23 +21,24 @@ public abstract class ConfigurableInjectionModule
   /**
    * A provider for configuration bindings.
    */
-  private ConfigurationBindingProvider configBindingProvider;
+  private org.opentcs.configuration.ConfigurationBindingProvider configBindingProvider;
 
   /**
    * Returns the configuration bindung provider.
-   * 
+   *
    * @return The configuration binding provider.
    */
-  public ConfigurationBindingProvider getConfigBindingProvider() {
+  public org.opentcs.configuration.ConfigurationBindingProvider getConfigBindingProvider() {
     return configBindingProvider;
   }
 
   /**
    * Sets the configuration binding provider.
-   * 
+   *
    * @param configBindingProvider The new configuration binding provider.
    */
-  public void setConfigBindingProvider(ConfigurationBindingProvider configBindingProvider) {
+  public void setConfigBindingProvider(
+      org.opentcs.configuration.ConfigurationBindingProvider configBindingProvider) {
     this.configBindingProvider = configBindingProvider;
   }
 }

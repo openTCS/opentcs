@@ -8,9 +8,9 @@
  */
 package org.opentcs.guing.components.tree;
 
-import com.google.common.base.Predicate;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.function.Predicate;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -29,7 +29,7 @@ public class BlockFolderFilter
   }
 
   @Override
-  public boolean apply(ModelComponent component) {
+  public boolean test(ModelComponent component) {
     requireNonNull(component, "component");
 
     return !Objects.equals(component.getTreeViewName(),

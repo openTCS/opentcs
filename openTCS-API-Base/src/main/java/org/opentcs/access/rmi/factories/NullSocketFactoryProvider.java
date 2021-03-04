@@ -10,16 +10,21 @@ package org.opentcs.access.rmi.factories;
 import java.rmi.registry.Registry;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
+import javax.inject.Inject;
 
 /**
  * Provides {@code null} for both client and server socket factories.
  * By using this provider, the default client-side/server-side socket factory will be used in
  * {@link Registry} stubs.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class NullSocketFactoryProvider
     implements SocketFactoryProvider {
+
+  @Inject
+  public NullSocketFactoryProvider() {
+  }
 
   @Override
   public RMIClientSocketFactory getClientSocketFactory() {

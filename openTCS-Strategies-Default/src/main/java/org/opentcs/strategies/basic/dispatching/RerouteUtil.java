@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
@@ -27,7 +28,9 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.IGNORE_PATH_LOCKS;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_AT_PATH_LOCK;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_IMMEDIATELY;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +81,8 @@ public class RerouteUtil {
   }
 
   public void reroute(Vehicle vehicle) {
+    requireNonNull(vehicle, "vehicle");
+
     if (!vehicle.isProcessingOrder()) {
       LOG.warn("{} can't be rerouted without processing a transport order.", vehicle.getName());
       return;
@@ -103,7 +108,10 @@ public class RerouteUtil {
     }
     else {
       unfinishedOrders = updatePathLocks(unfinishedOrders);
-      unfinishedOrders = markRestrictedSteps(unfinishedOrders);
+      unfinishedOrders
+          = markRestrictedSteps(unfinishedOrders,
+                                new ExecutionTest(configuration.reroutingImpossibleStrategy(),
+                                                  rerouteSource));
       newDriveOrders = unfinishedOrders;
     }
 
@@ -404,7 +412,8 @@ public class RerouteUtil {
     return updatedOrders;
   }
 
-  private List<DriveOrder> markRestrictedSteps(List<DriveOrder> orders) {
+  private List<DriveOrder> markRestrictedSteps(List<DriveOrder> orders,
+                                               Predicate<Step> executionTest) {
     if (configuration.reroutingImpossibleStrategy() == IGNORE_PATH_LOCKS) {
       return orders;
     }
@@ -413,21 +422,18 @@ public class RerouteUtil {
     }
 
     List<DriveOrder> updatedOrders = new ArrayList<>();
-    boolean allowed = configuration.reroutingImpossibleStrategy() != PAUSE_IMMEDIATELY;
-
     for (DriveOrder order : orders) {
       List<Step> updatedSteps = new ArrayList<>();
 
       for (Step step : order.getRoute().getSteps()) {
-        allowed = allowed && !step.getPath().isLocked();
-
-        LOG.debug("Marking path '{}' allowed: {}", step.getPath(), allowed);
+        boolean executionAllowed = executionTest.test(step);
+        LOG.debug("Marking path '{}' allowed: {}", step.getPath(), executionAllowed);
         updatedSteps.add(new Step(step.getPath(),
                                   step.getSourcePoint(),
                                   step.getDestinationPoint(),
                                   step.getVehicleOrientation(),
                                   step.getRouteIndex(),
-                                  allowed));
+                                  executionAllowed));
       }
 
       Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
@@ -446,8 +452,58 @@ public class RerouteUtil {
     return orders.stream()
         .map(order -> order.getRoute().getSteps())
         .flatMap(steps -> steps.stream())
-        .filter(step -> step.getPath().isLocked())
-        .findAny()
-        .isPresent();
+        .anyMatch(step -> step.getPath().isLocked());
+  }
+
+  private class ExecutionTest
+      implements Predicate<Step> {
+
+    /**
+     * The current fallback strategy.
+     */
+    private final ReroutingImpossibleStrategy strategy;
+    /**
+     * The (earliest) point from which execution may not be allowed.
+     */
+    private final Point source;
+    /**
+     * Whether execution of a step is allowed.
+     */
+    private boolean executionAllowed = true;
+
+    /**
+     * Creates a new intance.
+     *
+     * @param strategy The current fallback strategy.
+     * @param source The (earliest) point from which execution may not be allowed.
+     */
+    public ExecutionTest(ReroutingImpossibleStrategy strategy, Point source) {
+      this.strategy = requireNonNull(strategy, "strategy");
+      this.source = requireNonNull(source, "source");
+    }
+
+    @Override
+    public boolean test(Step step) {
+      if (!executionAllowed) {
+        return false;
+      }
+
+      switch (strategy) {
+        case PAUSE_IMMEDIATELY:
+          if (Objects.equals(step.getSourcePoint(), source)) {
+            executionAllowed = false;
+          }
+          break;
+        case PAUSE_AT_PATH_LOCK:
+          if (step.getPath().isLocked()) {
+            executionAllowed = false;
+          }
+          break;
+        default:
+          executionAllowed = true;
+      }
+
+      return executionAllowed;
+    }
   }
 }

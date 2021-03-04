@@ -149,11 +149,22 @@ A vehicle provides the following attributes:
 
 ==== Block
 
-Blocks (or block areas) are areas in which only a single vehicle may operate at the same time.
-They are useful to prevent deadlock situations, e.g. at path intersections or dead ends.
-A block has a single relevant attribute:
+Blocks (or block areas) are areas for which special traffic rules may apply.
+They can be useful to prevent deadlock situations, e.g. at path intersections or dead ends.
+A block has two relevant attributes:
 
-* A set of _members_, i.e. points, paths and/or locations that the block is composed of.
+* A set of _members_, i.e. resources (points, paths and/or locations) that the block is composed of.
+* A _type_, which determines the rules for entering a block:
+** _Single vehicle only_:
+   The resources aggregated in this block can only be used by a single vehicle at the same time.
+   This is the default type for blocks when modelling with the plant overview client.
+** _Same direction only_:
+   The resources aggregated in this block can be used by multiple vehicles at the same time, but only if they traverse the block in the same direction.
+
+The direction in which a vehicle traverses a block is determined using the first allocation request containing resources that are part of the block -- see <<Default scheduler>>.
+For the requested resources (usually a point and a path) the path is checked for a property with the key `tcs:blockEntryDirection`.
+The property's value may be an arbitrary character string (including the empty string).
+If there is no such property the path's name is being used as the direction.
 
 === Plant operation elements
 

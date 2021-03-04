@@ -25,6 +25,7 @@ public class NullVehicleCommAdapterFactory
   }
 
   @Override
+  @Deprecated
   public String getAdapterDescription() {
     return "-";
   }

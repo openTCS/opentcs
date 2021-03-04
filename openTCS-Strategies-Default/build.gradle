@@ -1,3 +1,4 @@
+apply from: "${rootDir}/gradle/guice-project.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
 
 dependencies {

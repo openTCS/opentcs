@@ -62,7 +62,7 @@ public class DefaultScheduler
   /**
    * The reservation pool.
    */
-  private final ReservationPool reservationPool = new ReservationPool();
+  private final ReservationPool reservationPool;
   /**
    * Allocations deferred because they couldn't be granted, yet.
    */
@@ -86,9 +86,11 @@ public class DefaultScheduler
   @Inject
   public DefaultScheduler(InternalPlantModelService plantModelService,
                           AllocationAdvisor allocationAdvisor,
+                          ReservationPool reservationPool,
                           @KernelExecutor ScheduledExecutorService kernelExecutor) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
+    this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 

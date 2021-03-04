@@ -22,16 +22,11 @@ For more information on how Guice works, see the Guice documentation.
 
 === Replacing default kernel components
 
-The kernel application comes with default implementations for the component interfaces in `org.opentcs.components.kernel`.
-These default implementations allow the kernel to fulfil all of its responsibilities, but the default components might not be optimal for a specific use case.
-They can be replaced with a custom Guice configuration, which could look similar to the default configuration the kernel application uses:
+The kernel application comes with default implementations for the dispatching, routing and scheduling components.
+These default implementations allow the kernel to fulfil all of its responsibilities, but specific use cases might make it necessary to replace them with custom ones.
+In such cases, they can be replaced with a custom Guice configuration.
 
-[source, java]
-----
-include::{kernel-guiceSrc}/org/opentcs/kernel/DefaultKernelStrategiesModule.java[tags=documentation_configureDefaultStrategies]
-----
-
-For every component, `KernelInjectionModule` provides a convenience method for (re)binding the implementation.
+For each of these components, `KernelInjectionModule` provides a convenience method for (re)binding the implementation.
 To replace e.g. the default `Dispatcher` implementation, simply register a Guice module in which you call `bindDispatcher()`.
 The module's implementation could look like this:
 
@@ -79,7 +74,7 @@ When developing a vehicle driver, the most important classes and interfaces in t
 
 ==== Classes and interfaces for the control center
 
-NOTE: The Kernel Control Center GUI provided by the kernel application itself is deprecated and scheduled for removal with version 5.0.
+NOTE: The Kernel Control Center GUI provided by the kernel application itself is *deprecated and scheduled for removal with openTCS 5.0*.
 A separate Kernel Control Center application is available and should be used instead.
 For the remote version of the Kernel Control Center the following interfaces are the most important.
 
@@ -118,11 +113,11 @@ For an example, refer to the implementation of the loopback comm adapter for vir
 
 . Create a Guice module for your vehicle driver by creating a subclass of `KernelInjectionModule`.
 Implement the `configure()` method and register a binding to your `VehicleCommAdapterFactory`.
-The following example demonstrates how this module's `configure()` method looks like for the loopback driver that is part of the openTCS distribution:
+For example, the loopback driver that is part of the openTCS distribution registers its own factory class with the following line in its `configure()` method:
 +
 [source, java]
 ----
-include::{kernel-guiceSrc}/org/opentcs/kernel/LoopbackCommAdapterModule.java[tags=documentation_createCommAdapterModule]
+include::{loopback-guiceSrc}/org/opentcs/virtualvehicle/LoopbackCommAdapterModule.java[tags=documentation_createCommAdapterModule]
 ----
 
 . In the JAR file containing your driver, ensure that there exists a folder named `META-INF/services/` with a file named `org.opentcs.customizations.kernel.KernelInjectionModule`.
@@ -130,7 +125,7 @@ This file should consist of a single line of text holding simply the name of the
 +
 [source]
 ----
-org.opentcs.kernel.LoopbackCommAdapterModule
+org.opentcs.virtualvehicle.LoopbackCommAdapterModule
 ----
 NOTE: Background: openTCS uses `java.util.ServiceLoader` to automatically find Guice modules on startup, which depends on this file (with this name) being present.
 See the JDK's API documentation for more information about how this mechanism works.

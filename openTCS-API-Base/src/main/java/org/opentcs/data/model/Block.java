@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * An aggregation of resources that can never be used by more than one vehicle at the same time.
+ * An aggregation of resources with distinct usage rules depending on the block's type.
  *
  * @see TCSResource
  * @author Stefan Walter (Fraunhofer IML)
@@ -29,9 +29,24 @@ public class Block
                Cloneable {
 
   /**
+   * This block's type.
+   */
+  private final Type type;
+  /**
    * The resources aggregated in this block.
    */
   private final Set<TCSResourceReference<?>> members;
+
+  /**
+   * Creates an empty block.
+   *
+   * @param name This block's name.
+   */
+  public Block(String name) {
+    super(name);
+    this.type = Type.SINGLE_VEHICLE_ONLY;
+    this.members = new HashSet<>();
+  }
 
   /**
    * Creates an empty block.
@@ -44,16 +59,7 @@ public class Block
   @ScheduledApiChange(when = "5.0")
   public Block(int objectID, String name) {
     super(objectID, name);
-    this.members = new HashSet<>();
-  }
-
-  /**
-   * Creates an empty block.
-   *
-   * @param name This block's name.
-   */
-  public Block(String name) {
-    super(name);
+    this.type = Type.SINGLE_VEHICLE_ONLY;
     this.members = new HashSet<>();
   }
 
@@ -61,8 +67,10 @@ public class Block
   private Block(int objectID,
                 String name,
                 Map<String, String> properties,
+                Type type,
                 Set<TCSResourceReference<?>> members) {
     super(objectID, name, properties);
+    this.type = type;
     this.members = new HashSet<>(requireNonNull(members, "members"));
   }
 
@@ -71,6 +79,7 @@ public class Block
     return new Block(getIdWithoutDeprecationWarning(),
                      getName(),
                      propertiesWith(key, value),
+                     type,
                      members);
   }
 
@@ -79,7 +88,27 @@ public class Block
     return new Block(getIdWithoutDeprecationWarning(),
                      getName(),
                      properties,
+                     type,
                      members);
+  }
+
+  /**
+   * Retruns the type of this block.
+   *
+   * @return The type of this block.
+   */
+  public Type getType() {
+    return type;
+  }
+
+  /**
+   * Creates a copy of this object, with the given type.
+   *
+   * @param type The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Block withType(Type type) {
+    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), type, members);
   }
 
   /**
@@ -123,7 +152,7 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withMembers(Set<TCSResourceReference<?>> members) {
-    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), members);
+    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), type, members);
   }
 
   /**
@@ -154,6 +183,22 @@ public class Block
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public Block clone() {
-    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), members);
+    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), type, members);
+  }
+
+  /**
+   * Describes the types of blocks in a driving course.
+   */
+  public enum Type {
+
+    /**
+     * The resources aggregated in this block can only be used by one vehicle at the same time.
+     */
+    SINGLE_VEHICLE_ONLY,
+    /**
+     * The resources aggregated in this block can be used by multiple vehicles, but only if they
+     * enter the block in the same direction.
+     */
+    SAME_DIRECTION_ONLY;
   }
 }

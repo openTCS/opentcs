@@ -11,13 +11,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.TCSResource;
-import org.opentcs.data.model.TCSResourceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,27 +132,29 @@ class AllocatorTask
    * @return <code>true</code> if, and only if, the given resources were allocated.
    */
   private boolean tryAllocate(AllocatorCommand.Allocate command) {
-    Set<TCSResource<?>> resourcesExpanded = expandResources(command.getResources());
+    Scheduler.Client client = command.getClient();
+    Set<TCSResource<?>> resources = command.getResources();
+
     synchronized (reservationPool) {
-      LOG.debug("{}: Checking if all resources are available...", command.getClient().getId());
-      if (!reservationPool.resourcesAvailableForUser(resourcesExpanded, command.getClient())) {
-        LOG.debug("{}: Resources unavailable.", command.getClient().getId());
+      LOG.debug("{}: Checking resource if all resources are available:", client.getId());
+      if (!reservationPool.resourcesAvailableForUser(resources, client)) {
+        LOG.debug("{}: Resources unavailable: {}", client.getId(), resources);
         return false;
       }
 
-      LOG.debug("{}: Checking if resources may be allocated...", command.getClient().getId());
-      if (!allocationAdvisor.mayAllocate(command.getClient(), command.getResources())) {
-        LOG.debug("{}: Resource allocation restricted by some modules.", command.getClient());
+      LOG.debug("{}: Checking if resources may be allocated...", client.getId());
+      if (!allocationAdvisor.mayAllocate(client, resources)) {
+        LOG.debug("{}: Resource allocation restricted by some modules.", client);
         return false;
       }
 
-      LOG.debug("{}: Some resources need to be prepared for allocation.", command.getClient().getId());
-      allocationAdvisor.prepareAllocation(command.getClient(), command.getResources());
+      LOG.debug("{}: Some resources need to be prepared for allocation.", client.getId());
+      allocationAdvisor.prepareAllocation(client, resources);
 
-      LOG.debug("{}: All resources available, allocating...", command.getClient().getId());
+      LOG.debug("{}: All resources available, allocating...", client.getId());
       // Allocate resources.
       for (TCSResource<?> curRes : command.getResources()) {
-        reservationPool.getReservationEntry(curRes).allocate(command.getClient());
+        reservationPool.getReservationEntry(curRes).allocate(client);
       }
 
       return true;
@@ -190,25 +190,4 @@ class AllocatorTask
     }
     deferredAllocations.clear();
   }
-
-  /**
-   * Returns the given set of resources after expansion (by resolution of blocks, for instance) by
-   * the kernel.
-   *
-   * @param resources The set of resources to be expanded.
-   * @return The given set of resources after expansion (by resolution of
-   * blocks, for instance) by the kernel.
-   */
-  private Set<TCSResource<?>> expandResources(Set<TCSResource<?>> resources) {
-    requireNonNull(resources, "resources");
-    // Build a set of references
-    Set<TCSResourceReference<?>> refs = resources.stream()
-        .map((resource) -> resource.getReference())
-        .collect(Collectors.toSet());
-    // Let the kernel expand the resources for us.
-    Set<TCSResource<?>> result = plantModelService.expandResources(refs);
-    LOG.debug("Set {} expanded to {}", resources, result);
-    return result;
-  }
-
 }

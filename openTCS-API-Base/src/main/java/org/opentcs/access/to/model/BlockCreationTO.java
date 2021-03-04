@@ -15,6 +15,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.data.model.Block;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -26,6 +27,11 @@ public class BlockCreationTO
     extends CreationTO
     implements Serializable {
 
+  /**
+   * This block's type.
+   */
+  @Nonnull
+  private Block.Type type = Block.Type.SINGLE_VEHICLE_ONLY;
   /**
    * This block's member names.
    */
@@ -50,8 +56,10 @@ public class BlockCreationTO
    */
   private BlockCreationTO(@Nonnull String name,
                           @Nonnull Map<String, String> properties,
+                          @Nonnull Block.Type type,
                           @Nonnull Set<String> memberNames) {
     super(name, properties);
+    this.type = requireNonNull(type, "type");
     this.memberNames = requireNonNull(memberNames, "memberNames");
   }
 
@@ -80,6 +88,7 @@ public class BlockCreationTO
   public BlockCreationTO withName(@Nonnull String name) {
     return new BlockCreationTO(name,
                                getModifiableProperties(),
+                               type,
                                memberNames);
   }
 
@@ -107,6 +116,7 @@ public class BlockCreationTO
   public BlockCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new BlockCreationTO(getName(),
                                properties,
+                               type,
                                memberNames);
   }
 
@@ -139,6 +149,30 @@ public class BlockCreationTO
   public BlockCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
     return new BlockCreationTO(getName(),
                                propertiesWith(key, value),
+                               type,
+                               memberNames);
+  }
+  
+  /**
+   * Returns the type of this block.
+   *
+   * @return The type of this block.
+   */
+  @Nonnull
+  public Block.Type getType() {
+    return type;
+  }
+
+  /**
+   * Creates a copy of this object with the given type.
+   *
+   * @param type The new type.
+   * @return A copy of this object, differing in the given type.
+   */
+  public BlockCreationTO withType(@Nonnull Block.Type type) {
+    return new BlockCreationTO(getName(),
+                               getModifiableProperties(),
+                               type,
                                memberNames);
   }
 
@@ -175,6 +209,7 @@ public class BlockCreationTO
   public BlockCreationTO withMemberNames(@Nonnull Set<String> memberNames) {
     return new BlockCreationTO(getName(),
                                getModifiableProperties(),
+                               type,
                                memberNames);
   }
 }

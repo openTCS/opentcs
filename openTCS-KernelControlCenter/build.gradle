@@ -1,4 +1,4 @@
-apply from: "${rootDir}/gradle/application-guice.gradle"
+apply from: "${rootDir}/gradle/guice-application.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
 
 if (!hasProperty('mainClass')) {
@@ -12,9 +12,7 @@ dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
   compile project(':openTCS-CommAdapter-Loopback')
-  
-  compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
-  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
+  compile project(':openTCS-Impl-Configuration-cfg4j')
   
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }

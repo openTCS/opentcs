@@ -9,21 +9,21 @@ package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.components.kernel.services.TCSObjectService;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Block;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
@@ -39,17 +39,13 @@ public class DefaultRechargePositionSupplier
     implements RechargePositionSupplier {
 
   /**
-   * The object service.
+   * The plant model service.
    */
-  private final TCSObjectService objectService;
+  private final InternalPlantModelService plantModelService;
   /**
    * Our router.
    */
   private final Router router;
-  /**
-   * Maps locations' access points to points sharing the same block(s).
-   */
-  private final Map<Point, Set<Point>> accessPoints = new ConcurrentHashMap<>();
   /**
    * Indicates whether this component is enabled.
    */
@@ -58,13 +54,13 @@ public class DefaultRechargePositionSupplier
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service.
+   * @param plantModelService The plant model service.
    * @param router The router to use.
    */
   @Inject
-  public DefaultRechargePositionSupplier(final TCSObjectService objectService,
-                                         final Router router) {
-    this.objectService = requireNonNull(objectService, "kernel");
+  public DefaultRechargePositionSupplier(InternalPlantModelService plantModelService,
+                                         Router router) {
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
   }
 
@@ -73,15 +69,7 @@ public class DefaultRechargePositionSupplier
     if (initialized) {
       return;
     }
-    accessPoints.clear();
-    Set<Block> allBlocks = objectService.fetchObjects(Block.class);
-    // Get all locations from the kernel, and for each of their access points,
-    // build a set of points that share the same block(s).
-    for (Location curLoc : objectService.fetchObjects(Location.class)) {
-      for (Point accessPoint : findAccessPoints(curLoc)) {
-        accessPoints.put(accessPoint, getBlockedPoints(accessPoint, allBlocks));
-      }
-    }
+
     initialized = true;
   }
 
@@ -95,7 +83,7 @@ public class DefaultRechargePositionSupplier
     if (!initialized) {
       return;
     }
-    accessPoints.clear();
+
     initialized = false;
   }
 
@@ -114,8 +102,8 @@ public class DefaultRechargePositionSupplier
 
     String assignedRechargeLocationName = vehicle.getProperty(PROPKEY_ASSIGNED_RECHARGE_LOCATION);
     if (assignedRechargeLocationName != null) {
-      Location location = selectLocationWithName(assignedRechargeLocationName,
-                                                 rechargeLocations.keySet());
+      Location location = pickLocationWithName(assignedRechargeLocationName,
+                                               rechargeLocations.keySet());
       if (location == null) {
         return new ArrayList<>();
       }
@@ -125,8 +113,8 @@ public class DefaultRechargePositionSupplier
 
     String preferredRechargeLocationName = vehicle.getProperty(PROPKEY_PREFERRED_RECHARGE_LOCATION);
     if (assignedRechargeLocationName != null) {
-      Location location = selectLocationWithName(preferredRechargeLocationName,
-                                                 rechargeLocations.keySet());
+      Location location = pickLocationWithName(preferredRechargeLocationName,
+                                               rechargeLocations.keySet());
       if (location != null) {
         // XXX Strictly, we should check whether there is a viable route to the location.
         return Arrays.asList(createDestination(location, vehicle.getRechargeOperation()));
@@ -143,20 +131,15 @@ public class DefaultRechargePositionSupplier
 
   @Nullable
   private Location findCheapestLocation(Map<Location, Set<Point>> locations, Vehicle vehicle) {
-    Point curPos = objectService.fetchObject(Point.class, vehicle.getCurrentPosition());
+    Point curPos = plantModelService.fetchObject(Point.class, vehicle.getCurrentPosition());
 
-    Location cheapestLocation = null;
-    long cheapestCosts = Long.MAX_VALUE;
-    for (Map.Entry<Location, Set<Point>> entry : locations.entrySet()) {
-      long costs = getMinimumAccessPointCosts(vehicle, curPos, entry.getValue());
-
-      if (costs < cheapestCosts) {
-        cheapestCosts = costs;
-        cheapestLocation = entry.getKey();
-      }
-    }
-
-    return cheapestLocation;
+    return locations.entrySet().stream()
+        .map(entry -> bestAccessPointCandidate(vehicle, curPos, entry.getKey(), entry.getValue()))
+        .filter(candidate -> candidate.isPresent())
+        .map(candidate -> candidate.get())
+        .min(Comparator.comparingLong(candidate -> candidate.costs))
+        .map(candidate -> candidate.location)
+        .orElse(null);
   }
 
   private DriveOrder.Destination createDestination(Location location, String operation) {
@@ -165,7 +148,7 @@ public class DefaultRechargePositionSupplier
   }
 
   @Nullable
-  private Location selectLocationWithName(String name, Set<Location> locations) {
+  private Location pickLocationWithName(String name, Set<Location> locations) {
     return locations.stream()
         .filter(location -> name.equals(location.getName()))
         .findAny()
@@ -187,8 +170,8 @@ public class DefaultRechargePositionSupplier
                                                               Set<Point> targetedPoints) {
     Map<Location, Set<Point>> result = new HashMap<>();
 
-    for (Location curLoc : objectService.fetchObjects(Location.class)) {
-      LocationType lType = objectService.fetchObject(LocationType.class, curLoc.getType());
+    for (Location curLoc : plantModelService.fetchObjects(Location.class)) {
+      LocationType lType = plantModelService.fetchObject(LocationType.class, curLoc.getType());
       if (lType.isAllowedOperation(operation)) {
         Set<Point> points = findUnoccupiedAccessPointsForOperation(curLoc,
                                                                    operation,
@@ -207,117 +190,95 @@ public class DefaultRechargePositionSupplier
                                                             String rechargeOp,
                                                             Vehicle vehicle,
                                                             Set<Point> targetedPoints) {
-    Set<Point> result = new HashSet<>();
-
-    for (Location.Link curLink : location.getAttachedLinks()) {
-      // This link is only interesting if it either does not define any allowed operations at all
-      // or, if it does, allows the required recharge operation.
-      if (curLink.getAllowedOperations().isEmpty() || curLink.hasAllowedOperation(rechargeOp)) {
-        Point accessPoint = objectService.fetchObject(Point.class, curLink.getPoint());
-
-        if (isPointUnoccupiedFor(accessPoint, vehicle, targetedPoints)) {
-          result.add(accessPoint);
-        }
-      }
-    }
-
-    return result;
-  }
-
-  private long getMinimumAccessPointCosts(Vehicle vehicle,
-                                          Point srcPosition,
-                                          Set<Point> destPositions) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(srcPosition, "srcPosition");
-
-    long bestLinkCosts = Long.MAX_VALUE;
-    for (Point destPosition : destPositions) {
-      long linkCosts = router.getCostsByPointRef(vehicle,
-                                                 srcPosition.getReference(),
-                                                 destPosition.getReference());
-      bestLinkCosts = Math.min(linkCosts, bestLinkCosts);
-    }
-    return bestLinkCosts;
+    return location.getAttachedLinks().stream()
+        .filter(link -> allowsOperation(link, rechargeOp))
+        .map(link -> plantModelService.fetchObject(Point.class, link.getPoint()))
+        .filter(accessPoint -> isPointUnoccupiedFor(accessPoint, vehicle, targetedPoints))
+        .collect(Collectors.toSet());
   }
 
   /**
-   * Checks whether the given point is a potential, unoccupied target position for the given
-   * vehicle.
+   * Checks if the given link either does not define any allowed operations at all (meaning it does
+   * not override the allowed operations of the corresponding location's location type), or - if it
+   * does - explicitly allows the required recharge operation.
+   *
+   * @param link The link to be checked.
+   * @param operation The operation to be checked for.
+   * @return <code>true</code> if, and only if, the given link does not disallow the given
+   * operation.
+   */
+  private boolean allowsOperation(Location.Link link, String operation) {
+    // This link is only interesting if it either does not define any allowed operations (does 
+    // not override the allowed operations of the corresponding location) at all or, if it does, 
+    // allows the required recharge operation.
+    return link.getAllowedOperations().isEmpty() || link.hasAllowedOperation(operation);
+  }
+
+  private Optional<LocationCandidate> bestAccessPointCandidate(Vehicle vehicle,
+                                                               Point srcPosition,
+                                                               Location location,
+                                                               Set<Point> destPositions) {
+    return destPositions.stream()
+        .map(point -> new LocationCandidate(location,
+                                            router.getCostsByPointRef(vehicle,
+                                                                      srcPosition.getReference(),
+                                                                      point.getReference())))
+        .min(Comparator.comparingLong(candidate -> candidate.costs));
+  }
+
+  /**
+   * Checks if ALL points within the same block as the given access point are NOT occupied or
+   * targeted by any other vehicle than the given one.
    *
    * @param accessPoint The point to be checked.
    * @param vehicle The vehicle to be checked for.
    * @param targetedPoints All currently known targeted points.
-   * @return <code>true</code> if, and only if, the given point is a potential and unoccupied target
-   * position for the given vehicle.
+   * @return <code>true</code> if, and only if, ALL points within the same block as the given access
+   * point are NOT occupied or targeted by any other vehicle than the given one.
    */
   private boolean isPointUnoccupiedFor(Point accessPoint,
                                        Vehicle vehicle,
                                        Set<Point> targetedPoints) {
-    for (Point blockedPoint : accessPoints.get(accessPoint)) {
-      Point blockedPointActu = objectService.fetchObject(Point.class, blockedPoint.getReference());
-      // If the point is occupied by another vehicle, give up this link.
-      if (blockedPointActu.getOccupyingVehicle() != null
-          && !blockedPointActu.getOccupyingVehicle().equals(vehicle.getReference())) {
-        return false;
-      }
-      // If the point is targeted by another vehicle, give up this link.
-      else if (targetedPoints.contains(blockedPointActu)) {
-        return false;
-      }
-    }
+    return expandPoints(accessPoint).stream()
+        .allMatch(point -> !pointOccupiedOrTargetedByOtherVehicle(point,
+                                                                  vehicle,
+                                                                  targetedPoints));
+  }
 
-    return true;
+  private boolean pointOccupiedOrTargetedByOtherVehicle(Point pointToCheck,
+                                                        Vehicle vehicle,
+                                                        Set<Point> targetedPoints) {
+    if (pointToCheck.getOccupyingVehicle() != null
+        && !pointToCheck.getOccupyingVehicle().equals(vehicle.getReference())) {
+      return true;
+    }
+    else if (targetedPoints.contains(pointToCheck)) {
+      return true;
+    }
+    return false;
   }
 
   /**
-   * Gathers a set of all points from all given blocks that the given point is a member of.
+   * Gathers a set of all points from all blocks that the given point is a member of.
    *
    * @param point The point to check.
-   * @param blocks The blocks to scan for the point.
-   * @return A set of all points from all given blocks that the given point is a
-   * member of.
+   * @return A set of all points from all blocks that the given point is a member of.
    */
-  @SuppressWarnings("unchecked")
-  private Set<Point> getBlockedPoints(Point point, Set<Block> blocks) {
-    requireNonNull(point, "point");
-    requireNonNull(blocks, "blocks");
-
-    Set<Point> result = new HashSet<>();
-
-    // The point itself is always required.
-    result.add(point);
-
-    // Check for every block if the given point is part of it.
-    for (Block curBlock : blocks) {
-      if (curBlock.getMembers().contains(point.getReference())) {
-        // Check for every member of the block if it's a point. If it is, add it
-        // to the resulting set.
-        for (TCSObjectReference<?> memberRef : curBlock.getMembers()) {
-          if (Point.class.equals(memberRef.getReferentClass())) {
-            result.add(objectService.fetchObject(Point.class,
-                                                 (TCSObjectReference<Point>) memberRef));
-          }
-        }
-      }
-    }
-    return result;
+  private Set<Point> expandPoints(Point point) {
+    return plantModelService.expandResources(Collections.singleton(point.getReference())).stream()
+        .filter(resource -> Point.class.equals(resource.getReference().getReferentClass()))
+        .map(resource -> (Point) resource)
+        .collect(Collectors.toSet());
   }
 
-  /**
-   * Returns a set of points from which the given location can be accessed.
-   *
-   * @param location The location.
-   * @return A set of points from which the given location can be accessed.
-   */
-  private Set<Point> findAccessPoints(Location location) {
-    requireNonNull(location, "location");
+  private static class LocationCandidate {
 
-    Set<Point> result = new HashSet<>();
+    private final Location location;
+    private final long costs;
 
-    for (Location.Link curLink : location.getAttachedLinks()) {
-      result.add(objectService.fetchObject(Point.class, curLink.getPoint()));
+    public LocationCandidate(Location location, long costs) {
+      this.location = location;
+      this.costs = costs;
     }
-
-    return result;
   }
 }
