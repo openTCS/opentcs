@@ -338,8 +338,8 @@ public class TransportOrderUtil
     }
     // If requested, reset the vehicle position to null and free all resources.
     if (immediateAbort && resetVehiclePosition) {
-      // XXX Doesn't work with NullVehicleController, (== without a communication adapter), yet.
-      vehicleControllerPool.getVehicleController(vehicle.getName()).resetVehiclePosition();
+      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
+                                                   Vehicle.IntegrationLevel.TO_BE_IGNORED);
     }
   }
 

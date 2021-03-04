@@ -10,7 +10,6 @@
 package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -25,8 +24,6 @@ import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.util.Collection;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
@@ -34,7 +31,6 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.data.model.Triple;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.application.menus.VehiclePopupMenu;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
@@ -54,7 +50,6 @@ import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * The graphical representation of a vehicle.
@@ -88,6 +83,10 @@ public class VehicleFigure
    */
   private final MenuFactory menuFactory;
   /**
+   * The tool tip text generator.
+   */
+  private final ToolTipTextGenerator textGenerator;
+  /**
    * The angle at which the image is to be drawn.
    */
   private double fAngle;
@@ -108,12 +107,12 @@ public class VehicleFigure
    * Creates a new instance.
    *
    * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected
-   * model component(s).
+   * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param vehicleTheme The vehicle theme to be used.
    * @param menuFactory A factory for popup menus.
    * @param appConfig The application's configuration.
    * @param model The model corresponding to this graphical object.
+   * @param textGenerator The tool tip text generator.
    */
   @Inject
   public VehicleFigure(ComponentsTreeViewManager componentsTreeManager,
@@ -121,10 +120,12 @@ public class VehicleFigure
                        VehicleTheme vehicleTheme,
                        MenuFactory menuFactory,
                        PlantOverviewApplicationConfiguration appConfig,
-                       @Assisted VehicleModel model) {
+                       @Assisted VehicleModel model,
+                       ToolTipTextGenerator textGenerator) {
     super(componentsTreeManager, propertiesComponent, model);
     this.vehicleTheme = requireNonNull(vehicleTheme, "vehicleTheme");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
+    this.textGenerator = requireNonNull(textGenerator, "textGenerator");
 
     fDisplayBox = new Rectangle((int) LENGTH, (int) WIDTH);
     fZoomPoint = new ZoomPoint(0.5 * LENGTH, 0.5 * WIDTH);
@@ -132,7 +133,7 @@ public class VehicleFigure
     setIgnorePrecisePosition(appConfig.ignoreVehiclePrecisePosition());
     setIgnoreOrientationAngle(appConfig.ignoreVehicleOrientationAngle());
 
-    fImage = vehicleTheme.getThemeImage();
+    fImage = vehicleTheme.statelessImage(model.getVehicle());
   }
 
   @Override
@@ -180,49 +181,7 @@ public class VehicleFigure
 
   @Override
   public String getToolTipText(Point2D.Double p) {
-    VehicleModel model = getModel();
-    String vehicleDesc = ResourceBundleUtil.getBundle().getString("vehicle.description");
-    String positionDesc = ResourceBundleUtil.getBundle().getString("vehicle.point.text");
-    String nextPositionDesc = ResourceBundleUtil.getBundle().getString("vehicle.nextPoint.text");
-    String stateDesc = ResourceBundleUtil.getBundle().getString("vehicle.state.text");
-    String procStateDesc = ResourceBundleUtil.getBundle().getString("vehicle.procState.text");
-    String integrationLevelDesc = ResourceBundleUtil.getBundle().getString("vehicle.integrationLevel.text");
-    String energyDesc = ResourceBundleUtil.getBundle().getString("vehicle.energyLevel.text");
-    StringBuilder sb = new StringBuilder("<html>");
-    sb.append(vehicleDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
-    sb.append("<br>").append(positionDesc).append(": ")
-        .append(model.getPoint() != null ? model.getPoint().getName() : "?");
-    sb.append("<br>").append(nextPositionDesc).append(": ")
-        .append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
-    sb.append("<br>").append(stateDesc).append(": ").append(model.getPropertyState().getValue());
-    sb.append("<br>").append(procStateDesc).append(": ").append(model.getPropertyProcState().getValue());
-    sb.append("<br>").append(integrationLevelDesc).append(": ").append(model.getPropertyIntegrationLevel().getValue());
-
-    VehicleModel.EnergyState state = (VehicleModel.EnergyState) model.getPropertyEnergyState().getValue();
-    String sColor;
-    switch (state) {
-      case CRITICAL:
-        sColor = "red";
-        break;
-
-      case DEGRADED:
-        sColor = "orange";
-        break;
-
-      case GOOD:
-        sColor = "green";
-        break;
-
-      default:
-        sColor = "black";
-    }
-
-    sb.append("<br>").append(energyDesc).append(": <font color=").append(sColor).append(">")
-        .append(model.getPropertyEnergyLevel().getValue())
-        .append("%</font>");
-    sb.append("</html>");
-
-    return sb.toString();
+    return textGenerator.getToolTipText(getModel());
   }
 
   /**
@@ -253,7 +212,7 @@ public class VehicleFigure
    * @param doIgnore Whether to ignore the reported precise position of the
    * vehicle.
    */
-  public void setIgnorePrecisePosition(boolean doIgnore) {
+  public final void setIgnorePrecisePosition(boolean doIgnore) {
     ignorePrecisePosition = doIgnore;
     PointModel point = getModel().getPoint();
 
@@ -430,17 +389,6 @@ public class VehicleFigure
     else {
       // TODO: Rechteck als Umriss zeichnen
     }
-
-    // Text
-    String name = getModel().getName();
-    Pattern p = Pattern.compile("\\d+");  // Ziffern suchen
-    Matcher m = p.matcher(name);
-
-    if (m.find()) {  // Wenn es mindestens eine Ziffer gibt...
-      String number = m.group();
-      g2d.setPaint(Color.BLUE);
-      g2d.drawString(number, (int) r.getCenterX() - 5, (int) r.getCenterY() + 6);
-    }
   }
 
   @Override
@@ -497,8 +445,7 @@ public class VehicleFigure
       return;
     }
 
-    Vehicle vehicle = model.getVehicle();
-    fImage = vehicle == null ? null : vehicleTheme.getImageFor(model.getVehicle());
+    fImage = vehicleTheme.statefulImage(model.getVehicle());
 
     PointModel point = model.getPoint();
     Triple precisePosition = model.getPrecisePosition();
@@ -542,5 +489,14 @@ public class VehicleFigure
     }
 
     return (infoflags & (ALLBITS | ABORT)) == 0;
+  }
+
+  /**
+   * Returns the vehicle theme.
+   *
+   * @return The vehicle theme.
+   */
+  protected VehicleTheme getVehicleTheme() {
+    return vehicleTheme;
   }
 }

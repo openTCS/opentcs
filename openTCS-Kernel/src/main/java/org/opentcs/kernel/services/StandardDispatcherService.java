@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.services.DispatcherService;
-import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -45,10 +44,6 @@ public class StandardDispatcherService
    * The dispatcher.
    */
   private final Dispatcher dispatcher;
-  /**
-   * The vehicle service.
-   */
-  private final InternalVehicleService vehicleService;
 
   /**
    * Creates a new instance.
@@ -56,17 +51,14 @@ public class StandardDispatcherService
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param globalObjectPool The object pool to be used.
    * @param dispatcher The dispatcher.
-   * @param vehicleService The vehicle service.
    */
   @Inject
   public StandardDispatcherService(@GlobalKernelSync Object globalSyncObject,
                                    TCSObjectPool globalObjectPool,
-                                   Dispatcher dispatcher,
-                                   InternalVehicleService vehicleService) {
+                                   Dispatcher dispatcher) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
-    this.vehicleService = requireNonNull(vehicleService, "vehicleService");
   }
 
   @Override
@@ -77,6 +69,7 @@ public class StandardDispatcherService
   }
 
   @Override
+  @Deprecated
   public void releaseVehicle(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
@@ -85,6 +78,7 @@ public class StandardDispatcherService
   }
 
   @Override
+  @Deprecated
   public void withdrawByVehicle(TCSObjectReference<Vehicle> ref,
                                 boolean immediateAbort,
                                 boolean disableVehicle)
@@ -97,6 +91,7 @@ public class StandardDispatcherService
   }
 
   @Override
+  @Deprecated
   public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
                                        boolean immediateAbort,
                                        boolean disableVehicle)
@@ -105,6 +100,24 @@ public class StandardDispatcherService
       dispatcher.withdrawOrder(globalObjectPool.getObject(TransportOrder.class, ref),
                                immediateAbort,
                                disableVehicle);
+    }
+  }
+
+  @Override
+  public void withdrawByVehicle(TCSObjectReference<Vehicle> ref, boolean immediateAbort)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      dispatcher.withdrawOrder(globalObjectPool.getObject(Vehicle.class, ref), immediateAbort);
+    }
+  }
+
+  @Override
+  public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
+                                       boolean immediateAbort)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      dispatcher.withdrawOrder(globalObjectPool.getObject(TransportOrder.class, ref),
+                               immediateAbort);
     }
   }
 }

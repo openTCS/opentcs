@@ -78,22 +78,6 @@ public interface PlantOverviewApplicationConfiguration {
       orderKey = "2_connection_0")
   List<ConnectionParamSet> connectionBookmarks();
 
-  @ConfigurationEntry(
-      type = "String",
-      description = {"The type of encryption used for RMI.",
-                     "'NONE': No encryption.",
-                     "'SSL_UNTRUSTED': SSL is used, but there is no way to verify the remote "
-                     + "peer's identity. (Default)",
-                     "'SSL': SSL is used. (Generation of a keystore-truststore-pair is required.)"},
-      orderKey = "2_connection_1")
-  ConnectionEncryption connectionEncryption();
-
-  @ConfigurationEntry(
-      type = "String",
-      description = {"The password for the truststore.",
-                     "(Only used, if connection encryption 'SSL' is selected.)"},
-      orderKey = "2_connection_2")
-  String truststorePassword();
 
   @ConfigurationEntry(
       type = "Boolean",
@@ -101,14 +85,14 @@ public interface PlantOverviewApplicationConfiguration {
                      "If 'true', the first connection bookmark will be used for the connection "
                      + "attempt.",
                      "If 'false', a dialog will be shown to enter connection parameters."},
-      orderKey = "2_connection_3")
+      orderKey = "2_connection_1")
   boolean useBookmarksWhenConnecting();
 
   @ConfigurationEntry(
       type = "Class name",
       description = {"The name of the class to be used for the location theme.",
                      "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"},
-      orderKey = "3_themes"
+      orderKey = "3_themes_0"
   )
   Class<? extends LocationTheme> locationThemeClass();
 
@@ -116,7 +100,7 @@ public interface PlantOverviewApplicationConfiguration {
       type = "Class name",
       description = {"The name of the class to be used for the vehicle theme.",
                      "Must be a class extending org.opentcs.components.plantoverview.VehicleTheme"},
-      orderKey = "3_themes")
+      orderKey = "3_themes_0")
   Class<? extends VehicleTheme> vehicleThemeClass();
 
   @ConfigurationEntry(
@@ -136,11 +120,5 @@ public interface PlantOverviewApplicationConfiguration {
     MODELLING,
     OPERATING,
     ASK
-  }
-
-  enum ConnectionEncryption {
-    NONE,
-    SSL_UNTRUSTED,
-    SSL;
   }
 }

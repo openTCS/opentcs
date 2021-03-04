@@ -16,9 +16,12 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.DRIVE_ORDER_FINISHED;
 import org.opentcs.strategies.basic.dispatching.Phase;
+import org.opentcs.strategies.basic.dispatching.RerouteTask;
+import org.opentcs.strategies.basic.dispatching.RerouteUtil;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
-import org.opentcs.strategies.basic.dispatching.phase.recharging.RechargeIdleVehiclesPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +37,7 @@ public class AssignNextDriveOrdersPhase
   /**
    * This class's Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(RechargeIdleVehiclesPhase.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AssignNextDriveOrdersPhase.class);
   private final InternalTransportOrderService transportOrderService;
   private final InternalVehicleService vehicleService;
   /**
@@ -47,6 +50,14 @@ public class AssignNextDriveOrdersPhase
   private final VehicleControllerPool vehicleControllerPool;
   private final TransportOrderUtil transportOrderUtil;
   /**
+   * The task performing the rerouting.
+   */
+  private final RerouteTask rerouteTask;
+  /**
+   * The dispatcher configuration.
+   */
+  private final DefaultDispatcherConfiguration configuration;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -56,12 +67,16 @@ public class AssignNextDriveOrdersPhase
                                     InternalVehicleService vehicleService,
                                     Router router,
                                     VehicleControllerPool vehicleControllerPool,
-                                    TransportOrderUtil transportOrderUtil) {
+                                    TransportOrderUtil transportOrderUtil,
+                                    RerouteTask rerouteTask,
+                                    DefaultDispatcherConfiguration configuration) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.router = requireNonNull(router, "router");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
+    this.rerouteTask = requireNonNull(rerouteTask, "rerouteTask");
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -116,15 +131,25 @@ public class AssignNextDriveOrdersPhase
     }
     else {
       LOG.debug("Assigning next drive order to vehicle '{}'...", vehicle.getName());
-      // The vehicle is still processing a transport order.
       // Get the next drive order to be processed.
-      vehicleService.updateVehicleProcState(vehicle.getReference(),
-                                            Vehicle.ProcState.PROCESSING_ORDER);
       DriveOrder currentDriveOrder = vehicleOrder.getCurrentDriveOrder();
       if (transportOrderUtil.mustAssign(currentDriveOrder, vehicle)) {
+        if (configuration.rerouteTrigger() == DRIVE_ORDER_FINISHED) {
+          rerouteTask.run();
+        }
+        
+        // Get an up-to-date copy of the transport order in case the route changed
+        vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
+                                                         vehicle.getTransportOrder());
+        currentDriveOrder = vehicleOrder.getCurrentDriveOrder();
+
         // Let the vehicle controller know about the new drive order.
         vehicleControllerPool.getVehicleController(vehicle.getName())
             .setDriveOrder(currentDriveOrder, vehicleOrder.getProperties());
+
+        // The vehicle is still processing a transport order.
+        vehicleService.updateVehicleProcState(vehicle.getReference(),
+                                              Vehicle.ProcState.PROCESSING_ORDER);
       }
       // If the drive order need not be assigned, immediately check for another one.
       else {

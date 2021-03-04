@@ -297,14 +297,19 @@ public class StandardVehicleService
                                             Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException, KernelRuntimeException {
     synchronized (globalSyncObject) {
-      model.setVehicleIntegrationLevel(ref, integrationLevel);
-      
-      if (integrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED) {
-        Vehicle vehicle = globalObjectPool.getObject(Vehicle.class, ref);
-        if (vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE)) {
-          updateVehicleProcState(ref, Vehicle.ProcState.IDLE);
-        }
+      Vehicle vehicle = fetchObject(Vehicle.class, ref);
+
+      if (vehicle.isProcessingOrder()
+          && (integrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED
+              || integrationLevel == Vehicle.IntegrationLevel.TO_BE_NOTICED)) {
+        throw new IllegalArgumentException(
+            String.format("%s: Cannot change integration level to %s while processing orders.",
+                          vehicle.getName(),
+                          integrationLevel.name())
+        );
       }
+
+      model.setVehicleIntegrationLevel(ref, integrationLevel);
     }
   }
 

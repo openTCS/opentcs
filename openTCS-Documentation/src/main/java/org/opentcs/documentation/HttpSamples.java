@@ -16,7 +16,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
@@ -29,6 +32,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.OrderStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOrderState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleStatusMessage;
 import org.slf4j.LoggerFactory;
 
@@ -56,15 +61,102 @@ public class HttpSamples {
       case STATUS:
         writeStatusEventsSample(outputFile);
         break;
-
       case CREATE_ORDER:
         writeTransportOrderCreationSample(outputFile);
         break;
-
+      case STATUS_TRANSPORT_ORDERS:
+        writeStatusTransportOrdersSample(outputFile);
+        break;
+      case STATUS_SINGLE_TRANSPORT_ORDER:
+        writeStatusSingleTransportOrder(outputFile);
+        break;
+      case STATUS_VEHICLES:
+        writeStatusVehicles(outputFile);
+        break;
+      case STATUS_SINGLE_VEHICLE:
+        writeStatusSingleVehicle(outputFile);
+        break;
       default:
         throw new IllegalArgumentException("Unhandled sample type: " + type);
     }
+  }
 
+  private static void writeStatusSingleVehicle(File outputFile) {
+    Vehicle vehicle = new Vehicle("Vehicle-1")
+        .withProcState(Vehicle.ProcState.AWAITING_ORDER)
+        .withEnergyLevel(60)
+        .withProperty("someKey", "someValue");
+    VehicleState vehicleState = VehicleState.fromVehicle(vehicle);
+
+    writeToFile(vehicleState, outputFile);
+  }
+
+  private static void writeStatusVehicles(File outputFile) {
+    List<Vehicle> vehicles = new ArrayList<>();
+    vehicles.add(new Vehicle("Vehicle-1")
+        .withProcState(Vehicle.ProcState.AWAITING_ORDER)
+        .withEnergyLevel(60)
+        .withProperty("someKey", "someValue"));
+    vehicles.add(new Vehicle("Vehicle-2")
+        .withProcState(Vehicle.ProcState.AWAITING_ORDER)
+        .withEnergyLevel(30));
+    vehicles.add(new Vehicle("Vehicle-3")
+        .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        .withEnergyLevel(40));
+    List<VehicleState> vehicleStates
+        = vehicles
+            .stream()
+            .map(vehicle -> VehicleState.fromVehicle(vehicle))
+            .collect(Collectors.toList());
+    writeToFile(vehicleStates, outputFile);
+  }
+
+  private static void writeStatusSingleTransportOrder(File outputFile) {
+    TransportOrder transportOrder
+        = createSampleTransportOrder(0,
+                                     "cat1",
+                                     new Vehicle("Vehicle-1")
+                                         .withProcState(Vehicle.ProcState.IDLE)
+                                         .withEnergyLevel(50));
+    TransportOrderState transportOrderState
+        = TransportOrderState.fromTransportOrder(transportOrder);
+    writeToFile(transportOrderState, outputFile);
+  }
+
+  private static void writeStatusTransportOrdersSample(File outputFile) {
+    List<TransportOrder> transportOrders = new ArrayList<>();
+    Vehicle simpleVehicle1 = new Vehicle("Vehicle-1")
+        .withProcState(Vehicle.ProcState.IDLE)
+        .withEnergyLevel(50);
+    Vehicle simpleVehicle2 = new Vehicle("Vehicle-2")
+        .withProcState(Vehicle.ProcState.IDLE)
+        .withEnergyLevel(50);
+    transportOrders.add(createSampleTransportOrder(0, "cat1", simpleVehicle1));
+    transportOrders.add(createSampleTransportOrder(1, "cat1", simpleVehicle2));
+    transportOrders.add(createSampleTransportOrder(2, "cat2", simpleVehicle1));
+    List<TransportOrderState> transportOrderStates
+        = transportOrders
+            .stream()
+            .map(x -> TransportOrderState.fromTransportOrder(x))
+            .collect(Collectors.toList());
+    writeToFile(transportOrderStates, outputFile);
+  }
+
+  private static TransportOrder createSampleTransportOrder(int index,
+                                                           String category,
+                                                           Vehicle intendedVehicle) {
+    List<DriveOrder> driveOrders = new ArrayList<>();
+    DriveOrder.Destination dest = new DriveOrder.Destination(getSampleDestinationLocation().getReference());
+    driveOrders.add(new DriveOrder(dest));
+    TransportOrder someTransportOrder = new TransportOrder("TransportOrder-" + index, driveOrders)
+        .withProperty("someKey", "someValue")
+        .withCategory(category)
+        .withIntendedVehicle(intendedVehicle.getReference());
+    return someTransportOrder;
+  }
+
+  private static Location getSampleDestinationLocation() {
+    return new Location("Location-01", new LocationType("LocationType-01").getReference());
   }
 
   private static void writeStatusEventsSample(File outputFile) {
@@ -148,6 +240,10 @@ public class HttpSamples {
 
   private static enum SampleType {
     STATUS,
-    CREATE_ORDER
+    CREATE_ORDER,
+    STATUS_TRANSPORT_ORDERS,
+    STATUS_SINGLE_TRANSPORT_ORDER,
+    STATUS_VEHICLES,
+    STATUS_SINGLE_VEHICLE
   }
 }

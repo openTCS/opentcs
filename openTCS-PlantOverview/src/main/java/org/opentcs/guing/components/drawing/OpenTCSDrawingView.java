@@ -15,7 +15,6 @@
  */
 package org.opentcs.guing.components.drawing;
 
-import com.google.common.collect.Iterators;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -55,13 +54,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -98,7 +95,6 @@ import org.jhotdraw.draw.event.HandleListener;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.gui.datatransfer.ClipboardUtil;
 import org.jhotdraw.util.ReversedList;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
@@ -135,6 +131,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -264,10 +261,6 @@ public abstract class OpenTCSDrawingView
    */
   private final List<VehicleModel> fVehicles = new ArrayList<>();
   /**
-   * A cycler for colors to be used for order routes.
-   */
-  private final Iterator<Color> orderColorCycler;
-  /**
    * A pointer to a figure that shall be highlighted by a red circle.
    */
   private Figure fFocusFigure;
@@ -348,19 +341,6 @@ public abstract class OpenTCSDrawingView
     setBackground(Color.LIGHT_GRAY);
     setOpaque(true);
     setAutoscrolls(true);
-
-    orderColorCycler = Iterators.cycle(Color.MAGENTA,
-                                       Color.CYAN,
-                                       Color.RED,
-                                       Color.GREEN,
-                                       Color.GRAY,
-                                       new Color(255, 64, 128),
-                                       new Color(255, 128, 0),
-                                       new Color(0, 128, 255),
-                                       new Color(128, 0, 255),
-                                       new Color(64, 64, 128),
-                                       new Color(64, 128, 64),
-                                       new Color(128, 64, 128));
   }
 
   @Override
@@ -705,7 +685,9 @@ public abstract class OpenTCSDrawingView
    *
    * @param bookmark The bookmark.
    */
-  public void scaleAndScrollTo(ViewBookmark bookmark) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public void scaleAndScrollTo(org.opentcs.data.model.visualization.ViewBookmark bookmark) {
     scaleAndScrollTo(bookmark.getViewScaleX(),
                      bookmark.getCenterX(),
                      bookmark.getCenterY());
@@ -1426,36 +1408,25 @@ public abstract class OpenTCSDrawingView
       return;
     }
 
+    refreshDetailLevel();
     handlesAreValid = true;
     selectionHandles.clear();
     Rectangle invalidatedArea = null;
 
-    while (true) {
-      for (Figure figure : getSelectedFigures()) {
-        for (Handle handle : figure.createHandles(detailLevel)) {
-          handle.setView(this);
-          selectionHandles.add(handle);
-          handle.addHandleListener(handleEventHandler);
+    for (Figure figure : getSelectedFigures()) {
+      for (Handle handle : figure.createHandles(detailLevel)) {
+        handle.setView(this);
+        selectionHandles.add(handle);
+        handle.addHandleListener(handleEventHandler);
 
-          if (invalidatedArea == null) {
-            invalidatedArea = handle.getDrawingArea();
-          }
-          else {
-            invalidatedArea.add(handle.getDrawingArea());
-          }
+        if (invalidatedArea == null) {
+          invalidatedArea = handle.getDrawingArea();
+        }
+        else {
+          invalidatedArea.add(handle.getDrawingArea());
         }
       }
-
-      if (selectionHandles.isEmpty() && detailLevel != 0) {
-        // No handles are available at the desired detail level.
-        // Retry with detail level 0.
-        detailLevel = 0;
-        continue;
-      }
-
-      break;  // while
     }
-
     if (invalidatedArea != null) {
       repaint(invalidatedArea);
     }
@@ -1973,7 +1944,9 @@ public abstract class OpenTCSDrawingView
 
   @Override // DrawingView
   public void addToSelection(Figure figure) {
+
     Set<Figure> oldSelection = new HashSet<>(selectedFigures);
+    refreshDetailLevel();
 
     if (selectedFigures.add(figure)) {
       figure.addFigureListener(handleInvalidator);
@@ -2004,12 +1977,29 @@ public abstract class OpenTCSDrawingView
     }
   }
 
+  /**
+   * The detailLevel indicates what type of Handles are supposed to be shouwn. In Operating mode,
+   * we require the type of handles for our figures that do not allow moving, that is
+   * indicated by -1.
+   * In modelling mode we require the regular Handles, indicated by 0.
+   */
+  private void refreshDetailLevel() {
+    if (OperationMode.OPERATING.equals(appState.getOperationMode())) {
+      detailLevel = -1;
+    }
+    else {
+      detailLevel = 0;
+    }
+  }
+
   @Override // DrawingView
   public void addToSelection(Collection<Figure> figures) {
+
     Set<Figure> oldSelection = new HashSet<>(selectedFigures);
     Set<Figure> newSelection = new HashSet<>(selectedFigures);
     boolean selectionChanged = false;
     Rectangle invalidatedArea = null;
+    refreshDetailLevel();
 
     for (Figure figure : figures) {
       if (selectedFigures.add(figure)) {
@@ -2079,6 +2069,7 @@ public abstract class OpenTCSDrawingView
 
   @Override // DrawingView
   public void selectAll() {
+
     Set<Figure> oldSelection = new HashSet<>(selectedFigures);
     selectedFigures.clear();
 
@@ -2264,8 +2255,11 @@ public abstract class OpenTCSDrawingView
    * @return A newly created bookmark for this view's current position and zoom
    * factor.
    */
-  public ViewBookmark bookmark() {
-    ViewBookmark bookmark = new ViewBookmark();
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public org.opentcs.data.model.visualization.ViewBookmark bookmark() {
+    org.opentcs.data.model.visualization.ViewBookmark bookmark
+        = new org.opentcs.data.model.visualization.ViewBookmark();
 
     // Currently visible part of the drawing in drawing coordinates.
     Rectangle2D.Double visibleViewRect = viewToDrawing(getVisibleRect());
@@ -2362,12 +2356,6 @@ public abstract class OpenTCSDrawingView
 
   @Override // DrawingView
   public void setHandleDetailLevel(int newValue) {
-    if (newValue == detailLevel) {
-      return;
-    }
-    detailLevel = newValue;
-    invalidateHandles();
-    validateHandles();
   }
 
   @Override // DrawingView
@@ -2495,6 +2483,7 @@ public abstract class OpenTCSDrawingView
     }
     // Create clones of all buffered figures
     List<Figure> clonedFigures = fOpenTCSView.cloneFigures(figuresToClone);
+    addToSelection(clonedFigures);
     if (!clonedFigures.isEmpty()) {
       // Undo for paste
       getDrawing().fireUndoableEditHappened(new PasteEdit(this, clonedFigures));
@@ -2549,36 +2538,8 @@ public abstract class OpenTCSDrawingView
 
   @Override // EditableComponent
   public void duplicate() {
-    Collection<Figure> sorted = getDrawing().sort(getSelectedFigures());
-    Map<Figure, Figure> originalToDuplicateMap = new HashMap<>(sorted.size());
-
-    clearSelection();
-
-    final List<Figure> duplicates = new ArrayList<>(sorted.size());
-    AffineTransform tx = new AffineTransform();
-    // TODO: Distance of the duplicate configurable
-    tx.translate(50, 50);
-
-    for (Figure f : sorted) {
-      if (f instanceof PathConnection || f instanceof LinkConnection) {
-        continue;
-      }
-
-      Figure d = f.clone();
-      d.transform(tx);
-      duplicates.add(d);
-      originalToDuplicateMap.put(f, d);
-      drawing.add(d);
-      editor.figureAdded(d);
-    }
-
-    for (Figure f : duplicates) {
-      f.remap(originalToDuplicateMap, false);
-    }
-
-    addToSelection(duplicates);
-
-    getDrawing().fireUndoableEditHappened(new PasteEdit(this, duplicates));
+    copySelectedItems();
+    pasteBufferedItems();
   }
 
   /**

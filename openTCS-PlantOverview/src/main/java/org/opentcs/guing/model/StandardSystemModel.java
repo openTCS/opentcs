@@ -32,7 +32,9 @@ import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.course.CoordinateBasedDrawingMethod;
 import org.opentcs.guing.components.drawing.course.DrawingMethod;
+import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import static org.opentcs.guing.model.ModelComponent.MISCELLANEOUS;
 import static org.opentcs.guing.model.ModelComponent.NAME;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
@@ -104,6 +106,11 @@ class StandardSystemModel
     createMainFolders();
     setupParentFolders();
     createProperties();
+  }
+
+  @Override
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
 
   @Override // SystemModel
@@ -476,11 +483,16 @@ class StandardSystemModel
 
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Name
+
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("systemModel.name.text"));
     pName.setHelptext(bundle.getString("systemModel.name.helptext"));
     setProperty(NAME, pName);
+
+    KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
+    pMiscellaneous.setDescription("Miscellaneous properties");
+    pMiscellaneous.setHelptext("Miscellaneous properties");
+    setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 
   /**

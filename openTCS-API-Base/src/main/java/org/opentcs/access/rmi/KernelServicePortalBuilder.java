@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelServicePortal;
-import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.access.rmi.services.RemoteKernelServicePortalProxy;
@@ -29,7 +29,7 @@ public class KernelServicePortalBuilder {
   /**
    * Provides socket factories used for RMI.
    */
-  private SocketFactoryProvider socketFactoryProvider = new AnonSslSocketFactoryProvider();
+  private SocketFactoryProvider socketFactoryProvider = new NullSocketFactoryProvider();
   /**
    * The user name for logging in.
    */

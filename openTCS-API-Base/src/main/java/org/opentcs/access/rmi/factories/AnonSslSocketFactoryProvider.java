@@ -17,6 +17,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,10 @@ import org.slf4j.LoggerFactory;
  * (with SSL) when there's no keystore on the server-side and no truststore on the client-side.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Use {@link SecureSocketFactoryProvider} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class AnonSslSocketFactoryProvider
     implements SocketFactoryProvider {
 

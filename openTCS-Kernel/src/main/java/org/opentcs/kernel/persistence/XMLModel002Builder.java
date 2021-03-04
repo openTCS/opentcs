@@ -30,6 +30,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.to.model.BlockCreationTO;
@@ -58,7 +59,6 @@ import org.opentcs.data.model.visualization.ImageLayoutElement;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.ShapeLayoutElement;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.util.Comparators;
@@ -99,7 +99,7 @@ public class XMLModel002Builder
   private static final Logger LOG = LoggerFactory.getLogger(XMLModel002Builder.class);
 
   /**
-   * Creates a new XMLModel001Builder.
+   * Creates a new instance.
    */
   public XMLModel002Builder() {
   }
@@ -120,6 +120,7 @@ public class XMLModel002Builder
 
     PlantModelTO plantModel = new PlantModelTO();
     plantModel.setName(name != null ? name : model.getName());
+    plantModel.setProperties(convertProperties(model.getProperties()));
     plantModel.setVersion(VERSION_STRING)
         .setPoints(getPoints(model))
         .setPaths(getPath(model))
@@ -164,21 +165,14 @@ public class XMLModel002Builder
                                                                   Charset.forName("UTF-8")))) {
       PlantModelTO plantModel = PlantModelTO.fromXml(reader);
 
-      String modelName = plantModel.getName();
-      if (modelName.isEmpty()) {
-        modelName = "ModelNameMissing";
-        //throw new InvalidModelException("Model name missing");
-      }
-
       String modelVersion = plantModel.getVersion();
       if (!VERSION_STRING.equals(modelVersion)) {
         throw new InvalidModelException("Bad model version: " + modelVersion);
       }
 
-      // Clear the model before reading the new data.
       model.clear();
-      // Set the model's name.
-      model.setName(modelName);
+      model.setName(plantModel.getName());
+      model.setProperties(convertProperties(plantModel.getProperties()));
 
       // Fill the model with components.
       List<PointTO> pointElements = plantModel.getPoints();
@@ -233,7 +227,7 @@ public class XMLModel002Builder
         outgoingPathList.add(new PointTO.OutgoingPath().setName(curRef.getName()));
       }
       point.setOutgoingPaths(outgoingPathList)
-          .setProperties(getProperties(curPoint));
+          .setProperties(convertProperties(curPoint.getProperties()));
 
       result.add(point);
     }
@@ -260,7 +254,7 @@ public class XMLModel002Builder
           .setMaxVelocity((long) curPath.getMaxVelocity())
           .setMaxReverseVelocity((long) curPath.getMaxReverseVelocity())
           .setLocked(curPath.isLocked())
-          .setProperties(getProperties(curPath));
+          .setProperties(convertProperties(curPath.getProperties()));
       result.add(path);
     }
     return result;
@@ -284,7 +278,7 @@ public class XMLModel002Builder
           .setEnergyLevelGood((long) curVehicle.getEnergyLevelGood())
           .setMaxVelocity(curVehicle.getMaxVelocity())
           .setMaxReverseVelocity(curVehicle.getMaxReverseVelocity())
-          .setProperties(getProperties(curVehicle));
+          .setProperties(convertProperties(curVehicle.getProperties()));
       result.add(vehicle);
     }
 
@@ -312,7 +306,7 @@ public class XMLModel002Builder
         operations.add(operation);
       }
       locationType.setAllowedOperations(operations)
-          .setProperties(getProperties(curType));
+          .setProperties(convertProperties(curType.getProperties()));
 
       result.add(locationType);
     }
@@ -352,7 +346,7 @@ public class XMLModel002Builder
         links.add(link);
       }
       location.setLinks(links)
-          .setProperties(getProperties(curLoc));
+          .setProperties(convertProperties(curLoc.getProperties()));
 
       result.add(location);
     }
@@ -380,7 +374,7 @@ public class XMLModel002Builder
         members.add(member);
       }
       block.setMembers(members)
-          .setProperties(getProperties(curBlock));
+          .setProperties(convertProperties(curBlock.getProperties()));
 
       result.add(block);
     }
@@ -407,7 +401,7 @@ public class XMLModel002Builder
         hops.add(new StaticRouteTO.Hop().setName(curRef.getName()));
       }
       staticRoute.setHops(hops)
-          .setProperties(getProperties(curRoute));
+          .setProperties(convertProperties(curRoute.getProperties()));
 
       result.add(staticRoute);
     }
@@ -435,7 +429,7 @@ public class XMLModel002Builder
         members.add(member);
       }
       group.setMembers(members)
-          .setProperties(getProperties(curGroup));
+          .setProperties(convertProperties(curGroup.getProperties()));
 
       result.add(group);
     }
@@ -559,7 +553,8 @@ public class XMLModel002Builder
 
       // Add ViewBookmarks.
       List<VisualLayoutTO.ViewBookmark> viewBookmarks = new ArrayList<>();
-      for (ViewBookmark curBookmark : curLayout.getViewBookmarks()) {
+      for (org.opentcs.data.model.visualization.ViewBookmark curBookmark
+               : curLayout.getViewBookmarks()) {
         viewBookmarks.add(new VisualLayoutTO.ViewBookmark()
             .setLabel(curBookmark.getLabel())
             .setCenterX(curBookmark.getCenterX())
@@ -569,7 +564,7 @@ public class XMLModel002Builder
             .setViewRotation(curBookmark.getViewRotation()));
       }
       layout.setViewBookmarks(viewBookmarks)
-          .setProperties(getProperties(curLayout));
+          .setProperties(convertProperties(curLayout.getProperties()));
 
       result.add(layout);
     }
@@ -593,7 +588,7 @@ public class XMLModel002Builder
                                        pointTO.getzPosition()))
               .withVehicleOrientationAngle(pointTO.getVehicleOrientationAngle().doubleValue())
               .withType(Point.Type.valueOf(pointTO.getType()))
-              .withProperties(getProperties(pointTO.getProperties())));
+              .withProperties(convertProperties(pointTO.getProperties())));
     }
   }
 
@@ -614,7 +609,7 @@ public class XMLModel002Builder
               .withEnergyLevelGood(vehicleTO.getEnergyLevelGood().intValue())
               .withMaxReverseVelocity(vehicleTO.getMaxReverseVelocity())
               .withMaxVelocity(vehicleTO.getMaxVelocity())
-              .withProperties(getProperties(vehicleTO.getProperties()))
+              .withProperties(convertProperties(vehicleTO.getProperties()))
       );
     }
   }
@@ -638,7 +633,7 @@ public class XMLModel002Builder
               .withLocked(pathTO.isLocked())
               .withMaxVelocity(pathTO.getMaxVelocity().intValue())
               .withMaxReverseVelocity(pathTO.getMaxReverseVelocity().intValue())
-              .withProperties(getProperties(pathTO.getProperties())));
+              .withProperties(convertProperties(pathTO.getProperties())));
     }
 //
 //    // Loop through all paths. Add the path to its source point as an outgoing path and to its 
@@ -662,7 +657,7 @@ public class XMLModel002Builder
       model.createLocationType(
           new LocationTypeCreationTO(locationTypeTO.getName())
               .withAllowedOperations(getAllowedOperations(locationTypeTO.getAllowedOperations()))
-              .withProperties(getProperties(locationTypeTO.getProperties())));
+              .withProperties(convertProperties(locationTypeTO.getProperties())));
     }
   }
 
@@ -691,7 +686,7 @@ public class XMLModel002Builder
                                             locationTO.getyPosition(),
                                             locationTO.getzPosition()))
               .withLinks(getLinks(locationTO))
-              .withProperties(getProperties(locationTO.getProperties()))
+              .withProperties(convertProperties(locationTO.getProperties()))
       );
     }
 
@@ -720,7 +715,7 @@ public class XMLModel002Builder
       model.createBlock(
           new BlockCreationTO(blockTO.getName())
               .withMemberNames(getMemberNames(blockTO.getMembers()))
-              .withProperties(getProperties(blockTO.getProperties())));
+              .withProperties(convertProperties(blockTO.getProperties())));
     }
   }
 
@@ -745,7 +740,7 @@ public class XMLModel002Builder
       model.createGroup(
           new GroupCreationTO(groupTO.getName())
               .withMemberNames(getMemberNames(groupTO.getMembers()))
-              .withProperties(getProperties(groupTO.getProperties())));
+              .withProperties(convertProperties(groupTO.getProperties())));
     }
   }
 
@@ -763,7 +758,7 @@ public class XMLModel002Builder
       model.createStaticRoute(
           new org.opentcs.access.to.model.StaticRouteCreationTO(staticRouteTO.getName())
               .setHopNames(getHopNames(staticRouteTO.getHops()))
-              .setProperties(getProperties(staticRouteTO.getProperties())));
+              .setProperties(convertProperties(staticRouteTO.getProperties())));
     }
   }
 
@@ -791,7 +786,7 @@ public class XMLModel002Builder
               .withScaleY(visualLayoutTO.getScaleY())
               .withShapeElements(getShapeElements(visualLayoutTO.getShapeLayoutElements()))
               .withModelElements(getModelElements(visualLayoutTO.getModelLayoutElements()))
-              .withProperties(getProperties(visualLayoutTO.getProperties()))
+              .withProperties(convertProperties(visualLayoutTO.getProperties()))
       );
     }
   }
@@ -802,7 +797,7 @@ public class XMLModel002Builder
     for (VisualLayoutTO.ModelLayoutElement mlElement : elements) {
       result.add(new ModelLayoutElementCreationTO(mlElement.getVisualizedObjectName())
           .withLayer(mlElement.getLayer().intValue())
-          .withProperties(getProperties(mlElement.getProperties()))
+          .withProperties(convertProperties(mlElement.getProperties()))
       );
     }
     return result;
@@ -814,42 +809,21 @@ public class XMLModel002Builder
     for (VisualLayoutTO.ShapeLayoutElement slElement : shapes) {
       result.add(new ShapeLayoutElementCreationTO("")
           .withLayer(slElement.getLayer().intValue())
-          .withProperties(getProperties(slElement.getProperties())));
+          .withProperties(convertProperties(slElement.getProperties())));
     }
     return result;
   }
 
-  private static List<PropertyTO> getProperties(@Nonnull TCSObject<?> object) {
-    requireNonNull(object, "object");
-
-    List<PropertyTO> properties = new ArrayList<>();
-    for (Map.Entry<String, String> entry : object.getProperties().entrySet()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(entry.getKey());
-      property.setValue(entry.getValue());
-      properties.add(property);
-    }
-    return properties;
-  }
-
-  private void setModelProperties(@Nonnull Model model,
-                                  @Nonnull List<PropertyTO> properties,
-                                  @Nonnull TCSObjectReference<?> ref) {
-    requireNonNull(model, "model");
+  private static List<PropertyTO> convertProperties(@Nonnull Map<String, String> properties) {
     requireNonNull(properties, "properties");
-    requireNonNull(ref, "ref");
 
-    for (PropertyTO property : properties) {
-      String propName
-          = Strings.isNullOrEmpty(property.getName()) ? "Property unknown" : property.getName();
-      String propValue
-          = Strings.isNullOrEmpty(property.getValue()) ? "Value unknown" : property.getValue();
-
-      model.getObjectPool().setObjectProperty(ref, propName, propValue);
-    }
+    return properties.entrySet().stream()
+        .sorted((prop1, prop2) -> prop1.getKey().compareTo(prop2.getKey()))
+        .map(prop -> new PropertyTO().setName(prop.getKey()).setValue(prop.getValue()))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  private Map<String, String> getProperties(List<PropertyTO> propsList) {
+  private Map<String, String> convertProperties(List<PropertyTO> propsList) {
     Map<String, String> result = new HashMap<>();
     for (PropertyTO property : propsList) {
       String propName

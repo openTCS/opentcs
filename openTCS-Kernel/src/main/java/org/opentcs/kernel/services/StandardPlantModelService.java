@@ -7,10 +7,13 @@
  */
 package org.opentcs.kernel.services;
 
+import java.util.HashMap;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.ModelTransitionEvent;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -109,8 +112,13 @@ public class StandardPlantModelService
   public void loadPlantModel()
       throws IllegalStateException {
     synchronized (globalSyncObject) {
+      if (!modelPersister.hasSavedModel()) {
+        createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
+        return;
+      }
+
       final String oldModelName = getLoadedModelName();
-      final String newModelName = getPersistentModelName();
+      final String newModelName = modelPersister.getPersistentModelName().orElse("");
       // Let listeners know we're in transition.
       emitModelEvent(oldModelName, newModelName, true, false);
 
@@ -150,6 +158,7 @@ public class StandardPlantModelService
     synchronized (globalSyncObject) {
       model.clear();
       model.setName(to.getName());
+      model.setProperties(new HashMap<>(to.getProperties()));
       model.createPlantModelObjects(to);
     }
 
@@ -167,13 +176,28 @@ public class StandardPlantModelService
   }
 
   @Override
+  @Deprecated
   public String getLoadedModelName() {
+    return getModelName();
+  }
+
+  @Override
+  public String getModelName() {
     synchronized (globalSyncObject) {
       return model.getName();
     }
   }
 
   @Override
+  public Map<String, String> getModelProperties()
+      throws KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      return model.getProperties();
+    }
+  }
+
+  @Override
+  @Deprecated
   public String getPersistentModelName()
       throws IllegalStateException {
     return modelPersister.getPersistentModelName().orElse("");

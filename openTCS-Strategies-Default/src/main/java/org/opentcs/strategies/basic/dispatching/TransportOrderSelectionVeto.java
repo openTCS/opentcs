@@ -12,7 +12,7 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * A predicate for {@link TransportOrder}s.
- * Returns {@code true}, if the {@link TransportOrder} isn't available to dispatch.
+ * Returns {@code true} if the given {@link TransportOrder} should NOT be processed, yet.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */

@@ -65,27 +65,23 @@ The configuration value can be a comma-separated list of <description>|<host>|<p
 The plant overview client and kernel control center client will automatically try to connect to the first host in the list.
 If that fails, they will show a dialog to select an entry or enter a different address.
 
-=== Using encrypted RMI connections
+=== Encrypting communication with the kernel
 
-Since the kernel and its client applications communicate via Java's Remote Method Invocation (RMI) mechanism it is possible to secure that communication over SSL connections.
-There are two options for using SSL connections, which can be configured by adjusting the corresponding entry in a client application's configuration file (see <<Kernel Control Center configuration>> and <<Plant Overview configuration>>):
+By default, client applications and the kernel communicate via plain Java Remote Method Invocation (RMI) calls or HTTP requests.
+These communication channels can optionally be encrypted via SSL/TLS.
+To achieve this, do the following:
 
-* `SSL_UNTRUSTED`: SSL is used, but there is no way to verify the remote peer’s identity
-* `SSL`: SSL is used, but a keystore-truststore-pair is required
-
-By default, the plant overview client and the kernel control center client are configured to use the `SSL_UNTRUSTED` option.
-However, if the `SSL` option is desired these steps are required in order to be able to use it:
-
-. Change the corresponding entry in the kernel application's and client application's configuration file to `SSL`.
-. Generate the keystore-truststore-pair (`keystore.jks` and `truststore.jks`) required for the kernel and its client applications:
-.. Start the keystore/truststore generation by executing the Unix shell script or Windows batch file (`generateKeystores.sh/.bat`) located in the kernel application's directory.
+. Generate a keystore/truststore pair (`keystore.p12` and `truststore.p12`).
+.. You can use the Unix shell script or Windows batch file (`generateKeystores.sh/.bat`) provided in the kernel application's directory for this.
 .. The scripts use the key and certificate management tool 'keytool' that is included in both the Java JDK and JRE.
-If 'keytool' is not contained in the system's `Path` environment variable the `KEYTOOL_PATH` variable in the respective script needs to be modified to point to the location where the 'keytool' is located.
-.. By default the generated files are stored in the kernel application's `config` directory.
-. Copy the `truststore.jks` file to the client application's (plant overview and/or kernel control center) `config` directory.
-.. Note that the file needs to remain in the kernel application's `config` directory as well.
-Otherwise the kernel's shutdown script won't work properly.
-. Start the kernel and the client applications.
+   If 'keytool' is not contained in the system's `Path` environment variable the `KEYTOOL_PATH` variable in the respective script needs to be modified to point to the location where the 'keytool' is located.
+.. By default, the generated files are placed in the kernel application's `config` directory.
+. Copy the `truststore.p12` file to the client application's (plant overview and/or kernel control center) `config` directory.
+  Leave the file in the kernel application's `config` directory as well.
+. In the kernel's configuration file, enable SSL for the RMI interface and/or for the web service interface.
+  (See <<RMI kernel interface configuration entries>> and/or <<Service web API configuration entries>> for a description of the configuration entries.)
+. If you enabled SSL for the RMI interface, you need to enable it in the Plant Overview's and the Kernel Control Center's configuration files, too.
+  (See <<SSL PO-side application configuration entries>> and <<SSL KCC-side application configuration entries>> for a description of the configuration entries.)
 
 === Configuring automatic parking and recharging
 

@@ -832,14 +832,6 @@ public class TransportOrder
   public TransportOrder withDriveOrders(@Nonnull List<DriveOrder> driveOrders) {
     requireNonNull(driveOrders, "driveOrders");
 
-    checkState(currentDriveOrderIndex < 0,
-               "Already processing drive order with index %s",
-               currentDriveOrderIndex);
-    checkArgument(driveOrders.size() == this.driveOrders.size(),
-                  "newOrders has wrong size: %s, should be %s",
-                  driveOrders.size(),
-                  this.driveOrders.size());
-
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),

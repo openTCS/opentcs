@@ -13,6 +13,7 @@ import com.google.inject.assistedinject.Assisted;
 import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
 import java.util.EventObject;
+import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
@@ -25,7 +26,6 @@ import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Eine gestrichelte Linie, die einen Meldepunkt mit einer Übergabestation oder
@@ -39,18 +39,26 @@ public class LinkConnection
     extends SimpleLineConnection {
 
   /**
+   * The tool tip text generator.
+   */
+  private final ToolTipTextGenerator textGenerator;
+
+  /**
    * Creates a new instance.
    *
    * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected
-   * model component(s).
+   * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param model The model corresponding to this graphical object.
+   * @param textGenerator The tool tip text generator.
    */
   @Inject
   public LinkConnection(ComponentsTreeViewManager componentsTreeManager,
                         SelectionPropertiesComponent propertiesComponent,
-                        @Assisted LinkModel model) {
+                        @Assisted LinkModel model,
+                        ToolTipTextGenerator textGenerator) {
     super(componentsTreeManager, propertiesComponent, model);
+    this.textGenerator = requireNonNull(textGenerator, "textGenerator");
+
     double[] dash = {5.0, 5.0};
     set(AttributeKeys.START_DECORATION, null);
     set(AttributeKeys.END_DECORATION, null);
@@ -88,13 +96,7 @@ public class LinkConnection
 
   @Override // AbstractFigure
   public String getToolTipText(Point2D.Double p) {
-    String linkDesc
-        = ResourceBundleUtil.getBundle().getString("link.description");
-    StringBuilder sb = new StringBuilder("<html>");
-    sb.append(linkDesc).append(" ").append("<b>").append(getModel().getName()).append("</b>");
-    sb.append("</html>");
-
-    return sb.toString();
+    return textGenerator.getToolTipText(getModel());
   }
 
   @Override // SimpleLineConnection

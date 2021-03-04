@@ -39,6 +39,7 @@ class RemoteDispatcherServiceProxy
   }
 
   @Override
+  @Deprecated
   public void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException, KernelRuntimeException {
     checkServiceAvailability();
@@ -52,6 +53,7 @@ class RemoteDispatcherServiceProxy
   }
 
   @Override
+  @Deprecated
   public void withdrawByVehicle(TCSObjectReference<Vehicle> vehicleRef,
                                 boolean immediateAbort,
                                 boolean disableVehicle)
@@ -70,6 +72,7 @@ class RemoteDispatcherServiceProxy
   }
 
   @Override
+  @Deprecated
   public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
                                        boolean immediateAbort,
                                        boolean disableVehicle)
@@ -81,6 +84,38 @@ class RemoteDispatcherServiceProxy
                                                   ref,
                                                   immediateAbort,
                                                   disableVehicle);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void withdrawByVehicle(TCSObjectReference<Vehicle> vehicleRef,
+                                boolean immediateAbort)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().withdrawByVehicle(getClientId(),
+                                           vehicleRef,
+                                           immediateAbort);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
+                                       boolean immediateAbort)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().withdrawByTransportOrder(getClientId(),
+                                                  ref,
+                                                  immediateAbort);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

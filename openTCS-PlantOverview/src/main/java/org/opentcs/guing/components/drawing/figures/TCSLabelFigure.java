@@ -18,8 +18,8 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.FigureComponent;
 
 /**
- * Das Label zu einer PointFigure das den Namen des zugehörigen Objekts im
- * Kernel-Modell anzeigt.
+ * A label belonging to another {@code Figure} that shows the name of the affiliated object in the
+ * kernel model.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
@@ -58,9 +58,9 @@ public class TCSLabelFigure
   }
 
   /**
-   * Sets the visibility of the label.
+   * Sets the visibility flag of the label.
    *
-   * @param visible
+   * @param visible The visibility flag.
    */
   public void setLabelVisible(boolean visible) {
     isLabelVisible = visible;
@@ -77,9 +77,9 @@ public class TCSLabelFigure
   }
 
   /**
-   * Position relativ zur Figur
+   * Sets the position relative to the {@code Figure}.
    *
-   * @param offset
+   * @param offset The offset.
    */
   public void setOffset(Point2D.Double offset) {
     fOffset = offset;

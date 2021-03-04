@@ -44,7 +44,6 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PathModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,10 @@ public class PathConnection
    * The dash pattern for unlocked paths.
    */
   private static final double[] UNLOCKED_DASH = {10.0, 0.0};
-
+  /**
+   * The tool tip text generator.
+   */
+  private final ToolTipTextGenerator textGenerator;
   /**
    * Control point 1.
    */
@@ -99,12 +101,15 @@ public class PathConnection
    * @param componentsTreeManager The manager for the components tree view.
    * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param model The model corresponding to this graphical object.
+   * @param textGenerator The tool tip text generator.
    */
   @Inject
   public PathConnection(ComponentsTreeViewManager componentsTreeManager,
                         SelectionPropertiesComponent propertiesComponent,
-                        @Assisted PathModel model) {
+                        @Assisted PathModel model,
+                        ToolTipTextGenerator textGenerator) {
     super(componentsTreeManager, propertiesComponent, model);
+    this.textGenerator = requireNonNull(textGenerator, "textGenerator");
     resetPath();
   }
 
@@ -517,12 +522,7 @@ public class PathConnection
 
   @Override
   public String getToolTipText(Point2D.Double p) {
-    String pathDesc = ResourceBundleUtil.getBundle().getString("path.description");
-    StringBuilder sb = new StringBuilder("<html>");
-    sb.append(pathDesc).append(" ").append("<b>").append(getModel().getName()).append("</b>");
-    sb.append("</html>");
-
-    return sb.toString();
+    return textGenerator.getToolTipText(getModel());
   }
 
   @Override

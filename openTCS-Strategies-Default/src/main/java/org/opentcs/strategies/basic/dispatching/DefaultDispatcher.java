@@ -21,6 +21,7 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.TOPOLOGY_CHANGE;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,7 @@ public class DefaultDispatcher
 
   private final DefaultDispatcherConfiguration configuration;
 
+  private final RerouteTask rerouteTask;
   /**
    *
    */
@@ -98,7 +100,8 @@ public class DefaultDispatcher
                            @KernelExecutor ScheduledExecutorService kernelExecutor,
                            FullDispatchTask fullDispatchTask,
                            Provider<PeriodicVehicleRedispatchingTask> periodicDispatchTaskProvider,
-                           DefaultDispatcherConfiguration configuration) {
+                           DefaultDispatcherConfiguration configuration,
+                           RerouteTask rerouteTask) {
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
@@ -109,6 +112,7 @@ public class DefaultDispatcher
     this.periodicDispatchTaskProvider = requireNonNull(periodicDispatchTaskProvider,
                                                        "periodicDispatchTaskProvider");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.rerouteTask = requireNonNull(rerouteTask, "rerouteTask");
   }
 
   @Override
@@ -212,6 +216,35 @@ public class DefaultDispatcher
   }
 
   @Override
+  public void withdrawOrder(TransportOrder order, boolean immediateAbort) {
+    requireNonNull(order, "order");
+    checkState(isInitialized(), "Not initialized");
+
+    // Schedule this to be executed by the kernel executor.
+    kernelExecutor.submit(() -> {
+      LOG.debug("Scheduling withdrawal for transport order '{}' (immediate={})...",
+                order.getName(),
+                immediateAbort);
+      transportOrderUtil.abortOrder(order, immediateAbort, false);
+    });
+  }
+
+  @Override
+  public void withdrawOrder(Vehicle vehicle, boolean immediateAbort) {
+    requireNonNull(vehicle, "vehicle");
+    checkState(isInitialized(), "Not initialized");
+
+    // Schedule this to be executed by the kernel executor.
+    kernelExecutor.submit(() -> {
+      LOG.debug("Scheduling withdrawal for vehicle '{}' (immediate={})...",
+                vehicle.getName(),
+                immediateAbort);
+      transportOrderUtil.abortOrder(vehicle, immediateAbort, false, false);
+    });
+  }
+
+  @Override
+  @Deprecated
   public void withdrawOrder(TransportOrder order, boolean immediateAbort, boolean disableVehicle) {
     requireNonNull(order, "order");
     checkState(isInitialized(), "Not initialized");
@@ -227,6 +260,7 @@ public class DefaultDispatcher
   }
 
   @Override
+  @Deprecated
   public void withdrawOrder(Vehicle vehicle, boolean immediateAbort, boolean disableVehicle) {
     requireNonNull(vehicle, "vehicle");
     checkState(isInitialized(), "Not initialized");
@@ -242,6 +276,7 @@ public class DefaultDispatcher
   }
 
   @Override
+  @Deprecated
   public void releaseVehicle(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
     checkState(isInitialized(), "Not initialized");
@@ -251,6 +286,14 @@ public class DefaultDispatcher
       LOG.debug("Scheduling release for vehicle '{}'...", vehicle.getName());
       transportOrderUtil.abortOrder(vehicle, true, true, true);
     });
+  }
+
+  @Override
+  public void topologyChanged() {
+    if (configuration.rerouteTrigger() == TOPOLOGY_CHANGE) {
+      LOG.debug("Scheduling reroute task...");
+      kernelExecutor.submit(rerouteTask);
+    }
   }
 
   private static boolean vehicleDispatchable(Vehicle vehicle) {

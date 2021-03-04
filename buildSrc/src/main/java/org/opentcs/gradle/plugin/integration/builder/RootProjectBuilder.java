@@ -36,8 +36,7 @@ public class RootProjectBuilder
   public void build()
       throws Exception {
     PluginFileUtils.copyFilesFromProject(getProjectBase(),
-                                         Arrays.asList(".gitattributes",
-                                                       ".nb-gradle-properties",
+                                         Arrays.asList(".nb-gradle-properties",
                                                        "gradlew",
                                                        "gradlew.bat"),
                                          getOutputPath());

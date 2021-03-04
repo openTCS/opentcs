@@ -190,7 +190,6 @@ public class MultipleSelectionTool
           else {
             v.clearSelection();
             v.addToSelection(outerFigure);
-            v.setHandleDetailLevel(v.getHandleDetailLevel() + 1);
           }
         }
       }

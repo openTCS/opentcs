@@ -663,7 +663,6 @@ public class DriverGUI
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-      JOptionPane.showMessageDialog(null, "Not supported yet");
       for (String vehicleName : vehicleNames) {
         servicePortal.getVehicleService().attachCommAdapter(
             vehicleEntryPool.getEntryFor(vehicleName).getAttachmentInformation().getVehicleReference(),

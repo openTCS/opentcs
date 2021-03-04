@@ -11,13 +11,18 @@ import java.io.IOException;
 import java.net.Socket;
 import javax.net.ssl.SSLSocket;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Extends the {@link SslRMIClientSocketFactory} by enabling anonymous cipher suites
  * (see {@link AnonSslSocketFactoryProvider#getAnonymousCipherSuites()}).
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Explicit support for anonymous cipher suites will be removed.
+ * Use {@link SecureSocketFactoryProvider}.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class AnonSslClientSocketFactory
     extends SslRMIClientSocketFactory {
 

@@ -22,7 +22,9 @@ import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.TransportOrderService;
+import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
@@ -42,6 +44,10 @@ public class OrderHandler {
    */
   private final TransportOrderService orderService;
   /**
+   * The service we use to update vehicle states.
+   */
+  private final VehicleService vehicleService;
+  /**
    * The service we use to withdraw transport orders.
    */
   private final DispatcherService dispatcherService;
@@ -53,21 +59,27 @@ public class OrderHandler {
   /**
    * Creates a new instance.
    *
-   * @param orderService The service we use to create transport orders.
-   * @param dispatcherService The service we use to withdraw transport orders.
+   * @param orderService Used to create transport orders.
+   * @param vehicleService Used to update vehicle state.
+   * @param dispatcherService Used to withdraw transport orders.
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
   public OrderHandler(TransportOrderService orderService,
+                      VehicleService vehicleService,
                       DispatcherService dispatcherService,
                       @KernelExecutor ExecutorService kernelExecutor) {
     this.orderService = requireNonNull(orderService, "orderService");
+    this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
   public void createOrder(String name, Transport order)
-      throws KernelRuntimeException, IllegalStateException {
+      throws ObjectUnknownException,
+             ObjectExistsException,
+             KernelRuntimeException,
+             IllegalStateException {
     requireNonNull(name, "name");
     requireNonNull(order, "order");
 
@@ -99,12 +111,19 @@ public class OrderHandler {
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    TransportOrder order = orderService.fetchObject(TransportOrder.class, name);
-    if (order == null) {
+    if (orderService.fetchObject(TransportOrder.class, name) == null) {
       throw new ObjectUnknownException("Unknown transport order: " + name);
     }
 
-    dispatcherService.withdrawByTransportOrder(order.getReference(), immediate, disableVehicle);
+    kernelExecutor.submit(() -> {
+      TransportOrder order = orderService.fetchObject(TransportOrder.class, name);
+      if (disableVehicle && order.getProcessingVehicle() != null) {
+        vehicleService.updateVehicleIntegrationLevel(order.getProcessingVehicle(),
+                                                     Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+      }
+
+      dispatcherService.withdrawByTransportOrder(order.getReference(), immediate);
+    });
   }
 
   public void withdrawByVehicle(String name, boolean immediate, boolean disableVehicle)
@@ -116,7 +135,14 @@ public class OrderHandler {
       throw new ObjectUnknownException("Unknown vehicle: " + name);
     }
 
-    dispatcherService.withdrawByVehicle(vehicle.getReference(), immediate, disableVehicle);
+    kernelExecutor.submit(() -> {
+      if (disableVehicle) {
+        vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
+                                                     Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+      }
+
+      dispatcherService.withdrawByVehicle(vehicle.getReference(), immediate);
+    });
   }
 
   private List<DestinationCreationTO> destinations(Transport order) {

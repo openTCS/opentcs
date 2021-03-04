@@ -52,13 +52,13 @@ public class Authenticator {
     requireNonNull(request, "request");
 
     String requestAccessKey = request.headers(HttpConstants.HEADER_NAME_ACCESS_KEY);
-    LOG.info("Provided access key in header is '{}', required value is '{}'",
-             requestAccessKey,
-             configuration.accessKey());
+    LOG.debug("Provided access key in header is '{}', required value is '{}'",
+              requestAccessKey,
+              configuration.accessKey());
 
     // Any empty access key indicates authentication is not required.
     if (Strings.isNullOrEmpty(configuration.accessKey())) {
-      LOG.info("No access key, authentication not required.");
+      LOG.debug("No access key, authentication not required.");
       return true;
     }
 

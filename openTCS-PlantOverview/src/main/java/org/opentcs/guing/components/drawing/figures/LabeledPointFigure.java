@@ -35,10 +35,8 @@ import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.decoration.PointOutlineHandle;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * LabeledPointFigure: PointFigure mit zugehörigem Label, das mit der Figur
@@ -51,13 +49,21 @@ public class LabeledPointFigure
     extends LabeledFigure {
 
   /**
+   * The tool tip text generator.
+   */
+  private final ToolTipTextGenerator textGenerator;
+
+  /**
    * Creates a new instance.
    *
    * @param figure The presentation figure.
+   * @param textGenerator The tool tip text generator.
    */
   @Inject
-  public LabeledPointFigure(@Assisted PointFigure figure) {
+  public LabeledPointFigure(@Assisted PointFigure figure,
+                            ToolTipTextGenerator textGenerator) {
     requireNonNull(figure, "figure");
+    this.textGenerator = requireNonNull(textGenerator, "textGenerator");
 
     setPresentationFigure(figure);
   }
@@ -97,20 +103,7 @@ public class LabeledPointFigure
 
   @Override
   public String getToolTipText(Point2D.Double p) {
-    PointFigure pf = getPresentationFigure();
-    String pointDesc
-        = ResourceBundleUtil.getBundle().getString("point.description");
-    StringBuilder sb = new StringBuilder("<html>");
-    sb.append(pointDesc).append(" ").append("<b>")
-        .append(pf.getModel().getName()).append("</b>");
-    // Show miscellaneous properties in tooltip
-    for (KeyValueProperty kvp : pf.getModel().getPropertyMiscellaneous().getItems()) {
-      sb.append("<br>").append(kvp.getKey()).append(": ").append(kvp.getValue());
-    }
-
-    sb.append("</html>");
-
-    return sb.toString();
+    return textGenerator.getToolTipText(getPresentationFigure().getModel());
   }
 
   @Override

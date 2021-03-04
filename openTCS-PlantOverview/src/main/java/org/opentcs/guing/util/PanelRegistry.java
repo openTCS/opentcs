@@ -35,11 +35,10 @@ public class PanelRegistry {
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param factories The factories.
    */
   @Inject
-  @SuppressWarnings("deprecation")
   public PanelRegistry(Set<PluggablePanelFactory> factories) {
     requireNonNull(factories, "factories");
 

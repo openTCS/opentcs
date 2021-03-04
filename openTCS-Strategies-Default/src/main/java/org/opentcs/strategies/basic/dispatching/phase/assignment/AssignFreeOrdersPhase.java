@@ -19,15 +19,17 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.CompositeTransportOrderSelectionVeto;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
-import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeOrderCandidateComparator;
-import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeOrderComparator;
-import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeVehicleCandidateComparator;
-import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeVehicleComparator;
+import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCandidateComparator;
+import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderComparator;
+import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCandidateComparator;
+import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +84,8 @@ public class AssignFreeOrdersPhase
   private final CompositeTransportOrderSelectionVeto transportOrderSelectionVeto;
 
   private final TransportOrderUtil transportOrderUtil;
+
+  private final DefaultDispatcherConfiguration configuration;
   /**
    * Indicates whether this component is initialized.
    */
@@ -98,7 +102,8 @@ public class AssignFreeOrdersPhase
       CompositeOrderCandidateComparator orderCandidateComparator,
       CompositeVehicleCandidateComparator vehicleCandidateComparator,
       CompositeTransportOrderSelectionVeto transportOrderSelectionVeto,
-      TransportOrderUtil transportOrderUtil) {
+      TransportOrderUtil transportOrderUtil,
+      DefaultDispatcherConfiguration configuration) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
@@ -112,6 +117,7 @@ public class AssignFreeOrdersPhase
                                                      "vehicleCandidateComparator");
     this.transportOrderSelectionVeto = requireNonNull(transportOrderSelectionVeto,
                                                       "transportOrderSelectionVeto");
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -277,9 +283,16 @@ public class AssignFreeOrdersPhase
         && vehicle.getCurrentPosition() != null
         && vehicle.getOrderSequence() == null
         && !vehicle.isEnergyLevelCritical()
+        && !needsMoreCharging(vehicle)
         && (processesNoOrder(vehicle)
             || processesDispensableOrder(vehicle))
         && !hasOrderReservation(vehicle);
+  }
+
+  private boolean needsMoreCharging(Vehicle vehicle) {
+    return configuration.keepRechargingUntilGood()
+        && vehicle.hasState(Vehicle.State.CHARGING)
+        && vehicle.isEnergyLevelDegraded();
   }
 
   private boolean processesNoOrder(Vehicle vehicle) {

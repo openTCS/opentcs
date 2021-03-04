@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.kernel.ActiveInAllModes;
@@ -75,18 +74,10 @@ public class KernelStarter {
     // Start local kernel.
     kernel.initialize();
     LOG.debug("Kernel initialized.");
-    String savedModelName = plantModelService.getPersistentModelName();
 
-    if (savedModelName != null) {
-      // Load the persistent model .
-      LOG.debug("Loading model '{}'...", savedModelName);
-      plantModelService.loadPlantModel();
-      LOG.info("Loaded model '{}'.", savedModelName);
-    }
-    else {
-      // Load an empty model.
-      plantModelService.createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
-    }
+    plantModelService.loadPlantModel();
+    LOG.info("Loaded model named '{}'.", plantModelService.getModelName());
+
     kernel.setState(Kernel.State.OPERATING);
   }
 }

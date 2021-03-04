@@ -14,6 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
+import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.action.file.LoadModelAction;
 import org.opentcs.guing.application.action.file.NewModelAction;
@@ -67,6 +68,10 @@ public class FileMenu
    * A sub-menu for setting the application's mode of operation.
    */
   private final FileModeMenu menuMode;
+  /**
+   * A menu item for showing the current model's properties.
+   */
+  private final JMenuItem menuItemModelProperties;
   /**
    * A menu item for closing the application.
    */
@@ -133,6 +138,12 @@ public class FileMenu
 
     addSeparator();
 
+    menuItemModelProperties = new JMenuItem(actionMap.get(ModelPropertiesAction.ID));
+    labels.configureMenu(menuItemModelProperties, ModelPropertiesAction.ID);
+    add(menuItemModelProperties);
+
+    addSeparator();
+
     // Menu item File -> Close
     menuItemClose = new JMenuItem(actionMap.get(CloseFileAction.ID));
     labels.configureMenu(menuItemClose, CloseFileAction.ID);
@@ -156,7 +167,7 @@ public class FileMenu
 
     menuImport.setEnabled(mode == OperationMode.MODELLING);
     menuExport.setEnabled(mode == OperationMode.MODELLING);
-    
+
     menuItemLoadModelFromKernel.setEnabled(mode == OperationMode.MODELLING);
     menuItemPersistInKernel.setEnabled(mode == OperationMode.MODELLING);
   }

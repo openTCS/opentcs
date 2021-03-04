@@ -84,7 +84,7 @@ public class StandardRemoteDispatcherService
    * @param dispatcherService The dispatcher service.
    * @param userManager The user manager.
    * @param configuration This class' configuration.
-   * @param socketFactoryProvider The provider for socket factories used for RMI.
+   * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param registryProvider The provider for the registry with which this remote service registers.
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
@@ -166,6 +166,7 @@ public class StandardRemoteDispatcherService
   }
 
   @Override
+  @Deprecated
   public void releaseVehicle(ClientID clientId, TCSObjectReference<Vehicle> ref) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
@@ -178,6 +179,7 @@ public class StandardRemoteDispatcherService
   }
 
   @Override
+  @Deprecated
   public void withdrawByVehicle(ClientID clientId,
                                 TCSObjectReference<Vehicle> ref,
                                 boolean immediateAbort,
@@ -196,6 +198,7 @@ public class StandardRemoteDispatcherService
   }
 
   @Override
+  @Deprecated
   public void withdrawByTransportOrder(ClientID clientId,
                                        TCSObjectReference<TransportOrder> ref,
                                        boolean immediateAbort,
@@ -206,6 +209,36 @@ public class StandardRemoteDispatcherService
       kernelExecutor.submit(() -> dispatcherService.withdrawByTransportOrder(ref,
                                                                              immediateAbort,
                                                                              disableVehicle))
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void withdrawByVehicle(ClientID clientId,
+                                TCSObjectReference<Vehicle> ref,
+                                boolean immediateAbort) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
+
+    try {
+      kernelExecutor.submit(() -> dispatcherService.withdrawByVehicle(ref, immediateAbort))
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void withdrawByTransportOrder(ClientID clientId,
+                                       TCSObjectReference<TransportOrder> ref,
+                                       boolean immediateAbort) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
+
+    try {
+      kernelExecutor.submit(() -> dispatcherService.withdrawByTransportOrder(ref, immediateAbort))
           .get();
     }
     catch (InterruptedException | ExecutionException exc) {

@@ -332,7 +332,7 @@ public class PlantModelCreationTO
                                     visualLayouts);
   }
 
-    /**
+  /**
    * Creates a copy of this object that includes the given block in the list of locations.
    *
    * @param location the new location.
@@ -533,7 +533,7 @@ public class PlantModelCreationTO
    * @return A copy of this model that also includes the given route.
    */
   @Deprecated
-  @ScheduledApiChange(when="5.0")
+  @ScheduledApiChange(when = "5.0")
   public PlantModelCreationTO withStaticRoute(@Nonnull StaticRouteCreationTO staticRoute) {
     requireNonNull(staticRoute, "staticRoute");
     return new PlantModelCreationTO(getName(),
@@ -678,4 +678,49 @@ public class PlantModelCreationTO
                                     listWithAppendix(visualLayouts, visualLayout));
   }
 
+  /**
+   * Creates a copy of this object with the given properties.
+   *
+   * @param properties The new properties.
+   * @return A copy of this object, differing in the given properties.
+   */
+  @Override
+  public PlantModelCreationTO withProperties(@Nonnull Map<String, String> properties) {
+    return new PlantModelCreationTO(getName(),
+                                    properties,
+                                    points,
+                                    paths,
+                                    locationTypes,
+                                    locations,
+                                    blocks,
+                                    groups,
+                                    staticRoutes,
+                                    vehicles,
+                                    visualLayouts);
+  }
+
+  /**
+   * Creates a copy of this object and adds the given property.
+   * If value == null, then the key-value pair is removed from the properties.
+   *
+   * @param key the key.
+   * @param value the value
+   * @return A copy of this object that either
+   * includes the given entry in it's current properties, if value != null or
+   * excludes the entry otherwise.
+   */
+  @Override
+  public PlantModelCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
+    return new PlantModelCreationTO(getName(),
+                                    propertiesWith(key, value),
+                                    points,
+                                    paths,
+                                    locationTypes,
+                                    locations,
+                                    blocks,
+                                    groups,
+                                    staticRoutes,
+                                    vehicles,
+                                    visualLayouts);
+  }
 }

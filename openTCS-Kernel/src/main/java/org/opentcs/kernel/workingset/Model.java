@@ -9,6 +9,7 @@ package org.opentcs.kernel.workingset;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +49,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.ShapeLayoutElement;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -84,6 +84,10 @@ public class Model {
    * This model's name.
    */
   private String name = "";
+  /**
+   * This model's properties.
+   */
+  private Map<String, String> properties = new HashMap<>();
 
   /**
    * Creates a new model.
@@ -121,10 +125,28 @@ public class Model {
   /**
    * Sets this model's name.
    *
-   * @param newName This model's new name.
+   * @param name This model's new name.
    */
-  public void setName(String newName) {
-    name = requireNonNull(newName, "newName");
+  public void setName(String name) {
+    this.name = requireNonNull(name, "name");
+  }
+
+  /**
+   * Returns this model's properties.
+   *
+   * @return This model's properties.
+   */
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  /**
+   * Sets this model's properties.
+   *
+   * @param properties The properties.
+   */
+  public void setProperties(Map<String, String> properties) {
+    this.properties = requireNonNull(properties, "properties");
   }
 
   /**
@@ -386,7 +408,7 @@ public class Model {
   @Deprecated
   public VisualLayout setVisualLayoutViewBookmarks(
       TCSObjectReference<VisualLayout> ref,
-      List<ViewBookmark> bookmarks)
+      List<org.opentcs.data.model.visualization.ViewBookmark> bookmarks)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     VisualLayout layout = objectPool.getObjectOrNull(VisualLayout.class, ref);
@@ -1947,7 +1969,7 @@ public class Model {
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
-  
+
   /**
    * Sets a vehicle's processing state.
    *

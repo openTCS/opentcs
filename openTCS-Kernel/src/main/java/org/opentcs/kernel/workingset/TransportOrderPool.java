@@ -437,11 +437,8 @@ public class TransportOrderPool {
    * @throws IllegalArgumentException If the destinations of the given drive
    * orders do not match the destinations of the drive orders in this transport
    * order.
-   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
-   * instead.
    */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
+  @SuppressWarnings("deprecation")
   public TransportOrder setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
                                                      List<DriveOrder> newOrders)
       throws ObjectUnknownException, IllegalArgumentException {

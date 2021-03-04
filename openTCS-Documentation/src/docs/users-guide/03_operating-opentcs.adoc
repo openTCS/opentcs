@@ -93,7 +93,7 @@ Select menu:File[Persist model in the kernel] and your model will be persisted i
 This, though, requires you to save it locally first.
 Note that the model that was previously persisted in the kernel will be replaced, as the kernel can only keep a single model at a time.
 
-=== Operating the system
+=== Operating the plant
 
 These instructions explain how the newly created model that was persisted in the kernel can be used in plant operation mode, how vehicle drivers are used and how transport orders can be created and processed by a vehicle.
 
@@ -114,10 +114,10 @@ These instructions explain how the newly created model that was persisted in the
 (In a real-world application, a vehicle driver communicating with a real vehicle would automatically report the vehicle's current position to the kernel as soon as it is known.)
 . Switch to the plant overview client.
 An icon representing the vehicle should now be shown at the point on which you placed it using the loopback driver.
-. Right-click on the vehicle and select menu:Context menu[Dispatch Vehicle] to allow the kernel to dispatch the vehicle.
-The vehicle is then available for processing orders, which is indicated by a processing state `IDLE` in the property panel at the bottom left of the plant overview client's window.
-(You can revert this by right-clicking on the vehicle and selecting menu:Context menu[Withdraw TO and Disable Vehicle] in the context menu.
-The processing state shown is now `UNAVAILABLE` and the vehicle will not be dispatched for transport orders any more.)
+. Right-click on the vehicle and select menu:Context menu[Change integration level > ...to utilize this vehicle for transport orders] to allow the kernel to dispatch the vehicle.
+The vehicle is then available for processing orders, which is indicated by an integration level `TO_BE_UTILIZED` in the property panel at the bottom left of the plant overview client's window.
+(You can revert this by right-clicking on the vehicle and selecting menu:Context menu[Change integration level > ...to respect this vehicle's position] in the context menu.
+The integration level shown is now `TO_BE_RESPECTED` and the vehicle will not be dispatched for transport orders any more.)
 
 NOTE: For now, all steps above can either be done in the kernel control center provided by the kernel itself or in the standalone/remote version.
 The kernel control center GUI in the kernel will be removed in openTCS 5.0, though.
@@ -146,10 +146,26 @@ The loopback driver simulates the vehicle's movement to the destinations and the
 ==== Withdrawing transport orders using the plant overview client
 
 A transport order can be withdrawn from a vehicle that is currently processing it.
-This can be done by right-clicking on the respective vehicle in the plant overview client and selecting menu:Context menu[Withdraw Transport Order].
-The processing of the order will be cancelled and the vehicle (driver) will not receive any further drive orders.
-Processing of this transport order _cannot_ be resumed later.
-Instead, a new transport order will have to be created.
+This can be done by right-clicking on the respective vehicle in the plant overview client, selecting menu:Context menu[Withdraw transport order] and then selecting one of the following actions:
+
+* '...and let the vehicle finish movement':
+  The vehicle will process any movement orders it has already received and will stop after processing them.
+* '...and stop the vehicle immediately':
+  The vehicle is asked to discard all movement orders it has already received and to stop immediately/as soon as possible.
+
+When withdrawing a transport order, its processing will be cancelled and the vehicle (driver) will not receive any further movement orders for it.
+
+Processing of a withdrawn transport order _cannot_ be resumed later.
+To resume a transportation process that was interrupted by withdrawing a transport order, you need to create a new transport order, which may, of course, contain the same destinations as the withdrawn one.
+Note, however, that the new transport order may not be created with the same name.
+The reason for this is:
+
+a. Names of transport orders need to be unique.
+b. Withdrawing a transport order only aborts its processing, but does not remove it from the kernel's memory, yet.
+   The transport order data is kept as historical information for a while before it is completely removed.
+   (For how long the old order is kept depends on the kernel application's configuration -- see <<Order pool configuration entries>>.)
+
+As a result, a name used for a transport order may eventually be reused, but only after the actual data of the old order has been removed.
 
 ==== Continuous creation of transport orders
 
@@ -188,9 +204,9 @@ Future versions of openTCS may include a live report plugin that collects data d
 There may be situations in which you want to remove a single vehicle from a system, e.g. because the vehicle temporarily cannot be controlled by openTCS due to a hardware defect that has to be dealt with first.
 The following steps will ensure that no further transport orders are assigned to the vehicle and that the resources it might still be occupying are freed for use by other vehicles.
 
-. In the plant overview client, right-click on the vehicle and select menu:Context menu[Withdraw transport order > ...and disable vehicle] to disable the vehicle for transport order processing.
+. In the plant overview client, right-click on the vehicle and select menu:Context menu[Change integration level > ...to ignore this vehicle] to disable the vehicle for transport order processing and to free the point in the driving course that the vehicle is occupying.
 . In the kernel control center, disable the vehicle's driver by unticking the checkbox btn:[Enable loopback adapter] in the btn:[Loopback options] tab or the checkbox in the btn:[Enabled?] column of the vehicle list.
-. In the kernel control center, right-click on the vehicle in the vehicle list and select menu:Context menu[Reset vehicle position] to free the point in the driving course that the vehicle is occupying.
+. Optionally, in the kernel control center, right-click on the vehicle in the vehicle list and select menu:Context menu[Reset vehicle position].
 
 NOTE: For now, all steps regarding the kernel control center can either be done in the kernel control center provided by the kernel itself or in the standalone/remote version.
 The kernel control center GUI in the kernel will be removed in openTCS 5.0, though.

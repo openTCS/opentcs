@@ -49,4 +49,10 @@ public interface ServiceWebApiConfiguration {
       description = "Maximum number of status events to be kept.",
       orderKey = "4")
   int statusEventsCapacity();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to use SSL to encrypt connections.",
+      orderKey = "5")
+  boolean useSsl();
 }

@@ -28,8 +28,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -44,7 +42,6 @@ import org.xml.sax.SAXException;
 public class PlantModelTO
     extends PlantModelElementTO {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PlantModelTO.class);
   private String version = "";
   private List<PointTO> points = new ArrayList<>();
   private List<PathTO> paths = new ArrayList<>();

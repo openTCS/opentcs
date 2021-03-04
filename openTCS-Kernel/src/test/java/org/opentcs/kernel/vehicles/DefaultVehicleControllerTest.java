@@ -11,7 +11,6 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.opentcs.DataObjectFactory;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Scheduler;
@@ -95,10 +93,6 @@ public class DefaultVehicleControllerTest {
    * The instance we're testing.
    */
   private DefaultVehicleController stdVehicleController;
-  /**
-   * The configuration;
-   */
-  private VehiclesConfiguration configuration;
 
   @Before
   @SuppressWarnings("unchecked")
@@ -119,8 +113,6 @@ public class DefaultVehicleControllerTest {
 
     scheduler = new DummyScheduler();
     scheduler.initialize();
-    configuration = mock(VehiclesConfiguration.class);
-    when(configuration.ignoreUnknownReportedPositions()).thenReturn(true);
     stdVehicleController = new DefaultVehicleController(vehicle,
                                                         commAdapter,
                                                         localKernel,
@@ -128,9 +120,7 @@ public class DefaultVehicleControllerTest {
                                                         mock(NotificationService.class),
                                                         mock(DispatcherService.class),
                                                         scheduler,
-                                                        eventBus,
-                                                        MoreExecutors.newDirectExecutorService(),
-                                                        configuration);
+                                                        eventBus);
     stdVehicleController.initialize();
   }
 

@@ -16,8 +16,8 @@ buildscript {
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
     // Stats plugin
     classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.0'
-    // Uses JApicmp to check binary compatibility with previous releases
-    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.6'
+    // Swagger generator plugin for the web API documentation
+    classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.11.0"
   }
 }
 

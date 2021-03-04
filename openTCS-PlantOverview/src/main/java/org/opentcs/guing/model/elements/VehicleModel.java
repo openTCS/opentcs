@@ -12,6 +12,8 @@ package org.opentcs.guing.model.elements;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
@@ -95,7 +97,7 @@ public class VehicleModel
   /**
    * A reference to the vehicle.
    */
-  private Vehicle vehicle;
+  private Vehicle vehicle = new Vehicle("Dummy");
 
   /**
    * Creates a new instance.
@@ -267,6 +269,7 @@ public class VehicleModel
    *
    * @return The kernel object.
    */
+  @Nonnull
   public Vehicle getVehicle() {
     return vehicle;
   }
@@ -276,8 +279,8 @@ public class VehicleModel
    *
    * @param vehicle The kernel object.
    */
-  public void setVehicle(Vehicle vehicle) {
-    this.vehicle = vehicle;
+  public void setVehicle(@Nonnull Vehicle vehicle) {
+    this.vehicle = requireNonNull(vehicle, "vehicle");
   }
 
   /**

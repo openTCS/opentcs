@@ -14,14 +14,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import org.opentcs.components.Lifecycle;
+import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
+import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.OrderHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.RequestStatusHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.StatusEventDispatcher;
+import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
+import spark.Service;
 
 /**
  * Handles requests and produces responses for version 1 of the web API.
@@ -29,7 +33,7 @@ import spark.Response;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class V1RequestHandler
-    implements Lifecycle {
+    implements RequestHandler {
 
   /**
    * Maps between objects and their JSON representations.
@@ -46,15 +50,20 @@ public class V1RequestHandler
    * Creates transport orders.
    */
   private final OrderHandler orderHandler;
+
+  private final RequestStatusHandler statusInformationProvider;
   /**
    * Whether this instance is initialized.
    */
   private boolean initialized;
 
   @Inject
-  public V1RequestHandler(StatusEventDispatcher statusEventDispatcher, OrderHandler orderHandler) {
+  public V1RequestHandler(StatusEventDispatcher statusEventDispatcher,
+                          OrderHandler orderHandler,
+                          RequestStatusHandler requestHandler) {
     this.statusEventDispatcher = requireNonNull(statusEventDispatcher, "statusEventDispatcher");
     this.orderHandler = requireNonNull(orderHandler, "orderHandler");
+    this.statusInformationProvider = requireNonNull(requestHandler, "requestHandler");
   }
 
   @Override
@@ -84,7 +93,31 @@ public class V1RequestHandler
     initialized = false;
   }
 
-  public Object handleGetEvents(Request request, Response response)
+  @Override
+  public void addRoutes(Service service) {
+    requireNonNull(service, "service");
+
+    service.get("/events",
+                this::handleGetEvents);
+    service.put("/vehicles/:NAME/integrationLevel",
+                this::handlePutVehicleIntegrationLevel);
+    service.post("/vehicles/:NAME/withdrawal",
+                 this::handlePostWithdrawalByVehicle);
+    service.get("/vehicles/:NAME",
+                this::handleGetVehicleByName);
+    service.get("/vehicles",
+                this::handleGetVehicles);
+    service.post("/transportOrders/:NAME/withdrawal",
+                 this::handlePostWithdrawalByOrder);
+    service.post("/transportOrders/:NAME",
+                 this::handlePostTransportOrder);
+    service.get("/transportOrders/:NAME",
+                this::handleGetTransportOrderByName);
+    service.get("/transportOrders",
+                this::handleGetTransportOrders);
+  }
+
+  private Object handleGetEvents(Request request, Response response)
       throws IllegalArgumentException, IllegalStateException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return toJson(statusEventDispatcher.fetchEvents(minSequenceNo(request),
@@ -92,14 +125,17 @@ public class V1RequestHandler
                                                     timeout(request)));
   }
 
-  public Object handlePostTransportOrder(Request request, Response response)
-      throws IllegalArgumentException, IllegalStateException {
+  private Object handlePostTransportOrder(Request request, Response response)
+      throws ObjectUnknownException,
+             ObjectExistsException,
+             IllegalArgumentException,
+             IllegalStateException {
     orderHandler.createOrder(request.params(":NAME"), fromJson(request.body(), Transport.class));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
-  public Object handlePostWithdrawalByOrder(Request request, Response response)
+  private Object handlePostWithdrawalByOrder(Request request, Response response)
       throws ObjectUnknownException {
     orderHandler.withdrawByTransportOrder(request.params(":NAME"),
                                           immediate(request),
@@ -108,13 +144,61 @@ public class V1RequestHandler
     return "";
   }
 
-  public Object handlePostWithdrawalByVehicle(Request request, Response response)
+  private Object handlePostWithdrawalByVehicle(Request request, Response response)
       throws ObjectUnknownException {
     orderHandler.withdrawByVehicle(request.params(":NAME"),
                                    immediate(request),
                                    disableVehicle(request));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
+  }
+
+  private Object handleGetTransportOrders(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(
+        statusInformationProvider.getTransportOrdersState(
+            valueIfKeyPresent(request.queryMap(), "intendedVehicle")
+        )
+    );
+  }
+
+  private Object handleGetTransportOrderByName(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(statusInformationProvider.getTransportOrderByName(request.params(":NAME")));
+  }
+
+  private Object handleGetVehicles(Request request, Response response)
+      throws IllegalArgumentException {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(
+        statusInformationProvider.getVehiclesState(valueIfKeyPresent(request.queryMap(),
+                                                                     "procState"))
+    );
+  }
+
+  private Object handleGetVehicleByName(Request request, Response response)
+      throws ObjectUnknownException {
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return toJson(statusInformationProvider.getVehicleStateByName(request.params(":NAME")));
+  }
+
+  private Object handlePutVehicleIntegrationLevel(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putVehicleIntegrationLevel(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private String valueIfKeyPresent(QueryParamsMap queryParams, String key) {
+    if (queryParams.hasKey(key)) {
+      return queryParams.value(key);
+    }
+    else {
+      return null;
+    }
   }
 
   private <T> T fromJson(String jsonString, Class<T> clazz)

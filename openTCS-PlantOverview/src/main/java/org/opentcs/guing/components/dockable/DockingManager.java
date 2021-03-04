@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.dockable;
 
 import bibliothek.gui.dock.common.CContentArea;
@@ -197,16 +196,16 @@ public class DockingManager {
       control.removeDockable(dockable);
     }
   }
-  
+
   /**
    * Removes a dockable with the given id.
-   * 
+   *
    * @param id The id of the dockable to remove.
    */
   public void removeDockable(String id) {
     Objects.requireNonNull(id);
     SingleCDockable dock = control.getSingleDockable(id);
-    if(dock != null) {
+    if (dock != null) {
       removeDockable(dock);
     }
   }
@@ -301,7 +300,7 @@ public class DockingManager {
     tabPanes.put(COURSE_TAB_PANE_ID, courseTabPane);
     DefaultSingleCDockable vehiclesDockable
         = createDockable(VEHICLES_DOCKABLE_ID,
-                         bundle.getString("dockable.vehicles"),
+                         vehiclesPanel.getAccessibleContext().getAccessibleName(),
                          vehiclesPanel,
                          false);
     treeTabPane = new CStack(TREE_TAB_PANE_ID);
@@ -321,17 +320,17 @@ public class DockingManager {
                          bundle.getString("tree.groups.text"),
                          (JComponent) fGroupsView,
                          false);
-    grid.add(0, 0, 1, 150, treeTabPane);
-    grid.add(0, 150, 1, 100, createDockable(PROPERTIES_ID,
-                                            bundle.getString("dockable.properties"),
-                                            fPropertiesComponent,
-                                            false));
-    grid.add(0, 250, 1, 50, createDockable(STATUS_ID,
-                                           bundle.getString("dockable.status"),
-                                           statusScrollPane,
-                                           false));
-    grid.add(1, 0, 3.5, 252, courseTabPane);
-    grid.add(1, 230, 1, 48, vehiclesDockable);
+    grid.add(0, 0, 250, 400, treeTabPane);
+    grid.add(0, 400, 250, 400, createDockable(PROPERTIES_ID,
+                                              bundle.getString("dockable.properties"),
+                                              fPropertiesComponent,
+                                              false));
+    grid.add(0, 800, 250, 200, createDockable(STATUS_ID,
+                                              bundle.getString("dockable.status"),
+                                              statusScrollPane,
+                                              false));
+    grid.add(250, 0, 150, 500, vehiclesDockable);
+    grid.add(400, 0, 1000, 500, courseTabPane);
 
     control.getContentArea().deploy(grid);
 

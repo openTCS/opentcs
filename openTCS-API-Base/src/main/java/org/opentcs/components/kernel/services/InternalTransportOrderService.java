@@ -66,6 +66,18 @@ public interface InternalTransportOrderService
       throws ObjectUnknownException;
 
   /**
+   * Updates a transport order's list of drive orders.
+   *
+   * @param ref A reference to the transport order to be modified.
+   * @param driveOrders The drive orders containing the data to be copied into this transport
+   * order's drive orders.
+   * @throws ObjectUnknownException If the referenced transport order does not exist.
+   */
+  void updateTransportOrderDriveOrders(TCSObjectReference<TransportOrder> ref,
+                                       List<DriveOrder> driveOrders)
+      throws ObjectUnknownException;
+
+  /**
    * Updates a transport order's current drive order.
    * Marks the current drive order as finished, adds it to the list of past drive orders and sets
    * the current drive order to the next one of the list of future drive orders (or {@code null},

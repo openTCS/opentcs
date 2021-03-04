@@ -51,7 +51,7 @@ public class RegistryProvider
   /**
    * Creates a new instance.
    *
-   * @param socketFactoryProvider Provides socket factories used to create RMI registries.
+   * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param configuration This class' configuration.
    */
   @Inject

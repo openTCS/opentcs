@@ -97,38 +97,14 @@ public interface RmiKernelInterfaceConfiguration {
   int remoteDispatcherServicePort();
 
   @ConfigurationEntry(
-      type = "String",
-      description = {"The type of encryption used for RMI.",
-                     "'NONE': No encryption.",
-                     "'SSL_UNTRUSTED': SSL is used, but there is no way to verify the remote peer's "
-                     + "identity. (Default)",
-                     "'SSL': SSL is used. (Generation of a keystore-truststore-pair is required.)"},
-      orderKey = "1_connection_0")
-  ConnectionEncryption connectionEncryption();
-
-  @ConfigurationEntry(
-      type = "String",
-      description = {"The password for the keystore.",
-                     "(Only used, if connection encryption 'SSL' is selected.)"},
-      orderKey = "1_connection_1")
-  String keystorePassword();
-
-  @ConfigurationEntry(
-      type = "String",
-      description = {"The password for the truststore.",
-                     "(Only used, if connection encryption 'SSL' is selected.)"},
-      orderKey = "1_connection_2")
-  String truststorePassword();
-
-  @ConfigurationEntry(
       type = "Long",
       description = "The interval for cleaning out inactive clients (in ms).",
       orderKey = "2_sweeping")
   long clientSweepInterval();
 
-  enum ConnectionEncryption {
-    NONE,
-    SSL_UNTRUSTED,
-    SSL;
-  }
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to use SSL to encrypt connections.",
+      orderKey = "0_address_11")
+  boolean useSsl();
 }

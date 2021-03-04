@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.List;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
@@ -84,8 +83,9 @@ abstract class KernelStateOnline
 
   @Override
   @Deprecated
-  public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
-                                           List<ViewBookmark> bookmarks)
+  public void setVisualLayoutViewBookmarks(
+      TCSObjectReference<VisualLayout> ref,
+      List<org.opentcs.data.model.visualization.ViewBookmark> bookmarks)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       getModel().setVisualLayoutViewBookmarks(ref, bookmarks);

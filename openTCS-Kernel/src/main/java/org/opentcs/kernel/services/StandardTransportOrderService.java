@@ -144,6 +144,15 @@ public class StandardTransportOrderService
   }
 
   @Override
+  public void updateTransportOrderDriveOrders(TCSObjectReference<TransportOrder> ref,
+                                              List<DriveOrder> driveOrders)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      orderPool.setTransportOrderDriveOrders(ref, driveOrders);
+    }
+  }
+
+  @Override
   public void updateTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {

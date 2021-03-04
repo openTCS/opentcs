@@ -116,10 +116,12 @@ public interface VehicleService
    * @param integrationLevel The vehicle's new integration level.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @throws IllegalArgumentException If changing the vehicle's integration level to 
+   * {@code integrationLevel} is not allowed from its current integration level.
    */
   void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                      Vehicle.IntegrationLevel integrationLevel)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException, KernelRuntimeException, IllegalArgumentException;
 
   /**
    * Updates the categories of transport orders a vehicle can process.

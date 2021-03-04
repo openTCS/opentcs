@@ -6,10 +6,15 @@
 openTCS is a control system/fleet management software for automatic vehicles.
 It was primarily developed for the coordination of automated guided vehicles (AGV) performing transportation tasks e.g. in a production plant.
 However, it can be used with other automatic vehicles like mobile robots or quadrocopters, too.
-openTCS controls the vehicles independent of their specific characteristics like track guidance system or load handling device.
+openTCS controls the vehicles independent of their specific characteristics like navigation principle/track guidance system or load handling device.
+It can manage vehicles of different types (and performing different tasks) at the same time.
 This is achieved by integrating vehicles into the system via pluggable drivers, similar to device drivers in operating systems.
 
 === System requirements
+
+openTCS does not come with any specific hardware requirements.
+CPU power and RAM capacity highly depend on the use case, e.g. the size and complexity of the driving course and the number of vehicles managed.
+Some kind of networking hardware -- in most cases simply a standard Ethernet controller -- is required for communicating with the vehicles (and possibly other systems, like a warehouse management system).
 
 To run openTCS, a Java Runtime Environment (JRE) version 1.8 is required.
 (The directory `bin` of the installed JRE, for example `C:/Program Files/Java/jre1.8.0/bin`, should be included in the enviroment variable PATH to be able to use the included start scripts.)

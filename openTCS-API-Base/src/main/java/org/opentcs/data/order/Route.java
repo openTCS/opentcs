@@ -85,6 +85,21 @@ public class Route
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Route)) {
+      return false;
+    }
+    final Route other = (Route) o;
+    return costs == other.costs
+        && Objects.equals(steps, other.steps);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(steps, costs);
+  }
+
+  @Override
   public String toString() {
     return "Route{" + "steps=" + steps + ", costs=" + costs + '}';
   }
@@ -115,6 +130,34 @@ public class Route
      * This step's index in the vehicle's route.
      */
     private final int routeIndex;
+    /**
+     * Whether execution of this step is allowed.
+     */
+    private final boolean executionAllowed;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param path The path to travel.
+     * @param srcPoint The point that the vehicle is starting from.
+     * @param destPoint The point that is reached by travelling the path.
+     * @param orientation The vehicle's orientation on this step.
+     * @param routeIndex This step's index in the vehicle's route.
+     * @param executionAllowed Whether execution of this step is allowed.
+     */
+    public Step(@Nullable Path path,
+                @Nullable Point srcPoint,
+                @Nonnull Point destPoint,
+                @Nonnull Vehicle.Orientation orientation,
+                int routeIndex,
+                boolean executionAllowed) {
+      this.path = path;
+      this.sourcePoint = srcPoint;
+      this.destinationPoint = requireNonNull(destPoint, "destPoint");
+      this.vehicleOrientation = requireNonNull(orientation, "orientation");
+      this.routeIndex = routeIndex;
+      this.executionAllowed = executionAllowed;
+    }
 
     /**
      * Creates a new instance.
@@ -130,11 +173,7 @@ public class Route
                 @Nonnull Point destPoint,
                 @Nonnull Vehicle.Orientation orientation,
                 int routeIndex) {
-      this.path = path;
-      this.sourcePoint = srcPoint;
-      this.destinationPoint = requireNonNull(destPoint, "destPoint");
-      vehicleOrientation = requireNonNull(orientation, "orientation");
-      this.routeIndex = routeIndex;
+      this(path, srcPoint, destPoint, orientation, routeIndex, true);
     }
 
     /**
@@ -204,6 +243,15 @@ public class Route
      */
     public int getRouteIndex() {
       return routeIndex;
+    }
+
+    /**
+     * Returns whether execution of this step is allowed.
+     *
+     * @return {@code true}, if execution of this step is allowed, otherwise {@code false}.
+     */
+    public boolean isExecutionAllowed() {
+      return executionAllowed;
     }
 
     @Override

@@ -9,12 +9,15 @@ package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A bookmarked view on the layout.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class ViewBookmark
     implements Serializable {
 

@@ -16,16 +16,11 @@ openTCS {project-version}
   link:./developer/developers-guide/opentcs-developers-guide.pdf[PDF]
 * Frequently Asked Questions: link:./faq.html[HTML]
 * Base API:
-  link:./developer/api-base/index.html[JavaDoc documentation],
-  link:./developer/compatibility-reports/japicmp-opentcs-api-base.html[Compatibility report against previous major release]
+  link:./developer/api-base/index.html[JavaDoc documentation]
 * Injection API:
-  link:./developer/api-injection/index.html[JavaDoc documentation],
-  link:./developer/compatibility-reports/japicmp-opentcs-api-injection.html[Compatibility report against previous major release]
-* JSON schemas for the web API:
-** Transport order (incoming):
-   link:./developer/json-schemas/org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport.json[JSON]
-** Status messages (outgoing):
-   link:./developer/json-schemas/org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList.json[JSON]
+  link:./developer/api-injection/index.html[JavaDoc documentation]
+* Web API:
+  link:./developer/web-api/index.html[OpenAPI documentation]
 * XML schemas for the (deprecated) TCP/IP-based host interface:
 ** Transport orders (sent from host to openTCS):
    link:./developer/xml-schemas/opentcs-host-order.xsd[XSD]

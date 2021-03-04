@@ -39,39 +39,18 @@ public interface KernelControlCenterConfiguration {
   List<ConnectionParamSet> connectionBookmarks();
 
   @ConfigurationEntry(
-      type = "String",
-      description = {"The type of encryption used for RMI.",
-                     "'NONE': No encryption.",
-                     "'SSL_UNTRUSTED': SSL is used, but there is no way to verify the remote "
-                     + "peer's identity. (Default)",
-                     "'SSL': SSL is used. (Generation of a keystore-truststore-pair is required.)"},
-      orderKey = "1_connection_1")
-  ConnectionEncryption connectionEncryption();
-
-  @ConfigurationEntry(
-      type = "String",
-      description = {"The password for the truststore.",
-                     "(Only used, if connection encryption 'SSL' is selected.)"},
-      orderKey = "1_connection_2")
-  String truststorePassword();
-
-  @ConfigurationEntry(
       type = "Boolean",
       description = {"Whether to connect automatically on startup.",
                      "If 'true', the first connection bookmark will be used for the initial "
                      + "connection attempt.",
                      "If 'false', a dialog will be shown to enter connection parameters."},
-      orderKey = "1_connection_3")
+      orderKey = "1_connection_1")
   boolean connectAutomaticallyOnStartup();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The maximum number of characters in the logging text area.")
+      description = "The maximum number of characters in the logging text area.",
+      orderKey = "9_misc")
   int loggingAreaCapacity();
 
-  enum ConnectionEncryption {
-    NONE,
-    SSL_UNTRUSTED,
-    SSL;
-  }
 }

@@ -1601,14 +1601,13 @@ public class Vehicle
   public static enum IntegrationLevel {
 
     /**
-     * @deprecated Not to be used, yet.
+     * The vehicle's reported position is ignored.
      */
-    @Deprecated
     TO_BE_IGNORED,
     /**
-     * @deprecated Not to be used, yet.
+     * The vehicle's reported position is noticed, meaning that resources will not be reserved for
+     * it.
      */
-    @Deprecated
     TO_BE_NOTICED,
     /**
      * The vehicle's reported position is respected, meaning that resources will be reserved for it.

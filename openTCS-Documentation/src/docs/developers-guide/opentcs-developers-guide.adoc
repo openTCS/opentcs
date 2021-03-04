@@ -9,9 +9,7 @@ include::01_general-development.adoc[]
 
 include::02_kernel-api.adoc[]
 
-include::03a_kernel-web-api.adoc[]
-
-include::03b_tcp-host-interface.adoc[]
+include::03_tcp-host-interface.adoc[]
 
 include::04_generate-integration-project.adoc[]
 

@@ -37,7 +37,6 @@ import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
@@ -337,9 +336,10 @@ public interface RemoteKernel
 
   @Deprecated
   @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
-  void setVisualLayoutViewBookmarks(ClientID clientID,
-                                    TCSObjectReference<VisualLayout> ref,
-                                    List<ViewBookmark> bookmarks)
+  void setVisualLayoutViewBookmarks(
+      ClientID clientID,
+      TCSObjectReference<VisualLayout> ref,
+      List<org.opentcs.data.model.visualization.ViewBookmark> bookmarks)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @Deprecated

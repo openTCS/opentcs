@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -25,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.filechooser.FileFilter;
 import org.opentcs.guing.application.StatusPanel;
+import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
@@ -109,6 +111,13 @@ public class UnifiedModelReader
                                                                   Charset.forName("UTF-8")))) {
       plantModel = PlantModelTO.fromXml(reader);
     }
+
+    plantModel.getProperties().stream()
+        .forEach(
+            propertyTo -> systemModel.getPropertyMiscellaneous().addItem(
+                new KeyValueProperty(systemModel, propertyTo.getName(), propertyTo.getValue())
+            )
+        );
 
     if (plantModel.getVisualLayouts().size() > 1) {
       LOG.warn("There is more than one visual layout. Using only the first one.");

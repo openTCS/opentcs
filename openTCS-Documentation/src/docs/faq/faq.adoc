@@ -3,6 +3,41 @@ The openTCS developers
 openTCS {project-version}
 :last-update-label!:
 
+== General questions about the software
+
+=== Which navigation principles are supported?
+
+openTCS works independently from specific navigation implementations, so any kind of navigation principle may be used.
+Locating and navigating are tasks usually performed on the vehicle side:
+The vehicle simply reports its current state, including its position, to the control system, and the control system orders the vehicle to move to a different position.
+
+Note that openTCS focuses on the dispatching of vehicles for transport orders.
+This task should not be confused with lower-level vehicle-side tasks like accelerating, decelerating and steering the vehicle, which are out of openTCS's scope.
+
+=== What are the requirements to manage a vehicle with openTCS?
+
+The requirements for this are minimal:
+
+1. Communication with the vehicle must be possible.
+   (This implies that the vehicle's communication interface must be specified and accessible.)
+   How this communication is implemented exactly is not really relevant as long as the communication hardware exists and can be used from Java software.
+   In many cases, standard Wi-Fi hardware is used.
+2. The vehicle must be able to report its current position/state.
+3. The vehicle must be able to perform movement orders from its current position to an adjacent position in the driving course/environment given by openTCS.
+
+=== How many vehicles can be managed at the same time?
+
+There is virtually no limit imposed by the design of the software.
+The hardware equipment used (CPU, RAM, communication bandwidth etc.) can, however, limit the system's effective performance.
+
+=== Which interfaces for transport orders exist?
+
+Transport orders can be created interactively by a user via the graphical user interface.
+
+To create transport orders from other systems, e.g. a warehouse management system, interfaces based on Java Remote Method Invocation (RMI) and webservices are included.
+These are documented in the developer's guide.
+Additional, custom interfaces for software that cannot use these interfaces can be added easily.
+
 == Plant models
 
 === How can I migrate plant models created with openTCS before version 3.0?

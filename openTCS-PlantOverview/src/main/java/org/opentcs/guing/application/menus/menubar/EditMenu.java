@@ -14,7 +14,11 @@ import javax.swing.JMenu;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.edit.ClearSelectionAction;
+import org.opentcs.guing.application.action.edit.CopyAction;
+import org.opentcs.guing.application.action.edit.CutAction;
 import org.opentcs.guing.application.action.edit.DeleteAction;
+import org.opentcs.guing.application.action.edit.DuplicateAction;
+import org.opentcs.guing.application.action.edit.PasteAction;
 import org.opentcs.guing.application.action.edit.SelectAllAction;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 
@@ -50,6 +54,10 @@ public class EditMenu
 //    menuItemDuplicate = menuEdit.add(actionMap.get(DuplicateAction.ID));
     // Delete
     add(actionMap.get(DeleteAction.ID));
+    add(actionMap.get(CopyAction.ID));
+    add(actionMap.get(PasteAction.ID));
+    add(actionMap.get(DuplicateAction.ID));
+    add(actionMap.get(CutAction.ID));
     addSeparator();
     // Select all, Clear selection
     add(actionMap.get(SelectAllAction.ID));

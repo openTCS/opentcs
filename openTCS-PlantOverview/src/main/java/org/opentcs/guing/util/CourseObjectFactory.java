@@ -16,6 +16,7 @@ import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.LinkConnection;
 import org.opentcs.guing.components.drawing.figures.LocationFigure;
+import org.opentcs.guing.components.drawing.figures.NamedVehicleFigure;
 import org.opentcs.guing.components.drawing.figures.OffsetFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
@@ -97,6 +98,10 @@ public class CourseObjectFactory {
 
   public VehicleFigure createVehicleFigure(VehicleModel model) {
     return figureFactory.createVehicleFigure(model);
+  }
+
+  public NamedVehicleFigure createNamedVehicleFigure(VehicleModel model) {
+    return figureFactory.createNamedVehicleFigure(model);
   }
 
   public OffsetFigure createOffsetFigure() {

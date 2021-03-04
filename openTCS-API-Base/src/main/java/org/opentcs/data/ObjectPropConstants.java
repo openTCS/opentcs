@@ -25,9 +25,16 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 public interface ObjectPropConstants {
 
   /**
+   * A property key for models used to store the last-modified time stamp.
+   * <p>
+   * Type: A time stamp, encoded using ISO 8601. (Can be parsed using {@code java.time.Instant}.)
+   * </p>
+   */
+  String MODEL_FILE_LAST_MODIFIED = "tcs:modelFileLastModified";
+  /**
    * A property key for the orientation of a vehicle on a path.
    * <p>
-   * Type String (any string - details currently not specified)
+   * Type: String (any string - details currently not specified)
    * </p>
    *
    * @deprecated Will be removed.

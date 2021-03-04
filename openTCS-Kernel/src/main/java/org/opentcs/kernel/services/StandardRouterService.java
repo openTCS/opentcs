@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.ObjectUnknownException;
@@ -41,6 +42,10 @@ public class StandardRouterService
    */
   private final Router router;
   /**
+   * The dispatcher.
+   */
+  private final Dispatcher dispatcher;
+  /**
    * The model facade to the object pool.
    */
   private final Model model;
@@ -55,6 +60,7 @@ public class StandardRouterService
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param kernel The kernel.
    * @param router The scheduler.
+   * @param dispatcher The dispatcher.
    * @param model The model to be used.
    * @param configuration The kernel application's configuration.
    */
@@ -62,11 +68,13 @@ public class StandardRouterService
   public StandardRouterService(@GlobalKernelSync Object globalSyncObject,
                                LocalKernel kernel,
                                Router router,
+                               Dispatcher dispatcher,
                                Model model,
                                KernelApplicationConfiguration configuration) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.kernel = requireNonNull(kernel, "kernel");
     this.router = requireNonNull(router, "router");
+    this.dispatcher = requireNonNull(dispatcher, "dispatcher");
     this.model = requireNonNull(model, "model");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -87,7 +95,7 @@ public class StandardRouterService
   public void updateRoutingTopology() {
     synchronized (globalSyncObject) {
       router.topologyChanged();
-      // XXX Check if we need to re-route any vehicles?
+      dispatcher.topologyChanged();
     }
   }
 }

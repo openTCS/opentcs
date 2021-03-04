@@ -155,9 +155,7 @@ public class OrderSequencesContainerPanel
   public void clearOrderSequences() {
     if (fOrderSequences != null) {
       if (fTableModel != null) {
-        for (int i = 0; i < fOrderSequences.size(); i++) {
-          fTableModel.removeRow(i);
-        }
+        fTableModel.setRowCount(0);
       }
       fOrderSequences.clear();
     }

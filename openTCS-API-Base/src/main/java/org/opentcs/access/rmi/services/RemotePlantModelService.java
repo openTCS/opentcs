@@ -9,6 +9,7 @@ package org.opentcs.access.rmi.services;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Map;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
@@ -36,9 +37,17 @@ public interface RemotePlantModelService
   void createPlantModel(ClientID clientId, PlantModelCreationTO to)
       throws RemoteException;
 
+  @Deprecated
   String getLoadedModelName(ClientID clientId)
       throws RemoteException;
 
+  String getModelName(ClientID clientId)
+      throws RemoteException;
+
+  Map<String, String> getModelProperties(ClientID clientId)
+      throws RemoteException;
+
+  @Deprecated
   String getPersistentModelName(ClientID clientId)
       throws RemoteException;
 }

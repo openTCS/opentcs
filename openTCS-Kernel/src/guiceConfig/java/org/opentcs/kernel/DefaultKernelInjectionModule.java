@@ -18,10 +18,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Singleton;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
+import org.opentcs.access.SslParameterSet;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SslSocketFactoryProvider;
 import org.opentcs.common.LoggingScheduledThreadPoolExecutor;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -43,7 +43,6 @@ import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.extensions.rmi.KernelRemoteService;
 import org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration;
-import static org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration.ConnectionEncryption.NONE;
 import org.opentcs.kernel.extensions.rmi.StandardRemoteDispatcherService;
 import org.opentcs.kernel.extensions.rmi.StandardRemoteNotificationService;
 import org.opentcs.kernel.extensions.rmi.StandardRemotePlantModelService;
@@ -70,7 +69,6 @@ import org.opentcs.kernel.vehicles.DefaultVehicleControllerPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
-import org.opentcs.kernel.vehicles.VehiclesConfiguration;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
@@ -78,6 +76,7 @@ import org.opentcs.kernel.workingset.TransportOrderPool;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.SimpleEventBus;
+import org.opentcs.util.logging.UncaughtExceptionLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +137,8 @@ public class DefaultKernelInjectionModule
 
     configureKernelStatesDependencies();
     configureKernelStarterDependencies();
-    configureStandardRemoteKernelDependencies(applicationHome);
+    configureStandardRemoteKernelDependencies();
+    configureSocketConnections();
     configureKernelServicesDependencies();
   }
 
@@ -182,10 +182,6 @@ public class DefaultKernelInjectionModule
   }
 
   private void configureVehicleControllers() {
-    bind(VehiclesConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(VehiclesConfiguration.PREFIX,
-                                                   VehiclesConfiguration.class));
-
     install(new FactoryModuleBuilder().build(VehicleControllerFactory.class));
 
     bind(DefaultVehicleControllerPool.class)
@@ -255,40 +251,54 @@ public class DefaultKernelInjectionModule
                                                    KernelApplicationConfiguration.class));
   }
 
-  private void configureStandardRemoteKernelDependencies(File applicationHome) {
+  private void configureSocketConnections() {
+    //Load and bind the encryption of the connections used within the kernel
+    SslConfiguration configuration
+        = getConfigBindingProvider().get(SslConfiguration.PREFIX,
+                                         SslConfiguration.class);
+    RmiKernelInterfaceConfiguration rmiConfig
+        = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
+                                         RmiKernelInterfaceConfiguration.class);
+    SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
+                                                      new File(configuration.keystoreFile()),
+                                                      configuration.keystorePassword(),
+                                                      new File(configuration.truststoreFile()),
+                                                      configuration.truststorePassword());
+    bind(SslParameterSet.class).toInstance(sslParamSet);
+
+    SocketFactoryProvider provider;
+    if (rmiConfig.useSsl()) {
+      provider = new SecureSocketFactoryProvider(sslParamSet);
+    }
+    else {
+      LOG.warn("SSL encryption disabled, connections will not be secured!");
+      provider = new NullSocketFactoryProvider();
+    }
+    bind(SocketFactoryProvider.class).toInstance(provider);
+  }
+
+  private void configureStandardRemoteKernelDependencies() {
     bind(RegistryProvider.class).in(Singleton.class);
 
-    RmiKernelInterfaceConfiguration configuration
+    //Load and bind the ports for the rmi connection
+    RmiKernelInterfaceConfiguration rmiConfiguration
         = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
                                          RmiKernelInterfaceConfiguration.class);
     bind(RmiKernelInterfaceConfiguration.class)
-        .toInstance(configuration);
+        .toInstance(rmiConfiguration);
 
-    SocketFactoryProvider socketFactoryProvider;
-    switch (configuration.connectionEncryption()) {
-      case NONE:
-        socketFactoryProvider = new NullSocketFactoryProvider();
-        break;
-      case SSL_UNTRUSTED:
-        socketFactoryProvider = new AnonSslSocketFactoryProvider();
-        break;
-      case SSL:
-        socketFactoryProvider = new SslSocketFactoryProvider(applicationHome.getPath(),
-                                                             configuration.keystorePassword(),
-                                                             configuration.truststorePassword());
-        break;
-      default:
-        LOG.warn("No implementation for '{}' encryption, falling back to '{}'.",
-                 configuration.connectionEncryption().name(),
-                 NONE.name());
-        socketFactoryProvider = new NullSocketFactoryProvider();
-    }
-    bind(SocketFactoryProvider.class).toInstance(socketFactoryProvider);
   }
 
   private void configureKernelExecutor() {
-    ScheduledExecutorService executor = new LoggingScheduledThreadPoolExecutor(
-        1, runnable -> new Thread(runnable, "kernelExecutor"));
+    ScheduledExecutorService executor
+        = new LoggingScheduledThreadPoolExecutor(
+            1,
+            (runnable) -> {
+              Thread thread = new Thread(runnable, "kernelExecutor");
+              thread.setUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
+              return thread;
+            }
+        );
     bind(ScheduledExecutorService.class)
         .annotatedWith(KernelExecutor.class)
         .toInstance(executor);

@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.theInstance;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
 
 /**
  *
@@ -31,7 +32,7 @@ public class VehicleComparatorIdleFirstTest {
 
   @Test
   public void sortIdleVehiclesUp() {
-    Vehicle vehicle1 = new Vehicle("Some vehicle").withState(Vehicle.State.CHARGING);
+    Vehicle vehicle1 = new Vehicle("Vehicle1").withState(Vehicle.State.CHARGING);
     Vehicle vehicle2 = vehicle1.withState(Vehicle.State.IDLE);
     Vehicle vehicle3 = vehicle1.withState(Vehicle.State.CHARGING);
 

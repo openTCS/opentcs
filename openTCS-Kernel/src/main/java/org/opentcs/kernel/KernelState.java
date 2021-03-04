@@ -39,7 +39,6 @@ import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
@@ -339,8 +338,9 @@ abstract class KernelState
   }
 
   @Deprecated
-  public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
-                                           List<ViewBookmark> bookmarks)
+  public void setVisualLayoutViewBookmarks(
+      TCSObjectReference<VisualLayout> ref,
+      List<org.opentcs.data.model.visualization.ViewBookmark> bookmarks)
       throws ObjectUnknownException {
     throw new org.opentcs.access.UnsupportedKernelOpException(unsupportedMsg());
   }

@@ -86,7 +86,7 @@ public class StandardRemoteKernelClientPortal
    * @param remoteServices The kernel's remote services.
    * @param userManager The user manager.
    * @param configuration This class' configuration.
-   * @param socketFactoryProvider The provider for socket factories used for RMI.
+   * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param registryProvider The provider for the registry with which this remote portal registers.
    */
   @Inject

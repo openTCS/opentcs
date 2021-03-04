@@ -45,6 +45,10 @@
                      type="visualLayoutType"
                      minOccurs="0"
                      maxOccurs="unbounded"/>
+        <xsd:element name="property"
+                     type="propertyType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
       </xsd:sequence>
       <!-- model attributes -->
       <xsd:attribute name="version"

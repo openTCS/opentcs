@@ -8,8 +8,6 @@
  */
 package org.opentcs.guing.application.menus.menubar;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.ButtonGroup;
@@ -18,6 +16,9 @@ import javax.swing.JMenu;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
+import org.opentcs.guing.application.action.ViewActionMap;
+import org.opentcs.guing.application.action.synchronize.SwitchToModellingAction;
+import org.opentcs.guing.application.action.synchronize.SwitchToOperatingAction;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -37,58 +38,25 @@ public class FileModeMenu
    *
    * @param appState Stores the application's current mode of operation.
    * @param view The application's main view.
+   * @param actionMap The application's action map.
    */
   @Inject
   public FileModeMenu(final ApplicationState appState,
-                      final OpenTCSView view) {
+                      final OpenTCSView view,
+                      final ViewActionMap actionMap) {
     super(labels.getString("file.mode.setMode"));
     requireNonNull(view, "view");
+    requireNonNull(actionMap, "actionMap");
 
-    final ButtonGroup bgMode = new ButtonGroup();
+    final ButtonGroup modeButtonGroup = new ButtonGroup();
 
-    modellingModeItem
-        = new JCheckBoxMenuItem(labels.getString("kernel.stateModelling"));
+    modellingModeItem = new JCheckBoxMenuItem(actionMap.get(SwitchToModellingAction.ID));
     add(modellingModeItem);
+    modeButtonGroup.add(modellingModeItem);
 
-    if (appState.getOperationMode().equals(OperationMode.MODELLING)) {
-      modellingModeItem.setSelected(true);
-    }
-
-    bgMode.add(modellingModeItem);
-
-    modellingModeItem.addActionListener(
-        new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        view.switchPlantOverviewState(OperationMode.MODELLING);
-        if (!appState.hasOperationMode(OperationMode.MODELLING)) {
-          operatingModeItem.setSelected(true);
-        }
-      }
-    }
-    );
-
-    operatingModeItem
-        = new JCheckBoxMenuItem(labels.getString("kernel.stateOperating"));
+    operatingModeItem = new JCheckBoxMenuItem(actionMap.get(SwitchToOperatingAction.ID));
     add(operatingModeItem);
-
-    if (appState.getOperationMode().equals(OperationMode.OPERATING)) {
-      operatingModeItem.setSelected(true);
-    }
-
-    bgMode.add(operatingModeItem);
-
-    operatingModeItem.addActionListener(
-        new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        view.switchPlantOverviewState(OperationMode.OPERATING);
-        if (!appState.hasOperationMode(OperationMode.OPERATING)) {
-          modellingModeItem.setSelected(true);
-        }
-      }
-    }
-    );
+    modeButtonGroup.add(operatingModeItem);
   }
 
   public void setOperationMode(OperationMode mode) {

@@ -66,7 +66,6 @@ public class OpenTCSDragTracker
     view = getView();
 
     if (evt.isShiftDown()) {
-      view.setHandleDetailLevel(0);
       view.toggleSelection(anchorFigure);
 
       if (!view.isFigureSelected(anchorFigure)) {
@@ -74,7 +73,6 @@ public class OpenTCSDragTracker
       }
     }
     else if (!view.isFigureSelected(anchorFigure)) {
-      view.setHandleDetailLevel(0);
       view.clearSelection();
       view.addToSelection(anchorFigure);
     }

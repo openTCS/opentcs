@@ -40,7 +40,7 @@ public class DefaultRouterTest {
    * The class to test.
    */
   private Router router;
-  
+
   /**
    * The mocked object service to use.
    */
@@ -135,12 +135,11 @@ public class DefaultRouterTest {
    *
    * @return The router
    */
+  @SuppressWarnings("unchecked")
   private Router createRouter() {
     when(builder.createPointRouter(any())).thenReturn(mock(PointRouter.class));
 
-    return new DefaultRouter(objectService,
-                             builder,
-                             configuration);
+    return new DefaultRouter(objectService, builder, configuration);
   }
 
   /**

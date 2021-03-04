@@ -7,10 +7,14 @@
  */
 package org.opentcs.guing.storage;
 
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.guing.components.properties.type.KeyValueProperty;
+import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.model.ModelComponent;
@@ -66,7 +70,8 @@ public class ModelExportAdapter {
       throws IllegalArgumentException {
     requireNonNull(systemModel, "model");
 
-    PlantModelCreationTO plantModel = new PlantModelCreationTO(systemModel.getName());
+    PlantModelCreationTO plantModel = new PlantModelCreationTO(systemModel.getName())
+        .withProperties(convertProperties(systemModel.getPropertyMiscellaneous()));
 
     long timeBefore = System.currentTimeMillis();
     for (LayoutModel model : systemModel.getLayoutModels()) {
@@ -139,6 +144,11 @@ public class ModelExportAdapter {
               System.currentTimeMillis() - timeBefore);
 
     return plantModel;
+  }
+
+  private Map<String, String> convertProperties(KeyValueSetProperty kvsp) {
+    return kvsp.getItems().stream()
+        .collect(Collectors.toMap(KeyValueProperty::getKey, KeyValueProperty::getValue));
   }
 
   private PlantModelCreationTO persist(ModelComponent component,

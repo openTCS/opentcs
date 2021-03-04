@@ -22,6 +22,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.course.DrawingMethod;
+import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
@@ -43,6 +44,13 @@ import org.opentcs.guing.model.elements.VehicleModel;
  */
 public interface SystemModel
     extends ModelComponent {
+
+  /**
+   * Returns this model's set of miscellaneous properties.
+   *
+   * @return This model's set of miscellaneous properties.
+   */
+  KeyValueSetProperty getPropertyMiscellaneous();
 
   /**
    * Fügt dem Systemmodell eine Hauptkomponente hinzu.

@@ -102,18 +102,7 @@ public class OrderStatusMessage
         order.getProcessingVehicle() == null ? null : order.getProcessingVehicle().getName());
     orderMessage.setOrderState(OrderState.fromTransportOrderState(order.getState()));
     for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
-      Destination dest = new Destination();
-      dest.setLocationName(curDriveOrder.getDestination().getDestination().getName());
-      dest.setOperation(curDriveOrder.getDestination().getOperation());
-      dest.setState(mapDriveOrderState(curDriveOrder.getState()));
-      for (Map.Entry<String, String> mapEntry
-               : curDriveOrder.getDestination().getProperties().entrySet()) {
-        Property prop = new Property();
-        prop.setKey(mapEntry.getKey());
-        prop.setValue(mapEntry.getValue());
-        dest.getProperties().add(prop);
-      }
-      orderMessage.getDestinations().add(dest);
+      orderMessage.getDestinations().add(Destination.fromDriveOrder(curDriveOrder));
     }
     for (Map.Entry<String, String> mapEntry : order.getProperties().entrySet()) {
       Property prop = new Property();
@@ -122,26 +111,6 @@ public class OrderStatusMessage
       orderMessage.getProperties().add(prop);
     }
     return orderMessage;
-  }
-
-  @SuppressWarnings("deprecation")
-  private static Destination.State mapDriveOrderState(DriveOrder.State driveOrderState) {
-    switch (driveOrderState) {
-      case PRISTINE:
-        return Destination.State.PRISTINE;
-      case ACTIVE:
-        return Destination.State.ACTIVE;
-      case TRAVELLING:
-        return Destination.State.TRAVELLING;
-      case OPERATING:
-        return Destination.State.OPERATING;
-      case FINISHED:
-        return Destination.State.FINISHED;
-      case FAILED:
-        return Destination.State.FAILED;
-      default:
-        throw new IllegalArgumentException("Unhandled drive order state: " + driveOrderState);
-    }
   }
 
   /**

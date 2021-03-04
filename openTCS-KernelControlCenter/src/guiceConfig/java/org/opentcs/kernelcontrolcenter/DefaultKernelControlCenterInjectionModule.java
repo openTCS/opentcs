@@ -17,11 +17,11 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.SslParameterSet;
 import org.opentcs.access.rmi.KernelServicePortalBuilder;
-import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SslSocketFactoryProvider;
 import org.opentcs.common.DefaultPortalManager;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
@@ -30,10 +30,8 @@ import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.kernelcontrolcenter.exchange.DefaultServiceCallWrapper;
+import org.opentcs.kernelcontrolcenter.exchange.SslConfiguration;
 import org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration;
-import static org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration.ConnectionEncryption.NONE;
-import static org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration.ConnectionEncryption.SSL;
-import static org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration.ConnectionEncryption.SSL_UNTRUSTED;
 import org.opentcs.kernelcontrolcenter.vehicles.LocalVehicleEntryPool;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.event.EventBus;
@@ -75,7 +73,7 @@ public class DefaultKernelControlCenterInjectionModule
     install(new FactoryModuleBuilder().build(AdapterPanelComponentsFactory.class));
 
     configureEventBus();
-    configureKernelControlCenterDependencies(applicationHome);
+    configureKernelControlCenterDependencies();
     configureExchangeInjectionModules();
   }
 
@@ -98,37 +96,14 @@ public class DefaultKernelControlCenterInjectionModule
         .in(Singleton.class);
   }
 
-  private void configureKernelControlCenterDependencies(File applicationHome) {
+  private void configureKernelControlCenterDependencies() {
     KernelControlCenterConfiguration configuration
         = getConfigBindingProvider().get(KernelControlCenterConfiguration.PREFIX,
                                          KernelControlCenterConfiguration.class);
     bind(KernelControlCenterConfiguration.class)
         .toInstance(configuration);
     configureKernelControlCenter(configuration);
-
-    SocketFactoryProvider socketFactoryProvider;
-    switch (configuration.connectionEncryption()) {
-      case NONE:
-        socketFactoryProvider = new NullSocketFactoryProvider();
-        break;
-      case SSL_UNTRUSTED:
-        socketFactoryProvider = new AnonSslSocketFactoryProvider();
-        break;
-      case SSL:
-        socketFactoryProvider = new SslSocketFactoryProvider(applicationHome.getPath(),
-                                                             configuration.truststorePassword());
-        break;
-      default:
-        LOG.warn("No implementation for '{}' encryption, falling back to '{}'.",
-                 configuration.connectionEncryption().name(),
-                 NONE.name());
-        socketFactoryProvider = new NullSocketFactoryProvider();
-    }
-
-    bind(KernelServicePortal.class)
-        .toInstance(new KernelServicePortalBuilder()
-            .setSocketFactoryProvider(socketFactoryProvider)
-            .build());
+    configureSocketConnections();
 
     bind(CallWrapper.class)
         .annotatedWith(ServiceCallWrapper.class)
@@ -138,6 +113,34 @@ public class DefaultKernelControlCenterInjectionModule
     bind(new TypeLiteral<List<ConnectionParamSet>>() {
     })
         .toInstance(configuration.connectionBookmarks());
+  }
+
+  private void configureSocketConnections() {
+    SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
+                                                                       SslConfiguration.class);
+
+    //Create the data object for the ssl configuration
+    SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
+                                                      null,
+                                                      null,
+                                                      new File(sslConfiguration.truststoreFile()),
+                                                      sslConfiguration.truststorePassword());
+    bind(SslParameterSet.class).toInstance(sslParamSet);
+
+    SocketFactoryProvider socketFactoryProvider;
+    if (sslConfiguration.enable()) {
+      socketFactoryProvider = new SecureSocketFactoryProvider(sslParamSet);
+    }
+    else {
+      LOG.warn("SSL encryption disabled, connections will not be secured!");
+      socketFactoryProvider = new NullSocketFactoryProvider();
+    }
+
+    //Bind socket provider to the kernel portal
+    bind(KernelServicePortal.class)
+        .toInstance(new KernelServicePortalBuilder()
+            .setSocketFactoryProvider(socketFactoryProvider)
+            .build());
   }
 
   private void configureKernelControlCenter(KernelControlCenterConfiguration configuration) {

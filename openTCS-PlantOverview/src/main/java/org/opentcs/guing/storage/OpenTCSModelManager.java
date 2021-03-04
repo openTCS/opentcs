@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.customizations.ApplicationHome;
+import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
@@ -60,6 +62,7 @@ import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
+import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.model.ModelComponent;
@@ -332,6 +335,13 @@ public class OpenTCSModelManager
     try {
       statusPanel.clear();
 
+      // Set the last-modified time stamp of the model to right now, as we're saving the model file.
+      systemModel.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(systemModel,
+                               ObjectPropConstants.MODEL_FILE_LAST_MODIFIED,
+                               Instant.now().toString())
+      );
+
       return persistModel(systemModel,
                           currentModelFile,
                           modelPersistorFilter.get(modelPersistorFileChooser.getFileFilter()),
@@ -465,8 +475,14 @@ public class OpenTCSModelManager
 
     createEmptyModel();
 
-    fModelName = portal.getPlantModelService().getLoadedModelName();
+    fModelName = portal.getPlantModelService().getModelName();
     systemModel.getPropertyName().setText(fModelName);
+    portal.getPlantModelService().getModelProperties().entrySet().stream()
+        .forEach(
+            entry -> systemModel.getPropertyMiscellaneous().addItem(
+                new KeyValueProperty(systemModel, entry.getKey(), entry.getValue())
+            )
+        );
 
     TCSObjectService objectService = (TCSObjectService) portal.getPlantModelService();
 

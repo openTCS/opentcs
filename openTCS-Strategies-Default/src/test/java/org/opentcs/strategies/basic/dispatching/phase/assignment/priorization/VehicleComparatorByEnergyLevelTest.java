@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.theInstance;
 import org.junit.*;
 import static org.junit.Assert.assertThat;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByEnergyLevel;
 
 /**
  *
@@ -31,7 +32,7 @@ public class VehicleComparatorByEnergyLevelTest {
 
   @Test
   public void sortHighEnergyLevelsUp() {
-    Vehicle vehicle1 = new Vehicle("Some vehicle").withEnergyLevel(99);
+    Vehicle vehicle1 = new Vehicle("Vehicle1").withEnergyLevel(99);
     Vehicle vehicle2 = vehicle1.withEnergyLevel(50);
     Vehicle vehicle3 = vehicle1.withEnergyLevel(98);
 

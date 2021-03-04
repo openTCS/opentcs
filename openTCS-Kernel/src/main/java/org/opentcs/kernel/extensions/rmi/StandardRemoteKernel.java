@@ -46,7 +46,6 @@ import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LayoutElement;
-import org.opentcs.data.model.visualization.ViewBookmark;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
@@ -128,7 +127,7 @@ public class StandardRemoteKernel
    * @param kernel The local kernel.
    * @param userManager The user manager.
    * @param configuration This class' configuration.
-   * @param socketFactoryProvider Provides socket factories used for RMI.
+   * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param registryProvider Provides the registry with which this <code>RemoteKernel</code>
    * registers.
    */
@@ -600,8 +599,10 @@ public class StandardRemoteKernel
 
   @Deprecated
   @Override
-  public void setVisualLayoutViewBookmarks(ClientID clientID, TCSObjectReference<VisualLayout> ref,
-                                           List<ViewBookmark> bookmarks)
+  public void setVisualLayoutViewBookmarks(
+      ClientID clientID,
+      TCSObjectReference<VisualLayout> ref,
+      List<org.opentcs.data.model.visualization.ViewBookmark> bookmarks)
       throws CredentialsException, ObjectUnknownException, RemoteException {
     checkCredentialsForRole(clientID, UserPermission.MODIFY_MODEL);
 

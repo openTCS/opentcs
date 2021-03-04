@@ -37,18 +37,31 @@ public interface RemoteDispatcherService
   void dispatch(ClientID clientId)
       throws RemoteException;
 
+  @Deprecated
   void releaseVehicle(ClientID clientId, TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
+  @Deprecated
   void withdrawByVehicle(ClientID clientId,
                          TCSObjectReference<Vehicle> ref,
                          boolean immediateAbort,
                          boolean disableVehicle)
       throws RemoteException;
 
+  @Deprecated
   void withdrawByTransportOrder(ClientID clientId,
                                 TCSObjectReference<TransportOrder> ref,
                                 boolean immediateAbort,
                                 boolean disableVehicle)
+      throws RemoteException;
+
+  void withdrawByVehicle(ClientID clientId,
+                         TCSObjectReference<Vehicle> ref,
+                         boolean immediateAbort)
+      throws RemoteException;
+
+  void withdrawByTransportOrder(ClientID clientId,
+                                TCSObjectReference<TransportOrder> ref,
+                                boolean immediateAbort)
       throws RemoteException;
 }

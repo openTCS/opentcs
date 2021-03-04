@@ -8,14 +8,15 @@
  */
 package org.opentcs.guing.application.action;
 
-import org.opentcs.guing.application.action.course.DispatchVehicleAction;
 import org.opentcs.guing.application.action.course.FollowVehicleAction;
-import org.opentcs.guing.application.action.course.ReleaseVehicleAction;
+import org.opentcs.guing.application.action.course.IntegrationLevelIgnoreAction;
+import org.opentcs.guing.application.action.course.IntegrationLevelNoticeAction;
+import org.opentcs.guing.application.action.course.IntegrationLevelRespectAction;
+import org.opentcs.guing.application.action.course.IntegrationLevelUtilizeAction;
 import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
 import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
 import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
 import org.opentcs.guing.application.action.course.WithdrawAction;
-import org.opentcs.guing.application.action.course.WithdrawAndDisableAction;
 import org.opentcs.guing.application.action.course.WithdrawImmediatelyAction;
 import org.opentcs.guing.model.elements.VehicleModel;
 
@@ -36,11 +37,13 @@ public interface ActionFactory {
 
   WithdrawAction createWithdrawAction(VehicleModel vehicleModel);
 
-  WithdrawAndDisableAction createWithdrawAndDisableAction(VehicleModel vehicleModel);
-
   WithdrawImmediatelyAction createWithdrawImmediatelyAction(VehicleModel vehicleModel);
 
-  ReleaseVehicleAction createReleaseVehicleAction(VehicleModel vehicleModel);
+  IntegrationLevelIgnoreAction createIntegrationLevelIgnoreAction(VehicleModel vehicleModel);
 
-  DispatchVehicleAction createDispatchVehicleAction(VehicleModel vehicleModel);
+  IntegrationLevelNoticeAction createIntegrationLevelNoticeAction(VehicleModel vehicleModel);
+
+  IntegrationLevelRespectAction createIntegrationLevelRespectAction(VehicleModel vehicleModel);
+
+  IntegrationLevelUtilizeAction createIntegrationLevelUtilizeAction(VehicleModel vehicleModel);
 }

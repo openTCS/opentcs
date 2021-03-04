@@ -20,6 +20,8 @@ import org.opentcs.guing.application.action.actions.CreateStaticRouteAction;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
 import org.opentcs.guing.application.action.app.AboutAction;
+import org.opentcs.guing.application.action.file.ModelPropertiesAction;
+import org.opentcs.guing.application.action.course.DispatchVehicleAction;
 import org.opentcs.guing.application.action.edit.ClearSelectionAction;
 import org.opentcs.guing.application.action.edit.CopyAction;
 import org.opentcs.guing.application.action.edit.CutAction;
@@ -35,6 +37,8 @@ import org.opentcs.guing.application.action.file.SaveModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAsAction;
 import org.opentcs.guing.application.action.synchronize.LoadModelFromKernelAction;
 import org.opentcs.guing.application.action.synchronize.PersistInKernelAction;
+import org.opentcs.guing.application.action.synchronize.SwitchToModellingAction;
+import org.opentcs.guing.application.action.synchronize.SwitchToOperatingAction;
 import org.opentcs.guing.application.action.view.AddBitmapAction;
 import org.opentcs.guing.application.action.view.AddDrawingViewAction;
 import org.opentcs.guing.application.action.view.AddTransportOrderSequenceView;
@@ -58,39 +62,52 @@ public class ViewActionMap
    * @param undoRedoManager The undo redo manager
    * @param actionFactory The action factory
    * @param createTransportOrderAction The action to create transport orders
+   * @param dispatchAction The action to trigger a dispatcher run
    * @param findVehicleAction The action to find vehicles
    * @param pauseAllVehiclesAction The action to pause all vehicles
    * @param createGroupAction The action to create a group
    * @param aboutAction The action to show the about window
+   * @param modellingAction The action to switch to modelling mode.
+   * @param operatingingAction The action to switch to operating mode.
    */
   @Inject
   public ViewActionMap(OpenTCSView view,
                        UndoRedoManager undoRedoManager,
                        ActionFactory actionFactory,
                        CreateTransportOrderAction createTransportOrderAction,
+                       DispatchVehicleAction dispatchAction,
                        FindVehicleAction findVehicleAction,
                        PauseAllVehiclesAction pauseAllVehiclesAction,
                        CreateGroupAction createGroupAction,
-                       AboutAction aboutAction) {
+                       AboutAction aboutAction,
+                       SwitchToModellingAction modellingAction,
+                       SwitchToOperatingAction operatingingAction,
+                       ModelPropertiesAction modelPropertiesAction) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(createTransportOrderAction, "createTransportOrderAction");
+    requireNonNull(dispatchAction, "dispatchAction");
     requireNonNull(findVehicleAction, "findVehicleAction");
     requireNonNull(pauseAllVehiclesAction, "pauseAllVehiclesAction");
     requireNonNull(createGroupAction, "createGroupAction");
     requireNonNull(aboutAction, "aboutAction");
+    requireNonNull(modellingAction, "modellingAction");
+    requireNonNull(operatingingAction, "operatingingAction");
 
     // --- Menu File ---
     put(NewModelAction.ID, new NewModelAction(view));
     put(LoadModelAction.ID, new LoadModelAction(view));
     put(SaveModelAction.ID, new SaveModelAction(view));
     put(SaveModelAsAction.ID, new SaveModelAsAction(view));
+    put(ModelPropertiesAction.ID, modelPropertiesAction);
     put(CloseFileAction.ID, new CloseFileAction(view));
 
     // --- Menu Synchronize ---
     put(PersistInKernelAction.ID, new PersistInKernelAction(view));
     put(LoadModelFromKernelAction.ID, new LoadModelFromKernelAction(view));
+    put(SwitchToModellingAction.ID, modellingAction);
+    put(SwitchToOperatingAction.ID, operatingingAction);
 
     // --- Menu Edit ---
     // Undo, Redo
@@ -113,6 +130,7 @@ public class ViewActionMap
     put(CreateBlockAction.ID, new CreateBlockAction(view));
     put(CreateStaticRouteAction.ID, new CreateStaticRouteAction(view));
     put(CreateTransportOrderAction.ID, createTransportOrderAction);
+    put(DispatchVehicleAction.ID, dispatchAction);
 
     Action action;
     // --- Menu View ---

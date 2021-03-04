@@ -11,8 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.validation.constraints.Size;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -74,6 +76,44 @@ public class Destination {
     this.properties = properties;
   }
 
+  public static Destination fromDriveOrder(DriveOrder driveOrder){
+    if(driveOrder == null){
+      return null;
+    }
+    Destination destination = new Destination();
+    destination.setLocationName(driveOrder.getDestination().getDestination().getName());
+    destination.setOperation(driveOrder.getDestination().getOperation());
+    destination.setState(mapDriveOrderState(driveOrder.getState()));
+    
+    for (Map.Entry<String, String> mapEntry
+               : driveOrder.getDestination().getProperties().entrySet()) {
+        Property prop = new Property();
+        prop.setKey(mapEntry.getKey());
+        prop.setValue(mapEntry.getValue());
+        destination.getProperties().add(prop);
+      }
+    return destination;
+  }
+  
+    @SuppressWarnings("deprecation")
+  private static Destination.State mapDriveOrderState(DriveOrder.State driveOrderState) {
+    switch (driveOrderState) {
+      case PRISTINE:
+        return Destination.State.PRISTINE;
+      case ACTIVE:
+        return Destination.State.ACTIVE;
+      case TRAVELLING:
+        return Destination.State.TRAVELLING;
+      case OPERATING:
+        return Destination.State.OPERATING;
+      case FINISHED:
+        return Destination.State.FINISHED;
+      case FAILED:
+        return Destination.State.FAILED;
+      default:
+        throw new IllegalArgumentException("Unhandled drive order state: " + driveOrderState);
+    }
+  }
   /**
    * This enumeration defines the various states a DriveOrder may be in.
    */

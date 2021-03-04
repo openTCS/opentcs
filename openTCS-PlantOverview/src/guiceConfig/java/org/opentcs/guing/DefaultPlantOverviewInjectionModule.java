@@ -17,11 +17,11 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.SslParameterSet;
 import org.opentcs.access.rmi.KernelServicePortalBuilder;
-import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SslSocketFactoryProvider;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ApplicationHome;
@@ -30,11 +30,11 @@ import org.opentcs.drivers.vehicle.management.CommAdapterEvent;
 import org.opentcs.guing.application.ApplicationInjectionModule;
 import org.opentcs.guing.components.ComponentsInjectionModule;
 import org.opentcs.guing.exchange.ExchangeInjectionModule;
+import org.opentcs.guing.exchange.SslConfiguration;
 import org.opentcs.guing.model.ModelInjectionModule;
 import org.opentcs.guing.storage.DefaultStorageInjectionModule;
 import org.opentcs.guing.transport.TransportInjectionModule;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
-import static org.opentcs.guing.util.PlantOverviewApplicationConfiguration.ConnectionEncryption.NONE;
 import org.opentcs.guing.util.UtilInjectionModule;
 import org.opentcs.util.ClassMatcher;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
@@ -62,7 +62,7 @@ public class DefaultPlantOverviewInjectionModule
         .annotatedWith(ApplicationHome.class)
         .toInstance(applicationHome);
 
-    configurePlantOverviewDependencies(applicationHome);
+    configurePlantOverviewDependencies();
     install(new ApplicationInjectionModule());
     install(new ComponentsInjectionModule());
     install(new ExchangeInjectionModule());
@@ -72,7 +72,7 @@ public class DefaultPlantOverviewInjectionModule
     install(new UtilInjectionModule());
   }
 
-  private void configurePlantOverviewDependencies(File applicationHome) {
+  private void configurePlantOverviewDependencies() {
     PlantOverviewApplicationConfiguration configuration
         = getConfigBindingProvider().get(PlantOverviewApplicationConfiguration.PREFIX,
                                          PlantOverviewApplicationConfiguration.class);
@@ -80,35 +80,40 @@ public class DefaultPlantOverviewInjectionModule
         .toInstance(configuration);
     configurePlantOverview(configuration);
     configureThemes(configuration);
+    configureSocketConnections();
+
+    bind(new TypeLiteral<List<ConnectionParamSet>>() {
+    })
+        .toInstance(configuration.connectionBookmarks());
+  }
+
+  private void configureSocketConnections() {
+    SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
+                                                                       SslConfiguration.class);
+
+    //Create the data object for the ssl configuration
+    SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
+                                                      null,
+                                                      null,
+                                                      new File(sslConfiguration.truststoreFile()),
+                                                      sslConfiguration.truststorePassword());
+    bind(SslParameterSet.class).toInstance(sslParamSet);
 
     SocketFactoryProvider socketFactoryProvider;
-    switch (configuration.connectionEncryption()) {
-      case NONE:
-        socketFactoryProvider = new NullSocketFactoryProvider();
-        break;
-      case SSL_UNTRUSTED:
-        socketFactoryProvider = new AnonSslSocketFactoryProvider();
-        break;
-      case SSL:
-        socketFactoryProvider = new SslSocketFactoryProvider(applicationHome.getPath(),
-                                                             configuration.truststorePassword());
-        break;
-      default:
-        LOG.warn("No implementation for '{}' encryption, falling back to '{}'.",
-                 configuration.connectionEncryption().name(),
-                 NONE.name());
-        socketFactoryProvider = new NullSocketFactoryProvider();
+    if (sslConfiguration.enable()) {
+      socketFactoryProvider = new SecureSocketFactoryProvider(sslParamSet);
+    }
+    else {
+      LOG.warn("SSL encryption disabled, connections will not be secured!");
+      socketFactoryProvider = new NullSocketFactoryProvider();
     }
 
+    //Bind socket provider to the kernel portal
     bind(KernelServicePortal.class)
         .toInstance(new KernelServicePortalBuilder()
             .setSocketFactoryProvider(socketFactoryProvider)
             .setEventFilter(new ClassMatcher(CommAdapterEvent.class).negate())
             .build());
-
-    bind(new TypeLiteral<List<ConnectionParamSet>>() {
-    })
-        .toInstance(configuration.connectionBookmarks());
   }
 
   private void configureThemes(PlantOverviewApplicationConfiguration configuration) {

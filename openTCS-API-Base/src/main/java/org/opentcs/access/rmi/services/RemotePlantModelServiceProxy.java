@@ -8,6 +8,7 @@
 package org.opentcs.access.rmi.services;
 
 import java.rmi.RemoteException;
+import java.util.Map;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
@@ -39,12 +40,19 @@ class RemotePlantModelServiceProxy
   }
 
   @Override
+  @Deprecated
   public String getLoadedModelName()
+      throws KernelRuntimeException {
+    return getModelName();
+  }
+
+  @Override
+  public String getModelName()
       throws KernelRuntimeException {
     checkServiceAvailability();
 
     try {
-      return getRemoteService().getLoadedModelName(getClientId());
+      return getRemoteService().getModelName(getClientId());
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
@@ -52,6 +60,20 @@ class RemotePlantModelServiceProxy
   }
 
   @Override
+  public Map<String, String> getModelProperties()
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().getModelProperties(getClientId());
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  @Deprecated
   public String getPersistentModelName()
       throws KernelRuntimeException, IllegalStateException {
     checkServiceAvailability();

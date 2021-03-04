@@ -35,9 +35,9 @@ import org.opentcs.guing.application.action.draw.MoveAction;
 import org.opentcs.guing.application.action.edit.DeleteAction;
 import org.opentcs.guing.application.action.edit.SelectAllAction;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
+import org.opentcs.guing.components.drawing.figures.NamedVehicleFigure;
 import org.opentcs.guing.components.drawing.figures.OffsetFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
-import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.event.DrawingEditorEvent;
@@ -148,7 +148,7 @@ public class OpenTCSDrawingEditor
    * @param vehicleModel The vehicle model to add.
    */
   public void addVehicle(VehicleModel vehicleModel) {
-    VehicleFigure vehicleFigure = crsObjectFactory.createVehicleFigure(vehicleModel);
+    NamedVehicleFigure vehicleFigure = crsObjectFactory.createNamedVehicleFigure(vehicleModel);
 
     SwingUtilities.invokeLater(() -> {
       getDrawing().add(vehicleFigure);

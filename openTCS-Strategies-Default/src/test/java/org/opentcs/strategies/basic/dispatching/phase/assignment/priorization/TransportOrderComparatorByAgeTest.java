@@ -15,8 +15,9 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
 import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByAge;
 
 /**
  *
@@ -33,10 +34,10 @@ public class TransportOrderComparatorByAgeTest {
 
   @Test
   public void sortOlderOrdersUp() {
-    TransportOrder order1 = new TransportOrder("Some order", new ArrayList<>())
-        .withCreationTime(Instant.now());
-    TransportOrder order2 = order1.withCreationTime(Instant.now().plus(2, ChronoUnit.HOURS));
-    TransportOrder order3 = order1.withCreationTime(Instant.now().plus(1, ChronoUnit.HOURS));
+    TransportOrder plainOrder = new TransportOrder("Some order", new ArrayList<>());
+    TransportOrder order1 = plainOrder.withCreationTime(Instant.now());
+    TransportOrder order2 = plainOrder.withCreationTime(Instant.now().plus(2, ChronoUnit.HOURS));
+    TransportOrder order3 = plainOrder.withCreationTime(Instant.now().plus(1, ChronoUnit.HOURS));
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(order1);

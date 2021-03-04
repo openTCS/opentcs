@@ -165,6 +165,10 @@ public class VehiclesPanel
     scrollPaneVehicles.setViewportView(panelVehicles);
 
     add(scrollPaneVehicles);
+
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/components/dialogs/VehiclesPanel"); // NOI18N
+    getAccessibleContext().setAccessibleName(bundle.getString("VehiclesPanel.title")); // NOI18N
+    getAccessibleContext().setAccessibleDescription("");
   }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables

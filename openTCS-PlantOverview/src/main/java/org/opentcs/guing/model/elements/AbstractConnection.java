@@ -161,6 +161,14 @@ public abstract class AbstractConnection
   public void propertiesChanged(AttributesChangeEvent e) {
     if (getStartComponent().getPropertyName().hasChanged()
         || getEndComponent().getPropertyName().hasChanged()) {
+      if (nameFulfillsConvention()) {
+        updateName();
+      }
+      else {
+        // Don't forget to update these properties.
+        getPropertyStartComponent().setText(fStartComponent.getName());
+        getPropertyEndComponent().setText(fEndComponent.getName());
+      }
     }
   }
 
@@ -253,5 +261,26 @@ public abstract class AbstractConnection
     }
     getPropertyStartComponent().setText(fStartComponent.getName());
     getPropertyEndComponent().setText(fEndComponent.getName());
+  }
+
+  /**
+   * Checks if the name of this connection follows a defined naming scheme.
+   * Definition: {@literal <startComponent> --- <endComponent>}
+   *
+   * @return {@code true}, if the name fulfills the convention, otherwise {@code false}.
+   */
+  private boolean nameFulfillsConvention() {
+    StringProperty property = getPropertyName();
+    if (property != null) {
+      String name = property.getText();
+      String nameByConvention = getPropertyStartComponent().getText() + " --- "
+          + getPropertyEndComponent().getText();
+
+      if (name.equals(nameByConvention)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

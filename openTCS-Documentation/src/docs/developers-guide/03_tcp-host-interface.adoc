@@ -1,0 +1,168 @@
+
+== TCP/IP-based interfaces to other systems
+
+IMPORTANT: This interface is deprecated and will be removed in favour of the kernel's web API.
+Its specification is included in the openTCS distribution's documentation.
+
+In addition to the Java-specific kernel interface, openTCS offers the following interfaces for communication with other systems:
+
+* A bidirectional interface via a TCP/IP connection for the creation of transport orders
+* An unidirectional interface via a TCP/IP connection for receiving status messages, e.g. about transport orders being processed
+
+The TCP/IP interfaces are described in the following sections.
+
+=== Creating orders via TCP/IP
+
+For creating transport orders, the openTCS kernel accepts connections to a TCP port (default: port 55555).
+The communication between openTCS and the host works as follows:
+
+. The host establishes a new TCP/IP connection to openTCS.
+. The host sends a single XML telegram (described in detail in <<XML telegrams for creating orders>> and <<XML telegrams referencing order batches>>) which either describes the transport orders to be created or identifies batch files that are available with the kernel and that contain the transport order descriptions.
+. The host closes its output stream of the TCP/IP connection or sends two consecutive line breaks (i.e. \"``\r\n\r\n``"), letting the kernel know that no further data will follow.
+. openTCS interprets the telegram sent by the host, creates the corresponding transport orders and activates them.
+. openTCS sends an XML telegram (described in detail in <<Receipts for created orders>>) to confirm processing of the telegram.
+. openTCS closes the TCP/IP connection.
+
+The following points should be respected:
+
+* Multiple sets of transport orders are not intended to be transferred via the same TCP connection.
+After processing a set and sending the response, openTCS closes the connection.
+To transfer further sets new TCP/IP connections need to be established by the peer system.
+* openTCS only waits a limited amount of time (default: ten seconds) for incoming data.
+If there is no incoming data from the peer system over a longer period of time, the connection will be closed by openTCS without any transport orders being created.
+* The maximum length of a single XML telegram is limited to 100 kilobytes by default.
+If more data is transferred, the connection will be closed without any transport orders being created.
+
+==== XML telegrams for creating orders
+
+Every XML telegram sent to openTCS via the interface described above can describe multiple transport orders to be created.
+Every order element must contain the following data:
+
+* A string identifying the order element.
+This string is required for unambiguous matching of receipts (see <<Receipts for created orders>>) and orders.
+* A sequence of destinations and destination operations defining the actual order.
+
+Furthermore, each order element may contain the following data:
+
+* A deadline/point of time at which the order should be finished.
+* The name of a vehicle in the system that the order should be assigned to.
+If this information is omitted, any vehicle in the system may process the order.
+* A set of names of existing transport orders that have to be finished before the new order may be assigned to a vehicle.
+
+// counter for labeling and referencing the coding examples
+:code-example-label: {counter:code-example}
+
+The following example shows how an XML telegram for the creation of two transport orders could look like.
+
+// problems with attributes in anchors
+// see solution/workaround: https://github.com/asciidoctor/asciidoctor/issues/1381
+[#example.xmlorders, reftext='Example {code-example-label}']
+[[example.xmlorders]]
+.Example {code-example-label}: XML telegram for the creation of two transport orders
+[source,xml]
+----
+include::{samples}/xml-telegram-to-two-orders.xml[]
+----
+
+==== XML telegrams referencing order batches
+
+Alternatively, an XML telegram may also reference order batches which are kept in files on the openTCS system.
+The (parameters of the) transport orders to be created will then be read from the referenced batch files.
+A batch file may contain/create an arbitrary number of transport orders and needs to be placed in the kernel application's subdirectory `scripts`.
+In the openTCS distribution, this directory already contains a couple of templates for batch files (`template.tcs` and `test.tcs`).
+
+:code-example-label: {counter:code-example}
+
+The following example shows how an XML telegram referencing a batch file could look like.
+
+[#example.xmlbatch, reftext='Example {code-example-label}']
+[[example.xmlbatch]]
+.Example {code-example-label}: XML telegram referencing a batch file
+[source, xml] 
+----
+include::{samples}/xml-telegram-to-batch.xml[]
+----
+
+==== Receipts for created orders
+
+In response to an XML telegram for the creation of transport orders, an XML telegram will be sent back to the peer, reporting the operation's outcome.
+In the response telegram, every order element of the original telegram will be referenced by a response element with the same ID.
+Furthermore, every response element contains:
+
+* A flag reflecting the success of creating the respective order
+* The name that openTCS internally assigned to the created order.
+(This name is relevant for interpreting the messages on the status channel - see <<Status messages via TCP/IP>>.)
+
+:code-example-label: {counter:code-example}
+
+The following example shows how a response to the telegram in <<example.xmlorders>> could look like.
+
+[#example.xmlreceipts, reftext='Example {code-example-label}']
+[[example.xmlreceipts]]
+.Example {code-example-label}: XML telegram with receipts for created orders
+[source, xml]
+----
+include::{samples}/xml-telegram-to-receipt-orders.xml[]
+----
+
+==== Receipts for order batches
+
+For referenced order batches, receipts will be sent back to the peer, too.
+The response contains an element for every batch file referenced by the peer.
+If the batch file was successfully read and processed, a response for every single order definition it contains will be included.
+
+:code-example-label: {counter:code-example}
+
+The following example shows a possible response to the batch file reference in <<example.xmlbatch>>.
+In this case, the batch file contains two transport order definitions which have been processed successfully.
+
+[#example.xmlreceiptsbatch, reftext='Example {code-example-label}']
+[[example.xmlreceiptsbatch]]
+.Example {code-example-label}: XML telegram with receipts for orders in batch file
+[source, xml]
+----
+include::{samples}/xml-telegram-to-receipt-batch.xml[]
+----
+
+=== Status messages via TCP/IP
+
+To receive status messages for transport orders in the system, connections to another TCP port (default: port 44444) may be established.
+Whenever the state of a transport order changes, an XML telegram will be sent to each connnected client, describing the new state of the order.
+Each of these telegrams is followed by a string that does not appear in the telegrams themselves (by default, a single pipe symbol: "|"), marking the end of the respective telegram.
+Status messages will be sent until the peer closes the TCP connection.
+
+The following points should be respected:
+
+* From the peer's point of view, connections to this status channel are purely passive, i.e. openTCS does not expect any messages from the peer and will not process any data received via this connection.
+* A peer needs to filter the received telegrams for relevant data itself.
+The openTCS kernel does not provide any filtering of status messages for clients.
+* Due to concurrent processes within openTCS, it is possible that the creation and activation of a transport order and its assignment to a vehicle is reported via the status channel before the peer that created the order receives the corresponding receipt.
+
+:code-example-label: {counter:code-example}
+
+The following example shows a status message as it would be sent via the status channel after the first of the two transport orders defined in <<example.xmlorders>> has been created and activated.
+
+[#example.statusmessage, reftext='Example {code-example-label}']
+[[example.statusmessage]]
+.Example {code-example-label}: Status message for the generated order
+[source, xml]
+----
+include::{samples}/xml-telegram-to-status.xml[]
+----
+
+:code-example-label: {counter:code-example}
+
+The following example shows a status message as it would be sent via the status channel for a vehicle state update.
+
+[#example.statusmessage, reftext='Example {code-example-label}']
+[[example.vehiclestatusmessage]]
+.Example {code-example-label}: Status message for vehicle update
+[source, xml]
+----
+include::{samples}/xml-telegram-vehicle-status.xml[]
+----
+
+=== XML Schema definitions for telegrams and scripts
+
+XML schemas describing the expected structure of XML order telegrams and order batch files as well as the structure of receipt telegrams as
+sent by openTCS are part of the openTCS distribution and can be found in the directory containing the developer documentation.

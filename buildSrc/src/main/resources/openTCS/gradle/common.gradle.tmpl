@@ -22,7 +22,11 @@ ext {
   javaClassesDir = sourceSets.main.output.classesDirs
   testSrcDir = sourceSets.test.java.srcDirs[0]
 }
-  
+
+repositories {
+  jcenter()
+}
+
 dependencies {
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
   compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21', classifier: 'javadoc'

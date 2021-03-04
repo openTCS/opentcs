@@ -7,10 +7,12 @@
  */
 package org.opentcs.components.kernel.services;
 
+import java.util.Map;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the plant model.
@@ -39,8 +41,29 @@ public interface PlantModelService
    *
    * @return The name of the currently loaded model.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @deprecated Use {@link #getModelName()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   String getLoadedModelName()
+      throws KernelRuntimeException;
+
+  /**
+   * Returns the name of the model that is currently loaded in the kernel.
+   *
+   * @return The name of the currently loaded model.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  String getModelName()
+      throws KernelRuntimeException;
+
+  /**
+   * Returns the model's properties.
+   *
+   * @return The model's properties.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  Map<String, String> getModelProperties()
       throws KernelRuntimeException;
 
   /**
@@ -49,7 +72,11 @@ public interface PlantModelService
    * @return The name of the model, or {@code null} if there is no model.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    * @throws IllegalStateException If retrieving the model name was not possible.
+   * @deprecated Fetching a persistent model's name will not be supported any more, as the model
+   * would now already be loaded, anyway.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   String getPersistentModelName()
       throws KernelRuntimeException, IllegalStateException;
 }

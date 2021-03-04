@@ -11,6 +11,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -82,7 +83,7 @@ public class StandardRemotePlantModelService
    * @param plantModelService The plant model service.
    * @param userManager The user manager.
    * @param configuration This class' configuration.
-   * @param socketFactoryProvider The provider for socket factories used for RMI.
+   * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param registryProvider The provider for the registry with which this remote service registers.
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
@@ -165,13 +166,27 @@ public class StandardRemotePlantModelService
   }
 
   @Override
+  @Deprecated
   public String getLoadedModelName(ClientID clientId) {
-    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
-
-    return plantModelService.getLoadedModelName();
+    return getModelName(clientId);
   }
 
   @Override
+  public String getModelName(ClientID clientId) {
+    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
+
+    return plantModelService.getModelName();
+  }
+
+  @Override
+  public Map<String, String> getModelProperties(ClientID clientId) {
+    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
+
+    return plantModelService.getModelProperties();
+  }
+
+  @Override
+  @Deprecated
   public String getPersistentModelName(ClientID clientId) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 

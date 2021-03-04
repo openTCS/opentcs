@@ -18,6 +18,7 @@ import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
+import org.opentcs.guing.application.action.course.DispatchVehicleAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
@@ -57,6 +58,10 @@ public class ActionsMenu
    * A menu item for assuming the layout coordinates from the model coordinates.
    */
   private final JMenuItem cbiAlignModelWithLayout;
+  /**
+   * A menu item for triggering a dispatcher run.
+   */
+  private final JMenuItem menuItemDispatch;
 
   /**
    * Creates a new instance.
@@ -122,6 +127,12 @@ public class ActionsMenu
     // Menu item Actions -> Copy layout to model
     cbiAlignLayoutWithModel = menuFactory.createLayoutToModelMenuItem(true);
     add(cbiAlignLayoutWithModel);
+
+    addSeparator();
+
+    menuItemDispatch = new JMenuItem(actionMap.get(DispatchVehicleAction.ID));
+    labels.configureMenu(menuItemDispatch, DispatchVehicleAction.ID);
+    add(menuItemDispatch);
   }
 
   /**
@@ -138,5 +149,6 @@ public class ActionsMenu
     cbiIgnoreOrientationAngle.setEnabled(mode == OperationMode.OPERATING);
     cbiAlignLayoutWithModel.setEnabled(mode == OperationMode.MODELLING);
     cbiAlignModelWithLayout.setEnabled(mode == OperationMode.MODELLING);
+    menuItemDispatch.setEnabled(mode == OperationMode.OPERATING);
   }
 }

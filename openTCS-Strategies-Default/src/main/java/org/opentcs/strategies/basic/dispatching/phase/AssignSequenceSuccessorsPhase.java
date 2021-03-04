@@ -16,10 +16,10 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
-import org.opentcs.strategies.basic.dispatching.phase.assignment.AssignmentCandidate;
 
 /**
  * Assigns vehicles to the next transport orders in their respective order sequences, if any.

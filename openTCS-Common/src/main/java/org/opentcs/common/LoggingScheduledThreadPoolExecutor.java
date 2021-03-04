@@ -10,6 +10,7 @@ package org.opentcs.common;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import org.slf4j.Logger;
@@ -50,17 +51,38 @@ public class LoggingScheduledThreadPoolExecutor
         if (future.isDone()) {
           future.get();
         }
-      }
-      catch (CancellationException ce) {
-        // Ignore
+        else if (isPeriodic(future)) {
+          // Periodic futures will never be done
+          return;
+        }
+        else {
+          LOG.debug("Future was not done: {}", future);
+        }
       }
       catch (ExecutionException ee) {
-        LOG.error("Unhandled exception", ee.getCause());
+        LOG.warn("Unhandled exception in executed task", ee.getCause());
+      }
+      catch (CancellationException ce) {
+        LOG.debug("Task was cancelled", ce);
       }
       catch (InterruptedException ie) {
+        LOG.debug("Interrupted during Future.get()", ie);
         // Ignore/Reset
         Thread.currentThread().interrupt();
       }
     }
+    if (t != null) {
+      LOG.error("Abrupt termination", t);
+    }
+  }
+
+  private boolean isPeriodic(Future<?> future) {
+    if (future instanceof RunnableScheduledFuture<?>) {
+      RunnableScheduledFuture<?> runnableFuture = (RunnableScheduledFuture<?>) future;
+      if (runnableFuture.isPeriodic()) {
+        return true;
+      }
+    }
+    return false;
   }
 }

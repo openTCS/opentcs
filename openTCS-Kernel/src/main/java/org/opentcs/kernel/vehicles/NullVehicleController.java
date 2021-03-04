@@ -81,6 +81,7 @@ public class NullVehicleController
   }
 
   @Override
+  @Deprecated
   public void resetVehiclePosition() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }

@@ -75,7 +75,7 @@ public class StandardRemoteSchedulerService
    * @param schedulerService The scheduler service.
    * @param userManager The user manager.
    * @param configuration This class' configuration.
-   * @param socketFactoryProvider The provider for socket factories used for RMI.
+   * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param registryProvider The provider for the registry with which this remote service registers.
    */
   @Inject

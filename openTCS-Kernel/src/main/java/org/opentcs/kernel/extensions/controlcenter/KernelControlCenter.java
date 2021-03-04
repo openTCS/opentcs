@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -228,14 +227,12 @@ public class KernelControlCenter
         addPanels(panelProvidersOperating);
 
         menuButtonOperating.setSelected(true);
-        menuButtonModel.setEnabled(false);
         newModelMenuItem.setEnabled(false);
         break;
       case MODELLING:
         addPanels(panelProvidersModelling);
 
         menuButtonModelling.setSelected(true);
-        menuButtonModel.setEnabled(true);
         newModelMenuItem.setEnabled(true);
         break;
       default:
@@ -349,7 +346,6 @@ public class KernelControlCenter
     menuButtonModelling = new javax.swing.JRadioButtonMenuItem();
     menuButtonOperating = new javax.swing.JRadioButtonMenuItem();
     newModelMenuItem = new javax.swing.JMenuItem();
-    menuButtonModel = new javax.swing.JMenuItem();
     jSeparator1 = new javax.swing.JPopupMenu.Separator();
     menuButtonExit = new javax.swing.JMenuItem();
     menuHelp = new javax.swing.JMenu();
@@ -424,14 +420,6 @@ public class KernelControlCenter
       }
     });
     menuKernel.add(newModelMenuItem);
-
-    menuButtonModel.setText(bundle.getString("SwitchModel")); // NOI18N
-    menuButtonModel.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        menuButtonModelActionPerformed(evt);
-      }
-    });
-    menuKernel.add(menuButtonModel);
     menuKernel.add(jSeparator1);
 
     menuButtonExit.setText(bundle.getString("Exit")); // NOI18N
@@ -479,51 +467,16 @@ public class KernelControlCenter
 
   private void menuButtonModellingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonModellingActionPerformed
     kernel.setState(Kernel.State.MODELLING);
-    menuButtonModel.setEnabled(true);
-
   }//GEN-LAST:event_menuButtonModellingActionPerformed
 
   private void menuButtonOperatingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonOperatingActionPerformed
     kernel.setState(Kernel.State.OPERATING);
-    menuButtonModel.setEnabled(false);
   }//GEN-LAST:event_menuButtonOperatingActionPerformed
 
   private void menuAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAboutActionPerformed
     aboutDialog.setLocationRelativeTo(null);
     aboutDialog.setVisible(true);
   }//GEN-LAST:event_menuAboutActionPerformed
-
-  private void menuButtonModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonModelActionPerformed
-    Optional<String> modelName = Optional.ofNullable(plantModelService.getPersistentModelName());
-    if (modelName.isPresent()) {
-      // Show confirmation dialog
-      String message = new StringBuilder()
-          .append(BUNDLE.getString("loadModelMessagePart1"))
-          .append(" ")
-          .append(modelName.get())
-          .append(BUNDLE.getString("loadModelMessagePart2"))
-          .toString();
-      int reply = JOptionPane.showConfirmDialog(null,
-                                                message,
-                                                BUNDLE.getString("loadModelConfirmTitle"),
-                                                JOptionPane.YES_NO_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE);
-      if (reply != JOptionPane.YES_OPTION) {
-        return;
-      }
-      // Load model
-      LOG.info("Loading model: " + modelName.get());
-      plantModelService.loadPlantModel();
-      LOG.info("Finished loading the model.");
-    }
-    else {
-      JOptionPane.showMessageDialog(null,
-                                    BUNDLE.getString("loadModelInfoMessage"),
-                                    BUNDLE.getString("loadModelInfoTitle"),
-                                    JOptionPane.WARNING_MESSAGE);
-      LOG.info("No model available, keeping current model.");
-    }
-  }//GEN-LAST:event_menuButtonModelActionPerformed
 
   private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
     if (confirmExit()) {
@@ -560,7 +513,6 @@ public class KernelControlCenter
   private javax.swing.JMenuItem menuAbout;
   private javax.swing.JMenuBar menuBarMain;
   private javax.swing.JMenuItem menuButtonExit;
-  private javax.swing.JMenuItem menuButtonModel;
   private javax.swing.JRadioButtonMenuItem menuButtonModelling;
   private javax.swing.JRadioButtonMenuItem menuButtonOperating;
   private javax.swing.JMenu menuHelp;

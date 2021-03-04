@@ -354,6 +354,7 @@ public class ToolBarManager
     buttonCreateLocationType.setVisible(mode == OperationMode.MODELLING);
     buttonCreateVehicle.setVisible(mode == OperationMode.MODELLING);
     buttonCreateBlock.setVisible(mode == OperationMode.MODELLING);
+    buttonCreateGroup.setVisible(mode == OperationMode.MODELLING);
 //    buttonCreateStaticRoute.setVisible(mode == OperationMode.MODELLING);
 
     for (JToolBar.Separator sep : separatorList) {

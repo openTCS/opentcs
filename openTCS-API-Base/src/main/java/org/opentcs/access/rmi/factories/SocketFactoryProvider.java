@@ -9,6 +9,7 @@ package org.opentcs.access.rmi.factories;
 
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
+import javax.annotation.Nullable;
 
 /**
  * A provider for instances of {@link RMIClientSocketFactory} and {@link RMIServerSocketFactory}.
@@ -22,13 +23,17 @@ public interface SocketFactoryProvider {
    * Returns a {@link RMIClientSocketFactory}.
    *
    * @return A {@link RMIClientSocketFactory}.
+   * May be <code>null</code> to indicate that a default factory implementation is to be used.
    */
+  @Nullable
   RMIClientSocketFactory getClientSocketFactory();
 
   /**
    * Returns a {@link RMIServerSocketFactory}.
    *
    * @return A {@link RMIServerSocketFactory}.
+   * May be <code>null</code> to indicate that a default factory implementation is to be used.
    */
+  @Nullable
   RMIServerSocketFactory getServerSocketFactory();
 }

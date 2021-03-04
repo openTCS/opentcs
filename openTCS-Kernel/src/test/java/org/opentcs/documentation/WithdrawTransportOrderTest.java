@@ -53,10 +53,7 @@ public class WithdrawTransportOrderTest {
     // Withdraw the order.
     // The second argument indicates if the vehicle should finish the movements
     // it is already assigned to (false) or abort immediately (true).
-    // The third argument indicates whether the vehicle's processing state should
-    // be changed to UNAVAILABLE so it cannot be assigned another transport order
-    // right after the withdrawal.
-    dispatcherService.withdrawByTransportOrder(curOrder.getReference(), true, false);
+    dispatcherService.withdrawByTransportOrder(curOrder.getReference(), true);
     // end::documentation_withdrawTransportOrder[]
   }
 
@@ -76,10 +73,7 @@ public class WithdrawTransportOrderTest {
     // Withdraw the order.
     // The second argument indicates if the vehicle should finish the movements
     // it is already assigned to (false) or abort immediately (true).
-    // The third argument indicates whether the vehicle's processing state should
-    // be changed to UNAVAILABLE so it cannot be assigned another transport order
-    // right after the withdrawal.
-    dispatcherService.withdrawByVehicle(curVehicle.getReference(), true, false);
+    dispatcherService.withdrawByVehicle(curVehicle.getReference(), true);
     // end::documentation_withdrawTransportOrderByVehicle[]
   }
 

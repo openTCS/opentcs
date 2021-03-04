@@ -2139,15 +2139,13 @@ public class OpenTCSView
 
       ModelComponent model = event.getModel();
 
+      // If a model component's name changed, update the blocks this component is a member of
       if (model.getPropertyName() != null && model.getPropertyName().hasChanged()) {
         fComponentsTreeManager.itemChanged(model);
 
-        // If the name of a point changed, update the blocks this point is a member of
-        if (model instanceof PointModel) {
-          fModelManager.getModel().getBlockModels().stream()
-              .filter(block -> blockIsAffectedByPointRename(block, model))
-              .forEach(block -> updateBlockMembers(block));
-        }
+        fModelManager.getModel().getBlockModels().stream()
+            .filter(block -> blockAffectedByNameChange(block, model))
+            .forEach(block -> updateBlockMembers(block));
       }
 
       if (model instanceof SystemModel) {
@@ -2188,19 +2186,10 @@ public class OpenTCSView
       }
     }
 
-    private boolean blockIsAffectedByPointRename(BlockModel block, ModelComponent pointModel) {
+    private boolean blockAffectedByNameChange(BlockModel block, ModelComponent model) {
       for (ModelComponent member : block.getChildComponents()) {
-        if (member instanceof PointModel) {
-          if (member.equals(pointModel)) {
-            return true;
-          }
-        }
-        else if (member instanceof PathModel) {
-          PathModel path = (PathModel) member;
-          if (path.getStartComponent().equals(pointModel)
-              || path.getEndComponent().equals(pointModel)) {
-            return true;
-          }
+        if (member.equals(model)) {
+          return true;
         }
       }
       return false;

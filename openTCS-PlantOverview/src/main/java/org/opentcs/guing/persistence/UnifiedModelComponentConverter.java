@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Point;
@@ -26,6 +27,7 @@ import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
+import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
@@ -78,6 +80,7 @@ public class UnifiedModelComponentConverter {
 
     plantModel.setName(modelName);
     plantModel.setVersion(VERSION_STRING);
+    plantModel.setProperties(convertProperties(systemModel.getPropertyMiscellaneous()));
 
     List<PointTO> points = new ArrayList<>();
     for (PointModel model : systemModel.getPointModels()) {
@@ -143,6 +146,13 @@ public class UnifiedModelComponentConverter {
     plantModel.setVisualLayouts(visualLayouts);
 
     return plantModel;
+  }
+
+  private List<PropertyTO> convertProperties(KeyValueSetProperty kvsp) {
+    return kvsp.getItems().stream()
+        .sorted((kvp1, kvp2) -> kvp1.getKey().compareTo(kvp2.getKey()))
+        .map(kvp -> new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private PointTO convertPoint(PointModel pointModel, List<PathModel> pathModels) {
@@ -239,8 +249,8 @@ public class UnifiedModelComponentConverter {
     if (symp.getLocationRepresentation() != null) {
       locType.getProperties().add(
           new PropertyTO()
-          .setName(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)
-          .setValue(symp.getLocationRepresentation().name())
+              .setName(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)
+              .setValue(symp.getLocationRepresentation().name())
       );
     }
     else {
@@ -264,7 +274,8 @@ public class UnifiedModelComponentConverter {
 
     // Get this location's links
     for (LinkModel linkModel : linkModels) {
-      if (!linkModel.getPropertyName().getText().contains(locationName)) {
+      String linkLocationName = linkModel.getLocation().getName();
+      if (!linkLocationName.equals(locationName)) {
         continue;
       }
 
@@ -288,8 +299,8 @@ public class UnifiedModelComponentConverter {
     if (symp.getLocationRepresentation() != null) {
       location.getProperties().add(
           new PropertyTO()
-          .setName(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
-          .setValue(symp.getLocationRepresentation().name())
+              .setName(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
+              .setValue(symp.getLocationRepresentation().name())
       );
     }
     else {
@@ -395,8 +406,8 @@ public class UnifiedModelComponentConverter {
 
       mle.getProperties().add(
           new PropertyTO()
-          .setName(ElementPropKeys.VEHICLE_ROUTE_COLOR)
-          .setValue(Colors.encodeToHexRGB(vehicleModel.getPropertyRouteColor().getColor()))
+              .setName(ElementPropKeys.VEHICLE_ROUTE_COLOR)
+              .setValue(Colors.encodeToHexRGB(vehicleModel.getPropertyRouteColor().getColor()))
       );
 
       result.add(mle);
@@ -481,8 +492,8 @@ public class UnifiedModelComponentConverter {
 
       mle.getProperties().add(
           new PropertyTO()
-          .setName(ElementPropKeys.BLOCK_COLOR)
-          .setValue(Colors.encodeToHexRGB(block.getPropertyColor().getColor()))
+              .setName(ElementPropKeys.BLOCK_COLOR)
+              .setValue(Colors.encodeToHexRGB(block.getPropertyColor().getColor()))
       );
 
       result.add(mle);

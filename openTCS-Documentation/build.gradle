@@ -7,14 +7,13 @@ evaluationDependsOn(':openTCS-PlantOverview')
 
 apply plugin: 'distribution'
 apply plugin: 'org.asciidoctor.convert'
-apply plugin: 'me.champeau.gradle.japicmp'
+apply plugin: 'org.hidetake.swagger.generator'
 apply from: "${rootDir}/gradle/license-headers.gradle"
 
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
-def apiCmpDir = file("$buildDir/compatibility-reports")
+def webApiDir = file("$buildDir/swagger-ui-webapi")
 def schemasDir = file("$buildDir/schemagen")
-def jsonSchemasDir = file("$buildDir/schemagen-json")
 def samplesDir = file("$buildDir/samples")
 def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
@@ -33,10 +32,14 @@ configurations {
   baselineapiinjection
 }
 
+swaggerSources {
+  webapi {
+    inputFile = file("src/docs/web-api/service-web-api-v1.yaml")
+  }
+}
+
 dependencies {
   compile project(':openTCS-Kernel')
-  compile group: 'com.kjetland', name: 'mbknor-jackson-jsonschema_2.12', version: '1.0.29'
-  schemagen group: 'com.kjetland', name: 'mbknor-jackson-jsonschema_2.12', version: '1.0.29'
   
   schemagen project(':openTCS-Kernel')
   schemagen project(':openTCS-PlantOverview')
@@ -46,6 +49,8 @@ dependencies {
   configdocgen project(':openTCS-KernelControlCenter')
   configdocgen project(':openTCS-PlantOverview')
   configdocgen jar.outputs.files
+  
+  swaggerUI 'org.webjars:swagger-ui:3.10.0'
   
   baselineapibase  'org.opentcs:opentcs-api-base:4.0.0@jar'
   baselineapiinjection  'org.opentcs:opentcs-api-injection:4.0.0@jar'
@@ -59,14 +64,11 @@ distributions {
     contents.from(injectionApiDir) {
       into('developer/api-injection')
     }
-    contents.from(apiCmpDir) {
-      into('developer/compatibility-reports')
+    contents.from(webApiDir) {
+      into('developer/web-api')
     }
     contents.from(schemasDir) {
       into('developer/xml-schemas')
-    }
-    contents.from(jsonSchemasDir) {
-      into('developer/json-schemas')
     }
     contents.from(devManualDir) {
       into('developer/developers-guide')
@@ -83,10 +85,9 @@ distributions {
 task renderDocs {
   dependsOn 'apiBase'
   dependsOn 'apiInjection'
-  dependsOn 'jApiCmpAll'
   dependsOn 'schemagenXml'
-  dependsOn 'schemagenJson'
   dependsOn 'asciidoctor'
+  dependsOn 'generateSwaggerUI'
 }
 
 installDist.dependsOn renderDocs
@@ -136,30 +137,6 @@ task apiInjection(type: Javadoc, description: 'Creates Javadoc for injection API
     overview = "${project(':openTCS-API-Injection').projectDir}/src/main/java/overview.html"
     group("Classes supporting customization of openTCS applications", "org.opentcs.customizations*")
   }
-}
-
-task jApiCmpBase(type: me.champeau.gradle.japicmp.JapicmpTask) {
-  dependsOn project(':openTCS-API-Base').jar
-  oldClasspath = configurations.baselineapibase
-  newClasspath = files(project(':openTCS-API-Base').jar)
-  accessModifier = 'protected'
-  onlyModified = true
-  htmlOutputFile = file("$apiCmpDir/japicmp-opentcs-api-base.html")
-}
-
-task jApiCmpInjection(type: me.champeau.gradle.japicmp.JapicmpTask) {
-  dependsOn project(':openTCS-API-Injection').jar
-  oldClasspath = configurations.baselineapiinjection
-  newClasspath = files(project(':openTCS-API-Injection').jar)
-  accessModifier = 'protected'
-  onlyModified = true
-  htmlOutputFile = file("$apiCmpDir/japicmp-opentcs-api-injection.html")
-  ignoreMissingClasses = true
-}
-
-task jApiCmpAll {
-  dependsOn jApiCmpBase
-  dependsOn jApiCmpInjection
 }
 
 asciidoctor {
@@ -518,34 +495,6 @@ task schemagenXml {
   }
 }
 
-task schemagenJson {
-  dependsOn 'jar'
-  dependsOn ':openTCS-Kernel:jar'
-  dependsOn ':openTCS-PlantOverview:jar'
-
-  File schemagenDir = jsonSchemasDir
-
-  project(':openTCS-Kernel').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
-    if (srcDir.isDirectory()) {
-      inputs.dir srcDir
-    }
-  }
-  outputs.dir schemagenDir
-
-  doLast {
-    mkdir(schemagenDir)
-    
-    javaexec {
-      classpath configurations.schemagen
-      main = "org.opentcs.documentation.JSONSchemaGenerator"
-      args = [ "${schemagenDir}",
-            "org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport",
-            "org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList",
-      ]
-    }
-  }
-}
-
 task samplesgen {
   dependsOn 'jar'
   doLast {
@@ -592,6 +541,26 @@ task samplesgen {
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS", "${samplesDir}/sample-status.json"
     }
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.HttpSamples'
+      args "STATUS_TRANSPORT_ORDERS", "${samplesDir}/sample-transport-orders.json"
+    }
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.HttpSamples'
+      args "STATUS_SINGLE_TRANSPORT_ORDER", "${samplesDir}/sample-single-transport-order.json"
+    }
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.HttpSamples'
+      args "STATUS_VEHICLES", "${samplesDir}/sample-vehicles.json"
+    }
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.HttpSamples'
+      args "STATUS_SINGLE_VEHICLE", "${samplesDir}/sample-single-vehicle.json"
+    }
     
     javaexec {
       classpath configurations.runtime, jar.outputs.files
@@ -627,22 +596,8 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
-              "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration"]
-    }
-    
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/OrderPoolConfigurationEntries.adoc",
               "org.opentcs.kernel.OrderPoolConfiguration"]
-    }
-
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/VehiclesConfigurationEntries.adoc",
-              "org.opentcs.kernel.vehicles.VehiclesConfiguration"]
     }
 
     javaexec {
@@ -697,6 +652,13 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/KernelSslConfigurationEntries.adoc",
+              "org.opentcs.kernel.SslConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/StatisticsCollectorConfigurationEntries.adoc",
               "org.opentcs.kernel.extensions.statistics.StatisticsCollectorConfiguration"]
     }
@@ -711,8 +673,29 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
+              "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/KccSslConfigurationEntries.adoc",
+              "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
               "org.opentcs.guing.util.PlantOverviewApplicationConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/PoSslConfigurationEntries.adoc",
+              "org.opentcs.guing.exchange.SslConfiguration"]
     }
   }
 }

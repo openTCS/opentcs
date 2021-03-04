@@ -7,7 +7,6 @@
  */
 package org.opentcs.guing.application.action.course;
 
-import com.google.inject.assistedinject.Assisted;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -16,9 +15,6 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Vehicle;
-import org.opentcs.guing.model.elements.VehicleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +34,6 @@ public class DispatchVehicleAction
    */
   private static final Logger LOG = LoggerFactory.getLogger(DispatchVehicleAction.class);
   /**
-   * The vehicle.
-   */
-  private final VehicleModel vehicleModel;
-  /**
    * Provides access to a portal.
    */
   private final SharedKernelServicePortalProvider portalProvider;
@@ -49,13 +41,10 @@ public class DispatchVehicleAction
   /**
    * Creates a new instance.
    *
-   * @param vehicle The selected vehicle.
    * @param portalProvider Provides access to a shared portal.
    */
   @Inject
-  public DispatchVehicleAction(@Assisted VehicleModel vehicle,
-                               SharedKernelServicePortalProvider portalProvider) {
-    this.vehicleModel = requireNonNull(vehicle, "vehicle");
+  public DispatchVehicleAction(SharedKernelServicePortalProvider portalProvider) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
 
@@ -63,11 +52,6 @@ public class DispatchVehicleAction
   public void actionPerformed(ActionEvent evt) {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       KernelServicePortal portal = sharedPortal.getPortal();
-      TCSObjectReference<Vehicle> vehicleRef = portal.getVehicleService()
-          .fetchObject(Vehicle.class, vehicleModel.getName()).getReference();
-      portal.getVehicleService().updateVehicleIntegrationLevel(
-          vehicleRef,
-          Vehicle.IntegrationLevel.TO_BE_UTILIZED);
       portal.getDispatcherService().dispatch();
     }
     catch (KernelRuntimeException e) {

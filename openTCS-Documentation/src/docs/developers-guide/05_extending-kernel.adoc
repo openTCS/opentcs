@@ -172,3 +172,57 @@ include::{kernel-testSrc}/org/opentcs/documentation/ReceiveCommAdapterMessageTes
 ----
 
 Unlike information published via events, data stored as properties in `Vehicle` or `TransportOrder` objects can be retrieved at any time.
+
+=== Executing code in kernel context
+
+Within the kernel, concurrent modifications of the data model -- e.g. contents of the plant model or transport order properties -- need to be synchronized carefully.
+Similar to e.g. the Swing framework's Event Dispatcher Thread, a single thread is used for executing one-shot or periodics tasks performing data modifications.
+To help with this, an instance of `java.util.concurrent.ScheduledExecutorService` is provided.
+Custom code running within the kernel application, including vehicle drivers and implementations of additional funcionality, should also perform changes of the data model via this executor only to avoid concurrency issues.
+
+To make use of the kernel's executor, use the `@KernelExecutor` qualifier annotation and inject a `ScheduledExecutorService`:
+
+[source, java]
+----
+@Inject
+public MyClass(@KernelExecutor ScheduledExecutorService kernelExecutor) {
+  ...
+}
+----
+
+You can also inject it as a `java.util.concurrent.ExecutorService`:
+
+[source, java]
+----
+@Inject
+public MyClass(@KernelExecutor ExecutorService kernelExecutor) {
+  ...
+}
+----
+
+Injecting a `java.util.concurrent.Executor` is also possible:
+
+[source, java]
+----
+@Inject
+public MyClass(@KernelExecutor Executor kernelExecutor) {
+  ...
+}
+----
+
+Then, you can use it e.g. to lock a path in the plant model in kernel context:
+
+[source, java]
+----
+kernelExecutor.submit(() -> routerService.updatePathLock(ref, true));
+----
+
+Due to the single-threaded nature of the kernel executor, tasks submitted to it are executed sequentially, one after another.
+This implies that submitting long-running tasks should be avoided, as they would block the execution of subsequent tasks.
+
+When event objects, e.g. instances of `TCSObjectEvent`, are distributed within the kernel, this always happens in kernel context, i.e. from a task that is run by the kernel executor.
+Event handlers should behave accordingly and finish quickly/not block execution for too long.
+If processing an event requires time-consuming actions to be taken, these should be executed on a different thread.
+
+NOTE: As its name indicates, the kernel executor is only available within the kernel application.
+It is not available for code running in other applications like the Plant Overview, and it is not required there (for avoiding concurrency issues in the kernel).

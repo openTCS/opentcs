@@ -54,7 +54,8 @@ public class ImplicitDispatchTrigger
   }
 
   private void checkVehicleChange(Vehicle oldVehicle, Vehicle newVehicle) {
-    if (newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
+    if ((newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
+         || newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED)
         && (idleAndEnergyLevelChanged(oldVehicle, newVehicle)
             || awaitingNextOrder(oldVehicle, newVehicle)
             || orderSequenceNulled(oldVehicle, newVehicle))) {

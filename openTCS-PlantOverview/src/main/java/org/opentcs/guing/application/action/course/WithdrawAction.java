@@ -63,7 +63,7 @@ public class WithdrawAction
   public void actionPerformed(ActionEvent evt) {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       sharedPortal.getPortal().getDispatcherService().withdrawByVehicle(
-          vehicleReference(sharedPortal.getPortal().getVehicleService()), false, false);
+          vehicleReference(sharedPortal.getPortal().getVehicleService()), false);
     }
     catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
