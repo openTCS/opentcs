@@ -108,7 +108,6 @@ final class DetailPanel
     // Clean up first - but only if we're not reattaching the vehicle model
     // which is already attached to this panel.
     if (vehicleEntry != null && vehicleEntry != newVehicleEntry) {
-      vehicleEntry.setSelectedTabIndex(tabbedPane.getSelectedIndex());
       detachFromVehicle();
     }
     vehicleEntry = newVehicleEntry;

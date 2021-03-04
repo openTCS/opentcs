@@ -66,8 +66,6 @@ public class ViewMenu
    *
    * @param actionMap The application's action map.
    * @param view The application's main view.
-   * @param menuLocationTheme A menu for selecting a location theme.
-   * @param menuVehicleTheme A menu for selecting a vehicle theme.
    * @param menuPluginPanels A menu for showing/hiding plugin panels.
    */
   @Inject
@@ -108,6 +106,8 @@ public class ViewMenu
     // The ToolBarActions are set in OpenTCSView.wrapViewComponent().
     // Therefore createToolBars() has to be called() first.
     Object object = view.getComponent().getClientProperty(OpenTCSView.TOOLBAR_ACTIONS_PROPERTY);
+
+    @SuppressWarnings("unchecked")
     List<Action> viewActions = (List<Action>) object;
 
     if (viewActions != null && !viewActions.isEmpty()) {

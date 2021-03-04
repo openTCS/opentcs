@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -112,6 +113,7 @@ import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.tree.BlockFolderFilter;
 import org.opentcs.guing.components.tree.BlocksTreeViewManager;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
@@ -2438,11 +2440,18 @@ public class OpenTCSView
       }
 
       ModelComponent model = event.getModel();
-      StringProperty pName = (StringProperty) model.getProperty(
-          ModelComponent.NAME);
+      StringProperty pName = (StringProperty) model.getProperty(ModelComponent.NAME);
 
       if (pName != null && pName.hasChanged()) {
         fComponentsTreeManager.itemChanged(model);
+
+        // If the name of a point changed, update the blocks this point is a member of
+        if (model instanceof PointModel) {
+          List<BlockModel> blocksToUpdate = fModelManager.getModel().getBlockModels().stream()
+              .filter(block -> blockContainsPoint(block, model))
+              .collect(Collectors.toList());
+          updateBlockMembers(blocksToUpdate);
+        }
       }
 
       if (model instanceof SystemModel) {
@@ -2451,10 +2460,8 @@ public class OpenTCSView
 
       if (model instanceof LayoutModel) {
         // Ma�stabs�nderung behandeln
-        LengthProperty pScaleX
-            = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
-        LengthProperty pScaleY
-            = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
+        LengthProperty pScaleX = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
+        LengthProperty pScaleY = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
         updateLocationThemes(null);
 
         if (pScaleX.hasChanged() || pScaleY.hasChanged()) {
@@ -2462,8 +2469,7 @@ public class OpenTCSView
           double scaleY = (double) pScaleY.getValue();
 
           if (scaleX != 0.0 && scaleY != 0.0) {
-            fModelManager.getModel().getDrawingMethod().getOrigin().setScale(
-                scaleX, scaleY);
+            fModelManager.getModel().getDrawingMethod().getOrigin().setScale(scaleX, scaleY);
 //          fModelManager.restoreModel();  // ???
           }
         }
@@ -2471,11 +2477,9 @@ public class OpenTCSView
 
       if (model instanceof LocationModel) {
         if (model.getProperty(LocationModel.TYPE).hasChanged()) {
-          AbstractProperty p
-              = (AbstractProperty) model.getProperty(LocationModel.TYPE);
+          AbstractProperty p = (AbstractProperty) model.getProperty(LocationModel.TYPE);
           LocationTypeModel type
-              = fModelManager.getModel().getLocationTypeModel((String) p
-                  .getValue());
+              = fModelManager.getModel().getLocationTypeModel((String) p.getValue());
           ((LocationModel) model).setLocationType(type);
           if (!(model == event.getInitiator())) {
             model.propertiesChanged(this);
@@ -2484,13 +2488,33 @@ public class OpenTCSView
       }
 
       if (model instanceof LocationTypeModel) {
-        for (LocationModel locModel : fModelManager.getModel()
-            .getLocationModels()) {
-          locModel.updateTypeProperty(fModelManager.getModel()
-              .getLocationTypeModels());
+        for (LocationModel locModel : fModelManager.getModel().getLocationModels()) {
+          locModel.updateTypeProperty(fModelManager.getModel().getLocationTypeModels());
         }
       }
 //  resetSelectionTool(); ???
+    }
+
+    private boolean blockContainsPoint(BlockModel block, ModelComponent pointModel) {
+      for (ModelComponent member : block.getChildComponents()) {
+        PathModel path = (PathModel) member;
+        if (path.getStartComponent().equals(pointModel)
+            || path.getEndComponent().equals(pointModel)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void updateBlockMembers(List<BlockModel> blocks) {
+      for (BlockModel block : blocks) {
+        List<String> members = new ArrayList<>();
+        for (ModelComponent component : block.getChildComponents()) {
+          members.add(component.getName());
+        }
+        StringSetProperty memberProp = (StringSetProperty) block.getProperty(BlockModel.ELEMENTS);
+        memberProp.setItems(members);
+      }
     }
   }
 

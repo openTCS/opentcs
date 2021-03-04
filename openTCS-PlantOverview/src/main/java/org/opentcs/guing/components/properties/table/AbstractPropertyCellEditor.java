@@ -101,7 +101,7 @@ public abstract class AbstractPropertyCellEditor
    * @param comboBox
    * @param umh
    */
-  public AbstractPropertyCellEditor(JComboBox comboBox, UserMessageHelper umh) {
+  public AbstractPropertyCellEditor(JComboBox<?> comboBox, UserMessageHelper umh) {
     super(comboBox);
     fComponent = createComponent();
     userMessageHelper = Objects.requireNonNull(umh, "umh is null");

@@ -152,9 +152,6 @@ public abstract class SimpleLineConnection
     return dist;
   }
 
-  /**
-   * Is overridden in PathConnection.
-   */
   public void updateDecorations() {
   }
 

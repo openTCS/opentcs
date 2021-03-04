@@ -12,9 +12,11 @@ import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
 import org.opentcs.components.kernel.RecoveryEvaluator;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
@@ -51,7 +53,8 @@ public abstract class KernelInjectionModule
    * @deprecated Will be removed along with the deprecated supplier interface.
    */
   @Deprecated
-  protected void bindParkingPositionSupplier(Class<? extends org.opentcs.components.kernel.ParkingPositionSupplier> clazz) {
+  protected void bindParkingPositionSupplier(
+      Class<? extends org.opentcs.components.kernel.ParkingPositionSupplier> clazz) {
     bind(org.opentcs.components.kernel.ParkingPositionSupplier.class).to(clazz).in(Singleton.class);
   }
 
@@ -62,7 +65,8 @@ public abstract class KernelInjectionModule
    * @deprecated Will be removed along with the deprecated supplier interface.
    */
   @Deprecated
-  protected void bindRechargePositionSupplier(Class<? extends org.opentcs.components.kernel.RechargePositionSupplier> clazz) {
+  protected void bindRechargePositionSupplier(
+      Class<? extends org.opentcs.components.kernel.RechargePositionSupplier> clazz) {
     bind(org.opentcs.components.kernel.RechargePositionSupplier.class).to(clazz).in(Singleton.class);
   }
 
@@ -144,5 +148,23 @@ public abstract class KernelInjectionModule
    */
   protected Multibinder<VehicleCommAdapterFactory> vehicleCommAdaptersBinder() {
     return Multibinder.newSetBinder(binder(), VehicleCommAdapterFactory.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register transport order cleanup approvals.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<TransportOrderCleanupApproval> transportOrderCleanupApprovalBinder() {
+    return Multibinder.newSetBinder(binder(), TransportOrderCleanupApproval.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register order sequence cleanup approvals.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<OrderSequenceCleanupApproval> orderSequenceCleanupApprovalBinder() {
+    return Multibinder.newSetBinder(binder(), OrderSequenceCleanupApproval.class);
   }
 }

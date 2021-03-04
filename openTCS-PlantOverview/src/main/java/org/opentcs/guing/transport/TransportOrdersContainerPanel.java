@@ -410,7 +410,7 @@ public class TransportOrdersContainerPanel
 
   private void transportOrderChanged(TransportOrder t) {
     int rowIndex = fTransportOrders.indexOf(t);
-    Vector<Object> values = toTableRow(t);
+    Vector<String> values = toTableRow(t);
 
     for (int i = 0; i < values.size(); i++) {
       fTableModel.setValueAt(values.elementAt(i), rowIndex, i);
@@ -484,7 +484,7 @@ public class TransportOrdersContainerPanel
    *
    * @param t der Transportauftrag
    */
-  private Vector toTableRow(TransportOrder t) {
+  private Vector<String> toTableRow(TransportOrder t) {
     Vector<String> row = new Vector<>();
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     // Column 0: Name

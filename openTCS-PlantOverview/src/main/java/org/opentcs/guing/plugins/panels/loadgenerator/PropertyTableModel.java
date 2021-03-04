@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +28,7 @@ class PropertyTableModel
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(PropertyTableModel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PropertyTableModel.class);
   /**
    * The column names.
    */
@@ -40,7 +39,7 @@ class PropertyTableModel
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     String.class,
     String.class
   };
@@ -56,9 +55,10 @@ class PropertyTableModel
    */
   public PropertyTableModel(Map<String, String> data) {
     super();
-    Objects.requireNonNull(data);
-    for (Entry entry : data.entrySet()) {
-      this.data.add(new PropEntry((String) entry.getKey(), (String) entry.getValue()));
+    requireNonNull(data, "data");
+
+    for (Entry<String, String> entry : data.entrySet()) {
+      this.data.add(new PropEntry(entry.getKey(), entry.getValue()));
     }
   }
 
@@ -96,7 +96,7 @@ class PropertyTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.warn("Invalid columnIndex", exc);
+      LOG.warn("Invalid columnIndex", exc);
       return "FEHLER";
     }
   }

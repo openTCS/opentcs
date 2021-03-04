@@ -553,7 +553,6 @@ public class ButtonFactory {
       AttributeAction action;
       AbstractButton button = strokeDashesPopupButton.add(action
           = new AttributeAction(editor, AttributeKeys.STROKE_DASHES, dash, null, icon));
-      new LinkedList<Disposable>().add(action);
       button.setDisabledIcon(icon);
     }
 

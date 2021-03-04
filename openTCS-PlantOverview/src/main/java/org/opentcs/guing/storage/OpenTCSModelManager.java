@@ -61,12 +61,12 @@ import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
@@ -275,8 +275,8 @@ public class OpenTCSModelManager
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle()
-                                .getFormatted("modelManager.persistence.notLoaded",
-                                              file.getName()));
+                                    .getFormatted("modelManager.persistence.notLoaded",
+                                                  file.getName()));
       LOG.info("Error reading file", ex);
     }
     return false;
@@ -529,7 +529,7 @@ public class OpenTCSModelManager
           groupModel.add(modelComponent);
           procAdapterUtil.createProcessAdapter(modelComponent,
                                                systemModel
-                                               .getEventDispatcher());
+                                                   .getEventDispatcher());
         }
       }
     }
@@ -553,23 +553,23 @@ public class OpenTCSModelManager
       systemModel.getMainFolder(SystemModel.FolderKey.GROUPS).add(groupModel);
       Set<TCSObjectReference<?>> refs = group.getMembers();
 
-      for (TCSObjectReference ref : refs) {
+      for (TCSObjectReference<?> ref : refs) {
         if (ref.getReferentClass() == Point.class) {
-          Point point = kernel.getTCSObject(Point.class, ref);
+          Point point = kernel.getTCSObject(Point.class, ref.getName());
 
           if (point != null) {
             groupModel.add(systemModel.getPointModel(point.getName()));
           }
         }
         else if (ref.getReferentClass() == Location.class) {
-          Location location = kernel.getTCSObject(Location.class, ref);
+          Location location = kernel.getTCSObject(Location.class, ref.getName());
 
           if (location != null) {
             groupModel.add(systemModel.getLocationModel(location.getName()));
           }
         }
         else if (ref.getReferentClass() == Path.class) {
-          Path path = kernel.getTCSObject(Path.class, ref);
+          Path path = kernel.getTCSObject(Path.class, ref.getName());
 
           if (path != null) {
             groupModel.add(systemModel.getPathModel(path.getName()));
@@ -591,7 +591,7 @@ public class OpenTCSModelManager
       }
       procAdapterUtil.createProcessAdapter(staticRouteModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -648,7 +648,7 @@ public class OpenTCSModelManager
       }
       procAdapterUtil.createProcessAdapter(blockModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -778,7 +778,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(locationModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
       locationModel.propertiesChanged(new NullAttributesChangeListener());
       origin.addListener(llf);
       llf.set(FigureConstants.ORIGIN, origin);
@@ -935,7 +935,7 @@ public class OpenTCSModelManager
     for (LocationTypeModel locTypeModel : locTypeModels) {
       procAdapterUtil.createProcessAdapter(locTypeModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -964,7 +964,7 @@ public class OpenTCSModelManager
     for (LinkModel linkModel : linkModels) {
       procAdapterUtil.createProcessAdapter(linkModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -972,7 +972,7 @@ public class OpenTCSModelManager
     for (VehicleModel vehModel : vehicles) {
       procAdapterUtil.createProcessAdapter(vehModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
     }
   }
 
@@ -1014,9 +1014,9 @@ public class OpenTCSModelManager
         pathFigure.connect(startPointModel.getFigure(), endPointModel.getFigure());
       }
 
-      SelectionProperty selectionProperty
-          = (SelectionProperty) pathModel.getProperty(ElementPropKeys.PATH_CONN_TYPE);
-      PathModel.LinerType connectionType = (PathModel.LinerType) selectionProperty.getValue();
+      AbstractProperty property
+          = (AbstractProperty) pathModel.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+      PathModel.LinerType connectionType = (PathModel.LinerType) property.getValue();
 
       if (connectionType != null) {
         pathFigure.setLinerByType(connectionType);
@@ -1027,9 +1027,7 @@ public class OpenTCSModelManager
         initPathControlPoints(connectionType, sControlPoints, pathFigure);
       }
 
-      procAdapterUtil.createProcessAdapter(pathModel,
-                                           systemModel
-                                           .getEventDispatcher());
+      procAdapterUtil.createProcessAdapter(pathModel, systemModel.getEventDispatcher());
       pathModel.setFigure(pathFigure);
       pathModel.addAttributesChangeListener(pathFigure);
       restoredFigures.add(pathFigure);
@@ -1071,7 +1069,8 @@ public class OpenTCSModelManager
 
       if (layoutElement != null) {
         Map<String, String> layoutProperties = layoutElement.getProperties();
-        SelectionProperty property = (SelectionProperty) pathModel.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+        AbstractProperty property
+            = (AbstractProperty) pathModel.getProperty(ElementPropKeys.PATH_CONN_TYPE);
         String sConnectionType = layoutProperties.get(ElementPropKeys.PATH_CONN_TYPE);
 
         if (sConnectionType != null && !sConnectionType.isEmpty()) {
@@ -1210,7 +1209,7 @@ public class OpenTCSModelManager
 
       procAdapterUtil.createProcessAdapter(pointModel,
                                            systemModel
-                                           .getEventDispatcher());
+                                               .getEventDispatcher());
       // Koordinaten der Punkte �ndern sich, wenn der Ma�stab ver�ndert wird
       origin.addListener(lpf);
       lpf.set(FigureConstants.ORIGIN, origin);

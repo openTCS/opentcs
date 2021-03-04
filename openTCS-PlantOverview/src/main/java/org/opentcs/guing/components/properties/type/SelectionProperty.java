@@ -86,13 +86,13 @@ public class SelectionProperty<E extends Enum<E>>
   }
 
   @Override
-  public List getPossibleValues() {
+  public List<E> getPossibleValues() {
     return fPossibleValues;
   }
 
   @Override
   public void copyFrom(Property property) {
-    SelectionProperty selectionProperty = (SelectionProperty) property;
+    AbstractProperty selectionProperty = (AbstractProperty) property;
     setValue(selectionProperty.getValue());
   }
 }

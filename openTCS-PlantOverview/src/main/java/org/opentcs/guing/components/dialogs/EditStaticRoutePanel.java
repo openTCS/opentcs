@@ -93,7 +93,7 @@ public class EditStaticRoutePanel
 
         if (selectedIndex >= 0) {
           buttonRemove.setEnabled(true);
-          String entry = (String) listPoints.getModel().getElementAt(selectedIndex);
+          String entry = listPoints.getModel().getElementAt(selectedIndex);
           Iterator<PointModel> e = fAllPoints.iterator();
 
           while (e.hasNext()) {
@@ -127,12 +127,9 @@ public class EditStaticRoutePanel
 
   @Override // DialogContent
   public void initFields() {
-    DefaultListModel listModel = new DefaultListModel();
+    DefaultListModel<String> listModel = new DefaultListModel<>();
 
-    Iterator<PointModel> ePoints = fPoints.iterator();
-
-    while (ePoints.hasNext()) {
-      PointModel node = ePoints.next();
+    for (PointModel node : fPoints) {
       listModel.addElement(node.getName());
     }
 
@@ -150,7 +147,7 @@ public class EditStaticRoutePanel
     java.awt.GridBagConstraints gridBagConstraints;
 
     scrollPanePoints = new javax.swing.JScrollPane();
-    listPoints = new javax.swing.JList();
+    listPoints = new javax.swing.JList<>();
     controlPanel = new javax.swing.JPanel();
     buttonEdit = new javax.swing.JButton();
     buttonRemove = new javax.swing.JButton();
@@ -244,7 +241,7 @@ public class EditStaticRoutePanel
         return;
       }
 
-      DefaultListModel listModel = (DefaultListModel) listPoints.getModel();
+      DefaultListModel<String> listModel = (DefaultListModel<String>) listPoints.getModel();
 
       while (fPoints.size() > i) {
         fPoints.remove(i);
@@ -257,7 +254,7 @@ public class EditStaticRoutePanel
   private javax.swing.JButton buttonEdit;
   private javax.swing.JButton buttonRemove;
   private javax.swing.JPanel controlPanel;
-  private javax.swing.JList listPoints;
+  private javax.swing.JList<String> listPoints;
   private javax.swing.JScrollPane scrollPanePoints;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON

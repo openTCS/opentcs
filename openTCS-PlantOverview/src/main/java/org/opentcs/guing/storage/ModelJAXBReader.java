@@ -11,6 +11,7 @@ package org.opentcs.guing.storage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -55,8 +56,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
- * Implementation of <code>ModelReader</code> to deserialize a
- * <code>SystemModel</code>.
+ * Implementation of <code>ModelReader</code> to deserialize a <code>SystemModel</code>.
  *
  * @author Philipp Seifert (Fraunhofer IML)
  */
@@ -67,7 +67,6 @@ public class ModelJAXBReader
    * This class' logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(ModelValidator.class);
-
   /**
    * The <code>SystemModel</code> that will contain the read model.
    */
@@ -100,10 +99,9 @@ public class ModelJAXBReader
   @Override
   public Optional<SystemModel> deserialize(File file)
       throws IOException, IllegalArgumentException {
-    requireNonNull(file, "file is null");
+    requireNonNull(file, "file");
     SystemModel systemModel = systemModelProvider.get();
-    String modelName
-        = file.getName().replaceFirst("[.][^.]+$", ""); //remove extension;
+    String modelName = file.getName().replaceFirst("[.][^.]+$", ""); //remove extension;
     if (modelName != null && !modelName.isEmpty()) {
       systemModel.setName(modelName);
     }
@@ -135,13 +133,13 @@ public class ModelJAXBReader
                                         loc.getColumnNumber(),
                                         model.getClass().getSimpleName(),
                                         model.getName()};
-          String validationErrors = validator.getErrors().stream().collect(Collectors.joining("\n  "));
+          String validationErrors = validator.getErrors().stream()
+              .collect(Collectors.joining("\n  "));
           String message = MessageFormatter.arrayFormat(
-              "[Row {},Column {}] Invalid {}: \n  " + validationErrors,
-              args).getMessage();
+              "[Row {},Column {}] Invalid {}: \n  " + validationErrors, args).getMessage();
           LOG.warn(message);
           errors.add(message);
-
+          validator.resetErrors();
         }
       }
       //if any errors occurred, show the dialog with all errors listed
@@ -150,7 +148,7 @@ public class ModelJAXBReader
         JOptionPaneUtil.showDialogWithTextArea(statusPanel,
                                                bundle.getString("ValidationWarning.title"),
                                                bundle.getString("ValidationWarning.descriptionLoading"),
-                                               errors.stream().collect(Collectors.toList()));
+                                               errors);
       }
     }
     catch (JAXBException e) {
@@ -234,6 +232,5 @@ public class ModelJAXBReader
     public Location getLocation(Object o) {
       return locations.get(o);
     }
-
   }
 }

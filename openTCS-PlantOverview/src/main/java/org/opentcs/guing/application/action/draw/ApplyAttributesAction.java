@@ -18,6 +18,7 @@ package org.opentcs.guing.application.action.draw;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.jhotdraw.draw.AttributeKey;
 import static org.jhotdraw.draw.AttributeKeys.TEXT;
@@ -38,11 +39,13 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ApplyAttributesAction
     extends AbstractSelectedAction {
 
-  private Set<AttributeKey> excludedAttributes = new HashSet<>(
-      Arrays.asList(new AttributeKey[] {TRANSFORM, TEXT}));
+  private Set<AttributeKey<?>> excludedAttributes = new HashSet<>(
+      Arrays.asList(new AttributeKey<?>[] {TRANSFORM, TEXT}));
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The editor.
    */
   public ApplyAttributesAction(DrawingEditor editor) {
     super(editor);
@@ -53,9 +56,11 @@ public class ApplyAttributesAction
 
   /**
    * Set of attributes that is excluded when applying default attributes.
+   *
+   * @param excludedAttributes The set of attributes to be excluded.
    */
-  public void setExcludedAttributes(Set<AttributeKey> a) {
-    this.excludedAttributes = a;
+  public void setExcludedAttributes(Set<AttributeKey<?>> excludedAttributes) {
+    this.excludedAttributes = requireNonNull(excludedAttributes, "excludedAttributes");
   }
 
   @Override

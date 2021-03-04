@@ -10,9 +10,13 @@ package org.opentcs.kernel;
 import com.google.common.collect.Iterables;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.function.Predicate;
 import javax.inject.Inject;
+import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
+import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.workingset.TransportOrderPool;
 import org.opentcs.util.CyclicTask;
@@ -40,6 +44,14 @@ class OrderCleanerTask
    */
   private final TransportOrderPool orderPool;
   /**
+   * Check whether transport orders may be removed.
+   */
+  private final Set<TransportOrderCleanupApproval> orderCleanupApprovals;
+  /**
+   * Check whether order sequences may be removed.
+   */
+  private final Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals;
+  /**
    * This class's configuration.
    */
   private final OrderPoolConfiguration configuration;
@@ -53,10 +65,15 @@ class OrderCleanerTask
   @Inject
   public OrderCleanerTask(@GlobalKernelSync Object globalSyncObject,
                           TransportOrderPool orderPool,
+                          Set<TransportOrderCleanupApproval> orderCleanupApprovals,
+                          Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals,
                           OrderPoolConfiguration configuration) {
     super(configuration.sweepInterval());
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.orderPool = requireNonNull(orderPool, "orderPool");
+    this.orderCleanupApprovals = requireNonNull(orderCleanupApprovals, "orderCleanupApprovals");
+    this.sequenceCleanupApprovals = requireNonNull(sequenceCleanupApprovals,
+                                                   "sequenceCleanupApprovals");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -69,24 +86,77 @@ class OrderCleanerTask
 
       // Remove all transport orders in a final state that do NOT belong to a sequence and that are
       // older than the threshold.
-      orderPool.getTransportOrders((Pattern) null).stream()
-          .filter(order -> order.getState().isFinalState())
-          .filter(order -> order.getWrappingSequence() == null)
-          .filter(order -> order.getCreationTime() < creationTimeThreshold)
+      orderPool.getTransportOrders(new OrderApproval(creationTimeThreshold))
           .forEach(order -> orderPool.removeTransportOrder(order.getReference()));
 
       // Remove all order sequences that have been finished, including their transport orders.
-      orderPool.getOrderSequences(null).stream()
-          .filter(seq -> seq.isFinished())
-          .filter(seq -> {
-            List<TCSObjectReference<TransportOrder>> orderRefs = seq.getOrders();
-            if (orderRefs.isEmpty()) {
-              return true;
-            }
-            TransportOrder lastOrder = orderPool.getTransportOrder(Iterables.getLast(orderRefs));
-            return lastOrder.getCreationTime() < creationTimeThreshold;
-          })
+      orderPool.getOrderSequences(new SequenceApproval(creationTimeThreshold))
           .forEach(seq -> orderPool.removeFinishedOrderSequenceAndOrders(seq.getReference()));
+    }
+  }
+
+  /**
+   * Checks whether a transport order may be removed.
+   */
+  private class OrderApproval
+      implements Predicate<TransportOrder> {
+
+    private final long creationTimeThreshold;
+
+    public OrderApproval(long creationTimeThreshold) {
+      this.creationTimeThreshold = creationTimeThreshold;
+    }
+
+    @Override
+    public boolean test(TransportOrder order) {
+      if (!order.getState().isFinalState()) {
+        return false;
+      }
+      if (order.getWrappingSequence() != null) {
+        return false;
+      }
+      if (order.getCreationTime() >= creationTimeThreshold) {
+        return false;
+      }
+      for (TransportOrderCleanupApproval approval : orderCleanupApprovals) {
+        if (!approval.test(order)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  /**
+   * Checks whether an order sequence may be removed.
+   */
+  private class SequenceApproval
+      implements Predicate<OrderSequence> {
+
+    private final long creationTimeThreshold;
+
+    public SequenceApproval(long creationTimeThreshold) {
+      this.creationTimeThreshold = creationTimeThreshold;
+    }
+
+    @Override
+    public boolean test(OrderSequence seq) {
+      if (!seq.isFinished()) {
+        return false;
+      }
+      List<TCSObjectReference<TransportOrder>> orderRefs = seq.getOrders();
+      if (!orderRefs.isEmpty()) {
+        TransportOrder lastOrder = orderPool.getTransportOrder(Iterables.getLast(orderRefs));
+        if (lastOrder.getCreationTime() >= creationTimeThreshold) {
+          return false;
+        }
+      }
+      for (OrderSequenceCleanupApproval approval : sequenceCleanupApprovals) {
+        if (!approval.test(seq)) {
+          return false;
+        }
+      }
+      return true;
     }
   }
 }

@@ -36,7 +36,7 @@ class PointsTableModel
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     String.class,
     Long.class
   };
@@ -49,7 +49,6 @@ class PointsTableModel
    * Creates a new instance.
    */
   public PointsTableModel() {
-    // Do nada.
   }
 
   /**

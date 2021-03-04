@@ -7,12 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching.orderselection.parking;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.TCSObjectReference;
@@ -130,14 +130,16 @@ public abstract class AbstractParkingPositionSupplier
    * @param points The set of points to select the nearest one from.
    * @return The point nearest to the given vehicle.
    */
-  protected final Point nearestPoint(Vehicle vehicle, Set<Point> points) {
+  @Nullable
+  protected Point nearestPoint(Vehicle vehicle, Set<Point> points) {
     requireNonNull(vehicle, "vehicle");
-    requireNonNull(vehicle.getCurrentPosition(), "vehicle.getCurrentPosition()");
     requireNonNull(points, "points");
-    checkArgument(!points.isEmpty(), "points may not be empty");
 
-    Point vehiclePos = kernel.getTCSObject(Point.class,
-                                           vehicle.getCurrentPosition());
+    if (vehicle.getCurrentPosition() == null) {
+      return null;
+    }
+
+    Point vehiclePos = kernel.getTCSObject(Point.class, vehicle.getCurrentPosition());
 
     long lowestCost = Long.MAX_VALUE;
     Point nearestPoint = null;
@@ -148,9 +150,6 @@ public abstract class AbstractParkingPositionSupplier
         lowestCost = curCost;
       }
     }
-    // Actually, null is a valid answer - none of the points given might be
-    // reachable from the given vehicle's current position.
-//    assert nearestPoint != null;
     return nearestPoint;
   }
 

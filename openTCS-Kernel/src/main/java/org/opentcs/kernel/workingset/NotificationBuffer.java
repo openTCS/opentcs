@@ -48,7 +48,7 @@ public class NotificationBuffer {
   /**
    * This class's Logger.
    */
-  private static final Logger log = LoggerFactory.getLogger(NotificationBuffer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NotificationBuffer.class);
   /**
    * The actual messages.
    */
@@ -91,7 +91,7 @@ public class NotificationBuffer {
    * @return This buffer's capacity.
    */
   public int getCapacity() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return capacity;
   }
 
@@ -108,7 +108,7 @@ public class NotificationBuffer {
    * 1.
    */
   public void setCapacity(int newCapacity) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     if (newCapacity < 1) {
       throw new IllegalArgumentException("newCapacity must be at least 1");
     }
@@ -125,7 +125,7 @@ public class NotificationBuffer {
    * @return This buffer's <code>cut back count</code>.
    */
   public int getCutBackCount() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return cutBackCount;
   }
 
@@ -137,7 +137,7 @@ public class NotificationBuffer {
    * <code>capacity</code>.
    */
   public void setCutBackCount(int newValue) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     if (newValue < 0 || newValue > capacity) {
       throw new IllegalArgumentException(
           "newValue must be greater than 0 and less than or equal to capacity");
@@ -151,7 +151,7 @@ public class NotificationBuffer {
    * @return The number of messages currently in this buffer.
    */
   public int getMessageCount() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return notifications.size();
   }
 
@@ -164,7 +164,7 @@ public class NotificationBuffer {
     requireNonNull(notification, "notification");
     
     notifications.add(notification);
-    log.debug("New notification added: {}", notification.getText());
+    LOG.debug("New notification added: {}", notification.getText());
     // Make sure we don't have too many messages now.
     cutBackMessages();
     // Emit an event for this message.
@@ -177,7 +177,7 @@ public class NotificationBuffer {
    * @return A list of all existing Message objects.
    */
   public List<UserNotification> getNotifications() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return new LinkedList<>(notifications);
   }
 
@@ -189,7 +189,7 @@ public class NotificationBuffer {
    * @return A list of notifications accepted by the given filter.
    */
   public List<UserNotification> getNotifications(Predicate<UserNotification> predicate) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     List<UserNotification> result = new LinkedList<>();
     for (UserNotification notification : notifications) {
       if (predicate == null || predicate.test(notification)) {
@@ -203,7 +203,7 @@ public class NotificationBuffer {
    * Removes all messages from this buffer.
    */
   public void clear() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     notifications.clear();
   }
 
@@ -211,7 +211,7 @@ public class NotificationBuffer {
    * Removes messages until we're down to this buffer's <code>cut back count</code>.
    */
   private void cutBackMessages() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     if (notifications.size() > capacity) {
       // Cut back number of messages.
       while (notifications.size() > cutBackCount) {

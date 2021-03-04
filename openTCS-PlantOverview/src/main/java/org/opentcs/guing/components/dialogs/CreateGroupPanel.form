@@ -86,6 +86,9 @@
           <Events>
             <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="elementsListValueChanged"/>
           </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;AbstractFigureComponent&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -188,6 +191,9 @@
               <Events>
                 <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="pointListValueChanged"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PointModel&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -218,6 +224,9 @@
               <Events>
                 <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="pathListValueChanged"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PathModel&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -248,6 +257,9 @@
               <Events>
                 <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="locationListValueChanged"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;LocationModel&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>

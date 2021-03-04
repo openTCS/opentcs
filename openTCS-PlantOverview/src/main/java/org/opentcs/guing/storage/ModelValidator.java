@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
@@ -20,7 +21,6 @@ import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
@@ -158,14 +158,9 @@ public class ModelValidator {
    * @param args a list of arguments
    */
   private void errorOccurred(ModelComponent component, String format, Object... args) {
-    String name = component == null ? "null" : component.getName();
-    Object[] arguments = new Object[args.length + 1];
-    arguments[0] = name;
-    for (int x = 0; x < args.length; x++) {
-      arguments[x + 1] = args[x];
-    }
-
-    String message = MessageFormatter.arrayFormat(format, arguments).getMessage();
+    String componentName = component == null ? "null" : component.getName();
+    String pattern = componentName + ": " + format;
+    String message = MessageFormatter.arrayFormat(pattern, args).getMessage();
     LOG.info(message);
     errors.add(message);
   }
@@ -253,8 +248,7 @@ public class ModelValidator {
     }
 
     //Validate the point type
-    SelectionProperty<PointModel.PointType> typeProperty
-        = (SelectionProperty<PointModel.PointType>) point.getProperty(PointModel.TYPE);
+    AbstractProperty typeProperty = (AbstractProperty) point.getProperty(PointModel.TYPE);
     if (typeProperty == null || typeProperty.getComparableValue() == null) {
       errorOccurred(point, "Point type property does not exist.");
       return false; //Return because the next if would be a NPE
@@ -342,7 +336,8 @@ public class ModelValidator {
     }
 
     //Validate the connection type of this path
-    SelectionProperty typeProperty = (SelectionProperty) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+    AbstractProperty typeProperty
+        = (AbstractProperty) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
     if (typeProperty == null) {
       errorOccurred(path, "Path connection type does not exist.");
       return false; //Return because the next if would be a NPE
@@ -655,19 +650,19 @@ public class ModelValidator {
     //Validate that all members of the block exists
     StringSetProperty elementsProperty = (StringSetProperty) block.getProperty(BlockModel.ELEMENTS);
     if (elementsProperty == null) {
-      errorOccurred(model, "Elements property for the block does not exist.");
+      errorOccurred(block, "Elements property for the block does not exist.");
       return false; //Return because the next if would be a NPE
     }
 
     Set<String> elements = new HashSet<>();
     for (String element : elementsProperty.getItems()) {
       if (elements.contains(element)) {
-        errorOccurred(model, "Block element \"{}\" is listed multiple times.", element);
+        errorOccurred(block, "Block element \"{}\" is listed multiple times.", element);
         valid = false;
       }
       elements.add(element);
       if (!nameExists(model, element)) {
-        errorOccurred(model, "Block element \"{}\" does not exist.", element);
+        errorOccurred(block, "Block element \"{}\" does not exist.", element);
         valid = false;
       }
     }
@@ -688,18 +683,18 @@ public class ModelValidator {
     //Validate that all elements of the group exists
     StringSetProperty elementsProperty = (StringSetProperty) group.getProperty(GroupModel.ELEMENTS);
     if (elementsProperty == null) {
-      errorOccurred(model, "Elements property for the group does not exist.");
+      errorOccurred(group, "Elements property for the group does not exist.");
       return false; //Return because the next if would be a NPE
     }
     Set<String> elements = new HashSet<>();
     for (String element : elementsProperty.getItems()) {
       if (elements.contains(element)) {
-        errorOccurred(model, "Group element \"{}\" is listed multiple times.", element);
+        errorOccurred(group, "Group element \"{}\" is listed multiple times.", element);
         valid = false;
       }
       elements.add(element);
       if (!nameExists(model, element)) {
-        errorOccurred(model, "Group element \"{}\" does not exist.", element);
+        errorOccurred(group, "Group element \"{}\" does not exist.", element);
         valid = false;
       }
     }
@@ -720,18 +715,18 @@ public class ModelValidator {
     //Validate that all elements of the static route exists
     StringSetProperty elementsProperty = (StringSetProperty) staticRoute.getProperty(StaticRouteModel.ELEMENTS);
     if (elementsProperty == null) {
-      errorOccurred(model, "Elements property for the static route does not exist.");
+      errorOccurred(staticRoute, "Elements property for the static route does not exist.");
       return false; //Return because the next if would be a NPE
     }
     Set<String> elements = new HashSet<>();
     for (String element : elementsProperty.getItems()) {
       if (elements.contains(element)) {
-        errorOccurred(model, "Static route element \"{}\" is listed multiple times.", element);
+        errorOccurred(staticRoute, "Static route element \"{}\" is listed multiple times.", element);
         valid = false;
       }
       elements.add(element);
       if (!nameExists(model, element)) {
-        errorOccurred(model, "Static route element \"{}\" does not exist.", element);
+        errorOccurred(staticRoute, "Static route element \"{}\" does not exist.", element);
         valid = false;
       }
     }
@@ -752,86 +747,85 @@ public class ModelValidator {
     //Validate that all properties needed exist
     LengthProperty lengthProperty = (LengthProperty) vehicle.getProperty(VehicleModel.LENGTH);
     if (lengthProperty == null) {
-      errorOccurred(model, "Length property does not exist.");
+      errorOccurred(vehicle, "Length property does not exist.");
       valid = false;
     }
 
     PercentProperty energyCriticalProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
     if (energyCriticalProperty == null) {
-      errorOccurred(model, "Energy level critical property does not exist.");
+      errorOccurred(vehicle, "Energy level critical property does not exist.");
       valid = false;
     }
 
     PercentProperty energyGoodProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
     if (energyGoodProperty == null) {
-      errorOccurred(model, "Energy level good property does not exist.");
+      errorOccurred(vehicle, "Energy level good property does not exist.");
       valid = false;
     }
 
     CoursePointProperty initialPositionProperty
         = (CoursePointProperty) vehicle.getProperty(VehicleModel.INITIAL_POSITION);
     if (initialPositionProperty == null) {
-      errorOccurred(model, "Initial position property does not exist.");
+      errorOccurred(vehicle, "Initial position property does not exist.");
       valid = false;
     }
 
     PercentProperty energyLevelProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL);
     if (energyLevelProperty == null) {
-      errorOccurred(model, "Energy level property does not exist.");
+      errorOccurred(vehicle, "Energy level property does not exist.");
       valid = false;
     }
 
-    SelectionProperty<VehicleModel.EnergyState> energyStateProperty
-        = (SelectionProperty<VehicleModel.EnergyState>) vehicle.getProperty(VehicleModel.ENERGY_STATE);
+    AbstractProperty energyStateProperty
+        = (AbstractProperty) vehicle.getProperty(VehicleModel.ENERGY_STATE);
     if (energyStateProperty == null) {
-      errorOccurred(model, "Energy state property does not exist.");
+      errorOccurred(vehicle, "Energy state property does not exist.");
       valid = false;
     }
 
     BooleanProperty loadedProperty = (BooleanProperty) vehicle.getProperty(VehicleModel.LOADED);
     if (loadedProperty == null) {
-      errorOccurred(model, "Loaded property does not exist.");
+      errorOccurred(vehicle, "Loaded property does not exist.");
       valid = false;
     }
 
-    SelectionProperty<Vehicle.State> stateProperty
-        = (SelectionProperty<Vehicle.State>) vehicle.getProperty(VehicleModel.STATE);
+    AbstractProperty stateProperty = (AbstractProperty) vehicle.getProperty(VehicleModel.STATE);
     if (stateProperty == null) {
-      errorOccurred(model, "State property does not exist.");
+      errorOccurred(vehicle, "State property does not exist.");
       valid = false;
     }
 
-    SelectionProperty<Vehicle.ProcState> procStateproperty
-        = (SelectionProperty<Vehicle.ProcState>) vehicle.getProperty(VehicleModel.PROC_STATE);
+    AbstractProperty procStateproperty
+        = (AbstractProperty) vehicle.getProperty(VehicleModel.PROC_STATE);
     if (procStateproperty == null) {
-      errorOccurred(model, "Processing state property does not exist.");
+      errorOccurred(vehicle, "Processing state property does not exist.");
       valid = false;
     }
 
     StringProperty currentPointProperty = (StringProperty) vehicle.getProperty(VehicleModel.POINT);
     if (currentPointProperty == null) {
-      errorOccurred(model, "Current point property does not exist.");
+      errorOccurred(vehicle, "Current point property does not exist.");
       valid = false;
     }
 
     StringProperty nextPointProperty = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
     if (nextPointProperty == null) {
-      errorOccurred(model, "Next point property does not exist.");
+      errorOccurred(vehicle, "Next point property does not exist.");
       valid = false;
     }
 
     TripleProperty precisePositionProperty = (TripleProperty) vehicle.getProperty(VehicleModel.PRECISE_POSITION);
     if (precisePositionProperty == null) {
-      errorOccurred(model, "Precise position property does not exist.");
+      errorOccurred(vehicle, "Precise position property does not exist.");
       valid = false;
     }
 
     AngleProperty orientationProperty = (AngleProperty) vehicle.getProperty(VehicleModel.ORIENTATION_ANGLE);
     if (orientationProperty == null) {
-      errorOccurred(model, "Orientation angle property does not exist.");
+      errorOccurred(vehicle, "Orientation angle property does not exist.");
       valid = false;
     }
 

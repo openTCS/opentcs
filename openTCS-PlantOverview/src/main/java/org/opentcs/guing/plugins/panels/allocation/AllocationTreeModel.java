@@ -132,7 +132,9 @@ public class AllocationTreeModel
    * @return The index of the node containing the resource or -1 if not found
    */
   private int getChildIndexOf(TCSResource<?> resource, DefaultMutableTreeNode vehicleNode) {
+    @SuppressWarnings("unchecked")
     Enumeration<DefaultMutableTreeNode> enumeration = vehicleNode.children();
+
     int index = 0;
     while (enumeration.hasMoreElements()) {
       DefaultMutableTreeNode child = enumeration.nextElement();

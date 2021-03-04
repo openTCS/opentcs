@@ -253,9 +253,11 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param newState The vehicle's communication adapter's new state.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated VehicleCommAdapter.State is deprecated.
    */
-  void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
-                              VehicleCommAdapter.State newState)
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  void setVehicleAdapterState(TCSObjectReference<Vehicle> ref, VehicleCommAdapter.State newState)
       throws ObjectUnknownException;
 
   /**

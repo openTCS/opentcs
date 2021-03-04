@@ -49,6 +49,22 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.6 (2017-09-25)
+
+* Bugs fixed:
+** Don't mark a drive order as finished if the transport order it belongs to was withdrawn.
+** Properly update the vehicles' states in the kernel control center's vehicle list.
+** When creating locations, properly attach links to the respective points, too.
+** When renaming a point in the plant overview, properly update blocks containing paths starting or ending at this point.
+** Avoid NPE when the transport order referenced in a `Vehicle` instance does not exist in the kernel any more.
+* New features:
+** Allow the kernel's RMI port to be set via configuration.
+** Allow preferred parking positions and recharge locations to be set as properties on `Vehicle` instances.
+** In XML status channel messages, add a reference to a vehicle's transport order, and vice versa.
+** Allow the kernel's order cleanup task to be adjusted via predicates that approve cleanup of transport orders and order sequences.
+* Other changes:
+** Deprecate `VehicleCommAdapter.State`. It's not really used anywhere, and the enum elements are fuzzy/incomplete, anyway.
+
 === Version 4.5 (2017-08-10)
 
 * Switched to a plain JGraphT-based implementation of Dijkstra's algorithm for routing.

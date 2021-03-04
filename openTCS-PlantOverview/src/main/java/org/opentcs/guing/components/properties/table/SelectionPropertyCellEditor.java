@@ -39,9 +39,15 @@ public class SelectionPropertyCellEditor
    * @param comboBox
    * @param umh
    */
-  public SelectionPropertyCellEditor(JComboBox comboBox, UserMessageHelper umh) {
+  public SelectionPropertyCellEditor(JComboBox<Object> comboBox, UserMessageHelper umh) {
     super(comboBox, umh);
     comboBox.setFont(new Font("Dialog", Font.PLAIN, 12));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public JComboBox<Object> getComponent() {
+    return (JComboBox<Object>) super.getComponent();
   }
 
   @Override
@@ -49,8 +55,8 @@ public class SelectionPropertyCellEditor
       JTable table, Object value, boolean isSelected, int row, int column) {
 
     setValue(value);
-    JComboBox comboBox = (JComboBox) getComponent();
-    comboBox.setModel(new DefaultComboBoxModel(((Selectable) property()).getPossibleValues().toArray()));
+    JComboBox<Object> comboBox = getComponent();
+    comboBox.setModel(new DefaultComboBoxModel<>(((Selectable) property()).getPossibleValues().toArray()));
     comboBox.setSelectedItem(property().getValue());
 
     return fComponent;
@@ -58,15 +64,13 @@ public class SelectionPropertyCellEditor
 
   @Override
   public Object getCellEditorValue() {
-    JComboBox comboBox = (JComboBox) getComponent();
-
     // Wenn das Objekt über den Popup-Dialog geändert wurde, wird dieser Wert übernommen
     if (property().getChangeState() == ModelAttribute.ChangeState.DETAIL_CHANGED) {
       Object value = property().getValue();  // DEBUG
     }
     else {
       // ...sonst den Wert direkt im Tabellenfeld auswählen
-      Object selectedItem = comboBox.getSelectedItem();
+      Object selectedItem = getComponent().getSelectedItem();
       Object oldValue = property().getValue();
       property().setValue(selectedItem);
 

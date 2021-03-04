@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PointModel;
@@ -138,7 +138,7 @@ public class PointFigure
   protected void drawFill(Graphics2D g) {
     Rectangle rect = fDisplayBox;
     FigureComponent model = get(FigureConstants.MODEL);
-    SelectionProperty property = (SelectionProperty) model.getProperty(PointModel.TYPE);
+    AbstractProperty property = (AbstractProperty) model.getProperty(PointModel.TYPE);
 
     if (property.getValue() == PointModel.PointType.PARK) {
       g.setColor(C_PARK);

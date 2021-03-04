@@ -22,20 +22,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 import org.jhotdraw.app.action.ActionUtil;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingEditor;
+import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * {@code AttributeAction} applies attribute values on the selected figures of
- * the current {@code DrawingView} of a {@code DrawingEditor}.
+ * Applies attribute values on the selected figures of the current {@link DrawingView} of a
+ * {@link DrawingEditor}.
  *
  * @author Werner Randelshofer
  */
@@ -44,73 +44,11 @@ public class AttributeAction
 
   protected Map<AttributeKey, Object> attributes;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param editor
-   * @param key
-   * @param value
-   */
-  public AttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      Object value) {
-
-    this(editor, key, value, null, null);
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param editor
-   * @param value
-   * @param key
-   * @param icon
-   */
-  public AttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      Object value,
-      Icon icon) {
-
-    this(editor, key, value, null, icon);
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param editor
-   * @param key
-   * @param value
-   * @param name
-   */
-  public AttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      Object value,
-      String name) {
-
-    this(editor, key, value, name, null);
-  }
-
-  public AttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      Object value,
-      String name,
-      Icon icon) {
-
-    this(editor, key, value, name, icon, null);
-  }
-
-  public AttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      Object value,
-      String name,
-      Icon icon,
-      Action compatibleTextAction) {
-
+  public AttributeAction(DrawingEditor editor,
+                         AttributeKey key,
+                         Object value,
+                         String name,
+                         Icon icon) {
     super(editor);
     this.attributes = new HashMap<>();
     attributes.put(key, value);
@@ -121,14 +59,12 @@ public class AttributeAction
     updateEnabledState();
   }
 
-  public AttributeAction(
-      DrawingEditor editor,
-      Map<AttributeKey, Object> attributes,
-      String name,
-      Icon icon) {
-
+  public AttributeAction(DrawingEditor editor,
+                         Map<AttributeKey, Object> attributes,
+                         String name,
+                         Icon icon) {
     super(editor);
-    this.attributes = (attributes == null) ? new HashMap<AttributeKey, Object>() : attributes;
+    this.attributes = (attributes == null) ? new HashMap<>() : attributes;
 
     putValue(AbstractAction.NAME, name);
     putValue(AbstractAction.SMALL_ICON, icon);

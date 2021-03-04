@@ -475,7 +475,7 @@ public class XMLModel002Builder
           // of the TCSObject might change but won't be changed in the reference the 
           // ModelLayoutElement holds.
           ModelLayoutElement mle = (ModelLayoutElement) layoutElement;
-          TCSObject<?> vObj = model.getObjectPool().getObject(mle.getVisualizedObject());
+          TCSObject<?> vObj = model.getObjectPool().getObjectOrNull(mle.getVisualizedObject());
           // Don't persist layout elements for model elements that don't exist, but leave a log 
           // message in that case.
           if (vObj == null) {

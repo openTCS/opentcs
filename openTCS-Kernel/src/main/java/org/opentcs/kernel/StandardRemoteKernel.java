@@ -208,7 +208,7 @@ class StandardRemoteKernel
                                                     new Class<?>[] {RemoteKernel.class},
                                                     this);
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(proxy, 0);
+      UnicastRemoteObject.exportObject(proxy, configuration.remoteKernelPort());
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RemoteKernel.REGISTRATION_NAME, proxy);
     }

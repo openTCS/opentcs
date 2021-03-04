@@ -28,6 +28,39 @@ public interface Dispatcher
     extends Lifecycle {
 
   /**
+   * The key of a vehicle property defining the name of the vehicle's assigned parking position.
+   * <p>
+   * Whether and in what way this is respected for selecting a parking position is
+   * implementation-specific.
+   * </p>
+   */
+  String PROPKEY_ASSIGNED_PARKING_POSITION = "tcs:assignedParkingPosition";
+  /**
+   * The key of a vehicle property defining the name of the vehicle's preferred parking position.
+   * <p>
+   * Whether and in what way this is respected for selecting a parking position is
+   * implementation-specific.
+   * </p>
+   */
+  String PROPKEY_PREFERRED_PARKING_POSITION = "tcs:preferredParkingPosition";
+  /**
+   * The key of a vehicle property defining the name of the vehicle's assigned recharge location.
+   * <p>
+   * Whether and in what way this is respected for selecting a recharge location is
+   * implementation-specific.
+   * </p>
+   */
+  String PROPKEY_ASSIGNED_RECHARGE_LOCATION = "tcs:assignedRechargeLocation";
+  /**
+   * The key of a vehicle property defining the name of the vehicle's preferred recharge location.
+   * <p>
+   * Whether and in what way this is respected for selecting a recharge location is
+   * implementation-specific.
+   * </p>
+   */
+  String PROPKEY_PREFERRED_RECHARGE_LOCATION = "tcs:preferredRechargeLocation";
+
+  /**
    * Notifies the dispatcher that the given vehicle may now be dispatched.
    *
    * @param vehicle The dispatchable vehicle.
@@ -70,7 +103,7 @@ public interface Dispatcher
   void withdrawOrder(@Nonnull Vehicle vehicle,
                      boolean immediateAbort,
                      boolean disableVehicle);
-  
+
   /**
    * Notifies the dispatcher that the given vehicle should be released, aborting its transport
    * order, resetting its position and freeing any allocated resources.

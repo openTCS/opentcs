@@ -49,6 +49,7 @@ import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.kernel.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
@@ -113,6 +114,10 @@ class KernelStateOperating
    */
   private final Set<KernelExtension> extensions;
   /**
+   * The kernel's attachment manager.
+   */
+  private final AttachmentManager attachmentManager;
+  /**
    * This instance's <em>initialized</em> flag.
    */
   private boolean initialized;
@@ -141,7 +146,8 @@ class KernelStateOperating
                        LocalVehicleControllerPool controllerPool,
                        ScriptFileManager scriptFileManager,
                        OrderCleanerTask orderCleanerTask,
-                       @ActiveInOperatingMode Set<KernelExtension> extensions) {
+                       @ActiveInOperatingMode Set<KernelExtension> extensions,
+                       AttachmentManager attachmentManager) {
     super(globalSyncObject,
           objectPool,
           model,
@@ -158,6 +164,7 @@ class KernelStateOperating
     this.vehicleControllerPool = requireNonNull(controllerPool, "controllerPool");
     this.orderCleanerTask = requireNonNull(orderCleanerTask, "orderCleanerTask");
     this.extensions = requireNonNull(extensions, "extensions");
+    this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
   }
 
   // Implementation of interface Kernel starts here.
@@ -187,6 +194,8 @@ class KernelStateOperating
     recoveryEvaluator.initialize();
     LOG.debug("Initializing vehicle controller pool '{}'...", vehicleControllerPool);
     vehicleControllerPool.initialize();
+    LOG.debug("Initializing attachment manager '{}'...", attachmentManager);
+    attachmentManager.initialize();
 
     // Start a task for cleaning up orders regularly.
     new Thread(orderCleanerTask, "orderCleaner").start();
@@ -236,6 +245,8 @@ class KernelStateOperating
     scheduler.terminate();
     LOG.debug("Terminating vehicle controller pool '{}'...", vehicleControllerPool);
     vehicleControllerPool.terminate();
+    LOG.debug("Terminating attachment manager '{}'...", attachmentManager);
+    attachmentManager.terminate();
     // Grant communication adapters etc. some time to settle things.
     Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
 
@@ -265,7 +276,7 @@ class KernelStateOperating
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      TCSObject<?> object = getGlobalObjectPool().getObject(ref);
+      TCSObject<?> object = getGlobalObjectPool().getObjectOrNull(ref);
       if (object == null) {
         throw new ObjectUnknownException(ref);
       }
@@ -406,6 +417,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
                                      VehicleCommAdapter.State newState)
       throws ObjectUnknownException {
@@ -419,15 +431,8 @@ class KernelStateOperating
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      final String pointName = pointRef == null ? "<null>" : pointRef.getName();
-      LOG.debug("Vehicle " + vehicleRef.getName() + " has reached point "
-          + pointName);
-      Vehicle vehicle = getModel().getVehicle(vehicleRef);
-      TCSObjectReference<Point> oldPointRef = vehicle.getCurrentPosition();
+      LOG.debug("Vehicle {} has reached point {}.", vehicleRef, pointRef);
       getModel().setVehiclePosition(vehicleRef, pointRef);
-//      if (oldPointRef == null && pointRef != null) {
-//        dispatcher.dispatch(vehicle);
-//      }
     }
   }
 
@@ -811,7 +816,7 @@ class KernelStateOperating
   @Override
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef, Object message) {
     synchronized (getGlobalSyncObject()) {
-      Vehicle vehicle = getGlobalObjectPool().getObject(Vehicle.class, vehicleRef);
+      Vehicle vehicle = getGlobalObjectPool().getObjectOrNull(Vehicle.class, vehicleRef);
       vehicleControllerPool.getVehicleController(vehicle.getName()).sendCommAdapterMessage(message);
     }
   }

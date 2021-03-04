@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -41,10 +40,11 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.UniqueStringGenerator;
-import org.opentcs.util.gui.TCSObjectRefNameListCellRenderer;
-import org.opentcs.util.gui.TCSObjectRefNameTableCellRenderer;
+import org.opentcs.util.gui.StringListCellRenderer;
+import org.opentcs.util.gui.StringTableCellRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A panel for continously creating transport orders.
@@ -124,13 +124,15 @@ public class ContinuousLoadPanel
     vehicles.addAll(kernel.getTCSObjects(Vehicle.class));
     JComboBox<TCSObjectReference<Vehicle>> vehiclesComboBox = new JComboBox<>();
     vehiclesComboBox.addItem(null);
-    vehiclesComboBox.setRenderer(new TCSObjectRefNameListCellRenderer());
+    vehiclesComboBox.setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()));
     for (Vehicle curVehicle : vehicles) {
       vehiclesComboBox.addItem(curVehicle.getReference());
     }
     DefaultCellEditor vehicleEditor = new DefaultCellEditor(vehiclesComboBox);
     toTable.setDefaultEditor(TCSObjectReference.class, vehicleEditor);
-    toTable.setDefaultRenderer(TCSObjectReference.class, new TCSObjectRefNameTableCellRenderer());
+    toTable.setDefaultRenderer(TCSObjectReference.class,
+                               new StringTableCellRenderer<TCSObjectReference<?>>(
+                                   x -> x == null ? "" : x.getName()));
 
     initialized = true;
   }

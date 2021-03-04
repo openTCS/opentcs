@@ -42,6 +42,7 @@ import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.user.UserPermission;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
@@ -1488,6 +1489,7 @@ public interface Kernel
    * vehicle, so it's entirely possible that the communication adapter receiving
    * the message does not understand it.
    *
+   * @see VehicleCommAdapter#processMessage(java.lang.Object)
    * @param vehicleRef The vehicle whose communication adapter shall receive the
    * message.
    * @param message The message to be delivered.

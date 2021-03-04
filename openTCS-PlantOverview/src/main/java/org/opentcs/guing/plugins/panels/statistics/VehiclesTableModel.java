@@ -39,7 +39,7 @@ class VehiclesTableModel
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     String.class,
     Long.class,
     String.class,
@@ -55,7 +55,6 @@ class VehiclesTableModel
    * Creates a new instance.
    */
   public VehiclesTableModel() {
-    // Do nada.
   }
 
   /**

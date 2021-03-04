@@ -177,6 +177,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldForwardAdapterStateChangeToKernel() {
     vehicleModel.setVehicleAdapterState(VehicleCommAdapter.State.UNKNOWN);
 

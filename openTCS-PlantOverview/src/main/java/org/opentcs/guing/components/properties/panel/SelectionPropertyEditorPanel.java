@@ -9,6 +9,7 @@
  */
 package org.opentcs.guing.components.properties.panel;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
@@ -43,7 +44,8 @@ public class SelectionPropertyEditorPanel
   public void setProperty(Property property) {
     fProperty = (AbstractProperty) property;
 
-    DefaultComboBoxModel model = new DefaultComboBoxModel(((Selectable) fProperty).getPossibleValues().toArray());
+    ComboBoxModel<Object> model
+        = new DefaultComboBoxModel<>(((Selectable<Object>) fProperty).getPossibleValues().toArray());
     valueComboBox.setModel(model);
 
     Object value = fProperty.getValue();
@@ -78,7 +80,7 @@ public class SelectionPropertyEditorPanel
     java.awt.GridBagConstraints gridBagConstraints;
 
     valueLabel = new javax.swing.JLabel();
-    valueComboBox = new javax.swing.JComboBox();
+    valueComboBox = new javax.swing.JComboBox<>();
 
     setLayout(new java.awt.GridBagLayout());
 
@@ -97,7 +99,7 @@ public class SelectionPropertyEditorPanel
     add(valueComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JComboBox valueComboBox;
+  private javax.swing.JComboBox<Object> valueComboBox;
   private javax.swing.JLabel valueLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON

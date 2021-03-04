@@ -17,14 +17,23 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
 /**
+ * Mapper to translate a collection of points and paths into a weighted graph.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultModelGraphMapper
     implements ModelGraphMapper {
 
+  /**
+   * Computes the weight of single edges in the graph.
+   */
   private final EdgeEvaluator edgeEvaluator;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param edgeEvaluator Computes the weight of single edges in the graph.
+   */
   @Inject
   public DefaultModelGraphMapper(EdgeEvaluator edgeEvaluator) {
     this.edgeEvaluator = requireNonNull(edgeEvaluator, "edgeEvaluator");
@@ -46,7 +55,7 @@ public class DefaultModelGraphMapper
 
     for (Path path : paths) {
 
-      if (shouldAddForwardEdge(path)) {
+      if (shouldAddForwardEdge(path, vehicle)) {
         ModelEdge edge = new ModelEdge(path, false);
 
         graph.addEdge(path.getSourcePoint().getName(), path.getDestinationPoint().getName(), edge);
@@ -54,7 +63,7 @@ public class DefaultModelGraphMapper
         graph.setEdgeWeight(edge, edgeEvaluator.computeWeight(edge, vehicle));
       }
 
-      if (shouldAddReverseEdge(path)) {
+      if (shouldAddReverseEdge(path, vehicle)) {
         ModelEdge edge = new ModelEdge(path, true);
 
         graph.addEdge(path.getDestinationPoint().getName(), path.getSourcePoint().getName(), edge);
@@ -67,11 +76,27 @@ public class DefaultModelGraphMapper
     return graph;
   }
 
-  protected boolean shouldAddForwardEdge(Path path) {
+  /**
+   * Returns <code>true</code> if and only if the graph should contain an edge from the source
+   * of the path to its destination for the given vehicle.
+   *
+   * @param path The path
+   * @param vehicle The vehicle
+   * @return <code>true</code> if and only if the graph should contain the edge
+   */
+  protected boolean shouldAddForwardEdge(Path path, Vehicle vehicle) {
     return path.isNavigableForward();
   }
 
-  protected boolean shouldAddReverseEdge(Path path) {
+  /**
+   * Returns <code>true</code> if and only if the graph should contain an edge from the destination
+   * of the path to its source for the given vehicle.
+   *
+   * @param path The path
+   * @param vehicle The vehicle
+   * @return <code>true</code> if and only if the graph should contain the edge
+   */
+  protected boolean shouldAddReverseEdge(Path path, Vehicle vehicle) {
     return path.isNavigableReverse();
   }
 }

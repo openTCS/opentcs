@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.Orientation;
 import org.opentcs.data.order.Route.Step;
@@ -66,6 +67,14 @@ public class LoopbackCommunicationAdapter
    * The boolean flag to check if execution of the next command is allowed.
    */
   private boolean singleStepExecutionAllowed;
+  /**
+   * The vehicle to this comm adapter instance.
+   */
+  private Vehicle vehicle;
+  /**
+   * Whether the loopback adapter is initialized or not.
+   */
+  private boolean initialized;
 
   /**
    * Creates a new instance.
@@ -84,9 +93,43 @@ public class LoopbackCommunicationAdapter
           configuration.commandQueueCapacity(),
           1,
           configuration.rechargeOperation());
+    this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.energyStorage = requireNonNull(energyStorage, "energyStorage");
+  }
+
+  @Override
+  public void initialize() {
+    if (isInitialized()) {
+      LOG.debug("Already initialized.");
+      return;
+    }
+    super.initialize();
+
+    String initialPos = vehicle.getProperties().get(ObjectPropConstants.VEHICLE_INITIAL_POSITION);
+    if (initialPos != null) {
+      initVehiclePosition(initialPos);
+    }
+
+    getProcessModel().setVehicleState(Vehicle.State.IDLE);
+
+    initialized = true;
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  @Override
+  public void terminate() {
+    if (!isInitialized()) {
+      LOG.debug("Not initialized.");
+      return;
+    }
+    super.terminate();
+    initialized = false;
   }
 
   @Override

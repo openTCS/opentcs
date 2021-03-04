@@ -19,7 +19,7 @@ import java.util.Comparator;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class AscendingTreeViewNameComparator
-    implements Comparator {
+    implements Comparator<Object> {
 
   /**
    * Creates a new instance.

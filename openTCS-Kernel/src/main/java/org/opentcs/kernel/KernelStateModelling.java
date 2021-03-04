@@ -175,7 +175,7 @@ class KernelStateModelling
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      TCSObject<?> object = getGlobalObjectPool().getObject(ref);
+      TCSObject<?> object = getGlobalObjectPool().getObjectOrNull(ref);
       if (object == null) {
         throw new ObjectUnknownException(ref);
       }

@@ -15,9 +15,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -71,40 +69,29 @@ public class BlockAdapter
                                     TCSObject<?> tcsObject,
                                     @Nullable ModelLayoutElement layoutElement) {
     Block block = requireNonNull((Block) tcsObject, "tcsObject");
-    try {
-      StringProperty name
-          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      name.setText(block.getName());
 
-      getModel().removeAllCourseElements();
+    StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    name.setText(block.getName());
 
-      for (TCSResourceReference<?> resRef : block.getMembers()) {
-        ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(resRef);
-        getModel().addCourseElement(adapter.getModel());
-      }
+    getModel().removeAllCourseElements();
 
-      updateMiscModelProperties(block);
+    for (TCSResourceReference<?> resRef : block.getMembers()) {
+      ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(resRef);
+      getModel().addCourseElement(adapter.getModel());
     }
-    catch (CredentialsException e) {
-      LOG.warn("", e);
-    }
+
+    updateMiscModelProperties(block);
   }
 
   @Override  // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getBlocks().add(new BlockCreationTO(getModel().getName())
-          .setMemberNames(getMemberNames())
-          .setProperties(getKernelProperties()));
+    plantModel.getBlocks().add(new BlockCreationTO(getModel().getName())
+        .setMemberNames(getMemberNames())
+        .setProperties(getKernelProperties()));
 
-      // Write the block color into the model layout element
-      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout);
-      }
-
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
+    // Write the block color into the model layout element
+    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+      updateLayoutElement(layout);
     }
   }
 

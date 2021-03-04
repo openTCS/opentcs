@@ -9,8 +9,6 @@ package org.opentcs.kernel.xmlhost.status.binding;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 
@@ -26,6 +24,10 @@ public class VehicleStatusMessage
    * The vehicle's name.
    */
   private String vehicleName = "";
+  /**
+   * The vehicle's current transport order's name (or empty string).
+   */
+  private String transportOrderName = "";
   /**
    * Precise position of the vehicle.
    */
@@ -47,7 +49,6 @@ public class VehicleStatusMessage
    * Creates a new instance.
    */
   public VehicleStatusMessage() {
-    // Do nada.
   }
 
   /**
@@ -67,6 +68,26 @@ public class VehicleStatusMessage
    */
   public void setVehicleName(String vehicleName) {
     this.vehicleName = vehicleName;
+  }
+
+  /**
+   * Returns the vehicle's current transport order's name.
+   *
+   * @return The vehicle's current transport order's name (or null if not assigned to a
+   * transport order).
+   */
+  @XmlAttribute(name = "transportOrderName", required = false)
+  public String getTransportOrderName() {
+    return transportOrderName;
+  }
+
+  /**
+   * Sets the vehicle's current transport order's name.
+   *
+   * @param transportOrderName The transport order's name.
+   */
+  public void setTransportOrderName(String transportOrderName) {
+    this.transportOrderName = transportOrderName;
   }
 
   /**
@@ -147,20 +168,13 @@ public class VehicleStatusMessage
 
   public static VehicleStatusMessage fromVehicle(Vehicle vehicle) {
     VehicleStatusMessage vehicleMessage = new VehicleStatusMessage();
-    // Set vehicle name
     vehicleMessage.setVehicleName(vehicle.getName());
-    // Set position
-    TCSObjectReference<Point> posRef = vehicle.getCurrentPosition();
-    if (posRef != null) {
-      vehicleMessage.setPosition(posRef.getName());
-    }
-    // Set vehicle state
-    Vehicle.State state = vehicle.getState();
-    vehicleMessage.setState(state);
-    // Set vehciel processing state
-    Vehicle.ProcState procState = vehicle.getProcState();
-    vehicleMessage.setProcState(procState);
-    // Set presice position
+    vehicleMessage.setTransportOrderName(
+        vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName());
+    vehicleMessage.setPosition(
+        vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName());
+    vehicleMessage.setState(vehicle.getState());
+    vehicleMessage.setProcState(vehicle.getProcState());
     Triple precisePos = vehicle.getPrecisePosition();
     if (precisePos != null) {
       VehicleStatusMessage.PrecisePosition precisePosElement;

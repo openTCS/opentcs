@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and
@@ -158,7 +159,11 @@ public interface VehicleCommAdapter
 
   /**
    * Defines the possible states of a communication adapter.
+   *
+   * @deprecated Does not serve any useful purpose.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public enum State {
 
     /**

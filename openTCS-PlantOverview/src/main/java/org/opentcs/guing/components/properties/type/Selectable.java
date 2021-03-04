@@ -29,7 +29,7 @@ public interface Selectable<E> {
   /**
    * Returns the possible values.
    *
-   * @return
+   * @return The possible values.
    */
-  public List getPossibleValues();
+  public List<E> getPossibleValues();
 }

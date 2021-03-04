@@ -365,9 +365,7 @@ public abstract class OpenTCSDrawingView
     setOpaque(true);
     setAutoscrolls(true);
 
-    orderColorCycler = Iterators.cycle(Color.DARK_GRAY,
-                                       Color.MAGENTA,
-                                       Color.BLUE,
+    orderColorCycler = Iterators.cycle(Color.MAGENTA,
                                        Color.CYAN,
                                        Color.RED,
                                        Color.GREEN,
@@ -2809,7 +2807,7 @@ public abstract class OpenTCSDrawingView
     @Override // FigureListener
     public void attributeChanged(FigureEvent e) {
       if (e.getSource() == drawing) {
-        AttributeKey a = e.getAttribute();
+        AttributeKey<?> a = e.getAttribute();
 
         if (a.equals(CANVAS_HEIGHT) || a.equals(CANVAS_WIDTH)) {
           validateViewTranslation();

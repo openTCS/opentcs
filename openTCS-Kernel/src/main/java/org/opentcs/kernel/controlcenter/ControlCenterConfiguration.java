@@ -24,6 +24,13 @@ public interface ControlCenterConfiguration {
   String PREFIX = "controlcenter";
 
   @ConfigurationEntry(
+      type = "Boolean",
+      description = {"Whether the kernel control center GUI should be enabled on startup.",
+                     "(EXPERIMENTAL)"
+      })
+  boolean enable();
+
+  @ConfigurationEntry(
       type = "String",
       description = {"The application's current language.",
                      "Valid values: 'English', 'German'"

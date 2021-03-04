@@ -62,7 +62,8 @@ public class SortableTreeNode
    *
    * @param comparator
    */
-  public void sort(Comparator comparator) {
+  @SuppressWarnings("unchecked")
+  public void sort(Comparator<Object> comparator) {
     Collections.sort(children, comparator);
   }
   

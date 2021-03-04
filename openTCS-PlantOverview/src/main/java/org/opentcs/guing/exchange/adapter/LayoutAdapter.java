@@ -14,7 +14,6 @@ import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.TCSObject;
@@ -73,24 +72,19 @@ public class LayoutAdapter
 
       updateMiscModelProperties(layout);
     }
-    catch (Exception e) {
+    catch (IllegalArgumentException e) {
       LOG.warn("", e);
     }
   }
 
   @Override // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getVisualLayouts().add(
-          new VisualLayoutCreationTO(getModel().getName())
-              .setScaleX(getScaleX())
-              .setScaleY(getScaleY())
-              .setProperties(getKernelProperties())
-      );
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
-    }
+    plantModel.getVisualLayouts().add(
+        new VisualLayoutCreationTO(getModel().getName())
+            .setScaleX(getScaleX())
+            .setScaleY(getScaleY())
+            .setProperties(getKernelProperties())
+    );
   }
 
   private double getScaleX() {
@@ -104,7 +98,7 @@ public class LayoutAdapter
   }
 
   private void updateModelLengthProperty(VisualLayout layout)
-      throws Exception {
+      throws IllegalArgumentException {
     LengthProperty lp = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
     double scale = layout.getScaleX();
     lp.setValueAndUnit(scale, LengthProperty.Unit.MM);

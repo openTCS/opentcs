@@ -13,12 +13,16 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import org.opentcs.data.TCSObject;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This class implements the ListCellRenderer for all TCSObjects.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
+ * @deprecated use {@link StringListCellRenderer} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Class will be removed.")
 public class TCSObjectNameListCellRenderer
     implements ListCellRenderer<TCSObject<?>> {
 
@@ -45,6 +49,7 @@ public class TCSObjectNameListCellRenderer
                                                                 index,
                                                                 isSelected,
                                                                 cellHasFocus);
+    label.setOpaque(true);
     if (value == null) {
       label.setText("");
     }

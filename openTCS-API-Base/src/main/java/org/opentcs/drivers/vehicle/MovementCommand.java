@@ -15,6 +15,7 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A command for moving a step.
@@ -59,6 +60,10 @@ public class MovementCommand {
    */
   private final Point finalDestination;
   /**
+   * The destination location of the whole drive order.
+   */
+  private final Location finalDestinationLocation;
+  /**
    * The operation to be executed at the destination position.
    */
   private final String finalOperation;
@@ -68,20 +73,22 @@ public class MovementCommand {
   private final Map<String, String> properties;
 
   /**
-   * Creates a new MovementCommand.
+   * Creates a new instance.
    *
    * @param newStep The step describing the movement.
    * @param newOperation The operation to be executed after moving.
    * @param newOpLocation The location at which the operation is to be executed.
-   * May be <code>null</code> if <em>newOperation</em> is
-   * <code>NO_OPERATION</code>.)
+   * May be <code>null</code> if <em>newOperation</em> is <code>NO_OPERATION</code>.)
    * @param finalMovement Indicates whether this movement is the final one in the drive order it
    * belongs to.
    * @param newDestination The destination position of the whole drive order.
    * @param newDestOperation The operation to be executed at the destination
    * position.
    * @param newProperties Properties of the order this command is part of.
+   * @deprecated Use constructor that also explicitly sets the final destination location.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public MovementCommand(Step newStep,
                          String newOperation,
                          Location newOpLocation,
@@ -89,16 +96,50 @@ public class MovementCommand {
                          Point newDestination,
                          String newDestOperation,
                          Map<String, String> newProperties) {
-    this.step = requireNonNull(newStep, "newStep is null");
-    this.operation = requireNonNull(newOperation, "newOperation is null");
+    this(newStep,
+         newOperation,
+         newOpLocation,
+         finalMovement,
+         null,
+         newDestination,
+         newDestOperation,
+         newProperties);
+  }
+
+  /**
+   * Creates a new instance.
+   *
+   * @param step The step describing the movement.
+   * @param operation The operation to be executed after moving.
+   * @param opLocation The location at which the operation is to be executed.
+   * May be <code>null</code> if <em>newOperation</em> is <code>NO_OPERATION</code>.)
+   * @param finalMovement Indicates whether this movement is the final one in the drive order it
+   * belongs to.
+   * @param finalDestinationLocation The destination location of the whole drive order.
+   * @param finalDestination The destination position of the whole drive order.
+   * @param finalOperation The operation to be executed at the destination
+   * position.
+   * @param properties Properties of the order this command is part of.
+   */
+  public MovementCommand(@Nonnull Step step,
+                         @Nonnull String operation,
+                         @Nullable Location opLocation,
+                         boolean finalMovement,
+                         @Nullable Location finalDestinationLocation,
+                         @Nonnull Point finalDestination,
+                         @Nonnull String finalOperation,
+                         @Nonnull Map<String, String> properties) {
+    this.step = requireNonNull(step, "step");
+    this.operation = requireNonNull(operation, "operation");
     this.finalMovement = finalMovement;
-    this.finalDestination = requireNonNull(newDestination, "newDestination is null");
-    this.finalOperation = requireNonNull(newDestOperation, "newDestOperation is null");
-    this.properties = requireNonNull(newProperties, "newProperties is null");
-    if (newOpLocation == null && !isEmptyOperation(newOperation)) {
-      throw new NullPointerException("newOpLocation is null");
+    this.finalDestinationLocation = finalDestinationLocation;
+    this.finalDestination = requireNonNull(finalDestination, "finalDestination");
+    this.finalOperation = requireNonNull(finalOperation, "finalOperation");
+    this.properties = requireNonNull(properties, "properties");
+    if (opLocation == null && !isEmptyOperation(operation)) {
+      throw new NullPointerException("opLocation");
     }
-    this.opLocation = newOpLocation;
+    this.opLocation = opLocation;
   }
 
   /**
@@ -160,6 +201,16 @@ public class MovementCommand {
   @Nonnull
   public Point getFinalDestination() {
     return finalDestination;
+  }
+
+  /**
+   * Returns the destination location of the whole drive order.
+   *
+   * @return The destination location of the whole drive order.
+   */
+  @Nullable
+  public Location getFinalDestinationLocation() {
+    return finalDestinationLocation;
   }
 
   /**

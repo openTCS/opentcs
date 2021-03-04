@@ -12,10 +12,9 @@ package org.opentcs.guing.transport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
@@ -56,12 +55,12 @@ public class PointPanel
 
     Collections.sort(fItems, getComparator());
     List<String> names = new ArrayList<>();
-    Iterator<? extends ModelComponent> e = fItems.iterator();
 
-    while (e.hasNext()) {
-      names.add(e.next().getName());
+    for (PointModel pointModel : fItems) {
+      names.add(pointModel.getName());
     }
-    itemsComboBox.setModel(new DefaultComboBoxModel(new Vector(names)));
+
+    itemsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(names)));
     JTextField textField = (JTextField) (itemsComboBox.getEditor().getEditorComponent());
     textField.getDocument().addDocumentListener(new DocumentListener() {
       @Override
@@ -85,7 +84,8 @@ public class PointPanel
   }
 
   public void addInputValidationListener(InputValidationListener listener) {
-    Objects.requireNonNull(listener, "listener");
+    requireNonNull(listener, "listener");
+
     this.validationListeners.add(listener);
     verify();
   }
@@ -162,7 +162,7 @@ public class PointPanel
   private void initComponents() {
 
     itemsLabel = new javax.swing.JLabel();
-    itemsComboBox = new javax.swing.JComboBox();
+    itemsComboBox = new javax.swing.JComboBox<>();
 
     setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 5));
 
@@ -177,7 +177,7 @@ public class PointPanel
   }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JComboBox itemsComboBox;
+  private javax.swing.JComboBox<String> itemsComboBox;
   private javax.swing.JLabel itemsLabel;
   // End of variables declaration//GEN-END:variables
 }

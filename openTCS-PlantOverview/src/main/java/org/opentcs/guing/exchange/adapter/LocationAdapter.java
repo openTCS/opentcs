@@ -15,9 +15,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -87,8 +85,7 @@ public class LocationAdapter
     Location location = requireNonNull((Location) tcsObject, "tcsObject");
     try {
       // Name 
-      StringProperty pName
-          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
       pName.setText(location.getName());
 
       // Position in model
@@ -108,37 +105,32 @@ public class LocationAdapter
       // Misc properties
       updateMiscModelProperties(location);
       // look for label and symbol
-      KeyValueSetProperty miscellaneous = (KeyValueSetProperty) getModel()
-          .getProperty(ModelComponent.MISCELLANEOUS);
+      KeyValueSetProperty miscellaneous
+          = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
       updateRepresentation(miscellaneous);
       if (layoutElement != null) {
         updateModelLayoutElements(layoutElement);
       }
     }
-    catch (CredentialsException | IllegalArgumentException e) {
+    catch (IllegalArgumentException e) {
       LOG.warn("", e);
     }
   }
 
   @Override  // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getLocations().add(
-          new LocationCreationTO(getModel().getName(), getModel().getLocationType().getName())
-              .setPosition(getPosition())
-              .setProperties(getKernelProperties())
-      );
+    plantModel.getLocations().add(
+        new LocationCreationTO(getModel().getName(), getModel().getLocationType().getName())
+            .setPosition(getPosition())
+            .setProperties(getKernelProperties())
+    );
 
-      // Write new position into the model layout element
-      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout);
-      }
+    // Write new position into the model layout element
+    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+      updateLayoutElement(layout);
+    }
 
-      unmarkAllPropertiesChanged();
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
-    }
+    unmarkAllPropertiesChanged();
   }
 
   private void updateRepresentation(KeyValueSetProperty miscellaneous) {

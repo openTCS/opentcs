@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
@@ -46,7 +45,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterPanel;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.Comparators;
-import org.opentcs.util.gui.TCSObjectNameListCellRenderer;
+import org.opentcs.util.gui.StringListCellRenderer;
 import org.opentcs.virtualvehicle.inputcomponents.DropdownListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.InputDialog;
 import org.opentcs.virtualvehicle.inputcomponents.InputPanel;
@@ -54,7 +53,7 @@ import org.opentcs.virtualvehicle.inputcomponents.SingleTextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TripleTextInputPanel;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * The LoopbackCommunicationAdapterPanel corresponding to the LoopbackCommunicationAdapter.
@@ -2058,7 +2057,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
           .setLabel(bundle.getString("positionLabel"))
           .setEditable(true)
           .setInitialSelection(currentPoint)
-          .setRenderer(new TCSObjectNameListCellRenderer())
+          .setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()))
           .build();
       InputDialog dialog = new InputDialog(panel);
       dialog.setVisible(true);
@@ -2068,7 +2067,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         if (item == null) {
           vehicleModel.setVehiclePosition(null);
         }
-        else{
+        else {
           vehicleModel.setVehiclePosition(((Point) item).getName());
         }
 

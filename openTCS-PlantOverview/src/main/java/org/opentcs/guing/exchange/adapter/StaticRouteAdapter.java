@@ -15,9 +15,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
@@ -32,8 +30,6 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for static routes.
@@ -44,11 +40,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class StaticRouteAdapter
     extends AbstractProcessAdapter {
-
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(StaticRouteAdapter.class);
 
   /**
    * Creates a new instance.
@@ -74,40 +65,28 @@ public class StaticRouteAdapter
     org.opentcs.data.model.StaticRoute route
         = requireNonNull((org.opentcs.data.model.StaticRoute) tcsObject, "tcsObject");
 
-    try {
-      StringProperty name
-          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      name.setText(route.getName());
+    StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    name.setText(route.getName());
 
-      getModel().removeAllPoints();
+    getModel().removeAllPoints();
 
-      for (TCSObjectReference<Point> pointRef : route.getHops()) {
-        ProcessAdapter adapter
-            = getEventDispatcher().findProcessAdapter(pointRef);
-        getModel().addPoint((PointModel) adapter.getModel());
-      }
-
-      updateMiscModelProperties(route);
+    for (TCSObjectReference<Point> pointRef : route.getHops()) {
+      ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(pointRef);
+      getModel().addPoint((PointModel) adapter.getModel());
     }
-    catch (CredentialsException e) {
-      LOG.warn("", e);
-    }
+
+    updateMiscModelProperties(route);
   }
 
   @Override // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getStaticRoutes().add(
-          new org.opentcs.access.to.model.StaticRouteCreationTO(getModel().getName())
-              .setHopNames(getHopNames())
-              .setProperties(getKernelProperties()));
+    plantModel.getStaticRoutes().add(
+        new org.opentcs.access.to.model.StaticRouteCreationTO(getModel().getName())
+            .setHopNames(getHopNames())
+            .setProperties(getKernelProperties()));
 
-      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout);
-      }
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
+    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+      updateLayoutElement(layout);
     }
   }
 

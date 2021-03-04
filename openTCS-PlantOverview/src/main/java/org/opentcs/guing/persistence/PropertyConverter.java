@@ -135,7 +135,7 @@ public class PropertyConverter {
       return convertPercentProperty(key, (PercentProperty) property);
     }
     if (property instanceof SelectionProperty) {
-      return convertSelectionProperty(key, (SelectionProperty) property);
+      return convertSelectionProperty(key, (SelectionProperty<?>) property);
     }
     if (property instanceof SpeedProperty) {
       return convertSpeedProperty(key, (SpeedProperty) property);
@@ -397,11 +397,11 @@ public class PropertyConverter {
                                        String key,
                                        CourseObjectProperty property)
       throws ClassCastException {
-    SelectionProperty sp = (SelectionProperty) model.getProperty(key);
+    SelectionProperty<?> sp = (SelectionProperty<?>) model.getProperty(key);
     String value = (String) property.getValue();
     for (Object possibleValue : sp.getPossibleValues()) {
       if (possibleValue instanceof Enum) {
-        Enum enumVal = (Enum) possibleValue;
+        Enum<?> enumVal = (Enum<?>) possibleValue;
         if (enumVal.name().equals(value)) {
           sp.setValue(possibleValue);
           break;
@@ -593,8 +593,8 @@ public class PropertyConverter {
   }
 
   private SelectionCourseProperty convertSelectionProperty(String key,
-                                                           SelectionProperty selectionProperty) {
-    Enum value = (Enum) selectionProperty.getValue();
+                                                           SelectionProperty<?> selectionProperty) {
+    Enum<?> value = (Enum<?>) selectionProperty.getValue();
     SelectionCourseProperty property = new SelectionCourseProperty(key, value.name());
     return property;
   }

@@ -28,6 +28,10 @@ public class OrderStatusMessage
    */
   private String orderName = "";
   /**
+   * The name of the processing vehicle (empty if not currently processed).
+   */
+  private String processingVehicleName;
+  /**
    * The transport order's state.
    */
   private OrderState orderState;
@@ -63,6 +67,25 @@ public class OrderStatusMessage
    */
   public void setOrderName(String orderName) {
     this.orderName = orderName;
+  }
+
+  /**
+   * Returns the processing vehicle's name.
+   *
+   * @return The processing vehicle's name (or empty string if not assigned to a vehicle, yet).
+   */
+  @XmlAttribute(name = "processingVehicleName", required = false)
+  public String getProcessingVehicleName() {
+    return processingVehicleName;
+  }
+
+  /**
+   * Sets the processing vehicle's name.
+   *
+   * @param processingVehicleName The processing vehicle's name.
+   */
+  public void setProcessingVehicleName(String processingVehicleName) {
+    this.processingVehicleName = processingVehicleName;
   }
 
   /**
@@ -115,6 +138,8 @@ public class OrderStatusMessage
   public static OrderStatusMessage fromTransportOrder(TransportOrder order) {
     OrderStatusMessage orderMessage = new OrderStatusMessage();
     orderMessage.setOrderName(order.getName());
+    orderMessage.setProcessingVehicleName(
+        order.getProcessingVehicle() == null ? null : order.getProcessingVehicle().getName());
     orderMessage.setOrderState(OrderState.fromTransportOrderState(order.getState()));
     for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
       Destination dest = new Destination();

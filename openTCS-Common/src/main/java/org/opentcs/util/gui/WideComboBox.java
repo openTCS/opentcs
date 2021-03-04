@@ -69,7 +69,7 @@ public class WideComboBox<E>
     for (E item : items) {
       tmpPopupWidth = Integer.max(fontMetrics.stringWidth(item.toString()), tmpPopupWidth);
     }
-    tmpPopupWidth += 5;
+    tmpPopupWidth += 15;
     this.popupWidth = Optional.of(tmpPopupWidth);
   }
 

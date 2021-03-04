@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
@@ -85,36 +86,34 @@ public class CreateGroupPanel
     locations = systemModel.getLocationModels();
     Collections.sort(locations);
 
-    DefaultListModel listModel;
-    listModel = new DefaultListModel();
-
+    DefaultListModel<PointModel> pointListModel = new DefaultListModel<>();
     for (PointModel model : points) {
-      listModel.addElement(model);
+      pointListModel.addElement(model);
     }
 
     pointList.setCellRenderer(new ModelCellRenderer());
-    pointList.setModel(listModel);
+    pointList.setModel(pointListModel);
 
-    listModel = new DefaultListModel();
+    DefaultListModel<PathModel> pathListModel = new DefaultListModel<>();
 
     for (PathModel model : paths) {
-      listModel.addElement(model);
+      pathListModel.addElement(model);
     }
 
     pathList.setCellRenderer(new ModelCellRenderer());
-    pathList.setModel(listModel);
+    pathList.setModel(pathListModel);
 
-    listModel = new DefaultListModel();
+    DefaultListModel<LocationModel> locationListModel = new DefaultListModel<>();
 
     for (LocationModel model : locations) {
-      listModel.addElement(model);
+      locationListModel.addElement(model);
     }
 
     locationList.setCellRenderer(new ModelCellRenderer());
-    locationList.setModel(listModel);
+    locationList.setModel(locationListModel);
 
     elementsList.setCellRenderer(new ModelCellRenderer());
-    elementsList.setModel(new DefaultListModel());
+    elementsList.setModel(new DefaultListModel<>());
 
     revalidate();
   }
@@ -152,7 +151,7 @@ public class CreateGroupPanel
     addButton = new javax.swing.JButton();
     removeButton = new javax.swing.JButton();
     elementsScrollPane = new javax.swing.JScrollPane();
-    elementsList = new javax.swing.JList();
+    elementsList = new javax.swing.JList<>();
     selectLabel = new javax.swing.JLabel();
     selectedLabel = new javax.swing.JLabel();
     listPanel = new javax.swing.JPanel();
@@ -160,11 +159,11 @@ public class CreateGroupPanel
     pathLabel = new javax.swing.JLabel();
     locationLabel = new javax.swing.JLabel();
     pointScrollPane = new javax.swing.JScrollPane();
-    pointList = new javax.swing.JList();
+    pointList = new javax.swing.JList<>();
     pathScrollPane = new javax.swing.JScrollPane();
-    pathList = new javax.swing.JList();
+    pathList = new javax.swing.JList<>();
     locationScrollPane = new javax.swing.JScrollPane();
-    locationList = new javax.swing.JList();
+    locationList = new javax.swing.JList<>();
     buttonPanel = new javax.swing.JPanel();
     createGroupButton = new javax.swing.JButton();
     cancelButton = new javax.swing.JButton();
@@ -358,15 +357,16 @@ public class CreateGroupPanel
   // CHECKSTYLE:ON
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-    DefaultListModel listModel = new DefaultListModel();
-    List mergedList = new ArrayList<>();
-    Enumeration baseValues = ((DefaultListModel) elementsList.getModel()).elements();
+    DefaultListModel<AbstractFigureComponent> listModel = new DefaultListModel<>();
+    List<AbstractFigureComponent> mergedList = new ArrayList<>();
+    Enumeration<AbstractFigureComponent> baseValues
+        = ((DefaultListModel<AbstractFigureComponent>) elementsList.getModel()).elements();
 
     while (baseValues.hasMoreElements()) {
       mergedList.add(baseValues.nextElement());
     }
 
-    for (Object model : pointList.getSelectedValuesList()) {
+    for (PointModel model : pointList.getSelectedValuesList()) {
       if (!mergedList.contains(model)) {
         mergedList.add(model);
       }
@@ -374,7 +374,7 @@ public class CreateGroupPanel
 
     pointList.clearSelection();
 
-    for (Object model : pathList.getSelectedValuesList()) {
+    for (PathModel model : pathList.getSelectedValuesList()) {
       if (!mergedList.contains(model)) {
         mergedList.add(model);
       }
@@ -382,7 +382,7 @@ public class CreateGroupPanel
 
     pathList.clearSelection();
 
-    for (Object model : locationList.getSelectedValuesList()) {
+    for (LocationModel model : locationList.getSelectedValuesList()) {
       if (!mergedList.contains(model)) {
         mergedList.add(model);
       }
@@ -390,7 +390,7 @@ public class CreateGroupPanel
 
     Collections.sort(mergedList);
 
-    for (Object o : mergedList) {
+    for (AbstractFigureComponent o : mergedList) {
       listModel.addElement(o);
     }
 
@@ -400,14 +400,15 @@ public class CreateGroupPanel
   }//GEN-LAST:event_addButtonActionPerformed
 
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-    DefaultListModel listModel = (DefaultListModel) elementsList.getModel();
-    List selectedObjects = new ArrayList();
+    DefaultListModel<AbstractFigureComponent> listModel
+        = (DefaultListModel<AbstractFigureComponent>) elementsList.getModel();
+    List<AbstractFigureComponent> selectedObjects = new ArrayList<>();
 
     for (int i : elementsList.getSelectedIndices()) {
       selectedObjects.add(listModel.get(i));
     }
 
-    for (Object o : selectedObjects) {
+    for (AbstractFigureComponent o : selectedObjects) {
       listModel.removeElement(o);
     }
 
@@ -420,7 +421,8 @@ public class CreateGroupPanel
 
   private void createGroupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGroupButtonActionPerformed
     Set<ModelComponent> elements = new HashSet<>();
-    DefaultListModel listModel = (DefaultListModel) elementsList.getModel();
+    DefaultListModel<AbstractFigureComponent> listModel
+        = (DefaultListModel<AbstractFigureComponent>) elementsList.getModel();
 
     for (Object o : listModel.toArray()) {
       ModelComponent comp = (ModelComponent) o;
@@ -428,7 +430,8 @@ public class CreateGroupPanel
     }
 
     if (elements.isEmpty()) {
-      JOptionPane.showMessageDialog(this, ResourceBundleUtil.getBundle().getString("CreateGroupPanel.noElementsSelected"));
+      JOptionPane.showMessageDialog(
+          this, ResourceBundleUtil.getBundle().getString("CreateGroupPanel.noElementsSelected"));
       return;
     }
 
@@ -458,16 +461,16 @@ public class CreateGroupPanel
   private javax.swing.JPanel buttonPanel;
   private javax.swing.JButton cancelButton;
   private javax.swing.JButton createGroupButton;
-  private javax.swing.JList elementsList;
+  private javax.swing.JList<AbstractFigureComponent> elementsList;
   private javax.swing.JScrollPane elementsScrollPane;
   private javax.swing.JPanel listPanel;
   private javax.swing.JLabel locationLabel;
-  private javax.swing.JList locationList;
+  private javax.swing.JList<LocationModel> locationList;
   private javax.swing.JScrollPane locationScrollPane;
   private javax.swing.JLabel pathLabel;
-  private javax.swing.JList pathList;
+  private javax.swing.JList<PathModel> pathList;
   private javax.swing.JScrollPane pathScrollPane;
-  private javax.swing.JList pointList;
+  private javax.swing.JList<PointModel> pointList;
   private javax.swing.JScrollPane pointScrollPane;
   private javax.swing.JLabel pointsLabel;
   private javax.swing.JButton removeButton;
@@ -480,8 +483,16 @@ public class CreateGroupPanel
       extends DefaultListCellRenderer {
 
     @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-      JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+    public Component getListCellRendererComponent(JList<?> list,
+                                                  Object value,
+                                                  int index,
+                                                  boolean isSelected,
+                                                  boolean cellHasFocus) {
+      JLabel label = (JLabel) super.getListCellRendererComponent(list,
+                                                                 value,
+                                                                 index,
+                                                                 isSelected,
+                                                                 cellHasFocus);
       label.setText(((ModelComponent) value).getName());
 
       return label;

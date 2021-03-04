@@ -45,8 +45,7 @@ class TransportOrderTableModel
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(TransportOrderTableModel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransportOrderTableModel.class);
   /**
    * The column names.
    */
@@ -57,7 +56,7 @@ class TransportOrderTableModel
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     String.class,
     TransportOrderData.Deadline.class,
     TCSObjectReference.class,};
@@ -147,7 +146,7 @@ class TransportOrderTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.warn("Invalid columnIndex", exc);
+      LOG.warn("Invalid columnIndex", exc);
       return "FEHLER";
     }
   }
@@ -222,7 +221,7 @@ class TransportOrderTableModel
       marshaller.marshal(this, stringWriter);
     }
     catch (JAXBException exc) {
-      log.warn("Exception marshalling data", exc);
+      LOG.warn("Exception marshalling data", exc);
       throw new IllegalStateException("Exception marshalling data", exc);
     }
     return stringWriter.toString();
@@ -265,7 +264,7 @@ class TransportOrderTableModel
       return ((TransportOrderTableModel) o).xmlData;
     }
     catch (JAXBException exc) {
-      log.warn("Exception unmarshalling data", exc);
+      LOG.warn("Exception unmarshalling data", exc);
       throw new IllegalStateException("Exception unmarshalling data", exc);
     }
   }

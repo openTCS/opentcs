@@ -37,8 +37,6 @@ public class VehicleEntry
 
   private VehicleCommAdapter commAdapter;
 
-  private int selectedTabIndex;
-
   public VehicleEntry(Vehicle vehicle) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.processModel = new VehicleProcessModel(vehicle);
@@ -64,6 +62,11 @@ public class VehicleEntry
   @Nonnull
   public Vehicle getVehicle() {
     return vehicle;
+  }
+  
+  @Nonnull
+  public String getVehicleName() {
+    return vehicle.getName();
   }
 
   @Nonnull
@@ -105,17 +108,6 @@ public class VehicleEntry
     pcs.firePropertyChange(Attribute.COMM_ADAPTER.name(), oldValue, commAdapter);
   }
 
-  public int getSelectedTabIndex() {
-    return selectedTabIndex;
-  }
-
-  public void setSelectedTabIndex(int selectedTabIndex) {
-    int oldValue = this.selectedTabIndex;
-    this.selectedTabIndex = selectedTabIndex;
-    
-    pcs.firePropertyChange(Attribute.SELECTED_TAB_INDEX.name(), oldValue, selectedTabIndex);
-  }
-
   /**
    * Enum elements used as notification arguments to specify which argument changed.
    */
@@ -131,10 +123,6 @@ public class VehicleEntry
     /**
      * Indicates a change of the comm adapter reference.
      */
-    COMM_ADAPTER,
-    /**
-     * Indicates a change of the selected tab index.
-     */
-    SELECTED_TAB_INDEX
+    COMM_ADAPTER
   }
 }

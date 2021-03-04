@@ -21,7 +21,7 @@ import org.jhotdraw.draw.tool.Tool;
 import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -103,7 +103,8 @@ public class DefaultPointSelectedAction
       CreationTool creationTool = (CreationTool) tool;
       LabeledPointFigure lpf = (LabeledPointFigure) creationTool.getPrototype();
       PointFigure pointFigure = lpf.getPresentationFigure();
-      SelectionProperty pType = (SelectionProperty) pointFigure.getModel().getProperty(PointModel.TYPE);
+      AbstractProperty pType
+          = (AbstractProperty) pointFigure.getModel().getProperty(PointModel.TYPE);
       pType.setValue(pointType);
 
       ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "point.type." + pointType.name());

@@ -87,6 +87,7 @@ public class Vehicle
   /**
    * The current state of the communication adapter controlling the physical vehicle.
    */
+  @SuppressWarnings("deprecation")
   private VehicleCommAdapter.State adapterState;
   /**
    * A reference to the transport order this vehicle is currently processing.
@@ -157,6 +158,7 @@ public class Vehicle
    *
    * @param name The new vehicle's name.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle(String name) {
     super(name);
     this.length = 1000;
@@ -832,7 +834,10 @@ public class Vehicle
    * physical vehicle represented by this <code>Vehicle</code> instance.
    *
    * @return The current state of this vehicle's communication adapter.
+   * @deprecated VehicleCommAdapter.State is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public VehicleCommAdapter.State getAdapterState() {
     return adapterState;
   }
@@ -855,7 +860,10 @@ public class Vehicle
    *
    * @param adapterState The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated VehicleCommAdapter.State is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Vehicle withAdapterState(VehicleCommAdapter.State adapterState) {
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),

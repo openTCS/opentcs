@@ -15,9 +15,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
@@ -30,6 +28,7 @@ import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
@@ -78,57 +77,47 @@ public class PointAdapter
                                     TCSObject<?> tcsObject,
                                     @Nullable ModelLayoutElement layoutElement) {
     Point point = requireNonNull((Point) tcsObject, "tcsObject");
-    try {
-      // Name
-      StringProperty pName
-          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      pName.setText(point.getName());
+    // Name
+    StringProperty pName
+        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    pName.setText(point.getName());
 
-      // Position in model
-      CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(
-          AbstractFigureComponent.MODEL_X_POSITION);
-      cpx.setValueAndUnit(point.getPosition().getX(), LengthProperty.Unit.MM);
+    // Position in model
+    CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(
+        AbstractFigureComponent.MODEL_X_POSITION);
+    cpx.setValueAndUnit(point.getPosition().getX(), LengthProperty.Unit.MM);
 
-      CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(
-          AbstractFigureComponent.MODEL_Y_POSITION);
-      cpy.setValueAndUnit(point.getPosition().getY(), LengthProperty.Unit.MM);
+    CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(
+        AbstractFigureComponent.MODEL_Y_POSITION);
+    cpy.setValueAndUnit(point.getPosition().getY(), LengthProperty.Unit.MM);
 
-      AngleProperty pAngle = (AngleProperty) getModel().getProperty(
-          PointModel.VEHICLE_ORIENTATION_ANGLE);
-      pAngle.setValueAndUnit(point.getVehicleOrientationAngle(),
-                             AngleProperty.Unit.DEG);
+    AngleProperty pAngle = (AngleProperty) getModel().getProperty(
+        PointModel.VEHICLE_ORIENTATION_ANGLE);
+    pAngle.setValueAndUnit(point.getVehicleOrientationAngle(),
+                           AngleProperty.Unit.DEG);
 
-      updateModelType(point);
-      if (layoutElement != null) {
-        updateModelLayoutProperties(layoutElement);
-      }
-      updateMiscModelProperties(point);
+    updateModelType(point);
+    if (layoutElement != null) {
+      updateModelLayoutProperties(layoutElement);
     }
-    catch (CredentialsException e) {
-      LOG.warn("", e);
-    }
+    updateMiscModelProperties(point);
   }
 
   @Override  // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getPoints().add(
-          new PointCreationTO(getModel().getName())
-              .setPosition(getKernelCoordinates())
-              .setVehicleOrientationAngle(getKernelVehicleAngle())
-              .setType(getKernelPointType())
-              .setProperties(getKernelProperties()));
+    plantModel.getPoints().add(
+        new PointCreationTO(getModel().getName())
+            .setPosition(getKernelCoordinates())
+            .setVehicleOrientationAngle(getKernelVehicleAngle())
+            .setType(getKernelPointType())
+            .setProperties(getKernelProperties()));
 
-      // Write new position into the layout element
-      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout);
-      }
+    // Write new position into the layout element
+    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+      updateLayoutElement(layout);
+    }
 
-      unmarkAllPropertiesChanged();
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
-    }
+    unmarkAllPropertiesChanged();
   }
 
   private void updateModelLayoutProperties(ModelLayoutElement layoutElement) {
@@ -178,7 +167,7 @@ public class PointAdapter
   }
 
   private Point.Type getKernelPointType() {
-    SelectionProperty pType = (SelectionProperty) getModel().getProperty(PointModel.TYPE);
+    AbstractProperty pType = (AbstractProperty) getModel().getProperty(PointModel.TYPE);
     return convertPointType((PointModel.PointType) pType.getValue());
   }
 

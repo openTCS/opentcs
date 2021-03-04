@@ -14,11 +14,20 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
 /**
+ * Translates model data to weighted graphs.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ModelGraphMapper {
 
+  /**
+   * Translates the given points and paths to a weighted graph.
+   *
+   * @param points The points of the model.
+   * @param paths The paths of the model.
+   * @param vehicle The vehicle for which to build the graph.
+   * @return A weighted graph representing the topology to be used for the given vehicle.
+   */
   WeightedGraph<String, ModelEdge> translateModel(Collection<Point> points,
                                                   Collection<Path> paths,
                                                   Vehicle vehicle);

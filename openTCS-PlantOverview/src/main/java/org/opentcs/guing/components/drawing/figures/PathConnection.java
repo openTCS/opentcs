@@ -17,16 +17,14 @@ import java.awt.geom.Point2D.Double;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.LinkedList;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import net.engio.mbassy.bus.MBassador;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
-import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
-import org.jhotdraw.draw.decoration.LineDecoration;
 import org.jhotdraw.draw.handle.BezierOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.liner.ElbowLiner;
@@ -41,20 +39,19 @@ import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
-import org.opentcs.guing.event.PathLockedEvent;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PathModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Eine Verbindung zwischen zwei Punkten.
+ * A connection between two points.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -67,9 +64,14 @@ public class PathConnection
    */
   private static final Logger LOG = LoggerFactory.getLogger(PathConnection.class);
   /**
-   * The application's event bus.
+   * The dash pattern for locked paths.
    */
-  private final MBassador<Object> eventBus;
+  private static final double[] LOCKED_DASH = {6.0, 4.0};
+  /**
+   * The dash pattern for unlocked paths.
+   */
+  private static final double[] UNLOCKED_DASH = {10.0, 0.0};
+
   /**
    * Control point 1.
    */
@@ -97,18 +99,14 @@ public class PathConnection
    * Creates a new instance.
    *
    * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected
-   * model component(s).
-   * @param eventBus The application's event bus.
+   * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param model The model corresponding to this graphical object.
    */
   @Inject
   public PathConnection(ComponentsTreeViewManager componentsTreeManager,
                         SelectionPropertiesComponent propertiesComponent,
-                        MBassador<Object> eventBus,
                         @Assisted PathModel model) {
     super(componentsTreeManager, propertiesComponent, model);
-    this.eventBus = requireNonNull(eventBus, "eventBus");
     resetPath();
   }
 
@@ -117,8 +115,14 @@ public class PathConnection
     return (PathModel) get(FigureConstants.MODEL);
   }
 
+  @Override
+  public void updateConnection() {
+    super.updateConnection();
+    updateControlPoints();
+  }
+
   /**
-   * Kontrollpunkte lï¿½schen; Anfang und Ende durch eine Gerade verbinden.
+   * Resets control points and connects start and end point with a straight line.
    */
   private void resetPath() {
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
@@ -149,12 +153,6 @@ public class PathConnection
     path.add(new BezierPath.Node(ep));
     cp1 = cp2 = cp3 = cp4 = cp5 = null;
     getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
-  }
-
-  @Override
-  public void updateConnection() {
-    super.updateConnection();
-    updateControlPoints();
   }
 
   /**
@@ -255,13 +253,13 @@ public class PathConnection
   }
 
   /**
-   * Bezier-Kurve mit 3 Kontrollpunkten.
+   * A bezier curve with three control points.
    *
-   * @param cp1 Kontrollpunkt 1
-   * @param cp2 Kontrollpunkt 2
-   * @param cp3 Kontrollpunkt 3
-   * @param cp4 Kontrollpunkt 4
-   * @param cp5 Kontrollpunkt 5
+   * @param cp1 Control point 1
+   * @param cp2 Control point 2
+   * @param cp3 Control point 3
+   * @param cp4 Control point 4
+   * @param cp5 Control point 5
    */
   public void addControlPoints(Point2D.Double cp1,
                                Point2D.Double cp2,
@@ -322,7 +320,7 @@ public class PathConnection
     return cp5;
   }
 
-  @Override // BezierFigure
+  @Override
   public Point2D.Double getCenter() {
     // Computes the center of the curve.
     // Approximation: Center of the control points.
@@ -405,10 +403,10 @@ public class PathConnection
   }
 
   /**
-   * Verknï¿½pft zwei Figure-Objekte durch diese Verbindung.
+   * Connects two figures with this connection.
    *
-   * @param start das erste Figure-Objekt
-   * @param end das zweite Figure-Objekt
+   * @param start The first figure.
+   * @param end The second figure.
    */
   public void connect(LabeledPointFigure start, LabeledPointFigure end) {
     // ChopEllipseConnector zeichnet die Linienenden/Pfeilspitzen auf
@@ -429,19 +427,6 @@ public class PathConnection
                                       end.get(FigureConstants.MODEL));
   }
 
-  /**
-   *
-   * @param name
-   */
-  public void setLinerByName(String name) {
-    PathModel.LinerType type = PathModel.LinerType.valueOf(name);
-    setLinerByType(type);
-  }
-
-  /**
-   *
-   * @param type
-   */
   public void setLinerByType(PathModel.LinerType type) {
     switch (type) {
       case DIRECT:
@@ -485,10 +470,6 @@ public class PathConnection
     }
   }
 
-  /**
-   *
-   * @return
-   */
   private LengthProperty calculateLength() {
     try {
       LengthProperty property = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
@@ -515,7 +496,7 @@ public class PathConnection
     }
   }
 
-  @Override  // AbstractFigure
+  @Override
   public String getToolTipText(Point2D.Double p) {
     StringBuilder sb = new StringBuilder("<html>Path ");
     sb.append("<b>").append(getModel().getName()).append("</b>");
@@ -524,16 +505,9 @@ public class PathConnection
     return sb.toString();
   }
 
-  @Override // BezierFigure
-  public Connector findConnector(Double p, ConnectionFigure prototype) {
-    Connector connector = super.findConnector(p, prototype);
-
-    return connector;
-  }
-
-  @Override  // LineConnectionFigure
+  @Override
   public Collection<Handle> createHandles(int detailLevel) {
-    LinkedList<Handle> handles = new LinkedList<>();
+    List<Handle> handles = new LinkedList<>();
     // see BezierFigure
     switch (detailLevel % 2) {
       case -1: // Mouse hover handles
@@ -568,7 +542,7 @@ public class PathConnection
     return handles;
   }
 
-  @Override  // LineConnectionFigure
+  @Override
   public void lineout() {
     if (getLiner() == null) {
       path.invalidatePath();
@@ -598,17 +572,18 @@ public class PathConnection
 //    setLinerByName(sLinerType);
   }
 
-  @Override  // SimpleLineConnection
+  @Override
   public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
     boolean ret = super.handleMouseClick(p, evt, drawingView);
 
     return ret;
   }
 
-  @Override  // SimpleLineConnection
+  @Override
   public void propertiesChanged(AttributesChangeEvent e) {
     if (!e.getInitiator().equals(this)) {
-      SelectionProperty pType = (SelectionProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
+      AbstractProperty pType
+          = (AbstractProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
       PathModel.LinerType type = (PathModel.LinerType) pType.getValue();
       setLinerByType(type);
       // Lï¿½nge neu berechnen
@@ -619,49 +594,25 @@ public class PathConnection
     super.propertiesChanged(e);
   }
 
-  /**
-   * Updates the arrows.
-   */
-  @Override  // SimpleLineConnection
+  @Override
   public void updateDecorations() {
-    final double[] lockedDash = {6.0, 4.0};
-    final double[] unlockedDash = {10.0, 0.0};
+    if (getModel() == null) {
+      return;
+    }
 
-    if (getModel() != null) {
-      LineDecoration startDecoration = null;
-      LineDecoration endDecoration = null;
-      SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
+    set(AttributeKeys.START_DECORATION, navigableBackward() ? ARROW_BACKWARD : null);
+    set(AttributeKeys.END_DECORATION, navigableForward() ? ARROW_FORWARD : null);
 
-      if ((double) pSpeed.getValue() > 0.0) {
-        endDecoration = ARROW_FORWARD;
-      }
+    // Mark locked path.
+    BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
 
-      pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
-
-      if ((double) pSpeed.getValue() > 0.0) {
-        startDecoration = ARROW_BACKWARD;
-      }
-
-      set(AttributeKeys.START_DECORATION, startDecoration);
-      set(AttributeKeys.END_DECORATION, endDecoration);
-      // Gesperrte Strecken markieren
-      BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
-      if (pLocked.hasChanged()) {
-        eventBus.publish(new PathLockedEvent(this));
-      }
-
-      if (pLocked.getValue() instanceof Boolean) {
-        boolean locked = (boolean) (pLocked).getValue();
-
-        if (locked) {
-          set(AttributeKeys.STROKE_COLOR, Color.red);
-          set(AttributeKeys.STROKE_DASHES, lockedDash);
-        }
-        else {
-          set(AttributeKeys.STROKE_COLOR, Color.black);
-          set(AttributeKeys.STROKE_DASHES, unlockedDash);
-        }
-      }
+    if (Boolean.TRUE.equals(pLocked.getValue())) {
+      set(AttributeKeys.STROKE_COLOR, Color.red);
+      set(AttributeKeys.STROKE_DASHES, LOCKED_DASH);
+    }
+    else {
+      set(AttributeKeys.STROKE_COLOR, Color.black);
+      set(AttributeKeys.STROKE_DASHES, UNLOCKED_DASH);
     }
   }
 
@@ -675,7 +626,7 @@ public class PathConnection
     }
   }
 
-  @Override  // SimpleLineConnection
+  @Override
   public void updateModel() {
     if (calculateLength() == null) {
       return;
@@ -726,6 +677,18 @@ public class PathConnection
     updateControlPoints();
   }
 
+  private boolean navigableForward() {
+    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
+
+    return ((double) pSpeed.getValue()) > 0.0;
+  }
+
+  private boolean navigableBackward() {
+    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
+
+    return ((double) pSpeed.getValue()) > 0.0;
+  }
+
   private Point2D.Double scaleControlPoint(Point2D.Double p, Origin newScale) {
     return new Double((p.x * previousOrigin.getScaleX()) / newScale.getScaleX(),
                       (p.y * previousOrigin.getScaleY()) / newScale.getScaleY());
@@ -742,7 +705,8 @@ public class PathConnection
   @Override // LineConnectionFigure
   public PathConnection clone() {
     PathConnection clone = (PathConnection) super.clone();
-    SelectionProperty pConnType = (SelectionProperty) clone.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
+    AbstractProperty pConnType
+        = (AbstractProperty) clone.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
     if (getLiner() instanceof TupelBezierLiner) {
       pConnType.setValue(PathModel.LinerType.BEZIER);
     }

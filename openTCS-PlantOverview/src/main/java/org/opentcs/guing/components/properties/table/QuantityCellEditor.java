@@ -58,8 +58,8 @@ public class QuantityCellEditor
    *
    * @return
    */
-  protected AbstractQuantity property() {
-    return (AbstractQuantity) fProperty;
+  protected AbstractQuantity<?> property() {
+    return (AbstractQuantity<?>) fProperty;
   }
 
   /**

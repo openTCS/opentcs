@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.panel;
 
 import com.google.inject.assistedinject.Assisted;
@@ -301,17 +300,17 @@ public class PropertiesTableContent
     content = new SelectionPropertyEditorPanel();
     dialog = new StandardDetailsDialog(dialogParent, true, content);
     undoableEditor
-        = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox(), umh));
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox<>(), umh));
     undoableEditor.setDetailsDialog(dialog);
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(SelectionProperty.class, undoableEditor);
-    
+
     // Location type property
     content = new SelectionPropertyEditorPanel();
     dialog = new StandardDetailsDialog(dialogParent, true, content);
     undoableEditor
-        = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox(), umh));
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox<>(), umh));
     undoableEditor.setDetailsDialog(dialog);
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);

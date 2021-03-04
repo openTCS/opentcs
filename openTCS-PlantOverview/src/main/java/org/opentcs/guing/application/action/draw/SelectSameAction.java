@@ -16,6 +16,7 @@
 package org.opentcs.guing.application.action.draw;
 
 import java.util.HashSet;
+import java.util.Set;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
@@ -47,7 +48,7 @@ public class SelectSameAction
   }
 
   public void selectSame() {
-    HashSet<Class> selectedClasses = new HashSet<>();
+    Set<Class<?>> selectedClasses = new HashSet<>();
 
     for (Figure selected : getView().getSelectedFigures()) {
       selectedClasses.add(selected.getClass());

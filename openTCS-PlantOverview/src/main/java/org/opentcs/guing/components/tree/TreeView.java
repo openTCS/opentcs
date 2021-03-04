@@ -131,7 +131,7 @@ public interface TreeView {
    *
    * @param items
    */
-  void selectItems(Set items);
+  void selectItems(Set<?> items);
 
   /**
    * Teilt dem Baum mit, dass sich die Eigenschaften des übergeben Objekts

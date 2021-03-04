@@ -16,7 +16,6 @@
 package org.opentcs.guing.application.action.draw;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -74,12 +73,10 @@ public class SendToBackAction
     });
   }
 
-  public static void sendToBack(DrawingView view, Collection figures) {
-    Iterator i = figures.iterator();
+  public static void sendToBack(DrawingView view, Collection<Figure> figures) {
     Drawing drawing = view.getDrawing();
 
-    while (i.hasNext()) {
-      Figure figure = (Figure) i.next();
+    for (Figure figure : figures) {
       drawing.sendToBack(figure);
     }
   }

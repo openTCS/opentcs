@@ -55,6 +55,7 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.util.Comparators;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,11 +124,7 @@ public class Model {
    * @param newName This model's new name.
    */
   public void setName(String newName) {
-    LOG.debug("method entry");
-    if (newName == null) {
-      throw new NullPointerException("newName is null");
-    }
-    name = newName;
+    name = requireNonNull(newName, "newName");
   }
 
   /**
@@ -244,9 +241,6 @@ public class Model {
         .withScaleY(to.getScaleY());
     for (ModelLayoutElementCreationTO mleTO : to.getModelElements()) {
       TCSObject<?> object = objectPool.getObject(mleTO.getName());
-      if (object == null) {
-        throw new ObjectUnknownException(mleTO.getName());
-      }
       ModelLayoutElement mle = new ModelLayoutElement(object.getReference());
       mle.setLayer(mleTO.getLayer());
       mle.setProperties(mleTO.getProperties());
@@ -282,7 +276,7 @@ public class Model {
       double scaleX)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    VisualLayout layout = objectPool.getObject(VisualLayout.class, ref);
+    VisualLayout layout = objectPool.getObjectOrNull(VisualLayout.class, ref);
     if (layout == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -310,7 +304,7 @@ public class Model {
       double scaleY)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    VisualLayout layout = objectPool.getObject(VisualLayout.class, ref);
+    VisualLayout layout = objectPool.getObjectOrNull(VisualLayout.class, ref);
     if (layout == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -338,7 +332,7 @@ public class Model {
       Map<String, Color> colors)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    VisualLayout layout = objectPool.getObject(VisualLayout.class, ref);
+    VisualLayout layout = objectPool.getObjectOrNull(VisualLayout.class, ref);
     if (layout == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -366,7 +360,7 @@ public class Model {
       Set<LayoutElement> elements)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    VisualLayout layout = objectPool.getObject(VisualLayout.class, ref);
+    VisualLayout layout = objectPool.getObjectOrNull(VisualLayout.class, ref);
     if (layout == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -394,7 +388,7 @@ public class Model {
       List<ViewBookmark> bookmarks)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    VisualLayout layout = objectPool.getObject(VisualLayout.class, ref);
+    VisualLayout layout = objectPool.getObjectOrNull(VisualLayout.class, ref);
     if (layout == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -469,7 +463,7 @@ public class Model {
    */
   public Point getPoint(TCSObjectReference<Point> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(Point.class, ref);
+    return objectPool.getObjectOrNull(Point.class, ref);
   }
 
   /**
@@ -481,7 +475,7 @@ public class Model {
    */
   public Point getPoint(String pointName) {
     LOG.debug("method entry");
-    return objectPool.getObject(Point.class, pointName);
+    return objectPool.getObjectOrNull(Point.class, pointName);
   }
 
   /**
@@ -510,7 +504,7 @@ public class Model {
   public Point setPointPosition(TCSObjectReference<Point> ref, Triple position)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Point point = objectPool.getObject(Point.class, ref);
+    Point point = objectPool.getObjectOrNull(Point.class, ref);
     if (point == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -536,7 +530,7 @@ public class Model {
                                                double angle)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Point point = objectPool.getObject(Point.class, ref);
+    Point point = objectPool.getObjectOrNull(Point.class, ref);
     if (point == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -564,7 +558,7 @@ public class Model {
     if (newType == null) {
       throw new NullPointerException("newType is null");
     }
-    Point point = objectPool.getObject(Point.class, ref);
+    Point point = objectPool.getObjectOrNull(Point.class, ref);
     if (point == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -590,13 +584,7 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
-    if (point == null) {
-      throw new ObjectUnknownException(pointRef);
-    }
     Path path = objectPool.getObject(Path.class, pathRef);
-    if (path == null) {
-      throw new ObjectUnknownException(pathRef);
-    }
     // Check if the point really is the path's destination point.
     if (!path.getDestinationPoint().equals(point.getReference())) {
       throw new IllegalArgumentException(
@@ -626,13 +614,7 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
-    if (point == null) {
-      throw new ObjectUnknownException(pointRef);
-    }
     Path path = objectPool.getObject(Path.class, pathRef);
-    if (path == null) {
-      throw new ObjectUnknownException(pathRef);
-    }
     Path previousState = path.clone();
     Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
     incomingPaths.remove(path.getReference());
@@ -657,13 +639,7 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
-    if (point == null) {
-      throw new ObjectUnknownException(pointRef);
-    }
     Path path = objectPool.getObject(Path.class, pathRef);
-    if (path == null) {
-      throw new ObjectUnknownException(pathRef);
-    }
     // Check if the point really is the path's source.
     if (!path.getSourcePoint().equals(point.getReference())) {
       throw new IllegalArgumentException("Point is not the path's source.");
@@ -692,13 +668,7 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
-    if (point == null) {
-      throw new ObjectUnknownException(pointRef);
-    }
     Path path = objectPool.getObject(Path.class, pathRef);
-    if (path == null) {
-      throw new ObjectUnknownException(pathRef);
-    }
     Path previousState = path.clone();
     Set<TCSObjectReference<Path>> outgoingPaths = new HashSet<>(point.getOutgoingPaths());
     outgoingPaths.remove(path.getReference());
@@ -721,7 +691,7 @@ public class Model {
   public Point removePoint(TCSObjectReference<Point> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Point point = objectPool.getObject(Point.class, ref);
+    Point point = objectPool.getObjectOrNull(Point.class, ref);
     if (point == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -764,11 +734,11 @@ public class Model {
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Point srcPoint = objectPool.getObject(Point.class, srcRef);
+    Point srcPoint = objectPool.getObjectOrNull(Point.class, srcRef);
     if (srcPoint == null) {
       throw new ObjectUnknownException(srcRef);
     }
-    Point destPoint = objectPool.getObject(Point.class, destRef);
+    Point destPoint = objectPool.getObjectOrNull(Point.class, destRef);
     if (destPoint == null) {
       throw new ObjectUnknownException(destRef);
     }
@@ -809,13 +779,7 @@ public class Model {
     requireNonNull(to, "to");
 
     Point srcPoint = objectPool.getObject(Point.class, to.getSrcPointName());
-    if (srcPoint == null) {
-      throw new ObjectUnknownException(to.getSrcPointName());
-    }
     Point destPoint = objectPool.getObject(Point.class, to.getDestPointName());
-    if (destPoint == null) {
-      throw new ObjectUnknownException(to.getDestPointName());
-    }
     Path newPath = new Path(to.getName(),
                             srcPoint.getReference(),
                             destPoint.getReference())
@@ -848,7 +812,7 @@ public class Model {
    */
   public Path getPath(TCSObjectReference<Path> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(Path.class, ref);
+    return objectPool.getObjectOrNull(Path.class, ref);
   }
 
   /**
@@ -860,7 +824,7 @@ public class Model {
    */
   public Path getPath(String pathName) {
     LOG.debug("method entry");
-    return objectPool.getObject(Path.class, pathName);
+    return objectPool.getObjectOrNull(Path.class, pathName);
   }
 
   /**
@@ -889,7 +853,7 @@ public class Model {
   public Path setPathLength(TCSObjectReference<Path> ref, long newLength)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Path path = objectPool.getObject(Path.class, ref);
+    Path path = objectPool.getObjectOrNull(Path.class, ref);
     if (path == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -914,7 +878,7 @@ public class Model {
   public Path setPathRoutingCost(TCSObjectReference<Path> ref, long newCost)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Path path = objectPool.getObject(Path.class, ref);
+    Path path = objectPool.getObjectOrNull(Path.class, ref);
     if (path == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -939,7 +903,7 @@ public class Model {
   public Path setPathMaxVelocity(TCSObjectReference<Path> ref, int newVelocity)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Path path = objectPool.getObject(Path.class, ref);
+    Path path = objectPool.getObjectOrNull(Path.class, ref);
     if (path == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -965,7 +929,7 @@ public class Model {
                                         int newVelocity)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Path path = objectPool.getObject(Path.class, ref);
+    Path path = objectPool.getObjectOrNull(Path.class, ref);
     if (path == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -990,9 +954,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Path path = objectPool.getObject(Path.class, ref);
-    if (path == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Path previousState = path.clone();
     path = objectPool.replaceObject(path.withLocked(newLocked));
     objectPool.emitObjectEvent(path.clone(),
@@ -1013,7 +974,7 @@ public class Model {
   public Path removePath(TCSObjectReference<Path> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Path path = objectPool.getObject(Path.class, ref);
+    Path path = objectPool.getObjectOrNull(Path.class, ref);
     if (path == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1086,7 +1047,7 @@ public class Model {
    */
   public LocationType getLocationType(TCSObjectReference<LocationType> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(LocationType.class, ref);
+    return objectPool.getObjectOrNull(LocationType.class, ref);
   }
 
   /**
@@ -1098,7 +1059,7 @@ public class Model {
    */
   public LocationType getLocationType(String typeName) {
     LOG.debug("method entry");
-    return objectPool.getObject(LocationType.class, typeName);
+    return objectPool.getObjectOrNull(LocationType.class, typeName);
   }
 
   /**
@@ -1132,7 +1093,7 @@ public class Model {
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    LocationType type = objectPool.getObject(LocationType.class, ref);
+    LocationType type = objectPool.getObjectOrNull(LocationType.class, ref);
     if (type == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1160,7 +1121,7 @@ public class Model {
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    LocationType type = objectPool.getObject(LocationType.class, ref);
+    LocationType type = objectPool.getObjectOrNull(LocationType.class, ref);
     if (type == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1185,7 +1146,7 @@ public class Model {
   public LocationType removeLocationType(TCSObjectReference<LocationType> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    LocationType type = objectPool.getObject(LocationType.class, ref);
+    LocationType type = objectPool.getObjectOrNull(LocationType.class, ref);
     if (type == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1214,7 +1175,7 @@ public class Model {
                                  TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    LocationType type = objectPool.getObject(LocationType.class, typeRef);
+    LocationType type = objectPool.getObjectOrNull(LocationType.class, typeRef);
     if (type == null) {
       throw new ObjectUnknownException(typeRef);
     }
@@ -1251,30 +1212,39 @@ public class Model {
   public Location createLocation(LocationCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
     LocationType type = objectPool.getObject(LocationType.class, to.getTypeName());
-    if (type == null) {
-      throw new ObjectUnknownException(to.getTypeName());
-    }
     Location newLocation = new Location(to.getName(), type.getReference())
         .withPosition(to.getPosition())
         .withProperties(to.getProperties());
 
-    Set<Location.Link> attachedLinks = new HashSet<>();
+    Set<Location.Link> locationLinks = new HashSet<>();
     for (Map.Entry<String, Set<String>> linkEntry : to.getLinks().entrySet()) {
       Point point = objectPool.getObject(Point.class, linkEntry.getKey());
-      if (point == null) {
-        throw new ObjectUnknownException(linkEntry.getKey());
-      }
       Location.Link link = new Location.Link(newLocation.getReference(), point.getReference())
           .withAllowedOperations(linkEntry.getValue());
-      attachedLinks.add(link);
+      locationLinks.add(link);
     }
-    newLocation = newLocation.withAttachedLinks(attachedLinks);
+    newLocation = newLocation.withAttachedLinks(locationLinks);
 
     objectPool.addObject(newLocation);
     objectPool.emitObjectEvent(newLocation.clone(),
                                null,
                                TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created point.
+
+    // Add the location's links to the respective points, too.
+    for (Location.Link link : locationLinks) {
+      Point point = objectPool.getObjectOrNull(Point.class, link.getPoint());
+
+      Set<Location.Link> pointLinks = new HashSet<>(point.getAttachedLinks());
+      pointLinks.add(link);
+
+      Point previousPointState = point.clone();
+      point = objectPool.replaceObject(point.withAttachedLinks(pointLinks));
+
+      objectPool.emitObjectEvent(point.clone(),
+                                 previousPointState,
+                                 TCSObjectEvent.Type.OBJECT_MODIFIED);
+    }
+
     return newLocation;
   }
 
@@ -1287,7 +1257,7 @@ public class Model {
    */
   public Location getLocation(TCSObjectReference<Location> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(Location.class, ref);
+    return objectPool.getObjectOrNull(Location.class, ref);
   }
 
   /**
@@ -1299,7 +1269,7 @@ public class Model {
    */
   public Location getLocation(String locName) {
     LOG.debug("method entry");
-    return objectPool.getObject(Location.class, locName);
+    return objectPool.getObjectOrNull(Location.class, locName);
   }
 
   /**
@@ -1329,7 +1299,7 @@ public class Model {
                                       Triple position)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, ref);
+    Location location = objectPool.getObjectOrNull(Location.class, ref);
     if (location == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1356,11 +1326,11 @@ public class Model {
                                   TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, ref);
+    Location location = objectPool.getObjectOrNull(Location.class, ref);
     if (location == null) {
       throw new ObjectUnknownException(ref);
     }
-    LocationType type = objectPool.getObject(LocationType.class, typeRef);
+    LocationType type = objectPool.getObjectOrNull(LocationType.class, typeRef);
     if (type == null) {
       throw new ObjectUnknownException(typeRef);
     }
@@ -1387,12 +1357,12 @@ public class Model {
                                          TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, locRef);
+    Location location = objectPool.getObjectOrNull(Location.class, locRef);
     if (location == null) {
       throw new ObjectUnknownException(locRef);
     }
     Location previousLocationState = location.clone();
-    Point point = objectPool.getObject(Point.class, pointRef);
+    Point point = objectPool.getObjectOrNull(Point.class, pointRef);
     if (point == null) {
       throw new ObjectUnknownException(pointRef);
     }
@@ -1425,12 +1395,12 @@ public class Model {
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, locRef);
+    Location location = objectPool.getObjectOrNull(Location.class, locRef);
     if (location == null) {
       throw new ObjectUnknownException(locRef);
     }
     Location previousLocationState = location.clone();
-    Point point = objectPool.getObject(Point.class, pointRef);
+    Point point = objectPool.getObjectOrNull(Point.class, pointRef);
     if (point == null) {
       throw new ObjectUnknownException(pointRef);
     }
@@ -1462,12 +1432,12 @@ public class Model {
       String operation)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, locRef);
+    Location location = objectPool.getObjectOrNull(Location.class, locRef);
     if (location == null) {
       throw new ObjectUnknownException(locRef);
     }
     Location previousLocationState = location.clone();
-    Point point = objectPool.getObject(Point.class, pointRef);
+    Point point = objectPool.getObjectOrNull(Point.class, pointRef);
     if (point == null) {
       throw new ObjectUnknownException(pointRef);
     }
@@ -1510,12 +1480,12 @@ public class Model {
       String operation)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, locRef);
+    Location location = objectPool.getObjectOrNull(Location.class, locRef);
     if (location == null) {
       throw new ObjectUnknownException(locRef);
     }
     Location previousLocationState = location.clone();
-    Point point = objectPool.getObject(Point.class, pointRef);
+    Point point = objectPool.getObjectOrNull(Point.class, pointRef);
     if (point == null) {
       throw new ObjectUnknownException(pointRef);
     }
@@ -1556,12 +1526,12 @@ public class Model {
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, locRef);
+    Location location = objectPool.getObjectOrNull(Location.class, locRef);
     if (location == null) {
       throw new ObjectUnknownException(locRef);
     }
     Location previousLocationState = location.clone();
-    Point point = objectPool.getObject(Point.class, pointRef);
+    Point point = objectPool.getObjectOrNull(Point.class, pointRef);
     if (point == null) {
       throw new ObjectUnknownException(pointRef);
     }
@@ -1600,7 +1570,7 @@ public class Model {
   public Location removeLocation(TCSObjectReference<Location> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Location location = objectPool.getObject(Location.class, ref);
+    Location location = objectPool.getObjectOrNull(Location.class, ref);
     if (location == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1678,7 +1648,7 @@ public class Model {
    */
   public Vehicle getVehicle(TCSObjectReference<Vehicle> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(Vehicle.class, ref);
+    return objectPool.getObjectOrNull(Vehicle.class, ref);
   }
 
   /**
@@ -1690,7 +1660,7 @@ public class Model {
    */
   public Vehicle getVehicle(String vehicleName) {
     LOG.debug("method entry");
-    return objectPool.getObject(Vehicle.class, vehicleName);
+    return objectPool.getObjectOrNull(Vehicle.class, vehicleName);
   }
 
   /**
@@ -1718,7 +1688,7 @@ public class Model {
                                        int energyLevel)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1744,7 +1714,7 @@ public class Model {
                                                int energyLevel)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1770,7 +1740,7 @@ public class Model {
                                            int energyLevel)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1795,9 +1765,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withRechargeOperation(rechargeOperation));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -1819,9 +1786,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withLoadHandlingDevices(devices));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -1844,7 +1808,7 @@ public class Model {
                                        int velocity)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1870,7 +1834,7 @@ public class Model {
                                               int velocity)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1895,9 +1859,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withState(newState));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -1919,9 +1880,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withProcState(newState));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -1937,12 +1895,15 @@ public class Model {
    * @param newState The vehicle's communication adapter's new state.
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated VehicleCommAdapter.State is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Vehicle setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
                                         VehicleCommAdapter.State newState)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1967,7 +1928,7 @@ public class Model {
   public Vehicle setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -1992,9 +1953,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousVehicleState = vehicle.clone();
     // If the vehicle was occupying a point before, clear it and send an event.
     if (vehicle.getCurrentPosition() != null) {
@@ -2036,9 +1994,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withNextPosition(newPosition));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -2060,9 +2015,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withPrecisePosition(newPosition));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -2084,9 +2036,6 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withOrientationAngle(angle));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -2103,25 +2052,17 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  public Vehicle setVehicleTransportOrder(
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<TransportOrder> orderRef)
+  public Vehicle setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
+                                          TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(vehicleRef);
-    }
     Vehicle previousState = vehicle.clone();
     if (orderRef == null) {
       vehicle = objectPool.replaceObject(vehicle.withTransportOrder(null));
     }
     else {
-      TransportOrder order = objectPool.getObject(TransportOrder.class,
-                                                  orderRef);
-      if (order == null) {
-        throw new ObjectUnknownException(orderRef);
-      }
+      TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
       vehicle = objectPool.replaceObject(vehicle.withTransportOrder(order.getReference()));
     }
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -2138,24 +2079,17 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  public Vehicle setVehicleOrderSequence(
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<OrderSequence> seqRef)
+  public Vehicle setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
+                                         TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(vehicleRef);
-    }
     Vehicle previousState = vehicle.clone();
     if (seqRef == null) {
       vehicle = objectPool.replaceObject(vehicle.withOrderSequence(null));
     }
     else {
       OrderSequence seq = objectPool.getObject(OrderSequence.class, seqRef);
-      if (seq == null) {
-        throw new ObjectUnknownException(seqRef);
-      }
       vehicle = objectPool.replaceObject(vehicle.withOrderSequence(seq.getReference()));
     }
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -2173,15 +2107,11 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  public Vehicle setVehicleRouteProgressIndex(
-      TCSObjectReference<Vehicle> vehicleRef,
-      int index)
+  public Vehicle setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
+                                              int index)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(vehicleRef);
-    }
     Vehicle previousState = vehicle.clone();
     vehicle = objectPool.replaceObject(vehicle.withRouteProgressIndex(index));
     objectPool.emitObjectEvent(vehicle.clone(),
@@ -2202,7 +2132,7 @@ public class Model {
   public Vehicle removeVehicle(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -2284,7 +2214,7 @@ public class Model {
    */
   public Block getBlock(TCSObjectReference<Block> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(Block.class, ref);
+    return objectPool.getObjectOrNull(Block.class, ref);
   }
 
   /**
@@ -2296,7 +2226,7 @@ public class Model {
    */
   public Block getBlock(String blockName) {
     LOG.debug("method entry");
-    return objectPool.getObject(Block.class, blockName);
+    return objectPool.getObjectOrNull(Block.class, blockName);
   }
 
   /**
@@ -2326,12 +2256,12 @@ public class Model {
   public Block addBlockMember(TCSObjectReference<Block> ref,
                               TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
-    Block block = objectPool.getObject(Block.class, ref);
+    Block block = objectPool.getObjectOrNull(Block.class, ref);
     if (block == null) {
       throw new ObjectUnknownException(ref);
     }
     Block previousState = block.clone();
-    TCSObject<?> object = objectPool.getObject(newMemberRef);
+    TCSObject<?> object = objectPool.getObjectOrNull(newMemberRef);
     if (!(object instanceof TCSResource)) {
       throw new ObjectUnknownException(ref);
     }
@@ -2356,7 +2286,7 @@ public class Model {
   public Block removeBlockMember(TCSObjectReference<Block> ref,
                                  TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    Block block = objectPool.getObject(Block.class, ref);
+    Block block = objectPool.getObjectOrNull(Block.class, ref);
     if (block == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -2380,7 +2310,7 @@ public class Model {
   public Block removeBlock(TCSObjectReference<Block> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Block block = objectPool.getObject(Block.class, ref);
+    Block block = objectPool.getObjectOrNull(Block.class, ref);
     if (block == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -2481,12 +2411,12 @@ public class Model {
   public Group addGroupMember(TCSObjectReference<Group> ref,
                               TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException {
-    Group group = objectPool.getObject(Group.class, ref);
+    Group group = objectPool.getObjectOrNull(Group.class, ref);
     if (group == null) {
       throw new ObjectUnknownException(ref);
     }
     Group previousState = group.clone();
-    TCSObject<?> object = objectPool.getObject(newMemberRef);
+    TCSObject<?> object = objectPool.getObjectOrNull(newMemberRef);
     if (object == null) {
       throw new ObjectUnknownException(newMemberRef);
     }
@@ -2510,7 +2440,7 @@ public class Model {
   public Group removeGroupMember(TCSObjectReference<Group> ref,
                                  TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException {
-    Group group = objectPool.getObject(Group.class, ref);
+    Group group = objectPool.getObjectOrNull(Group.class, ref);
     if (group == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -2534,7 +2464,7 @@ public class Model {
   public Group removeGroup(TCSObjectReference<Group> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    Group group = objectPool.getObject(Group.class, ref);
+    Group group = objectPool.getObjectOrNull(Group.class, ref);
     if (group == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -2595,7 +2525,7 @@ public class Model {
       throws ObjectExistsException, ObjectUnknownException {
     List<TCSObjectReference<Point>> hops = new LinkedList<>();
     for (String memberName : to.getHopNames()) {
-      TCSObject<?> object = objectPool.getObject(memberName);
+      TCSObject<?> object = objectPool.getObjectOrNull(memberName);
       if (!(object instanceof Point)) {
         throw new ObjectUnknownException(memberName);
       }
@@ -2625,7 +2555,7 @@ public class Model {
   public org.opentcs.data.model.StaticRoute getStaticRoute(
       TCSObjectReference<org.opentcs.data.model.StaticRoute> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(org.opentcs.data.model.StaticRoute.class, ref);
+    return objectPool.getObjectOrNull(org.opentcs.data.model.StaticRoute.class, ref);
   }
 
   /**
@@ -2639,7 +2569,7 @@ public class Model {
   @Deprecated
   public org.opentcs.data.model.StaticRoute getStaticRoute(String routeName) {
     LOG.debug("method entry");
-    return objectPool.getObject(org.opentcs.data.model.StaticRoute.class, routeName);
+    return objectPool.getObjectOrNull(org.opentcs.data.model.StaticRoute.class, routeName);
   }
 
   /**
@@ -2675,12 +2605,12 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     org.opentcs.data.model.StaticRoute route
-        = objectPool.getObject(org.opentcs.data.model.StaticRoute.class, routeRef);
+        = objectPool.getObjectOrNull(org.opentcs.data.model.StaticRoute.class, routeRef);
     if (route == null) {
       throw new ObjectUnknownException(routeRef);
     }
     org.opentcs.data.model.StaticRoute previousState = route.clone();
-    Point point = objectPool.getObject(Point.class, newHopRef);
+    Point point = objectPool.getObjectOrNull(Point.class, newHopRef);
     if (point == null) {
       throw new ObjectUnknownException(newHopRef);
     }
@@ -2707,7 +2637,7 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     org.opentcs.data.model.StaticRoute route
-        = objectPool.getObject(org.opentcs.data.model.StaticRoute.class, routeRef);
+        = objectPool.getObjectOrNull(org.opentcs.data.model.StaticRoute.class, routeRef);
     if (route == null) {
       throw new ObjectUnknownException(routeRef);
     }
@@ -2734,7 +2664,7 @@ public class Model {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     org.opentcs.data.model.StaticRoute route
-        = objectPool.getObject(org.opentcs.data.model.StaticRoute.class, ref);
+        = objectPool.getObjectOrNull(org.opentcs.data.model.StaticRoute.class, ref);
     if (route == null) {
       throw new ObjectUnknownException(ref);
     }
@@ -2765,9 +2695,6 @@ public class Model {
     Set<Block> blocks = getBlocks(null);
     for (TCSResourceReference<?> curRef : resources) {
       TCSObject<?> object = objectPool.getObject(curRef);
-      if (object == null) {
-        throw new ObjectUnknownException(curRef);
-      }
       TCSResource<?> resource = (TCSResource<?>) object;
       result.add(resource);
       for (Block curBlock : blocks) {

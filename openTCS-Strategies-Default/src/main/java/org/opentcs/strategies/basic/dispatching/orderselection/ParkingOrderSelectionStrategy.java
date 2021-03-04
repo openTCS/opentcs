@@ -110,6 +110,7 @@ public class ParkingOrderSelectionStrategy
   @Nullable
   @Override
   public VehicleOrderSelection selectOrder(@Nonnull Vehicle vehicle) {
+    requireNonNull(vehicle, "vehicle");
     if (!configuration.parkIdleVehicles()) {
       return null;
     }

@@ -20,16 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Basisimplementierung fï¿½r Properties, die einen Wert und eine Einheit
- * besitzen. Beispiele hierfï¿½r sind 1 s, 200 m, 30 km/h. Zudem werden
- * Umwandlungsverhï¿½ltnisse (siehe {
- *
- * @see Relation}) zwischen verschiedenen Maï¿½einheiten festgelegt. Mit Hilfe
- * dieser Umwandlungsverhï¿½ltnisse kï¿½nnen Konvertierungen der Werte in andere
- * Einheiten vorgenommen werden.
+ * Base implementation for properties having a value and a unit.
+ * (Examples: 1 s, 200 m, 30 m/s.)
+ * Also specifies conversion relations (see {@link Relation}) between units that allow conversion
+ * to other units.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
+ * @param <U> The enum type.
  */
 public abstract class AbstractQuantity<U extends Enum<U>>
     extends AbstractProperty {
@@ -37,8 +35,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(AbstractQuantity.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractQuantity.class);
   /**
    * The unit's enum class;
    */
@@ -159,7 +156,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       }
     }
     catch (NumberFormatException nfe) {
-      log.info("Error parsing value", nfe);
+      LOG.info("Error parsing value", nfe);
       return fValue;
     }
   }
@@ -173,6 +170,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    */
   public double getValueByUnit(U unit) {
     try {
+      @SuppressWarnings("unchecked")
       AbstractQuantity<U> property = (AbstractQuantity<U>) clone();
       // PercentProperty threw
       // java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.Double
@@ -196,7 +194,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       return value;
     }
     catch (IllegalArgumentException e) {
-      log.error("Exception: ", e);
+      LOG.error("Exception: ", e);
     }
 
     return Double.NaN;
@@ -356,6 +354,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
 
   @Override
   public void copyFrom(Property property) {
+    @SuppressWarnings("unchecked")
     AbstractQuantity<U> quantity = (AbstractQuantity<U>) property;
 
     try {
@@ -367,7 +366,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
       }
     }
     catch (IllegalArgumentException e) {
-      log.error("Exception: ", e);
+      LOG.error("Exception: ", e);
     }
   }
 

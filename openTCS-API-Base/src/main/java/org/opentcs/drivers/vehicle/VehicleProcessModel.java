@@ -72,6 +72,8 @@ public class VehicleProcessModel {
 
   private Vehicle.State state = Vehicle.State.UNKNOWN;
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   private VehicleCommAdapter.State adapterState = VehicleCommAdapter.State.UNKNOWN;
 
   /**
@@ -435,7 +437,10 @@ public class VehicleProcessModel {
    * Returns the comm adapter's current state.
    *
    * @return The comm adapter's current state.
+   * @deprecated VehicleCommAdapter.State is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   public VehicleCommAdapter.State getVehicleAdapterState() {
     return adapterState;
@@ -445,7 +450,10 @@ public class VehicleProcessModel {
    * Sets the comm adapter's current state.
    *
    * @param newState The new state.
+   * @deprecated VehicleCommAdapter.State is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setVehicleAdapterState(@Nonnull VehicleCommAdapter.State newState) {
     VehicleCommAdapter.State oldValue = this.adapterState;
     this.adapterState = newState;
@@ -633,6 +641,7 @@ public class VehicleProcessModel {
      * @deprecated The maximum velocity is not a dynamic vehicle attribute.
      */
     @Deprecated
+    @ScheduledApiChange(when = "5.0")
     MAX_VELOCITY,
     /**
      * Indicates a change of the vehicle's maximum reverse velocity.
@@ -640,6 +649,7 @@ public class VehicleProcessModel {
      * @deprecated The maximum velocity is not a dynamic vehicle attribute.
      */
     @Deprecated
+    @ScheduledApiChange(when = "5.0")
     MAX_REVERSE_VELOCITY,
     /**
      * Indicates a change of the vehicle's state.
@@ -647,7 +657,11 @@ public class VehicleProcessModel {
     STATE,
     /**
      * Indicates a change of the comm adapter's state.
+     *
+     * @deprecated VehicleCommAdapter.State is deprecated.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
     COMM_ADAPTER_STATE,
     /**
      * Indicates a new user notification was published.

@@ -21,9 +21,11 @@ import net.engio.mbassy.bus.config.BusConfiguration;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.customizations.ApplicationHome;
-import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.kernel.CentralEventHub;
+import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
+import org.opentcs.kernel.controlcenter.vehicles.AttachmentManager;
+import org.opentcs.kernel.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
 import org.opentcs.kernel.persistence.XMLModel002Builder;
@@ -52,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultKernelInjectionModule
-    extends ConfigurableInjectionModule {
+    extends KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -91,6 +93,11 @@ public class DefaultKernelInjectionModule
         .in(Singleton.class);
 
     configureVehicleControllers();
+
+    bind(AttachmentManager.class)
+        .in(Singleton.class);
+    bind(VehicleEntryPool.class)
+        .in(Singleton.class);
 
     bind(StandardKernel.class)
         .in(Singleton.class);
@@ -174,6 +181,9 @@ public class DefaultKernelInjectionModule
     bind(OrderPoolConfiguration.class)
         .toInstance(getConfigBindingProvider().get(OrderPoolConfiguration.PREFIX,
                                                    OrderPoolConfiguration.class));
+
+    transportOrderCleanupApprovalBinder();
+    orderSequenceCleanupApprovalBinder();
   }
 
   private void configureKernelStarterDependencies() {

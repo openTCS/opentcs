@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.xmlhost.orders.binding.Destination;
@@ -173,7 +174,8 @@ public class SamplesGenerator {
     driveOrders.add(new DriveOrder(dest2));
     TransportOrder order = new TransportOrder("TOrder-0001", driveOrders)
         .withProperty("waitBefore", "Unload")
-        .withState(TransportOrder.State.ACTIVE);
+        .withState(TransportOrder.State.ACTIVE)
+        .withProcessingVehicle(new Vehicle("Vehicle-0001").getReference());
 
     OrderStatusMessage message = OrderStatusMessage.fromTransportOrder(order);
     TCSStatusMessageSet messageSet = new TCSStatusMessageSet();

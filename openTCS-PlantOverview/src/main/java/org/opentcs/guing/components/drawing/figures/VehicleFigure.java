@@ -45,9 +45,9 @@ import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
@@ -186,11 +186,11 @@ public class VehicleFigure
     sb.append("<b>").append(model.getName()).append("</b>");
     sb.append("<br>Position: ").append(model.getPoint() != null ? model.getPoint().getName() : "?");
     sb.append("<br>Next Position: ").append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
-    SelectionProperty sp = (SelectionProperty) model.getProperty(VehicleModel.STATE);
+    AbstractProperty sp = (AbstractProperty) model.getProperty(VehicleModel.STATE);
     sb.append("<br>State: ").append(sp.getValue().toString());
-    sp = (SelectionProperty) model.getProperty(VehicleModel.PROC_STATE);
+    sp = (AbstractProperty) model.getProperty(VehicleModel.PROC_STATE);
     sb.append("<br>Proc State: ").append(sp.getValue().toString());
-    SelectionProperty pEnergyState = (SelectionProperty) model.getProperty(VehicleModel.ENERGY_STATE);
+    AbstractProperty pEnergyState = (AbstractProperty) model.getProperty(VehicleModel.ENERGY_STATE);
     VehicleModel.EnergyState state = (VehicleModel.EnergyState) pEnergyState.getValue();
 
     String sColor;

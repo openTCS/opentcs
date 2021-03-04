@@ -124,6 +124,7 @@ public class DefaultVehicleController
   /**
    * The communication adapter's last known state.
    */
+  @SuppressWarnings("deprecation")
   private volatile VehicleCommAdapter.State commAdapterState = VehicleCommAdapter.State.UNKNOWN;
   /**
    * The capacity of the communication adapter's command queue.
@@ -175,6 +176,7 @@ public class DefaultVehicleController
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void initialize() {
     if (initialized) {
       return;
@@ -200,6 +202,7 @@ public class DefaultVehicleController
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void terminate() {
     if (!initialized) {
       return;
@@ -219,7 +222,7 @@ public class DefaultVehicleController
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "deprecation"})
   public void propertyChange(PropertyChangeEvent evt) {
     if (evt.getSource() != vehicleModel) {
       return;
@@ -559,6 +562,9 @@ public class DefaultVehicleController
     String op = newOrder.getDestination().getOperation();
     Route orderRoute = newOrder.getRoute();
     Point finalDestination = orderRoute.getFinalDestinationPoint();
+    Location finalDestinationLocation
+        = localKernel.getTCSObject(Location.class,
+                                   newOrder.getDestination().getDestination().getName());
     Map<String, String> destProperties = newOrder.getDestination().getProperties();
     Iterator<Step> stepIter = orderRoute.getSteps().iterator();
     while (stepIter.hasNext()) {
@@ -568,15 +574,13 @@ public class DefaultVehicleController
         boolean isFinalMovement = !stepIter.hasNext();
 
         String operation = isFinalMovement ? op : MovementCommand.NO_OPERATION;
-        Location opLocation = isFinalMovement
-            ? localKernel.getTCSObject(Location.class,
-                                       newOrder.getDestination().getDestination().getName())
-            : null;
+        Location location = isFinalMovement ? finalDestinationLocation : null;
 
         futureCommands.add(new MovementCommand(curStep,
                                                operation,
-                                               opLocation,
+                                               location,
                                                isFinalMovement,
+                                               finalDestinationLocation,
                                                finalDestination,
                                                op,
                                                mergeProperties(orderProperties,
@@ -585,15 +589,13 @@ public class DefaultVehicleController
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void updateCommAdapterState(VehicleCommAdapter.State newState) {
     commAdapterState = requireNonNull(newState, "newState");
     localKernel.setVehicleAdapterState(vehicle.getReference(), newState);
-    // If the adapter's state is unknown, the vehicle's state is unknown, too.
-    if (newState.equals(VehicleCommAdapter.State.UNKNOWN)) {
-      updateVehicleState(Vehicle.State.UNKNOWN);
-    }
   }
 
+  @SuppressWarnings("deprecation")
   private void updateVehicleState(Vehicle.State newState) {
     requireNonNull(newState, "newState");
     // If the communication adapter knows the state of the vehicle and is not

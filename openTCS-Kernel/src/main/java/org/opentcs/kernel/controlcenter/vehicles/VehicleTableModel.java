@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
@@ -46,9 +47,9 @@ final class VehicleTableModel
   private static final String[] COLUMN_NAMES = new String[] {
     BUNDLE.getString("Vehicle"),
     BUNDLE.getString("State"),
-    "Adapter",
+    BUNDLE.getString("Adapter"),
     BUNDLE.getString("Enabled?"),
-    "Position"
+    BUNDLE.getString("Position")
   };
   /**
    * The column classes.
@@ -84,6 +85,14 @@ final class VehicleTableModel
    * The vehicles we're controlling.
    */
   private final List<VehicleEntry> entries = new ArrayList<>();
+  /**
+   * The identifier for the adapter column.
+   */
+  public static final String ADAPTER_COLUMN_IDENTIFIER = COLUMN_NAMES[ADAPTER_COLUMN];
+  /**
+   * The identifier for the position column.
+   */
+  public static final String POSITION_COLUMN_IDENTIFIER = COLUMN_NAMES[POSITION_COLUMN];  
 
   /**
    * Creates a new instance.
@@ -162,7 +171,7 @@ final class VehicleTableModel
       case VEHICLE_COLUMN:
         return entry.getVehicle().getName();
       case STATE_COLUMNN:
-        return entry.getVehicle().getState().name();
+        return getVehicleState(entry);
       case ADAPTER_COLUMN:
         return entry.getCommAdapterFactory();
       case ENABLED_COLUMN:
@@ -227,12 +236,21 @@ final class VehicleTableModel
     }
 
     VehicleEntry entry = (VehicleEntry) evt.getSource();
-
     for (int index = 0; index < entries.size(); index++) {
       if (entry == entries.get(index)) {
         int myIndex = index;
         SwingUtilities.invokeLater(() -> fireTableRowsUpdated(myIndex, myIndex));
       }
+    }
+  }
+
+  private String getVehicleState(VehicleEntry entry) {
+    VehicleCommAdapter commAdapter = entry.getCommAdapter();
+    if (commAdapter == null) {
+      return Vehicle.State.UNKNOWN.name();
+    }
+    else {
+      return commAdapter.getProcessModel().getVehicleState().name();
     }
   }
 

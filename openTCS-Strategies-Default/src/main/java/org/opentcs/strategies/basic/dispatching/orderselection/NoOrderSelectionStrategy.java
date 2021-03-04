@@ -7,7 +7,7 @@
  */
 package org.opentcs.strategies.basic.dispatching.orderselection;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Checks whether vehicles should <em>not</em> get a transport order.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -62,7 +63,15 @@ public class NoOrderSelectionStrategy
   @Nullable
   @Override
   public VehicleOrderSelection selectOrder(@Nonnull Vehicle vehicle) {
-    Objects.requireNonNull(vehicle, "vehicle");
+    requireNonNull(vehicle, "vehicle");
+
+    if (!vehicle.hasState(Vehicle.State.IDLE) && !vehicle.hasState(Vehicle.State.CHARGING)) {
+      LOG.debug("{}: Vehicle state is not idle/charging but {} - leaving it alone.",
+                vehicle.getName(),
+                vehicle.getState());
+      return new VehicleOrderSelection(null, vehicle, null);
+    }
+
     if (vehicle.isEnergyLevelDegraded() && vehicle.hasState(Vehicle.State.CHARGING)) {
       LOG.debug("{}: Energy level degraded, vehicle charging - leaving it alone.",
                 vehicle.getName());

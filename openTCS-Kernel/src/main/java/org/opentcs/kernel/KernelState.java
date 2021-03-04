@@ -173,7 +173,7 @@ abstract class KernelState
   public final <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                        TCSObjectReference<T> ref) {
     synchronized (getGlobalSyncObject()) {
-      T result = getGlobalObjectPool().getObject(clazz, ref);
+      T result = getGlobalObjectPool().getObjectOrNull(clazz, ref);
       return result == null ? null : clazz.cast(result.clone());
     }
   }
@@ -181,7 +181,7 @@ abstract class KernelState
   public final <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                        String name) {
     synchronized (getGlobalSyncObject()) {
-      T result = getGlobalObjectPool().getObject(clazz, name);
+      T result = getGlobalObjectPool().getObjectOrNull(clazz, name);
       return result == null ? null : clazz.cast(result.clone());
     }
   }
@@ -222,14 +222,14 @@ abstract class KernelState
       Class<T> clazz,
       TCSObjectReference<T> ref) {
     synchronized (getGlobalSyncObject()) {
-      return getGlobalObjectPool().getObject(clazz, ref);
+      return getGlobalObjectPool().getObjectOrNull(clazz, ref);
     }
   }
 
   public final <T extends TCSObject<T>> T getTCSObjectOriginal(Class<T> clazz,
                                                                String name) {
     synchronized (getGlobalSyncObject()) {
-      return getGlobalObjectPool().getObject(clazz, name);
+      return getGlobalObjectPool().getObjectOrNull(clazz, name);
     }
   }
 
@@ -471,6 +471,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
                                      VehicleCommAdapter.State newState)
       throws ObjectUnknownException {

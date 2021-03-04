@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree;
 
 import java.awt.event.KeyEvent;
@@ -62,7 +61,8 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  */
 public abstract class AbstractTreeViewPanel
     extends JPanel
-    implements TreeView, EditableComponent {
+    implements TreeView,
+               EditableComponent {
 
   /**
    * Der Wurzelknoten.
@@ -173,7 +173,9 @@ public abstract class AbstractTreeViewPanel
   @Override
   public synchronized void sortItems(TreeNode treeNode) {
     SortableTreeNode sortable = (SortableTreeNode) treeNode;
-    // Alle Kinder rekursiv sortieren
+    // Sort children recursively.
+
+    @SuppressWarnings("unchecked")
     Enumeration<TreeNode> en = sortable.children();
 
     while (en.hasMoreElements()) {
@@ -215,13 +217,16 @@ public abstract class AbstractTreeViewPanel
    */
   public DefaultMutableTreeNode findFirst(Object dataObject) {
     DefaultMutableTreeNode searchNode = null;
-    Enumeration e = fRootNode.preorderEnumeration();
+
+    @SuppressWarnings("unchecked")
+    Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
+
     // boolean to prevent selecting the model in an other folder than "Static routes"
     // when selecting in element in a static route
     boolean selectStaticRouteComponent = false;
 
     while (e.hasMoreElements()) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+      DefaultMutableTreeNode node = e.nextElement();
       UserObject userObject = (UserObject) node.getUserObject();
       ModelComponent modelComponent = (ModelComponent) Objects.requireNonNull(dataObject);
       ModelComponent parentComponent = modelComponent.getParent();
@@ -283,8 +288,8 @@ public abstract class AbstractTreeViewPanel
 
   @Override
   public void sortChildren() {
-    Enumeration<TreeNode> eTreeNodes
-        = ((TreeNode) objectTree.getModel().getRoot()).children();
+    @SuppressWarnings("unchecked")
+    Enumeration<TreeNode> eTreeNodes = ((TreeNode) objectTree.getModel().getRoot()).children();
 
     while (eTreeNodes.hasMoreElements()) {
       TreeNode node = eTreeNodes.nextElement();
@@ -395,20 +400,21 @@ public abstract class AbstractTreeViewPanel
   }
 
   @Override
-  public void selectItems(Set items) {
+  public void selectItems(Set<?> items) {
     objectTree.removeSelectionPaths(objectTree.getSelectionPaths());
 
-    if (items != null) {
-      for (Object item : items) {
-        DefaultMutableTreeNode itemToSelect = findFirst(item);
+    if (items == null) {
+      return;
+    }
+    for (Object item : items) {
+      DefaultMutableTreeNode itemToSelect = findFirst(item);
 
-        if (itemToSelect == null) {
-          break;
-        }
-
-        TreePath treePath = new TreePath(itemToSelect.getPath());
-        objectTree.addSelectionPath(treePath);
+      if (itemToSelect == null) {
+        break;
       }
+
+      TreePath treePath = new TreePath(itemToSelect.getPath());
+      objectTree.addSelectionPath(treePath);
     }
   }
 
@@ -506,7 +512,7 @@ public abstract class AbstractTreeViewPanel
    *
    * @return
    */
-  private Comparator createSortComparator() {
+  private Comparator<Object> createSortComparator() {
     return new AscendingTreeViewNameComparator();
   }
 
@@ -519,10 +525,12 @@ public abstract class AbstractTreeViewPanel
    */
   private List<DefaultMutableTreeNode> findAll(Object dataObject) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
-    Enumeration e = fRootNode.preorderEnumeration();
+
+    @SuppressWarnings("unchecked")
+    Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
 
     while (e.hasMoreElements()) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+      DefaultMutableTreeNode node = e.nextElement();
       UserObject userObject = (UserObject) node.getUserObject();
 
       if (dataObject.equals(userObject.getModelComponent())) {
@@ -541,10 +549,12 @@ public abstract class AbstractTreeViewPanel
    */
   private List<DefaultMutableTreeNode> findAll(UserObject o) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
-    Enumeration e = fRootNode.preorderEnumeration();
+
+    @SuppressWarnings("unchecked")
+    Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
 
     while (e.hasMoreElements()) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+      DefaultMutableTreeNode node = e.nextElement();
       UserObject userObject = (UserObject) node.getUserObject();
 
       if (userObject == o) {
@@ -586,13 +596,15 @@ public abstract class AbstractTreeViewPanel
     }
 
     @Override
-    public void undo() throws CannotUndoException {
+    public void undo()
+        throws CannotUndoException {
       super.undo();
       restoreItems(userObjects, figures);
     }
 
     @Override
-    public void redo() throws CannotRedoException {
+    public void redo()
+        throws CannotRedoException {
       super.redo();
       // TODO: Delete again ...
       for (UserObject userObject : userObjects) {
@@ -621,7 +633,8 @@ public abstract class AbstractTreeViewPanel
     }
 
     @Override
-    public void undo() throws CannotUndoException {
+    public void undo()
+        throws CannotUndoException {
       super.undo();
 
       for (UserObject userObject : userObjects) {
@@ -635,7 +648,8 @@ public abstract class AbstractTreeViewPanel
     }
 
     @Override
-    public void redo() throws CannotRedoException {
+    public void redo()
+        throws CannotRedoException {
       super.redo();
       restoreItems(userObjects, figures);
     }

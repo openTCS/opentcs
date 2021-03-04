@@ -23,6 +23,7 @@ import org.opentcs.components.kernel.RecoveryEvaluator;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.kernel.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
@@ -57,6 +58,8 @@ public class KernelStateOperatingTest {
 
   private LocalVehicleControllerPool controllerPool;
 
+  private AttachmentManager attachmentManager;
+
   @Before
   public void setUp() {
     objectID = 0;
@@ -67,6 +70,7 @@ public class KernelStateOperatingTest {
     scheduler = mock(Scheduler.class);
     dispatcher = mock(Dispatcher.class);
     controllerPool = mock(LocalVehicleControllerPool.class);
+    attachmentManager = mock(AttachmentManager.class);
     when(objectPool.getObjects(Vehicle.class)).thenReturn(vehicles);
   }
 
@@ -158,6 +162,7 @@ public class KernelStateOperatingTest {
                                         controllerPool,
                                         mock(ScriptFileManager.class),
                                         mock(OrderCleanerTask.class),
-                                        extensions));
+                                        extensions,
+                                        attachmentManager));
   }
 }

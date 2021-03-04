@@ -14,10 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.Property;
@@ -56,12 +53,12 @@ public abstract class AbstractProcessAdapter
     this.fEventDispatcher = requireNonNull(eventDispatcher, "eventDispatcher");
   }
 
-  @Override // ProcessAdapter
+  @Override
   public void register() {
     fEventDispatcher.addProcessAdapter(this);
   }
 
-  @Override // ProcessAdapter
+  @Override
   public ModelComponent getModel() {
     return fModelComponent;
   }
@@ -73,28 +70,6 @@ public abstract class AbstractProcessAdapter
    */
   protected EventDispatcher getEventDispatcher() {
     return fEventDispatcher;
-  }
-
-  /**
-   * Reads the current misc properties from the model component and adopts these
-   * for the kernel object.
-   *
-   * @param kernel The kernel.
-   * @param ref A reference to the corresponding kernel object.
-   */
-  protected void updateMiscProcessProperties(Kernel kernel,
-                                             TCSObjectReference<?> ref)
-      throws KernelRuntimeException {
-    kernel.clearTCSObjectProperties(ref);
-
-    KeyValueSetProperty misc = (KeyValueSetProperty) getModel().getProperty(
-        ModelComponent.MISCELLANEOUS);
-
-    if (misc != null) {
-      for (KeyValueProperty p : misc.getItems()) {
-        kernel.setTCSObjectProperty(ref, p.getKey(), p.getValue());
-      }
-    }
   }
 
   protected Map<String, String> getKernelProperties() {

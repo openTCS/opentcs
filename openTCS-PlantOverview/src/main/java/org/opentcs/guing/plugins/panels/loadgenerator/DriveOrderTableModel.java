@@ -28,8 +28,7 @@ class DriveOrderTableModel
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(DriveOrderTableModel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DriveOrderTableModel.class);
   /**
    * The column names.
    */
@@ -40,7 +39,7 @@ class DriveOrderTableModel
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     TCSObjectReference.class,
     String.class
   };
@@ -120,7 +119,7 @@ class DriveOrderTableModel
       return COLUMN_NAMES[columnIndex];
     }
     catch (ArrayIndexOutOfBoundsException exc) {
-      log.warn("Invalid columnIndex", exc);
+      LOG.warn("Invalid columnIndex", exc);
       return "FEHLER";
     }
   }

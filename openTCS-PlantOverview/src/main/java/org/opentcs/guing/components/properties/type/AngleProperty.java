@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.type;
 
 import java.util.LinkedList;
@@ -25,42 +24,34 @@ public class AngleProperty
     extends AbstractQuantity<AngleProperty.Unit> {
 
   /**
-   * Creates a new instance of AngleProperty
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public AngleProperty(ModelComponent model) {
     this(model, Double.NaN, Unit.DEG);
   }
 
   /**
-   * Konstruktor mit Wert und Maßeinheit.
+   * Creates a new instance.
    *
-   * @param model
-   * @param value
-   * @param unit
+   * @param model The model component.
+   * @param value The property value.
+   * @param unit The value's unit.
    */
   public AngleProperty(ModelComponent model, double value, Unit unit) {
     super(model, value, unit, Unit.class, relations());
   }
 
-  @Override // Property
+  @Override
   public Object getComparableValue() {
     return String.valueOf(fValue) + getUnit();
-  }
-
-  private static List<Relation<Unit>> relations() {
-    List<Relation<Unit>> relations = new LinkedList<>();
-    relations.add(new Relation<>(Unit.DEG, Unit.RAD, 180.0 / Math.PI));
-    relations.add(new Relation<>(Unit.RAD, Unit.DEG, Math.PI / 180.0));
-    return relations;
   }
 
   @Override
   public void setValue(Object newValue) {
     if (newValue instanceof Double) {
-      double value = (double) newValue;
-      fValue = value % 360;
+      super.setValue(((double) newValue) % 360);
     }
     else {
       super.setValue(newValue);
@@ -73,8 +64,14 @@ public class AngleProperty
     validRange.setMin(0);
   }
 
-  public static enum Unit {
+  private static List<Relation<Unit>> relations() {
+    List<Relation<Unit>> relations = new LinkedList<>();
+    relations.add(new Relation<>(Unit.DEG, Unit.RAD, 180.0 / Math.PI));
+    relations.add(new Relation<>(Unit.RAD, Unit.DEG, Math.PI / 180.0));
+    return relations;
+  }
 
+  public static enum Unit {
     DEG("deg"),
     RAD("rad");
 

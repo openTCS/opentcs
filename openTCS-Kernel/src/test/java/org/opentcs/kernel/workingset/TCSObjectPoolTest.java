@@ -58,8 +58,8 @@ public class TCSObjectPoolTest {
     Point point2 = new Point("Point-00002");
     pool.addObject(point2);
 
-    assertEquals(point1, pool.getObject(Point.class, "Point-00001"));
-    assertEquals(point2, pool.getObject(Point.class, "Point-00002"));
+    assertEquals(point1, pool.getObjectOrNull(Point.class, "Point-00001"));
+    assertEquals(point2, pool.getObjectOrNull(Point.class, "Point-00002"));
   }
 
   @Test
@@ -69,8 +69,8 @@ public class TCSObjectPoolTest {
     Point point2 = new Point("Point-00002");
     pool.addObject(point2);
 
-    assertEquals(point1, pool.getObject("Point-00001"));
-    assertEquals(point2, pool.getObject("Point-00002"));
+    assertEquals(point1, pool.getObjectOrNull("Point-00001"));
+    assertEquals(point2, pool.getObjectOrNull("Point-00002"));
   }
 
   @Test
@@ -80,8 +80,8 @@ public class TCSObjectPoolTest {
     Point point2 = new Point("Point-00002");
     pool.addObject(point2);
 
-    assertEquals(point1, pool.getObject(Point.class, point1.getReference()));
-    assertEquals(point2, pool.getObject(Point.class, point2.getReference()));
+    assertEquals(point1, pool.getObjectOrNull(Point.class, point1.getReference()));
+    assertEquals(point2, pool.getObjectOrNull(Point.class, point2.getReference()));
   }
 
   @Test
@@ -91,8 +91,8 @@ public class TCSObjectPoolTest {
     Point point2 = new Point("Point-00002");
     pool.addObject(point2);
 
-    assertEquals(point1, pool.getObject(point1.getReference()));
-    assertEquals(point2, pool.getObject(point2.getReference()));
+    assertEquals(point1, pool.getObjectOrNull(point1.getReference()));
+    assertEquals(point2, pool.getObjectOrNull(point2.getReference()));
   }
 
   @Test
@@ -147,9 +147,9 @@ public class TCSObjectPoolTest {
   public void shouldRemoveObjectByRef() {
     Point point1 = new Point("Point-00001");
     pool.addObject(point1);
-    assertEquals(point1, pool.getObject("Point-00001"));
+    assertEquals(point1, pool.getObjectOrNull("Point-00001"));
     pool.removeObject(point1.getReference());
-    assertNull(pool.getObject("Point-00001"));
+    assertNull(pool.getObjectOrNull("Point-00001"));
   }
 
   @Test
@@ -158,16 +158,16 @@ public class TCSObjectPoolTest {
     pool.addObject(point1);
     Point point2 = new Point("Point-00002");
     pool.addObject(point2);
-    assertEquals(point1, pool.getObject(point1.getReference()));
-    assertEquals(point2, pool.getObject(point2.getReference()));
+    assertEquals(point1, pool.getObjectOrNull(point1.getReference()));
+    assertEquals(point2, pool.getObjectOrNull(point2.getReference()));
 
     Set<String> names = new HashSet<>();
     names.add("Point-00001");
     names.add("Point-00002");
     pool.removeObjects(names);
 
-    assertNull(pool.getObject("Point-00001"));
-    assertNull(pool.getObject("Point-00002"));
+    assertNull(pool.getObjectOrNull("Point-00001"));
+    assertNull(pool.getObjectOrNull("Point-00002"));
   }
 
   @Test

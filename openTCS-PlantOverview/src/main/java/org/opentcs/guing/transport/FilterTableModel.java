@@ -137,7 +137,7 @@ public class FilterTableModel
    *
    * @param rowData The row to be added.
    */
-  public void addRow(Vector rowData) {
+  public void addRow(Vector<?> rowData) {
     ((DefaultTableModel) getModel()).addRow(rowData);
     filter();
   }
@@ -172,7 +172,7 @@ public class FilterTableModel
    * @param row The index.
    * @param rowData The row to be added.
    */
-  public void insertRow(int row, Vector rowData) {
+  public void insertRow(int row, Vector<?> rowData) {
     ((DefaultTableModel) getModel()).insertRow(row, rowData);
     filter();
   }

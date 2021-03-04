@@ -548,12 +548,8 @@ public class DefaultDispatcher
       LOG.debug("{}: Finished a drive order", vehicle.getName());
       final TCSObjectReference<Vehicle> vehicleRef = vehicle.getReference();
       final TCSObjectReference<TransportOrder> vehicleOrderRef = vehicle.getTransportOrder();
-      // The vehicle is processing a transport order and has finished a drive
-      // order. See if we're coping with a withdrawal or, if not, if there's
-      // another drive order to be processed.
-      kernel.setTransportOrderNextDriveOrder(vehicleOrderRef);
+      // See if we're coping with a withdrawal.
       TransportOrder vehicleOrder = kernel.getTCSObject(TransportOrder.class, vehicleOrderRef);
-
       if (vehicleOrder.hasState(TransportOrder.State.WITHDRAWN)) {
         LOG.debug(vehicle.getName() + ": Aborted order " + vehicleOrder
             + ". Wrapping sequence: " + vehicleOrder.getWrappingSequence()
@@ -561,8 +557,14 @@ public class DefaultDispatcher
             + ". Intended vehicle: " + vehicleOrder.getIntendedVehicle()
             + ". Provided properties: " + vehicleOrder.getProperties());
         finishAbortion(vehicleOrderRef, vehicle, vehiclesToDisable.contains(vehicleRef));
+        return;
       }
-      else if (vehicleOrder.getCurrentDriveOrder() == null) {
+      
+      // The vehicle is processing a transport order and has finished a drive order.
+      // See if there's another drive order to be processed.
+      kernel.setTransportOrderNextDriveOrder(vehicleOrderRef);
+      vehicleOrder = kernel.getTCSObject(TransportOrder.class, vehicleOrderRef);
+      if (vehicleOrder.getCurrentDriveOrder() == null) {
         LOG.debug(vehicle.getName() + ": Finished order " + vehicleOrder
             + ". Wrapping sequence: " + vehicleOrder.getWrappingSequence()
             + ". Drive orders: " + vehicleOrder.getAllDriveOrders()

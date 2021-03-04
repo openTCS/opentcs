@@ -110,6 +110,7 @@ public class RechargeOrderSelectionStrategy
   @Nullable
   @Override
   public VehicleOrderSelection selectOrder(@Nonnull Vehicle vehicle) {
+    requireNonNull(vehicle,"vehicle");
     if (!configuration.rechargeIdleVehicles()) {
       return null;
     }

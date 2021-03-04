@@ -12,12 +12,16 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This class provides a representation of a TCSObjectReference as a JLabel.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
+ * @deprecated use {@link StringTableCellRenderer} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Class will be removed.")
 public class TCSObjectRefNameTableCellRenderer
     extends JLabel
     implements TableCellRenderer {

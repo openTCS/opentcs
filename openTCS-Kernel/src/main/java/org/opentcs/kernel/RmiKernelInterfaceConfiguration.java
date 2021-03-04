@@ -35,6 +35,12 @@ public interface RmiKernelInterfaceConfiguration {
       description = "The TCP port of the RMI.",
       orderKey = "0_address_1")
   int registryPort();
+  
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The TCP port of the remote kernel.",
+      orderKey = "0_address_2")
+  int remoteKernelPort();
 
   @ConfigurationEntry(
       type = "Long",

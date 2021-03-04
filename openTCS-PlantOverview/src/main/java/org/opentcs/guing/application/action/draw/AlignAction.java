@@ -64,7 +64,8 @@ public abstract class AlignAction
     fireUndoableEditHappened(edit);
   }
 
-  protected abstract void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds);
+  protected abstract void alignFigures(Collection<?> selectedFigures,
+                                       Rectangle2D.Double selectionBounds);
 
   /**
    * Returns the bounds of the selected figures.
@@ -93,7 +94,7 @@ public abstract class AlignAction
     }
 
     @Override
-    protected void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds) {
+    protected void alignFigures(Collection<?> selectedFigures, Rectangle2D.Double selectionBounds) {
       double y = selectionBounds.y;
 
       for (Figure f : getView().getSelectedFigures()) {
@@ -119,7 +120,7 @@ public abstract class AlignAction
     }
 
     @Override
-    protected void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds) {
+    protected void alignFigures(Collection<?> selectedFigures, Rectangle2D.Double selectionBounds) {
       double x = selectionBounds.x + selectionBounds.width;
 
       for (Figure f : getView().getSelectedFigures()) {
@@ -145,7 +146,7 @@ public abstract class AlignAction
     }
 
     @Override
-    protected void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds) {
+    protected void alignFigures(Collection<?> selectedFigures, Rectangle2D.Double selectionBounds) {
       double x = selectionBounds.x;
 
       for (Figure f : getView().getSelectedFigures()) {
@@ -171,7 +172,7 @@ public abstract class AlignAction
     }
 
     @Override
-    protected void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds) {
+    protected void alignFigures(Collection<?> selectedFigures, Rectangle2D.Double selectionBounds) {
       double y = selectionBounds.y + selectionBounds.height;
 
       for (Figure f : getView().getSelectedFigures()) {
@@ -197,7 +198,7 @@ public abstract class AlignAction
     }
 
     @Override
-    protected void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds) {
+    protected void alignFigures(Collection<?> selectedFigures, Rectangle2D.Double selectionBounds) {
       double y = selectionBounds.y + selectionBounds.height / 2;
 
       for (Figure f : getView().getSelectedFigures()) {
@@ -223,7 +224,7 @@ public abstract class AlignAction
     }
 
     @Override
-    protected void alignFigures(Collection selectedFigures, Rectangle2D.Double selectionBounds) {
+    protected void alignFigures(Collection<?> selectedFigures, Rectangle2D.Double selectionBounds) {
       double x = selectionBounds.x + selectionBounds.width / 2;
 
       for (Figure f : getView().getSelectedFigures()) {

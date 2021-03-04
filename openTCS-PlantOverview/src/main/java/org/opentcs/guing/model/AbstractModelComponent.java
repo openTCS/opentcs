@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public abstract class AbstractModelComponent
    * @param treeViewName The name.
    */
   public AbstractModelComponent(String treeViewName) {
-    fTreeViewName = requireNonNull(treeViewName, "treeViewName is null");
+    fTreeViewName = requireNonNull(treeViewName, "treeViewName");
   }
 
   @Override
@@ -205,7 +204,8 @@ public abstract class AbstractModelComponent
   }
 
   @Override
-  public AbstractModelComponent clone() throws CloneNotSupportedException {
+  public AbstractModelComponent clone()
+      throws CloneNotSupportedException {
     AbstractModelComponent clonedModelComponent = (AbstractModelComponent) super.clone();
     clonedModelComponent.fAttributesChangeListeners = new CopyOnWriteArrayList<>();
     // "Shallow" copy of the Map

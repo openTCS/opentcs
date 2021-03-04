@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.data.ObjectPropConstants;
@@ -36,6 +35,7 @@ import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
@@ -124,32 +124,24 @@ public class VehicleAdapter
 
   @Override // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getVehicles().add(
-          new VehicleCreationTO(getModel().getName())
-              .setLength(getLength())
-              .setEnergyLevelCritical(getEnergyLevelCritical())
-              .setEnergyLevelGood(getEnergyLevelGood())
-              .setProperties(getKernelProperties())
-      );
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
-    }
+    plantModel.getVehicles().add(
+        new VehicleCreationTO(getModel().getName())
+            .setLength(getLength())
+            .setEnergyLevelCritical(getEnergyLevelCritical())
+            .setEnergyLevelGood(getEnergyLevelGood())
+            .setProperties(getKernelProperties())
+    );
   }
 
   private void updateModelDriveOrder(Kernel kernel,
                                      Vehicle vehicle,
                                      VehicleModel vehicleModel)
       throws CredentialsException {
-    TCSObjectReference<TransportOrder> rTransportOrder = vehicle.getTransportOrder();
+    TransportOrder transportOrder = getTransportOrder(kernel, vehicle.getTransportOrder());
 
-    if (rTransportOrder != null) {
-      TransportOrder transportOrder
-          = kernel.getTCSObject(TransportOrder.class, rTransportOrder);
-      DriveOrder driveOrder = transportOrder.getCurrentDriveOrder();
-      List<FigureComponent> c
-          = composeDriveOrderComponents(driveOrder, vehicle.getRouteProgressIndex());
+    if (transportOrder != null) {
+      List<FigureComponent> c = composeDriveOrderComponents(transportOrder.getCurrentDriveOrder(),
+                                                            vehicle.getRouteProgressIndex());
       vehicleModel.setDriveOrderComponents(c);
       vehicleModel.setDriveOrderState(transportOrder.getState());
     }
@@ -216,7 +208,7 @@ public class VehicleAdapter
 
   private void updateModelState(Vehicle vehicle, VehicleModel vehicleModel) {
     Vehicle.State state = vehicle.getState();
-    SelectionProperty pState = (SelectionProperty) vehicleModel.getProperty(VehicleModel.STATE);
+    AbstractProperty pState = (AbstractProperty) vehicleModel.getProperty(VehicleModel.STATE);
     pState.setValue(state);
 
     Vehicle.ProcState procState = vehicle.getProcState();
@@ -237,7 +229,7 @@ public class VehicleAdapter
   }
 
   private void updateModelEnergyState(VehicleModel vehicleModel, Vehicle vehicle) {
-    SelectionProperty pEnergyState = (SelectionProperty) vehicleModel.getProperty(VehicleModel.ENERGY_STATE);
+    AbstractProperty pEnergyState = (AbstractProperty) vehicleModel.getProperty(VehicleModel.ENERGY_STATE);
 
     if (vehicle.isEnergyLevelCritical()) {
       pEnergyState.setValue(VehicleModel.EnergyState.CRITICAL);
@@ -318,6 +310,15 @@ public class VehicleAdapter
     return (Integer) pEnergy.getValue();
   }
 
+  @Nullable
+  private TransportOrder getTransportOrder(Kernel kernel, TCSObjectReference<TransportOrder> ref)
+      throws CredentialsException {
+    if (ref == null) {
+      return null;
+    }
+    return kernel.getTCSObject(TransportOrder.class, ref);
+  }
+
   /**
    * Extracts the left over course elements from a drive order and progress.
    *
@@ -326,8 +327,8 @@ public class VehicleAdapter
    * @return List containing the left over course elements or <code>null</code>
    * if driveOrder is <code>null</code>.
    */
-  private List<FigureComponent> composeDriveOrderComponents(
-      DriveOrder driveOrder, int routeProgressIndex) {
+  private List<FigureComponent> composeDriveOrderComponents(@Nullable DriveOrder driveOrder,
+                                                            int routeProgressIndex) {
     if (driveOrder == null) {
       return null;
     }
@@ -368,7 +369,8 @@ public class VehicleAdapter
     Map<String, String> misc = tcsObject.getProperties();
 
     for (Map.Entry<String, String> curEntry : misc.entrySet()) {
-      if (!curEntry.getValue().contains("Unknown")) {
+      if (!curEntry.getValue().contains("Unknown")
+          && !curEntry.getKey().equals(ObjectPropConstants.VEHICLE_INITIAL_POSITION)) {
         items.add(new KeyValueProperty(getModel(), curEntry.getKey(), curEntry.getValue()));
       }
     }

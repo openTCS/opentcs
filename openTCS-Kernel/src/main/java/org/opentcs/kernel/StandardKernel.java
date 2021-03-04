@@ -725,6 +725,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleAdapterState(TCSObjectReference<Vehicle> ref,
                                      VehicleCommAdapter.State newState)
       throws ObjectUnknownException {

@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.orderselection;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.*;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
 
@@ -18,6 +19,7 @@ import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
+@RunWith(JUnitParamsRunner.class)
 public class NoOrderSelectionStrategyTest {
 
   private NoOrderSelectionStrategy instance;
@@ -45,7 +47,7 @@ public class NoOrderSelectionStrategyTest {
   }
 
   @Test
-  public void retunNullForDispatchableVehicleIdle() {
+  public void returnNullForDispatchableVehicleIdle() {
     Vehicle vehicle = new Vehicle("TestVehicle")
         .withEnergyLevel(10)
         .withEnergyLevelCritical(15)
@@ -53,6 +55,19 @@ public class NoOrderSelectionStrategyTest {
         .withState(Vehicle.State.IDLE);
     VehicleOrderSelection result = instance.selectOrder(vehicle);
     assertNull(result);
+  }
+
+  @Test
+  @Parameters({"ERROR", "EXECUTING", "UNAVAILABLE", "UNKNOWN"})
+  public void returnUnassignableForDispatchableVehicleWithState(Vehicle.State state) {
+    Vehicle vehicle = new Vehicle("TestVehicle")
+        .withEnergyLevel(10)
+        .withEnergyLevelCritical(15)
+        .withEnergyLevelGood(60)
+        .withState(state);
+    VehicleOrderSelection result = instance.selectOrder(vehicle);
+    assertNotNull(result);
+    assertFalse(result.isAssignable());
   }
 
   @Test

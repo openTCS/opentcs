@@ -15,7 +15,7 @@ import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.application.toolbar.OpenTCSConnectionTool;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -109,7 +109,8 @@ public class DefaultPathSelectedAction
       // Typ explizit setzen, sodass die ausgewählte Kurve grafisch dargestellt wird
       pathConnection.setLinerByType(pathType);
       // Im Property muss die Kurve auch noch geändert werden
-      SelectionProperty pType = (SelectionProperty) pathConnection.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
+      AbstractProperty pType
+          = (AbstractProperty) pathConnection.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
       pType.setValue(pathType);
 
       ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "path.type." + pathType.name());

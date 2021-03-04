@@ -340,7 +340,7 @@ public class OrderSequencesContainerPanel
    * @param os
    * @return
    */
-  private Vector toTableRow(OrderSequence os) {
+  private Vector<Object> toTableRow(OrderSequence os) {
     Vector<Object> row = new Vector<>();
     // Spalte 0: Name
     String name = os.getName();

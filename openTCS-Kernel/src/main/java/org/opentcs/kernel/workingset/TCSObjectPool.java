@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
 import org.opentcs.data.ObjectExistsException;
@@ -105,13 +106,30 @@ public class TCSObjectPool {
    * Returns an object from the pool.
    *
    * @param ref A reference to the object to return.
-   * @return The referenced object, or <code>null</code>, if no such object
-   * exists in this pool.
+   * @return The referenced object, or <code>null</code>, if no such object exists in this pool.
    */
-  public TCSObject<?> getObject(TCSObjectReference<?> ref) {
+  @Nullable
+  public TCSObject<?> getObjectOrNull(TCSObjectReference<?> ref) {
     requireNonNull(ref);
 
     return objectsByName.get(ref.getName());
+  }
+
+  /**
+   * Returns an object from the pool.
+   *
+   * @param ref A reference to the object to return.
+   * @return The referenced object.
+   * @throws ObjectUnknownException If the referenced object does not exist.
+   */
+  @Nonnull
+  public TCSObject<?> getObject(TCSObjectReference<?> ref)
+      throws ObjectUnknownException {
+    TCSObject<?> result = getObjectOrNull(ref);
+    if (result == null) {
+      throw new ObjectUnknownException(ref);
+    }
+    return result;
   }
 
   /**
@@ -124,8 +142,8 @@ public class TCSObjectPool {
    * exists in this pool or if an object exists but is not an instance of the
    * given class.
    */
-  public <T extends TCSObject<T>> T getObject(Class<T> clazz,
-                                              TCSObjectReference<T> ref) {
+  @Nullable
+  public <T extends TCSObject<T>> T getObjectOrNull(Class<T> clazz, TCSObjectReference<T> ref) {
     requireNonNull(clazz, "clazz");
     requireNonNull(ref, "ref");
 
@@ -141,14 +159,52 @@ public class TCSObjectPool {
   /**
    * Returns an object from the pool.
    *
+   * @param <T> The object's type.
+   * @param clazz The class of the object to be returned.
+   * @param ref A reference to the object to be returned.
+   * @return The referenced object.
+   * @throws ObjectUnknownException If the referenced object does not exist, or if an object exists
+   * but is not an instance of the given class.
+   */
+  @Nonnull
+  public <T extends TCSObject<T>> T getObject(Class<T> clazz, TCSObjectReference<T> ref)
+      throws ObjectUnknownException {
+    T result = getObjectOrNull(clazz, ref);
+    if (result == null) {
+      throw new ObjectUnknownException(ref);
+    }
+    return result;
+  }
+
+  /**
+   * Returns an object from the pool.
+   *
    * @param name The name of the object to return.
    * @return The object with the given name, or <code>null</code>, if no such
    * object exists in this pool.
    */
-  public TCSObject<?> getObject(String name) {
+  @Nullable
+  public TCSObject<?> getObjectOrNull(String name) {
     requireNonNull(name, "name");
 
     return objectsByName.get(name);
+  }
+
+  /**
+   * Returns an object from the pool.
+   *
+   * @param name The name of the object to return.
+   * @return The object with the given name.
+   * @throws ObjectUnknownException If the referenced object does not exist.
+   */
+  @Nonnull
+  public TCSObject<?> getObject(String name)
+      throws ObjectUnknownException {
+    TCSObject<?> result = getObjectOrNull(name);
+    if (result == null) {
+      throw new ObjectUnknownException(name);
+    }
+    return result;
   }
 
   /**
@@ -161,8 +217,8 @@ public class TCSObjectPool {
    * exists in this pool or if an object exists but is not an instance of the
    * given class.
    */
-  public <T extends TCSObject<T>> T getObject(Class<T> clazz,
-                                              String name) {
+  @Nullable
+  public <T extends TCSObject<T>> T getObjectOrNull(Class<T> clazz, String name) {
     requireNonNull(clazz, "clazz");
     requireNonNull(name, "name");
 
@@ -173,6 +229,26 @@ public class TCSObjectPool {
     else {
       return null;
     }
+  }
+
+  /**
+   * Returns an object from the pool.
+   *
+   * @param <T> The object's type.
+   * @param clazz The class of the object to be returned.
+   * @param name The name of the object to be returned.
+   * @return The named object.
+   * @throws ObjectUnknownException If no object with the given name exists in this pool or if an
+   * object exists but is not an instance of the given class.
+   */
+  @Nonnull
+  public <T extends TCSObject<T>> T getObject(Class<T> clazz, String name)
+      throws ObjectUnknownException {
+    T result = getObjectOrNull(clazz, name);
+    if (result == null) {
+      throw new ObjectUnknownException(name);
+    }
+    return result;
   }
 
   /**
@@ -223,8 +299,7 @@ public class TCSObjectPool {
    * given regular expression. If no such objects exist, the returned set is
    * empty.
    */
-  public <T extends TCSObject<T>> Set<T> getObjects(Class<T> clazz,
-                                                    Pattern regexp) {
+  public <T extends TCSObject<T>> Set<T> getObjects(Class<T> clazz, Pattern regexp) {
     requireNonNull(clazz, "clazz");
 
     Set<T> result = new HashSet<>();
@@ -366,9 +441,7 @@ public class TCSObjectPool {
    * property from the object.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
-  public void setObjectProperty(TCSObjectReference<?> ref,
-                                String key,
-                                String value)
+  public void setObjectProperty(TCSObjectReference<?> ref, String key, String value)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 

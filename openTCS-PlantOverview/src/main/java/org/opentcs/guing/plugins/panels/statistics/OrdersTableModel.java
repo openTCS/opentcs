@@ -39,7 +39,7 @@ class OrdersTableModel
   /**
    * The column classes.
    */
-  private static final Class[] COLUMN_CLASSES = new Class[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
     String.class,
     Long.class,
     Long.class,
@@ -55,7 +55,6 @@ class OrdersTableModel
    * Creates a new instance.
    */
   public OrdersTableModel() {
-    // Do nada.
   }
 
   /**

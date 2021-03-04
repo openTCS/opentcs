@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -61,11 +62,12 @@ public class DefaultRechargePositionSupplierTest {
 
   @Test
   public void findExistingRechargePosition() {
-    Vehicle vehicle = new Vehicle("Some vehicle")
-        .withRechargeOperation("Do some recharging");
-
     Point currentVehiclePoint = new Point("Current vehicle point")
         .withType(Point.Type.HALT_POSITION);
+    Vehicle vehicle = new Vehicle("Some vehicle")
+        .withRechargeOperation("Do some recharging")
+        .withCurrentPosition(currentVehiclePoint.getReference());
+
     Point locationAccessPoint = new Point("Location access point")
         .withType(Point.Type.HALT_POSITION);
 
@@ -78,8 +80,6 @@ public class DefaultRechargePositionSupplierTest {
     location = location.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
 
     locationAccessPoint = locationAccessPoint.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
-
-    vehicle = vehicle.withCurrentPosition(currentVehiclePoint.getReference());
 
     when(kernel.getTCSObjects(Location.class))
         .thenReturn(Collections.singleton(location));
@@ -98,7 +98,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnNullIfNoRechargePositionExists() {
+  public void returnsEmptyListIfNoRechargePositionExists() {
     Point currentVehiclePoint = new Point("Current vehicle point");
     Vehicle vehicle = new Vehicle("Some vehicle")
         .withCurrentPosition(currentVehiclePoint.getReference());
@@ -112,4 +112,42 @@ public class DefaultRechargePositionSupplierTest {
     assertNotNull(result);
     assertThat(result, is(empty()));
   }
+
+  @Test
+  public void returnsEmptyListIfAssignedRechargePositionDoesNotExist() {
+    Point currentVehiclePoint = new Point("Current vehicle point");
+    Vehicle vehicle = new Vehicle("Some vehicle")
+        .withRechargeOperation("Do some recharging")
+        .withCurrentPosition(currentVehiclePoint.getReference())
+        .withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, "someUnknownLocation");
+
+    Point locationAccessPoint = new Point("Location access point")
+        .withType(Point.Type.HALT_POSITION);
+
+    LocationType rechargeLocType = new LocationType("Recharge location type")
+        .withAllowedOperations(Arrays.asList("Recharge"));
+    Location location = new Location("Recharge location", rechargeLocType.getReference());
+
+    Location.Link link = new Location.Link(location.getReference(),
+                                           locationAccessPoint.getReference());
+    location = location.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
+
+    locationAccessPoint = locationAccessPoint.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
+
+    when(kernel.getTCSObjects(Location.class))
+        .thenReturn(Collections.singleton(location));
+    when(kernel.getTCSObject(LocationType.class, rechargeLocType.getReference()))
+        .thenReturn(rechargeLocType);
+    when(kernel.getTCSObject(Point.class, currentVehiclePoint.getReference()))
+        .thenReturn(currentVehiclePoint);
+    when(kernel.getTCSObject(Point.class, locationAccessPoint.getReference()))
+        .thenReturn(locationAccessPoint);
+
+    rechargePosSupplier.initialize();
+
+    List<Destination> result = rechargePosSupplier.findRechargeSequence(vehicle);
+    assertNotNull(result);
+    assertThat(result, is(empty()));
+  }
+
 }

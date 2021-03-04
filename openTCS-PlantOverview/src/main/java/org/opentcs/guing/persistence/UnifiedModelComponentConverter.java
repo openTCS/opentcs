@@ -23,17 +23,18 @@ import static org.opentcs.data.model.Point.Type.PARK_POSITION;
 import static org.opentcs.data.model.Point.Type.REPORT_POSITION;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
+import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
@@ -166,8 +167,7 @@ public class UnifiedModelComponentConverter {
     AngleProperty ap = (AngleProperty) pointModel.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
     point.setVehicleOrientationAngle((float) ap.getValueByUnit(AngleProperty.Unit.DEG));
 
-    SelectionProperty<PointModel.PointType> selp
-        = (SelectionProperty<PointModel.PointType>) pointModel.getProperty(PointModel.TYPE);
+    AbstractProperty selp = (AbstractProperty) pointModel.getProperty(PointModel.TYPE);
     PointModel.PointType pointType = (PointModel.PointType) selp.getValue();
     switch (pointType) {
       case HALT:
@@ -266,6 +266,14 @@ public class UnifiedModelComponentConverter {
       property.setName(kvp.getKey());
       property.setValue(kvp.getValue());
       vehicle.getProperties().add(property);
+    }
+
+    CoursePointProperty cpp
+        = (CoursePointProperty) vehicleModel.getProperty(VehicleModel.INITIAL_POSITION);
+    if (!Strings.isNullOrEmpty(cpp.getPointName())) {
+      vehicle.getProperties().add(new PropertyTO()
+          .setName(ObjectPropConstants.VEHICLE_INITIAL_POSITION)
+          .setValue(cpp.getPointName()));
     }
 
     return vehicle;
@@ -504,8 +512,7 @@ public class UnifiedModelComponentConverter {
       StringProperty sp = (StringProperty) path.getProperty(PathModel.NAME);
       mle.setVisualizedObjectName(sp.getText());
 
-      SelectionProperty<PathModel.LinerType> selp
-          = (SelectionProperty<PathModel.LinerType>) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+      AbstractProperty selp = (AbstractProperty) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
       PathModel.LinerType pathType = (PathModel.LinerType) selp.getValue();
       PropertyTO property = new PropertyTO();
       property.setName(ElementPropKeys.PATH_CONN_TYPE);
@@ -586,8 +593,7 @@ public class UnifiedModelComponentConverter {
     AngleProperty ap = (AngleProperty) model.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
     ap.setValueAndUnit(pointTO.getVehicleOrientationAngle().doubleValue(), AngleProperty.Unit.DEG);
 
-    SelectionProperty<PointModel.PointType> selp
-        = (SelectionProperty<PointModel.PointType>) model.getProperty(PointModel.TYPE);
+    AbstractProperty selp = (AbstractProperty) model.getProperty(PointModel.TYPE);
     Point.Type pointType = Point.Type.valueOf(pointTO.getType());
     switch (pointType) {
       case HALT_POSITION:
@@ -688,8 +694,7 @@ public class UnifiedModelComponentConverter {
 
     // Gather information contained in visual layout
     if (visualLayoutTO != null) {
-      SelectionProperty<PathModel.LinerType> selp
-          = (SelectionProperty<PathModel.LinerType>) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+      AbstractProperty selp = (AbstractProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
       String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                               pathTO.getName(),
                                                               ElementPropKeys.PATH_CONN_TYPE);
@@ -723,8 +728,16 @@ public class UnifiedModelComponentConverter {
     pp = (PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
     pp.setValueAndUnit(vehicleTO.getEnergyLevelGood(), PercentProperty.Unit.PERCENT);
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(PointModel.MISCELLANEOUS);
+    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(VehicleModel.MISCELLANEOUS);
     for (PropertyTO property : vehicleTO.getProperties()) {
+      if (Objects.equals(property.getName(), ObjectPropConstants.VEHICLE_INITIAL_POSITION)) {
+        CoursePointProperty cpp
+            = (CoursePointProperty) model.getProperty(VehicleModel.INITIAL_POSITION);
+        cpp.setPointName(property.getValue());
+        // Don't add this to the vehicle's properties
+        continue;
+      }
+      
       kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
     }
 

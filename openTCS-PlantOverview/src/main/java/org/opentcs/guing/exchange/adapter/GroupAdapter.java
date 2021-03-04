@@ -15,9 +15,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.GroupCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.data.TCSObject;
@@ -67,28 +65,18 @@ public class GroupAdapter
                                     @Nullable ModelLayoutElement layoutElement) {
     Group group = requireNonNull((Group) tcsObject, "tcsObject");
 
-    try {
-      StringProperty name
-          = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      name.setText(group.getName());
+    StringProperty name
+        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
+    name.setText(group.getName());
 
-      updateMiscModelProperties(group);
-    }
-    catch (CredentialsException e) {
-      LOG.warn("", e);
-    }
+    updateMiscModelProperties(group);
   }
 
   @Override  // OpenTCSProcessAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getGroups().add(new GroupCreationTO(getModel().getName())
-          .setMemberNames(getMemberNames())
-          .setProperties(getKernelProperties()));
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
-    }
+    plantModel.getGroups().add(new GroupCreationTO(getModel().getName())
+        .setMemberNames(getMemberNames())
+        .setProperties(getKernelProperties()));
   }
 
   private Set<String> getMemberNames() {

@@ -44,9 +44,6 @@ public class DefaultKernelExtensionsModule
     // Kernel extensions for StandardKernel (permanent extensions)
     Multibinder<KernelExtension> allStatesBinder = extensionsBinderAllModes();
     allStatesBinder.addBinding()
-        .to(KernelControlCenter.class)
-        .in(Singleton.class);
-    allStatesBinder.addBinding()
         .to(StandardRemoteKernel.class)
         .in(Singleton.class);
     allStatesBinder.addBinding()
@@ -64,6 +61,16 @@ public class DefaultKernelExtensionsModule
   }
 
   private void configureControlCenterDependencies() {
+    ControlCenterConfiguration configuration
+        = getConfigBindingProvider().get(ControlCenterConfiguration.PREFIX,
+                                         ControlCenterConfiguration.class);
+    bind(ControlCenterConfiguration.class)
+        .toInstance(configuration);
+
+    if (!configuration.enable()) {
+      return;
+    }
+
     Multibinder<ControlCenterPanel> modellingBinder = controlCenterPanelBinderModelling();
     // No extensions for modelling mode, yet.
 
@@ -72,12 +79,11 @@ public class DefaultKernelExtensionsModule
 
     install(new FactoryModuleBuilder().build(ControlCenterInfoHandlerFactory.class));
 
-    ControlCenterConfiguration configuration
-        = getConfigBindingProvider().get(ControlCenterConfiguration.PREFIX,
-                                         ControlCenterConfiguration.class);
-    bind(ControlCenterConfiguration.class)
-        .toInstance(configuration);
     configureKernelControlCenter(configuration);
+
+    extensionsBinderAllModes().addBinding()
+        .to(KernelControlCenter.class)
+        .in(Singleton.class);
   }
 
   private void configureKernelExtensionsDependencies() {

@@ -7,16 +7,21 @@
  */
 package org.opentcs.strategies.basic.dispatching.orderselection.recharging;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION;
+import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
@@ -25,21 +30,15 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Tries to find recharge locations for vehicles that are off the route of other vehicles.
+ * Finds assigned, preferred or (routing-wise) cheapest recharge locations for vehicles.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultRechargePositionSupplier
     implements RechargePositionSupplier {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultRechargePositionSupplier.class);
   /**
    * Our kernel.
    */
@@ -79,7 +78,7 @@ public class DefaultRechargePositionSupplier
     // Get all locations from the kernel, and for each of their access points,
     // build a set of points that share the same block(s).
     for (Location curLoc : kernel.getTCSObjects(Location.class)) {
-      for (Point accessPoint : getAccessPoints(curLoc)) {
+      for (Point accessPoint : findAccessPoints(curLoc)) {
         accessPoints.put(accessPoint, getBlockedPoints(accessPoint, allBlocks));
       }
     }
@@ -105,108 +104,173 @@ public class DefaultRechargePositionSupplier
     requireNonNull(vehicle, "vehicle");
 
     if (vehicle.getCurrentPosition() == null) {
-      LOG.warn("Cannot compute recharge sequence, as current position of {} is null.",
-               vehicle.getName());
-      return new LinkedList<>();
+      return new ArrayList<>();
     }
 
-    String rechargeOp = vehicle.getRechargeOperation();
-    Point curPos = kernel.getTCSObject(Point.class, vehicle.getCurrentPosition());
-    Set<Point> targetedPoints = router.getTargetedPoints();
-    Location bestLocation = null;
-    long bestCosts = Long.MAX_VALUE;
-    for (Location curLoc : kernel.getTCSObjects(Location.class)) {
-      LocationType lType = kernel.getTCSObject(LocationType.class, curLoc.getType());
-      // If the location provides the vehicle's recharge operation
-      // AND has an untargeted access point
-      // AND that access point is closer than the best we found so far,
-      // then the location is our new candidate.
-      if (lType.isAllowedOperation(rechargeOp)) {
-        long costs = getBestUntargetedAccessPointCosts(vehicle,
-                                                       curPos,
-                                                       curLoc,
-                                                       targetedPoints,
-                                                       rechargeOp);
-        if (costs < bestCosts) {
-          bestCosts = costs;
-          bestLocation = curLoc;
-        }
+    Map<Location, Set<Point>> rechargeLocations
+        = findLocationsForOperation(vehicle.getRechargeOperation(),
+                                    vehicle,
+                                    router.getTargetedPoints());
+
+    String assignedRechargeLocationName = vehicle.getProperty(PROPKEY_ASSIGNED_RECHARGE_LOCATION);
+    if (assignedRechargeLocationName != null) {
+      Location location = selectLocationWithName(assignedRechargeLocationName,
+                                                 rechargeLocations.keySet());
+      if (location == null) {
+        return new ArrayList<>();
+      }
+      // XXX Strictly, we should check whether there is a viable route to the location.
+      return Arrays.asList(createDestination(location, vehicle.getRechargeOperation()));
+    }
+
+    String preferredRechargeLocationName = vehicle.getProperty(PROPKEY_PREFERRED_RECHARGE_LOCATION);
+    if (assignedRechargeLocationName != null) {
+      Location location = selectLocationWithName(preferredRechargeLocationName,
+                                                 rechargeLocations.keySet());
+      if (location != null) {
+        // XXX Strictly, we should check whether there is a viable route to the location.
+        return Arrays.asList(createDestination(location, vehicle.getRechargeOperation()));
       }
     }
 
-    LinkedList<DriveOrder.Destination> result = new LinkedList<>();
+    Location bestLocation = findCheapestLocation(rechargeLocations, vehicle);
     if (bestLocation != null) {
-      result.add(new DriveOrder.Destination(bestLocation.getReference())
-          .withOperation(vehicle.getRechargeOperation()));
+      return Arrays.asList(createDestination(bestLocation, vehicle.getRechargeOperation()));
     }
-    return result;
+
+    return new ArrayList<>();
+  }
+
+  @Nullable
+  private Location findCheapestLocation(Map<Location, Set<Point>> locations, Vehicle vehicle) {
+    Point curPos = kernel.getTCSObject(Point.class, vehicle.getCurrentPosition());
+
+    Location cheapestLocation = null;
+    long cheapestCosts = Long.MAX_VALUE;
+    for (Map.Entry<Location, Set<Point>> entry : locations.entrySet()) {
+      long costs = getMinimumAccessPointCosts(vehicle, curPos, entry.getValue());
+
+      if (costs < cheapestCosts) {
+        cheapestCosts = costs;
+        cheapestLocation = entry.getKey();
+      }
+    }
+
+    return cheapestLocation;
+  }
+
+  private DriveOrder.Destination createDestination(Location location, String operation) {
+    return new DriveOrder.Destination(location.getReference())
+        .withOperation(operation);
+  }
+
+  @Nullable
+  private Location selectLocationWithName(String name, Set<Location> locations) {
+    return locations.stream()
+        .filter(location -> name.equals(location.getName()))
+        .findAny()
+        .orElse(null);
   }
 
   /**
-   * Returns the lowest possible costs for the given vehicle travelling to an
-   * untargeted access point of the given location.
+   * Finds locations allowing the given operation, and the points they would be accessible from for
+   * the given vehicle.
    *
-   * @param vehicle The vehicle for which to compute the routes.
-   * @param srcPosition The position from which the vehicle would travel.
-   * @param location The location the vehicle would travel to.
-   * @param targetedPoints All points currently targeted by vehicles.
-   * @param rechargeOp The vehicle's recharge operation.
-   * @return The lowest possible costs for the given vehicle travelling to an
-   * untargeted access point of the given location.
+   * @param operation The operation.
+   * @param vehicle The vehicle.
+   * @param targetedPoints The points that are currently targeted by vehicles.
+   * @return The locations allowing the given operation, and the points they would be accessible
+   * from.
    */
-  private long getBestUntargetedAccessPointCosts(Vehicle vehicle,
-                                                 Point srcPosition,
-                                                 Location location,
-                                                 Set<Point> targetedPoints,
-                                                 String rechargeOp) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(srcPosition, "srcPosition");
-    requireNonNull(location, "location");
-    requireNonNull(targetedPoints, "targetedPoints");
+  private Map<Location, Set<Point>> findLocationsForOperation(String operation,
+                                                              Vehicle vehicle,
+                                                              Set<Point> targetedPoints) {
+    Map<Location, Set<Point>> result = new HashMap<>();
 
-    long bestLinkCosts = Long.MAX_VALUE;
-    for (Location.Link curLink : location.getAttachedLinks()) {
-      // This link is only interesting if it either does not define any allowed
-      // operations at all or, if it does, allows the required recharge
-      // operation.
-      if (curLink.getAllowedOperations().isEmpty()
-          || curLink.hasAllowedOperation(rechargeOp)) {
-
-        Point accessPoint = kernel.getTCSObject(Point.class,
-                                                curLink.getPoint());
-        Set<Point> blockedPoints = accessPoints.get(accessPoint);
-
-        boolean linkUsable = true;
-        for (Point blockedPoint : blockedPoints) {
-          Point blockedPointActu = kernel.getTCSObject(Point.class,
-                                                       blockedPoint.getReference());
-          // If the point is occupied by another vehicle, give up this link.
-          if (blockedPointActu.getOccupyingVehicle() != null
-              && !blockedPointActu.getOccupyingVehicle().equals(vehicle.getReference())) {
-            linkUsable = false;
-            break;
-          }
-          // If the point is targeted by another vehicle, give up this link.
-          else if (targetedPoints.contains(blockedPointActu)) {
-            linkUsable = false;
-            break;
-          }
-        }
-
-        if (linkUsable) {
-          long linkCosts = router.getCostsByPointRef(vehicle,
-                                                     srcPosition.getReference(),
-                                                     curLink.getPoint());
-          bestLinkCosts = Math.min(linkCosts, bestLinkCosts);
+    for (Location curLoc : kernel.getTCSObjects(Location.class)) {
+      LocationType lType = kernel.getTCSObject(LocationType.class, curLoc.getType());
+      if (lType.isAllowedOperation(operation)) {
+        Set<Point> points = findUnoccupiedAccessPointsForOperation(curLoc,
+                                                                   operation,
+                                                                   vehicle,
+                                                                   targetedPoints);
+        if (!points.isEmpty()) {
+          result.put(curLoc, points);
         }
       }
+    }
+
+    return result;
+  }
+
+  private Set<Point> findUnoccupiedAccessPointsForOperation(Location location,
+                                                            String rechargeOp,
+                                                            Vehicle vehicle,
+                                                            Set<Point> targetedPoints) {
+    Set<Point> result = new HashSet<>();
+
+    for (Location.Link curLink : location.getAttachedLinks()) {
+      // This link is only interesting if it either does not define any allowed operations at all
+      // or, if it does, allows the required recharge operation.
+      if (curLink.getAllowedOperations().isEmpty() || curLink.hasAllowedOperation(rechargeOp)) {
+        Point accessPoint = kernel.getTCSObject(Point.class, curLink.getPoint());
+
+        if (isPointUnoccupiedFor(accessPoint, vehicle, targetedPoints)) {
+          result.add(accessPoint);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  private long getMinimumAccessPointCosts(Vehicle vehicle,
+                                          Point srcPosition,
+                                          Set<Point> destPositions) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(srcPosition, "srcPosition");
+
+    long bestLinkCosts = Long.MAX_VALUE;
+    for (Point destPosition : destPositions) {
+      long linkCosts = router.getCostsByPointRef(vehicle,
+                                                 srcPosition.getReference(),
+                                                 destPosition.getReference());
+      bestLinkCosts = Math.min(linkCosts, bestLinkCosts);
     }
     return bestLinkCosts;
   }
 
   /**
-   * Gathers a set of all points from all given blocks that the given point is a
-   * member of.
+   * Checks whether the given point is a potential, unoccupied target position for the given
+   * vehicle.
+   *
+   * @param accessPoint The point to be checked.
+   * @param vehicle The vehicle to be checked for.
+   * @param targetedPoints All currently known targeted points.
+   * @return <code>true</code> if, and only if, the given point is a potential and unoccupied target
+   * position for the given vehicle.
+   */
+  private boolean isPointUnoccupiedFor(Point accessPoint,
+                                       Vehicle vehicle,
+                                       Set<Point> targetedPoints) {
+    for (Point blockedPoint : accessPoints.get(accessPoint)) {
+      Point blockedPointActu = kernel.getTCSObject(Point.class, blockedPoint.getReference());
+      // If the point is occupied by another vehicle, give up this link.
+      if (blockedPointActu.getOccupyingVehicle() != null
+          && !blockedPointActu.getOccupyingVehicle().equals(vehicle.getReference())) {
+        return false;
+      }
+      // If the point is targeted by another vehicle, give up this link.
+      else if (targetedPoints.contains(blockedPointActu)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Gathers a set of all points from all given blocks that the given point is a member of.
    *
    * @param point The point to check.
    * @param blocks The blocks to scan for the point.
@@ -244,7 +308,7 @@ public class DefaultRechargePositionSupplier
    * @param location The location.
    * @return A set of points from which the given location can be accessed.
    */
-  private Set<Point> getAccessPoints(Location location) {
+  private Set<Point> findAccessPoints(Location location) {
     requireNonNull(location, "location");
 
     Set<Point> result = new HashSet<>();
