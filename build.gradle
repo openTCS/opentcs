@@ -84,6 +84,7 @@ task distSrcZip(type: Zip) {
   classifier = 'src'
   from "${rootDir}"
 
+  includes << 'buildSrc/**'
   includes << 'config/**'
   includes << 'gradle/**'
   includes << 'openTCS-*/**'
@@ -96,6 +97,7 @@ task distSrcZip(type: Zip) {
   excludes << '.gitlab'
   excludes << '.gradle'
   excludes << '**/build'
+  excludes << 'buildSrc/.gradle'
 }
 
 artifacts {

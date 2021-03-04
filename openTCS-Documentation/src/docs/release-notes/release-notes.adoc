@@ -49,6 +49,13 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.9.1 (2018-04-26)
+
+* Bugs fixed:
+** Include the `buildSrc/` directory in the source distribution.
+** Properly display vehicle routes after adding driving course views in the Plant Overview.
+** Properly disconnect the plant overview from the kernel when switching to modelling mode.
+
 === Version 4.9 (2018-04-16)
 
 * Bugs fixed:

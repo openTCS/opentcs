@@ -146,6 +146,10 @@ public class OpenTCSEventDispatcher
   }
 
   private void register() {
+    if (sharedPortal != null) {
+      return;
+    }
+
     LOG.debug("EventDispatcher {} registering with portal...", this);
     if (!portalProvider.portalShared()) {
       LOG.warn("No shared portal to register with, aborting.");
@@ -157,6 +161,10 @@ public class OpenTCSEventDispatcher
   }
 
   private void release() {
+    if (sharedPortal == null) {
+      return;
+    }
+
     LOG.debug("EventDispatcher {} unregistering with portal...", this);
     if (!portalProvider.portalShared() || sharedPortal == null) {
       LOG.warn("No shared portal to unregister with, aborting.");
