@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -17,6 +16,14 @@ package org.opentcs.data.model.visualization;
  */
 public enum LocationRepresentation {
 
+  /**
+   * A (empty) location without any representation.
+   */
+  NONE,
+  /**
+   * The default representation inherited from the assigned location type.
+   */
+  DEFAULT,
   /**
    * A location for vehicle load transfer, generic variant.
    */

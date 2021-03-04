@@ -8,7 +8,6 @@
  */
 package org.opentcs.guing.storage;
 
-import java.io.IOException;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -16,7 +15,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.Kernel;
-import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
@@ -78,10 +77,10 @@ public class ModelKernelPersistor {
    * @param ignoreValidationErrors Whether to ignore any validation errors.
    * @return {@code true} if, and only if, the model was valid or validation errors were to be
    * ignored.
-   * @throws IOException If there was a problem persisting the model on the kernel side.
+   * @throws IllegalStateException If there was a problem persisting the model on the kernel side.
    */
   public boolean persist(SystemModel systemModel, Kernel kernel, boolean ignoreValidationErrors)
-      throws IOException {
+      throws IllegalStateException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(kernel, "kernel");
 
@@ -121,94 +120,89 @@ public class ModelKernelPersistor {
   }
 
   private void persistModelElements(Kernel kernel, SystemModel systemModel)
-      throws IOException {
-    // Start with a clean, empty model.
-    kernel.createModel(systemModel.getName());
+      throws IllegalStateException {
 
-    PlantModelCache plantModelCache = new PlantModelCache();
+    PlantModelCreationTO plantModel = new PlantModelCreationTO(systemModel.getName());
 
     long timeBefore = System.currentTimeMillis();
     for (LayoutModel model : systemModel.getLayoutModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting LayoutModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (PointModel model : systemModel.getPointModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting PointModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (PathModel model : systemModel.getPathModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting PathModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (LocationTypeModel model : systemModel.getLocationTypeModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting LocationTypeModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (LocationModel model : systemModel.getLocationModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting LocationModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (LinkModel model : systemModel.getLinkModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting LinkModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (BlockModel model : systemModel.getBlockModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting BlockModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (GroupModel model : systemModel.getGroupModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting GroupModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (StaticRouteModel model : systemModel.getStaticRouteModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting StaticRouteModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
     timeBefore = System.currentTimeMillis();
     for (VehicleModel model : systemModel.getVehicleModels()) {
-      persist(model, systemModel.getEventDispatcher(), kernel, plantModelCache);
+      persist(model, systemModel.getEventDispatcher(), plantModel);
     }
     LOG.debug("Persisting VehicleModels to kernel took {} milliseconds.",
               System.currentTimeMillis() - timeBefore);
 
-    for (VisualLayout layout : plantModelCache.getVisualLayouts()) {
-      kernel.setVisualLayoutElements(layout.getReference(), layout.getLayoutElements());
-    }
-
-    kernel.saveModel(systemModel.getName());
+    kernel.createPlantModel(plantModel);
   }
 
-  private void persist(ModelComponent component, EventDispatcher eventDispatcher, Kernel kernel,
-                       PlantModelCache plantModel) {
+  private void persist(ModelComponent component,
+                       EventDispatcher eventDispatcher,
+                       PlantModelCreationTO plantModel) {
     ProcessAdapter adapter = eventDispatcher.findProcessAdapter(component);
     if (adapter != null) {
-      adapter.updateProcessProperties(kernel, plantModel);
+      adapter.storeToPlantModel(plantModel);
     }
     else {
       LOG.warn("No process adapter for model component {} was found.", component.getName());

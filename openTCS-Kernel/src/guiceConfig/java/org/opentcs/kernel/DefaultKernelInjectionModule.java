@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2013 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -26,7 +25,6 @@ import org.opentcs.access.LocalKernel;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.kernel.CentralEventHub;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
-import org.opentcs.kernel.OrderCleanerTask.OrderSweepType;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.OrderPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
@@ -95,7 +93,7 @@ public class DefaultKernelInjectionModule
 
     bind(VehicleCommAdapterRegistry.class)
         .in(Singleton.class);
-    
+
     configureVehicleControllers();
 
     bind(StandardKernel.class)
@@ -208,37 +206,14 @@ public class DefaultKernelInjectionModule
   private void configureOrderCleanerTask() {
     ConfigurationStore cleanerConfigStore
         = ConfigurationStore.getStore(OrderCleanerTask.class.getName());
-    String configuredSweepType = cleanerConfigStore.getEnum("orderSweepType",
-                                                            "BY_AMOUNT",
-                                                            OrderSweepType.class);
 
-    long orderSweepInterval = cleanerConfigStore.getLong("orderSweepInterval",
-                                                         10 * 60 * 1000);
     bindConstant()
         .annotatedWith(OrderCleanerTask.SweepInterval.class)
-        .to(orderSweepInterval);
+        .to(cleanerConfigStore.getLong("orderSweepInterval", 1 * 60 * 1000));
 
-    OrderSweepType sweepType;
-    try {
-      sweepType = OrderSweepType.valueOf(configuredSweepType);
-    }
-    catch (IllegalArgumentException exc) {
-      LOG.warn("Illegal sweep type {}, using BY_AMOUNT", configuredSweepType, exc);
-      sweepType = OrderSweepType.BY_AMOUNT;
-    }
-    switch (sweepType) {
-      case BY_AGE:
-        bindConstant()
-            .annotatedWith(OrderCleanerTaskByAge.SweepAge.class)
-            .to(cleanerConfigStore.getInt("orderSweepAge", 10 * 60 * 6 * 1000));
-        bind(OrderCleanerTask.class).to(OrderCleanerTaskByAge.class);
-        break;
-      default:
-        bindConstant()
-            .annotatedWith(OrderCleanerTaskByAmount.SweepThreshold.class)
-            .to(cleanerConfigStore.getInt("orderSweepThreshold", 200));
-        bind(OrderCleanerTask.class).to(OrderCleanerTaskByAmount.class);
-    }
+    bindConstant()
+        .annotatedWith(OrderCleanerTask.SweepAge.class)
+        .to(cleanerConfigStore.getInt("orderSweepAge", 24 * 60 * 60 * 1000));
   }
 
   private void configureStandardRemoteKernel() {

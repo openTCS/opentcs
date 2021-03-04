@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -9,21 +8,29 @@
 package org.opentcs.kernel.workingset;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.UniqueTimestampGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +50,7 @@ public class TransportOrderPool {
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(TransportOrderPool.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransportOrderPool.class);
   /**
    * The system's global object pool.
    */
@@ -52,8 +58,7 @@ public class TransportOrderPool {
   /**
    * The timestamp generator for order creation times.
    */
-  private final UniqueTimestampGenerator timestampGenerator
-      = new UniqueTimestampGenerator();
+  private final UniqueTimestampGenerator timestampGenerator = new UniqueTimestampGenerator();
 
   /**
    * Creates a new TransportOrderPool.
@@ -74,7 +79,7 @@ public class TransportOrderPool {
    * order pool's data.
    */
   public TCSObjectPool getObjectPool() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return objectPool;
   }
 
@@ -82,7 +87,7 @@ public class TransportOrderPool {
    * Removes all transport orders from this pool.
    */
   public void clear() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     Set<TCSObject<?>> objects = objectPool.getObjects((Pattern) null);
     Set<String> removableNames = new HashSet<>();
     for (TCSObject<?> curObject : objects) {
@@ -100,10 +105,12 @@ public class TransportOrderPool {
    * @param destinations A list of destinations that are to be travelled to
    * when processing this transport order.
    * @return The newly created transport order.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
-  public TransportOrder createTransportOrder(
-      List<DriveOrder.Destination> destinations) {
-    log.debug("method entry");
+  @Deprecated
+  public TransportOrder createTransportOrder(List<DriveOrder.Destination> destinations) {
+    LOG.debug("method entry");
     // Get a unique ID and name for the new point and create an instance.
     int orderID = objectPool.getUniqueObjectId();
     String orderName = objectPool.getUniqueObjectName("TOrder-", "0000");
@@ -128,15 +135,54 @@ public class TransportOrderPool {
   }
 
   /**
+   * Adds a new transport order to the pool.
+   * This method implicitly adds the transport order to its wrapping sequence, if any.
+   *
+   * @param to The transfer object from which to create the new transport order.
+   * @return The newly created transport order.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   * @throws IllegalArgumentException If the order is supposed to be part of an order sequence, but
+   * the sequence is already complete or the intended vehicles of the two differ.
+   */
+  public TransportOrder createTransportOrder(TransportOrderCreationTO to)
+      throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
+    TransportOrder newOrder = new TransportOrder(objectPool.getUniqueObjectId(),
+                                                 to.getName(),
+                                                 toDestinations(to.getDestinations()),
+                                                 timestampGenerator.getNextTimestamp());
+    newOrder.setIntendedVehicle(getIntendedVehicle(to.getIntendedVehicleName()));
+    newOrder.setDeadline(to.getDeadline().toInstant().toEpochMilli());
+    newOrder.setDispensable(to.isDispensable());
+    newOrder.setWrappingSequence(getWrappingSequence(to));
+    newOrder.getDependencies().addAll(getDependencies(to));
+    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
+      newOrder.setProperty(entry.getKey(), entry.getValue());
+    }
+    objectPool.addObject(newOrder);
+    objectPool.emitObjectEvent(newOrder.clone(), null, TCSObjectEvent.Type.OBJECT_CREATED);
+
+    if (newOrder.getWrappingSequence() != null) {
+      OrderSequence sequence = objectPool.getObject(OrderSequence.class,
+                                                    newOrder.getWrappingSequence());
+      OrderSequence prevSeq = sequence.clone();
+      sequence.addOrder(newOrder.getReference());
+      objectPool.emitObjectEvent(sequence.clone(), prevSeq, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    }
+
+    // Return the newly created transport order.
+    return newOrder;
+  }
+
+  /**
    * Returns the referenced transport order.
    *
    * @param ref A reference to the transport order to return.
    * @return The referenced transport order, or <code>null</code>, if no such
    * order exists.
    */
-  public TransportOrder getTransportOrder(
-      TCSObjectReference<TransportOrder> ref) {
-    log.debug("method entry");
+  public TransportOrder getTransportOrder(TCSObjectReference<TransportOrder> ref) {
+    LOG.debug("method entry");
     return objectPool.getObject(TransportOrder.class, ref);
   }
 
@@ -148,7 +194,7 @@ public class TransportOrderPool {
    * no such order exists.
    */
   public TransportOrder getTransportOrder(String orderName) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return objectPool.getObject(TransportOrder.class, orderName);
   }
 
@@ -163,7 +209,7 @@ public class TransportOrderPool {
    * expression. If no such transport orders exist, the returned set is empty.
    */
   public Set<TransportOrder> getTransportOrders(Pattern regexp) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return objectPool.getObjects(TransportOrder.class, regexp);
   }
 
@@ -175,7 +221,7 @@ public class TransportOrderPool {
    * transport orders exist, the returned set is empty.
    */
   public Set<TransportOrder> getTransportOrders(TransportOrder.State state) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     if (state == null) {
       throw new NullPointerException("state is null");
     }
@@ -196,11 +242,14 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
-  public TransportOrder setTransportOrderDeadline(
-      TCSObjectReference<TransportOrder> ref, long deadline)
+  @Deprecated
+  public TransportOrder setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
+                                                  long deadline)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -222,10 +271,10 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
-  public TransportOrder setTransportOrderState(
-      TCSObjectReference<TransportOrder> ref, TransportOrder.State newState)
+  public TransportOrder setTransportOrderState(TCSObjectReference<TransportOrder> ref,
+                                               TransportOrder.State newState)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -246,12 +295,15 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
   public TransportOrder setTransportOrderIntendedVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -286,7 +338,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -326,7 +378,7 @@ public class TransportOrderPool {
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
       throws ObjectUnknownException, IllegalArgumentException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -352,10 +404,9 @@ public class TransportOrderPool {
    * @throws IllegalStateException If there already is a current drive order or
    * if the list of future drive orders is empty.
    */
-  public TransportOrder setTransportOrderInitialDriveOrder(
-      TCSObjectReference<TransportOrder> ref)
+  public TransportOrder setTransportOrderInitialDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -381,10 +432,9 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
-  public TransportOrder setTransportOrderNextDriveOrder(
-      TCSObjectReference<TransportOrder> ref)
+  public TransportOrder setTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
@@ -430,12 +480,14 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If any of the referenced transport orders
    * does not exist.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
-  public TransportOrder addTransportOrderDependency(
-      TCSObjectReference<TransportOrder> orderRef,
-      TCSObjectReference<TransportOrder> newDepRef)
+  @Deprecated
+  public TransportOrder addTransportOrderDependency(TCSObjectReference<TransportOrder> orderRef,
+                                                    TCSObjectReference<TransportOrder> newDepRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -463,12 +515,14 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If any of the referenced transport orders
    * does not exist.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
-  public TransportOrder removeTransportOrderDependency(
-      TCSObjectReference<TransportOrder> orderRef,
-      TCSObjectReference<TransportOrder> rmDepRef)
+  @Deprecated
+  public TransportOrder removeTransportOrderDependency(TCSObjectReference<TransportOrder> orderRef,
+                                                       TCSObjectReference<TransportOrder> rmDepRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -495,11 +549,10 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If any of the referenced transport orders
    * does not exist.
    */
-  public TransportOrder addTransportOrderRejection(
-      TCSObjectReference<TransportOrder> orderRef,
-      Rejection newRejection)
+  public TransportOrder addTransportOrderRejection(TCSObjectReference<TransportOrder> orderRef,
+                                                   Rejection newRejection)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -520,12 +573,15 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
   public TransportOrder setTransportOrderWrappingSequence(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -556,12 +612,14 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
-  public TransportOrder setTransportOrderDispensable(
-      TCSObjectReference<TransportOrder> orderRef,
-      boolean dispensable)
+  @Deprecated
+  public TransportOrder setTransportOrderDispensable(TCSObjectReference<TransportOrder> orderRef,
+                                                     boolean dispensable)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
     if (order == null) {
       throw new ObjectUnknownException(orderRef);
@@ -582,26 +640,20 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
-  public TransportOrder removeTransportOrder(
-      TCSObjectReference<TransportOrder> ref)
+  public TransportOrder removeTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
     if (order == null) {
       throw new ObjectUnknownException(ref);
     }
-    TransportOrder previousState = order.clone();
     // Make sure orders currently being processed are not removed.
-    switch (order.getState()) {
-      case BEING_PROCESSED:
-        throw new IllegalArgumentException("Transport order to be removed is "
-            + "in state " + order.getState());
-      default:
-      // OK, do nothing.
-    }
+    checkArgument(!order.hasState(TransportOrder.State.BEING_PROCESSED),
+                  "Transport order %s is being processed.",
+                  order.getName());
     objectPool.removeObject(ref);
-    objectPool.emitObjectEvent(order.clone(),
-                               previousState,
+    objectPool.emitObjectEvent(null,
+                               order.clone(),
                                TCSObjectEvent.Type.OBJECT_REMOVED);
     return order;
   }
@@ -610,9 +662,12 @@ public class TransportOrderPool {
    * Adds a new order sequence to the pool.
    *
    * @return The newly created order sequence.
+   * @deprecated Use
+   * {@link #createOrderSequence(org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
   public OrderSequence createOrderSequence() {
-    log.debug("method entry");
+    LOG.debug("method entry");
     // Get a unique ID and name for the new point and create an instance.
     int orderID = objectPool.getUniqueObjectId();
     String orderName = objectPool.getUniqueObjectName("OrderSeq-", "0000");
@@ -633,6 +688,30 @@ public class TransportOrderPool {
   }
 
   /**
+   * Adds a new order sequence to the pool.
+   *
+   * @param to The transfer object from which to create the new order sequence.
+   * @return The newly created order sequence.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   */
+  public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
+      throws ObjectExistsException, ObjectUnknownException {
+    OrderSequence newSequence = new OrderSequence(objectPool.getUniqueObjectId(), to.getName());
+    newSequence.setIntendedVehicle(getIntendedVehicle(to.getIntendedVehicleName()));
+    newSequence.setFailureFatal(to.isFailureFatal());
+    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
+      newSequence.setProperty(entry.getKey(), entry.getValue());
+    }
+    objectPool.addObject(newSequence);
+    objectPool.emitObjectEvent(newSequence.clone(),
+                               null,
+                               TCSObjectEvent.Type.OBJECT_CREATED);
+    // Return the newly created transport order.
+    return newSequence;
+  }
+
+  /**
    * Returns the referenced order sequence.
    *
    * @param ref A reference to the order sequence to return.
@@ -640,7 +719,7 @@ public class TransportOrderPool {
    * sequence exists.
    */
   public OrderSequence getOrderSequence(TCSObjectReference<OrderSequence> ref) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return objectPool.getObject(OrderSequence.class, ref);
   }
 
@@ -652,7 +731,7 @@ public class TransportOrderPool {
    * no such sequence exists.
    */
   public OrderSequence getOrderSequence(String seqName) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return objectPool.getObject(OrderSequence.class, seqName);
   }
 
@@ -666,7 +745,7 @@ public class TransportOrderPool {
    * expression. If no such sequences exist, the returned set is empty.
    */
   public Set<OrderSequence> getOrderSequences(Pattern regexp) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     return objectPool.getObjects(OrderSequence.class, regexp);
   }
 
@@ -681,12 +760,15 @@ public class TransportOrderPool {
    * @throws IllegalArgumentException If the sequence is already marked as
    * <em>complete</em>, if the sequence already contains the given order or
    * if the given transport order has already been activated.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
   public OrderSequence addOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException, IllegalArgumentException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -731,12 +813,14 @@ public class TransportOrderPool {
    * @return The modified order sequence.
    * @throws ObjectUnknownException If the referenced transport order or order
    * sequence are not in this pool.
+   * @deprecated Usage unclear. Handling of subsequent orders in the sequence is fuzzy.
    */
+  @Deprecated
   public OrderSequence removeOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -766,7 +850,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       int index)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -790,7 +874,7 @@ public class TransportOrderPool {
   public OrderSequence setOrderSequenceComplete(
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -814,7 +898,7 @@ public class TransportOrderPool {
   public OrderSequence setOrderSequenceFinished(
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -835,12 +919,15 @@ public class TransportOrderPool {
    * @return The modified order sequence.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use
+   * {@link #createOrderSequence(org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
   public OrderSequence setOrderSequenceFailureFatal(
       TCSObjectReference<OrderSequence> seqRef,
       boolean fatal)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -862,12 +949,15 @@ public class TransportOrderPool {
    * @return The modified order sequence.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use
+   * {@link #createOrderSequence(org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
   public OrderSequence setOrderSequenceIntendedVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -902,7 +992,7 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
     if (sequence == null) {
       throw new ObjectUnknownException(seqRef);
@@ -929,13 +1019,11 @@ public class TransportOrderPool {
    *
    * @param ref A reference to the order sequence to be removed.
    * @return The removed order sequence.
-   * @throws ObjectUnknownException If the referenced transport order is not
-   * in this pool.
+   * @throws ObjectUnknownException If the referenced order sequence is not in this pool.
    */
-  public OrderSequence removeOrderSequence(
-      TCSObjectReference<OrderSequence> ref)
+  public OrderSequence removeOrderSequence(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, ref);
     if (sequence == null) {
       throw new ObjectUnknownException(ref);
@@ -948,4 +1036,95 @@ public class TransportOrderPool {
                                TCSObjectEvent.Type.OBJECT_REMOVED);
     return sequence;
   }
+
+  /**
+   * Removes a completed order sequence including its transport orders.
+   *
+   * @param ref A reference to the order sequence.
+   * @throws ObjectUnknownException If the referenced order sequence is not in this pool.
+   * @throws IllegalArgumentException If the order sequence is not finished, yet.
+   */
+  public void removeFinishedOrderSequenceAndOrders(TCSObjectReference<OrderSequence> ref)
+      throws ObjectUnknownException, IllegalArgumentException {
+    OrderSequence sequence = objectPool.getObject(OrderSequence.class, ref);
+    if (sequence == null) {
+      throw new ObjectUnknownException(ref);
+    }
+    checkArgument(sequence.isFinished(), "Order sequence %s is not finished", sequence.getName());
+    OrderSequence previousState = sequence.clone();
+    objectPool.removeObject(ref);
+    objectPool.emitObjectEvent(null, previousState, TCSObjectEvent.Type.OBJECT_REMOVED);
+    // Also remove all orders in the sequence.
+    for (TCSObjectReference<TransportOrder> orderRef : sequence.getOrders()) {
+      removeTransportOrder(orderRef);
+    }
+  }
+
+  private Set<TCSObjectReference<TransportOrder>> getDependencies(TransportOrderCreationTO to)
+      throws ObjectUnknownException {
+    Set<TCSObjectReference<TransportOrder>> result = new HashSet<>();
+    for (String dependencyName : to.getDependencyNames()) {
+      TransportOrder dep = getTransportOrder(dependencyName);
+      if (dep == null) {
+        throw new ObjectUnknownException(dependencyName);
+      }
+      result.add(dep.getReference());
+    }
+    return result;
+  }
+
+  private TCSObjectReference<OrderSequence> getWrappingSequence(TransportOrderCreationTO to)
+      throws ObjectUnknownException, IllegalArgumentException {
+    if (to.getWrappingSequence() == null) {
+      return null;
+    }
+    OrderSequence sequence = getOrderSequence(to.getWrappingSequence());
+    if (sequence == null) {
+      throw new ObjectUnknownException(to.getWrappingSequence());
+    }
+    checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
+    checkArgument(Objects.equals(to.getIntendedVehicleName(),
+                                 sequence.getIntendedVehicle().getName()),
+                  "Order sequence %s has different intended vehicle than order %s: %s != %s",
+                  sequence,
+                  to.getName(),
+                  sequence.getIntendedVehicle(),
+                  to.getIntendedVehicleName());
+    return sequence.getReference();
+  }
+
+  private TCSObjectReference<Vehicle> getIntendedVehicle(String vehicleName)
+      throws ObjectUnknownException {
+    if (vehicleName == null) {
+      return null;
+    }
+    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleName);
+    if (vehicle == null) {
+      throw new ObjectUnknownException(vehicleName);
+    }
+    return vehicle.getReference();
+  }
+
+  private List<DriveOrder.Destination> toDestinations(List<DestinationCreationTO> dests)
+      throws ObjectUnknownException {
+    List<DriveOrder.Destination> result = new LinkedList<>();
+    for (DestinationCreationTO destTo : dests) {
+      TCSObject<?> destObject = objectPool.getObject(destTo.getDestLocationName());
+      TCSObjectReference<Location> destRef;
+      if (destObject instanceof Location) {
+        destRef = ((Location) destObject).getReference();
+      }
+      else if (destObject instanceof Point) {
+        destRef = TCSObjectReference.getDummyReference(Location.class, destTo.getDestLocationName());
+      }
+      else {
+        throw new ObjectUnknownException(destTo.getDestLocationName());
+      }
+      result.add(new DriveOrder.Destination(destRef,
+                                            destTo.getDestOperation(),
+                                            destTo.getProperties()));
+    }
+    return result;
+  }
+
 }

@@ -42,11 +42,9 @@ import org.opentcs.guing.application.action.view.AddDrawingViewAction;
 import org.opentcs.guing.application.action.view.AddTransportOrderSequenceView;
 import org.opentcs.guing.application.action.view.AddTransportOrderView;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
-import org.opentcs.guing.application.action.view.LoadViewBookmarkAction;
 import org.opentcs.guing.application.action.view.LocationThemeAction;
 import org.opentcs.guing.application.action.view.PauseAllVehiclesAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
-import org.opentcs.guing.application.action.view.SaveViewBookmarkAction;
 import org.opentcs.guing.application.action.view.VehicleThemeAction;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.VehicleThemeManager;
@@ -66,8 +64,6 @@ public class ViewActionMap
                        VehicleThemeManager vehicleThemeManager,
                        ActionFactory actionFactory,
                        CreateTransportOrderAction createTransportOrderAction,
-                       LoadViewBookmarkAction loadViewBookmarkAction,
-                       SaveViewBookmarkAction saveViewBookmarkAction,
                        FindVehicleAction findVehicleAction,
                        PauseAllVehiclesAction pauseAllVehiclesAction,
                        CreateGroupAction createGroupAction,
@@ -78,8 +74,6 @@ public class ViewActionMap
     requireNonNull(vehicleThemeManager, "vehicleThemeManager");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(createTransportOrderAction, "createTransportOrderAction");
-    requireNonNull(loadViewBookmarkAction, "loadViewBookmarkAction");
-    requireNonNull(saveViewBookmarkAction, "saveViewBookmarkAction");
     requireNonNull(findVehicleAction, "findVehicleAction");
     requireNonNull(pauseAllVehiclesAction, "pauseAllVehiclesAction");
     requireNonNull(createGroupAction, "createGroupAction");
@@ -159,8 +153,6 @@ public class ViewActionMap
       action.putValue(Action.NAME, id);
     }
 
-    put(LoadViewBookmarkAction.ID, loadViewBookmarkAction);
-    put(SaveViewBookmarkAction.ID, saveViewBookmarkAction);
     put(AddBitmapAction.ID, new AddBitmapAction(view));
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));
 

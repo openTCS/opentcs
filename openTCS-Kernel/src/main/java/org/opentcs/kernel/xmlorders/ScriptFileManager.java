@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2009 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -12,21 +11,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import java.util.UUID;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.data.ObjectUnknownException;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.xmlorders.binding.Destination;
 import org.opentcs.kernel.xmlorders.binding.TCSScriptFile;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public final class ScriptFileManager {
+public class ScriptFileManager {
 
   /**
    * This class's Logger.
@@ -57,15 +58,13 @@ public final class ScriptFileManager {
    * @param dir The application's home directory.
    */
   @Inject
-  public ScriptFileManager(LocalKernel kernel,
-                           @ApplicationHome File dir) {
-    localKernel = Objects.requireNonNull(kernel);
-    Objects.requireNonNull(dir);
+  public ScriptFileManager(@Nonnull LocalKernel kernel, @Nonnull @ApplicationHome File dir) {
+    localKernel = requireNonNull(kernel, "kernel");
+    requireNonNull(dir, "dir");
     scriptDir = new File(dir, "scripts");
-    if (!scriptDir.isDirectory() && !scriptDir.mkdirs()) {
-      throw new IllegalArgumentException(scriptDir.getPath()
-          + " is not an existing directory and could not be created, either.");
-    }
+    checkArgument(scriptDir.isDirectory() || scriptDir.mkdirs(),
+                  "%s is not an existing directory and could not be created, either.",
+                  scriptDir.getPath());
     // Create a template for script files if it doesn't exist, yet.
     createTemplate(new File(scriptDir, "template.tcs"));
   }
@@ -118,72 +117,41 @@ public final class ScriptFileManager {
    */
   public List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws IOException {
-    if (fileName == null) {
-      throw new NullPointerException("fileName is null");
-    }
+    requireNonNull(fileName, "fileName");
+
     List<TransportOrder> result = new LinkedList<>();
     TCSScriptFile scriptFile = getScriptFile(fileName);
-    TCSObjectReference<TransportOrder> prevOrderRef = null;
+    String prevOrderName = null;
     for (TCSScriptFile.Order curOrder : scriptFile.getOrders()) {
-      TransportOrder order = createTransportOrder(curOrder.getDestinations());
-      setIntendedVehicle(order, curOrder.getIntendedVehicle());
-      if (prevOrderRef != null) {
-        localKernel.addTransportOrderDependency(order.getReference(),
-                                                prevOrderRef);
+
+      TransportOrderCreationTO orderTO
+          = new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+                                         createDestinations(curOrder.getDestinations()))
+              .setIntendedVehicleName(curOrder.getIntendedVehicle());
+      if (scriptFile.getSequentialDependencies() && prevOrderName != null) {
+        orderTO.getDependencyNames().add(prevOrderName);
       }
+
+      TransportOrder order = localKernel.createTransportOrder(orderTO);
       localKernel.activateTransportOrder(order.getReference());
-      if (scriptFile.getSequentialDependencies()) {
-        prevOrderRef = order.getReference();
-      }
+
       result.add(order);
+
+      prevOrderName = order.getName();
     }
     return result;
   }
 
-  /**
-   * Creates a transport order.
-   * 
-   * @param destinations The destinations of this order.
-   * @return The newly created transport order.
-   */
-  TransportOrder createTransportOrder(List<Destination> destinations) {
-    List<DriveOrder.Destination> realDests
-        = new LinkedList<>();
+  private List<DestinationCreationTO> createDestinations(List<Destination> destinations) {
+    List<DestinationCreationTO> result = new ArrayList<>();
     for (Destination curDest : destinations) {
-      // XXX Avoid NullPointerException if location doesn't exist.
-      Location curLoc = localKernel.getTCSObject(Location.class,
-                                                 curDest.getLocationName());
-      if (curLoc == null) {
-        throw new ObjectUnknownException("Unknown destination location: "
-            + curDest.getLocationName());
-      }
-      TCSObjectReference<Location> curDestLoc = curLoc.getReference();
-      String curDestOp = curDest.getOperation();
-      realDests.add(new DriveOrder.Destination(curDestLoc, curDestOp));
+      result.add(new DestinationCreationTO(curDest.getLocationName(), curDest.getOperation()));
     }
-    return localKernel.createTransportOrder(realDests);
-  }
-
-  /**
-   * Sets the intended vehicle.
-   * 
-   * @param order The transport order the vehicle shall be set.
-   * @param vehicleName The name of the vehicle.
-   */
-  void setIntendedVehicle(TransportOrder order, String vehicleName) {
-    if (vehicleName != null && !vehicleName.isEmpty()) {
-      Vehicle vehicle = localKernel.getTCSObject(Vehicle.class, vehicleName);
-      if (vehicle == null) {
-        // XXX Set state of created order to FAILED?
-        throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
-      }
-      localKernel.setTransportOrderIntendedVehicle(order.getReference(),
-                                                   vehicle.getReference());
-    }
+    return result;
   }
 
   private void createTemplate(File templateFile) {
-    Objects.requireNonNull(templateFile);
+    requireNonNull(templateFile, "templateFile");
     if (templateFile.exists()) {
       return;
     }
@@ -200,10 +168,8 @@ public final class ScriptFileManager {
     order.getDestinations().add(dest);
     order.setIntendedVehicle("The intended vehicle");
     scriptFile.getOrders().add(order);
-    try {
-      Writer writer = new FileWriter(new File(scriptDir, "template.tcs"));
+    try (Writer writer = new FileWriter(new File(scriptDir, "template.tcs"))) {
       writer.write(scriptFile.toXml());
-      writer.close();
     }
     catch (IOException exc) {
       LOG.warn("Exception writing template script", exc);

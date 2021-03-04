@@ -1,24 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.documentation;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.data.TCSObjectReference;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
-import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.TransportOrder;
 
@@ -33,17 +37,14 @@ public class CreateTransportOrderTest {
 
   private LocalKernel localKernel;
 
-  private Vehicle vehicle;
-
   @Before
   public void setUp() {
     localKernel = mock(LocalKernel.class);
-    vehicle = new Vehicle(3, "Vehicle");
-    when(localKernel.createTransportOrder(any()))
+    when(localKernel.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenReturn(new TransportOrder(
             2,
             "Transportorder",
-            Collections.singletonList(new Destination(getSampleDestinationLocation().getReference(),
+            Collections.singletonList(new Destination(someDestinationLocation().getReference(),
                                                       getDestinationOperation())),
             0));
   }
@@ -52,41 +53,35 @@ public class CreateTransportOrderTest {
   public void shouldCreateAndActivateTransportOrder() {
     // tag::documentation_createNewTransportOrder[]
     // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    Kernel kernel = getAKernelReference();
 
-    // A list of Destination instances the transport order shall consist of:
-    List<Destination> destinations = new LinkedList<>();
+    // A list of destinations the transport order the vehicle is supposed
+    // to travel to:
+    List<DestinationCreationTO> destinations = new LinkedList<>();
+    // Create a new destination description and add it to the list.
+    // Every destination is described by the name of the destination
+    // location in the plant model and an operation the vehicle is supposed
+    // to perform there:
+    destinations.add(new DestinationCreationTO("Some location name",
+                                               "Some operation"));
+    // Add as many destinations to the list like this as necessary. Then
+    // create a transport order description with a name for the new transport
+    // order and the list of destinations.
+    // Note that the given name needs to be unique.
+    TransportOrderCreationTO orderTO
+        = new TransportOrderCreationTO("MyTransportOrder-" + UUID.randomUUID(),
+                                       destinations);
+    // Optionally, assign a specific vehicle to the transport order:
+    orderTO.setIntendedVehicleName("Some vehicle name");
+    // Optionally, set a deadline for the transport order:
+    orderTO.setDeadline(ZonedDateTime.of(2099, 12, 31, 23, 59, 59, 0, ZoneId.of("Europe/Berlin")));
 
-    // Every single destination of the order has to be added to the list like this:
-    // Get a reference to the location to move to...
-    // (You can get a set of all existing Location instances using
-    // kernel.getTCSObjects(Location.class).)
-    Location destLoc = getSampleDestinationLocation();
-    TCSObjectReference<Location> destLocRef = destLoc.getReference();
-
-    // ...and an operation the vehicle should execute at the location.
-    // (You can get a list of all operations allowed at the chosen location by
-    // looking into the LocationType instance that destLoc.getType() references.)
-    String destOp = getDestinationOperation();
-    // Create a new Destination instance and add it to the list.
-    destinations.add(new Destination(destLocRef, destOp));
-
-    // Add as many destinations to the list like this as necessary.
-    // Eventually create a new transport order with these destinations:
-    TransportOrder newOrder = kernel.createTransportOrder(destinations);
-
-    // Assign a vehicle to the transport order (optional)
-    kernel.setTransportOrderIntendedVehicle(newOrder.getReference(),
-                                            getSampleVehicle().getReference());
-
-    // Assign a deadline to the transport order (optional)
-    kernel.setTransportOrderDeadline(newOrder.getReference(),
-                                     getSampleTimestamp());
-
+    // Create a new transport order for the given description:
+    TransportOrder newOrder = kernel.createTransportOrder(orderTO);
     // And at last activate the transport order
     kernel.activateTransportOrder(newOrder.getReference());
-    // Once a vehicle is available and able to process the transport order, the
-    // kernel will assign it immediately.
+    // Once a vehicle is available and able to process the transport order,
+    // the kernel will assign it.
     // end::documentation_createNewTransportOrder[]
   }
 
@@ -94,53 +89,32 @@ public class CreateTransportOrderTest {
   public void shouldCreateTransportOrderToAPoint() {
     // tag::documentation_createNewTransportOrderToPoint[]
     // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    Kernel kernel = getAKernelReference();
 
-    // The point the vehicle shall be sent to
-    Point destPos = getSamplePoint();
+    // Create a list containing a single destination to a point.
+    // Use Destination.OP_MOVE as the operation to be executed:
+    List<DestinationCreationTO> destinations = new LinkedList<>();
+    destinations.add(new DestinationCreationTO("Some point name",
+                                               Destination.OP_MOVE));
+    // Create a transport order description with the destination and a
+    // unique name and assign it to a specific vehicle:
+    TransportOrderCreationTO orderTO
+        = new TransportOrderCreationTO("MyTransportOrder-" + UUID.randomUUID(),
+                                       destinations)
+            .setIntendedVehicleName("Some vehicle name");
 
-    // Wrap the name of the point in a dummy location reference
-    TCSObjectReference<Location> dummyLocRef
-        = TCSObjectReference.getDummyReference(Location.class, destPos.getName());
-
-    // Create a Destination instance using the dummy location reference and use
-    // Destination.OP_MOVE as the operation to be executed.
-    Destination dummyDest = new Destination(dummyLocRef, Destination.OP_MOVE);
-
-    // Wrap the Destination instance in a list.
-    List<Destination> dummyDests = Collections.singletonList(dummyDest);
-
-    // Create a transport order using the list
-    TransportOrder dummyOrder = kernel.createTransportOrder(dummyDests);
-    // Assign a specific vehicle to the transport order (optional)
-    kernel.setTransportOrderIntendedVehicle(dummyOrder.getReference(),
-                                            vehicle.getReference());
-
-    // Activate the new transport order
+    // Create a transport order using the description:
+    TransportOrder dummyOrder = kernel.createTransportOrder(orderTO);
+    // Activate the new transport order:
     kernel.activateTransportOrder(dummyOrder.getReference());
-
-    // Once a vehicle is available and able to process the transport order, the
-    // kernel will assign it immediately.
     // end::documentation_createNewTransportOrderToPoint[]
   }
 
-  private Point getSamplePoint() {
-    return new Point(5, "Point");
-  }
-
-  private Location getSampleDestinationLocation() {
+  private Location someDestinationLocation() {
     return new Location(0, "Location", new LocationType(1, "LocationType").getReference());
   }
 
-  private Vehicle getSampleVehicle() {
-    return vehicle;
-  }
-
-  private long getSampleTimestamp() {
-    return 0;
-  }
-
-  private LocalKernel getKernelFromSomewhere() {
+  private LocalKernel getAKernelReference() {
     return localKernel;
   }
 

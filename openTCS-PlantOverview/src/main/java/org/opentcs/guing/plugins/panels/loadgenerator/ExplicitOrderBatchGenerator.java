@@ -8,16 +8,17 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.order.DriveOrder;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.order.TransportOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,32 +70,25 @@ class ExplicitOrderBatchGenerator
 
   private TransportOrder createSingleOrder(TransportOrderData curData)
       throws KernelRuntimeException {
-    List<DriveOrder.Destination> destinations = new LinkedList<>();
-    for (DriveOrderStructure currentOrder : curData.getDriveOrders()) {
-      // Get the target of the drive order
-      Location destLoc = kernel.getTCSObject(Location.class,
-                                             currentOrder.getDriveOrderLocation());
-      // Get the operation of the drive order
-      String destOp
-          = currentOrder.getDriveOrderVehicleOperation();
-      // Add the drive order to the list
-      destinations.add(new DriveOrder.Destination(destLoc.getReference(),
-                                                  destOp));
-    }
+    TransportOrder newOrder = kernel.createTransportOrder(
+        new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+                                     createDestinations(curData.getDriveOrders()))
+            .setDeadline(ZonedDateTime.now().plusSeconds(curData.getDeadline().getTime() / 1000))
+            .setIntendedVehicleName(curData.getIntendedVehicle() == null
+                ? null
+                : curData.getIntendedVehicle().getName())
+            .setProperties(curData.getProperties()));
 
-    // Create a new transport order, set the indended vehicle, 
-    // the deadline, the properties and acivate it
-    TransportOrder newOrder = kernel.createTransportOrder(destinations);
-    kernel.setTransportOrderIntendedVehicle(newOrder.getReference(),
-                                            curData.getIntendedVehicle());
-    kernel.setTransportOrderDeadline(newOrder.getReference(),
-                                     curData.getDeadline().getTime());
-    for (Map.Entry<String, String> curEntry : curData.getProperties().entrySet()) {
-      kernel.setTCSObjectProperty(newOrder.getReference(),
-                                  curEntry.getKey(),
-                                  curEntry.getValue());
-    }
     kernel.activateTransportOrder(newOrder.getReference());
     return newOrder;
+  }
+
+  private List<DestinationCreationTO> createDestinations(List<DriveOrderStructure> structures) {
+    List<DestinationCreationTO> result = new ArrayList<>();
+    for (DriveOrderStructure currentOrder : structures) {
+      result.add(new DestinationCreationTO(currentOrder.getDriveOrderLocation().getName(),
+                                           currentOrder.getDriveOrderVehicleOperation()));
+    }
+    return result;
   }
 }

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -13,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
-import javax.xml.bind.annotation.XmlType;
+import javax.annotation.Nullable;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 
@@ -49,7 +48,7 @@ public class DriveOrder
    *
    * @param orderDestination This drive order's destination.
    */
-  public DriveOrder(Destination orderDestination) {
+  public DriveOrder(@Nonnull Destination orderDestination) {
     destination = requireNonNull(orderDestination, "orderDestination");
   }
 
@@ -58,6 +57,7 @@ public class DriveOrder
    *
    * @return This drive order's destination.
    */
+  @Nonnull
   public Destination getDestination() {
     return destination;
   }
@@ -67,6 +67,7 @@ public class DriveOrder
    *
    * @return A reference to the transport order this drive order belongs to.
    */
+  @Nullable
   public TCSObjectReference<TransportOrder> getTransportOrder() {
     return transportOrder;
   }
@@ -76,7 +77,7 @@ public class DriveOrder
    *
    * @param transportOrder A reference to the transport order.
    */
-  public void setTransportOrder(TCSObjectReference<TransportOrder> transportOrder) {
+  public void setTransportOrder(@Nullable TCSObjectReference<TransportOrder> transportOrder) {
     this.transportOrder = transportOrder;
   }
 
@@ -86,6 +87,7 @@ public class DriveOrder
    * @return This drive order's route. May be <code>null</code> if this drive
    * order's route hasn't been calculated, yet.
    */
+  @Nullable
   public Route getRoute() {
     return route;
   }
@@ -95,7 +97,7 @@ public class DriveOrder
    *
    * @param newRoute This drive order's new route.
    */
-  public void setRoute(Route newRoute) {
+  public void setRoute(@Nullable Route newRoute) {
     route = newRoute;
   }
 
@@ -104,6 +106,7 @@ public class DriveOrder
    *
    * @return This drive order's state.
    */
+  @Nonnull
   public State getState() {
     return state;
   }
@@ -113,7 +116,7 @@ public class DriveOrder
    *
    * @param newState This drive order's new state.
    */
-  public void setState(State newState) {
+  public void setState(@Nonnull State newState) {
     state = requireNonNull(newState, "newState");
   }
 
@@ -205,6 +208,7 @@ public class DriveOrder
      *
      * @return The destination location.
      */
+    @Nonnull
     public TCSObjectReference<Location> getLocation() {
       return location;
     }
@@ -214,6 +218,7 @@ public class DriveOrder
      *
      * @return The operation to be performed at the destination location.
      */
+    @Nonnull
     public String getOperation() {
       return operation;
     }
@@ -223,6 +228,7 @@ public class DriveOrder
      *
      * @return The properties of this destination.
      */
+    @Nonnull
     public Map<String, String> getProperties() {
       return properties;
     }
@@ -268,7 +274,6 @@ public class DriveOrder
   /**
    * This enumeration defines the various states a DriveOrder may be in.
    */
-  @XmlType(name = "driveOrderState")
   public enum State {
 
     /**

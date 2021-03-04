@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -30,6 +29,8 @@ import static org.mockito.Mockito.verify;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.opentcs.TestEnvironment;
+import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 
@@ -196,10 +197,9 @@ public class XMLFileModelPersisterTest {
   }
 
   private Model createTestModel(String name) {
-    Model model = new Model(
-        new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
-    model.createPoint(null);
-    model.createVehicle(null);
+    Model model = new Model(new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
+    model.createPoint(new PointCreationTO("testPointName"));
+    model.createVehicle(new VehicleCreationTO("testVehicleName"));
     model.setName(name);
     return model;
   }

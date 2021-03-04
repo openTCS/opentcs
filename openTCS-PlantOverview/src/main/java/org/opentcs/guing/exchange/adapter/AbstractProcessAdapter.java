@@ -10,6 +10,7 @@
 package org.opentcs.guing.exchange.adapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -19,10 +20,9 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Basic implementation of a <code>ProcessAdapter</code>.
@@ -34,12 +34,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractProcessAdapter
     implements ProcessAdapter {
-
-  /**
-   * This class's logger.
-   */
-  private static final Logger log
-      = LoggerFactory.getLogger(AbstractProcessAdapter.class);
 
   /**
    * The <code>ModelComponent</code>.
@@ -100,6 +94,27 @@ public abstract class AbstractProcessAdapter
       for (KeyValueProperty p : misc.getItems()) {
         kernel.setTCSObjectProperty(ref, p.getKey(), p.getValue());
       }
+    }
+  }
+
+  protected Map<String, String> getKernelProperties() {
+    Map<String, String> result = new HashMap<>();
+
+    KeyValueSetProperty misc = (KeyValueSetProperty) getModel().getProperty(
+        ModelComponent.MISCELLANEOUS);
+
+    if (misc != null) {
+      for (KeyValueProperty p : misc.getItems()) {
+        result.put(p.getKey(), p.getValue());
+      }
+    }
+
+    return result;
+  }
+
+  protected void unmarkAllPropertiesChanged() {
+    for (Property prop : getModel().getProperties().values()) {
+      prop.unmarkChanged();
     }
   }
 

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2009 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -27,6 +26,7 @@ import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the openTCS kernel must provide which are not accessible
@@ -37,6 +37,28 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 public interface LocalKernel
     extends Kernel,
             Lifecycle {
+
+  /**
+   * Loads the saved model into the kernel.
+   * If there is no saved model, a new empty model will be loaded.
+   *
+   * @throws IllegalStateException If the model cannot be loaded.
+   * @throws CredentialsException If the calling client is not allowed to
+   * execute this method.
+   */
+  void loadPlantModel()
+      throws CredentialsException, IllegalStateException;
+
+  /**
+   * Saves the current model under the given name.
+   * If there is a saved model, it will be overwritten.
+   *
+   * @throws IllegalStateException If the model could not be persisted for some reason.
+   * @throws CredentialsException If the calling client is not allowed to
+   * execute this method.
+   */
+  void savePlantModel()
+      throws CredentialsException, IllegalStateException;
 
   /**
    * Returns a single TCSObject of the given class.
@@ -388,7 +410,11 @@ public interface LocalKernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setTransportOrderWrappingSequence(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<OrderSequence> seqRef)
@@ -403,7 +429,11 @@ public interface LocalKernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setTransportOrderDispensable(TCSObjectReference<TransportOrder> orderRef,
                                     boolean dispensable)
       throws ObjectUnknownException, CredentialsException;

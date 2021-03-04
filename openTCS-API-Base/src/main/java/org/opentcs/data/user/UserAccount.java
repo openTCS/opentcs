@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -11,13 +10,17 @@ package org.opentcs.data.user;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Instances of this class store user account data, including name, password
  * and granted permissions of the user.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated User management via kernel interaction will not be supported in the future.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class UserAccount
     implements Serializable {
 

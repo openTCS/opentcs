@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
 /*
  *
  * Created on June 8, 2006, 9:15 AM
@@ -17,9 +24,7 @@ import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.opentcs.data.ObjectExistsException;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectEvent;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.util.eventsystem.TCSEvent;
@@ -46,11 +51,8 @@ public class TCSObjectPoolTest {
     pool = null;
   }
 
-  /**
-   * Test for method getObject(Class<T> clazz, String name)
-   */
   @Test
-  public void testGetObjectByClassAndName() {
+  public void shouldReturnObjectByClassAndName() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -60,11 +62,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, pool.getObject(Point.class, "Point-00002"));
   }
 
-  /**
-   * Test for method getObject(String name)
-   */
   @Test
-  public void testGetObjectByName() {
+  public void shouldReturnObjectByName() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -74,11 +73,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, pool.getObject("Point-00002"));
   }
 
-  /**
-   * Test for method getObject(Class<T> clazz, TCSObjectReference<T> ref)
-   */
   @Test
-  public void testGetObjectByClassAndRef() {
+  public void shouldReturnObjectByClassAndRef() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -88,11 +84,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, pool.getObject(Point.class, point2.getReference()));
   }
 
-  /**
-   * Test for method getObject(TCSObjectReference<?> ref)
-   */
   @Test
-  public void testGetObjectByRef() {
+  public void shouldReturnObjectByRef() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -102,11 +95,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, pool.getObject(point2.getReference()));
   }
 
-  /**
-   * Test for method getObjects(Class<T> clazz, Pattern regexp)
-   */
   @Test
-  public void testGetObjectsByClassAndPattern() {
+  public void shouldReturnObjectsByClassAndPattern() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -123,11 +113,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, it.next());
   }
 
-  /**
-   * Test for method getObjects(Class<T> clazz)
-   */
   @Test
-  public void testGetObjectsByClass() {
+  public void shouldReturnObjectsByClass() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -144,11 +131,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, it.next());
   }
 
-  /**
-   * Test for method getObjects(Pattern regexp)
-   */
   @Test
-  public void testGetObjectsByPattern() {
+  public void shouldReturnObjectsByPattern() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -164,11 +148,8 @@ public class TCSObjectPoolTest {
     assertEquals(point2, it.next());
   }
 
-  /**
-   * Test for method removeObject(TCSObjectReference<?> ref)
-   */
   @Test
-  public void testRemoveObjectByRef() {
+  public void shouldRemoveObjectByRef() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     assertEquals(point1, pool.getObject("Point-00001"));
@@ -176,11 +157,8 @@ public class TCSObjectPoolTest {
     assertNull(pool.getObject("Point-00001"));
   }
 
-  /**
-   * Test for method removeObjects(Set<String> objectNames)
-   */
   @Test
-  public void testRemoveObjectsByName() {
+  public void shouldRemoveObjectsByName() {
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
     Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
@@ -197,9 +175,6 @@ public class TCSObjectPoolTest {
     assertNull(pool.getObject("Point-00002"));
   }
 
-  /**
-   * Test for method emitObjectEvent()
-   */
   @Test
   public void shouldEmitEventForCreatedObject() {
     MBassador<Object> eventBus = new MBassador<>(BusConfiguration.Default());
@@ -221,11 +196,8 @@ public class TCSObjectPoolTest {
     assertEquals(1, receivedEvents.size());
   }
 
-  /**
-   * Verify that adding objects with duplicate names is refused by the pool.
-   */
   @Test(expected = ObjectExistsException.class)
-  public void testAddingDuplicateNames() {
+  public void shouldThrowIfAddingExistingName() {
     // A few initial objects
     Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
     pool.addObject(point1);
@@ -255,45 +227,4 @@ public class TCSObjectPoolTest {
     // Add a name that should already exist in the pool, and expect an exception.
     pool.addObject(new Point(pool.getUniqueObjectId(), "ABC050"));
   }
-
-  @Test(expected = ObjectUnknownException.class)
-  public void testRenamingUnknownObjectThrowsException() {
-    // A few initial objects
-    Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
-    pool.addObject(point1);
-    Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
-    pool.addObject(point2);
-    Point point3 = new Point(pool.getUniqueObjectId(), "Point-00003");
-    pool.addObject(point3);
-    Path path1 = new Path(pool.getUniqueObjectId(), "Path-00001",
-                          point1.getReference(), point2.getReference());
-    pool.addObject(path1);
-    Path path2 = new Path(pool.getUniqueObjectId(), "Path-00002",
-                          point2.getReference(), point1.getReference());
-    pool.addObject(path2);
-    // Try to rename an object that does not exist.
-    TCSObjectReference<Point> point3Ref = point3.getReference();
-    pool.removeObject(point3Ref);
-    pool.renameObject(point3Ref, "Path-00002");
-  }
-
-  @Test(expected = ObjectExistsException.class)
-  public void testRenamingToExistingNameThrowsException() {
-    // A few initial objects
-    Point point1 = new Point(pool.getUniqueObjectId(), "Point-00001");
-    pool.addObject(point1);
-    Point point2 = new Point(pool.getUniqueObjectId(), "Point-00002");
-    pool.addObject(point2);
-    Point point3 = new Point(pool.getUniqueObjectId(), "Point-00003");
-    pool.addObject(point3);
-    Path path1 = new Path(pool.getUniqueObjectId(), "Path-00001",
-                          point1.getReference(), point2.getReference());
-    pool.addObject(path1);
-    Path path2 = new Path(pool.getUniqueObjectId(), "Path-00002",
-                          point2.getReference(), point1.getReference());
-    pool.addObject(path2);
-    // Try to change an object's name to one that exists already.
-    pool.renameObject(point1.getReference(), "Path-00002");
-  }
-
 }

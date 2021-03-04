@@ -1,12 +1,13 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
 package org.opentcs.data.user;
+
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Defines the possible permission flags of kernel clients.
@@ -29,7 +30,11 @@ public enum UserPermission {
   CHANGE_CONFIGURATION,
   /**
    * Indicates the client may create, modify and remove user accounts.
+   *
+   * @deprecated User management via kernel interaction will not be supported in the future.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   MANAGE_USERS,
   /**
    * Indicates the client may load another model.

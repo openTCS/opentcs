@@ -10,22 +10,22 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +41,7 @@ public class LinkAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(LinkAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LinkAdapter.class);
 
   /**
    * Creates a new instance.
@@ -65,29 +64,26 @@ public class LinkAdapter
   public void updateModelProperties(Kernel kernel,
                                     TCSObject<?> tcsObject,
                                     @Nullable ModelLayoutElement layoutElement) {
-    // Do nada.
   }
 
   @Override
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    PointModel point = getModel().getPoint();
-    LocationModel location = getModel().getLocation();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      TCSObjectReference<Point> pointRef = plantModel.getPoints().get(point.getName()).getReference();
-      TCSObjectReference<Location> locRef = plantModel.getLocations().get(location.getName()).getReference();
+      PointModel point = getModel().getPoint();
+      LocationModel location = getModel().getLocation();
 
-      kernel.connectLocationToPoint(locRef, pointRef);
-
-      StringSetProperty pOperations = (StringSetProperty) getModel().getProperty(LinkModel.ALLOWED_OPERATIONS);
-
-      // Set allowed actions
-      for (String operations : pOperations.getItems()) {
-        kernel.addLocationLinkAllowedOperation(locRef, pointRef, operations);
-      }
+      plantModel.getLocations().stream()
+          .filter(loc -> Objects.equals(loc.getName(), location.getName()))
+          .findFirst()
+          .ifPresent(loc -> loc.getLinks().put(point.getName(), getAllowedOperations()));
     }
     catch (ObjectUnknownException | CredentialsException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
+  }
+
+  private Set<String> getAllowedOperations() {
+    StringSetProperty pOperations = (StringSetProperty) getModel().getProperty(LinkModel.ALLOWED_OPERATIONS);
+    return new HashSet<>(pOperations.getItems());
   }
 }

@@ -290,7 +290,7 @@ public class OpenTCSModelManager
       statusPanel.clear();
       return persistModel(systemModel, kernel, kernelPersistor, false);
     }
-    catch (IOException | CredentialsException e) {
+    catch (IllegalStateException | CredentialsException e) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
       LOG.warn("Exception persisting model", e);
@@ -299,6 +299,7 @@ public class OpenTCSModelManager
     catch (IllegalArgumentException e) {
       statusPanel.setLogMessage(Level.SEVERE,
                                 e.getMessage());
+      LOG.warn("Exception persisting model", e);
       return false;
     }
   }
@@ -380,12 +381,13 @@ public class OpenTCSModelManager
    * @param persistor The persistor to be used.
    * @param ignoreError whether the model should be persisted when duplicates exist
    * @return Whether the model was actually saved.
+   * @throws IllegalStateException If there was a problem persisting the model
    */
   private boolean persistModel(SystemModel systemModel,
                                Kernel kernel,
                                ModelKernelPersistor persistor,
                                boolean ignoreError)
-      throws IOException, KernelRuntimeException {
+      throws IllegalStateException, KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
 

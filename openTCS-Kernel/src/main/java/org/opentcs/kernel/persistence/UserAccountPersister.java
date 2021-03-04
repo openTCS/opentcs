@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -10,7 +9,7 @@ package org.opentcs.kernel.persistence;
 
 import java.io.IOException;
 import java.util.Set;
-import org.opentcs.data.user.UserAccount;
+import org.opentcs.kernel.UserAccount;
 
 /**
  * Provides methods to persist and load user account data.

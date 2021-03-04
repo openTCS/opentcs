@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2007 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -27,6 +26,10 @@ import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.queries.Queries;
 import org.opentcs.access.queries.Query;
 import org.opentcs.access.queries.QueryTopologyInfo;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
@@ -71,7 +74,7 @@ abstract class KernelState
     implements Lifecycle {
 
   /**
-   * A global object to be used within the kernel.
+   * A global object to be used for synchronization within the kernel.
    */
   private final Object globalSyncObject;
   /**
@@ -123,10 +126,10 @@ abstract class KernelState
    * Returns the name of the currently saved model.
    *
    * @return The name of the model which is not present when there is no model.
-   * @throws IOException If reading the model name from the model file failed.
+   * @throws IllegalStateException If reading the model name from the model file failed.
    */
   public final Optional<String> getPersistentModelName()
-      throws IOException {
+      throws IllegalStateException {
     return modelPersister.getPersistentModelName();
   }
 
@@ -136,20 +139,38 @@ abstract class KernelState
     }
   }
 
+  public void createPlantModel(PlantModelCreationTO to) {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  @Deprecated
   public void createModel(String modelName) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  public void loadPlantModel()
+      throws IllegalStateException {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  @Deprecated
   public void loadModel()
       throws IOException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  public void savePlantModel()
+      throws IllegalStateException {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  @Deprecated
   public void saveModel(String modelName)
       throws IOException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void removeModel()
       throws IOException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
@@ -233,6 +254,7 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public final void renameTCSObject(TCSObjectReference<?> ref,
                                     String newName)
       throws ObjectUnknownException, ObjectExistsException {
@@ -257,6 +279,7 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
@@ -274,85 +297,105 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public VisualLayout createVisualLayout() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  public VisualLayout createVisualLayout(VisualLayoutCreationTO to) {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  @Deprecated
   public void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                                     double scaleX)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                                     double scaleY)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                                     Map<String, Color> colors)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                       Set<LayoutElement> elements)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                            List<ViewBookmark> bookmarks)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public Point createPoint() {
+  @Deprecated
+  public Point createPoint()
+      throws ObjectExistsException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPointPosition(TCSObjectReference<Point> ref,
                                Triple position)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                               double angle)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPointType(TCSObjectReference<Point> ref, Point.Type newType)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPathLength(TCSObjectReference<Path> ref,
                             long length)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPathRoutingCost(TCSObjectReference<Path> ref,
                                  long cost)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPathMaxVelocity(TCSObjectReference<Path> ref,
                                  int velocity)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setPathMaxReverseVelocity(TCSObjectReference<Path> ref,
                                         int velocity)
       throws ObjectUnknownException {
@@ -365,6 +408,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public Vehicle createVehicle() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
@@ -375,6 +419,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public final void setVehicleEnergyLevelCritical(
       TCSObjectReference<Vehicle> ref,
       int energyLevel)
@@ -384,6 +429,7 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public final void setVehicleEnergyLevelGood(TCSObjectReference<Vehicle> ref,
                                               int energyLevel)
       throws ObjectUnknownException {
@@ -439,6 +485,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVehicleLength(TCSObjectReference<Vehicle> ref,
                                int length)
       throws ObjectUnknownException {
@@ -488,10 +535,12 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public LocationType createLocationType() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void addLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref,
       String operation)
@@ -499,6 +548,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void removeLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref,
       String operation)
@@ -506,35 +556,41 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setLocationPosition(TCSObjectReference<Location> ref,
                                   Triple position)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setLocationType(TCSObjectReference<Location> ref,
                               TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void connectLocationToPoint(TCSObjectReference<Location> locRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void addLocationLinkAllowedOperation(
       TCSObjectReference<Location> locRef,
       TCSObjectReference<Point> pointRef,
@@ -543,6 +599,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void removeLocationLinkAllowedOperation(
       TCSObjectReference<Location> locRef,
       TCSObjectReference<Point> pointRef,
@@ -551,6 +608,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void clearLocationLinkAllowedOperations(
       TCSObjectReference<Location> locRef,
       TCSObjectReference<Point> pointRef)
@@ -558,29 +616,34 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public Block createBlock() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void addBlockMember(TCSObjectReference<Block> ref,
                              TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void removeBlockMember(TCSObjectReference<Block> ref,
                                 TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public Group createGroup() {
     synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return getModel().createGroup(null).clone();
+      return getModel().createGroup((Integer) null).clone();
     }
   }
 
+  @Deprecated
   public void addGroupMember(TCSObjectReference<Group> ref,
                              TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException {
@@ -589,6 +652,7 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public void removeGroupMember(TCSObjectReference<Group> ref,
                                 TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException {
@@ -597,22 +661,29 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public StaticRoute createStaticRoute() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   public TransportOrder createTransportOrder(List<Destination> destinations) {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  public TransportOrder createTransportOrder(TransportOrderCreationTO to) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
@@ -703,16 +774,23 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public OrderSequence createOrderSequence() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  @Deprecated
   public void addOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void removeOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef) {
@@ -734,12 +812,14 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setOrderSequenceFailureFatal(
       TCSObjectReference<OrderSequence> ref,
       boolean fatal) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setOrderSequenceIntendedVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {

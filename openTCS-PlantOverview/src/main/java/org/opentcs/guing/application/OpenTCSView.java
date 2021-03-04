@@ -955,7 +955,7 @@ public class OpenTCSView
           locFigure.propertiesChanged(
               new AttributesChangeEvent(attributesEventHandler,
                                         locFigure.getPresentationFigure()
-                                        .getModel()));
+                                            .getModel()));
         }
       }
     }
@@ -1178,7 +1178,7 @@ public class OpenTCSView
               return;
             }
           }
-          loadCurrentKernelModel();
+          SwingUtilities.invokeLater(() -> loadCurrentKernelModel());
         }
         break;
       case DISCONNECTED:
@@ -1231,7 +1231,7 @@ public class OpenTCSView
             handleKernelInModellingMode();
           }
           setPlantOverviewState(newMode);
-          loadCurrentKernelModel();
+          SwingUtilities.invokeLater(() -> loadCurrentKernelModel());
         }
         else {
           // If a kernel is not available, switch (back) to modelling mode.
@@ -2122,7 +2122,7 @@ public class OpenTCSView
 
     procAdapterUtil.createProcessAdapter(modelComponent,
                                          fModelManager.getModel()
-                                         .getEventDispatcher());
+                                             .getEventDispatcher());
 
     // Knoten "Modell"
     fComponentsTreeManager.addItem(folder, modelComponent);

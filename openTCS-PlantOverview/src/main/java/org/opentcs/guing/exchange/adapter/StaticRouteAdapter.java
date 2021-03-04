@@ -10,28 +10,32 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
+import java.util.LinkedList;
+import java.util.List;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.StaticRouteCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for static routes.
@@ -45,8 +49,7 @@ public class StaticRouteAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(StaticRouteAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StaticRouteAdapter.class);
 
   /**
    * Creates a new instance.
@@ -87,48 +90,43 @@ public class StaticRouteAdapter
       updateMiscModelProperties(route);
     }
     catch (CredentialsException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    StaticRoute staticRoute = kernel.createStaticRoute();
-    TCSObjectReference<StaticRoute> reference = staticRoute.getReference();
-
-    StringProperty pName = (StringProperty) getModel().getProperty(
-        ModelComponent.NAME);
-    String name = pName.getText();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      kernel.renameTCSObject(reference, name);
+      plantModel.getStaticRoutes().add(
+          new StaticRouteCreationTO(getModel().getName())
+              .setHopNames(getHopNames())
+              .setProperties(getKernelProperties()));
 
-      kernel.clearStaticRouteHops(reference);
-
-      for (ModelComponent model : getModel().getChildComponents()) {
-        Point hop = plantModel.getPoints().get(model.getName());
-        kernel.addStaticRouteHop(reference, hop.getReference());
+      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout);
       }
-
-      for (VisualLayout layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout, reference);
-      }
-
-      updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
-  private void updateLayoutElement(VisualLayout layout,
-                                   TCSObjectReference<?> ref) {
-    ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
+  private List<String> getHopNames() {
+    List<String> result = new LinkedList<>();
+    for (ModelComponent model : getModel().getChildComponents()) {
+      result.add(model.getName());
+    }
+    return result;
+  }
 
+  private void updateLayoutElement(VisualLayoutCreationTO layout) {
     ColorProperty pColor = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
     int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
-    layoutElement.getProperties().put(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb));
 
-    layout.getLayoutElements().add(layoutElement);
+    layout.getModelElements().add(
+        new ModelLayoutElementCreationTO(getModel().getName())
+            .setProperty(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb))
+    );
   }
+
 }

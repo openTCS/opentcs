@@ -1,11 +1,12 @@
 /**
- * Copyright (c) 2016 Fraunhofer IML
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.kernel.controlcenter.vehicles;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
@@ -19,8 +20,7 @@ import org.opentcs.util.gui.WideComboBox;
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CommAdapterComboBox
-    extends WideComboBox<VehicleCommAdapterFactory>
-    implements PropertyChangeListener {
+    extends WideComboBox<VehicleCommAdapterFactory> {
 
   /**
    * This instance's resource bundle.
@@ -32,13 +32,6 @@ public class CommAdapterComboBox
    * Creates a new instance.
    */
   public CommAdapterComboBox() {
-  }
-
-  @Override
-  public void propertyChange(PropertyChangeEvent evt) {
-    if (Objects.equals(evt.getPropertyName(), VehicleEntry.Attribute.COMM_ADAPTER_FACTORY.name())) {
-      getModel().setSelectedItem(evt.getNewValue());
-    }
   }
 
   @Override

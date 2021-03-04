@@ -208,7 +208,7 @@ public class ModelValidatorTest {
   public void testPointInvalidOrientationAngle() {
     PointModel point = createPointModel(POINT_NAME);
     addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "abc");
-    Assert.assertFalse("Validator said valid for corrupt orientation angle.",
+    Assert.assertTrue("Validator said invalid for corrupt orientation angle.",
                        validator.isValidWith(model, point));
   }
 

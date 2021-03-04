@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -14,6 +13,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A <code>Scheduler</code> manages resources used by vehicles, preventing
@@ -114,6 +114,20 @@ public interface Scheduler
   Map<String, Set<TCSResource<?>>> getAllocations();
 
   /**
+   * Informs the scheduler that a set of resources was successfully prepared in order of allocating
+   * them to a client.
+   *
+   * @param module The module a preparation was necessary for.
+   * @param client The client that requested the preparation/allocation.
+   * @param resources The resources that are now prepared for the client.
+   */
+  @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+  default void preparationSuccessful(@Nonnull Module module,
+                                     @Nonnull Client client,
+                                     @Nonnull Set<TCSResource<?>> resources) {
+  }
+
+  /**
    * Defines callback methods for clients of the resource scheduler.
    */
   interface Client {
@@ -188,5 +202,40 @@ public interface Scheduler
      * given client.
      */
     boolean mayAllocate(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+
+    /**
+     * Lets this module prepare the given resources so they can be allocated to a client.
+     *
+     * @param client The client the resources are being prepared for.
+     * @param resources The resources to be prepared.
+     */
+    @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+    default void prepareAllocation(@Nonnull Client client,
+                                   @Nonnull Set<TCSResource<?>> resources) {
+    }
+
+    /**
+     * Checks if this module is done preparing the given resources for a client.
+     *
+     * @param client The client the resources are being prepared for.
+     * @param resources The resources to be checked.
+     * @return <code>true</code> if the resoruces are prepared for a client.
+     */
+    @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+    default boolean hasPreparedAllocation(@Nonnull Client client,
+                                          @Nonnull Set<TCSResource<?>> resources) {
+      return true;
+    }
+
+    /**
+     * Informs this module about resources being fully released by a client.
+     *
+     * @param client The client releasing the resources.
+     * @param resources The resources being released.
+     */
+    @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+    default void allocationReleased(@Nonnull Client client,
+                                    @Nonnull Set<TCSResource<?>> resources) {
+    }
   }
 }

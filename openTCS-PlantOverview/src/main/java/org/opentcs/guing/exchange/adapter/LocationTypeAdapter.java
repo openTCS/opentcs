@@ -11,14 +11,20 @@ package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.to.model.LocationTypeCreationTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.data.ObjectPropConstants;
+import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
@@ -30,11 +36,8 @@ import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for location types.
@@ -48,8 +51,7 @@ public class LocationTypeAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(LocationTypeAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LocationTypeAdapter.class);
 
   /**
    * Creates a new instance.
@@ -99,79 +101,46 @@ public class LocationTypeAdapter
       }
     }
     catch (CredentialsException e) {
-      log.error("", e);
+      LOG.error("", e);
     }
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    LocationType locType = kernel.createLocationType();
-    TCSObjectReference<LocationType> reference = locType.getReference();
-    
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    String name = pName.getText();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      kernel.renameTCSObject(reference, name);
+      plantModel.getLocationTypes().add(
+          new LocationTypeCreationTO(getModel().getName())
+              .setAllowedOperations(getAllowedOperations())
+              .setProperties(getKernelProperties())
+      );
 
-      updateProcessActions(kernel, reference);
-
-      updateMiscProcessProperties(kernel, reference);
-      
-      plantModel.getLocationTypes().put(name, locType);
+      unmarkAllPropertiesChanged();
     }
     catch (KernelRuntimeException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
-  private void updateProcessActions(Kernel kernel,
-                                    TCSObjectReference<LocationType> reference)
-      throws KernelRuntimeException {
-    StringSetProperty pActions = (StringSetProperty) getModel().getProperty(
-        LocationTypeModel.ALLOWED_OPERATIONS);
-
-    for (String newOp : pActions.getItems()) {
-      kernel.addLocationTypeAllowedOperation(reference, newOp);
-    }
+  private List<String> getAllowedOperations() {
+    return new LinkedList<>(
+        ((StringSetProperty) getModel().getProperty(LocationTypeModel.ALLOWED_OPERATIONS))
+            .getItems());
   }
 
-  @Override // OpenTCSProcessAdapter
-  protected void updateMiscProcessProperties(Kernel kernel,
-                                             TCSObjectReference<?> ref)
-      throws KernelRuntimeException {
-    kernel.clearTCSObjectProperties(ref);
-    KeyValueSetProperty pMisc = (KeyValueSetProperty) getModel().getProperty(
-        ModelComponent.MISCELLANEOUS);
+  @Override
+  protected Map<String, String> getKernelProperties() {
+    Map<String, String> result = super.getKernelProperties();
 
-    if (pMisc != null) {
-      // Update the location representation (symbol) from the model.
-      SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(
-          ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-      LocationRepresentation locationRepresentation = pSymbol
-          .getLocationRepresentation();
+    // Add the location representation (symbol) from the model.
+    SymbolProperty pSymbol
+        = (SymbolProperty) getModel().getProperty(LOCTYPE_DEFAULT_REPRESENTATION);
+    LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
 
-      if (locationRepresentation != null) {
-        KeyValueProperty kvp = new KeyValueProperty(getModel(),
-                                                    ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION,
-                                                    locationRepresentation
-                                                    .name());
-        pMisc.addItem(kvp);
-      }
-      else {
-        for (KeyValueProperty kvp : pMisc.getItems()) {
-          if (kvp.getKey().equals(
-              ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
-            pMisc.removeItem(kvp);
-            break;
-          }
-        }
-      }
-
-      // Set all properties on the kernel object.
-      for (KeyValueProperty kvp : pMisc.getItems()) {
-        kernel.setTCSObjectProperty(ref, kvp.getKey(), kvp.getValue());
-      }
+    if (locationRepresentation != null) {
+      result.put(LOCTYPE_DEFAULT_REPRESENTATION, locationRepresentation.name());
     }
+
+    return result;
   }
+
 }

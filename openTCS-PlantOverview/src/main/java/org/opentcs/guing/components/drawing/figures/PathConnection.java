@@ -285,7 +285,7 @@ public class PathConnection
     path.add(new BezierPath.Node(BezierPath.C1_MASK,
                                  ep.x, ep.y, //Current point
                                  cp5.x, cp5.y, //Previous point
-                                 ep.x, ep.y)); //Next point
+                                 cp4.x, cp4.y)); //Next point
     StringProperty sProp
         = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     sProp.setText(String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d;",

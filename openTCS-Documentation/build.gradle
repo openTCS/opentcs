@@ -5,10 +5,9 @@ evaluationDependsOn(':openTCS-Kernel')
 evaluationDependsOn(':openTCS-PlantOverview')
 
 apply plugin: 'distribution'
-// To use AsciiDoctor for documentation
 apply plugin: 'org.asciidoctor.convert'
-// For API backwards-compatibility checks with the last major release
 apply plugin: 'me.champeau.gradle.japicmp'
+apply from: "${rootDir}/gradle/license-headers.gradle"
 
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
@@ -19,7 +18,7 @@ def userManualDir = file("$buildDir/users-guide")
 def devManualDir = file("$buildDir/developers-guide")
 def devManualImagesDir = file("$devManualDir/images")
 def indexDir = file("$buildDir/index")
-def readmeDir = file("$buildDir/readme")
+def releaseNotesDir = file("$buildDir/release-notes")
 
 ext.collectableDistDir = file("$buildDir/install")
 
@@ -55,7 +54,7 @@ distributions {
       into('user')
     }
     contents.from(indexDir)
-    contents.from(readmeDir)
+    contents.from(releaseNotesDir)
   }
 }
 
@@ -135,7 +134,7 @@ asciidoctor {
   dependsOn 'asciidoctorUsersGuide'
   dependsOn 'asciidoctorDevelopersGuide'
   dependsOn 'asciidoctorIndex'
-  dependsOn 'asciidoctorReadme'
+  dependsOn 'asciidoctorReleaseNotes'
   enabled = false
 }
 
@@ -185,21 +184,21 @@ task asciidoctorIndex(type: org.asciidoctor.gradle.AsciidoctorTask) {
   experimental: true
 }
 
-task asciidoctorReadme(type: org.asciidoctor.gradle.AsciidoctorTask) {
+task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.AsciidoctorTask) {
   // Document type: article (default), book, inline, manpage)
   options doctype: 'book'
 
   // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/readme")
+  sourceDir = file("src/docs/release-notes")
   
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
-  outputDir = readmeDir
+  outputDir = releaseNotesDir
   
   // Whether to put backends' outputs into separate subdirectories  
   separateOutputDirs = false
 	
   sources {
-    include 'README.adoc'
+    include 'release-notes.adoc'
   }
   
   // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs

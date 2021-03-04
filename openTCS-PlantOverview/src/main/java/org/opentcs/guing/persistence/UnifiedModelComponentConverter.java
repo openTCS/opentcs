@@ -289,10 +289,21 @@ public class UnifiedModelComponentConverter {
     KeyValueSetProperty kvsp
         = (KeyValueSetProperty) locationTypeModel.getProperty(LocationTypeModel.MISCELLANEOUS);
     for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      locationType.getProperties().add(property);
+      locationType.getProperties().add(new PropertyTO()
+          .setName(kvp.getKey())
+          .setValue(kvp.getValue()));
+    }
+
+    SymbolProperty symp
+        = (SymbolProperty) locationTypeModel.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+    if (symp.getLocationRepresentation() != null) {
+      locationType.getProperties().add(new PropertyTO()
+          .setName(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)
+          .setValue(symp.getLocationRepresentation().name()));
+    }
+    else {
+      locationType.getProperties().removeIf(property
+          -> property.getName().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION));
     }
 
     return locationType;
@@ -339,10 +350,21 @@ public class UnifiedModelComponentConverter {
 
     KeyValueSetProperty kvsp = (KeyValueSetProperty) locationModel.getProperty(LocationModel.MISCELLANEOUS);
     for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      location.getProperties().add(property);
+      location.getProperties().add(new PropertyTO()
+          .setName(kvp.getKey())
+          .setValue(kvp.getValue()));
+    }
+
+    SymbolProperty symp
+        = (SymbolProperty) locationModel.getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
+    if (symp.getLocationRepresentation() != null) {
+      location.getProperties().add(new PropertyTO()
+          .setName(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
+          .setValue(symp.getLocationRepresentation().name()));
+    }
+    else {
+      location.getProperties().removeIf(property
+          -> property.getName().equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION));
     }
 
     return location;
@@ -364,10 +386,9 @@ public class UnifiedModelComponentConverter {
 
     KeyValueSetProperty kvsp = (KeyValueSetProperty) blockModel.getProperty(BlockModel.MISCELLANEOUS);
     for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      block.getProperties().add(property);
+      block.getProperties().add(new PropertyTO()
+          .setName(kvp.getKey())
+          .setValue(kvp.getValue()));
     }
 
     return block;
@@ -391,10 +412,9 @@ public class UnifiedModelComponentConverter {
     KeyValueSetProperty kvsp
         = (KeyValueSetProperty) staticRouteModel.getProperty(StaticRouteModel.MISCELLANEOUS);
     for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      staticRoute.getProperties().add(property);
+      staticRoute.getProperties().add(new PropertyTO()
+          .setName(kvp.getKey())
+          .setValue(kvp.getValue()));
     }
 
     return staticRoute;
@@ -417,10 +437,9 @@ public class UnifiedModelComponentConverter {
     KeyValueSetProperty kvsp
         = (KeyValueSetProperty) groupModel.getProperty(GroupModel.MISCELLANEOUS);
     for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      group.getProperties().add(property);
+      group.getProperties().add(new PropertyTO()
+          .setName(kvp.getKey())
+          .setValue(kvp.getValue()));
     }
 
     return group;
@@ -451,10 +470,9 @@ public class UnifiedModelComponentConverter {
     KeyValueSetProperty kvsp
         = (KeyValueSetProperty) layoutModel.getProperty(LayoutModel.MISCELLANEOUS);
     for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      visualLayout.getProperties().add(property);
+      visualLayout.getProperties().add(new PropertyTO()
+          .setName(kvp.getKey())
+          .setValue(kvp.getValue()));
     }
 
     return visualLayout;

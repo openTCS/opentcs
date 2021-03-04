@@ -12,21 +12,24 @@ package org.opentcs.guing.exchange.adapter;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.to.model.LocationCreationTO;
+import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.ObjectPropConstants;
+import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
-import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LocationFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
@@ -39,13 +42,12 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.AbstractFigureComponent;
+import static org.opentcs.guing.model.AbstractFigureComponent.MODEL_X_POSITION;
+import static org.opentcs.guing.model.AbstractFigureComponent.MODEL_Y_POSITION;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for locations.
@@ -59,8 +61,7 @@ public class LocationAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(LocationAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LocationAdapter.class);
 
   /**
    * Creates a new instance.
@@ -115,37 +116,28 @@ public class LocationAdapter
       }
     }
     catch (CredentialsException | IllegalArgumentException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    LocationType locType = plantModel.getLocationTypes().get(getModel().getLocationType().getName());
-    Location location = kernel.createLocation(locType.getReference());
-    TCSObjectReference<Location> reference = location.getReference();
-
-    StringProperty pName = (StringProperty) getModel().getProperty(
-        ModelComponent.NAME);
-    String name = pName.getText();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      // Name
-      kernel.renameTCSObject(reference, name);
-      pName.unmarkChanged();
-      updateProcessPosition(kernel, reference);
+      plantModel.getLocations().add(
+          new LocationCreationTO(getModel().getName(), getModel().getLocationType().getName())
+              .setPosition(getPosition())
+              .setProperties(getKernelProperties())
+      );
 
       // Write new position into the model layout element
-      for (VisualLayout layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout, reference);
+      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout);
       }
 
-      updateMiscProcessProperties(kernel, reference);
-      
-      plantModel.getLocations().put(name, location);
+      unmarkAllPropertiesChanged();
     }
     catch (KernelRuntimeException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
@@ -192,61 +184,29 @@ public class LocationAdapter
     sp.setText(properties.get(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE));
   }
 
-  private void updateProcessPosition(Kernel kernel,
-                                     TCSObjectReference<Location> reference)
-      throws KernelRuntimeException {
-    CoordinateProperty cpx = (CoordinateProperty) getModel().getProperty(
-        LocationModel.MODEL_X_POSITION);
-    CoordinateProperty cpy = (CoordinateProperty) getModel().getProperty(
-        LocationModel.MODEL_Y_POSITION);
-
-    kernel.setLocationPosition(reference, convertToTriple(cpx, cpy));
-    cpx.unmarkChanged();
-    cpy.unmarkChanged();
+  private Triple getPosition() {
+    return convertToTriple((CoordinateProperty) getModel().getProperty(MODEL_X_POSITION),
+                           (CoordinateProperty) getModel().getProperty(MODEL_Y_POSITION));
   }
 
-  @Override  // OpenTCSProcessAdapter
-  protected void updateMiscProcessProperties(Kernel kernel,
-                                             TCSObjectReference<?> ref)
-      throws KernelRuntimeException {
-    kernel.clearTCSObjectProperties(ref);
-    KeyValueSetProperty pMisc = (KeyValueSetProperty) getModel().getProperty(
-        ModelComponent.MISCELLANEOUS);
+  @Override
+  protected Map<String, String> getKernelProperties() {
+    Map<String, String> result = super.getKernelProperties();
 
-    if (pMisc != null) {
-      // file for the symbol
-      SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(
-          ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
-      LocationRepresentation locationRepresentation = pSymbol
-          .getLocationRepresentation();
+    SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(LOC_DEFAULT_REPRESENTATION);
+    LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
 
-      if (locationRepresentation != null) {
-        KeyValueProperty kvp = new KeyValueProperty(getModel(),
-                                                    ObjectPropConstants.LOC_DEFAULT_REPRESENTATION,
-                                                    locationRepresentation
-                                                    .name());
-        pMisc.addItem(kvp);
-      }
-      else {
-        for (KeyValueProperty kvp : pMisc.getItems()) {
-          if (kvp.getKey()
-              .equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)) {
-            pMisc.removeItem(kvp);
-            break;
-          }
-        }
-      }
-
-      for (KeyValueProperty kvp : pMisc.getItems()) {
-        kernel.setTCSObjectProperty(ref, kvp.getKey(), kvp.getValue());
-      }
+    if (locationRepresentation != null) {
+      result.put(LOC_DEFAULT_REPRESENTATION, locationRepresentation.name());
     }
+
+    return result;
   }
 
   private Triple convertToTriple(CoordinateProperty cpx, CoordinateProperty cpy) {
-    Triple result = new Triple();
-    result.setX((int) cpx.getValueByUnit(LengthProperty.Unit.MM));
-    result.setY((int) cpy.getValueByUnit(LengthProperty.Unit.MM));
+    Triple result = new Triple((int) cpx.getValueByUnit(LengthProperty.Unit.MM),
+                               (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
+                               0);
 
     return result;
   }
@@ -256,9 +216,7 @@ public class LocationAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(VisualLayout layout,
-                                   TCSObjectReference<?> ref) {
-
+  private void updateLayoutElement(VisualLayoutCreationTO layout) {
     LabeledLocationFigure llf = getModel().getFigure();
     LocationFigure lf = llf.getPresentationFigure();
     double scaleX = layout.getScaleX();
@@ -268,15 +226,12 @@ public class LocationAdapter
     TCSLabelFigure label = llf.getLabel();
     Point2D.Double offset = label.getOffset();
 
-    ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
-
-    layoutElement.getProperties().put(ElementPropKeys.LOC_POS_X, xPos + "");
-    layoutElement.getProperties().put(ElementPropKeys.LOC_POS_Y, yPos + "");
-    layoutElement.getProperties().put(ElementPropKeys.LOC_LABEL_OFFSET_X, (int) offset.x + "");
-    layoutElement.getProperties().put(ElementPropKeys.LOC_LABEL_OFFSET_Y, (int) offset.y + "");
-    // TODO:
-//    layoutProperties.put(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, ...);
-
-    layout.getLayoutElements().add(layoutElement);
+    layout.getModelElements().add(
+        new ModelLayoutElementCreationTO(getModel().getName())
+            .setProperty(ElementPropKeys.LOC_POS_X, xPos + "")
+            .setProperty(ElementPropKeys.LOC_POS_Y, yPos + "")
+            .setProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, (int) offset.x + "")
+            .setProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, (int) offset.y + "")
+    );
   }
 }

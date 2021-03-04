@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -8,22 +7,19 @@
  */
 package org.opentcs.kernel;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.collect.Iterables;
 import com.google.inject.BindingAnnotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
-import org.opentcs.access.LocalKernel;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.Comparators;
+import org.opentcs.kernel.workingset.TransportOrderPool;
 import org.opentcs.util.CyclicTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-abstract class OrderCleanerTask
+class OrderCleanerTask
     extends CyclicTask {
 
   /**
@@ -41,9 +37,17 @@ abstract class OrderCleanerTask
    */
   private static final Logger LOG = LoggerFactory.getLogger(OrderCleanerTask.class);
   /**
-   * The kernel we scan regularly.
+   * A global object to be used for synchronization within the kernel.
    */
-  private final LocalKernel kernel;
+  private final Object globalSyncObject;
+  /**
+   * Keeps all the transport orders.
+   */
+  private final TransportOrderPool orderPool;
+  /**
+   * The minimum age of orders to remove if orderSweepType is BY_AGE.
+   */
+  private final int orderSweepAge;
 
   /**
    * Creates a new OrderCleanerTask.
@@ -52,62 +56,54 @@ abstract class OrderCleanerTask
    * @param orderSweepInterval The interval between sweeps (in milliseconds).
    */
   @Inject
-  public OrderCleanerTask(LocalKernel kernel,
-                          @SweepInterval long orderSweepInterval) {
+  public OrderCleanerTask(@GlobalKernelSync Object globalSyncObject,
+                          TransportOrderPool orderPool,
+                          @SweepInterval long orderSweepInterval,
+                          @SweepAge int orderSweepAge) {
     super(orderSweepInterval);
-    this.kernel = requireNonNull(kernel, "kernel");
+    this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
+    this.orderPool = requireNonNull(orderPool, "orderPool");
+    this.orderSweepAge = orderSweepAge;
+  }
+
+  @Override
+  protected void runActualTask() {
+    synchronized (globalSyncObject) {
+      LOG.debug("Sweeping order pool...");
+      // Candidates that are created before this point of time should be removed.
+      long creationTimeThreshold = System.currentTimeMillis() - orderSweepAge;
+
+      // Remove all transport orders in a final state that do NOT belong to a sequence and that are
+      // older than the threshold.
+      orderPool.getTransportOrders((Pattern) null).stream()
+          .filter(order -> order.getState().isFinalState())
+          .filter(order -> order.getWrappingSequence() == null)
+          .filter(order -> order.getCreationTime() < creationTimeThreshold)
+          .forEach(order -> orderPool.removeTransportOrder(order.getReference()));
+
+      // Remove all order sequences that have been finished, including their transport orders.
+      orderPool.getOrderSequences(null).stream()
+          .filter(seq -> seq.isFinished())
+          .filter(seq -> {
+            List<TCSObjectReference<TransportOrder>> orderRefs = seq.getOrders();
+            if (orderRefs.isEmpty()) {
+              return true;
+            }
+            TransportOrder lastOrder = orderPool.getTransportOrder(Iterables.getLast(orderRefs));
+            return lastOrder.getCreationTime() < creationTimeThreshold;
+          })
+          .forEach(seq -> orderPool.removeFinishedOrderSequenceAndOrders(seq.getReference()));
+    }
   }
 
   /**
-   * Returns the kernel.
-   *
-   * @return The kernel.
+   * Annotation type for injecting the sweep age.
    */
-  protected LocalKernel kernel() {
-    return kernel;
-  }
-
-  /**
-   * Creates a candidate for the given order sequence.
-   *
-   * @param seq The sequence.
-   * @return A candidate for the given order sequence.
-   */
-  protected Candidate createEntry(OrderSequence seq) {
-    List<TransportOrder> seqOrders = new LinkedList<>();
-    seq.getOrders().stream()
-        .map(orderRef -> kernel().getTCSObject(TransportOrder.class,
-                                               orderRef))
-        .forEachOrdered(seqOrders::add);
-
-    return new SequenceCandidate(seq, seqOrders);
-  }
-
-  /**
-   * Creates a candidate for the given transport order.
-   *
-   * @param order The order.
-   * @return A candidate for the given transport order.
-   */
-  protected Candidate createEntry(TransportOrder order) {
-    return new OrderCandidate(order);
-  }
-
-  /**
-   * Specifies how the cleanup task should decide which orders to remove from
-   * the pool in each run.
-   */
-  public static enum OrderSweepType {
-
-    /**
-     * Remove finalized orders if the whole number of orders exceeds a certain
-     * amount.
-     */
-    BY_AMOUNT,
-    /**
-     * Remove finalized orders that have exceeded a certain age.
-     */
-    BY_AGE
+  @BindingAnnotation
+  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
+  @Retention(RetentionPolicy.RUNTIME)
+  static @interface SweepAge {
+    // Nothing here.
   }
 
   /**
@@ -118,141 +114,5 @@ abstract class OrderCleanerTask
   @Retention(RetentionPolicy.RUNTIME)
   static @interface SweepInterval {
     // Nothing here.
-  }
-
-  /**
-   * A candidate entry for removing one or more orders.
-   */
-  protected abstract class Candidate
-      implements Comparable<Candidate> {
-
-    @Override
-    public int compareTo(Candidate o) {
-      return Long.signum(getCreationTime() - o.getCreationTime());
-    }
-
-    /**
-     * Returns the creation time stamp(s) of the order(s) of this candidate.
-     * If multiple orders belong to this candidate, the latest creation time
-     * stamp is returned.
-     *
-     * @return The creation time of the order(s) of this candidate.
-     */
-    protected abstract long getCreationTime();
-
-    /**
-     * Removes the order(s) of this candidate and returns the number of removed
-     * orders.
-     *
-     * @return The number of removed orders.
-     */
-    protected abstract int removeOrders();
-
-    /**
-     * Removes the referenced transport order.
-     *
-     * @param orderRef The order.
-     * @return 1 if the order was removed, 0 if it wasn't.
-     */
-    protected int removeSingleOrder(TCSObjectReference<TransportOrder> orderRef) {
-      try {
-        LOG.info("Removing order: " + orderRef);
-        kernel().removeTCSObject(orderRef);
-        return 1;
-      }
-      catch (ObjectUnknownException exc) {
-        LOG.warn("Order vanished", exc);
-        return 0;
-      }
-    }
-  }
-
-  /**
-   * A candidate for a single order.
-   */
-  private class OrderCandidate
-      extends Candidate {
-
-    /**
-     * The transport order.
-     */
-    private final TransportOrder order;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param order The transport order.
-     */
-    private OrderCandidate(TransportOrder order) {
-      this.order = requireNonNull(order, "order");
-    }
-
-    @Override
-    protected long getCreationTime() {
-      return order.getCreationTime();
-    }
-
-    @Override
-    protected int removeOrders() {
-      return removeSingleOrder(order.getReference());
-    }
-  }
-
-  /**
-   * A candidate for an order sequence.
-   */
-  private class SequenceCandidate
-      extends Candidate {
-
-    /**
-     * The order sequence.
-     */
-    private final OrderSequence sequence;
-    /**
-     * The list of orders in the sequence.
-     */
-    private final List<TransportOrder> orders;
-    /**
-     * The creation time of the youngest order in the sequence (not necessarily
-     * the last order in the sequence).
-     */
-    private final long youngestCreationTime;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param sequence The sequence.
-     * @param orders  The orders in the sequence.
-     */
-    private SequenceCandidate(OrderSequence sequence,
-                              List<TransportOrder> orders) {
-      this.sequence = requireNonNull(sequence, "sequence");
-      this.orders = requireNonNull(orders, "orders");
-      checkArgument(!orders.isEmpty(), "orders is empty");
-      youngestCreationTime = orders.stream()
-          .max(Comparators.ordersByAge()).get().getCreationTime();
-    }
-
-    @Override
-    protected long getCreationTime() {
-      return youngestCreationTime;
-    }
-
-    @Override
-    protected int removeOrders() {
-      int result = 0;
-      // Remove all enclosed orders.
-      for (TransportOrder curOrder : orders) {
-        result += removeSingleOrder(curOrder.getReference());
-      }
-      // Remove the sequence itself.
-      try {
-        kernel().removeTCSObject(sequence.getReference());
-      }
-      catch (ObjectUnknownException exc) {
-        LOG.warn("Sequence vanished", exc);
-      }
-      return result;
-    }
   }
 }

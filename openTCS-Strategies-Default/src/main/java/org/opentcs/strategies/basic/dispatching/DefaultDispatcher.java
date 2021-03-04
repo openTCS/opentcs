@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2007 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -25,15 +24,17 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.ParkingPositionSupplier;
 import org.opentcs.components.kernel.RechargePositionSupplier;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
@@ -372,7 +373,7 @@ public class DefaultDispatcher
         .findFirst()
         .map(entry -> kernel.getTCSObject(TransportOrder.class, entry.getKey()))
         .filter(order -> !order.getState().isFinalState()
-            && !order.hasState(TransportOrder.State.WITHDRAWN));
+        && !order.hasState(TransportOrder.State.WITHDRAWN));
   }
 
   private boolean orderMandatory(TransportOrder order,
@@ -523,16 +524,15 @@ public class DefaultDispatcher
       LOG.warn("{}: Did not find a suitable parking position.", vehicle.getName());
       return false;
     }
-    // Wrap the name of the parking position in a dummy location reference.
-    TCSObjectReference<Location> parkLocRef
-        = TCSObjectReference.getDummyReference(Location.class, parkPos.get().getName());
-    // Create a destination.
-    Destination parkDest = new Destination(parkLocRef, Destination.OP_PARK);
-    List<Destination> parkDests = Collections.singletonList(parkDest);
+    // Create a destination for the point.
+    List<DestinationCreationTO> parkDests = new LinkedList<>();
+    parkDests.add(new DestinationCreationTO(parkPos.get().getName(), Destination.OP_PARK));
     // Create a transport order for parking and verify its processability.
-    TransportOrder parkOrder = kernel.createTransportOrder(parkDests);
-    kernel.setTransportOrderDispensable(parkOrder.getReference(), true);
-    kernel.setTransportOrderIntendedVehicle(parkOrder.getReference(), vehicle.getReference());
+    TransportOrder parkOrder = kernel.createTransportOrder(
+        new TransportOrderCreationTO("Park-" + UUID.randomUUID(), parkDests)
+            .setDispensable(true)
+            .setIntendedVehicleName(vehicle.getName())
+    );
     Optional<List<DriveOrder>> driveOrders = router.getRoute(vehicle, vehiclePosition, parkOrder);
     if (checkProcessability(vehicle, parkOrder)) {
       // Assign the parking order.
@@ -563,13 +563,21 @@ public class DefaultDispatcher
       LOG.warn("{}: Did not find a suitable recharge sequence for vehicle", vehicle.getName());
       return false;
     }
-    // Create a transport order for recharging and verify its processability.
-    TransportOrder rechargeOrder = kernel.createTransportOrder(rechargeDests);
-    // The recharge order may be withdrawn unless its energy level is critical.
-    if (!vehicle.isEnergyLevelCritical()) {
-      kernel.setTransportOrderDispensable(rechargeOrder.getReference(), true);
+    List<DestinationCreationTO> chargeDests = new LinkedList<>();
+    for (Destination dest : rechargeDests) {
+      chargeDests.add(
+          new DestinationCreationTO(dest.getLocation().getName(), dest.getOperation())
+              .setProperties(dest.getProperties())
+      );
     }
-    kernel.setTransportOrderIntendedVehicle(rechargeOrder.getReference(), vehicle.getReference());
+    // Create a transport order for recharging and verify its processability.
+    // The recharge order may be withdrawn unless its energy level is critical.
+    TransportOrder rechargeOrder = kernel.createTransportOrder(
+        new TransportOrderCreationTO("Recharge-" + UUID.randomUUID(), chargeDests)
+            .setIntendedVehicleName(vehicle.getName())
+            .setDispensable(!vehicle.isEnergyLevelCritical())
+    );
+
     Optional<List<DriveOrder>> driveOrders
         = router.getRoute(vehicle, vehiclePosition, rechargeOrder);
     if (checkProcessability(vehicle, rechargeOrder)) {

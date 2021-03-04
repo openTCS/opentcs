@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2007 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -31,6 +30,8 @@ import org.opentcs.access.queries.QueryAvailableScriptFiles;
 import org.opentcs.access.queries.QueryRecoveryStatus;
 import org.opentcs.access.queries.QueryRoutingInfo;
 import org.opentcs.access.queries.QuerySchedulerAllocations;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.RecoveryEvaluator;
@@ -243,6 +244,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -260,10 +262,10 @@ class KernelStateOperating
         // If the order is currently being processed by a vehicle, tell the
         // dispatcher to withdraw and implicitly remove it afterwards (by
         // calling this method again).
-        if (order.hasState(TransportOrder.State.BEING_PROCESSED)
-            && vRef != null) {
-          LOG.warn("Transport order " + order.getName()
-              + " being processed by " + vRef.getName() + ", not removing it");
+        if (order.hasState(TransportOrder.State.BEING_PROCESSED) && vRef != null) {
+          LOG.warn("Transport order {} being processed by {}, not removing it",
+                   order.getName(),
+                   vRef.getName());
         }
         else {
           // Check if the transport order is part of an order sequence. If so,
@@ -312,7 +314,7 @@ class KernelStateOperating
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       Vehicle vehicle = getModel().setVehicleEnergyLevel(ref,
-                                                    energyLevel);
+                                                         energyLevel);
       // If the vehicle is idle, dispatch it - maybe the dispatcher has an order
       // for it.
       if (vehicle.hasProcState(Vehicle.ProcState.IDLE)) {
@@ -466,6 +468,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public TransportOrder createTransportOrder(List<Destination> destinations) {
     synchronized (getGlobalSyncObject()) {
       return orderPool.createTransportOrder(destinations).clone();
@@ -473,6 +476,14 @@ class KernelStateOperating
   }
 
   @Override
+  public TransportOrder createTransportOrder(TransportOrderCreationTO to) {
+    synchronized (getGlobalSyncObject()) {
+      return orderPool.createTransportOrder(to).clone();
+    }
+  }
+
+  @Override
+  @Deprecated
   public void setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
                                         long deadline)
       throws ObjectUnknownException {
@@ -504,6 +515,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderIntendedVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -552,6 +564,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void addTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> newDepRef)
@@ -562,6 +575,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void removeTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
@@ -582,6 +596,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderDispensable(
       TCSObjectReference<TransportOrder> orderRef,
       boolean dispensable)
@@ -592,6 +607,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public OrderSequence createOrderSequence() {
     synchronized (getGlobalSyncObject()) {
       return orderPool.createOrderSequence().clone();
@@ -599,6 +615,14 @@ class KernelStateOperating
   }
 
   @Override
+  public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
+    synchronized (getGlobalSyncObject()) {
+      return orderPool.createOrderSequence(to).clone();
+    }
+  }
+
+  @Override
+  @Deprecated
   public void addOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef) {
@@ -608,6 +632,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void removeOrderSequenceOrder(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<TransportOrder> orderRef) {
@@ -673,6 +698,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceFailureFatal(
       TCSObjectReference<OrderSequence> ref,
       boolean fatal) {
@@ -682,6 +708,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceIntendedVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {

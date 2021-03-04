@@ -155,6 +155,11 @@ Some rules for using order sequences are described in the API documentation for 
 include::{kernel-testSrc}/org/opentcs/documentation/CreateTransportOrderSequenceTest.java[tags=documentation_createTransportOrderSequence]
 ----
 
+As long as the sequence has not been marked as complete and finished completely, the vehicle selected for its first order will be tied to this sequence.
+It will not process any orders not belonging to the same sequence until the whole sequence has been finished.
+
+Once the _complete_ flag of the sequence has been set and all transport orders belonging to it have been processed, its _finished_ flag will be set by the kernel.
+
 ==== How to withdraw a transport order that is currently being processed
 
 [source, java]

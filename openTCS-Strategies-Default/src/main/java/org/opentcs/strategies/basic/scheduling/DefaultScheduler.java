@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -16,12 +15,16 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
+import org.opentcs.strategies.basic.scheduling.AllocatorCommand.AllocationsReleased;
+import org.opentcs.strategies.basic.scheduling.AllocatorCommand.CheckAllocationsPrepared;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.RetryAllocates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,6 +203,12 @@ public class DefaultScheduler
     synchronized (reservationPool) {
       LOG.debug("{}: Releasing resources: {}", client.getId(), resources);
       reservationPool.free(client, resources);
+
+      // Check which resources are now completely free
+      Set<TCSResource<?>> completelyFreeResources = resources.stream()
+          .filter(resource -> reservationPool.getReservationEntry(resource).isFree())
+          .collect(Collectors.toCollection(HashSet::new));
+      allocatorTask.enqueue(new AllocationsReleased(client, completelyFreeResources));
     }
     allocatorTask.enqueue(new RetryAllocates(client));
   }
@@ -220,5 +229,16 @@ public class DefaultScheduler
     synchronized (reservationPool) {
       return reservationPool.getAllocations();
     }
+  }
+
+  @Override
+  public void preparationSuccessful(@Nonnull Module module,
+                                    @Nonnull Client client,
+                                    @Nonnull Set<TCSResource<?>> resources) {
+    requireNonNull(module, "module");
+    requireNonNull(client, "client");
+    requireNonNull(resources, "resources");
+
+    allocatorTask.enqueue(new CheckAllocationsPrepared(client, resources));
   }
 }

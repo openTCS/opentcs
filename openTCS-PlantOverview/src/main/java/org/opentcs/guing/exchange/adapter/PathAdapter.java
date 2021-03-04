@@ -13,6 +13,7 @@ import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import net.engio.mbassy.listener.Handler;
@@ -20,13 +21,15 @@ import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
+import org.opentcs.access.to.model.PathCreationTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
@@ -41,11 +44,8 @@ import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PathModel;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for Path objects.
@@ -175,50 +175,28 @@ public class PathAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    requireNonNull(kernel, "kernel");
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     ModelComponent srcPoint = getModel().getStartComponent();
     ModelComponent dstPoint = getModel().getEndComponent();
 
     LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.", getModel().getName(), srcPoint, dstPoint);
 
-    Point startPoint = plantModel.getPoints().get(srcPoint.getName());
-    if (startPoint == null) {
-      LOG.warn("Start point with name {} does not exist in kernel, ignored.", srcPoint.getName());
-      return;
-    }
-    Point endPoint = plantModel.getPoints().get(dstPoint.getName());
-    if (endPoint == null) {
-      LOG.warn("End point with name {} does not exist in kernel, ignored.", dstPoint.getName());
-      return;
-    }
-    Path path = kernel.createPath(startPoint.getReference(), endPoint.getReference());
-    TCSObjectReference<Path> reference = path.getReference();
-
-    // The kernel object will be created when the points to connect are
-    // known. Before the reference is null.
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    String name = pName.getText();
-
     try {
-      // NAME
-      kernel.renameTCSObject(reference, name);
-
-      updateProcessLength(kernel, reference);
-      updateProcessVelocity(kernel, reference);
-      updateProcessRoutingCost(kernel, reference);
+      plantModel.getPaths().add(
+          new PathCreationTO(getModel().getName(), srcPoint.getName(), dstPoint.getName())
+              .setLength(getLength())
+              .setMaxVelocity(getMaxVelocity())
+              .setMaxReverseVelocity(getMaxReverseVelocity())
+              .setRoutingCost(getRoutingCost())
+              .setProperties(getKernelProperties())
+              .setLocked(getLocked()));
 
       // Write liner type and position of the control points into the model layout element
-
-      for (VisualLayout layout : plantModel.getVisualLayouts()) {
-        updateLayoutElement(layout, reference);
+      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout);
       }
 
-      // MISCELLANEOUS
-      updateMiscProcessProperties(kernel, reference);
-      updateProcessLocked(kernel, reference);
-      
-      plantModel.getPaths().put(name, path);
+      unmarkAllPropertiesChanged();
     }
     catch (KernelRuntimeException e) {
       LOG.warn("", e);
@@ -245,60 +223,34 @@ public class PathAdapter
     if (sControlPoints != null) {
       pControlPoints.setText(sControlPoints);
     }
-    // PATH_ARROW_POSITION
-    // HH 2014-02-14: Verschieben der Pfeilspitze ist in der Figure noch nicht
-    // implementiert, daher dieses Property auch nicht auswerten
-//          PercentProperty pArrowPosition = (PercentProperty) getModel().getProperty(ElementPropKeys.PATH_ARROW_POSITION);
-//          String sArrowPosition = properties.get(ElementPropKeys.PATH_ARROW_POSITION);
-//
-//          if (sArrowPosition != null) {
-//            pArrowPosition.setValueAndUnit(Integer.parseInt(sArrowPosition), "%");
-//          }
   }
 
-  private void updateProcessLocked(Kernel kernel,
-                                   TCSObjectReference<Path> reference)
-      throws KernelRuntimeException {
-    // LOCKED: This state is allowed to be changed in OPERATING mode
-    BooleanProperty pLocked
-        = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
+  private boolean getLocked() {
+    BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
 
     if (pLocked.getValue() instanceof Boolean) {
-      kernel.setPathLocked(reference, (boolean) pLocked.getValue());
+      return (boolean) pLocked.getValue();
     }
+    return false;
   }
 
-  private void updateProcessVelocity(Kernel kernel,
-                                     TCSObjectReference<Path> reference)
-      throws KernelRuntimeException, IllegalArgumentException {
-    SpeedProperty pSpeed
-        = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
-    int speed = (int) Math.abs(pSpeed.getValueByUnit(SpeedProperty.Unit.MM_S));
-
-    kernel.setPathMaxVelocity(reference, speed);
-
-    // MAX_REVERSE_VELOCITY - must not be negative!
-    pSpeed
-        = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
-    speed = (int) Math.abs(pSpeed.getValueByUnit(SpeedProperty.Unit.MM_S));
-
-    kernel.setPathMaxReverseVelocity(reference, speed);
+  private int getMaxVelocity() {
+    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
+    return (int) Math.abs(pSpeed.getValueByUnit(SpeedProperty.Unit.MM_S));
   }
 
-  private void updateProcessRoutingCost(Kernel kernel,
-                                        TCSObjectReference<Path> reference)
-      throws IllegalArgumentException, KernelRuntimeException {
-    IntegerProperty pCost
-        = (IntegerProperty) getModel().getProperty(PathModel.ROUTING_COST);
-
-    kernel.setPathRoutingCost(reference, (int) pCost.getValue());
+  private int getMaxReverseVelocity() {
+    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
+    return (int) Math.abs(pSpeed.getValueByUnit(SpeedProperty.Unit.MM_S));
   }
 
-  private void updateProcessLength(Kernel kernel,
-                                   TCSObjectReference<Path> reference)
-      throws IllegalArgumentException, KernelRuntimeException {
-    LengthProperty pLength
-        = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
+  private int getRoutingCost() {
+    IntegerProperty pCost = (IntegerProperty) getModel().getProperty(PathModel.ROUTING_COST);
+    return (int) pCost.getValue();
+  }
+
+  private long getLength() {
+    LengthProperty pLength = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
 
     if ((double) pLength.getValue() <= 0) {
       try {
@@ -310,8 +262,7 @@ public class PathAdapter
       }
     }
 
-    kernel.setPathLength(reference,
-                         (long) pLength.getValueByUnit(LengthProperty.Unit.MM));
+    return (long) pLength.getValueByUnit(LengthProperty.Unit.MM);
   }
 
   /**
@@ -319,40 +270,32 @@ public class PathAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(VisualLayout layout,
-                                   TCSObjectReference<?> ref) {
-
-    ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
-
+  private void updateLayoutElement(VisualLayoutCreationTO layout) {
     AbstractConnection model = (AbstractConnection) getModel();
     // Connection type
-    SelectionProperty pType
-        = (SelectionProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
+    SelectionProperty pType = (SelectionProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
     PathModel.LinerType type = (PathModel.LinerType) pType.getValue();
-    layoutElement.getProperties().put(ElementPropKeys.PATH_CONN_TYPE, type.name());
 
     // BEZIER control points
     String sControlPoints = "";
-
     if (type.equals(PathModel.LinerType.BEZIER) || type.equals(PathModel.LinerType.BEZIER_3)) {
-      sControlPoints
-          = buildBezierControlPoints(model, sControlPoints, layoutElement.getProperties());
-    }
-    else {
-      layoutElement.getProperties().remove(ElementPropKeys.PATH_CONTROL_POINTS);
+      sControlPoints = buildBezierControlPoints();
     }
 
-    StringProperty pControlPoints = (StringProperty) model.getProperty(
-        ElementPropKeys.PATH_CONTROL_POINTS);
+    StringProperty pControlPoints
+        = (StringProperty) model.getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     pControlPoints.setText(sControlPoints);
 
-    layout.getLayoutElements().add(layoutElement);
+    layout.getModelElements().add(
+        new ModelLayoutElementCreationTO(model.getName())
+            .setProperty(ElementPropKeys.PATH_CONN_TYPE, type.name())
+            .setProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints)
+    );
   }
 
-  private String buildBezierControlPoints(AbstractConnection model,
-                                          String sControlPoints,
-                                          Map<String, String> layoutProperties) {
-    PathConnection figure = (PathConnection) model.getFigure();
+  private String buildBezierControlPoints() {
+    String result = "";
+    PathConnection figure = (PathConnection) getModel().getFigure();
     Point2D.Double cp1 = figure.getCp1();
     if (cp1 != null) {
       Point2D.Double cp2 = figure.getCp2();
@@ -362,32 +305,30 @@ public class PathAdapter
         Point2D.Double cp5 = figure.getCp5();
         if (cp3 != null && cp4 != null && cp5 != null) {
           // Format: x1,y1;x2,y2;x3,y3;x4,y4;x5,y5
-          sControlPoints = String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d",
-                                         (int) (cp1.x),
-                                         (int) (cp1.y),
-                                         (int) (cp2.x),
-                                         (int) (cp2.y),
-                                         (int) (cp3.x),
-                                         (int) (cp3.y),
-                                         (int) (cp4.x),
-                                         (int) (cp4.y),
-                                         (int) (cp5.x),
-                                         (int) (cp5.y));
+          result = String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d",
+                                 (int) (cp1.x),
+                                 (int) (cp1.y),
+                                 (int) (cp2.x),
+                                 (int) (cp2.y),
+                                 (int) (cp3.x),
+                                 (int) (cp3.y),
+                                 (int) (cp4.x),
+                                 (int) (cp4.y),
+                                 (int) (cp5.x),
+                                 (int) (cp5.y));
         }
         else {
           // Format: x1,y1;x2,y2
-          sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
-                                         (int) (cp1.y), (int) (cp2.x),
-                                         (int) (cp2.y));
+          result = String.format("%d,%d;%d,%d", (int) (cp1.x),
+                                 (int) (cp1.y), (int) (cp2.x),
+                                 (int) (cp2.y));
         }
       }
       else {
         // Format: x1,y1
-        sControlPoints = String.format("%d,%d", (int) (cp1.x), (int) (cp1.y));
+        result = String.format("%d,%d", (int) (cp1.x), (int) (cp1.y));
       }
-
-      layoutProperties.put(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints);
     }
-    return sControlPoints;
+    return result;
   }
 }

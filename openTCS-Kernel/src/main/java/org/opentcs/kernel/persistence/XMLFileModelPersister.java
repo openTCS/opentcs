@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -18,12 +17,14 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.kernel.workingset.Model;
+import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.FileSystems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +42,11 @@ public class XMLFileModelPersister
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(XMLFileModelPersister.class);
+  private static final Logger LOG = LoggerFactory.getLogger(XMLFileModelPersister.class);
   /**
    * The name of the model file in the model directory.
    */
-  private static final String modelFileName = "model.xml";
+  private static final String MODEL_FILE_NAME = "model.xml";
   /**
    * The directory path for the persisted model.
    */
@@ -73,7 +73,7 @@ public class XMLFileModelPersister
   public XMLFileModelPersister(@ApplicationHome File directory,
                                Provider<XMLModelReader> readerProvider,
                                Provider<XMLModelWriter> writerProvider) {
-    log.debug("method entry");
+    LOG.debug("method entry");
     this.readerProvider = Objects.requireNonNull(readerProvider);
     this.writerProvider = Objects.requireNonNull(writerProvider);
     Objects.requireNonNull(directory, "directory is null");
@@ -86,77 +86,73 @@ public class XMLFileModelPersister
 
   @Override
   public Optional<String> getPersistentModelName()
-      throws IOException {
-    log.debug("method entry");
+      throws IllegalStateException {
+    LOG.debug("method entry");
     if (!hasSavedModel()) {
       return Optional.empty();
     }
-    File modelFile = new File(dataDirectory, modelFileName);
+    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     return Optional.of(readXMLModelName(modelFile));
   }
 
   @Override
   public void saveModel(Model model, @Nullable String modelName)
-      throws IOException {
-    log.debug("method entry");
-    Objects.requireNonNull(model, "model is null");
+      throws IllegalStateException {
+    requireNonNull(model, "model");
 
-    StringBuilder message = new StringBuilder();
-    message.append("Saving model '").append(model.getName()).append("'");
-    if (modelName != null) {
-      message.append(" as ").append(modelName);
-    }
-    log.debug(message.toString());
+    LOG.debug("Saving model '{}', modelName is '{}'.", model.getName(), modelName);
 
-    File modelFile = new File(dataDirectory, modelFileName);
+    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     // Check if writing the model is possible.
-    if (!dataDirectory.exists()) {
-      throw new IOException(dataDirectory.getPath() + " does not exist");
+    checkState(dataDirectory.exists(), "%s does not exist", dataDirectory.getPath());
+    checkState(dataDirectory.isDirectory(),
+               "%s exists, but is not a directory",
+               dataDirectory.getPath());
+    checkState(!modelFile.exists() || modelFile.isFile(),
+               "%s exists, but is not a regular file",
+               modelFile.getPath());
+    try {
+      if (modelFile.exists()) {
+        createBackup();
+      }
+      try (OutputStream outStream = new FileOutputStream(modelFile)) {
+        XMLModelWriter writer = writerProvider.get();
+        writer.writeXMLModel(model, modelName, outStream);
+      }
     }
-    if (!dataDirectory.isDirectory()) {
-      throw new IOException(
-          dataDirectory.getPath() + " exists, but is not a directory");
-    }
-    if (modelFile.exists() && !modelFile.isFile()) {
-      throw new IOException(
-          modelFile.getPath() + " exists, but is not a regular file");
-    }
-    if (modelFile.exists()) {
-      createBackup();
-    }
-    try (OutputStream outStream = new FileOutputStream(modelFile)) {
-      XMLModelWriter writer = writerProvider.get();
-      writer.writeXMLModel(model, modelName, outStream);
+    catch (IOException exc) {
+      throw new IllegalStateException("Exception saving model", exc);
     }
   }
 
   @Override
   public void loadModel(Model model)
-      throws IOException {
-    log.debug("method entry");
-    Objects.requireNonNull(model, "model is null");
+      throws IllegalStateException {
+    requireNonNull(model, "model");
     // Return empty model if there is no saved model
     if (!hasSavedModel()) {
       model.clear();
       return;
     }
-    log.debug("Loading model. '" + getPersistentModelName() + "'");
-    checkIfModelFileExists();
-    // Read the model from the file.
-    File modelFile = new File(dataDirectory, modelFileName);
-    readXMLModel(modelFile, model);
-    log.debug("Successfully loaded model '" + model.getName() + "'");
+    if (!modelFileExists()) {
+      LOG.debug("There is no model file, doing nothing.");
+      return;
+    }
+    try {
+      LOG.debug("Loading model. '{}'", getPersistentModelName());
+      // Read the model from the file.
+      File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
+      readXMLModel(modelFile, model);
+      LOG.debug("Successfully loaded model '" + model.getName() + "'");
+    }
+    catch (IOException exc) {
+      throw new IllegalArgumentException("Exception loading model", exc);
+    }
   }
 
   @Override
   public boolean hasSavedModel() {
-    try {
-      checkIfModelFileExists();
-      return true;
-    }
-    catch (IOException ex) {
-      return false;
-    }
+    return modelFileExists();
   }
 
   /**
@@ -174,7 +170,7 @@ public class XMLFileModelPersister
     Calendar cal = Calendar.getInstance();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS");
     String time = sdf.format(cal.getTime());
-    String modelBackupName = modelFileName + "_backup_" + time;
+    String modelBackupName = MODEL_FILE_NAME + "_backup_" + time;
     // Make sure backup directory exists
     File modelBackupDirectory = new File(dataDirectory, "backups");
     if (modelBackupDirectory.exists()) {
@@ -190,7 +186,7 @@ public class XMLFileModelPersister
       }
     }
     // Backup the model file
-    Files.copy(new File(dataDirectory, modelFileName).toPath(),
+    Files.copy(new File(dataDirectory, MODEL_FILE_NAME).toPath(),
                new File(modelBackupDirectory, modelBackupName).toPath());
   }
 
@@ -200,42 +196,35 @@ public class XMLFileModelPersister
    *
    * @throws IOException If check failed.
    */
-  private void checkIfModelFileExists()
-      throws IOException {
-    log.debug("method entry");
-    File modelFile = new File(dataDirectory, modelFileName);
-    if (!dataDirectory.exists()) {
-      throw new IOException(dataDirectory.getPath() + " does not exist");
-    }
-    if (!dataDirectory.isDirectory()) {
-      throw new IOException(
-          dataDirectory.getPath() + " exists, but is not a directory");
-    }
+  private boolean modelFileExists() {
+    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     if (!modelFile.exists()) {
-      throw new IOException(modelFile.getPath() + " does not exist.");
+      return false;
     }
     if (modelFile.exists() && !modelFile.isFile()) {
-      throw new IOException(
-          modelFile.getPath() + " exists, but is not a regular file");
+      return false;
     }
+    return true;
   }
 
   @Override
   public void removeModel()
-      throws IOException {
-    log.debug("method entry");
-    log.debug("Removing model.");
-    File modelFile = new File(dataDirectory, modelFileName);
+      throws IllegalStateException {
+    LOG.debug("method entry");
+    LOG.debug("Removing model.");
+    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     // If the model file does not exist, don't do anything
-    try {
-      checkIfModelFileExists();
-    }
-    catch (IOException exc) {
+    if (!modelFileExists()) {
       return;
     }
-    createBackup();
-    if (!FileSystems.deleteRecursively(modelFile)) {
-      throw new IOException("Cannot delete " + modelFile.getPath());
+    try {
+      createBackup();
+      if (!FileSystems.deleteRecursively(modelFile)) {
+        throw new IOException("Cannot delete " + modelFile.getPath());
+      }
+    }
+    catch (IOException exc) {
+      throw new IllegalStateException("Exception removing model", exc);
     }
   }
 
@@ -246,16 +235,17 @@ public class XMLFileModelPersister
    * @throws IOException If an exception occured while loading
    */
   private String readXMLModelName(File modelFile)
-      throws IOException {
-    log.debug("method entry");
+      throws IllegalStateException {
+    LOG.debug("method entry");
     try (InputStream inStream = new FileInputStream(modelFile)) {
       XMLModelReader reader = readerProvider.get();
       return reader.readModelName(inStream);
     }
-    catch (InvalidModelException exc) {
-      throw new IOException("Exception parsing input", exc);
+    catch (IOException | InvalidModelException exc) {
+      throw new IllegalStateException("Exception parsing input", exc);
     }
   }
+
   /**
    * Reads a model from a given InputStream.
    *
@@ -265,13 +255,13 @@ public class XMLFileModelPersister
    */
   private void readXMLModel(File modelFile, Model model)
       throws IOException {
-    log.debug("method entry");
+    LOG.debug("method entry");
     try (InputStream inStream = new FileInputStream(modelFile)) {
       XMLModelReader reader = readerProvider.get();
       reader.readXMLModel(inStream, model);
     }
     catch (InvalidModelException exc) {
-      log.error("Exception parsing input", exc);
+      LOG.error("Exception parsing input", exc);
       throw new IOException("Exception parsing input: " + exc.getMessage());
     }
   }

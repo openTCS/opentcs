@@ -49,6 +49,14 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.2 (2017-05-29)
+
+* Simplify the kernel API by using transfer objects to create plant models and transport orders. 
+  Expect plant models to be transferred as a whole instead of updating existing model elements with multiple calls.
+* Actually make use of modules in the default scheduler: A scheduler module can be used to influence the allocation process of resources to vehicles (e.g. to wait for infrastructure feedback before letting a vehicle pass a path).
+* A location type's (default) symbol can now be overwritten by a location to display an empty symbol.
+* Fix a bug where a large plant model could be loaded multiple times when loaded from the kernel into the plant overview.
+
 === Version 4.1 (2017-04-20)
 
 * Added functionality for reading and writing the kernel's plant model file format to the plant overview client.

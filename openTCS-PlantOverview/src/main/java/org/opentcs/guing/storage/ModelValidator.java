@@ -250,20 +250,23 @@ public class ModelValidator {
       errorOccurred(point, "Vehicle orientation angle does not exist or null.");
       return false; //Return because the next if would be a NPE
     }
-    double angle = 0;
-    try {
-      angle = Double.parseDouble(orientationProperty.getValue().toString());
+
+    if (!(orientationProperty.getValue() instanceof Double)) {
+      LOG.warn("{}: Orientation angle property ('{}') is not a number. Setting it to 0.",
+               point.getName(),
+               orientationProperty.getValue());
+      orientationProperty.setValueAndUnit(0, AngleProperty.Unit.DEG);
     }
-    catch (NumberFormatException e) {
-      errorOccurred(point, "Orientation angle property is not a valid double: {}.", orientationProperty.getValue());
-      valid = false;
+    else {
+      Double angle = (Double) orientationProperty.getValue();
+      if (angle < 0) {
+        LOG.warn("{}: Orientation angle property is {} but has to be > 0. Transforming to positive angle.",
+                 point.getName(),
+                 orientationProperty.getValue());
+        orientationProperty.setValueAndUnit(360 + angle % 360, AngleProperty.Unit.DEG);
+      }
     }
-    if (angle < 0) {
-      errorOccurred(point, "Negative vehicle orientation angle {} not allowed. Transformed to "
-                    + "positive.", angle);
-      angle = 360 + angle % 360;
-      orientationProperty.setValue(angle);
-    }
+
     //Validate the point type
     SelectionProperty<PointModel.PointType> typeProperty
         = (SelectionProperty<PointModel.PointType>) point.getProperty(PointModel.TYPE);
@@ -331,18 +334,6 @@ public class ModelValidator {
       errorOccurred(path, "Path length does not exist.");
       return false; //Return because the next if would be a NPE
     }
-    double length = 0;
-    try {
-      length = Double.parseDouble(lengthProperty.getValue().toString());
-    }
-    catch (NumberFormatException e) {
-      errorOccurred(path, "Path length property is not a valid double: {}.", lengthProperty.getValue());
-      valid = false;
-    }
-    if (length < 0) {
-      errorOccurred(path, "Invalid path length {}.", length);
-      valid = false;
-    }
 
     //Validate the routing costs
     IntegerProperty costProperty = (IntegerProperty) path.getProperty(PathModel.ROUTING_COST);
@@ -350,36 +341,12 @@ public class ModelValidator {
       errorOccurred(path, "Path routing cost does not exist.");
       return false; //Return because the next if would be a NPE
     }
-    int costs = 0;
-    try {
-      costs = Integer.parseInt(costProperty.getValue().toString());
-    }
-    catch (NumberFormatException e) {
-      errorOccurred(path, "Routing costs property is not a valid double: {}.", lengthProperty.getValue());
-      valid = false;
-    }
-    if (costs < 0) {
-      errorOccurred(path, "Invalid routing costs {}.", costs);
-      valid = false;
-    }
 
     //Validate the max velocity
     SpeedProperty maxVelocityProperty = (SpeedProperty) path.getProperty(PathModel.MAX_VELOCITY);
     if (maxVelocityProperty == null || maxVelocityProperty.getValue() == null) {
       errorOccurred(path, "Path max velocity does not exist.");
       return false; //Return because the next if would be a NPE
-    }
-    double maxVelocity = 0;
-    try {
-      maxVelocity = Double.parseDouble(maxVelocityProperty.getValue().toString());
-    }
-    catch (NumberFormatException e) {
-      errorOccurred(path, "Max velocity property is not a valid double: {}.", maxVelocityProperty.getValue());
-      valid = false;
-    }
-    if (maxVelocity < 0) {
-      errorOccurred(path, "Invalid max velocity {}.", maxVelocity);
-      valid = false;
     }
 
     //Validate the max reverse velocity
@@ -389,35 +356,11 @@ public class ModelValidator {
       return false; //Return because the next if would be a NPE
     }
 
-    double maxRevVelocity = 0;
-    try {
-      maxRevVelocity = Double.parseDouble(maxRevVelocityProperty.getValue().toString());
-    }
-    catch (NumberFormatException e) {
-      errorOccurred(path, "Max velocity property is not a valid double: {}.", maxRevVelocityProperty.getValue());
-      valid = false;
-    }
-    if (maxRevVelocity < 0) {
-      errorOccurred(path, "Invalid max reverse velocity {}.", maxRevVelocity);
-      valid = false;
-    }
-
     //Validate the connection type of this path
     SelectionProperty typeProperty = (SelectionProperty) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
     if (typeProperty == null) {
       errorOccurred(path, "Path connection type does not exist.");
       return false; //Return because the next if would be a NPE
-    }
-    boolean found = false;
-    for (PathModel.LinerType type : PathModel.LinerType.values()) {
-      if (type.equals(typeProperty.getValue())) {
-        found = true;
-      }
-    }
-    //Record error if property value is not present in the enum
-    if (!found) {
-      errorOccurred(path, "Invalid type of path \"{}\".", typeProperty.getComparableValue());
-      valid = false;
     }
 
     //Validate the control points of the path
@@ -476,6 +419,57 @@ public class ModelValidator {
       errorOccurred(path, "Locked property does not exist.");
       valid = false; //Return because the next if would be a NPE
     }
+
+    //If some required properties do not exist, return to avoid NPE for semantic validation
+    if (!valid) {
+      return valid;
+    }
+
+    //Validate the length
+    if (((Double) lengthProperty.getValue()) < 1) {
+      LOG.warn("{}: Length property is {} but has to be > 0. Setting it to 1.",
+               path.getName(),
+               lengthProperty.getValue());
+      lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
+    }
+
+    //Validate the costs
+    if (((Integer) costProperty.getValue()) < 1) {
+      LOG.warn("{}: Costs property is {} but has to be > 0. Setting it to 1.",
+               path.getName(),
+               costProperty.getValue());
+      costProperty.setValue(1);
+    }
+
+    //Validate the maximum velocity
+    if (((Double) maxVelocityProperty.getValue()) < 0) {
+      LOG.warn("{}: Max. velocity property is {} but has to be >= 0. Setting it to 0.",
+               path.getName(),
+               maxVelocityProperty.getValue());
+      maxVelocityProperty.setValueAndUnit(0, SpeedProperty.Unit.MM_S);
+    }
+
+    //Validate the maximum reverse velocity
+    if (((Double) maxRevVelocityProperty.getValue()) < 0) {
+      LOG.warn("{}: Max. reverse velocity property is {} but has to be >= 0. Setting it to 0.",
+               path.getName(),
+               maxRevVelocityProperty.getValue());
+      maxRevVelocityProperty.setValueAndUnit(0, SpeedProperty.Unit.MM_S);
+    }
+
+    //Validate the connection type of this path
+    boolean found = false;
+    for (PathModel.LinerType type : PathModel.LinerType.values()) {
+      if (type.equals(typeProperty.getValue())) {
+        found = true;
+      }
+    }
+    //Record error if property value is not present in the enum
+    if (!found) {
+      errorOccurred(path, "Invalid type of path '{}'.", typeProperty.getComparableValue());
+      valid = false;
+    }
+
     return valid;
   }
 
@@ -862,41 +856,46 @@ public class ModelValidator {
     }
 
     //Validate the length
-    if (((Double) lengthProperty.getValue()) < 0) {
-      errorOccurred(model, "Length property {} has to be >= 0.", lengthProperty.getValue());
-      valid = false;
+    if (((Double) lengthProperty.getValue()) < 1) {
+      LOG.warn("{}: Length property is {} but has to be > 0. Setting it to 1.",
+               vehicle.getName(),
+               lengthProperty.getValue());
+      lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
     }
 
     //Validate the critical energy level
     if (((int) energyCriticalProperty.getValue()) < 0
         || ((int) energyCriticalProperty.getValue()) > 100) {
-      errorOccurred(model, "Energy level critical has to be in range of [0..100] - currently {}",
-                    energyCriticalProperty.getValue());
-      valid = false;
+      LOG.warn("{}: Energy level critical is {} but has to be in range of [0..100]. Setting it to 0.",
+               vehicle.getName(),
+               energyCriticalProperty.getValue());
+      energyCriticalProperty.setValueAndUnit(0, PercentProperty.Unit.PERCENT);
     }
 
     //Validate the good energy level
-    if (((int) energyGoodProperty.getValue()) < 0
-        || ((int) energyGoodProperty.getValue()) > 100) {
-      errorOccurred(model, "Energy level good has to be in range of [0..100] - currently {}",
-                    energyGoodProperty.getValue());
-      valid = false;
+    if (((int) energyGoodProperty.getValue()) < 0 || ((int) energyGoodProperty.getValue()) > 100) {
+      LOG.warn("{}: Energy level good is {} but has to be in range of [0..100]. Setting it to 100.",
+               vehicle.getName(),
+               energyGoodProperty.getValue());
+      energyGoodProperty.setValueAndUnit(100, PercentProperty.Unit.PERCENT);
     }
 
     //Validate that the good energy level is greater equals than the critical energy level
     if (((int) energyGoodProperty.getValue()) < ((int) energyCriticalProperty.getValue())) {
-      errorOccurred(model, "Energy level good(\"{}\") has to be >= energy level critical(\"{}\").",
-                    energyGoodProperty.getValue(),
-                    energyCriticalProperty.getValue());
-      valid = false;
+      LOG.warn("{}: Energy level good('{}') has to be >= energy level critical('{}'). Setting it to {}.",
+               vehicle.getName(),
+               energyGoodProperty.getValue(),
+               energyCriticalProperty.getValue(),
+               energyCriticalProperty.getValue());
+      energyGoodProperty
+          .setValueAndUnit(energyCriticalProperty.getValueByUnit(PercentProperty.Unit.PERCENT),
+                           PercentProperty.Unit.PERCENT);
     }
 
     //Validate the current energy level
-    if (((int) energyLevelProperty.getValue()) < 0
-        || ((int) energyLevelProperty.getValue()) > 100) {
-      errorOccurred(model, "Energy level has to be in range of [0..100] - currently {}",
-                    energyLevelProperty.getValue());
-      valid = false;
+    if (((int) energyLevelProperty.getValue()) < 0 || ((int) energyLevelProperty.getValue()) > 100) {
+      LOG.warn("{}: Energy level is {} but has to be in range of [0..100]. Setting it to 50.");
+      energyLevelProperty.setValueAndUnit(50, PercentProperty.Unit.PERCENT);
     }
 
     //Validate that the energy state is a valid/known value
@@ -927,9 +926,8 @@ public class ModelValidator {
 
     //Validate the precise position happens in the property converter
     if (((Double) orientationProperty.getValue()) < 0) {
-      errorOccurred(model, "Orientation angle has to be >= 0 - currently {}.",
-                    orientationProperty.getValue());
-      valid = false;
+      LOG.warn("{}: Orientation angle is {} but has to be >= 0. Setting it to 0.");
+      orientationProperty.setValueAndUnit(0, AngleProperty.Unit.DEG);
     }
     return valid;
   }

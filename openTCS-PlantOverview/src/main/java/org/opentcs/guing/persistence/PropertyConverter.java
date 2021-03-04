@@ -362,11 +362,16 @@ public class PropertyConverter {
       throws ClassCastException {
     TripleProperty tp = (TripleProperty) model.getProperty(key);
     String[] values = ((String) property.getValue()).split("=");
-    Triple triple = new Triple();
-    if (values.length == 3) { //otherwise it is empty
-      triple.setX(values[0].isEmpty() ? 0 : Long.parseLong(values[0]));
-      triple.setY(values[1].isEmpty() ? 0 : Long.parseLong(values[1]));
-      triple.setZ(values[2].isEmpty() ? 0 : Long.parseLong(values[2]));
+    Triple triple;
+    // values either contains three elements or is empty
+    if (values.length == 3) {
+      triple = new Triple(values[0].isEmpty() ? 0 : Long.parseLong(values[0]),
+                          values[1].isEmpty() ? 0 : Long.parseLong(values[1]),
+                          values[2].isEmpty() ? 0 : Long.parseLong(values[2])
+      );
+    }
+    else {
+      triple = new Triple(0, 0, 0);
     }
     tp.setValue(triple);
   }

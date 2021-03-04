@@ -1,3 +1,5 @@
+apply from: "${rootDir}/gradle/license-headers.gradle"
+
 dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -22,6 +21,9 @@ import org.opentcs.access.Kernel.State;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.queries.Query;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -44,9 +46,7 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.data.user.UserExistsException;
 import org.opentcs.data.user.UserPermission;
-import org.opentcs.data.user.UserUnknownException;
 import org.opentcs.util.eventsystem.EventFilter;
 import org.opentcs.util.eventsystem.TCSEvent;
 
@@ -126,26 +126,30 @@ public interface RemoteKernel
   Set<UserPermission> getUserPermissions(ClientID clientID)
       throws RemoteException;
 
+  @Deprecated
   @CallPermissions({UserPermission.MANAGE_USERS})
   void createUser(ClientID clientID, String userName, String userPassword,
                   Set<UserPermission> userPermissions)
-      throws UserExistsException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserExistsException, UnsupportedKernelOpException,
              CredentialsException, RemoteException;
 
+  @Deprecated
   @CallPermissions({})
   void setUserPassword(ClientID clientID, String userName, String userPassword)
-      throws UserUnknownException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException, RemoteException;
 
+  @Deprecated
   @CallPermissions({UserPermission.MANAGE_USERS})
   void setUserPermissions(ClientID clientID, String userName,
                           Set<UserPermission> userPermissions)
-      throws UserUnknownException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException, RemoteException;
 
+  @Deprecated
   @CallPermissions({UserPermission.MANAGE_USERS})
   void removeUser(ClientID clientID, String userName)
-      throws UserUnknownException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.READ_DATA})
@@ -255,6 +259,10 @@ public interface RemoteKernel
   @CallPermissions({UserPermission.READ_DATA})
   List<UserNotification> getUserNotifications(ClientID clientID,
                                               Predicate<UserNotification> predicate)
+      throws CredentialsException, RemoteException;
+
+  @CallPermissions({UserPermission.MODIFY_MODEL})
+  VisualLayout createPlantModel(ClientID clientID, PlantModelCreationTO to)
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
@@ -480,6 +488,10 @@ public interface RemoteKernel
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_ORDER})
+  TransportOrder createTransportOrder(ClientID clientID, TransportOrderCreationTO to)
+      throws CredentialsException, RemoteException;
+
+  @CallPermissions({UserPermission.MODIFY_ORDER})
   void setTransportOrderDeadline(ClientID clientID,
                                  TCSObjectReference<TransportOrder> ref, long deadline)
       throws CredentialsException, ObjectUnknownException, RemoteException;
@@ -515,6 +527,10 @@ public interface RemoteKernel
 
   @CallPermissions({UserPermission.MODIFY_ORDER})
   OrderSequence createOrderSequence(ClientID clientID)
+      throws CredentialsException, RemoteException;
+
+  @CallPermissions({UserPermission.MODIFY_ORDER})
+  OrderSequence createOrderSequence(ClientID clientID, OrderSequenceCreationTO to)
       throws CredentialsException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_ORDER})

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -35,12 +34,13 @@ import org.opentcs.data.TCSObjectReference;
  */
 public class Location
     extends TCSResource<Location>
-    implements Serializable, Cloneable {
+    implements Serializable,
+               Cloneable {
 
   /**
    * This location's position in mm.
    */
-  private Triple position = new Triple();
+  private Triple position = new Triple(0, 0, 0);
   /**
    * A reference to this location's type.
    */
@@ -161,13 +161,13 @@ public class Location
     return clone;
   }
 
-
   /**
    * A link connecting a point and a location, expressing that the location is
    * reachable from the point.
    */
   public static class Link
-      implements Serializable, Cloneable {
+      implements Serializable,
+                 Cloneable {
 
     /**
      * A reference to the location end of this link.
@@ -243,7 +243,7 @@ public class Location
     /**
      * Adds an allowed operation.
      *
-    * @param operation The operation to be allowed.
+     * @param operation The operation to be allowed.
      * @return <code>true</code> if, and only if, the given operation wasn't
      * already allowed before.
      */

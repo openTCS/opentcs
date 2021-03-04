@@ -1,19 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.documentation;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.junit.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -29,70 +37,67 @@ public class CreateTransportOrderSequenceTest {
 
   private LocalKernel localKernel;
 
-  private Vehicle vehicle;
+  private int idCounter;
 
   @Before
   public void setUp() {
     localKernel = mock(LocalKernel.class);
-    vehicle = new Vehicle(3, "Vehicle");
-    when(localKernel.createOrderSequence()).thenReturn(new OrderSequence(9, "OrderSequence"));
+    when(localKernel.createOrderSequence(any(OrderSequenceCreationTO.class)))
+        .thenReturn(new OrderSequence(idCounter++, "OrderSequence"));
+    when(localKernel.createTransportOrder(any(TransportOrderCreationTO.class)))
+        .thenReturn(new TransportOrder(
+            idCounter++,
+            "Transportorder",
+            Collections.singletonList(
+                new DriveOrder.Destination(getSampleDestinationLocation().getReference(),
+                                           "some operation")),
+            0));
   }
 
   @Test
   public void shouldCreateTransportOrderSequence() {
     // tag::documentation_createTransportOrderSequence[]
     // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    Kernel kernel = getAKernelReference();
 
-    // Create an order sequence.
-    OrderSequence orderSequence = kernel.createOrderSequence();
+    // Create an order sequence description with a unique name:
+    OrderSequenceCreationTO sequenceTO
+        = new OrderSequenceCreationTO("MyOrderSequence-" + UUID.randomUUID());
+    // Optionally, set the sequence's failure-fatal flag:
+    sequenceTO.setFailureFatal(true);
 
-    // Set the order sequence's failureFatal flag (optional).
-    kernel.setOrderSequenceFailureFatal(orderSequence.getReference(), true);
+    // Create the order sequence:
+    OrderSequence orderSequence = kernel.createOrderSequence(sequenceTO);
 
-    // Create an order and set it up as usual, but do not activate it, yet!
-    TransportOrder order = createARandomAndLongTransportOrder();
+    // Set up the transport order as usual:
+    List<DestinationCreationTO> destinations = new ArrayList<>();
+    destinations.add(new DestinationCreationTO("Some location name",
+                                               "Some operation"));
+    TransportOrderCreationTO orderTO
+        = new TransportOrderCreationTO("MyOrder-" + UUID.randomUUID(),
+                                       destinations);
+    // Set the name of the wrapping order sequence:
+    orderTO.setWrappingSequence(orderSequence.getName());
 
-    // Add the order to the sequence.
-    kernel.addOrderSequenceOrder(orderSequence.getReference(),
-                                 order.getReference());
-
+    // Create the transport order and activate it for processing:
+    TransportOrder order = kernel.createTransportOrder(orderTO);
     // Activate the order when it may be processed by a vehicle.
     kernel.activateTransportOrder(order.getReference());
 
-    // Create, add and activate more orders as necessary. As long as the sequence
-    // has not been marked as complete and finished completely, the vehicle
-    // selected for its first order will be tied to this sequence and will not
-    // process any orders not belonging to the same sequence.
+    // Create, add and activate more orders as necessary.
     // Eventually, set the order sequence's complete flag to indicate that more
     // transport orders will not be added to it.
     kernel.setOrderSequenceComplete(orderSequence.getReference());
-
-    // Once the complete flag of the sequence has been set and all transport
-    // orders belonging to it have been processed, its finished flag will be set
-    // by the kernel.
     // end::documentation_createTransportOrderSequence[]
   }
 
-  private TransportOrder createARandomAndLongTransportOrder() {
-    return new TransportOrder(
-        2,
-        "Transportorder",
-        Collections.singletonList(
-            new DriveOrder.Destination(getSampleDestinationLocation().getReference(),
-                                       getDestinationOperation())),
-        0);
-  }
-
-  private String getDestinationOperation() {
-    return "";
-  }
-
   private Location getSampleDestinationLocation() {
-    return new Location(0, "Location", new LocationType(1, "LocationType").getReference());
+    return new Location(idCounter++,
+                        "Location",
+                        new LocationType(idCounter++, "LocationType").getReference());
   }
 
-  private LocalKernel getKernelFromSomewhere() {
+  private LocalKernel getAKernelReference() {
     return localKernel;
   }
 }

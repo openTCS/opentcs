@@ -10,14 +10,15 @@ package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.data.TCSObjectReference;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.TransportOrder;
@@ -63,7 +64,7 @@ class RandomOrderBatchCreator
   public RandomOrderBatchCreator(final Kernel kernel,
                                  final int batchSize,
                                  final int orderSize) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
+    this.kernel = requireNonNull(kernel, "kernel");
     this.batchSize = batchSize;
     this.orderSize = orderSize;
     locations = new ArrayList<>(kernel.getTCSObjects(Location.class));
@@ -84,14 +85,13 @@ class RandomOrderBatchCreator
 
   private TransportOrder createSingleOrder()
       throws KernelRuntimeException {
-    List<Destination> destinations = new LinkedList<>();
+    List<DestinationCreationTO> dests = new ArrayList<>();
     for (int j = 0; j < orderSize; j++) {
       Location destLoc = locations.get(random.nextInt(locations.size()));
-      TCSObjectReference<Location> destLocRef = destLoc.getReference();
-      String destOp = Destination.OP_NOP;
-      destinations.add(new Destination(destLocRef, destOp));
+      dests.add(new DestinationCreationTO(destLoc.getName(), Destination.OP_NOP));
     }
-    TransportOrder newOrder = kernel.createTransportOrder(destinations);
+    TransportOrder newOrder = kernel.createTransportOrder(
+        new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(), dests));
     kernel.activateTransportOrder(newOrder.getReference());
     return newOrder;
   }

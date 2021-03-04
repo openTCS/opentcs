@@ -10,30 +10,30 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
+import java.util.HashSet;
+import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.to.model.BlockCreationTO;
+import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.BlockModel;
-import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.model.elements.PathModel;
-import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for blocks.
@@ -47,8 +47,7 @@ public class BlockAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(BlockAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BlockAdapter.class);
 
   /**
    * Creates a new instance.
@@ -87,66 +86,37 @@ public class BlockAdapter
       updateMiscModelProperties(block);
     }
     catch (CredentialsException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    requireNonNull(kernel, "kernel");
-
-    Block block = kernel.createBlock();
-    TCSObjectReference<Block> reference = block.getReference();
-
-    StringProperty pName
-        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    String name = pName.getText();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      kernel.renameTCSObject(reference, name);
+      plantModel.getBlocks().add(new BlockCreationTO(getModel().getName())
+          .setMemberNames(getMemberNames())
+          .setProperties(getKernelProperties()));
 
-      updateProcessBlock(kernel, block, plantModel);
+      // Write the block color into the model layout element
+      for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
+        updateLayoutElement(layout);
+      }
 
-      updateMiscProcessProperties(kernel, reference);
     }
     catch (KernelRuntimeException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
-  private void updateProcessBlock(Kernel kernel, Block block, PlantModelCache plantModel)
-      throws KernelRuntimeException {
-
-    for (TCSResourceReference<?> resRef : block.getMembers()) {
-      kernel.removeBlockMember(block.getReference(), resRef);
-    }
-
+  private Set<String> getMemberNames() {
+    Set<String> result = new HashSet<>();
     for (ModelComponent model : getModel().getChildComponents()) {
-      TCSResourceReference<?> memberRef;
-      if (model instanceof PointModel) {
-        memberRef = plantModel.getPoints().get(model.getName()).getReference();
-      }
-      else if (model instanceof PathModel) {
-        memberRef = plantModel.getPaths().get(model.getName()).getReference();
-      }
-      else if (model instanceof LocationModel) {
-        memberRef = plantModel.getLocations().get(model.getName()).getReference();
-      }
-      else {
-        throw new IllegalArgumentException("Unhandled model type "
-            + model.getClass().getName());
-      }
-
-      ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(model);
-
-      if (adapter != null) {
-        kernel.addBlockMember(block.getReference(), memberRef);
+      if (getEventDispatcher().findProcessAdapter(model) != null) {
+        result.add(model.getName());
       }
     }
-    // Write the block color into the model layout element
-    for (VisualLayout layout : plantModel.getVisualLayouts()) {
-      updateLayoutElement(layout, block.getReference());
-    }
+
+    return result;
   }
 
   /**
@@ -154,15 +124,14 @@ public class BlockAdapter
    *
    * @param layout The VisualLayout.
    */
-  private void updateLayoutElement(VisualLayout layout,
-                                   TCSObjectReference<?> ref) {
-    ModelLayoutElement layoutElement = new ModelLayoutElement(ref);
-
-    ColorProperty pColor
-        = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
+  private void updateLayoutElement(VisualLayoutCreationTO layout) {
+    ColorProperty pColor = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
     int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
-    layoutElement.getProperties().put(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb));
 
-    layout.getLayoutElements().add(layoutElement);
+    layout.getModelElements().add(
+        new ModelLayoutElementCreationTO(getModel().getName())
+            .setProperty(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb))
+    );
   }
+
 }

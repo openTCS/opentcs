@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2017 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -14,6 +13,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.data.model.TCSResource;
 
 /**
@@ -109,5 +109,35 @@ public class AllocationAdvisor
       result = result && module.mayAllocate(client, resources);
     }
     return result;
+  }
+
+  @Override
+  public void prepareAllocation(Scheduler.Client client,
+                                Set<TCSResource<?>> resources) {
+    requireNonNull(client, "client");
+    requireNonNull(resources, "resources");
+
+    for (Scheduler.Module module : modules) {
+      module.prepareAllocation(client, resources);
+    }
+  }
+
+  @Override
+  public boolean hasPreparedAllocation(Scheduler.Client client,
+                                    Set<TCSResource<?>> resources) {
+    boolean result = true;
+    for (Scheduler.Module module : modules) {
+      result = result && module.hasPreparedAllocation(client, resources);
+    }
+    return result;
+  }
+
+  @Override
+  public void allocationReleased(Client client, Set<TCSResource<?>> resources) {
+    requireNonNull(resources, "resources");
+
+    for (Scheduler.Module module : modules) {
+      module.allocationReleased(client, resources);
+    }
   }
 }

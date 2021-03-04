@@ -33,13 +33,13 @@ import org.slf4j.LoggerFactory;
 public class ProcessAdapterUtil {
 
   /**
+   * This class' logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessAdapterUtil.class);
+  /**
    * A factory for process adapters.
    */
   private final ProcessAdapterFactory procAdapterFactory;
-  /**
-   * This class' logger.
-   */
-  private final Logger log = LoggerFactory.getLogger(getClass());
 
   /**
    * Creates a new instance.
@@ -65,26 +65,26 @@ public class ProcessAdapterUtil {
     requireNonNull(dispatcher, "dispatcher");
 
     if (dispatcher.findProcessAdapter(model) != null) {
-      log.warn("There is already a process adapter for model " + model.getName());
+      LOG.warn("There is already a process adapter for model {}", model.getName());
     }
 
     ProcessAdapter adapter = basicCreateProcessAdapter(model, dispatcher);
     dispatcher.addProcessAdapter(adapter);
   }
-  
+
   /**
    * Removes the process adapter of the given model component.
-   * 
+   *
    * @param model The model component.
    * @param dispatcher The event dispatcher.
    */
-  public void removeProcessAdapter(ModelComponent model, 
+  public void removeProcessAdapter(ModelComponent model,
                                    EventDispatcher dispatcher) {
     requireNonNull(model, "model");
     requireNonNull(dispatcher, "dispatcher");
-    
+
     ProcessAdapter adapter = dispatcher.findProcessAdapter(model);
-    
+
     if (adapter != null) {
       dispatcher.removeProcessAdapter(adapter);
     }
@@ -135,8 +135,7 @@ public class ProcessAdapterUtil {
     }
     else {
       // Just in case the set of model classes ever changes.
-      throw new IllegalArgumentException(
-          "Unhandled model class: " + model.getClass());
+      throw new IllegalArgumentException("Unhandled model class: " + model.getClass());
     }
   }
 }

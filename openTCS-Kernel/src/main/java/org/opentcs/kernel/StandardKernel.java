@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -34,6 +33,9 @@ import org.opentcs.access.TCSModelTransitionEvent;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.queries.Query;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.CentralEventHub;
 import org.opentcs.data.ObjectExistsException;
@@ -210,6 +212,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void createUser(String userName, String userPassword,
                          Set<UserPermission> userPermissions)
       throws UnsupportedKernelOpException {
@@ -218,6 +221,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setUserPassword(String userName, String userPassword)
       throws UnsupportedKernelOpException {
     LOG.debug("method entry");
@@ -225,6 +229,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setUserPermissions(String userName,
                                  Set<UserPermission> userPermissions)
       throws UnsupportedKernelOpException {
@@ -233,6 +238,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeUser(String userName)
       throws UnsupportedKernelOpException {
     LOG.debug("method entry");
@@ -299,7 +305,7 @@ final class StandardKernel
 
   @Override
   public String getPersistentModelName()
-      throws IOException {
+      throws IllegalStateException {
     LOG.debug("method entry");
     return kernelState.getPersistentModelName().orElse(null);
   }
@@ -311,6 +317,18 @@ final class StandardKernel
   }
 
   @Override
+  public void createPlantModel(PlantModelCreationTO to) {
+    final String oldModelName = kernelState.getLoadedModelName();
+    emitModelEvent(oldModelName, to.getName(), true, false);
+    kernelState.createPlantModel(to);
+    kernelState.savePlantModel();
+    emitModelEvent(oldModelName, to.getName(), true, true);
+    publishUserNotification(new UserNotification("Kernel created model " + to.getName(),
+                                                 UserNotification.Level.INFORMATIONAL));
+  }
+
+  @Override
+  @Deprecated
   public void createModel(String modelName) {
     LOG.debug("method entry");
     final String oldModelName = kernelState.getLoadedModelName();
@@ -322,6 +340,22 @@ final class StandardKernel
   }
 
   @Override
+  public void loadPlantModel()
+      throws IllegalStateException {
+    final String oldModelName = kernelState.getLoadedModelName();
+    final String newModelName = kernelState.getPersistentModelName().orElse("");
+    // Let listeners know we're in transition.
+    emitModelEvent(oldModelName, newModelName, true, false);
+    // Load the new model
+    kernelState.loadPlantModel();
+    // Let listeners know we're done with the transition.
+    emitModelEvent(oldModelName, newModelName, true, true);
+    publishUserNotification(new UserNotification("Kernel loaded model " + newModelName,
+                                                 UserNotification.Level.INFORMATIONAL));
+  }
+
+  @Override
+  @Deprecated
   public void loadModel()
       throws IOException {
     LOG.debug("method entry");
@@ -338,6 +372,20 @@ final class StandardKernel
   }
 
   @Override
+  public void savePlantModel()
+      throws IllegalStateException {
+//    final String modelName = kernelState.getLoadedModelName();
+//    // Let listeners know we're in transition.
+//    emitModelEvent(modelName, modelName, false, false);
+    kernelState.savePlantModel();
+//    // Let listeners know we're done with the transition.
+//    emitModelEvent(modelName, modelName, false, true);
+//    publishUserNotification(new UserNotification("Kernel saved model " + modelName,
+//                                                 UserNotification.Level.INFORMATIONAL));
+  }
+
+  @Override
+  @Deprecated
   public void saveModel(String modelName)
       throws IOException {
     LOG.debug("method entry");
@@ -353,6 +401,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeModel()
       throws IOException {
     LOG.debug("method entry");
@@ -430,6 +479,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void renameTCSObject(TCSObjectReference<?> ref, String newName)
       throws CredentialsException, ObjectUnknownException, ObjectExistsException {
     LOG.debug("method entry");
@@ -452,6 +502,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeTCSObject(TCSObjectReference<?> ref) {
     LOG.debug("method entry");
     kernelState.removeTCSObject(ref);
@@ -471,6 +522,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public VisualLayout createVisualLayout()
       throws CredentialsException {
     LOG.debug("method entry");
@@ -478,6 +530,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                                     double scaleX)
       throws ObjectUnknownException, CredentialsException {
@@ -486,6 +539,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                                     double scaleY)
       throws ObjectUnknownException, CredentialsException {
@@ -494,6 +548,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                                     Map<String, Color> colors)
       throws ObjectUnknownException, CredentialsException {
@@ -502,6 +557,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                       Set<LayoutElement> elements)
       throws ObjectUnknownException, CredentialsException {
@@ -510,6 +566,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                            List<ViewBookmark> bookmarks)
       throws ObjectUnknownException, CredentialsException {
@@ -518,12 +575,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Point createPoint() {
     LOG.debug("method entry");
     return kernelState.createPoint();
   }
 
   @Override
+  @Deprecated
   public void setPointPosition(TCSObjectReference<Point> ref, Triple position)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -531,6 +590,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                               double angle)
       throws ObjectUnknownException {
@@ -539,6 +599,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPointType(TCSObjectReference<Point> ref, Point.Type newType)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -546,6 +607,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
@@ -554,6 +616,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPathLength(TCSObjectReference<Path> ref, long length)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -561,6 +624,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPathRoutingCost(TCSObjectReference<Path> ref, long cost)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -568,6 +632,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPathMaxVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -575,6 +640,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPathMaxReverseVelocity(TCSObjectReference<Path> ref,
                                         int velocity)
       throws ObjectUnknownException {
@@ -590,6 +656,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Vehicle createVehicle() {
     LOG.debug("method entry");
     return kernelState.createVehicle();
@@ -604,6 +671,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleEnergyLevelCritical(TCSObjectReference<Vehicle> ref,
                                             int energyLevel)
       throws ObjectUnknownException {
@@ -612,6 +680,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleEnergyLevelGood(TCSObjectReference<Vehicle> ref,
                                         int energyLevel)
       throws ObjectUnknownException {
@@ -676,6 +745,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -740,12 +810,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public LocationType createLocationType() {
     LOG.debug("method entry");
     return kernelState.createLocationType();
   }
 
   @Override
+  @Deprecated
   public void addLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
@@ -754,6 +826,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
@@ -762,6 +835,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -769,6 +843,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setLocationPosition(TCSObjectReference<Location> ref,
                                   Triple position)
       throws ObjectUnknownException {
@@ -777,6 +852,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setLocationType(TCSObjectReference<Location> ref,
                               TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
@@ -785,6 +861,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void connectLocationToPoint(TCSObjectReference<Location> locRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -793,6 +870,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -801,6 +879,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void addLocationLinkAllowedOperation(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
@@ -810,6 +889,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeLocationLinkAllowedOperation(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
@@ -819,6 +899,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void clearLocationLinkAllowedOperations(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -827,12 +908,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Block createBlock() {
     LOG.debug("method entry");
     return kernelState.createBlock();
   }
 
   @Override
+  @Deprecated
   public void addBlockMember(TCSObjectReference<Block> ref,
                              TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
@@ -841,6 +924,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeBlockMember(TCSObjectReference<Block> ref,
                                 TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
@@ -849,12 +933,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Group createGroup() {
     LOG.debug("method entry");
     return kernelState.createGroup();
   }
 
   @Override
+  @Deprecated
   public void addGroupMember(TCSObjectReference<Group> ref,
                              TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException {
@@ -863,6 +949,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeGroupMember(TCSObjectReference<Group> ref,
                                 TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException {
@@ -871,12 +958,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public StaticRoute createStaticRoute() {
     LOG.debug("method entry");
     return kernelState.createStaticRoute();
   }
 
   @Override
+  @Deprecated
   public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
@@ -885,6 +974,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -892,12 +982,20 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public TransportOrder createTransportOrder(List<Destination> destinations) {
     LOG.debug("method entry");
     return kernelState.createTransportOrder(destinations);
   }
 
   @Override
+  public TransportOrder createTransportOrder(TransportOrderCreationTO to) {
+    LOG.debug("method entry");
+    return kernelState.createTransportOrder(to);
+  }
+
+  @Override
+  @Deprecated
   public void setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
                                         long deadline)
       throws ObjectUnknownException {
@@ -921,6 +1019,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderIntendedVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -964,6 +1063,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void addTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> newDepRef)
@@ -973,6 +1073,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
@@ -991,6 +1092,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderWrappingSequence(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<OrderSequence> seqRef)
@@ -1000,6 +1102,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderDispensable(
       TCSObjectReference<TransportOrder> orderRef,
       boolean dispensable)
@@ -1009,12 +1112,20 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public OrderSequence createOrderSequence() {
     LOG.debug("method entry");
     return kernelState.createOrderSequence();
   }
 
   @Override
+  public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
+    LOG.debug("method entry");
+    return kernelState.createOrderSequence(to);
+  }
+
+  @Override
+  @Deprecated
   public void addOrderSequenceOrder(TCSObjectReference<OrderSequence> seqRef,
                                     TCSObjectReference<TransportOrder> orderRef) {
     LOG.debug("method entry");
@@ -1022,6 +1133,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void removeOrderSequenceOrder(TCSObjectReference<OrderSequence> seqRef,
                                        TCSObjectReference<TransportOrder> orderRef) {
     LOG.debug("method entry");
@@ -1049,6 +1161,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceFailureFatal(
       TCSObjectReference<OrderSequence> seqRef,
       boolean fatal) {
@@ -1057,6 +1170,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceIntendedVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {

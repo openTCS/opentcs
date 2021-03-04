@@ -11,12 +11,13 @@ package org.opentcs.guing.transport;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
@@ -38,8 +38,9 @@ import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.DateUtility;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Benutzerschnittstelle zur Eingabe eines neuen Transportauftrags.
@@ -50,6 +51,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class CreateTransportOrderPanel
     extends DialogContent {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CreateTransportOrderPanel.class);
   /**
    * Die ausgewählte Frist.
    */
@@ -86,73 +88,40 @@ public class CreateTransportOrderPanel
     this.fModelManager = requireNonNull(modelManager, "modelManager");
 
     initComponents();
-    Object[] columnNames = {ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.location"),
-                            ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.action")};
+    Object[] columnNames = {
+      ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.location"),
+      ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.action")
+    };
     DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
     model.setColumnIdentifiers(columnNames);
 
-    driveOrdersTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-      @Override
-      public void valueChanged(ListSelectionEvent evt) {
-        if (!evt.getValueIsAdjusting()) {
-          updateButtons();
-        }
+    driveOrdersTable.getSelectionModel().addListSelectionListener((ListSelectionEvent evt) -> {
+      if (!evt.getValueIsAdjusting()) {
+        updateButtons();
       }
     });
 
     fVehicles = fModelManager.getModel().getVehicleModels();
 
-    Comparator<VehicleModel> c = new Comparator<VehicleModel>() {
-
-      @Override
-      public int compare(VehicleModel o1, VehicleModel o2) {
-        String s1 = o1.getName().toLowerCase();
-        String s2 = o2.getName().toLowerCase();
-        return s1.compareTo(s2);
-      }
-    };
-
-    Collections.sort(fVehicles, c);
+    Collections.sort(fVehicles, (v1, v2) -> v1.getName().compareToIgnoreCase(v2.getName()));
   }
 
-  /**
-   * Liefert die anzufahrenden Stationen.
-   * Returns location or point models to allow transport orders with a point as destination.
-   *
-   * @return die Stationen
-   */
   public List<AbstractFigureComponent> getDestinationModels() {
     return fDestinationModels;
   }
 
-  /**
-   * Liefert die auszuführenden Aktionen.
-   *
-   * @return die Aktionen
-   */
   public List<String> getActions() {
     return fActions;
   }
-  
+
   public List<Map<String, String>> getPropertiesList() {
     return fPropertiesList;
   }
 
-  /**
-   * Liefert die ausgewählte Frist.
-   *
-   * @return die Frist
-   */
   public long getSelectedDeadline() {
     return fSelectedDeadline;
   }
 
-  /**
-   * Liefert das zu verwendende Fahrzeug.
-   *
-   * @return das Fahrzeug
-   */
   public VehicleModel getSelectedVehicle() {
     if (vehicleComboBox.getSelectedIndex() == 0) {
       return null;
@@ -164,31 +133,18 @@ public class CreateTransportOrderPanel
   @Override
   public void update() {
     try {
-      // Temporärer Kalender zum puffern des Datums
-      Calendar calDate = new GregorianCalendar();
-      SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy");
-      Date date = f.parse(dateTextField.getText());
-      calDate.setTime(date);
-      // Temporärer Kalender zum puffern der Uhrzeit
-      Calendar calTime = new GregorianCalendar();
-      f = new SimpleDateFormat("HH:mm");
-      Date time = f.parse(timeTextField.getText());
-      calTime.setTime(time);
-      // Uhrzeit zum Datum "addieren"
-      calDate.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
-      calDate.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
-
-      fSelectedDeadline = calDate.getTimeInMillis();
-
-      if (DateUtility.isWithinDaylightSavingTime(fSelectedDeadline)) {
-        fSelectedDeadline += 3600 * 1000;
-      }
+      fParsingFailed = false;
+      SimpleDateFormat deadlineFormat = new SimpleDateFormat("dd.MM.yyyyHH:mm");
+      Date date = deadlineFormat.parse(dateTextField.getText() + timeTextField.getText());
+      ZonedDateTime deadline = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+      fSelectedDeadline = deadline.toInstant().toEpochMilli();
     }
     catch (ParseException e) {
-      // XXX Do something here or document why nothing is done.
+      LOG.warn("Couldn't parse date '{}' or time '{}'.",
+               dateTextField.getText(),
+               timeTextField.getText());
+      fParsingFailed = true;
     }
-
-    fParsingFailed = false;
 
     if (fDestinationModels.isEmpty()) {
       String title = ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.inputError");
@@ -209,24 +165,16 @@ public class CreateTransportOrderPanel
       vehicleComboBox.addItem(v.getName());
     }
 
-    Calendar calendar = GregorianCalendar.getInstance();
-    calendar.add(Calendar.HOUR_OF_DAY, 1);
-    Date tDeadline = calendar.getTime();
-
-    SimpleDateFormat fDate = new SimpleDateFormat("dd.MM.yyyy");
-    SimpleDateFormat fTime = new SimpleDateFormat("HH:mm");
-    String sDate = fDate.format(tDeadline);
-    String sTime = fTime.format(tDeadline);
-    dateTextField.setText(sDate);
-    timeTextField.setText(sTime);
+    ZonedDateTime newDeadline = ZonedDateTime.now(ZoneId.systemDefault()).plusHours(1);
+    dateTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+    timeTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("HH:mm")));
 
     if (fPattern != null) {
       // Frist
-      Date deadline = new Date(fPattern.getDeadline());
-      sDate = fDate.format(deadline);
-      sTime = fTime.format(deadline);
-      dateTextField.setText(sDate);
-      timeTextField.setText(sTime);
+      newDeadline = ZonedDateTime.ofInstant(Instant.ofEpochMilli(fPattern.getDeadline()),
+                                            ZoneId.systemDefault());
+      dateTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+      timeTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("HH:mm")));
 
       // Gewolltes Fahrzeug
       if (fPattern.getIntendedVehicle() != null) {
@@ -266,18 +214,10 @@ public class CreateTransportOrderPanel
     updateButtons();
   }
 
-  /**
-   * Setzt einen Transportauftrag als Vorlage.
-   *
-   * @param t der Transportauftrag, der als Vorlage, verwendet werden soll
-   */
   public void setPattern(TransportOrder t) {
     fPattern = t;
   }
 
-  /**
-   * Aktualisiert den Zustand der Schaltflächen {enabled | disabled}.
-   */
   private void updateButtons() {
     boolean state = driveOrdersTable.getSelectedRow() != -1;
 
@@ -511,11 +451,6 @@ public class CreateTransportOrderPanel
         add(vehiclePanel);
     }// </editor-fold>//GEN-END:initComponents
 
-  /**
-   * Rückt den ausgewählten Fahrauftrag um eine Position nach unten.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
 
@@ -536,18 +471,13 @@ public class CreateTransportOrderPanel
 
       String action = fActions.remove(index);
       fActions.add(index + 1, action);
-      
+
       Map<String, String> properties = fPropertiesList.remove(index);
       fPropertiesList.add(index + 1, properties);
 
       updateButtons();
     }//GEN-LAST:event_moveDownButtonActionPerformed
 
-  /**
-   * Rückt den ausgewählten Fahrauftrag um eine Position nach oben.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void moveUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
 
@@ -567,15 +497,10 @@ public class CreateTransportOrderPanel
 
       Map<String, String> properties = fPropertiesList.remove(index);
       fPropertiesList.add(index - 1, properties);
-      
+
       updateButtons();
     }//GEN-LAST:event_moveUpButtonActionPerformed
 
-  /**
-   * Entfernt den ausgewählten Fahrauftrag.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
 
@@ -592,11 +517,6 @@ public class CreateTransportOrderPanel
       updateButtons();
     }//GEN-LAST:event_removeButtonActionPerformed
 
-  /**
-   * Bearbeitet den ausgewählten Fahrauftrag.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
       int index = driveOrdersTable.getSelectedRow();
 
@@ -627,11 +547,6 @@ public class CreateTransportOrderPanel
       }
     }//GEN-LAST:event_editButtonActionPerformed
 
-  /**
-   * Fügt einen Fahrauftrag hinzu.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels());
       StandardContentDialog dialog

@@ -22,9 +22,7 @@ import org.opentcs.guing.application.action.view.AddBitmapAction;
 import org.opentcs.guing.application.action.view.AddDrawingViewAction;
 import org.opentcs.guing.application.action.view.AddTransportOrderSequenceView;
 import org.opentcs.guing.application.action.view.AddTransportOrderView;
-import org.opentcs.guing.application.action.view.LoadViewBookmarkAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
-import org.opentcs.guing.application.action.view.SaveViewBookmarkAction;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -35,14 +33,6 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ViewMenu
     extends JMenu {
 
-  /**
-   * A menu item for saving a view bookmark.
-   */
-  private final JMenuItem menuItemSaveViewBookmark;
-  /**
-   * A menu item for restoring a view bookmark.
-   */
-  private final JMenuItem menuItemLoadViewBookmark;
   /**
    * A menu item for setting a bitmap for the current drawing view.
    */
@@ -109,18 +99,6 @@ public class ViewMenu
     requireNonNull(viewLanguageMenuProvider, "viewLanguageMenuProvider");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-
-    // Menu item View -> Load View Bookmark
-    menuItemLoadViewBookmark
-        = new JMenuItem(actionMap.get(LoadViewBookmarkAction.ID));
-    labels.configureMenu(menuItemLoadViewBookmark, LoadViewBookmarkAction.ID);
-    add(menuItemLoadViewBookmark);
-
-    // Menu item View -> Save View Bookmark
-    menuItemSaveViewBookmark
-        = new JMenuItem(actionMap.get(SaveViewBookmarkAction.ID));
-    labels.configureMenu(menuItemSaveViewBookmark, SaveViewBookmarkAction.ID);
-    add(menuItemSaveViewBookmark);
 
     // Menu item View -> Add Background Image
     menuAddBitmap = new JMenuItem(actionMap.get(AddBitmapAction.ID));
@@ -194,8 +172,6 @@ public class ViewMenu
   public void setOperationMode(OperationMode mode) {
     requireNonNull(mode, "mode");
 
-    menuItemLoadViewBookmark.setEnabled(mode == OperationMode.OPERATING);
-    menuItemSaveViewBookmark.setEnabled(mode == OperationMode.OPERATING);
     menuOrderSequenceView.setEnabled(mode == OperationMode.OPERATING);
     menuTransportOrderView.setEnabled(mode == OperationMode.OPERATING);
     menuAddDrawingView.setEnabled(mode == OperationMode.OPERATING);

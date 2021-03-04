@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2007 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -9,13 +8,17 @@
 package org.opentcs.data.user;
 
 import org.opentcs.access.KernelException;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Thrown when a new user account is supposed to be created, but an equivalent
  * user already exists.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated User management via kernel interaction will not be supported in the future.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class UserExistsException
     extends KernelException {
 

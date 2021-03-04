@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2017 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.slf4j.Logger;
@@ -92,6 +92,12 @@ class AllocatorTask
     else if (command instanceof AllocatorCommand.RetryAllocates) {
       retryWaitingAllocations();
     }
+    else if (command instanceof AllocatorCommand.CheckAllocationsPrepared) {
+      checkAllocationsPrepared((AllocatorCommand.CheckAllocationsPrepared) command);
+    }
+    else if (command instanceof AllocatorCommand.AllocationsReleased) {
+      allocationsReleased((AllocatorCommand.AllocationsReleased) command);
+    }
     else {
       LOG.warn("Unhandled AllocatorCommand implementation {}, ignored.", command.getClass());
     }
@@ -106,19 +112,34 @@ class AllocatorTask
   }
 
   private void processAllocate(AllocatorCommand.Allocate command) {
-    if (!doAllocate(command)) {
+    if (!tryAllocate(command)) {
       LOG.debug("{}: Resources unavailable, deferring allocation...", command.getClient().getId());
       deferredAllocations.add(command);
       return;
     }
 
-    LOG.debug("{}: Allocation successful, calling back client...", command.getClient().getId());
-    if (!command.getClient().allocationSuccessful(command.getResources())) {
+    checkAllocationsPrepared(command.getClient(), command.getResources());
+  }
+
+  private void checkAllocationsPrepared(AllocatorCommand.CheckAllocationsPrepared command) {
+    checkAllocationsPrepared(command.getClient(), command.getResources());
+  }
+
+  private void checkAllocationsPrepared(Client client, Set<TCSResource<?>> resources) {
+    if (!allocationAdvisor.hasPreparedAllocation(client, resources)) {
+      LOG.debug("{}: Preparation of resources not yet done.",
+                client.getId());
+      // XXX remember the resources a client is waiting for preparation done?
+      return;
+    }
+
+    LOG.debug("{}: Preparation of resoruces successful, calling back client...", client.getId());
+    if (!client.allocationSuccessful(resources)) {
       LOG.warn("{}: Client didn't want allocated resources ({}), unallocating them...",
-               command.getClient().getId(),
-               command.getResources());
-      undoAllocate(command);
-      enqueue(new AllocatorCommand.RetryAllocates(command.getClient()));
+               client.getId(),
+               resources);
+      undoAllocate(client, resources);
+      enqueue(new AllocatorCommand.RetryAllocates(client));
     }
   }
 
@@ -128,23 +149,36 @@ class AllocatorTask
    * @param command Describes the requested allocation.
    * @return <code>true</code> if, and only if, the given resources were allocated.
    */
-  private boolean doAllocate(AllocatorCommand.Allocate command) {
+  private boolean tryAllocate(AllocatorCommand.Allocate command) {
     Set<TCSResource<?>> resourcesExpanded = expandResources(command.getResources());
     synchronized (reservationPool) {
       LOG.debug("{}: Checking if all resources are available...", command.getClient().getId());
-      if (!(reservationPool.resourcesAvailableForUser(resourcesExpanded, command.getClient())
-            && allocationAdvisor.mayAllocate(command.getClient(), command.getResources()))) {
+      if (!reservationPool.resourcesAvailableForUser(resourcesExpanded, command.getClient())) {
         LOG.debug("{}: Resources unavailable.", command.getClient().getId());
         return false;
       }
+
+      LOG.debug("{}: Checking if resources may be allocated...", command.getClient().getId());
+      if (!allocationAdvisor.mayAllocate(command.getClient(), command.getResources())) {
+        LOG.debug("{}: Resource allocation restricted by some modules.", command.getClient());
+        return false;
+      }
+
+      LOG.debug("{}: Some resources need to be prepared for allocation.", command.getClient().getId());
+      allocationAdvisor.prepareAllocation(command.getClient(), command.getResources());
 
       LOG.debug("{}: All resources available, allocating...", command.getClient().getId());
       // Allocate resources.
       for (TCSResource<?> curRes : command.getResources()) {
         reservationPool.getReservationEntry(curRes).allocate(command.getClient());
       }
+
       return true;
     }
+  }
+  
+  private void allocationsReleased(AllocatorCommand.AllocationsReleased command) {
+    allocationAdvisor.allocationReleased(command.getClient(), command.getResources());
   }
 
   /**
@@ -152,9 +186,9 @@ class AllocatorTask
    *
    * @param command Describes the allocated resources.
    */
-  private void undoAllocate(AllocatorCommand.Allocate command) {
+  private void undoAllocate(Client client, Set<TCSResource<?>> resources) {
     synchronized (reservationPool) {
-      reservationPool.free(command.getClient(), command.getResources());
+      reservationPool.free(client, resources);
     }
   }
 

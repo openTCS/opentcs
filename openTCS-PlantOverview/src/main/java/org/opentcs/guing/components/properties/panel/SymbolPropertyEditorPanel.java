@@ -92,7 +92,7 @@ public class SymbolPropertyEditorPanel
   @Override // DetailsDialogContent
   public void updateValues() {
     if (fIndex < 0) {
-      fProperty.setLocationRepresentation(null);
+      fProperty.setLocationRepresentation(LocationRepresentation.DEFAULT);
     }
     else {
       fProperty.setLocationRepresentation(fRepresentations.get(fIndex));
@@ -262,7 +262,7 @@ public class SymbolPropertyEditorPanel
    */
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
     labelSymbol.setIcon(null);
-    labelSymbolName.setText("-");
+    labelSymbolName.setText(LocationRepresentation.DEFAULT.name());
     fIndex = -2;  // Invalid index, so in updateValues() no Icon will be loaded
   }//GEN-LAST:event_removeButtonActionPerformed
 

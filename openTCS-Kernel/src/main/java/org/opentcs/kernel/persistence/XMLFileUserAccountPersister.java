@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -27,8 +26,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.opentcs.data.user.UserAccount;
 import org.opentcs.data.user.UserPermission;
+import org.opentcs.kernel.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,15 +43,15 @@ public class XMLFileUserAccountPersister
   /**
    * This class's Logger.
    */
-  private static final Logger log = LoggerFactory.getLogger(XMLFileUserAccountPersister.class);
+  private static final Logger LOG = LoggerFactory.getLogger(XMLFileUserAccountPersister.class);
   /**
    * The name of the file containing the account data.
    */
-  private static final String accountFileName = "accounts.xml";
+  private static final String ACCOUNT_FILE_NAME = "accounts.xml";
   /**
    * The URL of the schema for XML model validataion.
    */
-  private static final URL schemaUrl = XMLFileUserAccountPersister.class.getResource(
+  private static final URL SCHEMA_URL = XMLFileUserAccountPersister.class.getResource(
       "/org/opentcs/util/persistence/useraccounts.xsd");
   /**
    * The directory in which the account file resides.
@@ -80,9 +79,9 @@ public class XMLFileUserAccountPersister
   public Set<UserAccount> loadUserAccounts()
       throws IOException {
     Set<UserAccount> result = new HashSet<>();
-    File accountFile = new File(dataDirectory, accountFileName);
+    File accountFile = new File(dataDirectory, ACCOUNT_FILE_NAME);
     if (!accountFile.exists()) {
-      log.info("Account data file does not exist, no user accounts available.");
+      LOG.info("Account data file does not exist, no user accounts available.");
       return result;
     }
     InputStream inStream = new FileInputStream(accountFile);
@@ -98,7 +97,7 @@ public class XMLFileUserAccountPersister
           true);
       builder.setProperty(
           "http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation",
-          schemaUrl.toString());
+          SCHEMA_URL.toString());
       document = builder.build(inStream);
     }
     catch (JDOMException exc) {
@@ -121,7 +120,7 @@ public class XMLFileUserAccountPersister
           permissions.add(UserPermission.valueOf(perm));
         }
         catch (IllegalArgumentException exc) {
-          log.warn("Unknown permission '" + perm + "' ignored.");
+          LOG.warn("Unknown permission '" + perm + "' ignored.");
         }
       }
       result.add(new UserAccount(userName, userPass, permissions));
@@ -140,7 +139,7 @@ public class XMLFileUserAccountPersister
         = new TreeSet<>((a1, a2) -> a1.getUserName().compareTo(a2.getUserName()));
     sortedAccounts.addAll(accounts);
     // Open the output file.
-    File accountFile = new File(dataDirectory, accountFileName);
+    File accountFile = new File(dataDirectory, ACCOUNT_FILE_NAME);
     OutputStream outStream = new FileOutputStream(accountFile);
     Element rootElement = new Element("userAccounts");
     // Add the account data.

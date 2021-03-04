@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -20,18 +19,25 @@ import java.lang.annotation.Target;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.data.ObjectUnknownException;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.xmlorders.binding.Destination;
 import org.opentcs.kernel.xmlorders.binding.ScriptResponse;
 import org.opentcs.kernel.xmlorders.binding.TCSOrder;
 import org.opentcs.kernel.xmlorders.binding.TCSOrderSet;
@@ -128,8 +134,7 @@ public class XMLTelegramOrderReceiver
                                   @InputTimeout int inputTimeout,
                                   @MaxInputLength int maxInputLength) {
     this.localKernel = requireNonNull(kernel, "kernel");
-    this.scriptFileManager = requireNonNull(scriptFileManager,
-                                            "scriptFileManager");
+    this.scriptFileManager = requireNonNull(scriptFileManager, "scriptFileManager");
     this.listenPort = listenPort;
     this.inputTimeout = inputTimeout;
     this.maxInputLength = maxInputLength;
@@ -147,8 +152,7 @@ public class XMLTelegramOrderReceiver
       return;
     }
     connectionListener = new ConnectionListener();
-    connectionListenerThread = new Thread(connectionListener,
-                                          "xmlOrderListenerThread");
+    connectionListenerThread = new Thread(connectionListener, "xmlOrderListenerThread");
     connectionListenerThread.start();
     enabled = true;
     LOG.debug("XMLTelegramOrderReceiver initialized");
@@ -415,27 +419,28 @@ public class XMLTelegramOrderReceiver
      * @return The <code>TCSResponse</code>.
      */
     private TCSResponse processTransport(Transport transport) {
-      assert transport != null;
+      requireNonNull(transport, "transport");
+
       // Create a response for this order.
       TransportResponse response = new TransportResponse();
       response.setId(transport.getId());
-      response.setOrderName("");
+
       try {
-        TransportOrder order
-            = scriptFileManager.createTransportOrder(transport.getDestinations());
+        TransportOrder order = localKernel.createTransportOrder(
+            new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+                                         createDestinations(transport.getDestinations()))
+                .setDeadline(transport.getDeadline() == null
+                    ? ZonedDateTime.of(2099, 12, 31, 23, 59, 59, 0, ZoneId.systemDefault())
+                    : ZonedDateTime.ofInstant(transport.getDeadline().toInstant(),
+                                              ZoneId.systemDefault()))
+                .setIntendedVehicleName(transport.getIntendedVehicle())
+                .setDependencyNames(new HashSet<>(transport.getDependencies()))
+        );
+
         response.setOrderName(order.getName());
-        // Set the transport order's deadline, if any.
-        if (transport.getDeadline() != null) {
-          long deadline = transport.getDeadline().getTime();
-          localKernel.setTransportOrderDeadline(order.getReference(), deadline);
-        }
-        // Set the order's intended vehicle, if any.
-        scriptFileManager.setIntendedVehicle(order,
-                                             transport.getIntendedVehicle());
-        // Set the transport order's dependencies, if any.
-        setDependencies(order, transport.getDependencies());
-        // Activate the new transport order.
+
         localKernel.activateTransportOrder(order.getReference());
+
         // Everything went fine - let the client know.
         response.setExecutionSuccessful(true);
       }
@@ -453,15 +458,15 @@ public class XMLTelegramOrderReceiver
      * @return The <code>ScriptResponse</code>.
      */
     private ScriptResponse processScriptFile(TransportScript transportScript) {
-      assert transportScript != null;
+      requireNonNull(transportScript, "transportScript");
+
       ScriptResponse result = new ScriptResponse();
       result.setId(transportScript.getId());
 
       // Parse the script file.
       TCSScriptFile scriptFile;
       try {
-        scriptFile
-            = scriptFileManager.getScriptFile(transportScript.getFileName());
+        scriptFile = scriptFileManager.getScriptFile(transportScript.getFileName());
       }
       catch (IOException exc) {
         LOG.warn("Exception parsing script file", exc);
@@ -469,58 +474,48 @@ public class XMLTelegramOrderReceiver
         return result;
       }
 
-      // Process all order entries in the script file and create a response
-      // entry for each of them.
-      TCSObjectReference<TransportOrder> prevOrderRef = null;
+      // Process all order entries in the script file and create a response entry for each of them.
+      String prevOrderName = null;
       for (TCSScriptFile.Order curOrder : scriptFile.getOrders()) {
         TransportResponse response = new TransportResponse();
         response.setId(transportScript.getId());
+
         try {
-          TransportOrder order
-              = scriptFileManager.createTransportOrder(curOrder.getDestinations());
+          TransportOrderCreationTO orderTO
+              = new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+                                             createDestinations(curOrder.getDestinations()))
+                  .setIntendedVehicleName(curOrder.getIntendedVehicle());
+          if (scriptFile.getSequentialDependencies() && prevOrderName != null) {
+            orderTO.getDependencyNames().add(prevOrderName);
+          }
+
+          TransportOrder order = localKernel.createTransportOrder(orderTO);
+
           response.setOrderName(order.getName());
-          // Set the order's intended vehicle, if any.
-          scriptFileManager.setIntendedVehicle(order,
-                                               curOrder.getIntendedVehicle());
-          if (prevOrderRef != null) {
-            localKernel.addTransportOrderDependency(order.getReference(),
-                                                    prevOrderRef);
-          }
+
           localKernel.activateTransportOrder(order.getReference());
+
           response.setExecutionSuccessful(true);
-          if (scriptFile.getSequentialDependencies()) {
-            prevOrderRef = order.getReference();
-          }
+          prevOrderName = order.getName();
         }
         catch (ObjectUnknownException | CredentialsException exc) {
           LOG.warn("Unexpected exception", exc);
           response.setExecutionSuccessful(false);
           // XXX With sequential dependencies, we should stop here, not add
           // another order without any dependencies!
-          prevOrderRef = null;
+          prevOrderName = null;
         }
         result.getTransports().add(response);
       }
       return result;
     }
 
-    /**
-     * Sets a list of dependencies to a transport order.
-     *
-     * @param order The order.
-     * @param deps The list of dependencies.
-     */
-    private void setDependencies(TransportOrder order, List<String> deps) {
-      for (String curDepName : deps) {
-        TransportOrder curDep = localKernel.getTCSObject(TransportOrder.class,
-                                                         curDepName);
-        // If curDep is null, ignore it - it might have been processed and
-        // removed already.
-        if (curDep != null) {
-          localKernel.addTransportOrderDependency(order.getReference(),
-                                                  curDep.getReference());
-        }
+    private List<DestinationCreationTO> createDestinations(List<Destination> destinations) {
+      List<DestinationCreationTO> result = new ArrayList<>();
+      for (Destination curDest : destinations) {
+        result.add(new DestinationCreationTO(curDest.getLocationName(), curDest.getOperation()));
       }
+      return result;
     }
   }
 }

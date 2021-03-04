@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -10,7 +9,6 @@ package org.opentcs.kernel.controlcenter;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,12 +31,12 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.TCSKernelStateEvent;
 import org.opentcs.access.TCSModelTransitionEvent;
 import org.opentcs.access.TCSNotificationEvent;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInModellingMode;
@@ -128,8 +126,8 @@ public class KernelControlCenter
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
-    catch (ClassNotFoundException | InstantiationException |
-           IllegalAccessException | UnsupportedLookAndFeelException ex) {
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+               | UnsupportedLookAndFeelException ex) {
       LOG.warn("Exception setting look and feel", ex);
     }
   }
@@ -610,14 +608,7 @@ public class KernelControlCenter
   }//GEN-LAST:event_menuAboutActionPerformed
 
   private void menuButtonModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonModelActionPerformed
-    Optional<String> modelName;
-    try {
-      modelName = Optional.ofNullable(kernel.getPersistentModelName());
-    }
-    catch (IOException exc) {
-      throw new IllegalStateException("Unhandled exception loading model",
-                                      exc);
-    }
+    Optional<String> modelName = Optional.ofNullable(kernel.getPersistentModelName());
     if (modelName.isPresent()) {
       // Show confirmation dialog
       String message = new StringBuilder()
@@ -635,15 +626,9 @@ public class KernelControlCenter
         return;
       }
       // Load model
-      try {
-        LOG.info("Loading model: " + modelName.get());
-        kernel.loadModel();
-        LOG.info("Finished loading the model.");
-      }
-      catch (IOException exc) {
-        throw new IllegalStateException("Unhandled exception loading model",
-                                        exc);
-      }
+      LOG.info("Loading model: " + modelName.get());
+      kernel.loadPlantModel();
+      LOG.info("Finished loading the model.");
     }
     else {
       JOptionPane.showMessageDialog(null,
@@ -673,12 +658,7 @@ public class KernelControlCenter
   }//GEN-LAST:event_menuEnglishActionPerformed
 
   private void menuItemSaveSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveSettingsActionPerformed
-    try {
-      kernel.saveModel(null);
-    }
-    catch (IOException | CredentialsException ex) {
-      LOG.error("Exception saving model", ex);
-    }
+    kernel.savePlantModel();
   }//GEN-LAST:event_menuItemSaveSettingsActionPerformed
 
   private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -699,7 +679,7 @@ public class KernelControlCenter
                                                   JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
           // creating new model
-          kernel.createModel(Kernel.DEFAULT_MODEL_NAME);
+          kernel.createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
           setWindowTitle();
         }
       }

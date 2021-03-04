@@ -7,7 +7,7 @@ openTCS {project-version}
 
 == Content
 
-* Release notes and change log: link:./README.html[HTML]
+* Release notes and change log: link:./release-notes.html[HTML]
 * User's Guide:
   link:./user/opentcs-users-guide.html[HTML],
   link:./user/opentcs-users-guide.pdf[PDF]

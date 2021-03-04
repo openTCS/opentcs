@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -11,6 +10,7 @@ package org.opentcs.drivers.vehicle;
 import java.util.List;
 import java.util.Queue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.util.ExplainedBoolean;
@@ -154,7 +154,7 @@ public interface VehicleCommAdapter
    *
    * @param message The message to be processed.
    */
-  void processMessage(@Nonnull Object message);
+  void processMessage(@Nullable Object message);
 
   /**
    * Defines the possible states of a communication adapter.

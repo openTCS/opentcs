@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -8,6 +7,7 @@
  */
 package org.opentcs.util.eventsystem;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ public class SynchronousEventHub<E extends Event>
   @Override
   public void processEvent(E event) {
     for (Map.Entry<EventListener<E>, EventFilter<E>> curEntry
-         : getEventListeners().entrySet()) {
+             : new HashMap<>(getEventListeners()).entrySet()) {
       if (curEntry.getValue().accept(event)) {
         curEntry.getKey().processEvent(event);
       }

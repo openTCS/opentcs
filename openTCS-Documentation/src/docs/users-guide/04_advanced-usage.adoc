@@ -83,20 +83,14 @@ For example, when set to `"distance, turns"` (which is the default value), costs
 
 ==== Configuring order pool cleanup
 
-By default, openTCS checks in intervals of ten minutes if the number of finished or failed transport orders in the pool exceeds 200.
-If this is the case, the oldest of these orders are removed from the pool until only 200 are left.
+By default, openTCS checks every minute for finished or failed transport orders that are older than 24 hours.
+These orders are removed from the pool.
 To customize this behaviour, the following steps are required:
 
 . Switch to the kernel control center's btn:[Configuration] tab.
 . Find and select the configuration entry `org.opentcs.kernel.OrderCleanerTask.orderSweepInterval`.
-The default value is 600000 (milliseconds, corresponding to an interval of 10 minutes).
+The default value is 60.000 (milliseconds, corresponding to an interval of one minute).
 Set this value according to your needs.
-. Find and select the configuration entry `org.opentcs.kernel.OrderCleanerTask.orderSweepType`.
-Its default value is `BY_AMOUNT`, which means that orders will be cleaned up when reaching a certain amount.
-Changing this value to `BY_AGE` will remove finished transport orders once they have passed a certain age.
-* If you selected `BY_AMOUNT`, find and select the configuration entry `org.opentcs.kernel.OrderCleanerTaskByAmount.orderSweepThreshold`.
-The default value is 200 (orders to be kept in the pool).
-Set this value according to your needs.
-* If you selected `BY_AGE`, find and select the configuration entry `org.opentcs.kernel.OrderCleanerTaskByAge.orderSweepAge` to change the maximum age of finished orders.
-The default value is 3600000 (milliseconds, corresponding to one hour that a finished order should be kept in the pool).
+. Find and select the configuration entry `org.opentcs.kernel.OrderCleanerTask.orderSweepAge` to change the maximum age of finished orders.
+The default value is 86.400.000 (milliseconds, corresponding to 24 hours that a finished order should be kept in the pool).
 Set this value according to your needs.

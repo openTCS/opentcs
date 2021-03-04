@@ -14,12 +14,16 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.data.ObjectPropConstants;
+import static org.opentcs.data.ObjectPropConstants.VEHICLE_INITIAL_POSITION;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -48,11 +52,12 @@ import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.storage.PlantModelCache;
+import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_CRITICAL;
+import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_GOOD;
+import static org.opentcs.guing.model.elements.VehicleModel.INITIAL_POSITION;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for vehicles.
@@ -66,8 +71,7 @@ public class VehicleAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(VehicleAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleAdapter.class);
 
   /**
    * Creates a new instance.
@@ -114,24 +118,23 @@ public class VehicleAdapter
       vehicleModel.propertiesChanged(new NullAttributesChangeListener());
     }
     catch (CredentialsException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    Vehicle vehicle = kernel.createVehicle();
-    TCSObjectReference<Vehicle> reference = vehicle.getReference();
-
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    String name = pName.getText();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      updateDefaultProcessProperties(kernel, reference, name);
-      updateMiscProcessProperties(kernel, reference);
+      plantModel.getVehicles().add(
+          new VehicleCreationTO(getModel().getName())
+              .setLength(getLength())
+              .setEnergyLevelCritical(getEnergyLevelCritical())
+              .setEnergyLevelGood(getEnergyLevelGood())
+              .setProperties(getKernelProperties())
+      );
     }
     catch (KernelRuntimeException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
@@ -197,7 +200,7 @@ public class VehicleAdapter
       ProcessAdapter pointAdapter = getEventDispatcher().findProcessAdapter(rCurrentPosition);
 
       if (pointAdapter == null) {
-        log.error("Error: Point " + rCurrentPosition.getName() + "not found.");
+        LOG.error("Error: Point " + rCurrentPosition.getName() + "not found.");
       }
       else {
         PointModel pointModel = (PointModel) pointAdapter.getModel();
@@ -276,27 +279,19 @@ public class VehicleAdapter
     pLength.setValueAndUnit(length, LengthProperty.Unit.MM);
   }
 
-  @SuppressWarnings("unchecked")
-  private void updateDefaultProcessProperties(Kernel kernel,
-                                              TCSObjectReference<Vehicle> reference,
-                                              String name)
-      throws KernelRuntimeException {
-    kernel.renameTCSObject(reference, name);
-
+  private int getLength() {
     LengthProperty pLength = (LengthProperty) getModel().getProperty(VehicleModel.LENGTH);
+    return ((Double) pLength.getValueByUnit(LengthProperty.Unit.MM)).intValue();
+  }
 
-    kernel.setVehicleLength(reference,
-                            ((Double) pLength.getValueByUnit(LengthProperty.Unit.MM)).intValue());
+  private int getEnergyLevelCritical() {
+    PercentProperty pEnergy = (PercentProperty) getModel().getProperty(ENERGY_LEVEL_CRITICAL);
+    return (Integer) pEnergy.getValue();
+  }
 
-    PercentProperty pEnergy = (PercentProperty) getModel().getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
-
-    kernel.setVehicleEnergyLevelCritical(reference,
-                                         (Integer) pEnergy.getValue());
-
-    pEnergy = (PercentProperty) getModel().getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
-
-    kernel.setVehicleEnergyLevelGood(reference,
-                                     (Integer) pEnergy.getValue());
+  private int getEnergyLevelGood() {
+    PercentProperty pEnergy = (PercentProperty) getModel().getProperty(ENERGY_LEVEL_GOOD);
+    return (Integer) pEnergy.getValue();
   }
 
   /**
@@ -365,23 +360,11 @@ public class VehicleAdapter
     }
   }
 
-  @Override // OpenTCSProcessAdapter
-  protected void updateMiscProcessProperties(Kernel kernel,
-                                             TCSObjectReference<?> ref)
-      throws KernelRuntimeException {
-
-    kernel.clearTCSObjectProperties(ref);
-    KeyValueSetProperty pMisc = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
-
-    if (pMisc != null) {
-      for (KeyValueProperty kvp : pMisc.getItems()) {
-        kernel.setTCSObjectProperty(ref, kvp.getKey(), kvp.getValue());
-      }
-    }
-
-    CoursePointProperty property = (CoursePointProperty) getModel().getProperty(VehicleModel.INITIAL_POSITION);
-    kernel.setTCSObjectProperty(ref,
-                                ObjectPropConstants.VEHICLE_INITIAL_POSITION,
-                                property.getPointName());
+  @Override
+  protected Map<String, String> getKernelProperties() {
+    Map<String, String> result = super.getKernelProperties();
+    result.put(VEHICLE_INITIAL_POSITION,
+               ((CoursePointProperty) getModel().getProperty(INITIAL_POSITION)).getPointName());
+    return result;
   }
 }

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -71,6 +70,15 @@ abstract class KernelStateOnline
   }
 
   @Override
+  public void savePlantModel()
+      throws IllegalStateException {
+    synchronized (getGlobalSyncObject()) {
+      getModelPersister().saveModel(getModel(), getModel().getName());
+    }
+  }
+
+  @Override
+  @Deprecated
   public void saveModel(String modelName)
       throws IOException {
     synchronized (getGlobalSyncObject()) {
@@ -79,6 +87,7 @@ abstract class KernelStateOnline
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                            List<ViewBookmark> bookmarks)
       throws ObjectUnknownException {

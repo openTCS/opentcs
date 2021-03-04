@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -14,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import static org.opentcs.util.Assertions.checkArgument;
 
 /**
@@ -72,7 +72,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    *
    * @return This object's ID.
    */
-  public final int getId() {
+  public int getId() {
     return id;
   }
 
@@ -81,7 +81,8 @@ public abstract class TCSObject<E extends TCSObject<E>>
    *
    * @return This object's name.
    */
-  public final String getName() {
+  @Nonnull
+  public String getName() {
     return name;
   }
 
@@ -90,7 +91,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    *
    * @param newName This object's new name.
    */
-  public final void setName(String newName) {
+  public void setName(@Nonnull String newName) {
     requireNonNull(newName, "newName");
     checkArgument(!newName.isEmpty(), "newName is empty string");
     name = newName;
@@ -111,6 +112,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    *
    * @return This object's properties.
    */
+  @Nonnull
   public Map<String, String> getProperties() {
     return propertiesReadOnly;
   }
@@ -122,6 +124,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @param key The property's key.
    * @return The property value for the given key, or <code>null</code>, if there is none.
    */
+  @Nullable
   public String getProperty(String key) {
     return properties.get(key);
   }

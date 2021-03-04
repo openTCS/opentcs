@@ -225,7 +225,8 @@ public class LocationFigure
       SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
       LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
       // Wenn fï¿½r diese Location kein eigenes Symbol spezifiziert ist, ...
-      if (locationRepresentation == null) {
+      if (locationRepresentation == null
+          || locationRepresentation == LocationRepresentation.DEFAULT) {
         // ... das Default-Symbol des zugehï¿½rigen LocationTypes verwenden
         pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
         locationRepresentation = pSymbol.getLocationRepresentation();

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -46,7 +45,7 @@ public class Route
    * @param routeSteps The sequence of steps this route consists of.
    * @param routeCosts The costs for travelling this route.
    */
-  public Route(List<Step> routeSteps, long routeCosts) {
+  public Route(@Nonnull List<Step> routeSteps, long routeCosts) {
     requireNonNull(routeSteps, "routeSteps");
     checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
     steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
@@ -60,6 +59,7 @@ public class Route
    * May be empty.
    * The returned <code>List</code> is unmodifiable.
    */
+  @Nonnull
   public List<Step> getSteps() {
     return steps;
   }
@@ -79,7 +79,7 @@ public class Route
    *
    * @return The final destination point that is reached by travelling this route.
    */
-  @Nullable
+  @Nonnull
   public Point getFinalDestinationPoint() {
     return steps.get(steps.size() - 1).getDestinationPoint();
   }

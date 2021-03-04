@@ -1,16 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
  */
 package org.opentcs.kernel.xmlstatus.binding;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import org.opentcs.data.order.DriveOrder;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * A {@link org.opentcs.data.order.DriveOrder DriveOrder}'s destination.
@@ -28,7 +30,7 @@ public class Destination {
   /**
    * The <code>DriveOrder</code>'s state.
    */
-  private DriveOrder.State state;
+  private State state;
   /**
    * The <code>DriveOrder</code>'s properties.
    */
@@ -56,7 +58,7 @@ public class Destination {
    * @param name The name of the destination location.
    */
   public void setLocationName(String name) {
-    this.locationName = Objects.requireNonNull(name, "name");
+    this.locationName = requireNonNull(name, "name");
   }
 
   /**
@@ -76,7 +78,7 @@ public class Destination {
    * location.
    */
   public void setOperation(String operation) {
-    this.operation = Objects.requireNonNull(operation, "operation");
+    this.operation = requireNonNull(operation, "operation");
   }
 
   /**
@@ -85,7 +87,7 @@ public class Destination {
    * @return The <code>DriveOrder</code>'s state.
    */
   @XmlAttribute(name = "state", required = true)
-  public DriveOrder.State getState() {
+  public State getState() {
     return state;
   }
 
@@ -94,8 +96,8 @@ public class Destination {
    *
    * @param state The <code>DriveOrder</code>'s state.
    */
-  public void setState(DriveOrder.State state) {
-    this.state = Objects.requireNonNull(state, "state");
+  public void setState(State state) {
+    this.state = requireNonNull(state, "state");
   }
 
   @XmlElement(name = "property", required = false)
@@ -105,5 +107,39 @@ public class Destination {
 
   public void setProperties(List<Property> properties) {
     this.properties = properties;
+  }
+  
+  /**
+   * This enumeration defines the various states a DriveOrder may be in.
+   */
+  @XmlType(name = "driveOrderState")
+  public enum State {
+
+    /**
+     * A DriveOrder's initial state, indicating it being still untouched/not
+     * being processed.
+     */
+    PRISTINE,
+    /**
+     * Indicates a DriveOrder is part of a TransportOrder.
+     */
+    ACTIVE,
+    /**
+     * Indicates this drive order being processed at the moment.
+     */
+    TRAVELLING,
+    /**
+     * Indicates the vehicle processing an order is currently executing an
+     * operation.
+     */
+    OPERATING,
+    /**
+     * Marks a DriveOrder as successfully completed.
+     */
+    FINISHED,
+    /**
+     * Marks a DriveOrder as failed.
+     */
+    FAILED;
   }
 }

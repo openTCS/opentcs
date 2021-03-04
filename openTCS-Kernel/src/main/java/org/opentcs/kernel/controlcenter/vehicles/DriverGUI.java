@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -265,7 +264,6 @@ public class DriverGUI
     commAdapterRegistry.findFactoriesFor(currentEntry.getVehicle())
         .forEach(factory -> comboBox.addItem(factory));
     comboBox.setSelectedIndex(0);
-    currentEntry.addPropertyChangeListener(comboBox);
     comboBox.setRenderer(new AdapterFactoryCellRenderer());
 
     comboBox.addItemListener((ItemEvent evt) -> {

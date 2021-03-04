@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -9,6 +8,7 @@
 package org.opentcs.data.model;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A generic 3-tuple of long integer values, usable for 3D coordinates and
@@ -17,7 +17,8 @@ import java.io.Serializable;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class Triple
-    implements Serializable, Cloneable {
+    implements Serializable,
+               Cloneable {
 
   /**
    * The X coordinate.
@@ -34,9 +35,12 @@ public class Triple
 
   /**
    * Creates a new Triple with all values set to 0.
+   *
+   * @deprecated Use {@link #Triple(long, long, long)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public Triple() {
-    // Do nada.
   }
 
   /**
@@ -56,7 +60,10 @@ public class Triple
    * Creates a new Triple with values copied from the given one.
    *
    * @param original The Triple from which to copy the values.
+   * @deprecated Not useful with immutable instances. Use {@link #Triple(long, long, long)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public Triple(Triple original) {
     this(original.x, original.y, original.z);
   }
@@ -74,9 +81,14 @@ public class Triple
    * Sets the new x coordinate.
    *
    * @param x The new x coordinate.
+   * @return This instance.
+   * @deprecated Instances should be immutable. Use {@link #Triple(long, long, long)} instead.
    */
-  public void setX(long x) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  public Triple setX(long x) {
     this.x = x;
+    return this;
   }
 
   /**
@@ -92,9 +104,14 @@ public class Triple
    * Sets the new y coordinate.
    *
    * @param y The new y coordinate.
+   * @return This instance.
+   * @deprecated Instances should be immutable. Use {@link #Triple(long, long, long)} instead.
    */
-  public void setY(long y) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  public Triple setY(long y) {
     this.y = y;
+    return this;
   }
 
   /**
@@ -110,9 +127,14 @@ public class Triple
    * Sets the new z coordinate.
    *
    * @param z The new z coordinate.
+   * @return This instance.
+   * @deprecated Instances should be immutable. Use {@link #Triple(long, long, long)} instead.
    */
-  public void setZ(long z) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  public Triple setZ(long z) {
     this.z = z;
+    return this;
   }
 
   @Override

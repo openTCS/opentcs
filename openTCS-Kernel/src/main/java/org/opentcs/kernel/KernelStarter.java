@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -20,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInAllModes;
 import org.opentcs.kernel.controlcenter.ChooseModelDialog;
@@ -109,7 +109,7 @@ public class KernelStarter {
     // Load the saved model if there is one
     if (loadModel && savedModelName != null) {
       LOG.debug("Loading model: " + savedModelName);
-      kernel.loadModel();
+      kernel.loadPlantModel();
       LOG.info("Loaded model: " + savedModelName);
       if (!modelingMode) {
         kernel.setState(Kernel.State.OPERATING);
@@ -117,7 +117,7 @@ public class KernelStarter {
     }
     // Load an empty model in modelling mode
     else {
-      kernel.createModel(Kernel.DEFAULT_MODEL_NAME);
+      kernel.createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
     }
   }
 

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -18,6 +17,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.queries.Query;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -40,9 +42,8 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.data.user.UserExistsException;
 import org.opentcs.data.user.UserPermission;
-import org.opentcs.data.user.UserUnknownException;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
 
@@ -77,15 +78,19 @@ public interface Kernel
    * @param userName The new user's name.
    * @param userPassword The new user's password.
    * @param userPermissions The new user's permissions.
-   * @throws UserExistsException If a user with the given name exists already.
+   * @throws org.opentcs.data.user.UserExistsException If a user with the given name exists already.
    * @throws UnsupportedKernelOpException If user management is not
    * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated User management should be strictly configuration-based and will not be supported by
+   * kernel interaction in the future.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void createUser(String userName, String userPassword,
                   Set<UserPermission> userPermissions)
-      throws UserExistsException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserExistsException, UnsupportedKernelOpException,
              CredentialsException;
 
   /**
@@ -94,14 +99,18 @@ public interface Kernel
    * @param userName The name of the user for which the password is to be
    * changed.
    * @param userPassword The user's new password.
-   * @throws UserUnknownException If a user with the given name does not exist.
+   * @throws org.opentcs.data.user.UserUnknownException If the user does not exist.
    * @throws UnsupportedKernelOpException If user management is not
    * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated User management should be strictly configuration-based and will not be supported by
+   * kernel interaction in the future.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void setUserPassword(String userName, String userPassword)
-      throws UserUnknownException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException;
 
   /**
@@ -110,28 +119,36 @@ public interface Kernel
    * @param userName The name of the user for which the permissions are to be
    * changed.
    * @param userPermissions The user's new permissions.
-   * @throws UserUnknownException If a user with the given name does not exist.
+   * @throws org.opentcs.data.user.UserUnknownException If the user does not exist.
    * @throws UnsupportedKernelOpException If user management is not
    * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated User management should be strictly configuration-based and will not be supported by
+   * kernel interaction in the future.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void setUserPermissions(String userName, Set<UserPermission> userPermissions)
-      throws UserUnknownException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException;
 
   /**
    * Removes a user account.
    *
    * @param userName The name of the user whose account is to be removed.
-   * @throws UserUnknownException If a user with the given name does not exist.
+   * @throws org.opentcs.data.user.UserUnknownException If the user does not exist.
    * @throws UnsupportedKernelOpException If user management is not
    * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated User management should be strictly configuration-based and will not be supported by
+   * kernel interaction in the future.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void removeUser(String userName)
-      throws UserUnknownException, UnsupportedKernelOpException,
+      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
              CredentialsException;
 
   /**
@@ -162,10 +179,10 @@ public interface Kernel
    * @return The name of the model, or <code>null</code> if there is no model.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
-   * @throws IOException If retrieving the model name was not possible.
+   * @throws IllegalStateException If retrieving the model name was not possible.
    */
   String getPersistentModelName()
-      throws CredentialsException, IOException;
+      throws CredentialsException, IllegalStateException;
 
   /**
    * Returns the name of the model that is currently loaded in the kernel.
@@ -183,9 +200,26 @@ public interface Kernel
    * @param modelName The newly created model's name.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
   void createModel(String modelName)
       throws CredentialsException;
+
+  /**
+   * Creates a new plant model with the objects described in the given transfer object.
+   * Implicitly saves/persists the new plant model.
+   *
+   * @param to The transfer object describing the plant model objects to be created.
+   * @throws ObjectUnknownException If any referenced object does not exist.
+   * @throws ObjectExistsException If an object with the same name already exists in the model.
+   * @throws CredentialsException If the calling client is not allowed to execute this method.
+   * @throws IllegalStateException If there was a problem persisting the model.
+   */
+  void createPlantModel(PlantModelCreationTO to)
+      throws CredentialsException, ObjectUnknownException, ObjectExistsException,
+             IllegalStateException;
 
   /**
    * Loads the saved model into the kernel.
@@ -194,7 +228,10 @@ public interface Kernel
    * @throws IOException If the model cannot be loaded.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Loading a plant model is a kernel-internal function. External clients need not care
+   * about persistence, internal clients should use {@link LocalKernel#loadPlantModel()} instead.
    */
+  @Deprecated
   void loadModel()
       throws IOException, CredentialsException;
 
@@ -209,7 +246,10 @@ public interface Kernel
    * @throws IOException If the model could not be persisted for some reason.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Saving a plant model is a kernel-internal function. External clients need not care
+   * about persistence, internal clients should use {@link LocalKernel#savePlantModel()} instead.
    */
+  @Deprecated
   void saveModel(@Nullable String modelName)
       throws IOException, CredentialsException;
 
@@ -219,7 +259,11 @@ public interface Kernel
    * @throws IOException If deleting the model was not possible for some reason.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Create an empty model with
+   * {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeModel()
       throws IOException, CredentialsException;
 
@@ -312,7 +356,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced object does not exist.
    * @throws ObjectExistsException If the object cannot be renamed because there
    * is already an object with the given new name.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void renameTCSObject(TCSObjectReference<?> ref, String newName)
       throws CredentialsException, ObjectUnknownException, ObjectExistsException;
 
@@ -350,7 +398,12 @@ public interface Kernel
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @throws ObjectUnknownException If the referenced object does not exist.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * to create complete plant models, implicitly removing model objects that existed before. Removal
+   * of transport orders is handled within the kernel itself.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeTCSObject(TCSObjectReference<?> ref)
       throws CredentialsException, ObjectUnknownException;
 
@@ -384,7 +437,11 @@ public interface Kernel
    * @return A copy of the newly created layout.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   VisualLayout createVisualLayout()
       throws CredentialsException;
 
@@ -396,7 +453,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced layout does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                              double scaleX)
       throws ObjectUnknownException, CredentialsException;
@@ -409,7 +470,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced layout does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                              double scaleY)
       throws ObjectUnknownException, CredentialsException;
@@ -422,7 +487,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced layout does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Will be removed. Storing named colors is out of scope here.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                              Map<String, Color> colors)
       throws ObjectUnknownException, CredentialsException;
@@ -435,7 +503,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced layout does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                Set<LayoutElement> elements)
       throws ObjectUnknownException, CredentialsException;
@@ -448,7 +520,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced layout does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Will be removed. Users may find/focus on course elements, instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVisualLayoutViewBookmarks(TCSObjectReference<VisualLayout> ref,
                                     List<ViewBookmark> bookmarks)
       throws ObjectUnknownException, CredentialsException;
@@ -461,7 +536,11 @@ public interface Kernel
    * @return A copy of the newly created point.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Point createPoint()
       throws CredentialsException;
 
@@ -473,7 +552,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced point does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPointPosition(TCSObjectReference<Point> ref, Triple position)
       throws ObjectUnknownException, CredentialsException;
 
@@ -487,7 +570,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced point does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                        double angle)
       throws ObjectUnknownException, CredentialsException;
@@ -500,7 +587,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced point does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPointType(TCSObjectReference<Point> ref, Point.Type newType)
       throws ObjectUnknownException, CredentialsException;
 
@@ -521,7 +612,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Path createPath(TCSObjectReference<Point> srcRef,
                   TCSObjectReference<Point> destRef)
       throws ObjectUnknownException, CredentialsException;
@@ -536,7 +631,11 @@ public interface Kernel
    * negative.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPathLength(TCSObjectReference<Path> ref, long length)
       throws ObjectUnknownException, IllegalArgumentException,
              CredentialsException;
@@ -550,7 +649,11 @@ public interface Kernel
    * @throws IllegalArgumentException If <code>cost</code> is zero or negative.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPathRoutingCost(TCSObjectReference<Path> ref, long cost)
       throws ObjectUnknownException, IllegalArgumentException,
              CredentialsException;
@@ -564,7 +667,11 @@ public interface Kernel
    * @throws IllegalArgumentException If <code>velocity</code> is negative.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPathMaxVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException, IllegalArgumentException,
              CredentialsException;
@@ -578,7 +685,11 @@ public interface Kernel
    * @throws IllegalArgumentException If <code>velocity</code> is negative.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setPathMaxReverseVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException, IllegalArgumentException,
              CredentialsException;
@@ -605,7 +716,11 @@ public interface Kernel
    * @return A copy of the newly created vehicle type.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Vehicle createVehicle()
       throws CredentialsException;
 
@@ -617,7 +732,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVehicleEnergyLevelCritical(TCSObjectReference<Vehicle> ref,
                                      int energyLevel)
       throws ObjectUnknownException, CredentialsException;
@@ -630,7 +749,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVehicleEnergyLevelGood(TCSObjectReference<Vehicle> ref,
                                  int energyLevel)
       throws ObjectUnknownException, CredentialsException;
@@ -643,7 +766,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException, CredentialsException;
 
@@ -656,7 +783,11 @@ public interface Kernel
    * @return A copy of the newly created location type.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   LocationType createLocationType()
       throws CredentialsException;
 
@@ -669,7 +800,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void addLocationTypeAllowedOperation(TCSObjectReference<LocationType> ref,
                                        String operation)
       throws ObjectUnknownException, CredentialsException;
@@ -683,7 +818,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeLocationTypeAllowedOperation(TCSObjectReference<LocationType> ref,
                                           String operation)
       throws ObjectUnknownException, CredentialsException;
@@ -701,7 +840,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException, CredentialsException;
 
@@ -713,7 +856,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced location does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setLocationPosition(TCSObjectReference<Location> ref, Triple position)
       throws ObjectUnknownException, CredentialsException;
 
@@ -726,7 +873,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setLocationType(TCSObjectReference<Location> ref,
                        TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException, CredentialsException;
@@ -741,7 +892,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void connectLocationToPoint(TCSObjectReference<Location> locRef,
                               TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException, CredentialsException;
@@ -756,7 +911,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                    TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException, CredentialsException;
@@ -771,7 +930,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void addLocationLinkAllowedOperation(TCSObjectReference<Location> locRef,
                                        TCSObjectReference<Point> pointRef,
                                        String operation)
@@ -787,7 +950,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeLocationLinkAllowedOperation(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef,
                                           String operation)
@@ -803,7 +970,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void clearLocationLinkAllowedOperations(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException, CredentialsException;
@@ -816,7 +987,11 @@ public interface Kernel
    * @return A copy of the newly created block.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Block createBlock()
       throws CredentialsException;
 
@@ -829,7 +1004,11 @@ public interface Kernel
    * not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void addBlockMember(TCSObjectReference<Block> ref,
                       TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException, CredentialsException;
@@ -842,7 +1021,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced block does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeBlockMember(TCSObjectReference<Block> ref,
                          TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException, CredentialsException;
@@ -855,7 +1038,11 @@ public interface Kernel
    * @return A copy of the newly created group.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Group createGroup()
       throws CredentialsException;
 
@@ -868,7 +1055,11 @@ public interface Kernel
    * not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void addGroupMember(TCSObjectReference<Group> ref,
                       TCSObjectReference<?> newMemberRef)
       throws ObjectUnknownException, CredentialsException;
@@ -881,7 +1072,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced group does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeGroupMember(TCSObjectReference<Group> ref,
                          TCSObjectReference<?> rmMemberRef)
       throws ObjectUnknownException, CredentialsException;
@@ -894,7 +1089,11 @@ public interface Kernel
    * @return A copy of the newly created route.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   StaticRoute createStaticRoute()
       throws CredentialsException;
 
@@ -907,7 +1106,11 @@ public interface Kernel
    * not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                          TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException, CredentialsException;
@@ -919,7 +1122,11 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced route does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException, CredentialsException;
 
@@ -935,9 +1142,29 @@ public interface Kernel
    * @return A copy of the newly created transport order.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   TransportOrder createTransportOrder(List<Destination> destinations)
       throws CredentialsException;
+
+  /**
+   * Creates a new transport order.
+   * A new transport order is created with a generated unique ID and all other attributes taken from
+   * the given transfer object.
+   * This method also implicitly adds the transport order to its wrapping sequence, if any.
+   * A copy of the newly created transport order is then returned.
+   *
+   * @param to Describes the transport order to be created.
+   * @return A copy of the newly created transport order.
+   * @throws ObjectUnknownException If any referenced object does not exist.
+   * @throws ObjectExistsException If an object with the same name already exists in the model.
+   * @throws CredentialsException If the calling client is not allowed to execute this method.
+   */
+  TransportOrder createTransportOrder(TransportOrderCreationTO to)
+      throws CredentialsException, ObjectUnknownException, ObjectExistsException;
 
   /**
    * Sets a transport order's deadline.
@@ -948,7 +1175,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
                                  long deadline)
       throws ObjectUnknownException, CredentialsException;
@@ -975,7 +1206,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setTransportOrderIntendedVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -1012,7 +1247,11 @@ public interface Kernel
    * does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void addTransportOrderDependency(TCSObjectReference<TransportOrder> orderRef,
                                    TCSObjectReference<TransportOrder> newDepRef)
       throws ObjectUnknownException, CredentialsException;
@@ -1028,7 +1267,11 @@ public interface Kernel
    * does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
@@ -1042,8 +1285,27 @@ public interface Kernel
    * @return A copy of the newly created order sequence.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createOrderSequence(org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   OrderSequence createOrderSequence()
+      throws CredentialsException;
+
+  /**
+   * Creates a new order sequence.
+   * A new order sequence is created with a generated unique ID and all other attributes taken from
+   * the given transfer object.
+   * A copy of the newly created order sequence is then returned.
+   *
+   * @param to Describes the order sequence to be created.
+   * @return A copy of the newly created order sequence.
+   * @throws ObjectUnknownException If any referenced object does not exist.
+   * @throws ObjectExistsException If an object with the same name already exists in the model.
+   * @throws CredentialsException If the calling client is not allowed to execute this method.
+   */
+  OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws CredentialsException;
 
   /**
@@ -1058,7 +1320,10 @@ public interface Kernel
    * @throws IllegalArgumentException If the sequence is already marked as
    * <em>complete</em>, if the sequence already contains the given order or
    * if the given transport order has already been activated.
+   * @deprecated Use
+   * {@link #createTransportOrder(org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
   void addOrderSequenceOrder(TCSObjectReference<OrderSequence> seqRef,
                              TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException, CredentialsException,
@@ -1073,7 +1338,10 @@ public interface Kernel
    * transport order is not in this pool.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Usage unclear. Handling of subsequent orders in the sequence is fuzzy.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void removeOrderSequenceOrder(TCSObjectReference<OrderSequence> seqRef,
                                 TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException, CredentialsException;
@@ -1099,7 +1367,11 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createOrderSequence(org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setOrderSequenceFailureFatal(TCSObjectReference<OrderSequence> seqRef,
                                     boolean fatal)
       throws ObjectUnknownException, CredentialsException;
@@ -1114,7 +1386,11 @@ public interface Kernel
    * does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link #createOrderSequence(org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setOrderSequenceIntendedVehicle(TCSObjectReference<OrderSequence> seqRef,
                                        TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException, CredentialsException;
@@ -1186,7 +1462,7 @@ public interface Kernel
                        boolean setIdleIfUnavailable)
       throws ObjectUnknownException, CredentialsException,
              IllegalArgumentException;
-  
+
   /**
    * Reset a vehicle's position, implicitly aborting any transport order it is currently processing,
    * disabling it for transport order disposition and freeing any allocated resources.

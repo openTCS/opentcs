@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -15,7 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlType;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -25,18 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a set of movements and operations that are to be executed by a
- * {@link org.opentcs.data.model.Vehicle Vehicle}.
+ * Represents a set of movements and operations that are to be executed by a {@link Vehicle}.
  * <p>
- * A TransportOrder basically encapsulates a list of {@link DriveOrder
- * DriveOrders}.
+ * A TransportOrder basically encapsulates a list of {@link DriveOrder} instances.
  * </p>
  * <p>
- * Transport orders may depend on other transport orders in the systems, which
- * means they may not be processed before the orders they depend on have been
- * processed. Furthermore, the priority of each transport order is measured by
- * its deadline; orders for which the deadline is closer in the future
- * implicitly have higher priority than others.
+ * Transport orders may depend on other transport orders in the systems, which means they may not be
+ * processed before the orders they depend on have been processed.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
@@ -49,34 +44,38 @@ public class TransportOrder
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(TransportOrder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransportOrder.class);
   /**
    * A set of TransportOrders that must have been finished before this one may
    * be processed.
    */
-  private Set<TCSObjectReference<TransportOrder>> dependencies
-      = new LinkedHashSet<>();
+  @Nonnull
+  private Set<TCSObjectReference<TransportOrder>> dependencies = new LinkedHashSet<>();
   /**
    * A list of rejections for this transport order.
    */
+  @Nonnull
   private List<Rejection> rejections = new LinkedList<>();
   /**
    * A list of drive orders that have been finished already.
    */
+  @Nonnull
   private List<DriveOrder> pastDriveOrders = new LinkedList<>();
   /**
    * A list of drive orders that still have to be processed as part of this
    * transport order (in the order they have to be processed in).
    */
+  @Nonnull
   private List<DriveOrder> futureDriveOrders = new LinkedList<>();
   /**
    * The drive order that is currently being processed.
    */
+  @Nullable
   private DriveOrder currentDriveOrder;
   /**
    * This transport order's current state.
    */
+  @Nonnull
   private State state = State.RAW;
   /**
    * The point of time at which this TransportOrder was created.
@@ -95,17 +94,20 @@ public class TransportOrder
    * order. If this order is free to be processed by any vehicle, this is
    * <code>null</code>.
    */
+  @Nullable
   private TCSObjectReference<Vehicle> intendedVehicle;
   /**
    * A reference to the vehicle currently processing this transport order. If
    * this transport order is not being processed at the moment, this is
    * <code>null</code>.
    */
+  @Nullable
   private TCSObjectReference<Vehicle> processingVehicle;
   /**
    * The order sequence this transport order belongs to. May be
    * <code>null</code> in case this order isn't part of any sequence.
    */
+  @Nullable
   private TCSObjectReference<OrderSequence> wrappingSequence;
   /**
    * Whether this order is dispensable (may be withdrawn automatically).
@@ -227,6 +229,7 @@ public class TransportOrder
    * transport order. If this order is free to be processed by any vehicle,
    * <code>null</code> is returned.
    */
+  @Nullable
   public TCSObjectReference<Vehicle> getIntendedVehicle() {
     return intendedVehicle;
   }
@@ -237,7 +240,7 @@ public class TransportOrder
    *
    * @param vehicle The reference to the vehicle intended to process this order.
    */
-  public void setIntendedVehicle(TCSObjectReference<Vehicle> vehicle) {
+  public void setIntendedVehicle(@Nullable TCSObjectReference<Vehicle> vehicle) {
     intendedVehicle = vehicle;
   }
 
@@ -249,6 +252,7 @@ public class TransportOrder
    * order. If this transport order is not currently being processed,
    * <code>null</code> is returned.
    */
+  @Nullable
   public TCSObjectReference<Vehicle> getProcessingVehicle() {
     return processingVehicle;
   }
@@ -259,7 +263,7 @@ public class TransportOrder
    * @param vehicle The reference to the vehicle currently processing this
    * transport order.
    */
-  public void setProcessingVehicle(TCSObjectReference<Vehicle> vehicle) {
+  public void setProcessingVehicle(@Nullable TCSObjectReference<Vehicle> vehicle) {
     processingVehicle = vehicle;
   }
 
@@ -280,7 +284,7 @@ public class TransportOrder
    * @return <code>true</code> if, and only if, the given transport order was
    * not already a dependency for this one.
    */
-  public boolean addDependency(TCSObjectReference<TransportOrder> newDep) {
+  public boolean addDependency(@Nonnull TCSObjectReference<TransportOrder> newDep) {
     requireNonNull(newDep, "newDep");
     return dependencies.add(newDep);
   }
@@ -293,7 +297,7 @@ public class TransportOrder
    * @return <code>true</code> if, and only if, the given transport order was
    * a dependency for this one.
    */
-  public boolean removeDependency(TCSObjectReference<TransportOrder> rmDep) {
+  public boolean removeDependency(@Nonnull TCSObjectReference<TransportOrder> rmDep) {
     requireNonNull(rmDep, "rmDep");
     return dependencies.remove(rmDep);
   }
@@ -303,6 +307,7 @@ public class TransportOrder
    *
    * @return A list of rejections for this transport order.
    */
+  @Nonnull
   public List<Rejection> getRejections() {
     return new ArrayList<>(rejections);
   }
@@ -312,7 +317,7 @@ public class TransportOrder
    *
    * @param newRejection The new rejection.
    */
-  public void addRejection(Rejection newRejection) {
+  public void addRejection(@Nonnull Rejection newRejection) {
     requireNonNull(newRejection, "newRejection");
     rejections.add(newRejection);
   }
@@ -322,6 +327,7 @@ public class TransportOrder
    *
    * @return A list of DriveOrders that have been processed already.
    */
+  @Nonnull
   public List<DriveOrder> getPastDriveOrders() {
     return new ArrayList<>(pastDriveOrders);
   }
@@ -331,6 +337,7 @@ public class TransportOrder
    *
    * @return A list of DriveOrders that still need to be processed.
    */
+  @Nonnull
   public List<DriveOrder> getFutureDriveOrders() {
     return new ArrayList<>(futureDriveOrders);
   }
@@ -345,7 +352,7 @@ public class TransportOrder
    * orders do not match the destinations of the drive orders in this transport
    * order.
    */
-  public void setFutureDriveOrders(List<DriveOrder> newOrders)
+  public void setFutureDriveOrders(@Nonnull List<DriveOrder> newOrders)
       throws IllegalArgumentException {
     requireNonNull(newOrders, "newOrders");
     int orderCount = newOrders.size();
@@ -379,6 +386,7 @@ public class TransportOrder
    * @return the current drive order, or <code>null</code>, if no drive order is
    * currently being processed.
    */
+  @Nullable
   public DriveOrder getCurrentDriveOrder() {
     return currentDriveOrder;
   }
@@ -390,6 +398,7 @@ public class TransportOrder
    * @return A list of all drive orders, i.e. the past, current and future drive
    * orders. If no drive orders exist, the returned list is empty.
    */
+  @Nonnull
   public List<DriveOrder> getAllDriveOrders() {
     List<DriveOrder> result = new LinkedList<>();
     result.addAll(pastDriveOrders);
@@ -430,7 +439,7 @@ public class TransportOrder
       pastDriveOrders.add(currentDriveOrder);
     }
     else {
-      log.warn("Cannot finish current drive order as it is null.");
+      LOG.warn("Cannot finish current drive order as it is null.");
     }
     // Pull in the next drive order, if there is any.
     if (futureDriveOrders.isEmpty()) {
@@ -446,10 +455,10 @@ public class TransportOrder
    *
    * @param newState The current drive order's new state.
    */
-  public void setCurrentDriveOrderState(DriveOrder.State newState) {
+  public void setCurrentDriveOrderState(@Nonnull DriveOrder.State newState) {
     requireNonNull(newState, "newState");
     if (currentDriveOrder == null) {
-      log.warn("currentDriveOrder is null");
+      LOG.warn("currentDriveOrder is null");
       return;
     }
     currentDriveOrder.setState(newState);
@@ -462,6 +471,7 @@ public class TransportOrder
    * @return The order sequence this order belongs to, or <code>null</code>, if
    * it doesn't belong to any sequence.
    */
+  @Nullable
   public TCSObjectReference<OrderSequence> getWrappingSequence() {
     return wrappingSequence;
   }
@@ -473,7 +483,7 @@ public class TransportOrder
    * <code>null</code> to indicate that this order does not belong to any
    * sequence.
    */
-  public void setWrappingSequence(TCSObjectReference<OrderSequence> sequence) {
+  public void setWrappingSequence(@Nullable TCSObjectReference<OrderSequence> sequence) {
     wrappingSequence = sequence;
   }
 
@@ -520,7 +530,6 @@ public class TransportOrder
   /**
    * This enumeration defines the various states a transport order may be in.
    */
-  @XmlType(name = "transportOrderState")
   public enum State {
 
     /**

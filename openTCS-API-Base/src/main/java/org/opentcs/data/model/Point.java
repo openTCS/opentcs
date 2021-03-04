@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -30,7 +29,7 @@ public class Point
   /**
    * This point's coordinates in mm.
    */
-  private Triple position = new Triple();
+  private Triple position = new Triple(0, 0, 0);
   /**
    * The vehicle's (assumed) orientation angle (-360..360) when it is at this
    * position.

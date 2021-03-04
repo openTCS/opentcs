@@ -9,21 +9,26 @@
 package org.opentcs.guing.exchange;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.UUID;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.ObjectUnknownException;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.model.AbstractFigureComponent;
@@ -99,7 +104,7 @@ public class TransportOrderUtil {
         .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
                   "destModels have to be a PointModel or a Locationmodel");
 
-    List<DriveOrder.Destination> destinations = new ArrayList<>();
+    List<DestinationCreationTO> destinations = new ArrayList<>();
     for (int i = 0; i < destModels.size(); i++) {
       AbstractFigureComponent locModel = destModels.get(i);
       String action = actions.get(i);
@@ -107,31 +112,28 @@ public class TransportOrderUtil {
       if (!propertiesList.isEmpty()) {
         properties = propertiesList.get(i);
       }
-      Location location
-          = getKernel().getTCSObject(Location.class, locModel.getName());
-      DriveOrder.Destination destination;
+      Location location = getKernel().getTCSObject(Location.class, locModel.getName());
+      DestinationCreationTO destination;
       if (location == null) {
         Point point = getKernel().getTCSObject(Point.class, locModel.getName());
-        destination
-            = new DriveOrder.Destination(TCSObjectReference.getDummyReference(Location.class,
-                                                                              point.getName()),
-                                         action);
+        destination = new DestinationCreationTO(point.getName(), action)
+            .setDestLocationName(point.getName());
       }
       else {
-        destination = new DriveOrder.Destination(location.getReference(), action, properties);
+        destination = new DestinationCreationTO(location.getName(), action)
+            .setDestLocationName(location.getName())
+            .setProperties(properties);
       }
       destinations.add(destination);
     }
 
     try {
-      TransportOrder tOrder = getKernel().createTransportOrder(destinations);
-      getKernel().setTransportOrderDeadline(tOrder.getReference(), deadline);
-
-      if (vModel != null) {
-        Vehicle vehicle = getKernel().getTCSObject(Vehicle.class, vModel.getName());
-        getKernel().setTransportOrderIntendedVehicle(tOrder.getReference(),
-                                                     vehicle.getReference());
-      }
+      TransportOrder tOrder = getKernel()
+          .createTransportOrder(new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+                                                             destinations)
+              .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(deadline),
+                                                   ZoneId.systemDefault()))
+              .setIntendedVehicleName(vModel == null ? null : vModel.getName()));
 
       getKernel().activateTransportOrder(tOrder.getReference());
     }
@@ -148,33 +150,15 @@ public class TransportOrderUtil {
   public void createTransportOrder(TransportOrder pattern) {
     requireNonNull(pattern, "pattern");
 
-    List<DriveOrder.Destination> destinations = new ArrayList<>();
-    List<DriveOrder> driveOrders = new ArrayList<>();
-    driveOrders.addAll(pattern.getPastDriveOrders());
-
-    if (pattern.getCurrentDriveOrder() != null) {
-      driveOrders.add(pattern.getCurrentDriveOrder());
-    }
-
-    driveOrders.addAll(pattern.getFutureDriveOrders());
-
-    for (DriveOrder dOrder : driveOrders) {
-      destinations.add(dOrder.getDestination());
-    }
-
     try {
-      TransportOrder tOrder = getKernel().createTransportOrder(destinations);
-      pattern.getProperties().entrySet()
-          .forEach(entry -> getKernel().setTCSObjectProperty(tOrder.getReference(),
-                                                             entry.getKey(),
-                                                             entry.getValue()));
-      getKernel().setTransportOrderDeadline(tOrder.getReference(),
-                                            pattern.getDeadline());
-
-      if (pattern.getIntendedVehicle() != null) {
-        getKernel().setTransportOrderIntendedVehicle(tOrder.getReference(),
-                                                     pattern.getIntendedVehicle());
-      }
+      TransportOrder tOrder = getKernel().createTransportOrder(
+          new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(), copyDestinations(pattern))
+              .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(pattern.getDeadline()),
+                                                   ZoneId.systemDefault()))
+              .setIntendedVehicleName(pattern.getIntendedVehicle() == null
+                  ? null
+                  : pattern.getIntendedVehicle().getName())
+              .setProperties(pattern.getProperties()));
 
       getKernel().activateTransportOrder(tOrder.getReference());
     }
@@ -199,25 +183,41 @@ public class TransportOrderUtil {
       return;
     }
 
-    TCSObjectReference<Location> locRef
-        = TCSObjectReference.getDummyReference(Location.class, pointModel.getName());
-    List<DriveOrder.Destination> dest
-        = Collections.singletonList(new DriveOrder.Destination(locRef, DriveOrder.Destination.OP_MOVE));
-
     try {
-      TransportOrder t = getKernel().createTransportOrder(dest);
-      getKernel().setTransportOrderDeadline(t.getReference(),
-                                            System.currentTimeMillis());
-
-      Vehicle vehicle = getKernel().getTCSObject(Vehicle.class, vModel.getName());
-      getKernel().setTransportOrderIntendedVehicle(t.getReference(),
-                                                   vehicle.getReference());
+      TransportOrder t = getKernel().createTransportOrder(
+          new TransportOrderCreationTO(
+              "TOrder-" + UUID.randomUUID(),
+              Collections.singletonList(new DestinationCreationTO(pointModel.getName(),
+                                                                  DriveOrder.Destination.OP_MOVE)))
+              .setDeadline(ZonedDateTime.now())
+              .setIntendedVehicleName(vModel.getName())
+      );
 
       getKernel().activateTransportOrder(t.getReference());
     }
     catch (CredentialsException | ObjectUnknownException e) {
       LOG.warn("Unexpected exception", e);
     }
+  }
+
+  private List<DestinationCreationTO> copyDestinations(TransportOrder original) {
+    List<DestinationCreationTO> result = new LinkedList<>();
+    for (DriveOrder driveOrder : original.getPastDriveOrders()) {
+      result.add(copyDestination(driveOrder));
+    }
+    if (original.getCurrentDriveOrder() != null) {
+      result.add(copyDestination(original.getCurrentDriveOrder()));
+    }
+    for (DriveOrder driveOrder : original.getFutureDriveOrders()) {
+      result.add(copyDestination(driveOrder));
+    }
+    return result;
+  }
+
+  private DestinationCreationTO copyDestination(DriveOrder driveOrder) {
+    return new DestinationCreationTO(driveOrder.getDestination().getLocation().getName(),
+                                     driveOrder.getDestination().getOperation())
+        .setProperties(driveOrder.getDestination().getProperties());
   }
 
   /**

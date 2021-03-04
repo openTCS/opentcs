@@ -7,18 +7,19 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
@@ -33,12 +34,10 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.plugins.themes.StandardLocationTheme;
 import org.opentcs.guing.plugins.themes.StandardVehicleTheme;
-import org.opentcs.guing.storage.PlantModelCache;
 import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.VehicleThemeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An adapter for VisualLayout instances.
@@ -52,8 +51,7 @@ public class LayoutAdapter
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(LayoutAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LayoutAdapter.class);
   /**
    * Manages the location themes.
    */
@@ -65,7 +63,7 @@ public class LayoutAdapter
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param model The corresponding model comoponent.
    * @param eventDispatcher The event dispatcher.
    * @param locationThemeManager Manages the location themes.
@@ -104,38 +102,33 @@ public class LayoutAdapter
       updateMiscModelProperties(layout);
     }
     catch (Exception e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateProcessProperties(Kernel kernel, PlantModelCache plantModel) {
-    VisualLayout layout = kernel.createVisualLayout();
-    TCSObjectReference<VisualLayout> reference = layout.getReference();
-
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    String name = pName.getText();
-
+  public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
-      kernel.renameTCSObject(reference, name);
-      LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
-      double scale = pScale.getValueByUnit(LengthProperty.Unit.MM);
-
-      kernel.setVisualLayoutScaleX(reference, scale);
-
-      pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
-      scale = pScale.getValueByUnit(LengthProperty.Unit.MM);
-
-      kernel.setVisualLayoutScaleY(reference, scale);
-      updateProcessThemes();
-
-      updateMiscProcessProperties(kernel, reference);
-      
-      plantModel.getVisualLayouts().add(layout);
+      plantModel.getVisualLayouts().add(
+          new VisualLayoutCreationTO(getModel().getName())
+              .setScaleX(getScaleX())
+              .setScaleY(getScaleY())
+              .setProperties(getKernelProperties())
+      );
     }
     catch (KernelRuntimeException e) {
-      log.warn("", e);
+      LOG.warn("", e);
     }
+  }
+
+  private double getScaleX() {
+    LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
+    return pScale.getValueByUnit(LengthProperty.Unit.MM);
+  }
+
+  private double getScaleY() {
+    LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
+    return pScale.getValueByUnit(LengthProperty.Unit.MM);
   }
 
   private void updateModelThemes(VisualLayout layout) {
@@ -166,7 +159,8 @@ public class LayoutAdapter
     }
   }
 
-  private void updateModelLengthProperty(VisualLayout layout) throws Exception {
+  private void updateModelLengthProperty(VisualLayout layout)
+      throws Exception {
     LengthProperty lp = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
     double scale = layout.getScaleX();
     lp.setValueAndUnit(scale, LengthProperty.Unit.MM);
@@ -208,5 +202,20 @@ public class LayoutAdapter
     }
 
     vehicleThemeManager.updateDefaultTheme();
+  }
+
+  @Override
+  protected Map<String, String> getKernelProperties() {
+    Map<String, String> result = super.getKernelProperties();
+
+    LocationThemeProperty pLocationTheme
+        = (LocationThemeProperty) getModel().getProperty(LayoutModel.LOCATION_THEME);
+    result.put(ObjectPropConstants.LOCATION_THEME_CLASS, pLocationTheme.getTheme());
+
+    VehicleThemeProperty pVehicleTheme
+        = (VehicleThemeProperty) getModel().getProperty(LayoutModel.VEHICLE_THEME);
+    result.put(ObjectPropConstants.VEHICLE_THEME_CLASS, pVehicleTheme.getTheme());
+
+    return result;
   }
 }

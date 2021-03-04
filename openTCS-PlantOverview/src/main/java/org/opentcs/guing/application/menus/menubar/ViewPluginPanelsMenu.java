@@ -9,6 +9,8 @@
 package org.opentcs.guing.application.menus.menubar;
 
 import static java.util.Objects.requireNonNull;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -29,7 +31,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ViewPluginPanelsMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle();
 
   /**
    * The application's main view.
@@ -48,7 +50,7 @@ public class ViewPluginPanelsMenu
   public ViewPluginPanelsMenu(OpenTCSView view,
                               PanelRegistry panelRegistry,
                               DockingManager dockingManager) {
-    super(labels.getString("view.pluginPanels.text"));
+    super(BUNDLE.getString("view.pluginPanels.text"));
 
     this.view = requireNonNull(view, "view");
     this.panelRegistry = requireNonNull(panelRegistry, "panelRegistry");
@@ -67,28 +69,32 @@ public class ViewPluginPanelsMenu
    * @param operationMode The operation mode.
    */
   private void evaluatePluginPanels(OperationMode operationMode) {
-    Kernel.State equivalentState = OperationMode.equivalent(operationMode);
-    if (equivalentState == null) {
+    Kernel.State kernelState = OperationMode.equivalent(operationMode);
+    if (kernelState == null) {
       return;
     }
 
     removeAll();
 
-    for (final PluggablePanelFactory factory : panelRegistry.getFactories()) {
-      if (factory.providesPanel(equivalentState)) {
+    SortedSet<PluggablePanelFactory> factories = new TreeSet<>((factory1, factory2) -> {
+      return factory1.getPanelDescription().compareTo(factory2.getPanelDescription());
+    });
+    factories.addAll(panelRegistry.getFactories());
+    
+    for (final PluggablePanelFactory factory : factories) {
+      if (factory.providesPanel(kernelState)) {
         String title = factory.getPanelDescription();
         final JCheckBoxMenuItem utilMenuItem = new JCheckBoxMenuItem();
         utilMenuItem.setAction(new AddPluginPanelAction(view, factory));
         utilMenuItem.setText(title);
-        dockingManager.addPropertyChangeListener(
-            new PluginPanelPropertyHandler(utilMenuItem));
+        dockingManager.addPropertyChangeListener(new PluginPanelPropertyHandler(utilMenuItem));
         add(utilMenuItem);
       }
     }
     // If the menu is empty, add a single disabled menu item to it that explains
     // to the user that no plugin panels are available.
     if (getMenuComponentCount() == 0) {
-      JMenuItem dummyItem = new JMenuItem(labels.getString("view.pluginPanels.noneAvailable.text"));
+      JMenuItem dummyItem = new JMenuItem(BUNDLE.getString("view.pluginPanels.noneAvailable.text"));
       dummyItem.setEnabled(false);
       add(dummyItem);
     }

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -275,7 +274,9 @@ public class TCSObjectPool {
    * @throws ObjectUnknownException If the referenced object does not exist.
    * @throws ObjectExistsException If the object cannot be renamed because
    * there is already an object named <code>newName</code>.
+   * @deprecated Set an object name when creating the object, instead.
    */
+  @Deprecated
   public void renameObject(TCSObjectReference<?> ref, String newName)
       throws ObjectUnknownException, ObjectExistsException {
     requireNonNull(ref, "ref");

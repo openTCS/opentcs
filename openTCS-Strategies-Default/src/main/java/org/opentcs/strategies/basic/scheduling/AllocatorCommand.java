@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2017 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -88,6 +87,38 @@ abstract class AllocatorCommand
       super(1, new DummyClient());
     }
   }
+  
+  /**
+   * Indicates resources being released by a client.
+   */
+  public static class AllocationsReleased
+      extends AllocatorCommand {
+    
+    /**
+     * The resources being released.
+     */
+    private final Set<TCSResource<?>> resources;
+    
+    /**
+     * Creates a new instance.
+     * 
+     * @param client The scheduler client this command is associated with.
+     * @param resources The resources being released.
+     */
+    public AllocationsReleased(Client client, Set<TCSResource<?>> resources) {
+      super(2, client);
+      this.resources = requireNonNull(resources, "resources");
+    }
+
+    /**
+     * Returns the resources being released.
+     * 
+     * @return The resources being released.
+     */
+    public Set<TCSResource<?>> getResources() {
+      return resources;
+    }
+  }
 
   /**
    * Indicates the receiving task should retry to grant deferred allocations.
@@ -101,10 +132,43 @@ abstract class AllocatorCommand
      * @param client The scheduler client this command is associated with.
      */
     public RetryAllocates(Client client) {
-      super(2, client);
+      super(3, client);
     }
   }
 
+  /**
+   * Indicates the receiving task should check if a set of resources is prepared for client 
+   * allocation.
+   */
+  public static class CheckAllocationsPrepared
+      extends AllocatorCommand {
+    
+    /**
+     * The resources to be checked.
+     */
+    private final Set<TCSResource<?>> resources;
+
+    /**
+     * Creates a new instance.
+     * 
+     * @param client The scheduler client this command is associated with.
+     * @param resources The resources to be checked.
+     */
+    public CheckAllocationsPrepared(Client client, Set<TCSResource<?>> resources) {
+      super(4, client);
+      this.resources = requireNonNull(resources, "resources");
+    }
+
+    /**
+     * Returns the resources to be checked.
+     * 
+     * @return The resources to be checked.
+     */
+    public Set<TCSResource<?>> getResources() {
+      return resources;
+    }
+  }
+  
   /**
    * Indicates the receiving task should try to allocate a set of resources for a client.
    */
@@ -123,7 +187,7 @@ abstract class AllocatorCommand
      * @param resources The resources to be allocated.
      */
     public Allocate(Client client, Set<TCSResource<?>> resources) {
-      super(4, client);
+      super(5, client);
       this.resources = requireNonNull(resources, "resources");
     }
 

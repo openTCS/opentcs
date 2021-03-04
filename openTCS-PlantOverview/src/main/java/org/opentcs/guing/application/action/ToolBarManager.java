@@ -41,9 +41,7 @@ import org.opentcs.guing.application.action.draw.DefaultPointSelectedAction;
 import org.opentcs.guing.application.action.draw.SelectSameAction;
 import org.opentcs.guing.application.action.draw.SendToBackAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
-import org.opentcs.guing.application.action.view.LoadViewBookmarkAction;
 import org.opentcs.guing.application.action.view.PauseAllVehiclesAction;
-import org.opentcs.guing.application.action.view.SaveViewBookmarkAction;
 import org.opentcs.guing.application.toolbar.DragTool;
 import org.opentcs.guing.application.toolbar.MultipleSelectionTool;
 import org.opentcs.guing.application.toolbar.OpenTCSConnectionTool;
@@ -275,15 +273,6 @@ public class ToolBarManager {
     toolBarCreation.add(buttonFindVehicle);
 
     toolBarCreation.addSeparator();
-
-    // --- Save/Load View Bookmark ---
-    JButton button = new JButton(actionMap.get(LoadViewBookmarkAction.ID));
-    labels.configureNamelessButton(button, LoadViewBookmarkAction.ID);
-    toolBarCreation.add(button);
-
-    button = new JButton(actionMap.get(SaveViewBookmarkAction.ID));
-    labels.configureNamelessButton(button, SaveViewBookmarkAction.ID);
-    toolBarCreation.add(button);
 
     // --- Pause All Vehicles (only in Operating mode) ---
     buttonPauseAllVehicles = new JToggleButton(actionMap.get(PauseAllVehiclesAction.ID));

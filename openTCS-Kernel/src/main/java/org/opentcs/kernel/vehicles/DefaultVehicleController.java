@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2006 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -8,8 +7,6 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
@@ -31,6 +28,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import net.engio.mbassy.bus.MBassador;
 import org.opentcs.access.LocalKernel;
@@ -38,7 +36,6 @@ import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Triple;
@@ -53,6 +50,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
+import static org.opentcs.util.Assertions.checkArgument;
+import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,11 +158,11 @@ public class DefaultVehicleController
    * @param ignoreUnknownPositions Whether to ignore unknown positions.
    */
   @Inject
-  public DefaultVehicleController(@Assisted Vehicle vehicle,
-                                  @Assisted VehicleCommAdapter adapter,
-                                  LocalKernel kernel,
-                                  Scheduler scheduler,
-                                  MBassador<Object> eventBus,
+  public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
+                                  @Assisted @Nonnull VehicleCommAdapter adapter,
+                                  @Nonnull LocalKernel kernel,
+                                  @Nonnull Scheduler scheduler,
+                                  @Nonnull MBassador<Object> eventBus,
                                   @IgnoreUnknownPositions boolean ignoreUnknownPositions) {
     this.controlledVehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
@@ -307,8 +306,8 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
       requireNonNull(orderProperties, "orderProperties");
-      // If there still is a drive order that hasn't been finished/removed, yet,
-      // throw an exception.
+      requireNonNull(newOrder.getRoute(), "newOrder.getRoute()");
+      // Assert that there isn't still is a drive order that hasn't been finished/removed, yet.
       checkState(currentDriveOrder == null,
                  "%s still has an order! Current order: %s, new order: %s",
                  vehicleName, currentDriveOrder, newOrder);
@@ -321,8 +320,7 @@ public class DefaultVehicleController
 
       // The communication adapter MUST have capacity for a new command - its
       // queue should be empty.
-      checkState(canSendNextCommand(),
-                 "Cannot send next command for some reason");
+      checkState(canSendNextCommand(), "Cannot send next command for some reason");
       allocateForNextCommand();
       // Set the vehicle's next expected position.
       Point nextPoint = newOrder.getRoute().getSteps().get(0).getDestinationPoint();
@@ -364,10 +362,10 @@ public class DefaultVehicleController
       futureCommands.clear();
       pendingCommand = null;
       // Free all resources that were reserved for future commands...
-      final Set<TCSResource<?>> neededResources = allocatedResources.poll();
-      final Iterator<Set<TCSResource<?>>> resIter = allocatedResources.iterator();
+      Set<TCSResource<?>> neededResources = allocatedResources.poll();
+      Iterator<Set<TCSResource<?>>> resIter = allocatedResources.iterator();
       while (resIter.hasNext()) {
-        final Set<TCSResource<?>> resSet = resIter.next();
+        Set<TCSResource<?>> resSet = resIter.next();
         if (resSet != null) {
           scheduler.free(this, resSet);
         }
@@ -391,7 +389,8 @@ public class DefaultVehicleController
   }
 
   @Override
-  public ExplainedBoolean canProcess(List<String> operations) {
+  @Nonnull
+  public ExplainedBoolean canProcess(@Nonnull List<String> operations) {
     requireNonNull(operations, "operations");
 
     synchronized (commAdapter) {
@@ -400,24 +399,24 @@ public class DefaultVehicleController
   }
 
   @Override
-  public void sendCommAdapterMessage(Object message) {
+  public void sendCommAdapterMessage(@Nullable Object message) {
     synchronized (commAdapter) {
       commAdapter.processMessage(message);
     }
   }
 
-  // Methods declared in interface ResourceUser start here.
   @Override
+  @Nonnull
   public String getId() {
     return controlledVehicle.getName();
   }
 
   @Override
-  public boolean allocationSuccessful(final Set<TCSResource<?>> resources) {
+  public boolean allocationSuccessful(@Nonnull Set<TCSResource<?>> resources) {
     requireNonNull(resources, "resources");
 
     // Look up the command the resources were required for.
-    final MovementCommand command;
+    MovementCommand command;
     synchronized (commAdapter) {
       // Check if we've actually been waiting for these resources now. If not,
       // let the scheduler know that we don't want them.
@@ -462,7 +461,7 @@ public class DefaultVehicleController
   }
 
   @Override
-  public void allocationFailed(final Set<TCSResource<?>> resources) {
+  public void allocationFailed(@Nonnull Set<TCSResource<?>> resources) {
     requireNonNull(resources, "resources");
     throw new IllegalStateException("Failed to allocate: " + resources);
   }
@@ -472,12 +471,12 @@ public class DefaultVehicleController
     return "DefaultVehicleController{" + "vehicleName=" + vehicleName + '}';
   }
 
-  private void setVehiclePosition(final String position) {
+  private void setVehiclePosition(String position) {
     // Place the vehicle on the given position, regardless of what the kernel
     // might expect. The vehicle is physically there, even if it shouldn't be.
     // The same is true for null values - if the vehicle says it's not on any
     // known position, it has to be treated as a fact.
-    final Point point;
+    Point point;
     if (position == null) {
       point = null;
     }
@@ -522,8 +521,7 @@ public class DefaultVehicleController
     // Change the state of controlled vehicle via the kernel, not directly,
     // since the kernel might have to emit events for it and it needs to be
     // synchronized.
-    localKernel.setVehiclePrecisePosition(controlledVehicle.getReference(),
-                                          position);
+    localKernel.setVehiclePrecisePosition(controlledVehicle.getReference(), position);
     // Get us a fresh copy of the modified vehicle object.
     updateVehicleInstance();
   }
@@ -532,8 +530,7 @@ public class DefaultVehicleController
     // Change the state of controlled vehicle via the kernel, not directly,
     // since the kernel might have to emit events for it and it needs to be
     // synchronized.
-    localKernel.setVehicleOrientationAngle(controlledVehicle.getReference(),
-                                           angle);
+    localKernel.setVehicleOrientationAngle(controlledVehicle.getReference(), angle);
     // Get us a fresh copy of the modified vehicle object.
     updateVehicleInstance();
   }
@@ -545,8 +542,7 @@ public class DefaultVehicleController
     // Change the state of controlled vehicle via the kernel, not directly,
     // since the kernel might have to emit events for it and it needs to be
     // synchronized.
-    localKernel.setVehicleEnergyLevel(controlledVehicle.getReference(),
-                                      energyLevel);
+    localKernel.setVehicleEnergyLevel(controlledVehicle.getReference(), energyLevel);
     // Get us a fresh copy of the modified vehicle object.
     updateVehicleInstance();
   }
@@ -562,7 +558,7 @@ public class DefaultVehicleController
   }
 
   private void setVehicleLoadHandlingDevices(List<LoadHandlingDevice> devices) {
-    Objects.requireNonNull(devices, "devices is null");
+    requireNonNull(devices, "devices");
     // Change the state of controlled vehicle via the kernel, not directly,
     // since the kernel might have to emit events for it and it needs to be
     // synchronized.
@@ -613,18 +609,18 @@ public class DefaultVehicleController
     localKernel.setTCSObjectProperty(currentDriveOrder.getTransportOrder(), key, value);
   }
 
-  private void commandExecuted(final MovementCommand executedCommand) {
-    requireNonNull(executedCommand, "executedCommand is null");
+  private void commandExecuted(MovementCommand executedCommand) {
+    requireNonNull(executedCommand, "executedCommand");
 
     synchronized (commAdapter) {
       // Check if the executed command is the one we expect at this point.
-      final MovementCommand expectedCommand = commandsSent.peek();
+      MovementCommand expectedCommand = commandsSent.peek();
       if (executedCommand.equals(expectedCommand)) {
         // Remove the command from the queue, since it has been processed
         // successfully.
         commandsSent.remove();
         // Free resources allocated for the command before the one now executed.
-        final Set<TCSResource<?>> oldResources = allocatedResources.poll();
+        Set<TCSResource<?>> oldResources = allocatedResources.poll();
         if (oldResources != null) {
           LOG.debug("{}: Freeing resources: {}", vehicleName, oldResources);
           scheduler.free(this, oldResources);
@@ -689,11 +685,11 @@ public class DefaultVehicleController
                                     Map<String, String> orderProperties) {
     // Start processing the new order, i.e. fill futureCommands with
     // corresponding command objects.
-    final String op = newOrder.getDestination().getOperation();
-    final Route orderRoute = newOrder.getRoute();
-    final Point finalDestination = orderRoute.getFinalDestinationPoint();
-    final Map<String, String> destProperties = newOrder.getDestination().getProperties();
-    final Iterator<Step> stepIter = orderRoute.getSteps().iterator();
+    String op = newOrder.getDestination().getOperation();
+    Route orderRoute = newOrder.getRoute();
+    Point finalDestination = orderRoute.getFinalDestinationPoint();
+    Map<String, String> destProperties = newOrder.getDestination().getProperties();
+    Iterator<Step> stepIter = orderRoute.getSteps().iterator();
     while (stepIter.hasNext()) {
       Step curStep = stepIter.next();
       // Ignore report positions on the route.
@@ -730,10 +726,8 @@ public class DefaultVehicleController
    * @param newState The communication adapter's new state.
    */
   private void updateCommAdapterState(VehicleCommAdapter.State newState) {
-    assert newState != null : "newState is null";
-    commAdapterState = newState;
-    localKernel.setVehicleAdapterState(controlledVehicle.getReference(),
-                                       newState);
+    commAdapterState = requireNonNull(newState, "newState");
+    localKernel.setVehicleAdapterState(controlledVehicle.getReference(), newState);
     // If the adapter's state is unknown, the vehicle's state is unknown, too.
     if (newState.equals(VehicleCommAdapter.State.UNKNOWN)) {
       updateVehicleState(Vehicle.State.UNKNOWN);
@@ -747,7 +741,7 @@ public class DefaultVehicleController
    * @param newState The vehicle's new state.
    */
   private void updateVehicleState(Vehicle.State newState) {
-    assert newState != null : "newState is null";
+    requireNonNull(newState, "newState");
     // Change the state of controlled vehicle via the kernel, not directly,
     // since the kernel might have to emit events for it and it needs to be
     // synchronized.
@@ -769,12 +763,11 @@ public class DefaultVehicleController
    * @param newState The vehicle's new processing state.
    */
   private void updateVehicleProcState(Vehicle.ProcState newState) {
-    assert newState != null : "newState is null";
+    requireNonNull(newState, "newState");
     // Change the state of controlled vehicle via the kernel, not directly,
     // since the kernel might have to emit events for it and it needs to be
     // synchronized.
-    localKernel.setVehicleProcState(controlledVehicle.getReference(),
-                                    newState);
+    localKernel.setVehicleProcState(controlledVehicle.getReference(), newState);
     // Get us a fresh copy of the modified vehicle object.
     updateVehicleInstance();
   }
@@ -783,9 +776,7 @@ public class DefaultVehicleController
    * Updates the reference to the controlled vehicle.
    */
   private void updateVehicleInstance() {
-    controlledVehicle
-        = localKernel.getTCSObject(Vehicle.class,
-                                   controlledVehicle.getReference());
+    controlledVehicle = localKernel.getTCSObject(Vehicle.class, controlledVehicle.getReference());
 
     checkState(controlledVehicle != null, "kernel lost a vehicle");
   }
@@ -798,8 +789,8 @@ public class DefaultVehicleController
    * @return <code>true</code> if, and only if, we can send another command.
    */
   private boolean canSendNextCommand() {
-    final int sendableCommands = Math.min(adapterCommandQueueCapacity - commandsSent.size(),
-                                          futureCommands.size());
+    int sendableCommands = Math.min(adapterCommandQueueCapacity - commandsSent.size(),
+                                    futureCommands.size());
     if (sendableCommands <= 0) {
       LOG.debug("{}: Cannot send, number of sendable commands: {}", vehicleName, sendableCommands);
       return false;
@@ -815,9 +806,10 @@ public class DefaultVehicleController
    * Allocate the resources needed for executing the next command.
    */
   private void allocateForNextCommand() {
-    assert pendingCommand == null : "pendingCommand != null";
+    checkState(pendingCommand == null, "pendingCommand != null");
+
     // Find out which resources are actually needed for the next command.
-    final MovementCommand moveCmd = futureCommands.poll();
+    MovementCommand moveCmd = futureCommands.poll();
     pendingResources = getNeededResources(moveCmd);
     LOG.debug("{}: Allocating resources: {}", vehicleName, pendingResources);
     scheduler.allocate(this, pendingResources);
@@ -835,13 +827,12 @@ public class DefaultVehicleController
    * @return A set of resources needed for executing the given command.
    */
   private Set<TCSResource<?>> getNeededResources(MovementCommand cmd) {
-    assert cmd != null : "cmd is null";
-    final Set<TCSResource<?>> result = new HashSet<>();
-    final Point destinationPoint = cmd.getStep().getDestinationPoint();
-    result.add(destinationPoint);
-    final Path path = cmd.getStep().getPath();
-    if (path != null) {
-      result.add(path);
+    requireNonNull(cmd, "cmd");
+
+    Set<TCSResource<?>> result = new HashSet<>();
+    result.add(cmd.getStep().getDestinationPoint());
+    if (cmd.getStep().getPath() != null) {
+      result.add(cmd.getStep().getPath());
     }
     return result;
   }
@@ -861,8 +852,7 @@ public class DefaultVehicleController
    * @param index The new index.
    */
   private void setVehicleRouteProgressIndex(int index) {
-    localKernel.setVehicleRouteProgressIndex(controlledVehicle.getReference(),
-                                             index);
+    localKernel.setVehicleRouteProgressIndex(controlledVehicle.getReference(), index);
   }
 
   /**
@@ -973,11 +963,10 @@ public class DefaultVehicleController
    * @param destProps The properties of a drive order destination.
    * @return The merged properties.
    */
-  private static Map<String, String> mergeProperties(
-      Map<String, String> orderProps,
-      Map<String, String> destProps) {
-    assert orderProps != null : "orderProps is null";
-    assert destProps != null : "destProps is null";
+  private static Map<String, String> mergeProperties(Map<String, String> orderProps,
+                                                     Map<String, String> destProps) {
+    requireNonNull(orderProps, "orderProps");
+    requireNonNull(destProps, "destProps");
 
     Map<String, String> result = new HashMap<>();
     result.putAll(orderProps);

@@ -1,5 +1,4 @@
-dependencies {
-}
+apply from: "${rootDir}/gradle/license-headers.gradle"
 
 task release {
   dependsOn build

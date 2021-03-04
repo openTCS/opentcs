@@ -39,6 +39,7 @@ public class StandardLocationTheme
     "TransferStation.20x20.png", // 0
     "WorkingStation.20x20.png", // 1
     "ChargingStation.20x20.png", // 2
+    "None.20x20.png", // 3
   };
   /**
    * A map of property values to image file names.
@@ -64,6 +65,9 @@ public class StandardLocationTheme
   }
 
   private void initSymbolMap() {
+    // NONE: A location without further description
+    symbolMap.put(LocationRepresentation.NONE, loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[3]));
+
     // LOAD_TRANSFER_GENERIC: A generic location for vehicle load transfers.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_GENERIC,
                   loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));

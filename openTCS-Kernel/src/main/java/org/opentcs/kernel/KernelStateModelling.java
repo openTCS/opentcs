@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2007 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -20,6 +19,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInModellingMode;
 import org.opentcs.data.ObjectUnknownException;
@@ -105,7 +106,7 @@ class KernelStateModelling
   public boolean isInitialized() {
     return initialized;
   }
-  
+
   @Override
   public void terminate() {
     if (!initialized) {
@@ -130,29 +131,44 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void createModel(String modelName) {
+    this.createPlantModel(new PlantModelCreationTO(modelName));
+  }
+
+  @Override
+  public void createPlantModel(PlantModelCreationTO to) {
     synchronized (getGlobalSyncObject()) {
-      // Clear the model and set its name.
       getModel().clear();
-      getModel().setName(modelName);
+      getModel().setName(to.getName());
+      getModel().createPlantModelObjects(to);
     }
   }
 
   @Override
-  public void loadModel()
-      throws IOException {
+  public void loadPlantModel()
+      throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {
       getModelPersister().loadModel(getModel());
     }
   }
 
   @Override
+  @Deprecated
+  public void loadModel()
+      throws IOException {
+    this.loadPlantModel();
+  }
+
+  @Override
+  @Deprecated
   public void removeModel()
       throws IOException {
     getModelPersister().removeModel();
   }
 
   @Override
+  @Deprecated
   public void removeTCSObject(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -192,13 +208,22 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public VisualLayout createVisualLayout() {
     synchronized (getGlobalSyncObject()) {
-      return getModel().createVisualLayout(null).clone();
+      return getModel().createVisualLayout((Integer) null).clone();
     }
   }
 
   @Override
+  public VisualLayout createVisualLayout(VisualLayoutCreationTO to) {
+    synchronized (getGlobalSyncObject()) {
+      return getModel().createVisualLayout(to).clone();
+    }
+  }
+
+  @Override
+  @Deprecated
   public void setVisualLayoutScaleX(TCSObjectReference<VisualLayout> ref,
                                     double scaleX)
       throws ObjectUnknownException {
@@ -208,6 +233,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutScaleY(TCSObjectReference<VisualLayout> ref,
                                     double scaleY)
       throws ObjectUnknownException {
@@ -217,6 +243,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutColors(TCSObjectReference<VisualLayout> ref,
                                     Map<String, Color> colors)
       throws ObjectUnknownException {
@@ -226,6 +253,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setVisualLayoutElements(TCSObjectReference<VisualLayout> ref,
                                       Set<LayoutElement> elements)
       throws ObjectUnknownException {
@@ -235,14 +263,16 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public Point createPoint() {
     synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return getModel().createPoint(null).clone();
+      return getModel().createPoint((Integer) null).clone();
     }
   }
 
   @Override
+  @Deprecated
   public void setPointPosition(TCSObjectReference<Point> ref,
                                Triple position)
       throws ObjectUnknownException {
@@ -252,6 +282,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setPointVehicleOrientationAngle(TCSObjectReference<Point> ref,
                                               double angle)
       throws ObjectUnknownException {
@@ -261,6 +292,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setPointType(TCSObjectReference<Point> ref,
                            Point.Type newType)
       throws ObjectUnknownException {
@@ -270,6 +302,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> destRef)
       throws ObjectUnknownException {
@@ -279,6 +312,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setPathLength(TCSObjectReference<Path> ref, long length)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -287,6 +321,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setPathRoutingCost(TCSObjectReference<Path> ref, long cost)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -295,6 +330,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setPathMaxVelocity(TCSObjectReference<Path> ref, int velocity)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -303,6 +339,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setPathMaxReverseVelocity(TCSObjectReference<Path> ref,
                                         int velocity)
       throws ObjectUnknownException {
@@ -320,13 +357,15 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public Vehicle createVehicle() {
     synchronized (getGlobalSyncObject()) {
-      return getModel().createVehicle(null).clone();
+      return getModel().createVehicle((Integer) null).clone();
     }
   }
 
   @Override
+  @Deprecated
   public void setVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -335,13 +374,15 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public LocationType createLocationType() {
     synchronized (getGlobalSyncObject()) {
-      return getModel().createLocationType(null).clone();
+      return getModel().createLocationType((Integer) null).clone();
     }
   }
 
   @Override
+  @Deprecated
   public void addLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref,
       String operation)
@@ -352,6 +393,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void removeLocationTypeAllowedOperation(
       TCSObjectReference<LocationType> ref, String operation)
       throws ObjectUnknownException {
@@ -361,6 +403,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public Location createLocation(TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -369,6 +412,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setLocationPosition(TCSObjectReference<Location> ref,
                                   Triple position)
       throws ObjectUnknownException {
@@ -378,6 +422,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void setLocationType(TCSObjectReference<Location> ref,
                               TCSObjectReference<LocationType> typeRef)
       throws ObjectUnknownException {
@@ -387,6 +432,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void connectLocationToPoint(TCSObjectReference<Location> locRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -396,6 +442,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void disconnectLocationFromPoint(TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -405,6 +452,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void addLocationLinkAllowedOperation(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
@@ -415,6 +463,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void removeLocationLinkAllowedOperation(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef,
       String operation)
@@ -425,6 +474,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void clearLocationLinkAllowedOperations(
       TCSObjectReference<Location> locRef, TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -434,14 +484,16 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public Block createBlock() {
     synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return getModel().createBlock(null).clone();
+      return getModel().createBlock((Integer) null).clone();
     }
   }
 
   @Override
+  @Deprecated
   public void addBlockMember(TCSObjectReference<Block> ref,
                              TCSResourceReference<?> newMemberRef)
       throws ObjectUnknownException {
@@ -451,6 +503,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void removeBlockMember(TCSObjectReference<Block> ref,
                                 TCSResourceReference<?> rmMemberRef)
       throws ObjectUnknownException {
@@ -460,14 +513,16 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public StaticRoute createStaticRoute() {
     synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
-      return getModel().createStaticRoute(null).clone();
+      return getModel().createStaticRoute((Integer) null).clone();
     }
   }
 
   @Override
+  @Deprecated
   public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
@@ -477,6 +532,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
