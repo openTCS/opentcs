@@ -8,7 +8,9 @@
 package org.opentcs.util.persistence;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +19,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
 import org.opentcs.util.persistence.binding.AllowedOperationTO;
@@ -66,11 +67,9 @@ public class DrivingCoursePersistenceTest {
 
   }
 
-  /**
-   * Test of toXml method, of class DrivingCourse.
-   */
   @Test
-  public void testToXml() {
+  public void testToXml()
+      throws IOException {
     PlantModelTO model = new PlantModelTO();
     model.setVersion("0.0.2");
     model.setName("Demo");
@@ -109,7 +108,10 @@ public class DrivingCoursePersistenceTest {
     VisualLayoutTO vl = createVisualLayout();
     model.setVisualLayouts(Arrays.asList(vl));
 
-    String xmlOutput = model.toXml();
+    StringWriter writer = new StringWriter();
+    model.toXml(writer);
+
+    String xmlOutput = writer.toString();
     LOG.info(xmlOutput);
 
     try {
@@ -120,21 +122,19 @@ public class DrivingCoursePersistenceTest {
     }
   }
 
-  private boolean validateXml(StringReader xmlString)
+  private boolean validateXml(Reader reader)
       throws SAXException, IOException {
-    Source schemaFile = new StreamSource(DrivingCoursePersistenceTest.class.getResourceAsStream(
+    Source schemaFile = new StreamSource(getClass().getResourceAsStream(
         "/org/opentcs/util/persistence/model-0.0.2.xsd"));
-    Source xmlFile = new StreamSource(xmlString);
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = schemaFactory.newSchema(schemaFile);
-    Validator validator = schema.newValidator();
     try {
-      validator.validate(xmlFile);
-      LOG.info("Xml is valid");
+      schema.newValidator().validate(new StreamSource(reader));
+      LOG.info("XML is valid.");
       return true;
     }
     catch (SAXException e) {
-      LOG.info("Xml is NOT valid reason:" + e);
+      LOG.info("XML is NOT valid.", e);
       return false;
     }
   }

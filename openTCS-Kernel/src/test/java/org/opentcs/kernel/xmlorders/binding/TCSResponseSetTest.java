@@ -7,6 +7,9 @@
  */
 package org.opentcs.kernel.xmlorders.binding;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
 import org.opentcs.kernel.xmlhost.orders.binding.ScriptResponse;
@@ -38,7 +41,8 @@ public class TCSResponseSetTest {
   }
 
   @Test
-  public void shouldOutputSampleResponseSet() {
+  public void shouldOutputSampleResponseSet()
+      throws IOException {
     TCSResponseSet responseSet = new TCSResponseSet();
 
     TransportResponse response = new TransportResponse();
@@ -55,17 +59,21 @@ public class TCSResponseSetTest {
 
     responseSet.getResponses().add(response);
 
-    String xmlOutput = responseSet.toXml();
+    StringWriter writer = new StringWriter();
+    responseSet.toXml(writer);
+    String xmlOutput = writer.toString();
 
     LOG.info(xmlOutput);
 
-    TCSResponseSet parsedResponseSet = TCSResponseSet.fromXml(xmlOutput);
+    StringReader reader = new StringReader(xmlOutput);
+    TCSResponseSet parsedResponseSet = TCSResponseSet.fromXml(reader);
     assertTrue("parsed set should have exactly two messages",
                parsedResponseSet.getResponses().size() == 2);
   }
 
   @Test
-  public void shouldOutputSampleScriptResponseSet() {
+  public void shouldOutputSampleScriptResponseSet()
+      throws IOException {
     TCSResponseSet responseSet = new TCSResponseSet();
 
     ScriptResponse response = new ScriptResponse();
@@ -88,11 +96,14 @@ public class TCSResponseSetTest {
 
     responseSet.getResponses().add(response);
 
-    String xmlOutput = responseSet.toXml();
+    StringWriter writer = new StringWriter();
+    responseSet.toXml(writer);
+    String xmlOutput = writer.toString();
 
     LOG.info(xmlOutput);
 
-    TCSResponseSet parsedResponseSet = TCSResponseSet.fromXml(xmlOutput);
+    StringReader reader = new StringReader(xmlOutput);
+    TCSResponseSet parsedResponseSet = TCSResponseSet.fromXml(reader);
     assertTrue("parsed set should have exactly one message",
                parsedResponseSet.getResponses().size() == 1);
   }

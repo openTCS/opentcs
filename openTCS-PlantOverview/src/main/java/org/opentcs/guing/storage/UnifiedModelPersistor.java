@@ -8,10 +8,12 @@
  */
 package org.opentcs.guing.storage;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
@@ -96,16 +98,16 @@ public class UnifiedModelPersistor
     return UnifiedModelConstants.DIALOG_FILE_FILTER;
   }
 
-  private void writeFile(PlantModelTO drinvingCourse, File file)
+  private void writeFile(PlantModelTO plantModel, File file)
       throws IOException {
     if (!file.getName().endsWith(UnifiedModelConstants.FILE_ENDING_XML)) {
       file = new File(file.getParentFile(),
                       file.getName() + "." + UnifiedModelConstants.FILE_ENDING_XML);
     }
 
-    try (OutputStream outStream = new FileOutputStream(file)) {
-      outStream.write(drinvingCourse.toXml().getBytes(Charset.forName("UTF-8")));
-      outStream.flush();
+    try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
+                                                                   Charset.forName("UTF-8")))) {
+      plantModel.toXml(writer);
     }
   }
 }

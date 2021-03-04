@@ -9,9 +9,16 @@ package org.opentcs.kernel.persistence;
 
 import com.google.common.base.Strings;
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +26,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
@@ -105,12 +111,12 @@ public class XMLModel002Builder
   }
 
   @Override
-  public void writeXMLModel(Model model,
+  public void writeXMLModel(@Nonnull Model model,
                             @Nullable String name,
-                            OutputStream outStream)
+                            @Nonnull OutputStream outStream)
       throws IOException {
-    Objects.requireNonNull(model, "model is null");
-    Objects.requireNonNull(outStream, "outStream is null");
+    requireNonNull(model, "model");
+    requireNonNull(outStream, "outStream");
 
     PlantModelTO plantModel = new PlantModelTO();
     plantModel.setName(name != null ? name : model.getName());
@@ -125,61 +131,66 @@ public class XMLModel002Builder
         .setGroups(getGroups(model))
         .setVisualLayouts(getVisualLayouts(model));
 
-    String xmlOutput = plantModel.toXml();
-    outStream.write(xmlOutput.getBytes());
-    outStream.flush();
+    Writer writer = new BufferedWriter(new OutputStreamWriter(outStream, Charset.forName("UTF-8")));
+    plantModel.toXml(writer);
+    writer.flush();
   }
 
   // Implementation of interface XMLModelReader starts here.
   @Override
-  public String readModelName(InputStream inStream)
+  public String readModelName(@Nonnull InputStream inStream)
       throws InvalidModelException, IOException {
     requireNonNull(inStream, "inStream");
 
-    String modelName = PlantModelTO.fromXml(inStream).getName();
+    try (Reader reader = new BufferedReader(new InputStreamReader(inStream,
+                                                                  Charset.forName("UTF-8")))) {
+      String modelName = PlantModelTO.fromXml(reader).getName();
 
-    if (modelName.isEmpty()) {
-      modelName = "ModelNameMissing";
-      //throw new InvalidModelException("Model name missing");
+      if (modelName.isEmpty()) {
+        modelName = "ModelNameMissing";
+        //throw new InvalidModelException("Model name missing");
+      }
+      return modelName;
     }
-    return modelName;
   }
 
   @Override
-  public void readXMLModel(InputStream inStream, Model model)
+  public void readXMLModel(@Nonnull InputStream inStream, @Nonnull Model model)
       throws InvalidModelException, IOException {
-    Objects.requireNonNull(inStream, "inStream is null");
-    Objects.requireNonNull(model, "model is null");
+    requireNonNull(inStream, "inStream");
+    requireNonNull(model, "model");
 
-    PlantModelTO plantModel = PlantModelTO.fromXml(inStream);
+    try (Reader reader = new BufferedReader(new InputStreamReader(inStream,
+                                                                  Charset.forName("UTF-8")))) {
+      PlantModelTO plantModel = PlantModelTO.fromXml(reader);
 
-    String modelName = plantModel.getName();
-    if (modelName.isEmpty()) {
-      modelName = "ModelNameMissing";
-      //throw new InvalidModelException("Model name missing");
-    }
+      String modelName = plantModel.getName();
+      if (modelName.isEmpty()) {
+        modelName = "ModelNameMissing";
+        //throw new InvalidModelException("Model name missing");
+      }
 
-    String modelVersion = plantModel.getVersion();
-    if (!VERSION_STRING.equals(modelVersion)) {
-      throw new InvalidModelException("Bad model version: " + modelVersion);
-    }
+      String modelVersion = plantModel.getVersion();
+      if (!VERSION_STRING.equals(modelVersion)) {
+        throw new InvalidModelException("Bad model version: " + modelVersion);
+      }
 
-    // Clear the model before reading the new data.
-    model.clear();
-    // Set the model's name.
-    model.setName(modelName);
+      // Clear the model before reading the new data.
+      model.clear();
+      // Set the model's name.
+      model.setName(modelName);
 
-    // Fill the model with components.
-    List<PointTO> pointElements = plantModel.getPoints();
-    List<PathTO> pathElements = plantModel.getPaths();
-    List<VehicleTO> vehicleElements = plantModel.getVehicles();
-    List<LocationTypeTO> locTypeElements = plantModel.getLocationTypes();
-    List<LocationTO> locationElements = plantModel.getLocations();
-    List<BlockTO> blockElements = plantModel.getBlocks();
-    List<StaticRouteTO> staticRouteElements = plantModel.getStaticRoutes();
-    List<GroupTO> groupElements = plantModel.getGroups();
-    List<VisualLayoutTO> visuLayoutElements = plantModel.getVisualLayouts();
-    try {
+      // Fill the model with components.
+      List<PointTO> pointElements = plantModel.getPoints();
+      List<PathTO> pathElements = plantModel.getPaths();
+      List<VehicleTO> vehicleElements = plantModel.getVehicles();
+      List<LocationTypeTO> locTypeElements = plantModel.getLocationTypes();
+      List<LocationTO> locationElements = plantModel.getLocations();
+      List<BlockTO> blockElements = plantModel.getBlocks();
+      List<StaticRouteTO> staticRouteElements = plantModel.getStaticRoutes();
+      List<GroupTO> groupElements = plantModel.getGroups();
+      List<VisualLayoutTO> visuLayoutElements = plantModel.getVisualLayouts();
+
       readPoints(pointElements, model);
       readPaths(pathElements, model);
       readVehicles(vehicleElements, model);

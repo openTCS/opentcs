@@ -49,6 +49,12 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.8.1 (2017-12-05)
+
+* Bugs fixed:
+** Ensure that marshalling and unmarshalling of XML data always uses UTF-8.
+   This fixes problems with plant models containing special characters (like German umlauts) e.g. in element names.
+
 === Version 4.8 (2017-11-28)
 
 * Bugs fixed:

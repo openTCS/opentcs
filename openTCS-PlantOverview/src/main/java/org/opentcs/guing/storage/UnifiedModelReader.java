@@ -8,10 +8,13 @@
  */
 package org.opentcs.guing.storage;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -92,6 +95,7 @@ public class UnifiedModelReader
   public Optional<SystemModel> deserialize(File file)
       throws IOException {
     requireNonNull(file, "file");
+
     deserializationErrors.clear();
     SystemModel systemModel = systemModelProvider.get();
 
@@ -100,9 +104,10 @@ public class UnifiedModelReader
       systemModel.setName(modelName);
     }
 
-    PlantModelTO plantModel = null;
-    try (InputStream inStream = new FileInputStream(file)) {
-      plantModel = PlantModelTO.fromXml(inStream);
+    PlantModelTO plantModel;
+    try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+                                                                  Charset.forName("UTF-8")))) {
+      plantModel = PlantModelTO.fromXml(reader);
     }
 
     if (plantModel.getVisualLayouts().size() > 1) {

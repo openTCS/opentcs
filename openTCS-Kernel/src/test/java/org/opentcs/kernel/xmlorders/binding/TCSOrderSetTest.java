@@ -7,6 +7,9 @@
  */
 package org.opentcs.kernel.xmlorders.binding;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,7 +42,8 @@ public class TCSOrderSetTest {
   }
 
   @Test
-  public void shouldOutputSampleOrder() {
+  public void shouldOutputSampleOrder()
+      throws IOException {
     TCSOrderSet orderSet = new TCSOrderSet();
 
     Transport transport = new Transport();
@@ -83,43 +87,54 @@ public class TCSOrderSetTest {
 
     orderSet.getOrders().add(transport);
 
-    String xmlOutput = orderSet.toXml();
+    StringWriter writer = new StringWriter();
+    orderSet.toXml(writer);
+    String xmlOutput = writer.toString();
     LOG.info(xmlOutput);
 
-    TCSOrderSet parsedOrderSet = TCSOrderSet.fromXml(xmlOutput);
+    StringReader reader = new StringReader(xmlOutput);
+    TCSOrderSet parsedOrderSet = TCSOrderSet.fromXml(reader);
     assertTrue(parsedOrderSet.getOrders().size() == 2);
   }
-  
+
   @Test
-  public void shouldOutputSampleScriptOrder() {
+  public void shouldOutputSampleScriptOrder()
+      throws IOException {
     TCSOrderSet orderSet = new TCSOrderSet();
-    
+
     TransportScript transportScript = new TransportScript();
     transportScript.setId("test.tcs");
     transportScript.setFileName("test.tcs");
-    
+
     orderSet.getOrders().add(transportScript);
-    
-    String xmlOutput = orderSet.toXml();
+
+    StringWriter writer = new StringWriter();
+    orderSet.toXml(writer);
+    String xmlOutput = writer.toString();
     LOG.info(xmlOutput);
 
-    TCSOrderSet parsedOrderSet = TCSOrderSet.fromXml(xmlOutput);
+    StringReader reader = new StringReader(xmlOutput);
+    TCSOrderSet parsedOrderSet = TCSOrderSet.fromXml(reader);
     assertTrue(parsedOrderSet.getOrders().size() == 1);
   }
 
   @Test
-  public void shouldMarshallAndUnmarshall() {
+  public void shouldMarshallAndUnmarshall()
+      throws IOException {
     List<TCSOrder> orders = Arrays.asList(createTransportOrder(1),
                                           createTransportOrder(2));
     TCSOrderSet orderSetFromOrders = new TCSOrderSet();
     orderSetFromOrders.setOrders(orders);
 
     // Test toXml
-    String result = orderSetFromOrders.toXml();
+    StringWriter writer = new StringWriter();
+    orderSetFromOrders.toXml(writer);
+    String result = writer.toString();
     LOG.info(result);
 
     // Test fromXml
-    TCSOrderSet orderSetFromXml = TCSOrderSet.fromXml(result);
+    StringReader reader = new StringReader(result);
+    TCSOrderSet orderSetFromXml = TCSOrderSet.fromXml(reader);
     Transport order = (Transport) orderSetFromXml.getOrders().get(0);
     assertTrue(order.getId().equals("TransportOrder-01"));
     Destination destination = order.getDestinations().get(1);

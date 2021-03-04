@@ -7,13 +7,20 @@
  */
 package org.opentcs.kernel.xmlhost.orders;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -275,44 +282,62 @@ public class XMLTelegramOrderReceiver
         }
         // Set a timeout for read() operations.
         socket.setSoTimeout(configuration.ordersIdleTimeout());
-        InputStream inStream = socket.getInputStream();
-        ByteArrayOutputStream bufferStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[IN_BUF_SIZE];
-        int bytesRead = inStream.read(buffer);
-        int totalBytesRead = 0;
-        boolean foundEndOfTelegram = false;
-        String telegram = "";
-        // Read from socket while we haven't encountered the end of telegram
-        // marker and we haven't reached the EOF on the stream.
-        while (!foundEndOfTelegram && bytesRead != -1) {
-          totalBytesRead += bytesRead;
-          if (totalBytesRead > configuration.ordersInputLimit()) {
-            throw new IllegalStateException("maxAllowedInputLength reached");
-          }
-          bufferStream.write(buffer, 0, bytesRead);
-          telegram = bufferStream.toString();
-          // If we did NOT receive the end of telegram marker, yet, read on.
-          if (!telegram.contains(END_OF_TELEGRAM)) {
-            bytesRead = inStream.read(buffer);
-          }
-          // If we did find the end of the telegram, stop reading.
-          else {
-            foundEndOfTelegram = true;
-          }
-        }
-        LOG.debug("Reached end of telegram, processing input");
-        TCSOrderSet orderSet = TCSOrderSet.fromXml(telegram);
-        LOG.debug("Constructed order set");
+        TCSOrderSet orderSet = receiveOrder(socket.getInputStream());
         TCSResponseSet responseSet = processOrderSet(orderSet);
-        OutputStream outStream = socket.getOutputStream();
-        LOG.debug("Sending response");
-        outStream.write(responseSet.toXml().getBytes());
-        outStream.flush();
-        LOG.debug("Sent response, finishing.");
+        sendResponse(responseSet, socket.getOutputStream());
       }
       catch (Exception exc) {
         LOG.warn("Unexpected exception, aborting communication", exc);
       }
+    }
+
+    private TCSOrderSet receiveOrder(InputStream inputStream)
+        throws IOException, IllegalStateException {
+      try (Reader reader = new BufferedReader(new InputStreamReader(inputStream,
+                                                                    Charset.forName("UTF-8")))) {
+        String telegram = readTelegram(reader);
+        TCSOrderSet orderSet = TCSOrderSet.fromXml(new StringReader(telegram));
+        LOG.debug("Constructed order set");
+        return orderSet;
+      }
+    }
+
+    private void sendResponse(TCSResponseSet responseSet, OutputStream outputStream)
+        throws IOException {
+      try (Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream,
+                                                                     Charset.forName("UTF-8")))) {
+        LOG.debug("Sending response");
+        responseSet.toXml(writer);
+        LOG.debug("Sent response, finishing.");
+      }
+    }
+
+    private String readTelegram(Reader reader)
+        throws IllegalStateException, IOException {
+      StringBuilder telegram = new StringBuilder();
+      char[] buffer = new char[IN_BUF_SIZE];
+      int bytesRead = reader.read(buffer);
+      int totalBytesRead = 0;
+      boolean foundEndOfTelegram = false;
+      // Read from socket while we haven't encountered the end of telegram
+      // marker and we haven't reached the EOF on the stream.
+      while (!foundEndOfTelegram && bytesRead != -1) {
+        totalBytesRead += bytesRead;
+        if (totalBytesRead > configuration.ordersInputLimit()) {
+          throw new IllegalStateException("Input limit of exceeded.");
+        }
+        telegram.append(buffer);
+        // If we did NOT receive the end of telegram marker, yet, read on.
+        if (!telegram.toString().contains(END_OF_TELEGRAM)) {
+          bytesRead = reader.read(buffer);
+        }
+        // If we did find the end of the telegram, stop reading.
+        else {
+          foundEndOfTelegram = true;
+        }
+      }
+      LOG.debug("Reached end of telegram, processing input");
+      return telegram.toString();
     }
 
     /**

@@ -7,9 +7,12 @@
  */
 package org.opentcs.kernel.xmlhost.status;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -21,7 +24,7 @@ import org.opentcs.kernel.xmlhost.status.binding.OrderStatusMessage;
 import org.opentcs.kernel.xmlhost.status.binding.StatusMessage;
 import org.opentcs.kernel.xmlhost.status.binding.TCSStatusMessageSet;
 import org.opentcs.kernel.xmlhost.status.binding.VehicleStatusMessage;
-import org.opentcs.util.Assertions;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.EventSource;
 import org.opentcs.util.eventsystem.TCSEvent;
@@ -73,8 +76,8 @@ class ConnectionHandler
                     String messageSeparator) {
     this.socket = requireNonNull(clientSocket, "clientSocket");
     this.eventSource = requireNonNull(evtSource, "evtSource");
-    Assertions.checkArgument(clientSocket.isConnected(), "clientSocket is not connected");
     this.messageSeparator = requireNonNull(messageSeparator, "messageSeparator");
+    checkArgument(clientSocket.isConnected(), "clientSocket is not connected");
   }
 
   /**
@@ -92,9 +95,10 @@ class ConnectionHandler
 
   @Override
   public void run() {
-    try (final OutputStream outStream = socket.getOutputStream()) {
+    try (Writer writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(),
+                                                                   Charset.forName("UTF-8")))) {
       while (!terminated) {
-        consume(commands.take(), outStream);
+        consume(commands.take(), writer);
       }
       LOG.debug("Terminating connection handler.");
     }
@@ -124,33 +128,33 @@ class ConnectionHandler
     return terminated;
   }
 
-  private void consume(ConnectionCommand command, OutputStream outStream)
+  private void consume(ConnectionCommand command, Writer writer)
       throws IOException {
     if (command instanceof ConnectionCommand.PoisonPill) {
       terminated = true;
     }
     else if (command instanceof ConnectionCommand.ProcessObjectEvent) {
-      processObjectEvent(((ConnectionCommand.ProcessObjectEvent) command).getEvent(), outStream);
+      processObjectEvent(((ConnectionCommand.ProcessObjectEvent) command).getEvent(), writer);
     }
   }
 
-  private void processObjectEvent(TCSObjectEvent event, OutputStream outStream)
+  private void processObjectEvent(TCSObjectEvent event, Writer writer)
       throws IOException {
     TCSObject<?> eventObject = event.getCurrentOrPreviousObjectState();
     if (eventObject instanceof TransportOrder) {
-      sendMessage(OrderStatusMessage.fromTransportOrder((TransportOrder) eventObject), outStream);
+      sendMessage(OrderStatusMessage.fromTransportOrder((TransportOrder) eventObject), writer);
     }
     else if (eventObject instanceof Vehicle) {
-      sendMessage(VehicleStatusMessage.fromVehicle((Vehicle) eventObject), outStream);
+      sendMessage(VehicleStatusMessage.fromVehicle((Vehicle) eventObject), writer);
     }
   }
 
-  private void sendMessage(StatusMessage message, OutputStream outStream)
+  private void sendMessage(StatusMessage message, Writer writer)
       throws IOException {
     TCSStatusMessageSet messageSet = new TCSStatusMessageSet();
     messageSet.getStatusMessages().add(message);
-    outStream.write(messageSet.toXml().getBytes());
-    outStream.write(messageSeparator.getBytes());
-    outStream.flush();
+    messageSet.toXml(writer);
+    writer.write(messageSeparator);
+    writer.flush();
   }
 }

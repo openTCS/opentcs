@@ -7,15 +7,13 @@
  */
 package org.opentcs.kernel.xmlhost.orders.binding;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -24,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.xml.sax.SAXException;
 
 /**
  * A script file containing orders.
@@ -90,79 +89,58 @@ public class TCSScriptFile {
   }
 
   /**
-   * Marshals the data.
+   * Marshals this instance to its XML representation.
    *
-   * @return The data as an XML string.
+   * @param writer The writer to write this instance's XML representation to.
+   * @throws IOException If there was a problem marshalling this instance.
    */
-  public String toXml() {
-    StringWriter stringWriter = new StringWriter();
+  public void toXml(@Nonnull Writer writer)
+      throws IOException {
     try {
-      // Als XML in eine Datei schreiben.
-      JAXBContext jc = JAXBContext.newInstance(TCSScriptFile.class);
-      Marshaller marshaller = jc.createMarshaller();
+      Marshaller marshaller = createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      marshaller.marshal(this, stringWriter);
+      marshaller.marshal(this, writer);
     }
-    catch (JAXBException exc) {
-      throw new IllegalStateException("Exception marshalling data", exc);
+    catch (JAXBException | SAXException exc) {
+      throw new IOException("Exception marshalling data", exc);
     }
-    return stringWriter.toString();
   }
 
   /**
-   * Reads a <code>TCSScriptFile</code> from an XML string.
+   * Unmarshals an instance of this class from the given XML representation.
    *
-   * @param xmlData XML data as a string.
-   * @return The read <code>TCSScriptFile</code>.
-   * @throws IOException If an exception occured while unmarshalling.
+   * @param reader Provides the XML representation to parse to an instance.
+   * @return The instance unmarshalled from the given reader.
+   * @throws IOException If there was a problem unmarshalling the given string.
    */
-  public static TCSScriptFile fromXml(String xmlData)
+  public static TCSScriptFile fromXml(@Nonnull Reader reader)
       throws IOException {
-    if (xmlData == null) {
-      throw new NullPointerException("xmlData is null");
-    }
-    StringReader stringReader = new StringReader(xmlData);
+    requireNonNull(reader, "reader");
+
     try {
-      JAXBContext jc = JAXBContext.newInstance(TCSScriptFile.class);
-      Unmarshaller unmarshaller = jc.createUnmarshaller();
-      Object o = unmarshaller.unmarshal(stringReader);
-      return (TCSScriptFile) o;
+      return (TCSScriptFile) createUnmarshaller().unmarshal(reader);
     }
-    catch (JAXBException exc) {
+    catch (JAXBException | SAXException exc) {
       throw new IOException("Exception unmarshalling data", exc);
     }
   }
 
-  /**
-   * Parses a <code>TCSScriptFile</code> from a file.
-   *
-   * @param sourceFile The source file.
-   * @return The parsed <code>TCSScriptFile</code>.
-   * @throws IOException If the file is invalid.
-   */
-  public static TCSScriptFile fromFile(File sourceFile)
-      throws IOException {
-    requireNonNull(sourceFile, "sourceFile");
+  private static Marshaller createMarshaller()
+      throws JAXBException, SAXException {
+    Marshaller marshaller = createContext().createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    return marshaller;
+  }
 
-    if (!sourceFile.isFile() || !sourceFile.canRead()) {
-      throw new IOException(sourceFile.getAbsolutePath()
-          + ": file is not a regular file or unreadable");
-    }
-    int fileSize = (int) sourceFile.length();
-    InputStream inStream = new FileInputStream(sourceFile);
-    byte[] buffer = new byte[fileSize];
-    try {
-      int bytesRead = inStream.read(buffer);
-      if (bytesRead != fileSize) {
-        throw new IOException("read() returned unexpected value: " + bytesRead
-            + ", should be :" + fileSize);
-      }
-    }
-    finally {
-      inStream.close();
-    }
-    String fileContent = new String(buffer);
-    return fromXml(fileContent);
+  private static Unmarshaller createUnmarshaller()
+      throws JAXBException, SAXException {
+    Unmarshaller unmarshaller = createContext().createUnmarshaller();
+    return unmarshaller;
+  }
+
+  private static JAXBContext createContext()
+      throws JAXBException {
+    return JAXBContext.newInstance(TCSScriptFile.class);
   }
 
   /**

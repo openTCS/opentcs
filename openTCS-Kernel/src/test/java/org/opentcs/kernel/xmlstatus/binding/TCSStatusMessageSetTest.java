@@ -7,6 +7,9 @@
  */
 package org.opentcs.kernel.xmlstatus.binding;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.*;
@@ -43,7 +46,8 @@ public class TCSStatusMessageSetTest {
   }
 
   @Test
-  public void shouldMapToOrderStatusMessage() {
+  public void shouldMapToOrderStatusMessage()
+      throws IOException {
     List<DriveOrder> driveOrders = new LinkedList<>();
     LocationType locType = new LocationType("testLocType");
     Location loc1 = new Location("Storage 01", locType.getReference());
@@ -62,11 +66,14 @@ public class TCSStatusMessageSetTest {
     TCSStatusMessageSet messageSet = new TCSStatusMessageSet();
     messageSet.getStatusMessages().add(message);
 
-    String xmlOutput = messageSet.toXml();
+    StringWriter writer = new StringWriter();
+    messageSet.toXml(writer);
+    String xmlOutput = writer.toString();
 
     LOG.info(xmlOutput);
 
-    TCSStatusMessageSet parsedMessageSet = TCSStatusMessageSet.fromXml(xmlOutput);
+    StringReader reader = new StringReader(xmlOutput);
+    TCSStatusMessageSet parsedMessageSet = TCSStatusMessageSet.fromXml(reader);
     assertTrue("parsed message set should have exactly one message",
                parsedMessageSet.getStatusMessages().size() == 1);
   }

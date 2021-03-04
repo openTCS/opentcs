@@ -7,8 +7,9 @@
  */
 package org.opentcs.util.persistence.binding;
 
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,63 +167,66 @@ public class PlantModelTO
   }
 
   /**
-   * Marshals this instance to its XML representation and returns that in a string.
+   * Marshals this instance to its XML representation and writes it to the given writer.
    *
-   * @return A <code>String</code> containing the XML representation of this instance.
-   * @throws IllegalArgumentException If there was a problem marshalling this instance.
+   * @param writer The writer to write this instance's XML representation to.
+   * @throws IOException If there was a problem marshalling this instance.
    */
-  public String toXml()
-      throws IllegalArgumentException {
-    StringWriter stringWriter = new StringWriter();
+  public void toXml(@Nonnull Writer writer)
+      throws IOException {
+    requireNonNull(writer, "writer");
+
     try {
-      // Als XML in eine Datei schreiben.
-      JAXBContext jc = JAXBContext.newInstance(PlantModelTO.class);
-      Marshaller marshaller = jc.createMarshaller();
-      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-      URL schemaUrl = PlantModelTO.class
-          .getResource("/org/opentcs/util/persistence/model-0.0.2.xsd");
-      SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      Schema schema = schemaFactory.newSchema(schemaUrl);
-      marshaller.setSchema(schema);
-
-      marshaller.marshal(this, stringWriter);
+      createMarshaller().marshal(this, writer);
     }
     catch (JAXBException | SAXException exc) {
-      LOG.warn("Exception marshalling data", exc);
-      throw new IllegalArgumentException("Exception marshalling data", exc);
+      throw new IOException("Exception marshalling data", exc);
     }
-    return stringWriter.toString();
   }
 
   /**
    * Unmarshals an instance of this class from the given XML representation.
    *
-   * @param xmlData A <code>String</code> containing the XML representation.
-   * @return The status instance unmarshalled from the given String.
-   * @throws IllegalArgumentException If there was a problem unmarshalling the given string.
+   * @param reader Provides the XML representation to parse to an instance.
+   * @return The instance unmarshalled from the given reader.
+   * @throws IOException If there was a problem unmarshalling the given string.
    */
-  public static PlantModelTO fromXml(InputStream xmlData)
-      throws IllegalArgumentException {
-    requireNonNull(xmlData, "xmlData");
+  public static PlantModelTO fromXml(@Nonnull Reader reader)
+      throws IOException {
+    requireNonNull(reader, "reader");
 
-//    StringReader stringReader = new StringReader(xmlData);
     try {
-      JAXBContext jc = JAXBContext.newInstance(PlantModelTO.class);
-      Unmarshaller unmarshaller = jc.createUnmarshaller();
-
-      URL schemaUrl = PlantModelTO.class
-          .getResource("/org/opentcs/util/persistence/model-0.0.2.xsd");
-      SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      Schema schema = schemaFactory.newSchema(schemaUrl);
-      unmarshaller.setSchema(schema);
-
-      Object o = unmarshaller.unmarshal(xmlData);
-      return (PlantModelTO) o;
+      return (PlantModelTO) createUnmarshaller().unmarshal(reader);
     }
     catch (JAXBException | SAXException exc) {
-      LOG.warn("Exception marshalling data", exc);
-      throw new IllegalArgumentException("Exception unmarshalling data", exc);
+      throw new IOException("Exception unmarshalling data", exc);
     }
+  }
+
+  private static Marshaller createMarshaller()
+      throws JAXBException, SAXException {
+    Marshaller marshaller = createContext().createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    marshaller.setSchema(createSchema());
+    return marshaller;
+  }
+
+  private static Unmarshaller createUnmarshaller()
+      throws JAXBException, SAXException {
+    Unmarshaller unmarshaller = createContext().createUnmarshaller();
+    unmarshaller.setSchema(createSchema());
+    return unmarshaller;
+  }
+
+  private static JAXBContext createContext()
+      throws JAXBException {
+    return JAXBContext.newInstance(PlantModelTO.class);
+  }
+
+  private static Schema createSchema()
+      throws SAXException {
+    URL schemaUrl = PlantModelTO.class.getResource("/org/opentcs/util/persistence/model-0.0.2.xsd");
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    return schemaFactory.newSchema(schemaUrl);
   }
 }

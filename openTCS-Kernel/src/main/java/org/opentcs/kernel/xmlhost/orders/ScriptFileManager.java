@@ -7,10 +7,17 @@
  */
 package org.opentcs.kernel.xmlhost.orders;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -99,8 +106,11 @@ public class ScriptFileManager {
     // Make sure we only look for scripts in the script directory.
     File inputFile = new File(fileName);
     inputFile = new File(scriptDir, inputFile.getName());
-    // Parse the script file and return the resulting instance.
-    return TCSScriptFile.fromFile(inputFile);
+    try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile),
+                                                                  Charset.forName("UTF-8")))) {
+      // Parse the script file and return the resulting instance.
+      return TCSScriptFile.fromXml(reader);
+    }
   }
 
   /**
@@ -150,9 +160,9 @@ public class ScriptFileManager {
     return result;
   }
 
-  private void createTemplate(File templateFile) {
-    requireNonNull(templateFile, "templateFile");
-    if (templateFile.exists()) {
+  private void createTemplate(File file) {
+    requireNonNull(file, "file");
+    if (file.exists()) {
       return;
     }
 
@@ -168,8 +178,9 @@ public class ScriptFileManager {
     order.getDestinations().add(dest);
     order.setIntendedVehicle("The intended vehicle");
     scriptFile.getOrders().add(order);
-    try (Writer writer = new FileWriter(new File(scriptDir, "template.tcs"))) {
-      writer.write(scriptFile.toXml());
+    try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
+                                                                   Charset.forName("UTF-8")))) {
+      scriptFile.toXml(writer);
     }
     catch (IOException exc) {
       LOG.warn("Exception writing template script", exc);

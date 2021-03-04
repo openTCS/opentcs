@@ -11,6 +11,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -48,7 +50,8 @@ public class SamplesGenerator {
   private SamplesGenerator() {
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args)
+      throws IOException {
     checkArgument(args.length >= 2, "Need at least two argument for the task and target file");
 
     GeneratorTask task = GeneratorTask.valueOf(args[0]);
@@ -89,7 +92,8 @@ public class SamplesGenerator {
    *
    * @param directory the output directory
    */
-  private static void generateTransportScriptOrderSample(File file) {
+  private static void generateTransportScriptOrderSample(File file)
+      throws IOException {
     createFile(file);
     TCSOrderSet orderSet = new TCSOrderSet();
 
@@ -99,7 +103,9 @@ public class SamplesGenerator {
 
     orderSet.getOrders().add(transportScript);
 
-    String xmlOutput = orderSet.toXml();
+    Writer writer = new StringWriter();
+    orderSet.toXml(writer);
+    String xmlOutput = writer.toString();
     storeInFile(xmlOutput, file);
   }
 
@@ -108,7 +114,8 @@ public class SamplesGenerator {
    *
    * @param directory the output directory
    */
-  private static void generateScriptResponseSetSample(File file) {
+  private static void generateScriptResponseSetSample(File file)
+      throws IOException {
     createFile(file);
     TCSResponseSet responseSet = new TCSResponseSet();
 
@@ -132,7 +139,9 @@ public class SamplesGenerator {
 
     responseSet.getResponses().add(response);
 
-    String xmlOutput = responseSet.toXml();
+    Writer writer = new StringWriter();
+    responseSet.toXml(writer);
+    String xmlOutput = writer.toString();
     storeInFile(xmlOutput, file);
   }
 
@@ -141,7 +150,8 @@ public class SamplesGenerator {
    *
    * @param directory the output directory
    */
-  private static void generateResponseSetSample(File file) {
+  private static void generateResponseSetSample(File file)
+      throws IOException {
     createFile(file);
     TCSResponseSet responseSet = new TCSResponseSet();
 
@@ -159,7 +169,9 @@ public class SamplesGenerator {
 
     responseSet.getResponses().add(response);
 
-    String xmlOutput = responseSet.toXml();
+    Writer writer = new StringWriter();
+    responseSet.toXml(writer);
+    String xmlOutput = writer.toString();
     storeInFile(xmlOutput, file);
   }
 
@@ -168,7 +180,8 @@ public class SamplesGenerator {
    *
    * @param directory the output directory
    */
-  private static void generateTelegramStatusSample(File file) {
+  private static void generateTelegramStatusSample(File file)
+      throws IOException {
     createFile(file);
     List<DriveOrder> driveOrders = new LinkedList<>();
     LocationType locType = new LocationType("testLocType");
@@ -189,7 +202,9 @@ public class SamplesGenerator {
     TCSStatusMessageSet messageSet = new TCSStatusMessageSet();
     messageSet.getStatusMessages().add(message);
 
-    String xmlOutput = messageSet.toXml();
+    Writer writer = new StringWriter();
+    messageSet.toXml(writer);
+    String xmlOutput = writer.toString();
     storeInFile(xmlOutput, file);
   }
 
@@ -198,7 +213,8 @@ public class SamplesGenerator {
    *
    * @param directory the output directory
    */
-  private static void generateTwoTransportOrderSample(File file) {
+  private static void generateTwoTransportOrderSample(File file)
+      throws IOException {
     createFile(file);
     TCSOrderSet orderSet = new TCSOrderSet();
 
@@ -243,11 +259,14 @@ public class SamplesGenerator {
 
     orderSet.getOrders().add(transport);
 
-    String xmlOutput = orderSet.toXml();
+    Writer writer = new StringWriter();
+    orderSet.toXml(writer);
+    String xmlOutput = writer.toString();
     storeInFile(xmlOutput, file);
   }
 
-  private static void generateVehicleStatusSample(File file) {
+  private static void generateVehicleStatusSample(File file)
+      throws IOException {
     createFile(file);
 
     Point currentPosition = new Point("Point-000");
@@ -274,7 +293,9 @@ public class SamplesGenerator {
     TCSStatusMessageSet messageSet = new TCSStatusMessageSet();
     messageSet.getStatusMessages().add(message);
 
-    String xmlOutput = messageSet.toXml();
+    Writer writer = new StringWriter();
+    messageSet.toXml(writer);
+    String xmlOutput = writer.toString();
     storeInFile(xmlOutput, file);
   }
 
