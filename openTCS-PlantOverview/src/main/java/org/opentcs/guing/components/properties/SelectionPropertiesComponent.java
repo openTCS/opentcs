@@ -9,10 +9,10 @@
 package org.opentcs.guing.components.properties;
 
 import javax.inject.Inject;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * An AttributesComponent intended to be shown permanently to display the
@@ -21,7 +21,8 @@ import org.opentcs.guing.event.SystemModelTransitionEvent;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class SelectionPropertiesComponent
-    extends AttributesComponent {
+    extends AttributesComponent
+    implements EventHandler {
 
   /**
    * Creates a new instance.
@@ -33,8 +34,17 @@ public class SelectionPropertiesComponent
     super(undoManager);
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
+    }
+    if (event instanceof OperationModeChangeEvent) {
+      handleOperationModeChange((OperationModeChangeEvent) event);
+    }
+  }
+
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
     switch (evt.getStage()) {
       case UNLOADING:
         reset();
@@ -44,8 +54,7 @@ public class SelectionPropertiesComponent
     }
   }
 
-  @Handler
-  public void handleOperationModeChange(OperationModeChangeEvent evt) {
+  private void handleOperationModeChange(OperationModeChangeEvent evt) {
     reset();
   }
 }

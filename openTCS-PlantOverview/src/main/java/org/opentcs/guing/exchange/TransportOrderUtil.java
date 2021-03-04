@@ -10,8 +10,6 @@ package org.opentcs.guing.exchange;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,10 +21,11 @@ import java.util.UUID;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
@@ -50,18 +49,18 @@ public class TransportOrderUtil {
    */
   private static final Logger LOG = LoggerFactory.getLogger(TransportOrderUtil.class);
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
 
   /**
    * Creates a new instance.
    *
-   * @param kernelProvider Provides a access to a kernel.
+   * @param portalProvider Provides a access to a portal.
    */
   @Inject
-  public TransportOrderUtil(SharedKernelProvider kernelProvider) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+  public TransportOrderUtil(SharedKernelServicePortalProvider portalProvider) {
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
 
   /**
@@ -70,7 +69,7 @@ public class TransportOrderUtil {
    * @param destModels The locations or points to visit.
    * @param actions The actions to execute.
    * @param deadline The deadline.
-   * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the 
+   * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the
    * kernel determine one.
    * @param category The category.
    */
@@ -90,7 +89,7 @@ public class TransportOrderUtil {
    * @param actions The actions to execute.
    * @param propertiesList The properties for each destination.
    * @param deadline The deadline.
-   * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the 
+   * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the
    * kernel determine one.
    * @param category The category.
    */
@@ -108,7 +107,9 @@ public class TransportOrderUtil {
         .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
                   "destModels have to be a PointModel or a Locationmodel");
 
-    try (SharedKernelClient client = kernelProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      TransportOrderService transportOrderService
+          = sharedPortal.getPortal().getTransportOrderService();
       List<DestinationCreationTO> destinations = new ArrayList<>();
       for (int i = 0; i < destModels.size(); i++) {
         AbstractFigureComponent locModel = destModels.get(i);
@@ -117,30 +118,29 @@ public class TransportOrderUtil {
         if (!propertiesList.isEmpty()) {
           properties = propertiesList.get(i);
         }
-        Location location = client.getKernel().getTCSObject(Location.class, locModel.getName());
+        Location location = transportOrderService.fetchObject(Location.class, locModel.getName());
         DestinationCreationTO destination;
         if (location == null) {
-          Point point = client.getKernel().getTCSObject(Point.class, locModel.getName());
+          Point point = transportOrderService.fetchObject(Point.class, locModel.getName());
           destination = new DestinationCreationTO(point.getName(), action)
-              .setDestLocationName(point.getName());
+              .withDestLocationName(point.getName());
         }
         else {
           destination = new DestinationCreationTO(location.getName(), action)
-              .setDestLocationName(location.getName())
-              .setProperties(properties);
+              .withDestLocationName(location.getName())
+              .withProperties(properties);
         }
         destinations.add(destination);
       }
-      
-      TransportOrder tOrder = client.getKernel()
-          .createTransportOrder(new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
-                                                             destinations)
-              .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(deadline),
-                                                   ZoneId.systemDefault()))
-              .setIntendedVehicleName(vModel == null ? null : vModel.getName())
-              .setCategory(category));
 
-      client.getKernel().activateTransportOrder(tOrder.getReference());
+      transportOrderService.createTransportOrder(
+          new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+                                       destinations)
+              .withDeadline(Instant.ofEpochMilli(deadline))
+              .withIntendedVehicleName(vModel == null ? null : vModel.getName())
+              .withCategory(category));
+
+      sharedPortal.getPortal().getDispatcherService().dispatch();
     }
     catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
@@ -155,18 +155,18 @@ public class TransportOrderUtil {
   public void createTransportOrder(TransportOrder pattern) {
     requireNonNull(pattern, "pattern");
 
-    try (SharedKernelClient client = kernelProvider.register()) {
-      TransportOrder tOrder = client.getKernel().createTransportOrder(
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+
+      sharedPortal.getPortal().getTransportOrderService().createTransportOrder(
           new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(), copyDestinations(pattern))
-              .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(pattern.getDeadline()),
-                                                   ZoneId.systemDefault()))
-              .setIntendedVehicleName(pattern.getIntendedVehicle() == null
+              .withDeadline(Instant.ofEpochMilli(pattern.getDeadline()))
+              .withIntendedVehicleName(pattern.getIntendedVehicle() == null
                   ? null
                   : pattern.getIntendedVehicle().getName())
-              .setCategory(pattern.getCategory())
-              .setProperties(pattern.getProperties()));
+              .withCategory(pattern.getCategory())
+              .withProperties(pattern.getProperties()));
 
-      client.getKernel().activateTransportOrder(tOrder.getReference());
+      sharedPortal.getPortal().getDispatcherService().dispatch();
     }
     catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
@@ -184,22 +184,22 @@ public class TransportOrderUtil {
     requireNonNull(pointModel, "point");
     requireNonNull(vModel, "vehicle");
 
-    try (SharedKernelClient client = kernelProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       // This is only allowed in operating mode.
-      if (client.getKernel().getState() != Kernel.State.OPERATING) {
+      if (sharedPortal.getPortal().getState() != Kernel.State.OPERATING) {
         return;
       }
 
-      TransportOrder t = client.getKernel().createTransportOrder(
+      sharedPortal.getPortal().getTransportOrderService().createTransportOrder(
           new TransportOrderCreationTO(
-              "TOrder-" + UUID.randomUUID(),
+              "Move-" + UUID.randomUUID(),
               Collections.singletonList(new DestinationCreationTO(pointModel.getName(),
                                                                   DriveOrder.Destination.OP_MOVE)))
-              .setDeadline(ZonedDateTime.now())
-              .setIntendedVehicleName(vModel.getName())
+              .withDeadline(Instant.now())
+              .withIntendedVehicleName(vModel.getName())
       );
 
-      client.getKernel().activateTransportOrder(t.getReference());
+      sharedPortal.getPortal().getDispatcherService().dispatch();
     }
     catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
@@ -217,6 +217,6 @@ public class TransportOrderUtil {
   private DestinationCreationTO copyDestination(DriveOrder driveOrder) {
     return new DestinationCreationTO(driveOrder.getDestination().getDestination().getName(),
                                      driveOrder.getDestination().getOperation())
-        .setProperties(driveOrder.getDestination().getProperties());
+        .withProperties(driveOrder.getDestination().getProperties());
   }
 }

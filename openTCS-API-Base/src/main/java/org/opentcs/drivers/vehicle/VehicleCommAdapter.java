@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.Lifecycle;
+import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -54,6 +55,17 @@ public interface VehicleCommAdapter
    */
   @Nonnull
   VehicleProcessModel getProcessModel();
+
+  /**
+   * Returns a transferable/serializable model of the vehicle's and its comm adapter's attributes.
+   *
+   * @return A transferable/serializable model of the vehicle's and its comm adapter's attributes.
+   */
+  @Nonnull
+  @ScheduledApiChange(details = "Default implementation will be removed", when = "5.0")
+  default VehicleProcessModelTO createTransferableProcessModel() {
+    return new VehicleProcessModelTO();
+  }
 
   /**
    * Indicates how many commands this comm adapter's command queue accepts.
@@ -119,8 +131,11 @@ public interface VehicleCommAdapter
    * its custom properties.
    *
    * @return A list of panels.
+   * @deprecated {@code VehicleCommAdapterPanel} is deprecated.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   List<VehicleCommAdapterPanel> getAdapterPanels();
 
   /**
@@ -156,6 +171,16 @@ public interface VehicleCommAdapter
    * @param message The message to be processed.
    */
   void processMessage(@Nullable Object message);
+
+  /**
+   * Executes the given {@link AdapterCommand}.
+   *
+   * @param command The command to execute.
+   */
+  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
+  default void execute(@Nonnull AdapterCommand command) {
+    command.execute(this);
+  }
 
   /**
    * Defines the possible states of a communication adapter.

@@ -11,13 +11,12 @@ import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.kernel.ActiveInAllModes;
-import org.opentcs.kernel.controlcenter.ChooseModelDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-@Singleton
 public class KernelStarter {
 
   /**
@@ -38,32 +36,28 @@ public class KernelStarter {
    */
   private final LocalKernel kernel;
   /**
+   * The plant model service.
+   */
+  private final InternalPlantModelService plantModelService;
+  /**
    * The kernel extensions to be registered.
    */
   private final Set<KernelExtension> extensions;
-  /**
-   * This class's configuration.
-   */
-  private final KernelApplicationConfiguration configuration;
 
   /**
    * Creates a new instance.
    *
    * @param kernel The kernel we're working with.
+   * @param plantModelService The plant model service.
    * @param extensions The kernel extensions to be registered.
-   * @param configuration This class's configuration.
    */
   @Inject
   protected KernelStarter(LocalKernel kernel,
-                          @ActiveInAllModes Set<KernelExtension> extensions,
-                          KernelApplicationConfiguration configuration) {
-    this.kernel = requireNonNull(kernel, "kernel is null");
-    this.extensions = requireNonNull(extensions, "extensions is null");
-    this.configuration = requireNonNull(configuration, "configuration");
-    
-    if (configuration.selectModelOnStartup()) {
-      LOG.debug("Model will not be loaded automatically because startup dialog is to be shown");
-    }
+                          InternalPlantModelService plantModelService,
+                          @ActiveInAllModes Set<KernelExtension> extensions) {
+    this.kernel = requireNonNull(kernel, "kernel");
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
+    this.extensions = requireNonNull(extensions, "extensions");
   }
 
   /**
@@ -81,31 +75,18 @@ public class KernelStarter {
     // Start local kernel.
     kernel.initialize();
     LOG.debug("Kernel initialized.");
-    String savedModelName = kernel.getPersistentModelName();
-    boolean modelingMode = false;
+    String savedModelName = plantModelService.getPersistentModelName();
 
-    boolean loadModel = configuration.loadModelOnStartup() && !configuration.selectModelOnStartup();
-    // Show ChooseModelDialog and see if we should load a model
-    if (configuration.selectModelOnStartup()) {
-      ChooseModelDialog chooseModelDialog = new ChooseModelDialog(savedModelName);
-      chooseModelDialog.setVisible(true);
-      String modelName = chooseModelDialog.savedModelSelected() ? savedModelName : null;
-      modelingMode = chooseModelDialog.modelingSelected();
-
-      loadModel = modelName != null;
+    if (savedModelName != null) {
+      // Load the persistent model .
+      LOG.debug("Loading model '{}'...", savedModelName);
+      plantModelService.loadPlantModel();
+      LOG.info("Loaded model '{}'.", savedModelName);
     }
-    // Load the saved model if there is one
-    if (loadModel && savedModelName != null) {
-      LOG.debug("Loading model: " + savedModelName);
-      kernel.loadPlantModel();
-      LOG.info("Loaded model: " + savedModelName);
-      if (!modelingMode) {
-        kernel.setState(Kernel.State.OPERATING);
-      }
-    }
-    // Load an empty model in modelling mode
     else {
-      kernel.createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
+      // Load an empty model.
+      plantModelService.createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
     }
+    kernel.setState(Kernel.State.OPERATING);
   }
 }

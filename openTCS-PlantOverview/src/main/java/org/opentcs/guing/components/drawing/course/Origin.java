@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.course;
 
 import java.awt.Point;
@@ -36,16 +35,22 @@ import org.slf4j.LoggerFactory;
  */
 public final class Origin {
 
-  private static final Logger log = LoggerFactory.getLogger(Origin.class);
-  public static final double DEFAULT_SCALE = 50.0; // mm per Pixel
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(Origin.class);
+  /**
+   * Scale (in mm per pixel) of the layout.
+   */
+  public static final double DEFAULT_SCALE = 50.0;
   /**
    * Soviele mm entsprechen einem Pixel in waagerechter Richtung.
    */
-  private double fScaleX;
+  private double fScaleX = DEFAULT_SCALE;
   /**
    * Soviele mm entsprechen einem Pixel in senkrechter Richtung.
    */
-  private double fScaleY;
+  private double fScaleY = DEFAULT_SCALE;
   /**
    * Die aktuelle Position in Pixel.
    */
@@ -58,21 +63,17 @@ public final class Origin {
    * Liste aller Objekte, die an einer ï¿½nderung des Referenzpunktes interessiert
    * sind.
    */
-  private final Set<OriginChangeListener> fListeners;
+  private final Set<OriginChangeListener> fListeners = new HashSet<>();
   /**
    * Die grafische Darstellung des Ursprungs.
    */
-  private final OriginFigure fFigure;
+  private final OriginFigure fFigure = new OriginFigure();
 
   /**
    * Creates a new instance of Origin
    */
   public Origin() {
-    fScaleX = DEFAULT_SCALE;
-    fScaleY = DEFAULT_SCALE;
-    fListeners = new HashSet<>();
     setCoordinateSystem(new NormalCoordinateSystem());
-    fFigure = new OriginFigure();
     fFigure.setModel(this);
   }
 
@@ -173,7 +174,7 @@ public final class Origin {
       return pixelPosition;
     }
     catch (NumberFormatException e) {
-      log.info("Couldn't parse layout coordinates", e);
+      LOG.info("Couldn't parse layout coordinates", e);
       return new Point2D.Double();
     }
   }
@@ -189,7 +190,8 @@ public final class Origin {
    * @param yReal das Lï¿½ngenattribut fï¿½r die y-Achse, in welches der errechnete
    * reale Wert geschrieben wird
    */
-  public Point2D calculateRealPosition(Point pixelPosition, LengthProperty xReal, LengthProperty yReal) {
+  public Point2D calculateRealPosition(Point pixelPosition, LengthProperty xReal,
+                                       LengthProperty yReal) {
     Point2D realPosition = fCoordinateSystem.toReal(fPosition, pixelPosition, fScaleX, fScaleY);
 
     LengthProperty.Unit unitX = xReal.getUnit();

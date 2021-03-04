@@ -140,6 +140,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void createPlantModel(PlantModelCreationTO to) {
     synchronized (getGlobalSyncObject()) {
       getModel().clear();
@@ -149,6 +150,7 @@ class KernelStateModelling
   }
 
   @Override
+  @Deprecated
   public void loadPlantModel()
       throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {
@@ -345,6 +347,7 @@ class KernelStateModelling
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setPathLocked(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {

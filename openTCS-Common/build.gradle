@@ -4,7 +4,6 @@ dependencies {
   compile project(':openTCS-API-Base')
 
   compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
-  compile group: 'net.engio', name: 'mbassador', version: '1.1.10'
 }
 
 processResources.doLast {

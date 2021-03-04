@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.AbstractModelComponent;
 import org.opentcs.guing.model.ModelComponent;
@@ -144,8 +143,7 @@ public class ModelComponentConverter {
   private LocationModel revertLocation(Location location)
       throws IllegalArgumentException {
     LocationModel model = new LocationModel();
-    LocationTypeProperty locTypeProperty = (LocationTypeProperty) model.getProperty(LocationModel.TYPE);
-    locTypeProperty.setPossibleValues(locationTypeNames);
+    model.getPropertyType().setPossibleValues(locationTypeNames);
     revertProperties(model, location);
     return model;
   }

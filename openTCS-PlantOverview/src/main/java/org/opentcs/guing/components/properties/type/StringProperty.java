@@ -9,6 +9,7 @@
  */
 package org.opentcs.guing.components.properties.type;
 
+import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -30,19 +31,18 @@ public class StringProperty
    * @param model
    */
   public StringProperty(ModelComponent model) {
-    this(model, new String());
+    this(model, "");
   }
 
   /**
    * Konstruktor, dem der String übergeben wird.
    *
    * @param model
-   *
    * @param text
    */
   public StringProperty(ModelComponent model, String text) {
     super(model);
-    fText = text;
+    fText = requireNonNull(text, "text");
   }
 
   @Override

@@ -14,6 +14,7 @@ import java.util.Optional;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import static org.opentcs.util.Assertions.checkInRange;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A wider combo box that can be used as a cell editor in tables.
@@ -23,15 +24,17 @@ import static org.opentcs.util.Assertions.checkInRange;
  * @author Philipp Seifert (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
  * @author Mats Wilhelm (Fraunhofer IML)
- * @param <E> The type of this combo box's elements.
+ * @deprecated Use {@link BoundsPopupMenuListener} instead.
  */
-public class WideComboBox<E>
-    extends JComboBox<E> {
+@Deprecated
+@ScheduledApiChange(when = "5.0")
+public class WideComboBox
+    extends JComboBox<String> {
 
   /**
    * The popup width.
    */
-  private final Optional<Integer> popupWidth;
+  private Optional<Integer> popupWidth;
 
   /**
    * Indicates whether we are currently layout out or not.
@@ -61,15 +64,15 @@ public class WideComboBox<E>
    *
    * @param items The values in the new combo box.
    */
-  public WideComboBox(final E[] items) {
+  public WideComboBox(final String[] items) {
     super(items);
     int tmpPopupWidth = 1;
     Canvas c = new Canvas();
     FontMetrics fontMetrics = c.getFontMetrics(this.getFont());
-    for (E item : items) {
-      tmpPopupWidth = Integer.max(fontMetrics.stringWidth(item.toString()), tmpPopupWidth);
+    for (String item : items) {
+      tmpPopupWidth = Integer.max(fontMetrics.stringWidth(item), tmpPopupWidth);
     }
-    tmpPopupWidth += 15;
+    tmpPopupWidth += 20;
     this.popupWidth = Optional.of(tmpPopupWidth);
   }
 
@@ -78,7 +81,7 @@ public class WideComboBox<E>
    *
    * @param aModel The model this combo box should use.
    */
-  public WideComboBox(ComboBoxModel<E> aModel) {
+  public WideComboBox(ComboBoxModel<String> aModel) {
     super(aModel);
     this.popupWidth = Optional.empty();
   }
@@ -87,6 +90,15 @@ public class WideComboBox<E>
   public void doLayout() {
     try {
       layingOut = true;
+      int tmpPopupWidth = 1;
+      Canvas c = new Canvas();
+      FontMetrics fontMetrics = c.getFontMetrics(this.getFont());
+      for (int i = 0; i < super.getItemCount(); i++) {
+        String item = super.getItemAt(i);
+        tmpPopupWidth = Integer.max(fontMetrics.stringWidth(item), tmpPopupWidth);
+      }
+      tmpPopupWidth += 15;
+      this.popupWidth = Optional.of(tmpPopupWidth);
       super.doLayout();
     }
     finally {

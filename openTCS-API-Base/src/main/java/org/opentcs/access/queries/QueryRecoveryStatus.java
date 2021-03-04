@@ -9,13 +9,17 @@ package org.opentcs.access.queries;
 
 import java.io.Serializable;
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A query for the current recovery status of the overall system (vehicle and
  * resources availability).
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Instead of queries, explicit service calls should be used.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 @Availability(Kernel.State.OPERATING)
 public class QueryRecoveryStatus
     extends Query<QueryRecoveryStatus>

@@ -9,18 +9,14 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
 import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
 import org.opentcs.data.TCSObject;
@@ -28,15 +24,9 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for location types.
@@ -47,84 +37,59 @@ import org.slf4j.LoggerFactory;
 public class LocationTypeAdapter
     extends AbstractProcessAdapter {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(LocationTypeAdapter.class);
-
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public LocationTypeAdapter(@Assisted LocationTypeModel model,
-                             @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
-  }
-
-  @Override
-  public LocationTypeModel getModel() {
-    return (LocationTypeModel) super.getModel();
-  }
-
   @Override // OpenTCSProcessAdapter
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
                                     @Nullable ModelLayoutElement layoutElement) {
     LocationType locationType = requireNonNull((LocationType) tcsObject, "tcsObject");
-    // Name
-    StringProperty pNname = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    pNname.setText(locationType.getName());
-    // Allowed operations
-    StringSetProperty pOperations = (StringSetProperty) getModel()
-        .getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
-    pOperations.setItems(new ArrayList<>(locationType.getAllowedOperations()));
-    updateMiscModelProperties(locationType);
-    KeyValueSetProperty miscellaneous = (KeyValueSetProperty) getModel()
-        .getProperty(ModelComponent.MISCELLANEOUS);
+    LocationTypeModel model = (LocationTypeModel) modelComponent;
 
-    for (KeyValueProperty next : miscellaneous.getItems()) {
+    // Name
+    model.getPropertyName().setText(locationType.getName());
+    // Allowed operations
+    model.getPropertyAllowedOperations()
+        .setItems(new ArrayList<>(locationType.getAllowedOperations()));
+    updateMiscModelProperties(model, locationType);
+
+    for (KeyValueProperty next : model.getPropertyMiscellaneous().getItems()) {
       if (next.getKey().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
-        SymbolProperty symbol = (SymbolProperty) getModel().getProperty(
-            ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-        symbol.setLocationRepresentation(LocationRepresentation.valueOf(next.getValue()));
+        model.getPropertyDefaultRepresentation()
+            .setLocationRepresentation(LocationRepresentation.valueOf(next.getValue()));
         break;
       }
     }
   }
 
-  @Override // OpenTCSProcessAdapter
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    try {
-      plantModel.getLocationTypes().add(
-          new LocationTypeCreationTO(getModel().getName())
-              .setAllowedOperations(getAllowedOperations())
-              .setProperties(getKernelProperties())
-      );
+  @Override
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    PlantModelCreationTO result = plantModel
+        .withLocationType(
+            new LocationTypeCreationTO(modelComponent.getName())
+                .withAllowedOperations(getAllowedOperations((LocationTypeModel) modelComponent))
+                .withProperties(getKernelProperties(modelComponent))
+        );
 
-      unmarkAllPropertiesChanged();
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("", e);
-    }
+    unmarkAllPropertiesChanged(modelComponent);
+
+    return result;
   }
 
-  private List<String> getAllowedOperations() {
-    return new LinkedList<>(
-        ((StringSetProperty) getModel().getProperty(LocationTypeModel.ALLOWED_OPERATIONS))
-            .getItems());
+  private List<String> getAllowedOperations(LocationTypeModel model) {
+    return new ArrayList<>(model.getPropertyAllowedOperations().getItems());
   }
 
   @Override
-  protected Map<String, String> getKernelProperties() {
-    Map<String, String> result = super.getKernelProperties();
+  protected Map<String, String> getKernelProperties(ModelComponent model) {
+    Map<String, String> result = super.getKernelProperties(model);
+    LocationTypeModel locationTypeModel = (LocationTypeModel) model;
 
     // Add the location representation (symbol) from the model.
-    SymbolProperty pSymbol
-        = (SymbolProperty) getModel().getProperty(LOCTYPE_DEFAULT_REPRESENTATION);
-    LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
+    LocationRepresentation locationRepresentation
+        = locationTypeModel.getPropertyDefaultRepresentation().getLocationRepresentation();
 
     if (locationRepresentation != null) {
       result.put(LOCTYPE_DEFAULT_REPRESENTATION, locationRepresentation.name());

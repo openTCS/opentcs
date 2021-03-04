@@ -17,6 +17,16 @@ dependencies {
   compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
   compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
   
+  compile group: 'com.sparkjava', name: 'spark-core', version: '2.7.1'
+  compileOnly group: 'com.sparkjava', name: 'spark-core', version: '2.7.1', classifier: 'sources'
+  
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11'
+  compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11', classifier: 'sources'
+  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11'
+  compileOnly group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11', classifier: 'sources'
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11'
+  compileOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11', classifier: 'sources'
+  
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 
@@ -41,10 +51,7 @@ run {
   systemProperties(['java.util.logging.config.file':'./config/logging.config',\
                     'java.security.policy':'file:./config/java.policy',\
                     'opentcs.base':'.',\
-                    'opentcs.home':'.',\
-                    'org.opentcs.util.configuration.xml.file':'./config/openTCS-config.xml',\
-                    'org.opentcs.util.configuration.saveonexit':'true',\
-                    'org.opentcs.virtualvehicle.profiles.file':'./config/virtualvehicle-profiles.xml'])
+                    'opentcs.home':'.'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\
           '-splash:bin/splash-image.gif')
 }

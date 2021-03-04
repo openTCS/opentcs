@@ -11,17 +11,22 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JFrame;
-import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.app.SDIApplication;
 import org.jhotdraw.app.View;
+import org.opentcs.common.PortalManager;
+import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
+import org.opentcs.util.event.EventHandler;
+import org.opentcs.util.event.EventSource;
 import org.opentcs.util.gui.Icons;
 
 /**
@@ -30,8 +35,11 @@ import org.opentcs.util.gui.Icons;
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class OpenTCSSDIApplication
-    extends SDIApplication {
+    extends SDIApplication
+    implements EventHandler {
 
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/guing/res/labels");
   /**
    * The JFrame in which the OpenTCSView is shown. May be null.
    */
@@ -52,6 +60,14 @@ public class OpenTCSSDIApplication
    * Provides the application's current state.
    */
   private final ApplicationState appState;
+  /**
+   * Where we register for application events.
+   */
+  private final EventSource eventSource;
+  /**
+   * The portal manager.
+   */
+  private final PortalManager portalManager;
 
   /**
    * Creates a new instance.
@@ -61,18 +77,24 @@ public class OpenTCSSDIApplication
    * @param modelManager Provides the current system model.
    * @param appConfig The application's configuration.
    * @param appState Provides the application's current state.
+   * @param eventSource Where this instance registers for application events.
+   * @param portalManager The portal manager.
    */
   @Inject
   public OpenTCSSDIApplication(@ApplicationFrame JFrame frame,
                                Provider<ApplicationMenuBar> menuBarProvider,
                                ModelManager modelManager,
                                PlantOverviewApplicationConfiguration appConfig,
-                               ApplicationState appState) {
+                               ApplicationState appState,
+                               @ApplicationEventBus EventSource eventSource,
+                               PortalManager portalManager) {
     this.contentFrame = requireNonNull(frame, "frame");
     this.menuBarProvider = requireNonNull(menuBarProvider, "menuBarProvider");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.appConfig = requireNonNull(appConfig, "appConfig");
     this.appState = requireNonNull(appState, "appState");
+    this.eventSource = requireNonNull(eventSource, "eventSource");
+    this.portalManager = requireNonNull(portalManager, "portalManager");
   }
 
   @Override
@@ -84,11 +106,16 @@ public class OpenTCSSDIApplication
     }
     view.setShowing(true);
 
+    eventSource.subscribe(this);
+
     final OpenTCSView opentcsView = (OpenTCSView) view;
 
     setupContentFrame(opentcsView);
 
-    opentcsView.addPropertyChangeListener(new TitleUpdater(opentcsView));
+    TitleUpdater titleUpdater = new TitleUpdater(opentcsView);
+    opentcsView.addPropertyChangeListener(titleUpdater);
+    eventSource.subscribe(titleUpdater);
+
     updateViewTitle(view, contentFrame);
 
     // The frame should be shown only after the view has been initialized.
@@ -98,42 +125,37 @@ public class OpenTCSSDIApplication
 
   @Override
   protected void updateViewTitle(View view, JFrame frame) {
-    requireNonNull(view, "view");
-    requireNonNull(frame, "frame");
-
     OpenTCSView opentcsView = (OpenTCSView) view;
     opentcsView.updateModelName();
+  }
 
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof ModelNameChangeEvent) {
+      ModelNameChangeEvent modelNameChangeEvent = (ModelNameChangeEvent) event;
+      updateViewTitle((OpenTCSView) modelNameChangeEvent.getSource(), contentFrame);
+    }
+  }
+
+  private void updateViewTitle(OpenTCSView view, JFrame frame) {
     String modelName = modelManager.getModel().getName();
-    if (opentcsView.hasUnsavedChanges()) {
+    if (view.hasUnsavedChanges()) {
       modelName += "*";
     }
 
     if (frame != null) {
       frame.setTitle(OpenTCSView.NAME + " - "
-          + opentcsView.getPlantOverviewState() + " - \""
-          + modelName + "\"");
-    }
-  }
-
-  @Handler
-  public void modelNameChange(ModelNameChangeEvent event) {
-    OpenTCSView opentcsView = (OpenTCSView) event.getSource();
-    String modelName = modelManager.getModel().getName();
-    if (opentcsView.hasUnsavedChanges()) {
-      modelName += "*";
-    }
-
-    if (contentFrame != null) {
-      contentFrame.setTitle(OpenTCSView.NAME + " - "
-          + opentcsView.getPlantOverviewState() + " - \""
-          + modelName + "\"");
+          + view.getPlantOverviewState() + " - \""
+          + modelName + "\" - "
+          + BUNDLE.getString("Application.ConnectedToKernel.text") + portalManager.getDescription()
+          + " (" + portalManager.getHost() + ":" + portalManager.getPort()+")");
     }
   }
 
   private void setupContentFrame(OpenTCSView opentcsView) {
     ApplicationMenuBar menuBar = menuBarProvider.get();
     menuBar.setOperationMode(appState.getOperationMode());
+    eventSource.subscribe(menuBar);
     contentFrame.setJMenuBar(menuBar);
 
     contentFrame.setIconImages(Icons.getOpenTCSIcons());
@@ -154,7 +176,8 @@ public class OpenTCSSDIApplication
   }
 
   private class TitleUpdater
-      implements PropertyChangeListener {
+      implements PropertyChangeListener,
+                 EventHandler {
 
     private final OpenTCSView opentcsView;
 
@@ -168,6 +191,21 @@ public class OpenTCSSDIApplication
 
       if (name.equals(View.HAS_UNSAVED_CHANGES_PROPERTY)
           || name.equals(OpenTCSView.OPERATIONMODE_PROPERTY)) {
+        updateViewTitle(opentcsView, contentFrame);
+      }
+    }
+
+    @Override
+    public void onEvent(Object event) {
+      if (event instanceof PortalManager.ConnectionState) {
+        PortalManager.ConnectionState connectionState = (PortalManager.ConnectionState) event;
+        switch (connectionState) {
+          case CONNECTED:
+            break;
+          case DISCONNECTED:
+            break;
+          default:
+        }
         updateViewTitle(opentcsView, contentFrame);
       }
     }

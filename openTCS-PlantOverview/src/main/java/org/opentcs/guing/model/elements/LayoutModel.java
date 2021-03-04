@@ -40,6 +40,18 @@ public class LayoutModel
     return ResourceBundleUtil.getBundle().getString("layout.description");
   }
 
+  public LengthProperty getPropertyScaleX() {
+    return (LengthProperty) getProperty(SCALE_X);
+  }
+
+  public LengthProperty getPropertyScaleY() {
+    return (LengthProperty) getProperty(SCALE_Y);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 

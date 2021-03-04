@@ -145,7 +145,14 @@ public class Block
     return getId();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Block clone() {
     return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), members);
   }

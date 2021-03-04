@@ -7,17 +7,15 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.slf4j.Logger;
@@ -34,9 +32,9 @@ class AllocatorTask
    */
   private static final Logger LOG = LoggerFactory.getLogger(AllocatorTask.class);
   /**
-   * The kernel.
+   * The plant model service.
    */
-  private final LocalKernel kernel;
+  private final InternalPlantModelService plantModelService;
   /**
    * The reservation pool.
    */
@@ -46,51 +44,42 @@ class AllocatorTask
    */
   private final Scheduler.Module allocationAdvisor;
   /**
-   * Commands to be processed.
-   */
-  private final BlockingQueue<AllocatorCommand> commands = new PriorityBlockingQueue<>();
-  /**
    * Allocations deferred because they couldn't be granted, yet.
    */
-  private final Queue<AllocatorCommand.Allocate> deferredAllocations = new LinkedList<>();
+  private final Queue<AllocatorCommand.Allocate> deferredAllocations;
   /**
-   * This tasks termination flag.
+   * Executes tasks.
    */
-  private boolean terminated;
+  private final ScheduledExecutorService kernelExecutor;
+  /**
+   * Describes the actual task.
+   */
+  private final AllocatorCommand command;
 
   /**
    * Creates a new instance.
    */
-  public AllocatorTask(@Nonnull LocalKernel kernel,
+  public AllocatorTask(@Nonnull InternalPlantModelService plantModelService,
                        @Nonnull ReservationPool reservationPool,
-                       @Nonnull Scheduler.Module allocationAdvisor) {
-    this.kernel = requireNonNull(kernel, "kernel");
+                       @Nonnull Queue<AllocatorCommand.Allocate> deferredAllocations,
+                       @Nonnull Scheduler.Module allocationAdvisor,
+                       @Nonnull ScheduledExecutorService kernelExecutor,
+                       @Nonnull AllocatorCommand command) {
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
+    this.deferredAllocations = requireNonNull(deferredAllocations, "deferredAllocations");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
+    this.command = requireNonNull(command, "command");
   }
 
   @Override
   public void run() {
-    while (!terminated) {
-      try {
-        consume(commands.take());
-      }
-      catch (InterruptedException exc) {
-        LOG.warn("Unexpectedly interrupted, ignored.", exc);
-      }
-    }
-  }
-
-  private void consume(AllocatorCommand command) {
-    if (command instanceof AllocatorCommand.PoisonPill) {
-      commands.clear();
-      terminated = true;
-    }
-    else if (command instanceof AllocatorCommand.Allocate) {
+    if (command instanceof AllocatorCommand.Allocate) {
       processAllocate((AllocatorCommand.Allocate) command);
     }
     else if (command instanceof AllocatorCommand.RetryAllocates) {
-      retryWaitingAllocations();
+      scheduleRetryWaitingAllocations();
     }
     else if (command instanceof AllocatorCommand.CheckAllocationsPrepared) {
       checkAllocationsPrepared((AllocatorCommand.CheckAllocationsPrepared) command);
@@ -101,14 +90,6 @@ class AllocatorTask
     else {
       LOG.warn("Unhandled AllocatorCommand implementation {}, ignored.", command.getClass());
     }
-  }
-
-  public void enqueue(AllocatorCommand command) {
-    commands.offer(command);
-  }
-
-  public void terminate() {
-    enqueue(new AllocatorCommand.PoisonPill());
   }
 
   private void processAllocate(AllocatorCommand.Allocate command) {
@@ -141,7 +122,8 @@ class AllocatorTask
                client.getId(),
                resources);
       undoAllocate(client, resources);
-      enqueue(new AllocatorCommand.RetryAllocates(client));
+      // See if others want the resources this one didn't, then.
+      scheduleRetryWaitingAllocations();
     }
   }
 
@@ -197,8 +179,15 @@ class AllocatorTask
   /**
    * Moves all waiting allocations back into the incoming queue so they can be rechecked.
    */
-  private void retryWaitingAllocations() {
-    commands.addAll(deferredAllocations);
+  private void scheduleRetryWaitingAllocations() {
+    for (AllocatorCommand.Allocate allocate : deferredAllocations) {
+      kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                              reservationPool,
+                                              deferredAllocations,
+                                              allocationAdvisor,
+                                              kernelExecutor,
+                                              allocate));
+    }
     deferredAllocations.clear();
   }
 
@@ -217,7 +206,7 @@ class AllocatorTask
         .map((resource) -> resource.getReference())
         .collect(Collectors.toSet());
     // Let the kernel expand the resources for us.
-    Set<TCSResource<?>> result = kernel.expandResources(refs);
+    Set<TCSResource<?>> result = plantModelService.expandResources(refs);
     LOG.debug("Set {} expanded to {}", resources, result);
     return result;
   }

@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.util.ExplainedBoolean;
 import org.slf4j.Logger;
@@ -91,6 +92,11 @@ public class NullVehicleController
 
   @Override
   public void sendCommAdapterMessage(Object message) {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+  }
+
+  @Override
+  public void sendCommAdapterCommand(AdapterCommand command) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 

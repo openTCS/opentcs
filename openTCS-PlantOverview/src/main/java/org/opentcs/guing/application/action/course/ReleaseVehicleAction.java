@@ -14,10 +14,10 @@ import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.ApplicationFrame;
@@ -58,38 +58,40 @@ public class ReleaseVehicleAction
    */
   private final JFrame applicationFrame;
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
 
   /**
    * Creates a new instance.
    *
    * @param vehicle The selected vehicle.
    * @param applicationFrame The application's main view.
-   * @param kernelProvider Provides access to a shared kernel.
+   * @param portalProvider Provides access to a shared portal.
    */
   @Inject
   public ReleaseVehicleAction(@Assisted VehicleModel vehicle,
                               @ApplicationFrame JFrame applicationFrame,
-                              SharedKernelProvider kernelProvider) {
+                              SharedKernelServicePortalProvider portalProvider) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.applicationFrame = requireNonNull(applicationFrame, "applicationFrame");
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
-    try (SharedKernelClient kernelClient = kernelProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      VehicleService vehicleService = sharedPortal.getPortal().getVehicleService();
       if (JOptionPane.showConfirmDialog(
           applicationFrame,
-          labels.getString(MESSAGE_CONFIRM_RELEASE_TEXT) + " " + vehicleReference(kernelClient.getKernel()).getName(),
+          labels.getString(MESSAGE_CONFIRM_RELEASE_TEXT) + " " + vehicleReference(vehicleService).getName(),
           labels.getString(MESSAGE_CONFIRM_RELEASE_TITLE),
           JOptionPane.YES_NO_OPTION)
           == JOptionPane.YES_OPTION) {
-        kernelClient.getKernel().releaseVehicle(vehicleReference(kernelClient.getKernel()));
+        sharedPortal.getPortal().getDispatcherService()
+            .releaseVehicle(vehicleReference(vehicleService));
       }
     }
     catch (KernelRuntimeException e) {
@@ -97,8 +99,8 @@ public class ReleaseVehicleAction
     }
   }
 
-  private TCSObjectReference<Vehicle> vehicleReference(Kernel kernel) {
-    return kernel.getTCSObject(Vehicle.class, vehicleModel.getName()).getReference();
+  private TCSObjectReference<Vehicle> vehicleReference(VehicleService vehicleService) {
+    return vehicleService.fetchObject(Vehicle.class, vehicleModel.getName()).getReference();
   }
 
 }

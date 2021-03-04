@@ -11,9 +11,9 @@ package org.opentcs.guing.util;
 import java.util.List;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
-import org.opentcs.guing.exchange.ConnectionParamSet;
 import org.opentcs.util.configuration.ConfigurationEntry;
 import org.opentcs.util.configuration.ConfigurationPrefix;
+import org.opentcs.util.gui.dialog.ConnectionParamSet;
 
 /**
  * Provides methods to configure the PlantOverview application.
@@ -38,12 +38,12 @@ public interface PlantOverviewApplicationConfiguration {
   @ConfigurationEntry(
       type = "String",
       description = {"The plant overview application's mode on startup.",
-                     "Valid values: 'MODELLING', 'OPERATING', 'ASK'"},
+                     "Valid values: 'MODELLING', 'OPERATING'"},
       orderKey = "0_init_1")
   InitialMode initialMode();
 
   @ConfigurationEntry(
-      type = "Integer",
+      type = "Boolean",
       description = "Whether the GUI window should be maximized on startup.",
       orderKey = "1_size_0")
   boolean frameMaximized();
@@ -73,7 +73,7 @@ public interface PlantOverviewApplicationConfiguration {
   int frameBoundsY();
 
   @ConfigurationEntry(
-      type = "List of <hostname:port>",
+      type = "List of <description>\\|<hostname>\\|<port>",
       description = "The configured connection bookmarks.",
       orderKey = "2_connection_0")
   List<ConnectionParamSet> connectionBookmarks();
@@ -87,6 +87,22 @@ public interface PlantOverviewApplicationConfiguration {
                      "'SSL': SSL is used. (Generation of a keystore-truststore-pair is required.)"},
       orderKey = "2_connection_1")
   ConnectionEncryption connectionEncryption();
+
+  @ConfigurationEntry(
+      type = "String",
+      description = {"The password for the truststore.",
+                     "(Only used, if connection encryption 'SSL' is selected.)"},
+      orderKey = "2_connection_2")
+  String truststorePassword();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = {"Whether to use the configured bookmarks when connecting to the kernel.",
+                     "If 'true', the first connection bookmark will be used for the connection "
+                     + "attempt.",
+                     "If 'false', a dialog will be shown to enter connection parameters."},
+      orderKey = "2_connection_3")
+  boolean useBookmarksWhenConnecting();
 
   @ConfigurationEntry(
       type = "Class name",

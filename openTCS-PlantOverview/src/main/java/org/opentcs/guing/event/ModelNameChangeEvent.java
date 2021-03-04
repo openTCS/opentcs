@@ -34,4 +34,13 @@ public class ModelNameChangeEvent
   public String getNewName() {
     return newName;
   }
+
+  @Override
+  public String toString() {
+    return "ModelNameChangeEvent{"
+        + "newName=" + newName
+        + ", source=" + getSource()
+        + '}';
+  }
+
 }

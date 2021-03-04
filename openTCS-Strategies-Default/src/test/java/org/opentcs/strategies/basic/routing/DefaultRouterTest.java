@@ -19,8 +19,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Router;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Vehicle;
 
@@ -40,11 +40,11 @@ public class DefaultRouterTest {
    * The class to test.
    */
   private Router router;
-
+  
   /**
-   * The mocked kernel to use.
+   * The mocked object service to use.
    */
-  private LocalKernel kernel;
+  private TCSObjectService objectService;
 
   /**
    * The builder for routing tables.
@@ -58,10 +58,10 @@ public class DefaultRouterTest {
 
   @Before
   public void setUp() {
-    kernel = mock(LocalKernel.class);
+    objectService = mock(TCSObjectService.class);
     builder = mock(PointRouterFactory.class);
-    when(kernel.getTCSObjects(Vehicle.class)).thenReturn(vehicles);
-    when(kernel.getTCSObject(eq(Vehicle.class), anyString()))
+    when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
+    when(objectService.fetchObject(eq(Vehicle.class), anyString()))
         .then(o -> vehicles.stream()
         .filter(t -> filterByName(o, t))
         .findFirst().orElse(null));
@@ -138,7 +138,7 @@ public class DefaultRouterTest {
   private Router createRouter() {
     when(builder.createPointRouter(any())).thenReturn(mock(PointRouter.class));
 
-    return new DefaultRouter(kernel,
+    return new DefaultRouter(objectService,
                              builder,
                              configuration);
   }

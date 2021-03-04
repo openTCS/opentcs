@@ -27,8 +27,6 @@ start /b %JAVA% -enableassertions ^
     -Dopentcs.home="%OPENTCS_HOME%" ^
     -Djava.util.logging.config.file="%OPENTCS_CONFIGDIR%\logging.config" ^
     -Djava.security.policy="file:%OPENTCS_CONFIGDIR%\java.policy" ^
-    -Dorg.opentcs.util.configuration.xml.file="%OPENTCS_CONFIGDIR%\openTCS-plantoverview-config.xml" ^
-    -Dorg.opentcs.util.configuration.saveonexit=true ^
     -Dsun.java2d.d3d=false ^
     -XX:-OmitStackTraceInFastThrow ^
     -classpath "%OPENTCS_CP%" ^

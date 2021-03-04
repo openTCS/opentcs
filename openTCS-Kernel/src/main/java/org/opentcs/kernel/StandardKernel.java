@@ -18,26 +18,24 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.Kernel.State;
+import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.TCSKernelStateEvent;
-import org.opentcs.access.TCSModelTransitionEvent;
-import org.opentcs.access.TravelCosts;
-import org.opentcs.access.UnsupportedKernelOpException;
-import org.opentcs.access.queries.Query;
+import org.opentcs.access.ModelTransitionEvent;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
-import org.opentcs.customizations.kernel.CentralEventHub;
+import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -61,12 +59,9 @@ import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.data.user.UserPermission;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
-import org.opentcs.util.eventsystem.EventHub;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +78,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-@Singleton
 final class StandardKernel
     implements LocalKernel,
                Runnable {
@@ -104,7 +98,16 @@ final class StandardKernel
   /**
    * An event hub for synchronous dispatching of events.
    */
-  private final EventHub<TCSEvent> eventHub;
+  @SuppressWarnings("deprecation")
+  private final org.opentcs.util.eventsystem.EventHub<org.opentcs.util.eventsystem.TCSEvent> eventHub;
+  /**
+   * The application's event bus.
+   */
+  private final EventBus eventBus;
+  /**
+   * Our executor.
+   */
+  private final ScheduledExecutorService kernelExecutor;
   /**
    * This kernel's order receivers.
    */
@@ -126,19 +129,25 @@ final class StandardKernel
    * Creates a new kernel.
    *
    * @param eventHub The central event hub to be used.
+   * @param kernelExecutor An executor for this kernel's tasks.
    * @param stateProviders The state map to be used.
    */
   @Inject
-  StandardKernel(@CentralEventHub EventHub<TCSEvent> eventHub,
-                 Map<Kernel.State, Provider<KernelState>> stateProviders) {
+  @SuppressWarnings("deprecation")
+  StandardKernel(
+      @org.opentcs.customizations.kernel.CentralEventHub org.opentcs.util.eventsystem.EventHub<org.opentcs.util.eventsystem.TCSEvent> eventHub,
+      @ApplicationEventBus EventBus eventBus,
+      @KernelExecutor ScheduledExecutorService kernelExecutor,
+      Map<Kernel.State, Provider<KernelState>> stateProviders) {
     this.eventHub = requireNonNull(eventHub, "eventHub");
+    this.eventBus = requireNonNull(eventBus, "eventBus");
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.stateProviders = requireNonNull(stateProviders, "stateProviders");
   }
 
   @Override
   public void initialize() {
-    if (initialized) {
-      LOG.debug("Already initialized, doing nothing.");
+    if (isInitialized()) {
       return;
     }
     // First of all, start all kernel extensions that are already registered.
@@ -163,8 +172,7 @@ final class StandardKernel
 
   @Override
   public void terminate() {
-    if (!initialized) {
-      LOG.debug("Not initialized, doing nothing.");
+    if (!isInitialized()) {
       return;
     }
     // Note that the actual shutdown of extensions should happen when the kernel
@@ -187,48 +195,50 @@ final class StandardKernel
     for (KernelExtension extension : kernelExtensions) {
       extension.terminate();
     }
+    kernelExecutor.shutdown();
     LOG.info("Kernel thread finished.");
   }
 
   // Implementation of interface Kernel starts here.
   @Override
-  public Set<UserPermission> getUserPermissions() {
+  @Deprecated
+  public Set<org.opentcs.data.user.UserPermission> getUserPermissions() {
     LOG.debug("method entry");
-    return EnumSet.allOf(UserPermission.class);
+    return EnumSet.allOf(org.opentcs.data.user.UserPermission.class);
   }
 
   @Override
   @Deprecated
   public void createUser(String userName, String userPassword,
-                         Set<UserPermission> userPermissions)
-      throws UnsupportedKernelOpException {
+                         Set<org.opentcs.data.user.UserPermission> userPermissions)
+      throws org.opentcs.access.UnsupportedKernelOpException {
     LOG.debug("method entry");
-    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
+    throw new org.opentcs.access.UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   @Deprecated
   public void setUserPassword(String userName, String userPassword)
-      throws UnsupportedKernelOpException {
+      throws org.opentcs.access.UnsupportedKernelOpException {
     LOG.debug("method entry");
-    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
+    throw new org.opentcs.access.UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   @Deprecated
   public void setUserPermissions(String userName,
-                                 Set<UserPermission> userPermissions)
-      throws UnsupportedKernelOpException {
+                                 Set<org.opentcs.data.user.UserPermission> userPermissions)
+      throws org.opentcs.access.UnsupportedKernelOpException {
     LOG.debug("method entry");
-    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
+    throw new org.opentcs.access.UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
   @Deprecated
   public void removeUser(String userName)
-      throws UnsupportedKernelOpException {
+      throws org.opentcs.access.UnsupportedKernelOpException {
     LOG.debug("method entry");
-    throw new UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
+    throw new org.opentcs.access.UnsupportedKernelOpException(MSG_NO_USER_MANAGEMENT);
   }
 
   @Override
@@ -281,7 +291,8 @@ final class StandardKernel
   }
 
   @Override
-  public List<TravelCosts> getTravelCosts(
+  @Deprecated
+  public List<org.opentcs.access.TravelCosts> getTravelCosts(
       TCSObjectReference<Vehicle> vRef,
       TCSObjectReference<Location> srcRef,
       Set<TCSObjectReference<Location>> destRefs) {
@@ -290,6 +301,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public String getPersistentModelName()
       throws IllegalStateException {
     LOG.debug("method entry");
@@ -297,17 +309,32 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public String getLoadedModelName() {
     LOG.debug("method entry");
     return kernelState.getLoadedModelName();
   }
 
   @Override
+  @Deprecated
   public void createPlantModel(PlantModelCreationTO to) {
+
+    boolean kernelInOperating = getState() == Kernel.State.OPERATING;
+    // If we are in state operating, change the kernel state before creating the plant model
+    if (kernelInOperating) {
+      setState(Kernel.State.MODELLING);
+    }
+
     final String oldModelName = kernelState.getLoadedModelName();
     emitModelEvent(oldModelName, to.getName(), true, false);
     kernelState.createPlantModel(to);
     kernelState.savePlantModel();
+
+    // If we were in state operating before, change the kernel state back to operating
+    if (kernelInOperating) {
+      setState(Kernel.State.OPERATING);
+    }
+
     emitModelEvent(oldModelName, to.getName(), true, true);
     publishUserNotification(new UserNotification("Kernel created model " + to.getName(),
                                                  UserNotification.Level.INFORMATIONAL));
@@ -326,6 +353,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void loadPlantModel()
       throws IllegalStateException {
     final String oldModelName = kernelState.getLoadedModelName();
@@ -358,6 +386,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void savePlantModel()
       throws IllegalStateException {
 //    final String modelName = kernelState.getLoadedModelName();
@@ -395,6 +424,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                  TCSObjectReference<T> ref)
       throws CredentialsException {
@@ -403,6 +433,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                                  String name)
       throws CredentialsException {
@@ -411,6 +442,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz)
       throws CredentialsException {
     LOG.debug("method entry");
@@ -418,6 +450,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
                                                        Pattern regexp)
       throws CredentialsException {
@@ -426,6 +459,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
                                                        Predicate<? super T> predicate)
       throws CredentialsException {
@@ -433,6 +467,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> T getTCSObjectOriginal(
       Class<T> clazz,
       TCSObjectReference<T> ref)
@@ -442,6 +477,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> T getTCSObjectOriginal(Class<T> clazz,
                                                          String name)
       throws CredentialsException {
@@ -450,6 +486,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(Class<T> clazz)
       throws CredentialsException {
     LOG.debug("method entry");
@@ -457,6 +494,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(Class<T> clazz,
                                                                Pattern regexp)
       throws CredentialsException {
@@ -473,6 +511,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTCSObjectProperty(TCSObjectReference<?> ref, String key,
                                    String value)
       throws ObjectUnknownException {
@@ -481,6 +520,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void clearTCSObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -495,12 +535,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void publishUserNotification(UserNotification notification) {
     LOG.debug("method entry");
     kernelState.publishUserNotification(notification);
   }
 
   @Override
+  @Deprecated
   public List<UserNotification> getUserNotifications(Predicate<UserNotification> predicate)
       throws CredentialsException {
     LOG.debug("method entry");
@@ -635,6 +677,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setPathLocked(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -649,6 +692,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                     int energyLevel)
       throws ObjectUnknownException {
@@ -675,6 +719,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                           String rechargeOperation)
       throws ObjectUnknownException {
@@ -683,6 +728,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                             List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
@@ -709,6 +755,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleState(TCSObjectReference<Vehicle> ref,
                               Vehicle.State newState)
       throws ObjectUnknownException {
@@ -717,6 +764,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                   Vehicle.ProcState newState)
       throws ObjectUnknownException {
@@ -742,6 +790,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
                                               Set<String> processableCategories)
       throws ObjectUnknownException {
@@ -749,6 +798,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -757,6 +807,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -765,6 +816,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehiclePrecisePosition(TCSObjectReference<Vehicle> vehicleRef,
                                         Triple newPosition)
       throws ObjectUnknownException {
@@ -773,6 +825,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleOrientationAngle(TCSObjectReference<Vehicle> vehicleRef,
                                          double angle)
       throws ObjectUnknownException {
@@ -781,6 +834,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                        TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
@@ -789,6 +843,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
@@ -797,6 +852,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleRouteProgressIndex(
       TCSObjectReference<Vehicle> vehicleRef,
       int index)
@@ -985,6 +1041,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public TransportOrder createTransportOrder(TransportOrderCreationTO to) {
     LOG.debug("method entry");
     return kernelState.createTransportOrder(to);
@@ -999,6 +1056,7 @@ final class StandardKernel
     kernelState.setTransportOrderDeadline(ref, deadline);
   }
 
+  @Deprecated
   @Override
   public void activateTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
@@ -1007,6 +1065,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                      TransportOrder.State newState)
       throws ObjectUnknownException {
@@ -1025,6 +1084,16 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
+  public void setTransportOrderProcessingVehicle(TCSObjectReference<TransportOrder> orderRef,
+                                                 TCSObjectReference<Vehicle> vehicleRef,
+                                                 List<DriveOrder> driveOrders)
+      throws ObjectUnknownException, IllegalArgumentException {
+    kernelState.setTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
+  }
+
+  @Override
+  @Deprecated
   public void setTransportOrderProcessingVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -1043,6 +1112,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
                                            List<DriveOrder> newOrders)
       throws ObjectUnknownException {
@@ -1051,6 +1121,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderInitialDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
@@ -1059,6 +1130,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderNextDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
@@ -1087,6 +1159,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void addTransportOrderRejection(
       TCSObjectReference<TransportOrder> orderRef,
       Rejection newRejection)
@@ -1123,6 +1196,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
     LOG.debug("method entry");
     return kernelState.createOrderSequence(to);
@@ -1145,6 +1219,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceFinishedIndex(
       TCSObjectReference<OrderSequence> seqRef,
       int index) {
@@ -1153,12 +1228,14 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceComplete(TCSObjectReference<OrderSequence> seqRef) {
     LOG.debug("method entry");
     kernelState.setOrderSequenceComplete(seqRef);
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef) {
     LOG.debug("method entry");
     kernelState.setOrderSequenceFinished(seqRef);
@@ -1183,6 +1260,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {
@@ -1191,6 +1269,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void withdrawTransportOrder(TCSObjectReference<TransportOrder> ref,
                                      boolean immediateAbort,
                                      boolean disableVehicle)
@@ -1200,6 +1279,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void withdrawTransportOrderByVehicle(TCSObjectReference<Vehicle> vehicleRef,
                                               boolean immediateAbort,
                                               boolean disableVehicle)
@@ -1209,6 +1289,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void dispatchVehicle(TCSObjectReference<Vehicle> vehicleRef,
                               boolean setIdleIfUnavailable) {
     LOG.debug("method entry");
@@ -1216,6 +1297,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException, CredentialsException {
     LOG.debug("method entry");
@@ -1223,6 +1305,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef,
                                      Object message)
       throws ObjectUnknownException, CredentialsException {
@@ -1231,6 +1314,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void updateRoutingTopology()
       throws CredentialsException {
     LOG.debug("method entry");
@@ -1246,6 +1330,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -1253,7 +1338,8 @@ final class StandardKernel
   }
 
   @Override
-  public <T extends Query<T>> T query(Class<T> clazz) {
+  @Deprecated
+  public <T extends org.opentcs.access.queries.Query<T>> T query(Class<T> clazz) {
     LOG.debug("method entry");
     return kernelState.query(clazz);
   }
@@ -1303,19 +1389,24 @@ final class StandardKernel
   // Event management methods start here.
   @Override
   @Deprecated
-  public void addEventListener(EventListener<TCSEvent> listener,
-                               org.opentcs.util.eventsystem.EventFilter<TCSEvent> filter) {
+  public void addEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener,
+      org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> filter) {
     LOG.debug("method entry");
     eventHub.addEventListener(listener, filter);
   }
 
   @Override
-  public void addEventListener(EventListener<TCSEvent> listener) {
+  @Deprecated
+  public void addEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener) {
     eventHub.addEventListener(listener);
   }
 
   @Override
-  public void removeEventListener(EventListener<TCSEvent> listener) {
+  @Deprecated
+  public void removeEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener) {
     LOG.debug("method entry");
     eventHub.removeEventListener(listener);
   }
@@ -1332,11 +1423,13 @@ final class StandardKernel
                               State enteredState,
                               boolean transitionFinished) {
     assert enteredState != null;
-    TCSKernelStateEvent event = new TCSKernelStateEvent(leftState,
-                                                        enteredState,
-                                                        transitionFinished);
-    LOG.debug("Emitting kernel state event: " + event);
+    // Keep on emitting the old TCSKernelStateEvent until it is actually removed.
+    @SuppressWarnings("deprecation")
+    org.opentcs.access.TCSKernelStateEvent event
+        = new org.opentcs.access.TCSKernelStateEvent(leftState, enteredState, transitionFinished);
+    LOG.debug("Emitting kernel state event: {}", event);
     eventHub.processEvent(event);
+    eventBus.onEvent(new KernelStateTransitionEvent(leftState, enteredState, transitionFinished));
   }
 
   /**
@@ -1352,12 +1445,18 @@ final class StandardKernel
                               boolean modelContentChanged,
                               boolean transitionFinished) {
     assert enteredModelName != null;
-    TCSModelTransitionEvent event
-        = new TCSModelTransitionEvent(oldModelName,
-                                      enteredModelName,
-                                      modelContentChanged,
-                                      transitionFinished);
-    LOG.debug("Emitting model transition event: " + event);
+    // Keep on emitting the old TCSKernelStateEvent until it is actually removed.
+    @SuppressWarnings("deprecation")
+    org.opentcs.access.TCSModelTransitionEvent event
+        = new org.opentcs.access.TCSModelTransitionEvent(oldModelName,
+                                                         enteredModelName,
+                                                         modelContentChanged,
+                                                         transitionFinished);
+    LOG.debug("Emitting model transition event: {}", event);
     eventHub.processEvent(event);
+    eventBus.onEvent(new ModelTransitionEvent(oldModelName,
+                                              enteredModelName,
+                                              modelContentChanged,
+                                              transitionFinished));
   }
 }

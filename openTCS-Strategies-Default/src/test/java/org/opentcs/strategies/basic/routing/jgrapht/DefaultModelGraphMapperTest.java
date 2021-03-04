@@ -9,10 +9,12 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import org.jgrapht.WeightedGraph;
+import org.jgrapht.Graph;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -33,6 +35,7 @@ public class DefaultModelGraphMapperTest {
   private Path pathCD;
   private Path pathAD;
 
+  private ShortestPathConfiguration configuration;
   private DefaultModelGraphMapper mapper;
 
   @Before
@@ -55,21 +58,26 @@ public class DefaultModelGraphMapperTest {
         .withMaxVelocity(1000)
         .withMaxReverseVelocity(1000);
 
-    mapper = new DefaultModelGraphMapper(new EdgeEvaluatorHops());
+    configuration = mock(ShortestPathConfiguration.class);
+    mapper = new DefaultModelGraphMapper(new EdgeEvaluatorHops(), configuration);
   }
 
   @Test
   public void createEmptyGraph() {
-    WeightedGraph<String, ModelEdge> graph = mapper.translateModel(new HashSet<>(),
-                                                                   new HashSet<>(),
-                                                                   new Vehicle("someVehicle"));
+    when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
+
+    Graph<String, ModelEdge> graph = mapper.translateModel(new HashSet<>(),
+                                                           new HashSet<>(),
+                                                           new Vehicle("someVehicle"));
     assertEquals("Number of vertices", 0, graph.vertexSet().size());
     assertEquals("Number of edges", 0, graph.edgeSet().size());
   }
 
   @Test
   public void createGraphWithFourPointsAndNoPath() {
-    WeightedGraph<String, ModelEdge> graph
+    when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
+
+    Graph<String, ModelEdge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(),
                                 new Vehicle("someVehicle"));
@@ -83,7 +91,9 @@ public class DefaultModelGraphMapperTest {
 
   @Test
   public void createGraphWithFourPointsAndOneUnidirectionalPath() {
-    WeightedGraph<String, ModelEdge> graph
+    when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
+
+    Graph<String, ModelEdge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAB)),
                                 new Vehicle("someVehicle"));
@@ -103,7 +113,9 @@ public class DefaultModelGraphMapperTest {
 
   @Test
   public void createGraphWithFourPointsAndOneBidirectionalPath() {
-    WeightedGraph<String, ModelEdge> graph
+    when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
+
+    Graph<String, ModelEdge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAD)),
                                 new Vehicle("someVehicle"));
@@ -129,7 +141,9 @@ public class DefaultModelGraphMapperTest {
 
   @Test
   public void createGraphWithFourPointsThreeUnidirectionalAndOneBidirectionalPaths() {
-    WeightedGraph<String, ModelEdge> graph
+    when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
+
+    Graph<String, ModelEdge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAB, pathBC, pathCD, pathAD)),
                                 new Vehicle("someVehicle"));

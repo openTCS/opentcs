@@ -11,9 +11,9 @@ import java.util.Iterator;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.jgrapht.WeightedGraph;
+import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -35,9 +35,9 @@ public abstract class AbstractPointRouterFactory
    */
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPointRouterFactory.class);
   /**
-   * The kernel providing the model data.
+   * The object service providing the model data.
    */
-  private final LocalKernel kernel;
+  private final TCSObjectService objectService;
   /**
    * Maps the plant model to a graph.
    */
@@ -46,12 +46,12 @@ public abstract class AbstractPointRouterFactory
   /**
    * Creates a new instance.
    *
-   * @param kernel The kernel providing model data.
+   * @param objectService The object service providing model data.
    * @param mapper Maps the plant model to a graph.
    */
-  public AbstractPointRouterFactory(@Nonnull LocalKernel kernel,
+  public AbstractPointRouterFactory(@Nonnull TCSObjectService objectService,
                                     @Nonnull ModelGraphMapper mapper) {
-    this.kernel = requireNonNull(kernel, "kernel");
+    this.objectService = requireNonNull(objectService, "objectService");
     this.mapper = requireNonNull(mapper, "mapper");
   }
 
@@ -61,10 +61,10 @@ public abstract class AbstractPointRouterFactory
 
     long timeStampBefore = System.currentTimeMillis();
 
-    Set<Point> points = kernel.getTCSObjects(Point.class);
-    WeightedGraph<String, ModelEdge> graph = mapper.translateModel(points,
-                                                                   kernel.getTCSObjects(Path.class),
-                                                                   vehicle);
+    Set<Point> points = objectService.fetchObjects(Point.class);
+    Graph<String, ModelEdge> graph = mapper.translateModel(points,
+                                                           objectService.fetchObjects(Path.class),
+                                                           vehicle);
 
     PointRouter router = new ShortestPathPointRouter(createShortestPathAlgorithm(graph), points);
     // Make a single request for a route from one point to a different one to make sure the
@@ -88,5 +88,5 @@ public abstract class AbstractPointRouterFactory
    * @return A shortest path algorithm implementation working on the given graph.
    */
   protected abstract ShortestPathAlgorithm<String, ModelEdge> createShortestPathAlgorithm(
-      WeightedGraph<String, ModelEdge> graph);
+      Graph<String, ModelEdge> graph);
 }

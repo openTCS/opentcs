@@ -69,7 +69,6 @@ import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.AbstractFigure;
 import org.jhotdraw.draw.AttributeKey;
 import static org.jhotdraw.draw.AttributeKeys.CANVAS_FILL_COLOR;
@@ -136,6 +135,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +147,8 @@ public abstract class OpenTCSDrawingView
     extends JComponent
     implements DrawingView,
                EditableComponent,
-               PropertyChangeListener {
+               PropertyChangeListener,
+               EventHandler {
 
   public static final String FOCUS_GAINED = "focusGained";
   /**
@@ -386,8 +387,14 @@ public abstract class OpenTCSDrawingView
     super.processKeyEvent(e);
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
+    }
+  }
+
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
     switch (evt.getStage()) {
       case UNLOADING:
         removeAll();

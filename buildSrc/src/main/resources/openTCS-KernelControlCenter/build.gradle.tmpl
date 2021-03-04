@@ -1,0 +1,61 @@
+apply from: "${rootDir}/gradle/application-guice.gradle"
+
+if (!hasProperty('mainClass')) {
+  ext.mainClass = 'org.opentcs.kernelcontrolcenter.RunKernelControlCenter'
+}
+mainClassName = ext.mainClass
+
+ext.collectableDistDir = new File(buildDir, 'install')
+
+configurations {
+  kernelcontrolcenterJar
+}
+
+dependencies {
+  compile project(':openTCS-%PROJECT_NAME%-CommAdapter-Vehicle')
+  
+  compile group: 'org.opentcs', name: 'opentcs-kernelcontrolcenter', version: openTcsBaselineVersion
+  compileOnly group: 'org.opentcs', name: 'opentcs-kernelcontrolcenter', version: openTcsBaselineVersion, classifier: 'sources'
+  kernelcontrolcenterJar group: 'org.opentcs', name: 'opentcs-kernelcontrolcenter', version: openTcsBaselineVersion, ext: 'jar'
+}
+
+distributions {
+  main {
+    contents {
+      from (zipTree(configurations.kernelcontrolcenterJar.singleFile)) {
+        include 'org/opentcs/kernelcontrolcenter/distribution/**'
+          
+        eachFile { file ->
+          // Remove the top-level folders. We only want the content of '/distribution'
+          file.path = file.path.replaceFirst("(.*)/distribution", "")
+        }
+          
+        includeEmptyDirs false
+      }
+      from "${sourceSets.main.resources.srcDirs[0]}/de/fraunhofer/iml/opentcs/bmw_str/kernelcontrolcenter/distribution"
+    }
+  }
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:-rawtypes"
+}
+
+// For now, we're using hand-crafted start scripts, so disable the application
+// plugin's start script generation.
+startScripts.enabled = false
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+run {
+  systemProperties(['java.util.logging.config.file':'./config/logging.config',\
+                    'java.security.policy':'file:./config/java.policy',\
+                    'sun.java2d.d3d':'false',\
+                    'opentcs.base':'.',\
+                    'opentcs.home':'.'])
+  jvmArgs('-XX:-OmitStackTraceInFastThrow',\
+          '-splash:bin/splash-image.gif')
+}

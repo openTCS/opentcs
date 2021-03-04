@@ -34,7 +34,6 @@ public class LocationTypeModel
    * Creates a new instance.
    */
   public LocationTypeModel() {
-    super();
     createProperties();
   }
 
@@ -48,6 +47,18 @@ public class LocationTypeModel
     String treeViewName = getDescription() + " " + getName();
 
     return treeViewName;
+  }
+  
+  public StringSetProperty getPropertyAllowedOperations() {
+    return (StringSetProperty) getProperty(ALLOWED_OPERATIONS);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+  
+  public SymbolProperty getPropertyDefaultRepresentation() {
+    return (SymbolProperty) getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
   }
 
   private void createProperties() {

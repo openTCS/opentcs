@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +21,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual event implementation.
+ * @deprecated For event handling, use classes in <code>org.opentcs.util.event</code> instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class AsynchronousEventHub<E extends Event>
     extends EventHub<E> {
 
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(SynchronousEventHub.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AsynchronousEventHub.class);
   /**
    * The received events, in chronological order.
    */

@@ -570,7 +570,14 @@ public class OrderSequence
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public OrderSequence clone() {
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),

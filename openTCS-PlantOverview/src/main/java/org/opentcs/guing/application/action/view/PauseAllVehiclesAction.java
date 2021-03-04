@@ -12,10 +12,10 @@ import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.ModelManager;
@@ -46,9 +46,9 @@ public class PauseAllVehiclesAction
    */
   private final ModelManager modelManager;
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * Whether the vehicles are currently paused or not.
    */
@@ -58,39 +58,39 @@ public class PauseAllVehiclesAction
    * Creates a new instance.
    *
    * @param modelManager Provides the current system model.
-   * @param kernelProvider Provides access to a kernel.
+   * @param portalProvider Provides access to a portal.
    */
   @Inject
   public PauseAllVehiclesAction(ModelManager modelManager,
-                                SharedKernelProvider kernelProvider) {
+                                SharedKernelServicePortalProvider portalProvider) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    try (SharedKernelClient kernelClient = kernelProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       paused = !paused;
-      setVehicleSpeedMultiplier(paused ? 0 : 100, kernelClient.getKernel());
+      setVehicleSpeedMultiplier(paused ? 0 : 100, sharedPortal.getPortal());
     }
-    catch (KernelUnavailableException exc) {
+    catch (ServiceUnavailableException exc) {
       LOG.warn("Could not connect to kernel", exc);
     }
   }
 
-  private void setVehicleSpeedMultiplier(int speed, Kernel kernel) {
-    if (kernel == null) {
+  private void setVehicleSpeedMultiplier(int speed, KernelServicePortal portal) {
+    if (portal == null) {
       return;
     }
     LOG.debug("Limiting to {}", speed);
     ModelComponent folder
         = modelManager.getModel().getMainFolder(SystemModel.FolderKey.VEHICLES);
 
-    if (kernelProvider.kernelShared()) {
+    if (portalProvider.portalShared()) {
       for (ModelComponent component : folder.getChildComponents()) {
         VehicleModel vModel = (VehicleModel) component;
-        kernel.sendCommAdapterMessage(vModel.getVehicle().getReference(),
-                                      new SetSpeedMultiplier(speed));
+        portal.getVehicleService().sendCommAdapterMessage(vModel.getVehicle().getReference(),
+                                                          new SetSpeedMultiplier(speed));
       }
     }
   }

@@ -11,3 +11,7 @@
 /openTCS-Common/build/
 /openTCS-API-Injection/build/
 /openTCS-API-Base/build/
+/buildSrc/build/
+/buildSrc/.gradle/
+/openTCS-KernelControlCenter/.nb-gradle/
+/openTCS-KernelControlCenter/build/

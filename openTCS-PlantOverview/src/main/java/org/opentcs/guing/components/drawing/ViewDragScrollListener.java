@@ -24,9 +24,13 @@ import javax.swing.JToggleButton;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.Figure;
+import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.application.StatusPanel;
+import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
-import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.drawing.figures.PathConnection;
+import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
+import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.util.Cursors;
@@ -59,6 +63,14 @@ public class ViewDragScrollListener
    */
   private final JToggleButton dragTool;
   /**
+   * The button for creating a link.
+   */
+  private final JToggleButton linkCreationTool;
+  /**
+   * The button for creating a path.
+   */
+  private final JPopupButton pathCreationTool;
+  /**
    * The status panel to display the current mouse position in.
    */
   private final StatusPanel statusPanel;
@@ -87,6 +99,10 @@ public class ViewDragScrollListener
    * End coordinate for measuring.
    */
   private final Point2D.Double fMouseEndPoint = new Point2D.Double();
+  /**
+   * The figure a user may have pressed on / want to drag.
+   */
+  private Figure pressedFigure;
 
   /**
    * Creates a new instance.
@@ -95,21 +111,25 @@ public class ViewDragScrollListener
    * @param zoomComboBox The combo box for selecting the zoom level.
    * @param selectionTool The button for enabling object selection.
    * @param dragTool The button for enabling dragging.
-   * @param statusPanel The status panel to display the current mouse position
-   * in.
-   * @param modelManager The manager keeping/providing the currently loaded
-   * model.
+   * @param linkCreationTool The button for creating a link.
+   * @param pathCreationTool The button for creating a path.
+   * @param statusPanel The status panel to display the current mouse position in.
+   * @param modelManager The manager keeping/providing the currently loaded model.
    */
   public ViewDragScrollListener(DrawingViewScrollPane scrollPane,
                                 JComboBox<ZoomItem> zoomComboBox,
                                 JToggleButton selectionTool,
                                 JToggleButton dragTool,
+                                JToggleButton linkCreationTool,
+                                JPopupButton pathCreationTool,
                                 StatusPanel statusPanel,
                                 ModelManager modelManager) {
     this.scrollPane = requireNonNull(scrollPane, "scrollPane");
     this.zoomComboBox = requireNonNull(zoomComboBox, "zoomComboBox");
     this.selectionTool = requireNonNull(selectionTool, "selectionTool");
     this.dragTool = requireNonNull(dragTool, "dragTool");
+    this.linkCreationTool = requireNonNull(linkCreationTool, "linkCreationTool");
+    this.pathCreationTool = requireNonNull(pathCreationTool, "pathCreationTool");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.defaultCursor = scrollPane.getDrawingView().getCursor();
@@ -128,32 +148,29 @@ public class ViewDragScrollListener
 
     final JViewport viewport = (JViewport) drawingView.getParent();
     Point cp = SwingUtilities.convertPoint(drawingView, evt.getPoint(), viewport);
-    int dx = startPoint.x - cp.x;
-    int dy = startPoint.y - cp.y;
-    Point vp = viewport.getViewPosition();
-    vp.translate(dx, dy);
+
     if (dragTool.isSelected()) {
+      int dx = startPoint.x - cp.x;
+      int dy = startPoint.y - cp.y;
+      Point vp = viewport.getViewPosition();
+      vp.translate(dx, dy);
       drawingView.scrollRectToVisible(new Rectangle(vp, viewport.getSize()));
     }
-    else {
+    else if (linkCreationTool.isSelected() || pathCreationTool.isSelected()) {
       viewport.revalidate();
-      Figure figure = drawingView.findFigure(evt.getPoint());
-      if (figure != null) {
-        int x;
-        int y;
-        if (dx < 0) {
-          x = evt.getX() + (int) figure.getDrawingArea().width;
+      // Start scrolling as soon as the mouse is hitting the view bounds.
+      drawingView.scrollRectToVisible(new Rectangle(evt.getX(), evt.getY(), 1, 1));
+    }
+    else { // The selection tool is selected
+      viewport.revalidate();
+
+      if (isMovableFigure(pressedFigure)) {
+        if (!isFigureCompletelyInView(pressedFigure, viewport, drawingView)) {
+          // If the figure exceeds the current view, start scrolling as soon as the mouse is 
+          // hitting the view bounds.
+          drawingView.scrollRectToVisible(new Rectangle(evt.getX(), evt.getY(), 1, 1));
         }
-        else {
-          x = evt.getX() - (int) figure.getDrawingArea().width;
-        }
-        if (dy < 0) {
-          y = evt.getY() + (int) figure.getDrawingArea().height;
-        }
-        else {
-          y = evt.getY() - (int) figure.getDrawingArea().height;
-        }
-        drawingView.scrollRectToVisible(new Rectangle(x, y, 1, 1));
+
         fMouseCurrentPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));
         showPositionStatus(false);
         startPoint.setLocation(cp);
@@ -169,6 +186,27 @@ public class ViewDragScrollListener
     });
   }
 
+  private boolean isMovableFigure(Figure figure) {
+    return (figure instanceof LabeledPointFigure)
+        || (figure instanceof LabeledLocationFigure)
+        || ((figure instanceof PathConnection)
+            && (((PathConnection) figure).getLiner() instanceof TupelBezierLiner))
+        || ((figure instanceof PathConnection)
+            && (((PathConnection) figure).getLiner() instanceof TripleBezierLiner));
+  }
+
+  private boolean isFigureCompletelyInView(Figure figure,
+                                           JViewport viewport,
+                                           OpenTCSDrawingView drawingView) {
+    Rectangle viewPortBounds = viewport.getViewRect();
+    Rectangle figureBounds = drawingView.drawingToView(figure.getDrawingArea());
+
+    return (figureBounds.getMinX() > viewPortBounds.getMinX())
+        && (figureBounds.getMinY() > viewPortBounds.getMinY())
+        && (figureBounds.getMaxX() < viewPortBounds.getMaxX())
+        && (figureBounds.getMaxY() < viewPortBounds.getMaxY());
+  }
+
   @Override
   public void mousePressed(MouseEvent evt) {
     final OpenTCSDrawingView drawingView = scrollPane.getDrawingView();
@@ -181,6 +219,7 @@ public class ViewDragScrollListener
       Point cp = SwingUtilities.convertPoint(drawingView, evt.getPoint(), viewPort);
       startPoint.setLocation(cp);
     }
+    pressedFigure = drawingView.findFigure(evt.getPoint());
     fMouseCurrentPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));
     fMouseStartPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));
     showPositionStatus(false);
@@ -197,6 +236,7 @@ public class ViewDragScrollListener
     if (fig instanceof LabeledPointFigure) {
       drawingView.createPossibleTransportOrder(fig);
     }
+    pressedFigure = null;
     fMouseEndPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));
     if (evt.getButton() != 2) {
       showPositionStatus(true);
@@ -307,14 +347,10 @@ public class ViewDragScrollListener
       List<LayoutModel> layouts = modelManager.getModel().getLayoutModels();
 
       if (!layouts.isEmpty()) {
-        LayoutModel layout = layouts.iterator().next();
+        LayoutModel layout = layouts.get(0);
 
-        LengthProperty lpx
-            = (LengthProperty) layout.getProperty(LayoutModel.SCALE_X);
-        LengthProperty lpy
-            = (LengthProperty) layout.getProperty(LayoutModel.SCALE_Y);
-        double scaleX = (double) lpx.getValue();
-        double scaleY = (double) lpy.getValue();
+        double scaleX = (double) layout.getPropertyScaleX().getValue();
+        double scaleY = (double) layout.getPropertyScaleY().getValue();
         double xmm = x * scaleX;
         double ymm = y * scaleY;
         statusPanel.setPositionText(

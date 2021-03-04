@@ -8,6 +8,7 @@
 package org.opentcs.guing.components.properties.type;
 
 import com.google.inject.Inject;
+import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,6 +24,7 @@ public class MergedPropertySuggestions
 
   private final Set<String> keySuggestions = new TreeSet<>();
   private final Set<String> valueSuggestions = new TreeSet<>();
+  private final Set<PropertySuggestions> propertySuggestions;
 
   /**
    * Creates a new instance, merging the keys/values of the given suggestions sets.
@@ -31,8 +33,7 @@ public class MergedPropertySuggestions
    */
   @Inject
   public MergedPropertySuggestions(Set<PropertySuggestions> propertySuggestions) {
-    requireNonNull(propertySuggestions, "propertySuggestors");
-
+    this.propertySuggestions = requireNonNull(propertySuggestions, "propertySuggestors");
     for (PropertySuggestions suggestor : propertySuggestions) {
       keySuggestions.addAll(suggestor.getKeySuggestions());
       valueSuggestions.addAll(suggestor.getValueSuggestions());
@@ -48,5 +49,16 @@ public class MergedPropertySuggestions
   public Set<String> getValueSuggestions() {
     return valueSuggestions;
   }
-
+  
+  @Override
+  public Set<String> getValueSuggestionsFor(String key){
+    Set<String> mergedCustomSuggestions = new HashSet<>();
+    for(PropertySuggestions suggestor : propertySuggestions){
+      Set<String> currentSuggestion = suggestor.getValueSuggestionsFor(key);
+      if(currentSuggestion!=null){
+        mergedCustomSuggestions.addAll(currentSuggestion);
+      }
+    }
+    return mergedCustomSuggestions;
+  }
 }

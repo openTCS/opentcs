@@ -10,7 +10,6 @@ package org.opentcs.guing.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
@@ -22,116 +21,79 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * A utility class for handling of process adapters.
+ * A utility class providing process adapters.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class ProcessAdapterUtil {
 
-  /**
-   * This class' logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(ProcessAdapterUtil.class);
-  /**
-   * A factory for process adapters.
-   */
-  private final ProcessAdapterFactory procAdapterFactory;
+  private final BlockAdapter blockAdapter;
+  private final GroupAdapter groupAdapter;
+  private final LayoutAdapter layoutAdapter;
+  private final LinkAdapter linkAdapter;
+  private final LocationAdapter locationAdapter;
+  private final LocationTypeAdapter locationTypeAdapter;
+  private final PathAdapter pathAdapter;
+  private final PointAdapter pointAdapter;
+  private final StaticRouteAdapter staticRouteAdapter;
+  private final VehicleAdapter vehicleAdapter;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param procAdapterFactory A factory for process adapters.
-   */
   @Inject
-  public ProcessAdapterUtil(ProcessAdapterFactory procAdapterFactory) {
-    this.procAdapterFactory = requireNonNull(procAdapterFactory,
-                                             "procAdapterFactory");
+  public ProcessAdapterUtil(BlockAdapter blockAdapter,
+                            GroupAdapter groupAdapter,
+                            LayoutAdapter layoutAdapter,
+                            LinkAdapter linkAdapter,
+                            LocationAdapter locationAdapter,
+                            LocationTypeAdapter locationTypeAdapter,
+                            PathAdapter pathAdapter,
+                            PointAdapter pointAdapter,
+                            StaticRouteAdapter staticRouteAdapter,
+                            VehicleAdapter vehicleAdapter) {
+    this.blockAdapter = requireNonNull(blockAdapter, "blockAdapter");
+    this.groupAdapter = requireNonNull(groupAdapter, "groupAdapter");
+    this.layoutAdapter = requireNonNull(layoutAdapter, "layoutAdapter");
+    this.linkAdapter = requireNonNull(linkAdapter, "linkAdapter");
+    this.locationAdapter = requireNonNull(locationAdapter, "locationAdapter");
+    this.locationTypeAdapter = requireNonNull(locationTypeAdapter, "locationTypeAdapter");
+    this.pathAdapter = requireNonNull(pathAdapter, "pathAdapter");
+    this.pointAdapter = requireNonNull(pointAdapter, "pointAdapter");
+    this.staticRouteAdapter = requireNonNull(staticRouteAdapter, "staticRouteAdapter");
+    this.vehicleAdapter = requireNonNull(vehicleAdapter, "vehicleAdapter");
   }
 
-  /**
-   * Creates a new process adapter for the given model component and registers
-   * it with the given event dispatcher.
-   *
-   * @param model The model component.
-   * @param dispatcher The event dispatcher.
-   */
-  public void createProcessAdapter(ModelComponent model,
-                                   EventDispatcher dispatcher) {
-    requireNonNull(model, "model");
-    requireNonNull(dispatcher, "dispatcher");
-
-    if (dispatcher.findProcessAdapter(model) != null) {
-      LOG.warn("There is already a process adapter for model {}", model.getName());
-    }
-
-    ProcessAdapter adapter = basicCreateProcessAdapter(model, dispatcher);
-    dispatcher.addProcessAdapter(adapter);
-  }
-
-  /**
-   * Removes the process adapter of the given model component.
-   *
-   * @param model The model component.
-   * @param dispatcher The event dispatcher.
-   */
-  public void removeProcessAdapter(ModelComponent model,
-                                   EventDispatcher dispatcher) {
-    requireNonNull(model, "model");
-    requireNonNull(dispatcher, "dispatcher");
-
-    ProcessAdapter adapter = dispatcher.findProcessAdapter(model);
-
-    if (adapter != null) {
-      dispatcher.removeProcessAdapter(adapter);
-    }
-  }
-
-  private ProcessAdapter basicCreateProcessAdapter(
-      ModelComponent model, EventDispatcher dispatcher) {
+  public ProcessAdapter processAdapterFor(ModelComponent model) {
 
     if (model instanceof PointModel) {
-      return procAdapterFactory.createPointAdapter((PointModel) model,
-                                                   dispatcher);
+      return pointAdapter;
     }
     else if (model instanceof PathModel) {
-      return procAdapterFactory.createPathAdapter((PathModel) model,
-                                                  dispatcher);
+      return pathAdapter;
     }
     else if (model instanceof LocationTypeModel) {
-      return procAdapterFactory.createLocTypeAdapter((LocationTypeModel) model,
-                                                     dispatcher);
+      return locationTypeAdapter;
     }
     else if (model instanceof LocationModel) {
-      return procAdapterFactory.createLocationAdapter((LocationModel) model,
-                                                      dispatcher);
+      return locationAdapter;
     }
     else if (model instanceof StaticRouteModel) {
-      return procAdapterFactory.createStaticRouteAdapter((StaticRouteModel) model,
-                                                         dispatcher);
+      return staticRouteAdapter;
     }
     else if (model instanceof BlockModel) {
-      return procAdapterFactory.createBlockAdapter((BlockModel) model,
-                                                   dispatcher);
+      return blockAdapter;
     }
     else if (model instanceof GroupModel) {
-      return procAdapterFactory.createGroupAdapter((GroupModel) model,
-                                                   dispatcher);
+      return groupAdapter;
     }
     else if (model instanceof VehicleModel) {
-      return procAdapterFactory.createVehicleAdapter((VehicleModel) model,
-                                                     dispatcher);
+      return vehicleAdapter;
     }
     else if (model instanceof LinkModel) {
-      return procAdapterFactory.createLinkAdapter((LinkModel) model,
-                                                  dispatcher);
+      return linkAdapter;
     }
     else if (model instanceof LayoutModel) {
-      return procAdapterFactory.createLayoutAdapter((LayoutModel) model,
-                                                    dispatcher);
+      return layoutAdapter;
     }
     else {
       // Just in case the set of model classes ever changes.

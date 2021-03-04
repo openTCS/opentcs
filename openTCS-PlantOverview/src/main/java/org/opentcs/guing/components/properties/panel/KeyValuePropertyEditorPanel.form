@@ -59,8 +59,11 @@
           <Connection code="&quot;tenletters&quot;" type="code"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="keyValueChangedListener"/>
+      </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new WideComboBox&lt;&gt;(propertySuggestions.getKeySuggestions().toArray(new String[propertySuggestions.getKeySuggestions().size()]))"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JComboBox&lt;&gt;(propertySuggestions.getKeySuggestions().toArray(new String[propertySuggestions.getKeySuggestions().size()]))"/>
         <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="KeyValuePropertyEditorPanel_keyComboBox"/>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
@@ -81,7 +84,7 @@
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new WideComboBox&lt;&gt;(propertySuggestions.getValueSuggestions().toArray(new String[propertySuggestions.getValueSuggestions().size()]))"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JComboBox&lt;&gt;(propertySuggestions.getValueSuggestions().toArray(new String[propertySuggestions.getValueSuggestions().size()]))"/>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
       <Constraints>

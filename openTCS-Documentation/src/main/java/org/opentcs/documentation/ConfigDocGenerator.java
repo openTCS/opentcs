@@ -53,7 +53,7 @@ public class ConfigDocGenerator {
       Class<?> clazz = ConfigDocGenerator.class.getClassLoader().loadClass(args[1]);
 
       checkArgument(clazz.isAnnotationPresent(ConfigurationPrefix.class),
-                    "Missing prefix annotation in {}.",
+                    "Missing prefix annotation in %s.",
                     clazz.getName());
 
       SortedSet<Entry> configurationEntries = new TreeSet<>();

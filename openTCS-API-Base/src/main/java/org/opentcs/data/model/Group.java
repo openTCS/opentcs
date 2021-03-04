@@ -143,7 +143,14 @@ public class Group
     return members.contains(chkMember);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Group clone() {
     return new Group(getIdWithoutDeprecationWarning(), getName(), getProperties(), members);
   }

@@ -1,0 +1,44 @@
+/**
+ * Copyright (c) 2016 Fraunhofer IML
+ */
+package de.fraunhofer.iml.opentcs.%PACKAGE_NAME%.vehicle;
+
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+
+/**
+ *
+ * @author 
+ */
+public class CommAdapterFactory
+    implements VehicleCommAdapterFactory {
+
+  @Override
+  public String getAdapterDescription() {
+    return "CommAdapter";
+  }
+
+  @Override
+  public boolean providesAdapterFor(Vehicle vehicle) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public VehicleCommAdapter getAdapterFor(Vehicle vehicle) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public void initialize() {
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return false;
+  }
+
+  @Override
+  public void terminate() {
+  }
+}

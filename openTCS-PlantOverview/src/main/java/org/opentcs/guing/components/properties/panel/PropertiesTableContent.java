@@ -25,7 +25,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.CannotUndoException;
-import net.engio.mbassy.bus.MBassador;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.components.dialogs.DetailsDialog;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
@@ -65,6 +65,7 @@ import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.opentcs.util.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +86,7 @@ public class PropertiesTableContent
   /**
    * This class's logger.
    */
-  private static final Logger logger
-      = LoggerFactory.getLogger(PropertiesTableContent.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PropertiesTableContent.class);
   /**
    * A factory for cell editors.
    */
@@ -98,7 +98,7 @@ public class PropertiesTableContent
   /**
    * The application's event bus.
    */
-  private final MBassador<Object> eventBus;
+  private final EventBus eventBus;
   /**
    * A parent for dialogs created by this instance.
    */
@@ -117,7 +117,7 @@ public class PropertiesTableContent
   public PropertiesTableContent(CellEditorFactory cellEditorFactory,
                                 Provider<AttributesTable> tableProvider,
                                 Provider<AttributesTableModel> tableModelProvider,
-                                MBassador<Object> eventBus,
+                                @ApplicationEventBus EventBus eventBus,
                                 @Assisted JPanel dialogParent) {
     super(tableProvider);
     this.cellEditorFactory = requireNonNull(cellEditorFactory,
@@ -140,7 +140,7 @@ public class PropertiesTableContent
 
     if (fModel instanceof PropertiesCollection) {
       fModel.propertiesChanged(this);
-      eventBus.publish(new ResetInteractionToolCommand(this));
+      eventBus.onEvent(new ResetInteractionToolCommand(this));
       // updates some values required by PropertiesCollection
       setModel(fModel);
     }
@@ -153,12 +153,12 @@ public class PropertiesTableContent
           }
         }
         catch (CannotUndoException ex) {
-          logger.warn("Exception trying to undo", ex);
+          LOG.warn("Exception trying to undo", ex);
         }
       }
       // 2013-11-04 HH: Alle ï¿½nderungen im Modell speichern, nicht nur den Namen!
       fModel.propertiesChanged(this);
-      eventBus.publish(new ResetInteractionToolCommand(this));
+      eventBus.onEvent(new ResetInteractionToolCommand(this));
     }
   }
 

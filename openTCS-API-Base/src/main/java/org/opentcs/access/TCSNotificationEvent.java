@@ -10,15 +10,18 @@ package org.opentcs.access;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Instances of this class represent events emitted by/for notifications being published.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link NotificationPublicationEvent} instead, which does not extend TCSEvent.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class TCSNotificationEvent
-    extends TCSEvent
+    extends org.opentcs.util.eventsystem.TCSEvent
     implements Serializable {
 
   /**

@@ -46,6 +46,18 @@ The shortest path algorithm can be configured using the following configuration 
 
 include::{configdoc}/ShortestPathConfigurationEntries.adoc[]
 
+==== Admin web API configuration entries
+
+The kernel's admin web API can be configured using the following configuration entries:
+
+include::{configdoc}/AdminWebApiConfigurationEntries.adoc[]
+
+==== Service web API configuration entries
+
+The kernel's service web API can be configured using the following configuration entries:
+
+include::{configdoc}/ServiceWebApiConfigurationEntries.adoc[]
+
 ==== RMI kernel interface configuration entries
 
 The kernel's RMI interface can be configured using the following configuration entries:
@@ -58,11 +70,28 @@ The kernel's XML-based host interface can be configured using the following conf
 
 include::{configdoc}/XMLHostInterfaceConfigurationEntries.adoc[]
 
+==== Statistics collector configuration entries
+
+The kernel's statistics collector can be configured using the following configuration entries:
+
+include::{configdoc}/StatisticsCollectorConfigurationEntries.adoc[]
+
 ==== Virtual vehicle configuration entries
 
 The virtual vehicle (loopback communication adapter) can be configured using the following configuration entries:
 
 include::{configdoc}/VirtualVehicleConfigurationEntries.adoc[]
+
+=== Kernel Control Center configuration
+
+The kernel control center application reads its configuration data from two files -- `config/opentcs-kernelcontrolcenter-defaults-baseline.properties` and `config/opentcs-kernelcontrolcenter.properties`.
+It is good practice to leave the first one untouched and set overriding values and project-specific configuration data in the second one.
+
+==== Kernel Control Center application configuration entries
+
+The kernel control center application itself can be configured using the following configuration entries:
+
+include::{configdoc}/KernelControlCenterApplicationConfigurationEntries.adoc[]
 
 === Plant Overview configuration
 

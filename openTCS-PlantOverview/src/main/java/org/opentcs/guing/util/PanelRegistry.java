@@ -13,7 +13,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
-import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +35,12 @@ public class PanelRegistry {
 
   /**
    * Creates a new instance.
-   *
-   * @param kernelProvider The shared kernel provider to be used.
+   * 
    * @param factories The factories.
    */
   @Inject
   @SuppressWarnings("deprecation")
-  public PanelRegistry(SharedKernelProvider kernelProvider, Set<PluggablePanelFactory> factories) {
-    requireNonNull(kernelProvider, "kernelProvider");
+  public PanelRegistry(Set<PluggablePanelFactory> factories) {
     requireNonNull(factories, "factories");
 
     // Auto-detect generic client panel factories.

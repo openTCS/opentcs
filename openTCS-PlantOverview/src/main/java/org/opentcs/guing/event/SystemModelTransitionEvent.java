@@ -46,6 +46,14 @@ public class SystemModelTransitionEvent
     return stage;
   }
 
+  @Override
+  public String toString() {
+    return "SystemModelTransitionEvent{" 
+        + "stage=" + stage 
+        + ", source=" + getSource()
+        + '}';
+  }
+
   public static enum Stage {
 
     /**

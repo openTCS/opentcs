@@ -9,33 +9,24 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
-import org.opentcs.guing.components.properties.type.AbstractProperty;
-import org.opentcs.guing.components.properties.type.BooleanProperty;
-import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.elements.AbstractConnection;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,143 +44,100 @@ public class PathAdapter
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(PathAdapter.class);
-  /**
-   * Handles path lock updates.
-   */
-  private final PathLockAdapter pathLockAdapter;
-
-  /**
-   * Creates a new instance.
-   *
-   * @param kernelProvider A kernel provider.
-   * @param applicationState The plant overviews mode.
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public PathAdapter(SharedKernelProvider kernelProvider,
-                     ApplicationState applicationState,
-                     @Assisted PathModel model,
-                     @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
-    this.pathLockAdapter = new PathLockAdapter(kernelProvider, applicationState, model);
-  }
 
   @Override
-  public PathModel getModel() {
-    return (PathModel) super.getModel();
-  }
-
-  @Override
-  public void register() {
-    super.register();
-    getModel().addAttributesChangeListener(pathLockAdapter);
-  }
-
-  @Override
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
                                     @Nullable ModelLayoutElement layoutElement) {
     Path path = requireNonNull((Path) tcsObject, "tcsObject");
+    PathModel model = (PathModel) modelComponent;
 
-    // NAME: Name of the path
-    StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    pName.setText(path.getName());
-    // LENGTH: Length in [mm]
-    LengthProperty pLength = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
-    pLength.setValueAndUnit(path.getLength(), LengthProperty.Unit.MM);
-    // ROUTING_COST:
-    IntegerProperty pCost = (IntegerProperty) getModel().getProperty(PathModel.ROUTING_COST);
-    pCost.setValue((int) path.getRoutingCost());
-    // MAX_VELOCITY: Maximum forward speed in [m/s]
-    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
-    pSpeed.setValueAndUnit(path.getMaxVelocity() * 0.001, SpeedProperty.Unit.M_S);
-    // MAX_REVERSE_VELOCITY: Maximum backward speed in [m/s]
-    pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
-    pSpeed.setValueAndUnit(path.getMaxReverseVelocity() * 0.001, SpeedProperty.Unit.M_S);
-    // LOCKED: Is the path locked?
-    BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
-    pLocked.setValue(path.isLocked());
-    // MISCELLANEOUS:
-    updateMiscModelProperties(path);
+    model.getPropertyName().setText(path.getName());
+    model.getPropertyStartComponent().setText(path.getSourcePoint().getName());
+    model.getPropertyEndComponent().setText(path.getDestinationPoint().getName());
+    model.getPropertyLength().setValueAndUnit(path.getLength(), LengthProperty.Unit.MM);
+    model.getPropertyRoutingCost().setValue((int) path.getRoutingCost());
+    model.getPropertyMaxVelocity().setValueAndUnit(path.getMaxVelocity(),
+                                                   SpeedProperty.Unit.MM_S);
+    model.getPropertyMaxReverseVelocity().setValueAndUnit(path.getMaxReverseVelocity(),
+                                                          SpeedProperty.Unit.MM_S);
+    model.getPropertyLocked().setValue(path.isLocked());
+    updateMiscModelProperties(model, path);
     if (layoutElement != null) {
-      updateModelLayoutProperties(layoutElement);
+      updateModelLayoutProperties(model, layoutElement);
     }
-    getModel().propertiesChanged(getModel());
+    model.propertiesChanged(model);
   }
 
   @Override
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    ModelComponent srcPoint = getModel().getStartComponent();
-    ModelComponent dstPoint = getModel().getEndComponent();
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    PathModel pathModel = (PathModel) modelComponent;
+    ModelComponent srcPoint = pathModel.getStartComponent();
+    ModelComponent dstPoint = pathModel.getEndComponent();
 
-    LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.", getModel().getName(), srcPoint, dstPoint);
+    LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.", pathModel.getName(), srcPoint, dstPoint);
 
-    plantModel.getPaths().add(
-        new PathCreationTO(getModel().getName(), srcPoint.getName(), dstPoint.getName())
-            .setLength(getLength())
-            .setMaxVelocity(getMaxVelocity())
-            .setMaxReverseVelocity(getMaxReverseVelocity())
-            .setRoutingCost(getRoutingCost())
-            .setProperties(getKernelProperties())
-            .setLocked(getLocked()));
+    PlantModelCreationTO result = plantModel
+        .withPath(
+            new PathCreationTO(pathModel.getName(), srcPoint.getName(), dstPoint.getName())
+                .withLength(getLength(pathModel))
+                .withMaxVelocity(getMaxVelocity(pathModel))
+                .withMaxReverseVelocity(getMaxReverseVelocity(pathModel))
+                .withRoutingCost(getRoutingCost(pathModel))
+                .withProperties(getKernelProperties(pathModel))
+                .withLocked(getLocked(pathModel))
+        )
+        .withVisualLayouts(updatedLayouts(pathModel, plantModel.getVisualLayouts()));
 
-    // Write liner type and position of the control points into the model layout element
-    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-      updateLayoutElement(layout);
-    }
+    unmarkAllPropertiesChanged(pathModel);
 
-    unmarkAllPropertiesChanged();
+    return result;
   }
 
-  private void updateModelLayoutProperties(ModelLayoutElement layoutElement) {
+  private void updateModelLayoutProperties(PathModel model, ModelLayoutElement layoutElement) {
     Map<String, String> properties = layoutElement.getProperties();
 
     // PATH_CONN_TYPE: DIRECT, BEZIER, ...
-    AbstractProperty pConnectionType
-        = (AbstractProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
     String sConnectionType = properties.get(ElementPropKeys.PATH_CONN_TYPE);
-
     if (sConnectionType != null) {
-      pConnectionType.setValue(sConnectionType);
+      model.getPropertyPathConnType()
+          .setValue(PathModel.LinerType.valueOfNormalized(sConnectionType));
     }
 
     // PATH_CONTROL_POINTS: Only when PATH_CONN_TYPE BEZIER
-    StringProperty pControlPoints
-        = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     String sControlPoints = properties.get(ElementPropKeys.PATH_CONTROL_POINTS);
-
     if (sControlPoints != null) {
-      pControlPoints.setText(sControlPoints);
+      model.getPropertyPathControlPoints().setText(sControlPoints);
     }
   }
 
-  private boolean getLocked() {
-    BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
-
-    if (pLocked.getValue() instanceof Boolean) {
-      return (boolean) pLocked.getValue();
+  private boolean getLocked(PathModel model) {
+    if (model.getPropertyLocked().getValue() instanceof Boolean) {
+      return (boolean) model.getPropertyLocked().getValue();
     }
     return false;
   }
 
-  private int getMaxVelocity() {
-    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
-    return (int) Math.abs(pSpeed.getValueByUnit(SpeedProperty.Unit.MM_S));
+  private int getMaxVelocity(PathModel model) {
+    return (int) Math.abs(model.getPropertyMaxVelocity()
+        .getValueByUnit(SpeedProperty.Unit.MM_S));
   }
 
-  private int getMaxReverseVelocity() {
-    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
-    return (int) Math.abs(pSpeed.getValueByUnit(SpeedProperty.Unit.MM_S));
+  private int getMaxReverseVelocity(PathModel model) {
+    return (int) Math.abs(model.getPropertyMaxReverseVelocity()
+        .getValueByUnit(SpeedProperty.Unit.MM_S));
   }
 
-  private int getRoutingCost() {
-    IntegerProperty pCost = (IntegerProperty) getModel().getProperty(PathModel.ROUTING_COST);
-    return (int) pCost.getValue();
+  private int getRoutingCost(PathModel model) {
+    return (int) model.getPropertyRoutingCost().getValue();
   }
 
-  private long getLength() {
-    LengthProperty pLength = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
+  private long getLength(PathModel model) {
+    LengthProperty pLength = model.getPropertyLength();
 
     if ((double) pLength.getValue() <= 0) {
       try {
@@ -204,37 +152,31 @@ public class PathAdapter
     return (long) pLength.getValueByUnit(LengthProperty.Unit.MM);
   }
 
-  /**
-   * Refreshes the properties of the layout element and saves it in the kernel.
-   *
-   * @param layout The VisualLayout.
-   */
-  private void updateLayoutElement(VisualLayoutCreationTO layout) {
-    AbstractConnection model = (AbstractConnection) getModel();
+  @Override
+  protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
+                                                 VisualLayoutCreationTO layout) {
+    PathModel pathModel = (PathModel) model;
     // Connection type
-    AbstractProperty pType = (AbstractProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
-    PathModel.LinerType type = (PathModel.LinerType) pType.getValue();
+    PathModel.LinerType type = (PathModel.LinerType) pathModel.getPropertyPathConnType().getValue();
 
     // BEZIER control points
     String sControlPoints = "";
     if (type.equals(PathModel.LinerType.BEZIER) || type.equals(PathModel.LinerType.BEZIER_3)) {
-      sControlPoints = buildBezierControlPoints();
+      sControlPoints = buildBezierControlPoints(pathModel);
     }
 
-    StringProperty pControlPoints
-        = (StringProperty) model.getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
-    pControlPoints.setText(sControlPoints);
+    pathModel.getPropertyPathControlPoints().setText(sControlPoints);
 
-    layout.getModelElements().add(
-        new ModelLayoutElementCreationTO(model.getName())
-            .setProperty(ElementPropKeys.PATH_CONN_TYPE, type.name())
-            .setProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints)
+    return layout.withModelElement(
+        new ModelLayoutElementCreationTO(pathModel.getName())
+            .withProperty(ElementPropKeys.PATH_CONN_TYPE, type.name())
+            .withProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints)
     );
   }
 
-  private String buildBezierControlPoints() {
+  private String buildBezierControlPoints(PathModel model) {
     String result = "";
-    PathConnection figure = (PathConnection) getModel().getFigure();
+    PathConnection figure = (PathConnection) model.getFigure();
     Point2D.Double cp1 = figure.getCp1();
     if (cp1 != null) {
       Point2D.Double cp2 = figure.getCp2();

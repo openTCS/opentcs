@@ -10,11 +10,10 @@ package org.opentcs.strategies.basic.recovery;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
-import org.opentcs.access.LocalKernel;
-import org.opentcs.access.queries.QueryRecoveryStatus;
-import org.opentcs.components.kernel.RecoveryEvaluator;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Evaluates the recovery status based on the sum of the squares of all vehicles' energy levels
@@ -22,14 +21,18 @@ import org.opentcs.data.order.TransportOrder;
  * (NES = Normalized Energy Squares)
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated The definition of <em>recovered</em> is unclear. Unless it is clearly specified,
+ * evaluation of a state of recovery should not be part of the API.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class DefaultRecoveryEvaluator
-    implements RecoveryEvaluator {
+    implements org.opentcs.components.kernel.RecoveryEvaluator {
 
   /**
-   * The local kernel.
+   * The object service.
    */
-  private final LocalKernel kernel;
+  private final TCSObjectService objectService;
   /**
    * Indicates whether this component is enabled.
    */
@@ -42,13 +45,13 @@ public class DefaultRecoveryEvaluator
   /**
    * Creates a new NESRecoveryEvaluator.
    *
-   * @param kernel The local kernel.
+   * @param objectService The object service.
    * @param configuration
    */
   @Inject
-  public DefaultRecoveryEvaluator(LocalKernel kernel,
+  public DefaultRecoveryEvaluator(TCSObjectService objectService,
                                   DefaultRecoveryEvaluatorConfiguration configuration) {
-    this.kernel = requireNonNull(kernel, "kernel is null");
+    this.objectService = requireNonNull(objectService, "objectService");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -68,9 +71,9 @@ public class DefaultRecoveryEvaluator
   }
 
   @Override
-  public QueryRecoveryStatus evaluateRecovery() {
+  public org.opentcs.access.queries.QueryRecoveryStatus evaluateRecovery() {
     boolean recovered = (currentNESValue() >= configuration.threshold()) && allOrdersFinished();
-    return new QueryRecoveryStatus(recovered);
+    return new org.opentcs.access.queries.QueryRecoveryStatus(recovered);
   }
 
   /**
@@ -80,7 +83,7 @@ public class DefaultRecoveryEvaluator
    */
   private double currentNESValue() {
     double result = 0;
-    Set<Vehicle> vehicles = kernel.getTCSObjects(Vehicle.class);
+    Set<Vehicle> vehicles = objectService.fetchObjects(Vehicle.class);
     int vehicleCount = vehicles.size();
     if (vehicleCount > 0) {
       for (Vehicle vehicle : vehicles) {
@@ -98,7 +101,7 @@ public class DefaultRecoveryEvaluator
    * final state.
    */
   private boolean allOrdersFinished() {
-    for (TransportOrder order : kernel.getTCSObjects(TransportOrder.class)) {
+    for (TransportOrder order : objectService.fetchObjects(TransportOrder.class)) {
       if (!order.getState().isFinalState()) {
         return false;
       }

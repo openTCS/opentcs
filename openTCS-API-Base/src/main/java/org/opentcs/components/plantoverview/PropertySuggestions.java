@@ -7,6 +7,7 @@
  */
 package org.opentcs.components.plantoverview;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 
@@ -32,4 +33,14 @@ public interface PropertySuggestions {
    */
   @Nonnull
   Set<String> getValueSuggestions();
+
+  /**
+   * Returns suggested property values that are specified for the <Code>key</Code>.
+   *
+   * @param key A key suggestion for which value suggestions are requested.
+   * @return A set of property value suggestions.
+   */
+  default Set<String> getValueSuggestionsFor(String key) {
+    return new HashSet<>();
+  }
 }

@@ -7,16 +7,19 @@
  */
 package org.opentcs.strategies.basic.recovery;
 
-import org.opentcs.access.queries.QueryRecoveryStatus;
-import org.opentcs.components.kernel.RecoveryEvaluator;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A recovery evaluator always returning the same result.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated The definition of <em>recovered</em> is unclear. Unless it is clearly specified,
+ * evaluation of a state of recovery should not be part of the API.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class StaticRecoveryEvaluator
-    implements RecoveryEvaluator {
+    implements org.opentcs.components.kernel.RecoveryEvaluator {
 
   /**
    * The evaluation result to be returned.
@@ -52,7 +55,7 @@ public class StaticRecoveryEvaluator
   }
 
   @Override
-  public QueryRecoveryStatus evaluateRecovery() {
-    return new QueryRecoveryStatus(evaluationResult);
+  public org.opentcs.access.queries.QueryRecoveryStatus evaluateRecovery() {
+    return new org.opentcs.access.queries.QueryRecoveryStatus(evaluationResult);
   }
 }

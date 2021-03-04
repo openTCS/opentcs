@@ -9,10 +9,10 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.jgrapht.WeightedGraph;
+import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
@@ -26,18 +26,18 @@ public class DijkstraPointRouterFactory
   /**
    * Creates a new instance.
    *
-   * @param kernel The kernel providing model data.
+   * @param objectService The object service providing model data.
    * @param mapper Maps the plant model to a graph.
    */
   @Inject
-  public DijkstraPointRouterFactory(@Nonnull LocalKernel kernel,
+  public DijkstraPointRouterFactory(@Nonnull TCSObjectService objectService,
                                     @Nonnull ModelGraphMapper mapper) {
-    super(kernel, mapper);
+    super(objectService, mapper);
   }
 
   @Override
   protected ShortestPathAlgorithm<String, ModelEdge> createShortestPathAlgorithm(
-      WeightedGraph<String, ModelEdge> graph) {
+      Graph<String, ModelEdge> graph) {
     return new DijkstraShortestPath<>(graph);
   }
 

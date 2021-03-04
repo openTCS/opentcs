@@ -8,17 +8,18 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.UUID;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.order.TransportOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,13 @@ class ExplicitOrderBatchGenerator
    */
   private static final Logger LOG = LoggerFactory.getLogger(ExplicitOrderBatchGenerator.class);
   /**
-   * The kernel we talk to.
+   * The transport order service we talk to.
    */
-  private final Kernel kernel;
+  private final TransportOrderService transportOrderService;
+  /**
+   * The dispatcher service.
+   */
+  private final DispatcherService dispatcherService;
   /**
    * The TransportOrderData we're building the transport orders from.
    */
@@ -47,13 +52,15 @@ class ExplicitOrderBatchGenerator
   /**
    * Creates a new ExplicitOrderBatchGenerator.
    *
-   * @param kernel The kernel
-   * @param data The transport order data
+   * @param transportOrderService The portal.
+   * @param data The transport order data.
    */
-  public ExplicitOrderBatchGenerator(final Kernel kernel,
+  public ExplicitOrderBatchGenerator(TransportOrderService transportOrderService,
+                                     DispatcherService dispatcherService,
                                      List<TransportOrderData> data) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
-    this.data = Objects.requireNonNull(data, "data is null");
+    this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
+    this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
+    this.data = requireNonNull(data, "data");
   }
 
   @Override
@@ -64,21 +71,22 @@ class ExplicitOrderBatchGenerator
       createdOrders.add(createSingleOrder(curData));
     }
 
+    dispatcherService.dispatch();
+
     return createdOrders;
   }
 
   private TransportOrder createSingleOrder(TransportOrderData curData)
       throws KernelRuntimeException {
-    TransportOrder newOrder = kernel.createTransportOrder(
+    TransportOrder newOrder = transportOrderService.createTransportOrder(
         new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
                                      createDestinations(curData.getDriveOrders()))
-            .setDeadline(ZonedDateTime.now().plusSeconds(curData.getDeadline().getTime() / 1000))
-            .setIntendedVehicleName(curData.getIntendedVehicle() == null
+            .withDeadline(Instant.now().plusSeconds(curData.getDeadline().getTime() / 1000))
+            .withIntendedVehicleName(curData.getIntendedVehicle() == null
                 ? null
                 : curData.getIntendedVehicle().getName())
-            .setProperties(curData.getProperties()));
+            .withProperties(curData.getProperties()));
 
-    kernel.activateTransportOrder(newOrder.getReference());
     return newOrder;
   }
 

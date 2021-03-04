@@ -280,9 +280,12 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * Returns a distinct copy of this object.
    *
    * @return A distinct copy of this object.
+   * @deprecated Will become immutable and not implement Cloneable any more.
    */
   @SuppressWarnings("unchecked")
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TCSObject<E> clone() {
     TCSObject<E> clone;
     try {

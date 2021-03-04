@@ -1,0 +1,102 @@
+buildscript {
+  repositories {
+    jcenter()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    // AsciiDoctor plugin(s)
+    classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+    classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.0'
+    // License plugin
+    classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.12.1'
+    // Versions plugin
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
+    // Stats plugin
+    classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.0'
+  }
+}
+
+apply plugin: 'base'
+apply plugin: 'distribution'
+
+apply from: "${rootDir}/gradle/versioning.gradle"
+
+group = 'de.fraunhofer.iml.opentcs.%GROUP_NAME%'
+
+subprojects {
+  apply from: rootProject.file('gradle/common.gradle')
+}
+evaluationDependsOnChildren()
+
+distributions {
+  main {
+    contents.from {
+      project(':openTCS-%PROJECT_NAME%-Kernel').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-%PROJECT_NAME%-KernelControlCenter').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-%PROJECT_NAME%-PlantOverview').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-%PROJECT_NAME%-Documentation').ext.collectableDistDir
+    }
+  }
+}
+
+task subDists {
+  dependsOn(':openTCS-%PROJECT_NAME%-Kernel:installDist')
+  dependsOn(':openTCS-%PROJECT_NAME%-KernelControlCenter:installDist')
+  dependsOn(':openTCS-%PROJECT_NAME%-PlantOverview:installDist')
+  dependsOn(':openTCS-%PROJECT_NAME%-Documentation:installDist')
+}
+
+installDist.dependsOn subDists
+
+distZip {
+  classifier = 'bin'
+  dependsOn subDists
+}
+
+distTar {
+  classifier = 'bin'
+  dependsOn subDists
+  compression = Compression.GZIP
+}
+
+task distSrcZip(type: Zip) {
+  classifier = 'src'
+  from "${rootDir}"
+
+  includes << 'config/**'
+  includes << 'gradle/**'
+  includes << 'lib/**'
+  includes << 'openTCS-*/**'
+  includes << 'src/**'
+  includes << '.nb-gradle-properties'
+  includes << '*.gradle'
+  includes << 'gradlew'
+  includes << 'gradlew.bat'
+
+  excludes << '.gradle'
+  excludes << '**/build'
+}
+
+artifacts {
+  archives distZip
+  archives distTar
+  archives distSrcZip
+}
+
+build {
+  dependsOn subprojects*.build
+  dependsOn installDist
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '4.5'
+}

@@ -15,11 +15,12 @@ import org.junit.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.InternalTransportOrderService;
+import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.order.DriveOrder;
@@ -35,14 +36,16 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class CreateTransportOrderSequenceTest {
 
-  private LocalKernel localKernel;
+  private TransportOrderService internalTransportOrderService;
+  private DispatcherService dispatcherService;
 
   @Before
   public void setUp() {
-    localKernel = mock(LocalKernel.class);
-    when(localKernel.createOrderSequence(any(OrderSequenceCreationTO.class)))
+    internalTransportOrderService = mock(InternalTransportOrderService.class);
+    dispatcherService = mock(DispatcherService.class);
+    when(internalTransportOrderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
         .thenReturn(new OrderSequence("OrderSequence"));
-    when(localKernel.createTransportOrder(any(TransportOrderCreationTO.class)))
+    when(internalTransportOrderService.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenReturn(new TransportOrder(
             "Transportorder",
             Collections.singletonList(new DriveOrder(
@@ -53,37 +56,41 @@ public class CreateTransportOrderSequenceTest {
   @Test
   public void shouldCreateTransportOrderSequence() {
     // tag::documentation_createTransportOrderSequence[]
-    // The Kernel instance we're working with
-    Kernel kernel = getAKernelReference();
+    // The transport order service instance we're working with
+    TransportOrderService transportOrderService = getATransportOrderServiceReference();
+
+    // The dispatcher service instance we're working with
+    DispatcherService dispatcherService = getADispatcherServiceReference();
 
     // Create an order sequence description with a unique name:
     OrderSequenceCreationTO sequenceTO
         = new OrderSequenceCreationTO("MyOrderSequence-" + UUID.randomUUID());
     // Optionally, set the sequence's failure-fatal flag:
-    sequenceTO.setFailureFatal(true);
+    sequenceTO = sequenceTO.withFailureFatal(true);
 
     // Create the order sequence:
-    OrderSequence orderSequence = kernel.createOrderSequence(sequenceTO);
+    OrderSequence orderSequence = transportOrderService.createOrderSequence(sequenceTO);
 
-    // Set up the transport order as usual:
+    // Set up the transport order as usual,
+    // but add the wrapping sequence's name:
     List<DestinationCreationTO> destinations = new ArrayList<>();
     destinations.add(new DestinationCreationTO("Some location name",
                                                "Some operation"));
     TransportOrderCreationTO orderTO
         = new TransportOrderCreationTO("MyOrder-" + UUID.randomUUID(),
-                                       destinations);
-    // Set the name of the wrapping order sequence:
-    orderTO.setWrappingSequence(orderSequence.getName());
+                                       destinations)
+            .withWrappingSequence(orderSequence.getName());
 
-    // Create the transport order and activate it for processing:
-    TransportOrder order = kernel.createTransportOrder(orderTO);
-    // Activate the order when it may be processed by a vehicle.
-    kernel.activateTransportOrder(order.getReference());
+    // Create the transport order:
+    TransportOrder order = transportOrderService.createTransportOrder(orderTO);
 
-    // Create, add and activate more orders as necessary.
+    // Create and add more orders as necessary.
     // Eventually, set the order sequence's complete flag to indicate that more
     // transport orders will not be added to it.
-    kernel.setOrderSequenceComplete(orderSequence.getReference());
+    transportOrderService.markOrderSequenceComplete(orderSequence.getReference());
+
+    // Trigger the dispatch process for the created order sequence.
+    dispatcherService.dispatch();
     // end::documentation_createTransportOrderSequence[]
   }
 
@@ -92,7 +99,11 @@ public class CreateTransportOrderSequenceTest {
                         new LocationType("LocationType").getReference());
   }
 
-  private LocalKernel getAKernelReference() {
-    return localKernel;
+  private TransportOrderService getATransportOrderServiceReference() {
+    return internalTransportOrderService;
+  }
+
+  private DispatcherService getADispatcherServiceReference() {
+    return dispatcherService;
   }
 }

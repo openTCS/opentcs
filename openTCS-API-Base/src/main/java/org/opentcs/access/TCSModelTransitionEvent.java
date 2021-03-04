@@ -8,16 +8,19 @@
 package org.opentcs.access;
 
 import java.io.Serializable;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Instances of this class represent events emitted when the kernel loads a
  * model.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link ModelTransitionEvent} instead, which does not extend TCSEvent.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class TCSModelTransitionEvent
-    extends TCSEvent
+    extends org.opentcs.util.eventsystem.TCSEvent
     implements Serializable {
 
   /**

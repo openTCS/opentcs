@@ -12,33 +12,27 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.queries.Availability;
-import org.opentcs.access.queries.Query;
-import org.opentcs.access.queries.QueryAvailableScriptFiles;
-import org.opentcs.access.queries.QueryRecoveryStatus;
-import org.opentcs.access.queries.QueryRoutingInfo;
-import org.opentcs.access.queries.QuerySchedulerAllocations;
-import org.opentcs.access.queries.QueryTopologyInfo;
 
 /**
  * Convenience methods for working with queries.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public final class Queries {
 
   /**
    * An unmodifiable set of all queries.
    */
-  private static final Set<Class<? extends Query<?>>> allQueries;
+  private static final Set<Class<? extends org.opentcs.access.queries.Query<?>>> allQueries;
 
   static {
-    Set<Class<? extends Query<?>>> queries = new HashSet<>();
-    queries.add(QueryAvailableScriptFiles.class);
-    queries.add(QueryRecoveryStatus.class);
-    queries.add(QueryRoutingInfo.class);
-    queries.add(QuerySchedulerAllocations.class);
-    queries.add(QueryTopologyInfo.class);
+    Set<Class<? extends org.opentcs.access.queries.Query<?>>> queries = new HashSet<>();
+    queries.add(org.opentcs.access.queries.QueryAvailableScriptFiles.class);
+    queries.add(org.opentcs.access.queries.QueryRecoveryStatus.class);
+    queries.add(org.opentcs.access.queries.QueryRoutingInfo.class);
+    queries.add(org.opentcs.access.queries.QuerySchedulerAllocations.class);
+    queries.add(org.opentcs.access.queries.QueryTopologyInfo.class);
     allQueries = Collections.unmodifiableSet(queries);
   }
 
@@ -54,7 +48,7 @@ public final class Queries {
    *
    * @return An unmodifiable set of all queries.
    */
-  public static Set<Class<? extends Query<?>>> getAllQueries() {
+  public static Set<Class<? extends org.opentcs.access.queries.Query<?>>> getAllQueries() {
     return allQueries;
   }
 
@@ -68,14 +62,14 @@ public final class Queries {
    * available in the given kernel state. If there are no such queries, the
    * returned set is empty.
    */
-  public static Set<Class<? extends Query<?>>> availableInState(
-      Set<Class<? extends Query<?>>> queries,
+  public static Set<Class<? extends org.opentcs.access.queries.Query<?>>> availableInState(
+      Set<Class<? extends org.opentcs.access.queries.Query<?>>> queries,
       Kernel.State state) {
     Objects.requireNonNull(queries, "queries is null");
     Objects.requireNonNull(state, "state is null");
 
-    Set<Class<? extends Query<?>>> result = new HashSet<>();
-    for (Class<? extends Query<?>> query : queries) {
+    Set<Class<? extends org.opentcs.access.queries.Query<?>>> result = new HashSet<>();
+    for (Class<? extends org.opentcs.access.queries.Query<?>> query : queries) {
       if (availableInState(query, state)) {
         result.add(query);
       }
@@ -90,7 +84,7 @@ public final class Queries {
    * @return A set of queries that are available in the given kernel state. If
    * there are no such queries, the returned set is empty.
    */
-  public static Set<Class<? extends Query<?>>> availableInState(
+  public static Set<Class<? extends org.opentcs.access.queries.Query<?>>> availableInState(
       Kernel.State state) {
     return availableInState(allQueries, state);
   }
@@ -103,12 +97,13 @@ public final class Queries {
    * @return <code>true</code> if, and only if, the given query is available
    * in the given kernel state.
    */
-  public static boolean availableInState(Class<? extends Query<?>> query,
+  public static boolean availableInState(Class<? extends org.opentcs.access.queries.Query<?>> query,
                                          Kernel.State state) {
     Objects.requireNonNull(query, "query is null");
     Objects.requireNonNull(state, "state is null");
 
-    Availability availability = query.getAnnotation(Availability.class);
+    org.opentcs.access.queries.Availability availability
+        = query.getAnnotation(org.opentcs.access.queries.Availability.class);
     for (Kernel.State availState : availability.value()) {
       if (state.equals(availState)) {
         return true;

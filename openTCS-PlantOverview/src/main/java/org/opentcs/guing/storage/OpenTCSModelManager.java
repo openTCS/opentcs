@@ -9,15 +9,12 @@
  */
 package org.opentcs.guing.storage;
 
-import com.google.common.collect.Iterators;
-import java.awt.Color;
+import com.google.common.base.Strings;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -30,13 +27,16 @@ import javax.inject.Provider;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.plantoverview.PlantModelExporter;
+import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.customizations.ApplicationHome;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
@@ -46,12 +46,11 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.components.drawing.course.Origin;
+import org.opentcs.guing.components.drawing.course.OriginChangeListener;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
@@ -61,34 +60,11 @@ import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
-import org.opentcs.guing.components.properties.type.AbstractProperty;
-import org.opentcs.guing.components.properties.type.ColorProperty;
-import org.opentcs.guing.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.LocationTypeProperty;
-import org.opentcs.guing.components.properties.type.SpeedProperty;
-import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.exchange.adapter.BlockAdapter;
-import org.opentcs.guing.exchange.adapter.GroupAdapter;
-import org.opentcs.guing.exchange.adapter.LayoutAdapter;
-import org.opentcs.guing.exchange.adapter.LinkAdapter;
-import org.opentcs.guing.exchange.adapter.LocationAdapter;
-import org.opentcs.guing.exchange.adapter.LocationTypeAdapter;
-import org.opentcs.guing.exchange.adapter.PathAdapter;
-import org.opentcs.guing.exchange.adapter.PointAdapter;
-import org.opentcs.guing.exchange.adapter.ProcessAdapter;
-import org.opentcs.guing.exchange.adapter.ProcessAdapterFactory;
 import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
-import org.opentcs.guing.exchange.adapter.StaticRouteAdapter;
-import org.opentcs.guing.exchange.adapter.VehicleAdapter;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
@@ -99,7 +75,6 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.Colors;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.SynchronizedFileChooser;
@@ -140,10 +115,6 @@ public class OpenTCSModelManager
    */
   private final Provider<SystemModel> systemModelProvider;
   /**
-   * A factory for process adapters.
-   */
-  private final ProcessAdapterFactory procAdapterFactory;
-  /**
    * A utility class for process adapters.
    */
   private final ProcessAdapterUtil procAdapterUtil;
@@ -168,6 +139,14 @@ public class OpenTCSModelManager
    */
   private final Map<FileFilter, ModelFilePersistor> modelPersistorFilter = new HashMap<>();
   /**
+   * Converts model data on import.
+   */
+  private final ModelImportAdapter modelImportAdapter;
+  /**
+   * Converts model data on export.
+   */
+  private final ModelExportAdapter modelExportAdapter;
+  /**
    * The model currently loaded.
    */
   private SystemModel systemModel;
@@ -184,7 +163,6 @@ public class OpenTCSModelManager
    * Creates a new instance.
    *
    * @param crsObjFactory A course object factory to be used.
-   * @param procAdapterFactory A process adapter factory to be used.
    * @param procAdapterUtil A utility class for process adapters.
    * @param systemModelProvider Provides instances of SystemModel.
    * @param statusPanel StatusPanel to log messages.
@@ -192,22 +170,23 @@ public class OpenTCSModelManager
    * @param kernelPersistor Persists a model to a kernel.
    * @param modelReaders The set of model readers
    * @param modelPersistors The set of model persistors
+   * @param modelImportAdapter Converts model data on import.
+   * @param modelExportAdapter Converts model data on export.
    */
   @Inject
   public OpenTCSModelManager(CourseObjectFactory crsObjFactory,
-                             ProcessAdapterFactory procAdapterFactory,
                              ProcessAdapterUtil procAdapterUtil,
                              Provider<SystemModel> systemModelProvider,
                              StatusPanel statusPanel,
                              @ApplicationHome File homeDir,
                              ModelKernelPersistor kernelPersistor,
                              Set<ModelReader> modelReaders,
-                             Set<ModelFilePersistor> modelPersistors) {
+                             Set<ModelFilePersistor> modelPersistors,
+                             ModelImportAdapter modelImportAdapter,
+                             ModelExportAdapter modelExportAdapter) {
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
-    this.procAdapterFactory = requireNonNull(procAdapterFactory, "procAdapterFactory");
     this.procAdapterUtil = requireNonNull(procAdapterUtil, "procAdapterUtil");
     this.systemModelProvider = requireNonNull(systemModelProvider, "systemModelProvider");
-    this.systemModel = systemModelProvider.get();
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     requireNonNull(homeDir, "homeDir");
     this.kernelPersistor = requireNonNull(kernelPersistor, "kernelPersistor");
@@ -235,6 +214,11 @@ public class OpenTCSModelManager
       }
       modelPersistorFilter.put(filter, o);
     });
+    this.modelImportAdapter = requireNonNull(modelImportAdapter, "modelImportAdapter");
+    this.modelExportAdapter = requireNonNull(modelExportAdapter, "modelExportAdapter");
+
+    this.systemModel = systemModelProvider.get();
+    initializeSystemModel(systemModel);
   }
 
   @Override
@@ -263,16 +247,14 @@ public class OpenTCSModelManager
 
     try {
       Optional<SystemModel> opt = reader.deserialize(file);
-      if (opt.isPresent()) {
-        systemModel = opt.get();
-        currentModelFile = file;
-        initializeDefaultSystemModel(systemModel);
-        return true;
-      }
-      else {
+      if (!opt.isPresent()) {
         LOG.debug("Loading model canceled.");
         return false;
       }
+      systemModel = opt.get();
+      currentModelFile = file;
+      initializeSystemModel(systemModel);
+      return true;
     }
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
@@ -285,11 +267,36 @@ public class OpenTCSModelManager
   }
 
   @Override
-  public boolean persistModel(Kernel kernel) {
+  public boolean importModel(PlantModelImporter importer) {
+    requireNonNull(importer, "importer");
+
+    try {
+      Optional<PlantModelCreationTO> opt = importer.importPlantModel();
+      if (!opt.isPresent()) {
+        LOG.debug("Model import cancelled.");
+        return false;
+      }
+      SystemModel newSystemModel = modelImportAdapter.convert(opt.get());
+      systemModel = newSystemModel;
+      currentModelFile = null;
+      initializeSystemModel(systemModel);
+      return true;
+    }
+    catch (IOException | IllegalArgumentException ex) {
+      statusPanel.setLogMessage(Level.SEVERE,
+                                ResourceBundleUtil.getBundle()
+                                    .getFormatted("modelManager.persistence.notImported"));
+      LOG.warn("Exception importing model", ex);
+      return false;
+    }
+  }
+
+  @Override
+  public boolean persistModel(KernelServicePortal portal) {
     try {
       fModelName = systemModel.getName();
       statusPanel.clear();
-      return persistModel(systemModel, kernel, kernelPersistor, false);
+      return persistModel(systemModel, portal, kernelPersistor, false);
     }
     catch (IllegalStateException | CredentialsException e) {
       statusPanel.setLogMessage(Level.SEVERE,
@@ -345,12 +352,28 @@ public class OpenTCSModelManager
   }
 
   @Override
+  public boolean exportModel(PlantModelExporter exporter) {
+    requireNonNull(exporter, "exporter");
+
+    try {
+      exporter.exportPlantModel(modelExportAdapter.convert(systemModel));
+      return true;
+    }
+    catch (IOException | IllegalArgumentException ex) {
+      statusPanel.setLogMessage(Level.SEVERE,
+                                ResourceBundleUtil.getBundle()
+                                    .getString("modelManager.persistence.notExported"));
+      LOG.warn("Exception exporting model", ex);
+      return false;
+    }
+  }
+
+  @Override
   public void createEmptyModel() {
     systemModel = systemModelProvider.get();
-    initializeDefaultSystemModel(systemModel);
+    initializeSystemModel(systemModel);
     systemModel.setName(Kernel.DEFAULT_MODEL_NAME);
     fModelName = systemModel.getName();
-
   }
 
   /**
@@ -387,14 +410,14 @@ public class OpenTCSModelManager
    * @throws IllegalStateException If there was a problem persisting the model
    */
   private boolean persistModel(SystemModel systemModel,
-                               Kernel kernel,
+                               KernelServicePortal portal,
                                ModelKernelPersistor persistor,
                                boolean ignoreError)
       throws IllegalStateException, KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
 
-    if (!persistor.persist(systemModel, kernel, ignoreError)) {
+    if (!persistor.persist(systemModel, portal, ignoreError)) {
       return false;
     }
 
@@ -407,60 +430,62 @@ public class OpenTCSModelManager
     fModelName = systemModel.getName();
     List<Figure> restoredFigures = new ArrayList<>();
 
+    LayoutModel layoutModel = (LayoutModel) systemModel.getMainFolder(SystemModel.FolderKey.LAYOUT);
+    double scaleX = layoutModel.getPropertyScaleX().getValueByUnit(LengthProperty.Unit.MM);
+    double scaleY = layoutModel.getPropertyScaleY().getValueByUnit(LengthProperty.Unit.MM);
+
+    // Create figures and process adapters
+    restoredFigures.addAll(restorePointsInModel(systemModel.getPointModels(), scaleX, scaleY));
+    restoredFigures.addAll(restorePathsInModel(systemModel.getPathModels(), systemModel));
+    restoredFigures.addAll(restoreLocationsInModel(systemModel.getLocationModels(),
+                                                   scaleX,
+                                                   scaleY,
+                                                   systemModel));
+    restoredFigures.addAll(restoreBlocksInModel(systemModel.getBlockModels(), systemModel));
+    restoredFigures.addAll(restoreStaticRoutesInModel(systemModel.getStaticRouteModels(), systemModel));
+    restoredFigures.addAll(restoreGroupsInModel(systemModel.getGroupModels(), systemModel));
+
+    // Associate all created figures with the origin.
     Origin origin = systemModel.getDrawingMethod().getOrigin();
-    LayoutModel layoutComponent
-        = (LayoutModel) systemModel.getMainFolder(SystemModel.FolderKey.LAYOUT);
-    LengthProperty scale = (LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_X);
-    double scaleX = scale.getValueByUnit(LengthProperty.Unit.MM);
-    scale = (LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_Y);
-    double scaleY = scale.getValueByUnit(LengthProperty.Unit.MM);
+    for (Figure figure : restoredFigures) {
+      if (figure instanceof OriginChangeListener) {
+        origin.addListener((OriginChangeListener) figure);
+        figure.set(FigureConstants.ORIGIN, origin);
+      }
+    }
 
-    restoreModelPoints(systemModel.getPointModels(), restoredFigures, origin, scaleX, scaleY);
-    restoreModelPaths(systemModel.getPathModels(), restoredFigures, origin);
-    restoreModelLocations(systemModel.getLocationModels(), restoredFigures, origin, scaleX, scaleY);
-    restoreModelLocationTypes(systemModel.getLocationTypeModels());
-    restoreModelBlocks(systemModel.getBlockModels());
-    restoreModelStaticRoutes(systemModel.getStaticRouteModels());
-    restoreModelGroups(systemModel.getGroupModels());
-    restoreModelVehicles(systemModel.getVehicleModels());
-    restoreModelLinks(systemModel.getLinkModels());
-
-    Drawing drawing = systemModel.getDrawing();
-    LayoutAdapter adapter;
-    adapter = procAdapterFactory.createLayoutAdapter(
-        layoutComponent, systemModel.getEventDispatcher());
-    adapter.register();
-    restoredFigures.stream().forEach((figure) -> {
-      drawing.add(figure);
-    });
+    long timeBefore = System.currentTimeMillis();
+    systemModel.getDrawing().addAll(restoredFigures);
+    LOG.debug("Adding figures to drawing took {} ms.", System.currentTimeMillis() - timeBefore);
   }
 
   @Override
-  public void restoreModel(Kernel kernel) {
-    createEmptyModel();
-    fModelName = kernel.getLoadedModelName();
-    ((StringProperty) systemModel.getProperty(ModelComponent.NAME)).setText(fModelName);
+  public void restoreModel(KernelServicePortal portal) {
+    requireNonNull(portal, "portal");
 
-    Set<VisualLayout> allVisualLayouts = kernel.getTCSObjects(VisualLayout.class);
-    Set<Vehicle> allVehicles = kernel.getTCSObjects(Vehicle.class);
-    Set<Point> allPoints = kernel.getTCSObjects(Point.class);
-    Set<LocationType> allLocationTypes = kernel.getTCSObjects(LocationType.class);
-    Set<Location> allLocations = kernel.getTCSObjects(Location.class);
-    Set<Path> allPaths = kernel.getTCSObjects(Path.class);
-    Set<Block> allBlocks = kernel.getTCSObjects(Block.class);
+    createEmptyModel();
+
+    fModelName = portal.getPlantModelService().getLoadedModelName();
+    systemModel.getPropertyName().setText(fModelName);
+
+    TCSObjectService objectService = (TCSObjectService) portal.getPlantModelService();
+
+    Set<VisualLayout> allVisualLayouts = objectService.fetchObjects(VisualLayout.class);
+    Set<Vehicle> allVehicles = objectService.fetchObjects(Vehicle.class);
+    Set<Point> allPoints = objectService.fetchObjects(Point.class);
+    Set<LocationType> allLocationTypes = objectService.fetchObjects(LocationType.class);
+    Set<Location> allLocations = objectService.fetchObjects(Location.class);
+    Set<Path> allPaths = objectService.fetchObjects(Path.class);
+    Set<Block> allBlocks = objectService.fetchObjects(Block.class);
     @SuppressWarnings("deprecation")
     Set<org.opentcs.data.model.StaticRoute> allStaticRoutes
-        = kernel.getTCSObjects(org.opentcs.data.model.StaticRoute.class);
-    Set<Group> allGroups = kernel.getTCSObjects(Group.class);
+        = objectService.fetchObjects(org.opentcs.data.model.StaticRoute.class);
+    Set<Group> allGroups = objectService.fetchObjects(Group.class);
 
-    Set<ProcessAdapter> createdAdapters = new HashSet<>();
     List<Figure> restoredFigures = new ArrayList<>();
 
-    double scaleX = Origin.DEFAULT_SCALE;
-    double scaleY = Origin.DEFAULT_SCALE;
     Origin origin = systemModel.getDrawingMethod().getOrigin();
 
-    // "Neues" Modell: Layout ist im Visual-Layout Objekt gespeichert
     VisualLayout visualLayout = null;
     for (VisualLayout visLayout : allVisualLayouts) {
       visualLayout = visLayout;  // Es sollte genau ein Layout geben
@@ -470,667 +495,369 @@ public class OpenTCSModelManager
                                   allLocations,
                                   allBlocks,
                                   allVehicles);
-      scaleX = visualLayout.getScaleX();
-      scaleY = visualLayout.getScaleY();
-
-      if (scaleX != 0.0 && scaleY != 0.0) {
-        origin.setScale(scaleX, scaleY);
+      if (visualLayout.getScaleX() != 0.0 && visualLayout.getScaleY() != 0.0) {
+        origin.setScale(visualLayout.getScaleX(), visualLayout.getScaleY());
       }
     }
 
-    LayoutModel layoutComponent
+    LayoutModel layoutModel
         = (LayoutModel) systemModel.getMainFolder(SystemModel.FolderKey.LAYOUT);
-    // Leeres Modell: Default-Layout erzeugen
-    LayoutAdapter adapter;
-    if (visualLayout == null) {
-      StringProperty name = (StringProperty) layoutComponent.getProperty(LayoutModel.NAME);
-      name.setText("VLayout");
 
-      try {
-        LengthProperty scale = (LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_X);
-        scale.setValueAndUnit(scaleX, LengthProperty.Unit.MM);
-        scale = (LengthProperty) layoutComponent.getProperty(LayoutModel.SCALE_Y);
-        scale.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
-      }
-      catch (IllegalArgumentException ex) {
-        LOG.warn("Exception in setValueAndUnit()", ex);
-      }
+    prepareLayout(layoutModel, systemModel, origin, objectService, visualLayout);
 
-      adapter = procAdapterFactory.createLayoutAdapter(
-          layoutComponent, systemModel.getEventDispatcher());
-      adapter.register();
-      createdAdapters.add(adapter);
-    }
-    else {
-      // TODO: Bei mehreren Layouts muss jedem SystemFolder der Name des Layouts zugewiesen werden
-      adapter = procAdapterFactory.createLayoutAdapter(
-          layoutComponent, systemModel.getEventDispatcher());
-      adapter.register();
+    restoreModelPoints(allPoints, systemModel, origin, restoredFigures, objectService);
+    restoreModelPaths(allPaths, systemModel, origin, restoredFigures, objectService);
+    restoreModelVehicles(allVehicles, systemModel, objectService);
+    restoreModelLocationTypes(allLocationTypes, systemModel, objectService);
+    restoreModelLocations(allLocations, systemModel, origin, restoredFigures, objectService);
+    restoreModelBlocks(allBlocks, systemModel, objectService);
+    restoreModelStaticRoutes(allStaticRoutes, systemModel, objectService);
+    restoreModelGroups(allGroups, systemModel, objectService);
 
-      adapter.updateModelProperties(kernel,
-                                    visualLayout,
-                                    null);
-    }
+    systemModel.getDrawing().addAll(restoredFigures);
+  }
 
-    restoreModelPoints(allPoints, systemModel, origin, scaleX,
-                       scaleY, createdAdapters, restoredFigures, kernel);
-    restoreModelPaths(allPaths, systemModel, origin, createdAdapters, restoredFigures, kernel);
-    restoreModelVehicles(allVehicles, systemModel, createdAdapters, kernel);
-    restoreModelLocationTypes(allLocationTypes, systemModel, createdAdapters, kernel);
-    restoreModelLocations(allLocations, systemModel, origin, scaleX,
-                          scaleY, createdAdapters, restoredFigures, kernel);
-    restoreModelBlocks(allBlocks, systemModel, createdAdapters, kernel);
-    restoreModelStaticRoutes(allStaticRoutes, systemModel, createdAdapters, kernel);
-    restoreModelGroups(allGroups, systemModel, createdAdapters, kernel);
+  private void prepareLayout(LayoutModel layoutModel,
+                             SystemModel systemModel,
+                             Origin origin,
+                             TCSObjectService objectService,
+                             @Nullable VisualLayout layout) {
+    layoutModel.getPropertyName().setText("VLayout");
+    layoutModel.getPropertyScaleX().setValueAndUnit(origin.getScaleX(),
+                                                    LengthProperty.Unit.MM);
+    layoutModel.getPropertyScaleY().setValueAndUnit(origin.getScaleY(),
+                                                    LengthProperty.Unit.MM);
 
-    Drawing drawing = systemModel.getDrawing();
-
-    for (Figure figure : restoredFigures) {
-      drawing.add(figure);
+    if (layout != null) {
+      procAdapterUtil.processAdapterFor(layoutModel)
+          .updateModelProperties(layout, layoutModel, systemModel, objectService, null);
     }
   }
 
-  private void restoreModelGroups(List<GroupModel> groupModels) {
+  private List<Figure> restoreGroupsInModel(List<GroupModel> groupModels,
+                                            SystemModel systemModel) {
     for (GroupModel groupModel : groupModels) {
-      StringSetProperty pElements
-          = (StringSetProperty) groupModel.getProperty(GroupModel.ELEMENTS);
-      for (String elementName : pElements.getItems()) {
-        ModelComponent modelComponent = getGroupMember(elementName);
+      // XXX This should probably be done when the group model is created, not here.
+      for (String elementName : groupModel.getPropertyElements().getItems()) {
+        ModelComponent modelComponent = getGroupMember(systemModel, elementName);
         if (modelComponent != null) {
           groupModel.add(modelComponent);
-          procAdapterUtil.createProcessAdapter(modelComponent,
-                                               systemModel
-                                                   .getEventDispatcher());
         }
       }
     }
+
+    return new ArrayList<>();
   }
 
   private void restoreModelGroups(Set<Group> allGroups, SystemModel systemModel,
-                                  Set<ProcessAdapter> createdAdapters,
-                                  Kernel kernel) {
-    // --- Groups ---
+                                  TCSObjectService objectService) {
     for (Group group : allGroups) {
       GroupModel groupModel = new GroupModel(group.getName());
-      GroupAdapter adapter = procAdapterFactory.createGroupAdapter(
-          groupModel, systemModel.getEventDispatcher());
-      adapter.register();
 
-      createdAdapters.add(adapter);
-      adapter.updateModelProperties(kernel,
-                                    group,
-                                    null);
+      procAdapterUtil.processAdapterFor(groupModel)
+          .updateModelProperties(group, groupModel, systemModel, objectService, null);
 
-      systemModel.getMainFolder(SystemModel.FolderKey.GROUPS).add(groupModel);
-      Set<TCSObjectReference<?>> refs = group.getMembers();
-
-      for (TCSObjectReference<?> ref : refs) {
-        if (ref.getReferentClass() == Point.class) {
-          Point point = kernel.getTCSObject(Point.class, ref.getName());
-
-          if (point != null) {
-            groupModel.add(systemModel.getPointModel(point.getName()));
-          }
-        }
-        else if (ref.getReferentClass() == Location.class) {
-          Location location = kernel.getTCSObject(Location.class, ref.getName());
-
-          if (location != null) {
-            groupModel.add(systemModel.getLocationModel(location.getName()));
-          }
-        }
-        else if (ref.getReferentClass() == Path.class) {
-          Path path = kernel.getTCSObject(Path.class, ref.getName());
-
-          if (path != null) {
-            groupModel.add(systemModel.getPathModel(path.getName()));
-          }
+      for (TCSObjectReference<?> ref : group.getMembers()) {
+        ModelComponent component = systemModel.getModelComponent(ref.getName());
+        if (component != null) {
+          groupModel.add(component);
         }
       }
+
+      systemModel.getMainFolder(SystemModel.FolderKey.GROUPS).add(groupModel);
     }
   }
 
-  private void restoreModelStaticRoutes(List<StaticRouteModel> staticRouteModels) {
+  private List<Figure> restoreStaticRoutesInModel(List<StaticRouteModel> staticRouteModels,
+                                                  SystemModel systemModel) {
     for (StaticRouteModel staticRouteModel : staticRouteModels) {
-      StringSetProperty pElements
-          = (StringSetProperty) staticRouteModel.getProperty(StaticRouteModel.ELEMENTS);
-      for (String elementName : pElements.getItems()) {
-        PointModel modelComponent = getPointComponent(elementName);
+      // XXX This should probably be done when the route model is created, not here.
+      for (String elementName : staticRouteModel.getPropertyElements().getItems()) {
+        PointModel modelComponent = getPointComponent(systemModel, elementName);
         if (modelComponent != null) {
           staticRouteModel.addPoint(modelComponent);
         }
       }
-      procAdapterUtil.createProcessAdapter(staticRouteModel,
-                                           systemModel
-                                               .getEventDispatcher());
     }
+
+    return new ArrayList<>();
   }
 
   @SuppressWarnings("deprecation")
   private void restoreModelStaticRoutes(Set<org.opentcs.data.model.StaticRoute> allStaticRoutes,
                                         SystemModel systemModel,
-                                        Set<ProcessAdapter> createdAdapters,
-                                        Kernel kernel) {
-    // --- Static Routes ---
-    Iterator<Color> routeColorCycler = Iterators.cycle(Colors.defaultColors());
+                                        TCSObjectService objectService) {
     for (org.opentcs.data.model.StaticRoute staticRoute : allStaticRoutes) {
       StaticRouteModel staticRouteModel = crsObjFactory.createStaticRouteModel();
-      StaticRouteAdapter adapter = procAdapterFactory.createStaticRouteAdapter(
-          staticRouteModel, systemModel.getEventDispatcher());
-      adapter.register();
 
-      createdAdapters.add(adapter);
-      adapter.updateModelProperties(kernel,
-                                    staticRoute,
-                                    null);
-
-      // Neue Farbe suchen f�r StaticRoutes, die min. 1 Hop haben
-      if (!staticRoute.getHops().isEmpty()) {
-        ((ColorProperty) staticRouteModel
-         .getProperty(ElementPropKeys.BLOCK_COLOR))
-            .setColor(routeColorCycler.next());
-      }
-      // Das zugeh�rige Model Layout Element suchen
       ModelLayoutElement element = systemModel.getLayoutMap().get(staticRoute.getReference());
-
-      if (element != null) {
-        Map<String, String> properties = element.getProperties();
-        // Im Layout Element gespeicherte Farbe �berschreibt den Default-Wert
-        String sColor = properties.get(ElementPropKeys.BLOCK_COLOR);
-        String srgb = sColor.substring(1);  // delete trailing "#"
-        int rgb = Integer.parseInt(srgb, 16);
-        Color color = new Color(rgb);
-        ColorProperty cp = (ColorProperty) staticRouteModel.getProperty(ElementPropKeys.BLOCK_COLOR);
-        cp.setColor(color);
-      }
+      procAdapterUtil.processAdapterFor(staticRouteModel)
+          .updateModelProperties(staticRoute, staticRouteModel, systemModel, objectService, element);
 
       systemModel.getMainFolder(SystemModel.FolderKey.STATIC_ROUTES).add(staticRouteModel);
     }
   }
 
-  private void restoreModelBlocks(List<BlockModel> blockModels) {
+  private List<Figure> restoreBlocksInModel(List<BlockModel> blockModels, SystemModel systemModel) {
     for (BlockModel blockModel : blockModels) {
-      StringSetProperty pElements = (StringSetProperty) blockModel.getProperty(BlockModel.ELEMENTS);
-      for (String elementName : pElements.getItems()) {
-        ModelComponent modelComponent = getBlockMember(elementName);
+      // XXX This should probably be done when the block model is created, not here.
+      for (String elementName : blockModel.getPropertyElements().getItems()) {
+        ModelComponent modelComponent = getBlockMember(systemModel, elementName);
         if (modelComponent != null) {
           blockModel.addCourseElement(modelComponent);
         }
       }
-      procAdapterUtil.createProcessAdapter(blockModel,
-                                           systemModel
-                                               .getEventDispatcher());
     }
+
+    return new ArrayList<>();
   }
 
   private void restoreModelBlocks(Set<Block> allBlocks, SystemModel systemModel,
-                                  Set<ProcessAdapter> createdAdapters,
-                                  Kernel kernel) {
-    // --- Alle Blocks, die der Kernel kennt ---
-    Iterator<Color> blockColorCycler = Iterators.cycle(Colors.defaultColors());
+                                  TCSObjectService objectService) {
     for (Block block : allBlocks) {
       BlockModel blockModel = crsObjFactory.createBlockModel();
-      BlockAdapter adapter = procAdapterFactory.createBlockAdapter(
-          blockModel, systemModel.getEventDispatcher());
-      adapter.register();
 
-      createdAdapters.add(adapter);
-      adapter.updateModelProperties(kernel,
-                                    block,
-                                    null);
-
-//      Iterator iMembers = block.getMembers().iterator();
-//
-//      while (iMembers.hasNext()) {
-//        ModelComponent modelComponent = getModelComponent(systemModel, (TCSObjectReference) iMembers.next());
-//        blockModel.addCourseElement(modelComponent);
-//      }
-      // Neue Farbe suchen f�r Blocks, die mindestens ein Member haben
-      if (!block.getMembers().isEmpty()) {
-        ((ColorProperty) blockModel
-         .getProperty(ElementPropKeys.BLOCK_COLOR))
-            .setColor(blockColorCycler.next());
-      }
       // Das zugeh�rige Model Layout Element suchen
       ModelLayoutElement element = systemModel.getLayoutMap().get(block.getReference());
-
-      if (element != null) {
-        Map<String, String> properties = element.getProperties();
-        // Im Layout Element gespeicherte Farbe �berschreibt den Default-Wert
-        String sColor = properties.get(ElementPropKeys.BLOCK_COLOR);
-        String srgb = sColor.substring(1);  // delete trailing "#"
-        Color color = new Color(Integer.parseInt(srgb, 16));
-        ((ColorProperty) blockModel.getProperty(ElementPropKeys.BLOCK_COLOR))
-            .setColor(color);
-      }
+      procAdapterUtil.processAdapterFor(blockModel)
+          .updateModelProperties(block, blockModel, systemModel, objectService, element);
 
       systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS).add(blockModel);
     }
   }
 
-  private void restoreModelLocations(List<LocationModel> locationModels,
-                                     List<Figure> restoredFigures,
-                                     Origin origin, double scaleX, double scaleY) {
+  private List<Figure> restoreLocationsInModel(List<LocationModel> locationModels,
+                                               double scaleX,
+                                               double scaleY,
+                                               SystemModel systemModel) {
+    List<Figure> restoredFigures = new ArrayList<>(locationModels.size());
+
     for (LocationModel locationModel : locationModels) {
-      LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
-      LocationFigure locationFigure = llf.getPresentationFigure();
-      locationFigure.set(FigureConstants.MODEL, locationModel);
-
-      // The corresponding label
-      TCSLabelFigure label = new TCSLabelFigure(locationModel.getName());
-
-      Point2D.Double labelPosition;
-      Point2D.Double figurePosition;
-      double figurePositionX = 0;
-      double figurePositionY = 0;
-      StringProperty stringProperty
-          = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_POS_X);
-      String locPosX = stringProperty.getText();
-      stringProperty = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_POS_Y);
-      String locPosY = stringProperty.getText();
-      if (locPosX != null && locPosY != null) {
-        try {
-          figurePositionX = Integer.parseInt(locPosX);
-          figurePositionY = Integer.parseInt(locPosY);
-        }
-        catch (NumberFormatException ex) {
-        }
-      }
-
-      // Label
-      stringProperty
-          = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
-      String labelOffsetX = stringProperty.getText();
-      stringProperty
-          = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
-      String labelOffsetY = stringProperty.getText();
-      // TODO: labelOrientationAngle auswerten
-//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
-
-      double labelPositionX;
-      double labelPositionY;
-      if (labelOffsetX != null && labelOffsetY != null) {
-        try {
-          labelPositionX = Integer.parseInt(labelOffsetX);
-          labelPositionY = Integer.parseInt(labelOffsetY);
-        }
-        catch (NumberFormatException ex) {
-          // XXX This does not look right.
-          labelPositionX = labelPositionY = -20;
-        }
-
-        labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
-        label.setOffset(labelPosition);
-      }
-      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
-      locationFigure.setBounds(figurePosition, figurePosition);
-
-      labelPosition = locationFigure.getStartPoint();
-      labelPosition.x += label.getOffset().x;
-      labelPosition.y += label.getOffset().y;
-      label.setBounds(labelPosition, null);
-      llf.setLabel(label);
+      LabeledLocationFigure llf = createLocationFigure(locationModel, scaleX, scaleY);
 
       locationModel.setFigure(llf);
       locationModel.addAttributesChangeListener(llf);
 
-      String locationTypeName = (String) ((LocationTypeProperty) locationModel
-                                          .getProperty(LocationModel.TYPE)).getValue();
-      locationModel.setLocationType(getLocationTypeComponent(locationTypeName));
+      String locationTypeName = (String) locationModel.getPropertyType().getValue();
+      locationModel.setLocationType(getLocationTypeComponent(systemModel, locationTypeName));
 
-      for (LinkModel linkModel : getAttachedLinks(locationModel)) {
-        PointModel pointModel = linkModel.getPoint();
-        LabeledPointFigure lpf = pointModel.getFigure();
-        LinkConnection linkConnection = crsObjFactory.createLinkConnection();
-        linkConnection.set(FigureConstants.MODEL, linkModel);
-        linkConnection.connect(lpf, llf);
+      for (LinkModel linkModel : getAttachedLinks(systemModel, locationModel)) {
+        LinkConnection linkConnection = createLinkFigure(linkModel, llf);
 
         linkModel.setFigure(linkConnection);
         linkModel.addAttributesChangeListener(linkConnection);
         restoredFigures.add(linkConnection);
       }
 
-      procAdapterUtil.createProcessAdapter(locationModel,
-                                           systemModel
-                                               .getEventDispatcher());
       locationModel.propertiesChanged(new NullAttributesChangeListener());
-      origin.addListener(llf);
-      llf.set(FigureConstants.ORIGIN, origin);
       restoredFigures.add(llf);
     }
+
+    return restoredFigures;
+  }
+
+  private LabeledLocationFigure createLocationFigure(LocationModel locationModel,
+                                                     double scaleX,
+                                                     double scaleY) {
+    LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
+    LocationFigure locationFigure = llf.getPresentationFigure();
+    locationFigure.set(FigureConstants.MODEL, locationModel);
+
+    // The corresponding label
+    TCSLabelFigure label = new TCSLabelFigure(locationModel.getName());
+
+    Point2D.Double labelPosition;
+    Point2D.Double figurePosition;
+    double figurePositionX = 0;
+    double figurePositionY = 0;
+    String locPosX = locationModel.getPropertyLayoutPositionX().getText();
+    String locPosY = locationModel.getPropertyLayoutPositionY().getText();
+    if (locPosX != null && locPosY != null) {
+      try {
+        figurePositionX = Integer.parseInt(locPosX);
+        figurePositionY = Integer.parseInt(locPosY);
+      }
+      catch (NumberFormatException ex) {
+      }
+    }
+
+    // Label
+    String labelOffsetX = locationModel.getPropertyLabelOffsetX().getText();
+    String labelOffsetY = locationModel.getPropertyLabelOffsetY().getText();
+    // TODO: labelOrientationAngle auswerten
+//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+
+    double labelPositionX;
+    double labelPositionY;
+    if (labelOffsetX != null && labelOffsetY != null) {
+      try {
+        labelPositionX = Integer.parseInt(labelOffsetX);
+        labelPositionY = Integer.parseInt(labelOffsetY);
+      }
+      catch (NumberFormatException ex) {
+        // XXX This does not look right.
+        labelPositionX = labelPositionY = -20;
+      }
+
+      labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
+      label.setOffset(labelPosition);
+    }
+    figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
+    locationFigure.setBounds(figurePosition, figurePosition);
+
+    labelPosition = locationFigure.getStartPoint();
+    labelPosition.x += label.getOffset().x;
+    labelPosition.y += label.getOffset().y;
+    label.setBounds(labelPosition, null);
+    llf.setLabel(label);
+
+    return llf;
+  }
+
+  private LinkConnection createLinkFigure(LinkModel linkModel, LabeledLocationFigure llf) {
+    PointModel pointModel = linkModel.getPoint();
+    LabeledPointFigure lpf = pointModel.getFigure();
+    LinkConnection linkConnection = crsObjFactory.createLinkConnection();
+    linkConnection.set(FigureConstants.MODEL, linkModel);
+    linkConnection.connect(lpf, llf);
+    linkConnection.getModel().updateName();
+
+    return linkConnection;
   }
 
   private void restoreModelLocations(Set<Location> allLocations,
                                      SystemModel systemModel,
-                                     Origin origin, double scaleX, double scaleY,
-                                     Set<ProcessAdapter> createdAdapters,
+                                     Origin origin,
                                      List<Figure> restoredFigures,
-                                     Kernel kernel) {
-    // --- Alle Locations, die der Kernel kennt ---
+                                     TCSObjectService objectService) {
     for (Location location : allLocations) {
-      // Neues Figure-Objekt
-      LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
-      LocationFigure locationFigure = llf.getPresentationFigure();
-      // Das zugeh�rige Modell
-      LocationModel locationModel = locationFigure.getModel();
-      // Adapter zur Verkn�pfung des Kernel-Objekts mit der Figur
-      LocationAdapter adapter = procAdapterFactory.createLocationAdapter(
-          locationModel, systemModel.getEventDispatcher());
-      adapter.register();
+      LocationModel locationModel = new LocationModel();
 
-      createdAdapters.add(adapter);
-      // Das zugeh�rige Model Layout Element suchen und mit dem Adapter verkn�pfen
-      ModelLayoutElement layoutElement
-          = systemModel.getLayoutMap().get(location.getReference());
+      ModelLayoutElement layoutElement = systemModel.getLayoutMap().get(location.getReference());
+      procAdapterUtil.processAdapterFor(locationModel)
+          .updateModelProperties(location, locationModel, systemModel, objectService, layoutElement);
 
-      // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
-      adapter.updateModelProperties(kernel,
-                                    location,
-                                    layoutElement);
-      // Default-Position f�r den Fall, dass kein Layout-Element zu dieser Location gefunden wurde
-      double figurePositionX = location.getPosition().getX();
-      double figurePositionY = location.getPosition().getY();
-      // Die zugeh�rige Beschriftung:
-      TCSLabelFigure label = new TCSLabelFigure(location.getName());
-
-      Point2D.Double labelPosition;
-      if (layoutElement != null) {
-        Map<String, String> layoutProperties = layoutElement.getProperties();
-        String locPosX = layoutProperties.get(ElementPropKeys.LOC_POS_X);
-        String locPosY = layoutProperties.get(ElementPropKeys.LOC_POS_Y);
-        // Die in den Properties gespeicherte Position �berschreibt die im Kernel-Objekt gespeicherten Werte
-        // TO DO: Auswahl, z.B. �ber Parameter?
-        if (locPosX != null && locPosY != null) {
-          try {
-            figurePositionX = Integer.parseInt(locPosX);
-            figurePositionY = Integer.parseInt(locPosY);
-          }
-          catch (NumberFormatException ex) {
-            figurePositionX = figurePositionY = 0;
-          }
-        }
-
-        String labelOffsetX = layoutProperties.get(ElementPropKeys.LOC_LABEL_OFFSET_X);
-        String labelOffsetY = layoutProperties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y);
-        // TODO: labelOrientationAngle auswerten
-//      String labelOrientationAngle = properties.get(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
-
-        double labelPositionX;
-        double labelPositionY;
-        if (labelOffsetX != null && labelOffsetY != null) {
-          try {
-            labelPositionX = Integer.parseInt(labelOffsetX);
-            labelPositionY = Integer.parseInt(labelOffsetY);
-          }
-          catch (NumberFormatException ex) {
-            labelPositionX = labelPositionY = -20;
-          }
-
-          labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
-          label.setOffset(labelPosition);
-        }
-      }
-      // Figur auf diese Position verschieben
-      Point2D.Double figurePosition = new Point2D.Double(figurePositionX / scaleX,
-                                                         -figurePositionY / scaleY);  // Vorzeichen!
-      locationFigure.setBounds(figurePosition, figurePosition);
-
-      labelPosition = locationFigure.getStartPoint();
-      labelPosition.x += label.getOffset().x;
-      labelPosition.y += label.getOffset().y;
-      label.setBounds(labelPosition, labelPosition);
-      llf.setLabel(label);
+      LabeledLocationFigure llf = createLocationFigure(locationModel,
+                                                       origin.getScaleX(),
+                                                       origin.getScaleY());
 
       locationModel.setFigure(llf);
       locationModel.addAttributesChangeListener(llf);
       systemModel.getMainFolder(SystemModel.FolderKey.LOCATIONS).add(locationModel);
       restoredFigures.add(llf);
-      // Den Stationstyp zuweisen
-      // Der Typ der Station
-      LocationTypeModel type = (LocationTypeModel) getModelComponent(systemModel,
-                                                                     location.getType());
+
+      LocationTypeModel type = getLocationTypeComponent(systemModel, location.getType().getName());
       locationModel.setLocationType(type);
       locationModel.updateTypeProperty(systemModel.getLocationTypeModels());
       locationModel.propertiesChanged(new NullAttributesChangeListener());
-      // XXX Why clearing the objects properties? pseifert @ 25.04.14
-      //kernel().clearTCSObjectProperties(location.getReference());
-      KeyValueSetProperty misc
-          = (KeyValueSetProperty) locationModel.getProperty(ModelComponent.MISCELLANEOUS);
 
-      if (misc != null) {
-        for (String key : location.getProperties().keySet()) {
-          misc.addItem(new KeyValueProperty(locationModel, key, location.getProperties().get(key)));
-        }
-        // Datei f�r Default-Symbol
-        SymbolProperty symbol
-            = (SymbolProperty) locationModel
-                .getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
-
-        if (symbol.getLocationRepresentation() != null) {
-          LocationRepresentation symbolName = symbol.getLocationRepresentation();
-          KeyValueProperty pr = new KeyValueProperty(locationModel,
-                                                     ObjectPropConstants.LOC_DEFAULT_REPRESENTATION,
-                                                     symbolName.name());
-          misc.addItem(pr);
-
-          Iterator<KeyValueProperty> e = misc.getItems().iterator();
-
-          while (e.hasNext()) {
-            pr = e.next();
-            kernel.setTCSObjectProperty(location.getReference(), pr.getKey(), pr.getValue());
-          }
-        }
-      }
-
-      // Die zugeh�rigen Links
       for (Link link : location.getAttachedLinks()) {
-        // Der mit dem Link verbundene Point
-        PointModel pointModel = (PointModel) getModelComponent(systemModel, link.getPoint());
-        LabeledPointFigure lpf = pointModel.getFigure();
-        // Eine Figure zur Darstellung des Links...
-        LinkConnection linkConnection = crsObjFactory.createLinkConnection();
-        // ...verbindet Point und Location
-        linkConnection.connect(lpf, llf);
+        PointModel pointModel = getPointComponent(systemModel, link.getPoint().getName());
 
-        // Das zur Figure geh�rige Datenmodell in der GUI
-        LinkModel linkModel = linkConnection.getModel();
-        // Speziell f�r diesen Link erlaubte Operation
-        StringSetProperty pOperations
-            = (StringSetProperty) linkModel.getProperty(LinkModel.ALLOWED_OPERATIONS);
-        pOperations.setItems(new ArrayList<>(link.getAllowedOperations()));
+        LinkModel linkModel = new LinkModel();
 
-        LinkAdapter linkAdapter = addProcessAdapter(systemModel, linkModel);
-        createdAdapters.add(linkAdapter);
+        linkModel.setConnectedComponents(pointModel, locationModel);
+        linkModel.updateName();
+        linkModel.getPropertyStartComponent().setText(pointModel.getName());
+        linkModel.getPropertyEndComponent().setText(locationModel.getName());
+        linkModel.getPropertyAllowedOperations()
+            .setItems(new ArrayList<>(link.getAllowedOperations()));
+
+        LinkConnection linkConnection = createLinkFigure(linkModel, llf);
+
         linkModel.setFigure(linkConnection);
         linkModel.addAttributesChangeListener(linkConnection);
         systemModel.getMainFolder(SystemModel.FolderKey.LINKS).add(linkModel);
         restoredFigures.add(linkConnection);
       }
 
-      // Koordinaten der Location �ndern sich, wenn der Ma�stab ver�ndert wird
       origin.addListener(llf);
       llf.set(FigureConstants.ORIGIN, origin);
     }
   }
 
-  private void restoreModelLocationTypes(List<LocationTypeModel> locTypeModels) {
-    for (LocationTypeModel locTypeModel : locTypeModels) {
-      procAdapterUtil.createProcessAdapter(locTypeModel,
-                                           systemModel
-                                               .getEventDispatcher());
-    }
-  }
-
   private void restoreModelLocationTypes(Set<LocationType> allLocationTypes,
                                          SystemModel systemModel,
-                                         Set<ProcessAdapter> createdAdapters,
-                                         Kernel kernel) {
-    // --- Alle Location-Types, die der Kernel kennt ---
+                                         TCSObjectService objectService) {
     for (LocationType locationType : allLocationTypes) {
       LocationTypeModel locationTypeModel = crsObjFactory.createLocationTypeModel();
-      LocationTypeAdapter adapter = procAdapterFactory.createLocTypeAdapter(
-          locationTypeModel, systemModel.getEventDispatcher());
-      adapter.register();
 
-      createdAdapters.add(adapter);
-      adapter.updateModelProperties(kernel,
-                                    locationType,
-                                    null);
-      systemModel
-          .getMainFolder(SystemModel.FolderKey.LOCATION_TYPES)
-          .add(locationTypeModel);
-    }
-  }
-
-  private void restoreModelLinks(List<LinkModel> linkModels) {
-    for (LinkModel linkModel : linkModels) {
-      procAdapterUtil.createProcessAdapter(linkModel,
-                                           systemModel
-                                               .getEventDispatcher());
-    }
-  }
-
-  private void restoreModelVehicles(List<VehicleModel> vehicles) {
-    for (VehicleModel vehModel : vehicles) {
-      procAdapterUtil.createProcessAdapter(vehModel,
-                                           systemModel
-                                               .getEventDispatcher());
+      procAdapterUtil.processAdapterFor(locationTypeModel)
+          .updateModelProperties(locationType, locationTypeModel, systemModel, objectService, null);
+      systemModel.getMainFolder(SystemModel.FolderKey.LOCATION_TYPES).add(locationTypeModel);
     }
   }
 
   private void restoreModelVehicles(Set<Vehicle> allVehicles,
                                     SystemModel systemModel,
-                                    Set<ProcessAdapter> createdAdapters,
-                                    Kernel kernel) {
-    Iterator<Color> routeColorCycler = Iterators.cycle(Colors.defaultColors());
-    // --- Alle Fahrzeuge, die der Kernel kennt ---
+                                    TCSObjectService objectService) {
     for (Vehicle vehicle : allVehicles) {
       VehicleModel vehicleModel = crsObjFactory.createVehicleModel();
       vehicleModel.setVehicle(vehicle);
-      // Adapter zur Verkn�pfung des Kernel-Objekts mit der Figur
-      VehicleAdapter adapter = procAdapterFactory.createVehicleAdapter(
-          vehicleModel, systemModel.getEventDispatcher());
-      adapter.register();
 
-      createdAdapters.add(adapter);
-      // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
-      adapter.updateModelProperties(kernel,
-                                    vehicle,
-                                    null);
-
-      // Neue Farbe suchen für Vehicles
-      ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
-          .setColor(routeColorCycler.next());
-      // Das zugeh�rige Model Layout Element suchen
       ModelLayoutElement element = systemModel.getLayoutMap().get(vehicle.getReference());
-
-      if (element != null) {
-        Map<String, String> properties = element.getProperties();
-        // Im Layout Element gespeicherte Farbe �berschreibt den Default-Wert
-        String sColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR);
-        String srgb = sColor.substring(1);  // delete trailing "#"
-        Color color = new Color(Integer.parseInt(srgb, 16));
-        ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
-            .setColor(color);
-      }
-      SpeedProperty maxVelP
-          = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_VELOCITY);
-      maxVelP.setValueAndUnit(vehicle.getMaxVelocity(), Unit.MM_S);
-      SpeedProperty maxRevVelP
-          = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
-      maxRevVelP.setValueAndUnit(vehicle.getMaxReverseVelocity(), Unit.MM_S);
+      procAdapterUtil.processAdapterFor(vehicleModel)
+          .updateModelProperties(vehicle, vehicleModel, systemModel, objectService, element);
 
       systemModel.getMainFolder(SystemModel.FolderKey.VEHICLES).add(vehicleModel);
-      // Die VehicleFigures werden erst in OpenTCSDrawingView.setVehicles() erzeugt
+      // VehicleFigures will be created in OpenTCSDrawingView.setVehicles().
     }
   }
 
-  private void restoreModelPaths(List<PathModel> paths,
-                                 List<Figure> restoredFigures,
-                                 Origin origin) {
+  private List<Figure> restorePathsInModel(List<PathModel> paths, SystemModel systemModel) {
+    List<Figure> restoredFigures = new ArrayList<>(paths.size());
+
     for (PathModel pathModel : paths) {
-      PathConnection pathFigure = crsObjFactory.createPathConnection();
-      pathFigure.set(FigureConstants.MODEL, pathModel);
-      StringProperty stringProperty
-          = (StringProperty) pathModel.getProperty(AbstractConnection.START_COMPONENT);
-      PointModel startPointModel = getPointComponent(stringProperty.getText());
-      stringProperty = (StringProperty) pathModel.getProperty(AbstractConnection.END_COMPONENT);
-      PointModel endPointModel = getPointComponent(stringProperty.getText());
-      if (startPointModel != null && endPointModel != null) {
-        pathFigure.connect(startPointModel.getFigure(), endPointModel.getFigure());
-      }
+      PathConnection pathFigure = createPathFigure(pathModel, systemModel);
 
-      AbstractProperty property
-          = (AbstractProperty) pathModel.getProperty(ElementPropKeys.PATH_CONN_TYPE);
-      PathModel.LinerType connectionType = (PathModel.LinerType) property.getValue();
-
-      if (connectionType != null) {
-        pathFigure.setLinerByType(connectionType);
-
-        stringProperty
-            = (StringProperty) pathModel.getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
-        String sControlPoints = stringProperty.getText();
-        initPathControlPoints(connectionType, sControlPoints, pathFigure);
-      }
-
-      procAdapterUtil.createProcessAdapter(pathModel, systemModel.getEventDispatcher());
       pathModel.setFigure(pathFigure);
       pathModel.addAttributesChangeListener(pathFigure);
+
       restoredFigures.add(pathFigure);
-      origin.addListener(pathFigure);
-      pathFigure.set(FigureConstants.ORIGIN, origin);
     }
+
+    return restoredFigures;
+  }
+
+  private PathConnection createPathFigure(PathModel pathModel, SystemModel systemModel) {
+    PathConnection pathFigure = crsObjFactory.createPathConnection();
+
+    pathFigure.set(FigureConstants.MODEL, pathModel);
+    PointModel startPointModel = getPointComponent(systemModel,
+                                                   pathModel.getPropertyStartComponent().getText());
+    PointModel endPointModel = getPointComponent(systemModel,
+                                                 pathModel.getPropertyEndComponent().getText());
+    if (startPointModel != null && endPointModel != null) {
+      pathFigure.connect(startPointModel.getFigure(), endPointModel.getFigure());
+    }
+
+    PathModel.LinerType connectionType
+        = (PathModel.LinerType) pathModel.getPropertyPathConnType().getValue();
+
+    if (connectionType != null) {
+      initPathControlPoints(connectionType,
+                            pathModel.getPropertyPathControlPoints().getText(),
+                            pathFigure);
+      pathFigure.setLinerByType(connectionType);
+    }
+
+    pathFigure.updateDecorations();
+
+    return pathFigure;
   }
 
   private void restoreModelPaths(Set<Path> allPaths, SystemModel systemModel,
                                  Origin origin,
-                                 Set<ProcessAdapter> createdAdapters,
                                  List<Figure> restoredFigures,
-                                 Kernel kernel) {
-    // --- Alle Pfade, die der Kernel kennt ---
+                                 TCSObjectService objectService) {
     for (Path path : allPaths) {
-      // Neues Figure-Objekt
-      PathConnection pathFigure = crsObjFactory.createPathConnection();
-      // Das zugeh�rige Modell
-      PathModel pathModel = pathFigure.getModel();
-      // Anfangs- und Endpunkte
-      PointModel startPointModel = (PointModel) getModelComponent(systemModel,
-                                                                  path.getSourcePoint());
-      PointModel endPointModel = (PointModel) getModelComponent(systemModel,
-                                                                path.getDestinationPoint());
-      pathFigure.connect(startPointModel.getFigure(), endPointModel.getFigure());
-      // Adapter zur Verkn�pfung des Kernel-Objekts mit der Figur
-      PathAdapter adapter = procAdapterFactory.createPathAdapter(
-          pathModel, systemModel.getEventDispatcher());
-      adapter.register();
+      PathModel pathModel = new PathModel();
 
-      createdAdapters.add(adapter);
-      // Das zugeh�rige Model Layout Element suchen und mit dem Adapter verkn�pfen
       ModelLayoutElement layoutElement = systemModel.getLayoutMap().get(path.getReference());
+      procAdapterUtil.processAdapterFor(pathModel)
+          .updateModelProperties(path, pathModel, systemModel, objectService, layoutElement);
 
-      // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
-      adapter.updateModelProperties(kernel,
-                                    path,
-                                    layoutElement);
-
-      pathFigure.updateDecorations();
-
-      if (layoutElement != null) {
-        Map<String, String> layoutProperties = layoutElement.getProperties();
-        AbstractProperty property
-            = (AbstractProperty) pathModel.getProperty(ElementPropKeys.PATH_CONN_TYPE);
-        String sConnectionType = layoutProperties.get(ElementPropKeys.PATH_CONN_TYPE);
-
-        if (sConnectionType != null && !sConnectionType.isEmpty()) {
-          PathModel.LinerType connectionType
-              = PathModel.LinerType.valueOfNormalized(sConnectionType);
-          property.setValue(connectionType);
-          pathFigure.setLinerByType(connectionType);
-
-          String sControlPoints = layoutProperties.get(ElementPropKeys.PATH_CONTROL_POINTS);
-          initPathControlPoints(connectionType, sControlPoints, pathFigure);
-        }
-      }
+      PathConnection pathFigure = createPathFigure(pathModel, systemModel);
 
       pathModel.setFigure(pathFigure);
       pathModel.addAttributesChangeListener(pathFigure);
@@ -1145,207 +872,146 @@ public class OpenTCSModelManager
   private void initPathControlPoints(PathModel.LinerType connectionType,
                                      String sControlPoints,
                                      PathConnection pathFigure) {
-    if (connectionType.equals(PathModel.LinerType.BEZIER)
-        || connectionType.equals(PathModel.LinerType.BEZIER_3)) {
-      // Format: x1,y1 or x1,y1;x2,y2
-      if (sControlPoints != null && !sControlPoints.isEmpty()) {
-        String[] values = sControlPoints.split("[,;]");
+    if (connectionType != PathModel.LinerType.BEZIER
+        && connectionType != PathModel.LinerType.BEZIER_3) {
+      return;
+    }
+    if (Strings.isNullOrEmpty(sControlPoints)) {
+      return;
+    }
 
-        try {
-          if (values.length >= 2) {
-            int xcp1 = (int) Double.parseDouble(values[0]);
-            int ycp1 = (int) Double.parseDouble(values[1]);
-            Point2D.Double cp1 = new Point2D.Double(xcp1, ycp1);
+    // Format: x1,y1 or x1,y1;x2,y2
+    String[] values = sControlPoints.split("[,;]");
 
-            if (values.length >= 4) {
-              int xcp2 = (int) Double.parseDouble(values[2]);
-              int ycp2 = (int) Double.parseDouble(values[3]);
-              Point2D.Double cp2 = new Point2D.Double(xcp2, ycp2);
+    try {
+      if (values.length >= 2) {
+        int xcp1 = (int) Double.parseDouble(values[0]);
+        int ycp1 = (int) Double.parseDouble(values[1]);
+        Point2D.Double cp1 = new Point2D.Double(xcp1, ycp1);
 
-              if (values.length >= 10) {
-                int xcp3 = (int) Double.parseDouble(values[4]);
-                int ycp3 = (int) Double.parseDouble(values[5]);
-                int xcp4 = (int) Double.parseDouble(values[6]);
-                int ycp4 = (int) Double.parseDouble(values[7]);
-                int xcp5 = (int) Double.parseDouble(values[8]);
-                int ycp5 = (int) Double.parseDouble(values[9]);
-                Point2D.Double cp3 = new Point2D.Double(xcp3, ycp3);
-                Point2D.Double cp4 = new Point2D.Double(xcp4, ycp4);
-                Point2D.Double cp5 = new Point2D.Double(xcp5, ycp5);
-                pathFigure.addControlPoints(cp1, cp2, cp3, cp4, cp5);
-              }
-              else {
-                pathFigure.addControlPoints(cp1, cp2);  // Cubic curve
-              }
-            }
-            else {
-              pathFigure.addControlPoints(cp1, cp1);  // Quadratic curve
-            }
+        if (values.length >= 4) {
+          int xcp2 = (int) Double.parseDouble(values[2]);
+          int ycp2 = (int) Double.parseDouble(values[3]);
+          Point2D.Double cp2 = new Point2D.Double(xcp2, ycp2);
+
+          if (values.length >= 10) {
+            int xcp3 = (int) Double.parseDouble(values[4]);
+            int ycp3 = (int) Double.parseDouble(values[5]);
+            int xcp4 = (int) Double.parseDouble(values[6]);
+            int ycp4 = (int) Double.parseDouble(values[7]);
+            int xcp5 = (int) Double.parseDouble(values[8]);
+            int ycp5 = (int) Double.parseDouble(values[9]);
+            Point2D.Double cp3 = new Point2D.Double(xcp3, ycp3);
+            Point2D.Double cp4 = new Point2D.Double(xcp4, ycp4);
+            Point2D.Double cp5 = new Point2D.Double(xcp5, ycp5);
+            pathFigure.addControlPoints(cp1, cp2, cp3, cp4, cp5);
+          }
+          else {
+            pathFigure.addControlPoints(cp1, cp2);  // Cubic curve
           }
         }
-        catch (NumberFormatException nfex) {
-          LOG.info("Error while parsing bezier control points.", nfex);
+        else {
+          pathFigure.addControlPoints(cp1, cp1);  // Quadratic curve
         }
       }
     }
+    catch (NumberFormatException nfex) {
+      LOG.info("Error while parsing bezier control points.", nfex);
+    }
   }
 
-  private void restoreModelPoints(List<PointModel> points,
-                                  List<Figure> restoredFigures,
-                                  Origin origin, double scaleX, double scaleY) {
+  private List<Figure> restorePointsInModel(List<PointModel> points,
+                                            double scaleX,
+                                            double scaleY) {
+    List<Figure> restoredFigures = new ArrayList<>(points.size());
+
     for (PointModel pointModel : points) {
-      LabeledPointFigure lpf = crsObjFactory.createPointFigure();
-      PointFigure pointFigure = lpf.getPresentationFigure();
-      pointFigure.setModel(pointModel);
-
-      // The corresponding label
-      TCSLabelFigure label = new TCSLabelFigure(pointModel.getName());
-
-      Point2D.Double labelPosition;
-      Point2D.Double figurePosition;
-      double figurePositionX = 0;
-      double figurePositionY = 0;
-      StringProperty stringProperty
-          = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_POS_X);
-      String pointPosX = stringProperty.getText();
-      stringProperty = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_POS_Y);
-      String pointPosY = stringProperty.getText();
-      if (pointPosX != null && pointPosY != null) {
-        try {
-          figurePositionX = Integer.parseInt(pointPosX);
-          figurePositionY = Integer.parseInt(pointPosY);
-        }
-        catch (NumberFormatException ex) {
-        }
-      }
-
-      // Label
-      stringProperty
-          = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
-      String labelOffsetX = stringProperty.getText();
-      stringProperty
-          = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
-      String labelOffsetY = stringProperty.getText();
-      // TODO: labelOrientationAngle auswerten
-//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
-
-      double labelPositionX;
-      double labelPositionY;
-      if (labelOffsetX != null && labelOffsetY != null) {
-        try {
-          labelPositionX = Integer.parseInt(labelOffsetX);
-          labelPositionY = Integer.parseInt(labelOffsetY);
-        }
-        catch (NumberFormatException ex) {
-          // XXX This does not look right.
-          labelPositionX = labelPositionY = -20;
-        }
-
-        labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
-        label.setOffset(labelPosition);
-      }
-      // Figur auf diese Position verschieben
-      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
-      pointFigure.setBounds(figurePosition, figurePosition);
-
-      labelPosition = pointFigure.getStartPoint();
-      labelPosition.x += label.getOffset().x;
-      labelPosition.y += label.getOffset().y;
-      label.setBounds(labelPosition, null);
-      lpf.setLabel(label);
+      LabeledPointFigure lpf = createPointFigure(pointModel, scaleX, scaleY);
 
       pointModel.setFigure(lpf);
       pointModel.addAttributesChangeListener(lpf);
       restoredFigures.add(lpf);
-
-      procAdapterUtil.createProcessAdapter(pointModel,
-                                           systemModel
-                                               .getEventDispatcher());
-      // Koordinaten der Punkte �ndern sich, wenn der Ma�stab ver�ndert wird
-      origin.addListener(lpf);
-      lpf.set(FigureConstants.ORIGIN, origin);
     }
+
+    return restoredFigures;
+  }
+
+  private LabeledPointFigure createPointFigure(PointModel pointModel,
+                                               double scaleX,
+                                               double scaleY) {
+    LabeledPointFigure lpf = crsObjFactory.createPointFigure();
+    PointFigure pointFigure = lpf.getPresentationFigure();
+    pointFigure.setModel(pointModel);
+
+    // The corresponding label
+    TCSLabelFigure label = new TCSLabelFigure(pointModel.getName());
+
+    Point2D.Double labelPosition;
+    Point2D.Double figurePosition;
+    double figurePositionX = 0;
+    double figurePositionY = 0;
+    String pointPosX = pointModel.getPropertyLayoutPosX().getText();
+    String pointPosY = pointModel.getPropertyLayoutPosY().getText();
+    if (pointPosX != null && pointPosY != null) {
+      try {
+        figurePositionX = Integer.parseInt(pointPosX);
+        figurePositionY = Integer.parseInt(pointPosY);
+      }
+      catch (NumberFormatException ex) {
+      }
+    }
+
+    // Label
+    String labelOffsetX = pointModel.getPropertyPointLabelOffsetX().getText();
+    String labelOffsetY = pointModel.getPropertyPointLabelOffsetY().getText();
+    // TODO: labelOrientationAngle auswerten
+//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
+
+    double labelPositionX;
+    double labelPositionY;
+    if (labelOffsetX != null && labelOffsetY != null) {
+      try {
+        labelPositionX = Integer.parseInt(labelOffsetX);
+        labelPositionY = Integer.parseInt(labelOffsetY);
+      }
+      catch (NumberFormatException ex) {
+        // XXX This does not look right.
+        labelPositionX = labelPositionY = -20;
+      }
+
+      labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
+      label.setOffset(labelPosition);
+    }
+    // Figur auf diese Position verschieben
+    figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
+    pointFigure.setBounds(figurePosition, figurePosition);
+
+    labelPosition = pointFigure.getStartPoint();
+    labelPosition.x += label.getOffset().x;
+    labelPosition.y += label.getOffset().y;
+    label.setBounds(labelPosition, null);
+    lpf.setLabel(label);
+
+    return lpf;
   }
 
   private void restoreModelPoints(Set<Point> allPoints, SystemModel systemModel,
-                                  Origin origin, double scaleX, double scaleY,
-                                  Set<ProcessAdapter> adapters,
+                                  Origin origin,
                                   List<Figure> restoredFigures,
-                                  Kernel kernel) {
-    // --- Alle Punkte, die der Kernel kennt ---
+                                  TCSObjectService objectService) {
     for (Point point : allPoints) {
-      // Neues Figure-Objekt
-      LabeledPointFigure lpf = crsObjFactory.createPointFigure();
-      PointFigure pointFigure = lpf.getPresentationFigure();
-      // Das zugeh�rige Modell
-      PointModel pointModel = pointFigure.getModel();
-      // Adapter zur Verkn�pfung des Kernel-Objekts mit der Figur
-      PointAdapter adapter = procAdapterFactory.createPointAdapter(
-          pointModel, systemModel.getEventDispatcher());
-      adapter.register();
+      PointModel pointModel = new PointModel();
 
       // Das zugeh�rige Model Layout Element suchen und mit dem Adapter verkn�pfen
       ModelLayoutElement layoutElement = systemModel.getLayoutMap().get(point.getReference());
+
       // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
-      adapter.updateModelProperties(kernel,
-                                    point,
-                                    layoutElement);
-      adapters.add(adapter);
-      // Die im Kernel gespeicherte Position
-      double figurePositionX = point.getPosition().getX();
-      double figurePositionY = point.getPosition().getY();
-      // TODO: positionZ = point.getPosition().getZ();  // immer 0
-      // Die zugeh�rige Beschriftung:
-      TCSLabelFigure label = new TCSLabelFigure(point.getName());
+      procAdapterUtil.processAdapterFor(pointModel)
+          .updateModelProperties(point, pointModel, systemModel, objectService, layoutElement);
 
-      Point2D.Double labelPosition;
-      Point2D.Double figurePosition;
-      if (layoutElement != null) {
-        Map<String, String> layoutProperties = layoutElement.getProperties();
-        String pointPosX = layoutProperties.get(ElementPropKeys.POINT_POS_X);
-        String pointPosY = layoutProperties.get(ElementPropKeys.POINT_POS_Y);
-        // Die in den Properties gespeicherte Position �berschreibt die im Kernel-Objekt gespeicherten Werte
-        // TO DO: Auswahl, z.B. �ber Parameter?
-        if (pointPosX != null && pointPosY != null) {
-          try {
-            figurePositionX = Integer.parseInt(pointPosX);
-            figurePositionY = Integer.parseInt(pointPosY);
-          }
-          catch (NumberFormatException ex) {
-          }
-        }
-
-        // Label
-        String labelOffsetX = layoutProperties.get(ElementPropKeys.POINT_LABEL_OFFSET_X);
-        String labelOffsetY = layoutProperties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y);
-        // TODO: labelOrientationAngle auswerten
-//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
-
-        double labelPositionX;
-        double labelPositionY;
-        if (labelOffsetX != null && labelOffsetY != null) {
-          try {
-            labelPositionX = Integer.parseInt(labelOffsetX);
-            labelPositionY = Integer.parseInt(labelOffsetY);
-          }
-          catch (NumberFormatException ex) {
-            // XXX This does not look right.
-            labelPositionX = labelPositionY = -20;
-          }
-
-          labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
-          label.setOffset(labelPosition);
-        }
-      }
-      // Figur auf diese Position verschieben
-      figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
-      pointFigure.setBounds(figurePosition, figurePosition);
-
-      labelPosition = pointFigure.getStartPoint();
-      labelPosition.x += label.getOffset().x;
-      labelPosition.y += label.getOffset().y;
-      label.setBounds(labelPosition, null);
-      lpf.setLabel(label);
+      LabeledPointFigure lpf = createPointFigure(pointModel,
+                                                 origin.getScaleX(),
+                                                 origin.getScaleY());
 
       pointModel.setFigure(lpf);
       pointModel.addAttributesChangeListener(lpf);
@@ -1400,50 +1066,13 @@ public class OpenTCSModelManager
   }
 
   /**
-   * Erzeugt zu einer gelesenen Verkn�pfung einen passenden ProcessAdapter und
-   * f�gt ihn dem EventDispatcher hinzu.
-   *
-   * @param systemModel
-   * @param link Die Verkn�pfung
-   * @param point Der Meldepunkt
-   * @param location Die Station
-   * @return Der erzeugte ProcessAdapter
-   */
-  private LinkAdapter addProcessAdapter(SystemModel systemModel,
-                                        LinkModel link) {
-    LinkAdapter linkAdapter = procAdapterFactory.createLinkAdapter(
-        link, systemModel.getEventDispatcher());
-    linkAdapter.register();
-
-    return linkAdapter;
-  }
-
-  /**
-   * Findet zu einem TCSObject das passende Objekt in der Modellierung.
-   *
-   * @param systemModel
-   * @param ref die Referenz auf das TCSObject
-   * @return das Objekt in der Modellierung
-   */
-  private ModelComponent getModelComponent(SystemModel systemModel,
-                                           TCSObjectReference<?> ref) {
-    ProcessAdapter adapter = systemModel.getEventDispatcher().findProcessAdapter(ref);
-
-    if (adapter == null) {
-      return null;
-    }
-
-    return adapter.getModel();
-  }
-
-  /**
    * Return the point model component with the given name from the
    * system model.
    *
    * @param name The name of the point to return.
    * @return The PointModel that matches the given name.
    */
-  private PointModel getPointComponent(String name) {
+  private PointModel getPointComponent(SystemModel systemModel, String name) {
     for (PointModel modelComponent : systemModel.getPointModels()) {
       if (modelComponent.getName().equals(name)) {
         return modelComponent;
@@ -1459,7 +1088,7 @@ public class OpenTCSModelManager
    * @param name The name of the location type to return.
    * @return The LocationModel that matches the given name.
    */
-  private LocationTypeModel getLocationTypeComponent(String name) {
+  private LocationTypeModel getLocationTypeComponent(SystemModel systemModel, String name) {
     for (LocationTypeModel modelComponent : systemModel.getLocationTypeModels()) {
       if (modelComponent.getName().equals(name)) {
         return modelComponent;
@@ -1475,7 +1104,7 @@ public class OpenTCSModelManager
    * @param name The name of the ModelComponent to return.
    * @return The ModelComponent.
    */
-  private ModelComponent getBlockMember(String name) {
+  private ModelComponent getBlockMember(SystemModel systemModel, String name) {
     for (PointModel pModel : systemModel.getPointModels()) {
       if (name.equals(pModel.getName())) {
         return pModel;
@@ -1501,8 +1130,8 @@ public class OpenTCSModelManager
    * @param name The name of the ModelComponent to return.
    * @return The ModelComponent.
    */
-  private ModelComponent getGroupMember(String name) {
-    return getBlockMember(name);
+  private ModelComponent getGroupMember(SystemModel systemModel, String name) {
+    return getBlockMember(systemModel, name);
   }
 
   /**
@@ -1515,22 +1144,22 @@ public class OpenTCSModelManager
    * links.
    * @return A list with the connected links.
    */
-  private List<LinkModel> getAttachedLinks(LocationModel locationModel) {
+  private List<LinkModel> getAttachedLinks(SystemModel systemModel, LocationModel locationModel) {
     List<LinkModel> links = new ArrayList<>();
     String locationName = locationModel.getName();
     for (LinkModel link : systemModel.getLinkModels()) {
-      StringProperty startProperty
-          = (StringProperty) link.getProperty(AbstractConnection.START_COMPONENT);
-      StringProperty endProperty
-          = (StringProperty) link.getProperty(AbstractConnection.END_COMPONENT);
-      if (startProperty.getText().equals(locationName)) {
-        PointModel pointModel = getPointComponent(endProperty.getText());
+      if (link.getPropertyStartComponent().getText().equals(locationName)) {
+        PointModel pointModel = getPointComponent(systemModel,
+                                                  link.getPropertyEndComponent().getText());
         link.setConnectedComponents(pointModel, locationModel);
+        link.updateName();
         links.add(link);
       }
-      else if (endProperty.getText().equals(locationName)) {
-        PointModel pointModel = getPointComponent(startProperty.getText());
+      else if (link.getPropertyEndComponent().getText().equals(locationName)) {
+        PointModel pointModel = getPointComponent(systemModel,
+                                                  link.getPropertyStartComponent().getText());
         link.setConnectedComponents(pointModel, locationModel);
+        link.updateName();
         links.add(link);
       }
     }
@@ -1538,34 +1167,25 @@ public class OpenTCSModelManager
     return links;
   }
 
-  /**
-   * Sets some default properties in the given system model.
-   *
-   * @param model The system model
-   */
-  private void initializeDefaultSystemModel(SystemModel model) {
-    List<LayoutModel> layoutModels = model.getLayoutModels();
+  private void initializeSystemModel(SystemModel systemModel) {
+    List<LayoutModel> layoutModels = systemModel.getLayoutModels();
+
     if (!layoutModels.isEmpty()) {
-      double scaleX = Origin.DEFAULT_SCALE;
-      double scaleY = Origin.DEFAULT_SCALE;
       LayoutModel layoutModel = layoutModels.get(0);
-      LengthProperty pScaleX = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_X);
+
+      LengthProperty pScaleX = layoutModel.getPropertyScaleX();
       if (pScaleX.getValueByUnit(LengthProperty.Unit.MM) == 0) {
-        pScaleX.setValueAndUnit(scaleX, LengthProperty.Unit.MM);
+        pScaleX.setValueAndUnit(Origin.DEFAULT_SCALE, LengthProperty.Unit.MM);
       }
-      LengthProperty pScaleY = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_Y);
+
+      LengthProperty pScaleY = layoutModel.getPropertyScaleY();
       if (pScaleY.getValueByUnit(LengthProperty.Unit.MM) == 0) {
-        pScaleY.setValueAndUnit(scaleY, LengthProperty.Unit.MM);
+        pScaleY.setValueAndUnit(Origin.DEFAULT_SCALE, LengthProperty.Unit.MM);
       }
-      model.getDrawingMethod().getOrigin()
+
+      systemModel.getDrawingMethod().getOrigin()
           .setScale(pScaleX.getValueByUnit(LengthProperty.Unit.MM),
                     pScaleY.getValueByUnit(LengthProperty.Unit.MM));
     }
-    LayoutModel layoutComponent
-        = (LayoutModel) model.getMainFolder(SystemModel.FolderKey.LAYOUT);
-
-    LayoutAdapter adapter = procAdapterFactory.createLayoutAdapter(
-        layoutComponent, model.getEventDispatcher());
-    adapter.register();
   }
 }

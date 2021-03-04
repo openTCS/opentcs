@@ -1,0 +1,51 @@
+apply from: "${rootDir}/gradle/application-guice.gradle"
+apply from: "${rootDir}/gradle/license-headers.gradle"
+
+if (!hasProperty('mainClass')) {
+  ext.mainClass = 'org.opentcs.kernelcontrolcenter.RunKernelControlCenter'
+}
+mainClassName = ext.mainClass
+
+ext.collectableDistDir = new File(buildDir, 'install')
+
+dependencies {
+  compile project(':openTCS-API-Injection')
+  compile project(':openTCS-Common')
+  compile project(':openTCS-CommAdapter-Loopback')
+  
+  compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
+  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
+  
+  runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:-rawtypes"
+}
+
+distributions {
+  main {
+    contents {
+      from "${sourceSets.main.resources.srcDirs[0]}/org/opentcs/kernelcontrolcenter/distribution"
+    }
+  }
+}
+
+// For now, we're using hand-crafted start scripts, so disable the application plugin's start 
+// script generation.
+startScripts.enabled = false
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+run {
+  systemProperties(['java.util.logging.config.file':'./config/logging.config',\
+                    'java.security.policy':'file:./config/java.policy',\
+                    'sun.java2d.d3d':'false',\
+                    'opentcs.base':'.',\
+                    'opentcs.home':'.'])
+  jvmArgs('-XX:-OmitStackTraceInFastThrow',\
+          '-splash:bin/splash-image.gif')
+}

@@ -9,6 +9,8 @@
  */
 package org.opentcs.guing.application;
 
+import org.opentcs.components.plantoverview.PlantModelExporter;
+import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.guing.model.FiguresFolder;
 import org.opentcs.guing.model.ModelComponent;
 
@@ -66,6 +68,13 @@ public interface GuiManager {
    * Loads a plant model.
    */
   void loadModel();
+  
+  /**
+   * Imports a plant model using the given importer.
+   *
+   * @param importer The importer.
+   */
+  void importModel(PlantModelImporter importer);
 
   /**
    * @return
@@ -77,6 +86,14 @@ public interface GuiManager {
    * @return
    */
   boolean saveModelAs();
+  
+  /**
+   * Exports a plant model using the given exporter.
+   *
+   * @param exporter The exporter.
+   * @return 
+   */
+  void exportModel(PlantModelExporter exporter);
 
   /**
    * Creates a new model component instance that does not have a corresponding figure.

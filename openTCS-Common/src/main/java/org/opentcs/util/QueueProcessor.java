@@ -10,6 +10,7 @@ package org.opentcs.util;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,10 @@ import org.slf4j.LoggerFactory;
  *
  * @param <E> The type of queue elements.
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use a <code>BlockingQueue</code>, instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public abstract class QueueProcessor<E>
     implements Runnable {
 

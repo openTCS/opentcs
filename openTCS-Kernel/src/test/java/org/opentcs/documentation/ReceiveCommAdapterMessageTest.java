@@ -14,8 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
@@ -33,7 +32,7 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class ReceiveCommAdapterMessageTest {
 
-  private LocalKernel localKernel;
+  private TCSObjectService objectService;
 
   private Vehicle sampleVehicle;
 
@@ -41,22 +40,22 @@ public class ReceiveCommAdapterMessageTest {
 
   @Before
   public void setUp() {
-    localKernel = mock(LocalKernel.class);
+    objectService = mock(TCSObjectService.class);
     sampleVehicle = createSampleVehicle();
     sampleTransportOrder = createSampleTransportOrder();
-    when(localKernel.getTCSObject(eq(Vehicle.class), any(String.class))).thenReturn(sampleVehicle);
-    when(localKernel.getTCSObject(eq(TransportOrder.class), any(String.class)))
+    when(objectService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(sampleVehicle);
+    when(objectService.fetchObject(eq(TransportOrder.class), any(String.class)))
         .thenReturn(sampleTransportOrder);
   }
 
   @Test
   public void shouldReceiveMessageFromVehicle() {
     // tag::documentation_receiveMessageFromVehicle[]
-    // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    // The object service instance we're working with
+    TCSObjectService objectService = getTCSObjectServiceFromSomewhere();
 
     // Get the vehicle from which information shall be retrieved
-    Vehicle vehicle = kernel.getTCSObject(Vehicle.class, getTheVehicleName());
+    Vehicle vehicle = objectService.fetchObject(Vehicle.class, getTheVehicleName());
 
     // Get the actual property you're looking for
     String property = vehicle.getProperty("someKey");
@@ -68,11 +67,11 @@ public class ReceiveCommAdapterMessageTest {
   public void shouldReceiveMessageFromTransportOrder() {
     // tag::documentation_receiveMessageFromTransportOrder[]
     // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    TCSObjectService objectService = getTCSObjectServiceFromSomewhere();
 
     // Get the tansport order from which information shall be retrieved
-    TransportOrder transportOrder = kernel.getTCSObject(TransportOrder.class,
-                                                        getTheTransportOrderName());
+    TransportOrder transportOrder = objectService.fetchObject(TransportOrder.class,
+                                                              getTheTransportOrderName());
 
     // Get the actual property you're looking for
     String property = transportOrder.getProperty("someKey");
@@ -107,7 +106,7 @@ public class ReceiveCommAdapterMessageTest {
     return sampleTransportOrder.getName();
   }
 
-  private LocalKernel getKernelFromSomewhere() {
-    return localKernel;
+  private TCSObjectService getTCSObjectServiceFromSomewhere() {
+    return objectService;
   }
 }

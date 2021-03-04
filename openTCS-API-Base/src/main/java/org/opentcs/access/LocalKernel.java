@@ -13,6 +13,10 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.components.kernel.services.InternalTransportOrderService;
+import org.opentcs.components.kernel.services.InternalVehicleService;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -46,7 +50,9 @@ public interface LocalKernel
    * @throws IllegalStateException If the model cannot be loaded.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link InternalPlantModelService#loadPlantModel()} instead.
    */
+  @Deprecated
   void loadPlantModel()
       throws CredentialsException, IllegalStateException;
 
@@ -57,7 +63,9 @@ public interface LocalKernel
    * @throws IllegalStateException If the model could not be persisted for some reason.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link InternalPlantModelService#savePlantModel()} instead.
    */
+  @Deprecated
   void savePlantModel()
       throws CredentialsException, IllegalStateException;
 
@@ -82,7 +90,10 @@ public interface LocalKernel
    * exists or if an object exists but is not an instance of the given class.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObject(
+   * java.lang.Class, org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> T getTCSObjectOriginal(Class<T> clazz,
                                                   TCSObjectReference<T> ref)
       throws CredentialsException;
@@ -108,7 +119,10 @@ public interface LocalKernel
    * if an object exists but is not an instance of the given class.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObject(
+   * java.lang.Class, java.lang.String)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> T getTCSObjectOriginal(Class<T> clazz,
                                                   String name)
       throws CredentialsException;
@@ -132,7 +146,9 @@ public interface LocalKernel
    * @return All existing objects of the given class.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObjects(java.lang.Class)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(Class<T> clazz)
       throws CredentialsException;
 
@@ -160,7 +176,10 @@ public interface LocalKernel
    * pattern. If no such objects exist, the returned set will be empty.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObjects(
+   * java.lang.Class, java.util.function.Predicate)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> Set<T> getTCSObjectsOriginal(@Nullable Class<T> clazz,
                                                         Pattern regexp)
       throws CredentialsException;
@@ -171,7 +190,10 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param energyLevel The vehicle's new energy level.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleEnergyLevel(
+   * org.opentcs.data.TCSObjectReference, int)} instead.
    */
+  @Deprecated
   void setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref, int energyLevel)
       throws ObjectUnknownException;
 
@@ -181,7 +203,10 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param rechargeOperation The vehicle's new recharge action.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleRechargeOperation(
+   * org.opentcs.data.TCSObjectReference, java.lang.String)} instead.
    */
+  @Deprecated
   void setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                    String rechargeOperation)
       throws ObjectUnknownException;
@@ -192,7 +217,10 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param devices The vehicle's new load handling devices.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleLoadHandlingDevices(
+   * org.opentcs.data.TCSObjectReference, java.util.List)} instead.
    */
+  @Deprecated
   void setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                      List<LoadHandlingDevice> devices)
       throws ObjectUnknownException;
@@ -232,7 +260,10 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param newState The vehicle's new state.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleState(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.model.Vehicle.State)} instead.
    */
+  @Deprecated
   void setVehicleState(TCSObjectReference<Vehicle> ref, Vehicle.State newState)
       throws ObjectUnknownException;
 
@@ -242,7 +273,10 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param newState The vehicle's new processing state.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleProcState(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.model.Vehicle.ProcState)} instead.
    */
+  @Deprecated
   void setVehicleProcState(TCSObjectReference<Vehicle> ref,
                            Vehicle.ProcState newState)
       throws ObjectUnknownException;
@@ -267,7 +301,10 @@ public interface LocalKernel
    * @param pointRef A reference to the point on which the vehicle is to be
    * placed.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehiclePosition(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                           TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException;
@@ -279,7 +316,10 @@ public interface LocalKernel
    * @param pointRef A reference to the point which the vehicle is expected to
    * occupy next.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleNextPosition(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
                               TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException;
@@ -290,7 +330,10 @@ public interface LocalKernel
    * @param vehicleRef A reference to the vehicle to be modified.
    * @param newPosition The vehicle's precise position in mm.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehiclePrecisePosition(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.model.Triple)} instead.
    */
+  @Deprecated
   void setVehiclePrecisePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  Triple newPosition)
       throws ObjectUnknownException;
@@ -302,7 +345,10 @@ public interface LocalKernel
    * @param vehicleRef A reference to the vehicle to be modified.
    * @param angle The vehicle's orientation angle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleOrientationAngle(
+   * org.opentcs.data.TCSObjectReference, double)} instead.
    */
+  @Deprecated
   void setVehicleOrientationAngle(TCSObjectReference<Vehicle> vehicleRef,
                                   double angle)
       throws ObjectUnknownException;
@@ -313,7 +359,10 @@ public interface LocalKernel
    * @param vehicleRef A reference to the vehicle to be modified.
    * @param orderRef A reference to the transport order the vehicle processes.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleTransportOrder(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference) } instead.
    */
+  @Deprecated
   void setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                 TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException;
@@ -324,7 +373,10 @@ public interface LocalKernel
    * @param vehicleRef A reference to the vehicle to be modified.
    * @param seqRef A reference to the order sequence the vehicle processes.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleOrderSequence(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException;
@@ -336,7 +388,10 @@ public interface LocalKernel
    * @param vehicleRef A reference to the vehicle to be modified.
    * @param index The new index.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use{@link InternalVehicleService#updateVehicleRouteProgressIndex(
+   * org.opentcs.data.TCSObjectReference, int)} instead.
    */
+  @Deprecated
   void setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
                                     int index)
       throws ObjectUnknownException;
@@ -348,7 +403,10 @@ public interface LocalKernel
    * @param newRejection The rejection to be added.
    * @throws ObjectUnknownException If the referenced transport order does not
    * exist.
+   * @deprecated Use {@link InternalTransportOrderService#registerTransportOrderRejection(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.order.Rejection)} instead.
    */
+  @Deprecated
   void addTransportOrderRejection(TCSObjectReference<TransportOrder> ref,
                                   Rejection newRejection)
       throws ObjectUnknownException;
@@ -363,7 +421,10 @@ public interface LocalKernel
    * @param newState The transport order's new state.
    * @throws ObjectUnknownException If the referenced transport order does not
    * exist.
+   * @deprecated Use {@link InternalTransportOrderService#updateTransportOrderState(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.order.TransportOrder.State)} instead.
    */
+  @Deprecated
   void setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                               TransportOrder.State newState)
       throws ObjectUnknownException;
@@ -373,9 +434,34 @@ public interface LocalKernel
    *
    * @param orderRef A reference to the transport order to be modified.
    * @param vehicleRef A reference to the vehicle processing the order.
+   * @param driveOrders The drive orders containing the data to be copied into this transport
+   * order's drive orders.
+   * @throws ObjectUnknownException If the referenced transport order does not exist.
+   * @throws IllegalArgumentException If the destinations of the given drive
+   * orders do not match the destinations of the drive orders in this transport
+   * order.
+   * @deprecated Use {@link InternalTransportOrderService#updateTransportOrderProcessingVehicle(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
+   */
+  @Deprecated
+  void setTransportOrderProcessingVehicle(TCSObjectReference<TransportOrder> orderRef,
+                                          TCSObjectReference<Vehicle> vehicleRef,
+                                          List<DriveOrder> driveOrders)
+      throws ObjectUnknownException, IllegalArgumentException;
+
+  /**
+   * Sets a transport order's processing vehicle.
+   *
+   * @param orderRef A reference to the transport order to be modified.
+   * @param vehicleRef A reference to the vehicle processing the order.
    * @throws ObjectUnknownException If the referenced transport order does not
    * exist.
+   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   void setTransportOrderProcessingVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -394,11 +480,14 @@ public interface LocalKernel
    * @throws IllegalArgumentException If the destinations of the given drive
    * orders do not match the destinations of the drive orders in this transport
    * order.
+   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
                                     List<DriveOrder> newOrders)
-      throws ObjectUnknownException, CredentialsException,
-             IllegalArgumentException;
+      throws ObjectUnknownException, IllegalArgumentException;
 
   /**
    * Sets a transport order's initial drive order.
@@ -411,7 +500,11 @@ public interface LocalKernel
    * exist.
    * @throws IllegalStateException If there already is a current drive order or
    * if the list of future drive orders is empty.
+   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   void setTransportOrderInitialDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException;
@@ -427,7 +520,10 @@ public interface LocalKernel
    * @param ref A reference to the transport order to be modified.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @deprecated Use {@link InternalTransportOrderService#updateTransportOrderNextDriveOrder(
+   * org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException;
 
@@ -477,7 +573,10 @@ public interface LocalKernel
    * in this pool.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link InternalTransportOrderService#updateOrderSequenceFinishedIndex(
+   * org.opentcs.data.TCSObjectReference, int)} instead.
    */
+  @Deprecated
   void setOrderSequenceFinishedIndex(TCSObjectReference<OrderSequence> seqRef,
                                      int index)
       throws ObjectUnknownException, CredentialsException;
@@ -490,7 +589,10 @@ public interface LocalKernel
    * in this pool.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link InternalTransportOrderService#markOrderSequenceFinished(
+   * org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException, CredentialsException;
 
@@ -503,7 +605,10 @@ public interface LocalKernel
    * in this pool.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link InternalTransportOrderService#updateOrderSequenceProcessingVehicle(
+   * org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -521,7 +626,9 @@ public interface LocalKernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link InternalPlantModelService#expandResources(java.util.Set)} instead.
    */
+  @Deprecated
   Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException, CredentialsException;
 

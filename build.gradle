@@ -17,13 +17,14 @@ buildscript {
     // Stats plugin
     classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.0'
     // Uses JApicmp to check binary compatibility with previous releases
-    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.1.2'
+    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.6'
   }
 }
 
 apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'opentcs-gradle-plugin'
 
 apply from: "${rootDir}/gradle/versioning.gradle"
 
@@ -40,6 +41,9 @@ distributions {
       project(':openTCS-Kernel').ext.collectableDistDir
     }
     contents.from {
+      project(':openTCS-KernelControlCenter').ext.collectableDistDir
+    }
+    contents.from {
       project(':openTCS-PlantOverview').ext.collectableDistDir
     }
     contents.from {
@@ -54,6 +58,7 @@ task statsAggregate(type: org.kordamp.gradle.stats.AggregateStatsReportTask) {
 
 task subDists {
   dependsOn(':openTCS-Kernel:installDist')
+  dependsOn(':openTCS-KernelControlCenter:installDist')
   dependsOn(':openTCS-PlantOverview:installDist')
   dependsOn(':openTCS-Documentation:installDist')
 }
@@ -88,6 +93,7 @@ task distSrcZip(type: Zip) {
   includes << 'gradlew'
   includes << 'gradlew.bat'
 
+  excludes << '.gitlab'
   excludes << '.gradle'
   excludes << '**/build'
 }
@@ -110,5 +116,5 @@ task release {
 }
 
 task wrapper(type: Wrapper, description: 'Creates and deploys the Gradle wrapper to the current directory.') {
-  gradleVersion = '3.5'
+  gradleVersion = '4.5'
 }

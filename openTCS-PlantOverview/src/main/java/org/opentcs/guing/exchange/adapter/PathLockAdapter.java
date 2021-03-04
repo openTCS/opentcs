@@ -9,15 +9,15 @@ package org.opentcs.guing.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.data.model.Path;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.model.elements.PathModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +39,9 @@ public class PathLockAdapter
    */
   private final PathModel model;
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * The state of the plant overview.
    */
@@ -54,14 +54,14 @@ public class PathLockAdapter
   /**
    * Creates a new instance.
    *
-   * @param kernelProvider A kernel provider.
+   * @param portalProvider A portal provider.
    * @param applicationState Keeps the plant overview's state.
    * @param model The path model.
    */
-  public PathLockAdapter(SharedKernelProvider kernelProvider,
+  public PathLockAdapter(SharedKernelServicePortalProvider portalProvider,
                          ApplicationState applicationState,
                          PathModel model) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.applicationState = requireNonNull(applicationState, "applicationState");
     this.model = requireNonNull(model, "model");
     this.lockedPreviously = isPathLocked();
@@ -87,25 +87,24 @@ public class PathLockAdapter
   }
 
   private boolean isPathLocked() {
-    BooleanProperty locked = (BooleanProperty) model.getProperty(PathModel.LOCKED);
-    return (Boolean) locked.getValue();
+    return (Boolean) model.getPropertyLocked().getValue();
   }
 
   private void updateLockInKernel(boolean locked) {
-    try (SharedKernelClient localKernelClient = kernelProvider.register()) {
-      Kernel kernel = localKernelClient.getKernel();
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      KernelServicePortal portal = sharedPortal.getPortal();
       // Check if the kernel is in operating mode, too.
-      if (kernel.getState() == Kernel.State.OPERATING) {
+      if (portal.getState() == Kernel.State.OPERATING) {
         // Update the path in the kernel if it exists and its locked state is different.
-        Path path = kernel.getTCSObject(Path.class, model.getName());
+        Path path = portal.getPlantModelService().fetchObject(Path.class, model.getName());
         if (path != null && path.isLocked() != locked) {
-          kernel.setPathLocked(path.getReference(), locked);
-          kernel.updateRoutingTopology();
+          portal.getRouterService().updatePathLock(path.getReference(), locked);
+          portal.getRouterService().updateRoutingTopology();
         }
       }
 
     }
-    catch (KernelUnavailableException exc) {
+    catch (ServiceUnavailableException exc) {
       LOG.warn("Could not connect to kernel", exc);
     }
   }

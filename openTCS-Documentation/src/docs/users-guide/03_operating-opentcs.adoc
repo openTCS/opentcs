@@ -6,11 +6,13 @@
 To create or to edit the plant model of a transport system, the openTCS Plant Overview application has to be started in modelling mode.
 To use it as a transportation control system based on an existing plant model, it has to be started in plant operation mode.
 Starting a component is done by executing the respective Unix shell script (`\*.sh`) or Windows batch file (`*.bat`).
-By manipulating the script and adding `-Dopentcs.initialmode=` followed by `operating` or `modelling` you can automatically start in the specific mode.
+By adjusting the Plant Overview's configuration entry `initialMode` to `OPERATING` or `MODELLING` you can automatically start in the specific mode (see <<Plant Overview configuration>>).
 
 ==== Starting in modelling mode
 
-. Start the plant overview client (`startPlantOverview.bat/.sh`) and select 'Modelling mode'.
+. Start the plant overview client (`startPlantOverview.bat/.sh`) 
++
+By default it is configured to start in 'Modelling mode'.
 . The plant overview will start with a new, empty model, but you can also load a model from a file (menu:File[Load Model]) or the current kernel model (menu:File[Load current kernel model]).
 The latter option requires a running kernel that the Plant Overview client can connect to and that has loaded an existing plant model.
 . Use the graphical user interface of the plant overview client to create an arbitrary driving course for your respective application/project.
@@ -22,21 +24,24 @@ How you can add elements like points, paths and vehicles to your driving course 
 image::screenshot_plant_overview.png[]
 
 . Start the kernel (`startKernel.bat/.sh`).
-.. Select the saved model and plant operation mode in the dialog window shown and click OK.
-+
-If this is your first time running the kernel, you need to persist the current plant model first.
-Start the kernel with an empty model instead and select menu:File[Persist model in the kernel] in the plant overview (also see <<Saving the plant model).
-. Start the plant overview client (`startPlantOverview.bat/.sh`) and select 'Operating mode'.
-. Select the tab btn:[Vehicle drivers] in the kernel control center.
+.. If this is your first time running the kernel, you need to persist the current plant model first.
+Select menu:File[Persist model in the kernel] in the plant overview (also see <<Saving the plant model>>).
+. Optionally, start the kernel control center client (`startKernelControlCenter.bat/.sh`)
+. Start the plant overview client (`startPlantOverview.bat/.sh`)
+..  Switch the plant overview client to 'Operating mode' (menu:File[Mode > Operating mode]).
+. Select the tab btn:[Vehicle driver] in the kernel control center.
 Then select, configure and start driver for each vehicle in the model.
 .. The list on the left-hand side of the window shows all vehicles in the chosen model.
 .. A detailed view for a vehicle can be seen on the right-hand side of the driver panel after double-clicking on the vehicle in the list.
 The specific design of this detailed view depends on the driver associated with the vehicle.
 Usually, status information sent by the vehicle (e.g. current position and mode of operation) is displayed and low-level settings (e.g. for the vehicle's IP address) are provided here.
-.. Right-clicking on the list of vehicles shows a popup menu that allows to attach or detach drivers for selected vehicles.
+.. Right-clicking on the list of vehicles shows a popup menu that allows to attach drivers for selected vehicles.
 .. For a vehicle to be controlled by the system, a driver needs to be attached to the vehicle and enabled.
 (For testing purposes without real vehicles that could communicate with the system, the so-called loopback driver can be used, which provides a virtual vehicle or simulates a real one.)
 How you attach and enable a vehicle driver is explained in detail in <<Configuring vehicle drivers>>.
+
+NOTE: For now, all steps regarding the tab btn:[Vehicle driver] can either be done in the kernel control center provided by the kernel itself or in the standalone/remote version.
+The kernel control center GUI in the kernel will be removed in openTCS 5.0, though.
 
 .Driver panel with detailed view of a vehicle
 image::screenshot_driver_panel.png[]
@@ -95,9 +100,8 @@ These instructions explain how the newly created model that was persisted in the
 ==== Starting components for system operation
 
 . Start the kernel (`startKernel.bat/.sh`).
-. Wait until the dialog for selecting a plant model is shown.
-. Select the saved model you created, select plant operation mode, and click btn:[OK].
-. Start the plant overview client (`startPlantOverview.bat/.sh`), select 'Operating mode' and wait until its graphical user interface is shown.
+. Optionally, start the kernel control center client (`startKernelControlCenter.bat/.sh`).
+. Start the plant overview client (`startPlantOverview.bat/.sh`), wait until its graphical user interface is shown and switch it to 'Operating mode'.
 
 ==== Configuring vehicle drivers
 
@@ -115,6 +119,9 @@ The vehicle is then available for processing orders, which is indicated by a pro
 (You can revert this by right-clicking on the vehicle and selecting menu:Context menu[Withdraw TO and Disable Vehicle] in the context menu.
 The processing state shown is now `UNAVAILABLE` and the vehicle will not be dispatched for transport orders any more.)
 
+NOTE: For now, all steps above can either be done in the kernel control center provided by the kernel itself or in the standalone/remote version.
+The kernel control center GUI in the kernel will be removed in openTCS 5.0, though.
+
 ==== Creating a transport order
 
 To create a transport order, the plant overview client provides a dialog window presented when selecting menu:Actions[Transport Order] in the menu.
@@ -122,6 +129,7 @@ Transport orders are defined as a sequence of destination locations at which act
 You can select a destination location and action from a dropdown menu.
 You may also optionally select the vehicle intended to process this order.
 If none is explicitly selected, the control system automatically assigns the order to a vehicle according to its internal strategies - with the default strategy, it will pick the vehicle that will most likely finish the transport order the soonest.
+You may also optionally select or define a category for the transport order to be created.
 Furthermore, a transport order can be given a deadline specifying the point of time at which the order should be finished at the latest.
 This deadline will primarily be considered when there are multiple transport orders in the pool and openTCS needs to decide which to assign next.
 
@@ -131,7 +139,6 @@ To create a new transport order, do the following:
 . In the dialog shown, click the btn:[Add] button and select a location as the destination and an operation which the vehicle should perform there.
 You can add an arbitrary number of destinations to the order this way.
 They will be processed in the given order.
-
 . After creating the transport order with the given destinations by clicking btn:[OK], the kernel will check for a vehicle that can process the order.
 If a vehicle is found, it is assigned the order immediately and the route computed for it will be highlighted in the plant overview client.
 The loopback driver simulates the vehicle's movement to the destinations and the execution of the operations.
@@ -181,6 +188,9 @@ Future versions of openTCS may include a live report plugin that collects data d
 There may be situations in which you want to remove a single vehicle from a system, e.g. because the vehicle temporarily cannot be controlled by openTCS due to a hardware defect that has to be dealt with first.
 The following steps will ensure that no further transport orders are assigned to the vehicle and that the resources it might still be occupying are freed for use by other vehicles.
 
-. In the plant overview client, right-click on the vehicle and select menu:Context menu[Withdraw TO and Disable Vehicle] to disable the vehicle for transport order processing.
+. In the plant overview client, right-click on the vehicle and select menu:Context menu[Withdraw transport order > ...and disable vehicle] to disable the vehicle for transport order processing.
 . In the kernel control center, disable the vehicle's driver by unticking the checkbox btn:[Enable loopback adapter] in the btn:[Loopback options] tab or the checkbox in the btn:[Enabled?] column of the vehicle list.
 . In the kernel control center, right-click on the vehicle in the vehicle list and select menu:Context menu[Reset vehicle position] to free the point in the driving course that the vehicle is occupying.
+
+NOTE: For now, all steps regarding the kernel control center can either be done in the kernel control center provided by the kernel itself or in the standalone/remote version.
+The kernel control center GUI in the kernel will be removed in openTCS 5.0, though.

@@ -8,8 +8,8 @@
 package org.opentcs.components.kernel;
 
 import javax.annotation.Nonnull;
-import org.opentcs.access.queries.QueryRecoveryStatus;
 import org.opentcs.components.Lifecycle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Objects implementing this interface may evaluate the kernel's recovery
@@ -18,7 +18,11 @@ import org.opentcs.components.Lifecycle;
  * @see org.opentcs.access.queries.QueryRecoveryStatus
  * @see org.opentcs.access.Kernel#query(java.lang.Class)
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated The definition of <em>recovered</em> is unclear. Unless it is clearly specified,
+ * evaluation of a state of recovery should not be part of the API.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public interface RecoveryEvaluator
     extends Lifecycle {
 
@@ -28,5 +32,5 @@ public interface RecoveryEvaluator
    * @return An evaluation of the kernel's recovery status.
    */
   @Nonnull
-  QueryRecoveryStatus evaluateRecovery();
+  org.opentcs.access.queries.QueryRecoveryStatus evaluateRecovery();
 }

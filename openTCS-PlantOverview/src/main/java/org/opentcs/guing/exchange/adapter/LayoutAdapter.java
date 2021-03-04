@@ -9,20 +9,17 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,72 +38,48 @@ public class LayoutAdapter
    */
   private static final Logger LOG = LoggerFactory.getLogger(LayoutAdapter.class);
 
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model comoponent.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public LayoutAdapter(@Assisted LayoutModel model,
-                       @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
-  }
-
-  @Override
-  public LayoutModel getModel() {
-    return (LayoutModel) super.getModel();
-  }
-
   @Override // OpenTCSProcessAdapter
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
                                     @Nullable ModelLayoutElement layoutElement) {
     VisualLayout layout = requireNonNull((VisualLayout) tcsObject, "tcsObject");
+    LayoutModel model = (LayoutModel) modelComponent;
 
     try {
-      StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      name.setText(layout.getName());
-      name.markChanged();
-      updateModelLengthProperty(layout);
+      model.getPropertyName().setText(layout.getName());
+      model.getPropertyName().markChanged();
 
-      updateMiscModelProperties(layout);
+      model.getPropertyScaleX().setValueAndUnit(layout.getScaleX(), LengthProperty.Unit.MM);
+      model.getPropertyScaleX().markChanged();
+      model.getPropertyScaleY().setValueAndUnit(layout.getScaleY(), LengthProperty.Unit.MM);
+      model.getPropertyScaleY().markChanged();
+
+      updateMiscModelProperties(model, layout);
     }
     catch (IllegalArgumentException e) {
       LOG.warn("", e);
     }
   }
 
-  @Override // OpenTCSProcessAdapter
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    plantModel.getVisualLayouts().add(
-        new VisualLayoutCreationTO(getModel().getName())
-            .setScaleX(getScaleX())
-            .setScaleY(getScaleY())
-            .setProperties(getKernelProperties())
+  @Override
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    return plantModel.withVisualLayout(
+        new VisualLayoutCreationTO(modelComponent.getName())
+            .withScaleX(getScaleX((LayoutModel) modelComponent))
+            .withScaleY(getScaleY((LayoutModel) modelComponent))
+            .withProperties(getKernelProperties(modelComponent))
     );
   }
 
-  private double getScaleX() {
-    LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
-    return pScale.getValueByUnit(LengthProperty.Unit.MM);
+  private double getScaleX(LayoutModel model) {
+    return model.getPropertyScaleX().getValueByUnit(LengthProperty.Unit.MM);
   }
 
-  private double getScaleY() {
-    LengthProperty pScale = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
-    return pScale.getValueByUnit(LengthProperty.Unit.MM);
-  }
-
-  private void updateModelLengthProperty(VisualLayout layout)
-      throws IllegalArgumentException {
-    LengthProperty lp = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
-    double scale = layout.getScaleX();
-    lp.setValueAndUnit(scale, LengthProperty.Unit.MM);
-    lp.markChanged();
-
-    lp = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_Y);
-    scale = layout.getScaleY();
-    lp.setValueAndUnit(scale, LengthProperty.Unit.MM);
-    lp.markChanged();
+  private double getScaleY(LayoutModel model) {
+    return model.getPropertyScaleY().getValueByUnit(LengthProperty.Unit.MM);
   }
 }

@@ -20,14 +20,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
-import org.opentcs.drivers.vehicle.VehicleCommAdapterPanel;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.StringListCellRenderer;
@@ -45,9 +44,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Iryna Felko (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated {@code VehicleCommAdapterPanel} has been deprecated.
  */
+@Deprecated
 public class LoopbackCommunicationAdapterPanel
-    extends VehicleCommAdapterPanel {
+    extends org.opentcs.drivers.vehicle.VehicleCommAdapterPanel {
 
   /**
    * A resource bundle for internationalization.
@@ -59,9 +60,9 @@ public class LoopbackCommunicationAdapterPanel
    */
   private static final Logger LOG = LoggerFactory.getLogger(LoopbackCommunicationAdapterPanel.class);
   /**
-   * The Kernel.
+   * The object service.
    */
-  private final LocalKernel kernel;
+  private final TCSObjectService objectService;
   /**
    * This panel's communication adapter.
    */
@@ -77,9 +78,9 @@ public class LoopbackCommunicationAdapterPanel
    * @param adapter The loopback communication adapter.
    */
   @Inject
-  LoopbackCommunicationAdapterPanel(LocalKernel kernel,
+  LoopbackCommunicationAdapterPanel(TCSObjectService objectService,
                                     @Assisted LoopbackCommunicationAdapter adapter) {
-    this.kernel = requireNonNull(kernel, "kernel");
+    this.objectService = requireNonNull(objectService, "objectService");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.vehicleModel = adapter.getProcessModel();
     initComponents();
@@ -189,7 +190,7 @@ public class LoopbackCommunicationAdapterPanel
         positionTxt.setText("");
       }
       else {
-        for (Point curPoint : kernel.getTCSObjects(Point.class)) {
+        for (Point curPoint : objectService.fetchObjects(Point.class)) {
           if (curPoint.getName().equals(vehiclePosition)) {
             positionTxt.setText(curPoint.getName());
             break;
@@ -1043,7 +1044,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
   private void positionTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_positionTxtMouseClicked
     if (positionTxt.isEnabled()) {
       // Prepare list of model points
-      Set<Point> pointSet = kernel.getTCSObjects(Point.class);
+      Set<Point> pointSet = objectService.fetchObjects(Point.class);
       List<Point> pointList = new ArrayList<>(pointSet);
       Collections.sort(pointList, Comparators.objectsByName());
       pointList.add(0, null);

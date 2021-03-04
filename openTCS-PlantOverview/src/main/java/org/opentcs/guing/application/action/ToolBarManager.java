@@ -20,7 +20,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.event.ToolAdapter;
 import org.jhotdraw.draw.event.ToolEvent;
@@ -56,13 +55,15 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * Sets up and manages a list of tool bars in the graphical user interface.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class ToolBarManager {
+public class ToolBarManager
+    implements EventHandler {
 
   /**
    * A factory for selectiont tools.
@@ -316,23 +317,29 @@ public class ToolBarManager {
     return dragToolButton;
   }
 
-  /**
-   * Handles changes of the application's operation mode.
-   *
-   * @param evt The mode change event.
-   */
-  @Handler
-  public void handleModeChange(OperationModeChangeEvent evt) {
+  public JPopupButton getButtonCreatePath() {
+    return buttonCreatePath;
+  }
+
+  public JToggleButton getButtonCreateLink() {
+    return buttonCreateLink;
+  }
+
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof OperationModeChangeEvent) {
+      handleModeChange((OperationModeChangeEvent) event);
+    }
+    if (event instanceof ResetInteractionToolCommand) {
+      handleToolReset((ResetInteractionToolCommand) event);
+    }
+  }
+
+  private void handleModeChange(OperationModeChangeEvent evt) {
     setOperationMode(evt.getNewMode());
   }
 
-  /**
-   * Resets the user's tool to the selection tool.
-   *
-   * @param evt The reset command.
-   */
-  @Handler
-  public void handleToolReset(ResetInteractionToolCommand evt) {
+  private void handleToolReset(ResetInteractionToolCommand evt) {
     selectionToolButton.setSelected(true);
   }
 

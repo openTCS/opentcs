@@ -82,7 +82,14 @@ public abstract class TCSResource<E extends TCSResource<E>>
     return (TCSResourceReference<E>) reference;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TCSResource<E> clone() {
     TCSResource<E> clone = (TCSResource<E>) super.clone();
     return clone;

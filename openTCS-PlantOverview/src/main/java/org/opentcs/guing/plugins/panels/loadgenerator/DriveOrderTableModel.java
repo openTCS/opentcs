@@ -11,11 +11,11 @@ package org.opentcs.guing.plugins.panels.loadgenerator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A table model for drive orders.

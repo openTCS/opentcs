@@ -116,7 +116,7 @@ public class Path
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
     this.length = checkInRange(length, 1, Long.MAX_VALUE, "length");
-    this.routingCost = checkInRange(routingCost, 1, Long.MAX_VALUE, "routingCost");
+    this.routingCost = routingCost;
     this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE, "maxVelocity");
     this.maxReverseVelocity = checkInRange(maxReverseVelocity,
                                            0,
@@ -212,15 +212,12 @@ public class Path
    * be used to influence routing. The higher the value, the more travelling
    * this path costs.
    *
-   * @param newCost The new routing cost (unitless). Must be a positive value.
+   * @param newCost The new routing cost (unitless).
    * @deprecated Set via constructor instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public void setRoutingCost(long newCost) {
-    if (newCost <= 0) {
-      throw new IllegalArgumentException("newCost <= 0: " + newCost);
-    }
     routingCost = newCost;
   }
 
@@ -439,7 +436,14 @@ public class Path
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Path clone() {
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),

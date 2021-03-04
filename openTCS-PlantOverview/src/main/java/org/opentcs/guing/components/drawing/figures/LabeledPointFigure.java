@@ -9,13 +9,13 @@
  */
 package org.opentcs.guing.components.drawing.figures;
 
+import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.Iterator;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -30,18 +30,13 @@ import org.jhotdraw.draw.handle.MoveHandle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
-import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.decoration.PointOutlineHandle;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
-import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.FigureComponent;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -77,14 +72,6 @@ public class LabeledPointFigure
     return getPresentationFigure().getShape();
   }
 
-  // TODO: Diese Methode überschreiben, damit keine Resize-Handles angezeigt werden
-//  @Override  // LabeledFigure
-//  public Collection<Handle> createHandles(int detailLevel) {
-//    Collection<Handle> handles = getPresentationFigure().createHandles(detailLevel);
-//    handles.addAll(fLabel.createHandles(detailLevel));
-//
-//    return handles;
-//  }
   @Override
   public Connector findConnector(Point2D.Double p, ConnectionFigure prototype) {
 //    double min = java.lang.Double.MAX_VALUE;
@@ -117,14 +104,8 @@ public class LabeledPointFigure
     sb.append(pointDesc).append(" ").append("<b>")
         .append(pf.getModel().getName()).append("</b>");
     // Show miscellaneous properties in tooltip
-    KeyValueSetProperty property = (KeyValueSetProperty) pf.getModel().getProperty(ModelComponent.MISCELLANEOUS);
-    Iterator<KeyValueProperty> items = property.getItems().iterator();
-
-    while (items.hasNext()) {
-      KeyValueProperty next = items.next();
-      String key = next.getKey();
-      String value = next.getValue();
-      sb.append("<br>").append(key).append(": ").append(value);
+    for (KeyValueProperty kvp : pf.getModel().getPropertyMiscellaneous().getItems()) {
+      sb.append("<br>").append(kvp.getKey()).append(": ").append(kvp.getValue());
     }
 
     sb.append("</html>");
@@ -185,8 +166,8 @@ public class LabeledPointFigure
     if (origin != null) {
       PointFigure pf = getPresentationFigure();
 
-      StringProperty xLayout = (StringProperty) pf.getModel().getProperty(ElementPropKeys.POINT_POS_X);
-      StringProperty yLayout = (StringProperty) pf.getModel().getProperty(ElementPropKeys.POINT_POS_Y);
+      StringProperty xLayout = pf.getModel().getPropertyLayoutPosX();
+      StringProperty yLayout = pf.getModel().getPropertyLayoutPosY();
 
       if (xLayout.hasChanged() || yLayout.hasChanged()) {
         getLabel().willChange();
@@ -212,11 +193,9 @@ public class LabeledPointFigure
     if (origin != null) {
       PointFigure pf = getPresentationFigure();
 
-      StringProperty xLayout = (StringProperty) pf.getModel().getProperty(ElementPropKeys.POINT_POS_X);
-      StringProperty yLayout = (StringProperty) pf.getModel().getProperty(ElementPropKeys.POINT_POS_Y);
-
 //      getLabel().willChange();
-      Point2D exact = origin.calculatePixelPositionExactly(xLayout, yLayout);
+      Point2D exact = origin.calculatePixelPositionExactly(pf.getModel().getPropertyLayoutPosX(),
+                                                           pf.getModel().getPropertyLayoutPosY());
       Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
       setBounds(anchor, anchor);
 //      getLabel().changed();
@@ -231,9 +210,9 @@ public class LabeledPointFigure
   public void updateModel() {
     Origin origin = get(FigureConstants.ORIGIN);
     PointFigure pf = getPresentationFigure();
-    FigureComponent model = pf.getModel();
-    CoordinateProperty cpx = (CoordinateProperty) model.getProperty(PointModel.MODEL_X_POSITION);
-    CoordinateProperty cpy = (CoordinateProperty) model.getProperty(PointModel.MODEL_Y_POSITION);
+    PointModel model = pf.getModel();
+    CoordinateProperty cpx = model.getPropertyModelPositionX();
+    CoordinateProperty cpy = model.getPropertyModelPositionY();
     // Schreibt die aktuellen Modell-Koordinaten in die Properties
     if ((double) cpx.getValue() == 0.0 && (double) cpy.getValue() == 0.0) {
       // Koordinaten nur einmal beim Erzeugen aus Layout übernehmen
@@ -245,43 +224,34 @@ public class LabeledPointFigure
     ZoomPoint zoomPoint = pf.getZoomPoint();
     // Wenn die Figure gerade gelöscht wurde, kann der Origin schon null sein
     if (zoomPoint != null && origin != null) {
-      StringProperty sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_X);
-      String sValue = sp.getText();
-      int oldValue;
+      StringProperty lpx = model.getPropertyLayoutPosX();
 
-      if (sValue == null || sValue.isEmpty()) {
-        oldValue = 0;
-      }
-      else {
-        oldValue = (int) Double.parseDouble(sp.getText());
+      int oldX = 0;
+      if (!Strings.isNullOrEmpty(lpx.getText())) {
+        oldX = (int) Double.parseDouble(lpx.getText());
       }
 
-      int newValue = (int) (zoomPoint.getX() * origin.getScaleX());
-
-      if (newValue != oldValue) {
-        sp.setText(String.format("%d", newValue));
-        sp.markChanged();
+      int newX = (int) (zoomPoint.getX() * origin.getScaleX());
+      if (newX != oldX) {
+        lpx.setText(String.format("%d", newX));
+        lpx.markChanged();
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_Y);
+      StringProperty lpy = model.getPropertyLayoutPosY();
 
-      if (sValue == null || sValue.isEmpty()) {
-        oldValue = 0;
-      }
-      else {
-        oldValue = (int) Double.parseDouble(sp.getText());
+      int oldY = 0;
+      if (!Strings.isNullOrEmpty(lpy.getText())) {
+        oldY = (int) Double.parseDouble(lpy.getText());
       }
 
-      newValue = (int) (-zoomPoint.getY() * origin.getScaleY());  // Vorzeichen!
-
-      if (newValue != oldValue) {
-        sp.setText(String.format("%d", newValue));
-        sp.markChanged();
+      int newY = (int) (-zoomPoint.getY() * origin.getScaleY());  // Vorzeichen!
+      if (newY != oldY) {
+        lpy.setText(String.format("%d", newY));
+        lpy.markChanged();
       }
     }
     // Immer den Typ aktualisieren
-    Property pType = model.getProperty(PointModel.TYPE);
-    pType.markChanged();
+    model.getPropertyType().markChanged();
 
     model.propertiesChanged(this);
     // Auch das Label aktualisieren

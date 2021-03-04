@@ -34,6 +34,6 @@ public class AddTransportOrderSequenceView
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    view.addTransportOrderSequenceView(true);
+    view.addTransportOrderSequenceView();
   }
 }

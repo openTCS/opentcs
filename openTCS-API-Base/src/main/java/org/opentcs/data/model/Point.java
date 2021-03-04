@@ -532,7 +532,14 @@ public class Point
                      occupyingVehicle);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Point clone() {
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),

@@ -21,7 +21,7 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * @deprecated Not really an API class.
  */
 @Deprecated
-@ScheduledApiChange(when = "5.0", details = "Method will be removed.")
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public final class Queries {
 
   /**

@@ -62,6 +62,39 @@ public class PathModel
     return ResourceBundleUtil.getBundle().getString("path.description");
   }
 
+  public LengthProperty getPropertyLength() {
+    return (LengthProperty) getProperty(LENGTH);
+  }
+
+  public IntegerProperty getPropertyRoutingCost() {
+    return (IntegerProperty) getProperty(ROUTING_COST);
+  }
+
+  public SpeedProperty getPropertyMaxVelocity() {
+    return (SpeedProperty) getProperty(MAX_VELOCITY);
+  }
+
+  public SpeedProperty getPropertyMaxReverseVelocity() {
+    return (SpeedProperty) getProperty(MAX_REVERSE_VELOCITY);
+  }
+
+  public BooleanProperty getPropertyLocked() {
+    return (BooleanProperty) getProperty(LOCKED);
+  }
+
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<LinerType> getPropertyPathConnType() {
+    return (SelectionProperty<LinerType>) getProperty(ElementPropKeys.PATH_CONN_TYPE);
+  }
+
+  public StringProperty getPropertyPathControlPoints() {
+    return (StringProperty) getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 

@@ -771,7 +771,7 @@ public class ModelValidatorTest {
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, "null");
     addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, "null");
     Assert.assertTrue("Validator said invalid for valid vehicle model.",
-                       validator.isValidWith(model, vehicle));
+                      validator.isValidWith(model, vehicle));
   }
 
   @Test
@@ -919,6 +919,9 @@ public class ModelValidatorTest {
                 VehicleModel.EnergyState.GOOD);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.PROC_STATE, Vehicle.ProcState.IDLE);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.STATE, Vehicle.State.IDLE);
+    addProperty(vehicle, SelectionProperty.class,
+                VehicleModel.INTEGRATION_LEVEL,
+                Vehicle.IntegrationLevel.TO_BE_RESPECTED);
     addProperty(vehicle, BooleanProperty.class, VehicleModel.LOADED, Boolean.FALSE);
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, POINT_NAME);
     addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, POINT_NAME_2);

@@ -35,6 +35,6 @@ public class AddTransportOrderView
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    view.addTransportOrderView(true);
+    view.addTransportOrderView();
   }
 }

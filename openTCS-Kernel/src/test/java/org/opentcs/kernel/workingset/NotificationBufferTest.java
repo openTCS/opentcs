@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import org.opentcs.data.notification.UserNotification;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * A test class for NotificationBuffer.
@@ -26,7 +27,7 @@ public class NotificationBufferTest {
   /**
    * A constant capacity for buffers to be tested here.
    */
-  private static final int capacity = 100;
+  private static final int CAPACITY = 100;
   /**
    * The buffer to be tested here.
    */
@@ -34,8 +35,8 @@ public class NotificationBufferTest {
 
   @Before
   public void setUp() {
-    testBuffer = new NotificationBuffer();
-    testBuffer.setCapacity(capacity);
+    testBuffer = new NotificationBuffer(new SimpleEventBus());
+    testBuffer.setCapacity(CAPACITY);
   }
 
   @After
@@ -48,10 +49,10 @@ public class NotificationBufferTest {
    */
   @Test
   public void testMessageCountValidity() {
-    int cutBackCount = capacity / 2;
+    int cutBackCount = CAPACITY / 2;
     testBuffer.setCutBackCount(cutBackCount);
     // Fill the buffer to its capacity.
-    for (int i = 1; i <= capacity; i++) {
+    for (int i = 1; i <= CAPACITY; i++) {
       testBuffer.addNotification(new UserNotification("message text",
                                                       UserNotification.Level.INFORMATIONAL));
       assertEquals(i, testBuffer.getMessageCount());
@@ -70,10 +71,10 @@ public class NotificationBufferTest {
    */
   @Test
   public void testCapacityAndCutBackCount() {
-    for (int cutBackCount = 0; cutBackCount < capacity; cutBackCount++) {
+    for (int cutBackCount = 0; cutBackCount < CAPACITY; cutBackCount++) {
       testBuffer.setCutBackCount(cutBackCount);
       // Add one more message than the buffer can hold.
-      for (int i = 0; i < (capacity + 1); i++) {
+      for (int i = 0; i < (CAPACITY + 1); i++) {
         testBuffer.addNotification(new UserNotification("message text",
                                                         UserNotification.Level.INFORMATIONAL));
       }

@@ -139,14 +139,13 @@ public abstract class AbstractModelComponent
 
   @Override
   public String getName() {
-    StringProperty property = (StringProperty) getProperty(NAME);
+    StringProperty property = getPropertyName();
     return property == null ? "" : property.getText();
   }
 
   @Override
   public void setName(String name) {
-    StringProperty property = (StringProperty) getProperty(NAME);
-    property.setText(name);
+    getPropertyName().setText(name);
   }
 
   @Override

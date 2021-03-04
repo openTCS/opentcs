@@ -18,9 +18,8 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel.State;
-import org.opentcs.access.TravelCosts;
-import org.opentcs.access.UnsupportedKernelOpException;
-import org.opentcs.access.queries.Query;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -45,9 +44,7 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.data.user.UserPermission;
 import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
  * Declares the methods provided by an openTCS kernel via RMI.
@@ -68,7 +65,10 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link RemoteKernelServicePortal} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public interface RemoteKernel
     extends Remote {
 
@@ -96,7 +96,10 @@ public interface RemoteKernel
    * @throws CredentialsException If authentication with the given username and
    * password failed.
    * @throws RemoteException If there was an RMI-related problem.
+   * @deprecated Use {@link RemoteKernelServicePortal#login(
+   * java.lang.String, java.lang.String, java.util.function.Predicate)} instead.
    */
+  @Deprecated
   @CallPermissions({})
   ClientID login(String userName, String password)
       throws CredentialsException, RemoteException;
@@ -108,53 +111,46 @@ public interface RemoteKernel
    *
    * @param clientID The client's ID.
    * @throws RemoteException If there was an RMI-related problem.
+   * @deprecated Use {@link RemoteKernelServicePortal#logout(org.opentcs.access.rmi.ClientID)}
+   * instead.
    */
+  @Deprecated
   @CallPermissions({})
   void logout(ClientID clientID)
       throws RemoteException;
 
-  /**
-   * Returns the permissions the client with the given ID is granted.
-   *
-   * @param clientID The calling client's identification object.
-   * @return A set of permissions the client is granted; if the given ID is
-   * invalid, the returned Set will be empty.
-   * @throws RemoteException If there was an RMI-related problem.
-   */
+  @Deprecated
   @CallPermissions({})
-  Set<UserPermission> getUserPermissions(ClientID clientID)
+  Set<org.opentcs.data.user.UserPermission> getUserPermissions(ClientID clientID)
       throws RemoteException;
 
   @Deprecated
-  @CallPermissions({UserPermission.MANAGE_USERS})
+  @CallPermissions({org.opentcs.data.user.UserPermission.MANAGE_USERS})
   void createUser(ClientID clientID, String userName, String userPassword,
-                  Set<UserPermission> userPermissions)
-      throws org.opentcs.data.user.UserExistsException, UnsupportedKernelOpException,
-             CredentialsException, RemoteException;
+                  Set<org.opentcs.data.user.UserPermission> userPermissions)
+      throws org.opentcs.data.user.UserExistsException, CredentialsException, RemoteException;
 
   @Deprecated
   @CallPermissions({})
   void setUserPassword(ClientID clientID, String userName, String userPassword)
-      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
-             CredentialsException, RemoteException;
+      throws org.opentcs.data.user.UserUnknownException, CredentialsException, RemoteException;
 
   @Deprecated
-  @CallPermissions({UserPermission.MANAGE_USERS})
+  @CallPermissions({org.opentcs.data.user.UserPermission.MANAGE_USERS})
   void setUserPermissions(ClientID clientID, String userName,
-                          Set<UserPermission> userPermissions)
-      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
-             CredentialsException, RemoteException;
+                          Set<org.opentcs.data.user.UserPermission> userPermissions)
+      throws org.opentcs.data.user.UserUnknownException, CredentialsException, RemoteException;
 
   @Deprecated
-  @CallPermissions({UserPermission.MANAGE_USERS})
+  @CallPermissions({org.opentcs.data.user.UserPermission.MANAGE_USERS})
   void removeUser(ClientID clientID, String userName)
-      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
-             CredentialsException, RemoteException;
+      throws org.opentcs.data.user.UserUnknownException, CredentialsException, RemoteException;
 
   @Deprecated
-  @CallPermissions({UserPermission.READ_DATA})
-  void setEventFilter(ClientID clientID,
-                      org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter)
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
+  void setEventFilter(
+      ClientID clientID,
+      org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> eventFilter)
       throws CredentialsException, RemoteException;
 
   /**
@@ -164,324 +160,399 @@ public interface RemoteKernel
    * @param timeout A timeout (in ms) for which to wait for events to arrive.
    * @return A list of events (in the order they arrived).
    * @throws RemoteException If there was an RMI-related problem.
+   * @deprecated Use {@link KernelServicePortal#fetchEvents(long)} instead.
    */
-  @CallPermissions({UserPermission.READ_DATA})
-  List<TCSEvent> pollEvents(ClientID clientID, long timeout)
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
+  List<org.opentcs.util.eventsystem.TCSEvent> pollEvents(ClientID clientID, long timeout)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  /**
+   * Returns the current state of the kernel.
+   *
+   * @param clientID The identification object of the client calling the method.
+   * @return The current state of the kernel.
+   * @throws CredentialsException If the calling client is not allowed to execute this method.
+   * @throws RemoteException If there was an RMI-related problem.
+   * @deprecated Use {@link RemoteKernelServicePortal#getState(org.opentcs.access.rmi.ClientID)}
+   * instead.
+   */
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   State getState(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.CHANGE_KERNEL_STATE})
+  /**
+   * Sets the current state of the kernel.
+   *
+   * @param clientID The identification object of the client calling the method.
+   * @param newState The state the kernel is to be set to.
+   * @throws CredentialsException If the calling client is not allowed to execute this method.
+   * @throws RemoteException If there was an RMI-related problem.
+   * @deprecated Remote clients will not be allowed to set the kernel's state in the future.
+   */
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.CHANGE_KERNEL_STATE})
   void setState(ClientID clientID, State newState)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   String getPersistentModelName(ClientID clientID)
       throws CredentialsException, IOException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   String getLoadedModelName(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void createModel(ClientID clientID, String modelName)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.LOAD_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.LOAD_MODEL})
   void loadModel(ClientID clientID)
       throws CredentialsException, IOException, RemoteException;
 
-  @CallPermissions({UserPermission.SAVE_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.SAVE_MODEL})
   void saveModel(ClientID clientID, String modelName)
       throws CredentialsException, IOException, RemoteException;
 
-  @CallPermissions({UserPermission.SAVE_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.SAVE_MODEL})
   void removeModel(ClientID clientID)
       throws CredentialsException, IOException,
              RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   <T extends TCSObject<T>> T getTCSObject(ClientID clientID,
                                           Class<T> clazz,
                                           TCSObjectReference<T> ref)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   <T extends TCSObject<T>> T getTCSObject(ClientID clientID,
                                           Class<T> clazz,
                                           String name)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   <T extends TCSObject<T>> Set<T> getTCSObjects(ClientID clientID,
                                                 Class<T> clazz)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   <T extends TCSObject<T>> Set<T> getTCSObjects(ClientID clientID,
                                                 Class<T> clazz,
                                                 Pattern regexp)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   <T extends TCSObject<T>> Set<T> getTCSObjects(ClientID clientID,
                                                 Class<T> clazz,
                                                 Predicate<? super T> predicate)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void renameTCSObject(ClientID clientID,
                        TCSObjectReference<?> ref,
                        String newName)
       throws CredentialsException, ObjectUnknownException,
              ObjectExistsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setTCSObjectProperty(ClientID clientID, TCSObjectReference<?> ref,
                             String key, String value)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void clearTCSObjectProperties(ClientID clientID, TCSObjectReference<?> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void removeTCSObject(ClientID clientID,
                        TCSObjectReference<?> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.PUBLISH_MESSAGES})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.PUBLISH_MESSAGES})
   void publishUserNotification(ClientID clientID, UserNotification notification)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   List<UserNotification> getUserNotifications(ClientID clientID,
                                               Predicate<UserNotification> predicate)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
-  VisualLayout createPlantModel(ClientID clientID, PlantModelCreationTO to)
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
+  void createPlantModel(ClientID clientID, PlantModelCreationTO to)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   VisualLayout createVisualLayout(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVisualLayoutScaleX(ClientID clientID,
                              TCSObjectReference<VisualLayout> ref,
                              double scaleX)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVisualLayoutScaleY(ClientID clientID,
                              TCSObjectReference<VisualLayout> ref,
                              double scaleY)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVisualLayoutColors(ClientID clientID,
                              TCSObjectReference<VisualLayout> ref,
                              Map<String, Color> colors)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVisualLayoutElements(ClientID clientID,
                                TCSObjectReference<VisualLayout> ref,
                                Set<LayoutElement> elements)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVisualLayoutViewBookmarks(ClientID clientID,
                                     TCSObjectReference<VisualLayout> ref,
                                     List<ViewBookmark> bookmarks)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   Point createPoint(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPointPosition(ClientID clientID,
                         TCSObjectReference<Point> ref,
                         Triple position)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPointVehicleOrientationAngle(ClientID clientID,
                                        TCSObjectReference<Point> ref,
                                        double angle)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPointType(ClientID clientID, TCSObjectReference<Point> ref,
                     Point.Type newType)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   Path createPath(ClientID clientID, TCSObjectReference<Point> srcRef,
                   TCSObjectReference<Point> destRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPathLength(ClientID clientID, TCSObjectReference<Path> ref,
                      long length)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPathRoutingCost(ClientID clientID, TCSObjectReference<Path> ref,
                           long cost)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPathMaxVelocity(ClientID clientID, TCSObjectReference<Path> ref,
                           int velocity)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPathMaxReverseVelocity(ClientID clientID,
                                  TCSObjectReference<Path> ref, int velocity)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setPathLocked(ClientID clientID, TCSObjectReference<Path> ref,
                      boolean locked)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   Vehicle createVehicle(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVehicleEnergyLevelCritical(ClientID clientID,
                                      TCSObjectReference<Vehicle> ref,
                                      int energyLevel)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVehicleEnergyLevelGood(ClientID clientID,
                                  TCSObjectReference<Vehicle> ref,
                                  int energyLevel)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVehicleLength(ClientID clientID, TCSObjectReference<Vehicle> ref,
                         int length)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setVehicleProcessableCategories(ClientID clientID, TCSObjectReference<Vehicle> ref,
-                                             Set<String> processableCategories)
+                                       Set<String> processableCategories)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
-  void removeVehicle(ClientID clientID, TCSObjectReference<Vehicle> ref)
-      throws CredentialsException, ObjectUnknownException, RemoteException;
-
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   LocationType createLocationType(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void addLocationTypeAllowedOperation(ClientID clientID,
                                        TCSObjectReference<LocationType> ref,
                                        String operation)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void removeLocationTypeAllowedOperation(ClientID clientID,
                                           TCSObjectReference<LocationType> ref,
                                           String operation)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   Location createLocation(ClientID clientID,
                           TCSObjectReference<LocationType> typeRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setLocationPosition(ClientID clientID,
                            TCSObjectReference<Location> ref,
                            Triple position)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void setLocationType(ClientID clientID,
                        TCSObjectReference<Location> ref,
                        TCSObjectReference<LocationType> typeRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void connectLocationToPoint(ClientID clientID,
                               TCSObjectReference<Location> locRef,
                               TCSObjectReference<Point> pointRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void disconnectLocationFromPoint(ClientID clientID,
                                    TCSObjectReference<Location> locRef,
                                    TCSObjectReference<Point> pointRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void addLocationLinkAllowedOperation(ClientID clientID,
                                        TCSObjectReference<Location> locRef,
                                        TCSObjectReference<Point> pointRef,
                                        String operation)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void removeLocationLinkAllowedOperation(ClientID clientID,
                                           TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef,
                                           String operation)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void clearLocationLinkAllowedOperations(ClientID clientID,
                                           TCSObjectReference<Location> locRef,
                                           TCSObjectReference<Point> pointRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   Block createBlock(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void addBlockMember(ClientID clientID, TCSObjectReference<Block> ref,
                       TCSResourceReference<?> newMemberRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void removeBlockMember(ClientID clientID, TCSObjectReference<Block> ref,
                          TCSResourceReference<?> rmMemberRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   Group createGroup(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void addGroupMember(ClientID clientID, TCSObjectReference<Group> ref,
                       TCSObjectReference<?> newMemberRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void removeGroupMember(ClientID clientID, TCSObjectReference<Group> ref,
                          TCSObjectReference<?> rmMemberRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   org.opentcs.data.model.StaticRoute createStaticRoute(ClientID clientID)
       throws CredentialsException, RemoteException;
 
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void addStaticRouteHop(ClientID clientID,
                          TCSObjectReference<org.opentcs.data.model.StaticRoute> ref,
                          TCSObjectReference<Point> newHopRef)
@@ -489,148 +560,173 @@ public interface RemoteKernel
 
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void clearStaticRouteHops(ClientID clientID,
                             TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   TransportOrder createTransportOrder(ClientID clientID,
                                       List<Destination> destinations)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   TransportOrder createTransportOrder(ClientID clientID, TransportOrderCreationTO to)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void setTransportOrderDeadline(ClientID clientID,
                                  TCSObjectReference<TransportOrder> ref, long deadline)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void activateTransportOrder(ClientID clientID,
                               TCSObjectReference<TransportOrder> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void setTransportOrderIntendedVehicle(ClientID clientID,
                                         TCSObjectReference<TransportOrder> orderRef,
                                         TCSObjectReference<Vehicle> vehicleRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void setTransportOrderFutureDriveOrders(ClientID clientID,
                                           TCSObjectReference<TransportOrder> orderRef,
                                           List<DriveOrder> newOrders)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void addTransportOrderDependency(ClientID clientID,
                                    TCSObjectReference<TransportOrder> orderRef,
                                    TCSObjectReference<TransportOrder> newDepRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void removeTransportOrderDependency(ClientID clientID,
                                       TCSObjectReference<TransportOrder> orderRef,
                                       TCSObjectReference<TransportOrder> rmDepRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   OrderSequence createOrderSequence(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   OrderSequence createOrderSequence(ClientID clientID, OrderSequenceCreationTO to)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void addOrderSequenceOrder(ClientID clientID,
                              TCSObjectReference<OrderSequence> seqRef,
                              TCSObjectReference<TransportOrder> orderRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void removeOrderSequenceOrder(ClientID clientID,
                                 TCSObjectReference<OrderSequence> seqRef,
                                 TCSObjectReference<TransportOrder> orderRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void setOrderSequenceComplete(ClientID clientID,
                                 TCSObjectReference<OrderSequence> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void setOrderSequenceFailureFatal(ClientID clientID,
                                     TCSObjectReference<OrderSequence> ref,
                                     boolean fatal)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void setOrderSequenceIntendedVehicle(ClientID clientID,
                                        TCSObjectReference<OrderSequence> seqRef,
                                        TCSObjectReference<Vehicle> vehicleRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   void withdrawTransportOrder(ClientID clientID,
                               TCSObjectReference<TransportOrder> ref,
                               boolean immediateAbort,
                               boolean disableVehicle)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_VEHICLES})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_VEHICLES})
   void withdrawTransportOrderByVehicle(ClientID clientID,
                                        TCSObjectReference<Vehicle> vehicleRef,
                                        boolean immediateAbort,
                                        boolean disableVehicle)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_VEHICLES})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_VEHICLES})
   void dispatchVehicle(ClientID clientID,
                        TCSObjectReference<Vehicle> vehicleRef,
                        boolean setIdleIfUnavailable)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_VEHICLES})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_VEHICLES})
   void releaseVehicle(ClientID clientID,
                       TCSObjectReference<Vehicle> vehicleRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_VEHICLES})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_VEHICLES})
   void sendCommAdapterMessage(ClientID clientID,
                               TCSObjectReference<Vehicle> vehicleRef,
                               Object message)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_ORDER})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_ORDER})
   List<TransportOrder> createTransportOrdersFromScript(ClientID clientID,
                                                        String fileName)
       throws CredentialsException, ObjectUnknownException, IOException,
              RemoteException;
 
-  @CallPermissions({UserPermission.MODIFY_MODEL})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.MODIFY_MODEL})
   void updateRoutingTopology(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
-  <T extends Query<T>> T query(ClientID clientID, Class<T> clazz)
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
+  <T extends org.opentcs.access.queries.Query<T>> T query(ClientID clientID, Class<T> clazz)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
   double getSimulationTimeFactor(ClientID clientID)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.CHANGE_CONFIGURATION})
+  @Deprecated
+  @CallPermissions({org.opentcs.data.user.UserPermission.CHANGE_CONFIGURATION})
   void setSimulationTimeFactor(ClientID clientID, double factor)
       throws CredentialsException, RemoteException;
 
-  @CallPermissions({UserPermission.READ_DATA})
-  List<TravelCosts> getTravelCosts(ClientID clientID,
-                                   TCSObjectReference<Vehicle> vRef,
-                                   TCSObjectReference<Location> srcRef,
-                                   Set<TCSObjectReference<Location>> destRefs)
+  @CallPermissions({org.opentcs.data.user.UserPermission.READ_DATA})
+  List<org.opentcs.access.TravelCosts> getTravelCosts(ClientID clientID,
+                                                      TCSObjectReference<Vehicle> vRef,
+                                                      TCSObjectReference<Location> srcRef,
+                                                      Set<TCSObjectReference<Location>> destRefs)
       throws CredentialsException, RemoteException;
 }

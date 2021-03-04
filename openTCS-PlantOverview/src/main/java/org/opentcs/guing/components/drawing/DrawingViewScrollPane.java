@@ -24,6 +24,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import org.jhotdraw.gui.PlacardScrollPaneLayout;
 import org.opentcs.guing.components.drawing.course.Origin;
+import org.opentcs.guing.components.drawing.course.OriginChangeListener;
 
 /**
  * A custom scroll pane to wrap an <code>OpenTCSDrawingView</code>.
@@ -31,7 +32,8 @@ import org.opentcs.guing.components.drawing.course.Origin;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingViewScrollPane
-    extends JScrollPane {
+    extends JScrollPane
+    implements OriginChangeListener {
 
   /**
    * The drawing view.
@@ -131,10 +133,12 @@ public class DrawingViewScrollPane
 
     this.origin.removeListener(getHorizontalRuler());
     this.origin.removeListener(getVerticalRuler());
+    this.origin.removeListener(this);
     this.origin = origin;
 
     origin.addListener(getHorizontalRuler());
     origin.addListener(getVerticalRuler());
+    origin.addListener(this);
 
     // Notify the rulers directly. This is necessary to initialize/update the rulers scale when a 
     // model is created or loaded.
@@ -142,6 +146,16 @@ public class DrawingViewScrollPane
     // times for bigger models would suffer).
     getHorizontalRuler().originScaleChanged(new EventObject(origin));
     getVerticalRuler().originScaleChanged(new EventObject(origin));
+  }
+
+  @Override
+  public void originLocationChanged(EventObject evt) {
+
+  }
+
+  @Override
+  public void originScaleChanged(EventObject evt) {
+    drawingView.revalidate();
   }
 
   private class PlacardScrollbar

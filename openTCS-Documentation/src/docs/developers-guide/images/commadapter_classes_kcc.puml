@@ -1,0 +1,43 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+hide empty members
+'left to right direction
+
+together {
+  interface VehicleCommAdapterPanelFactory
+
+  class "**CustomPanelFactory**" as CustomPanelFactory
+
+  VehicleCommAdapterPanelFactory <|-- CustomPanelFactory
+}
+
+together {
+  abstract class VehicleCommAdapterPanel
+
+  class "**CustomPanel**" as CustomPanel
+
+  VehicleCommAdapterPanel <|-- CustomPanel
+}
+
+together {
+  abstract class VehicleCommAdapterDescription
+
+  class "**CustomDescription**" as CustomDescription
+
+  VehicleCommAdapterDescription <|-- CustomDescription
+}
+
+together {
+  class VehicleProcessModelTO
+
+  class "**CustomProcessModelTO**" as CustomProcessModelTO
+
+  VehicleProcessModelTO <|-- CustomProcessModelTO
+}
+
+CustomPanelFactory ..> CustomPanel : instantiates
+
+CustomPanel ..> CustomProcessModelTO : consumes
+
+@enduml

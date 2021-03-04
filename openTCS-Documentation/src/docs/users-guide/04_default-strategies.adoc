@@ -7,22 +7,39 @@ These implementations can easily be replaced to adapt to project-specific requir
 
 === Default dispatcher
 
-When a transport order becomes dispatchable, the dispatcher needs to decide which vehicle should process it.
+When either a transport order or a vehicle becomes available, the dispatcher needs to decide what should happen with which transport order and which vehicle should do what.
 To make this decision, the default dispatcher takes the following steps:
 
-. The default dispatcher checks which vehicles are available and not currently processing a transport order.
-  If there are no such vehicles, the incoming transport order is postponed without a vehicle assignment.
-. The default dispatcher requests the potential routes from the router for all vehicle candidates in case they were selected for the incoming transport order.
-  If no viable route is available for any of the vehicles, the incoming transport order is postponed without a vehicle assignment.
-. From all vehicles with viable routes, the one with the lowest routing costs is assigned to the incoming transport order.
-
-When a vehicle becomes available, the dispatcher needs to decide which transport order it should process.
-To make this decision, the default dispatcher takes the following steps:
-
-. If the vehicle's energy level is not _critical_ and transport orders are available, the default dispatcher will select the most urgent one (according to its deadline) for which a route can be computed.
-. If the vehicle's energy level is _degraded_ and automatic recharging is enabled, an order is created for the vehicle to recharge at a recharging location.
-. If the vehicle is not currently at a parking position and there are unoccupied parking positions, an order is created for the vehicle to move to one of them.
-. If none of the previous steps assigned an order to the vehicle, it is left at its current position.
+. New transport orders are prepared for processing.
+  This includes checking general routability and unfinished dependencies.
+. Updates of processes that are currently active are performed.
+  This includes:
+** Withdrawals of transport orders
+** Successful completion of transport orders
+** Assignment of subsequent transport orders for vehicles that are processing order sequences
+. Vehicles that are currently unoccupied are assigned to processable transport orders, if possible.
+** Criteria for a vehicle to be taken into account are:
+*** It must be at a known position in the driving course.
+*** It may not be assigned to a transport order, or the assigned transport order must be _dispensable_.
+    That is the case with parking orders, for instance, or with recharging orders if the vehicle's energy level is not critical.
+*** Its energy level must not be critical.
+** Criteria for a transport order to be taken into account are:
+*** It must be generally dispatchable.
+*** It must not be part of an order sequence that is already being processed by a vehicle.
+** The assignment mechanics are as following:
+*** If there are less unoccupied vehicles than processable transport orders, the list of vehicles is sorted by configurable criteria.
+    The default dispatcher then iterates over the sorted list and, for every vehicle, finds all orders processable by it, computes the required routes, sorts the candidates by configurable criteria and assigns the first one.
+*** If there are less processable transport orders than unocuppied vehicles, the list of transport orders is sorted by configurable criteria.
+    The default dispatcher then iterates over the sorted list and, for every transport order, finds all vehicles that could process it, computes the required routes, sorts the candidates by configurable criteria and assigns the first one.
+*** For configuration options regarding the sorting criteria, see <<Default dispatcher configuration entries>>.
+. Vehicles that are still unoccupied are sent to a recharging location, if possible.
+** Criteria for a vehicle to be taken into account are:
+*** It must be at a known position in the driving course.
+*** Its energy level is _degraded_.
+. Vehicles that are still unoccupied are sent to a parking position, if possible.
+** Criteria for a vehicle to be taken into account are:
+*** It must be at a known position in the driving course.
+*** It must not be at a parking position already.
 
 When sending a vehicle to a recharge location or parking position, the closest (according to the router) unoccupied position is selected by default.
 It is possible to assign fixed positions to vehicles instead, by setting properties with the following keys on them:
@@ -54,7 +71,7 @@ The default cost function for a path simply evaluates to the path's length, so t
 
 It is possible to treat vehicles in a plant differently when computing their routes.
 This may be desirable if they have different characteristics and actually have different optimal routes through the driving course.
-For this to work, the paths in the model or the cost function used need to reflect reflect this difference.
+For this to work, the paths in the model or the cost function used need to reflect this difference.
 This isn't done by default -- the default router computes routes for all vehicles the same way unless told otherwise.
 To let the router know that it should compute routes for a vehicle separately, set a property with the key `tcs:routingGroup` to an integer value other than zero.
 (Vehicles that have the same integer value set share the same routing table, and zero is the default value for all vehicles.)

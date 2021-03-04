@@ -1,0 +1,20 @@
+/**
+ * Copyright (c) 2016 Fraunhofer IML
+ */
+package de.fraunhofer.iml.opentcs.%PACKAGE_NAME%.customization;
+
+import de.fraunhofer.iml.opentcs.%PACKAGE_NAME%.vehicle.CommAdapterFactory;
+import org.opentcs.customizations.kernel.KernelInjectionModule;
+
+/**
+ *
+ * @author Stefan Walter (Fraunhofer IML)
+ */
+public class CommAdaptersModule
+    extends KernelInjectionModule {
+
+  @Override
+  protected void configure() {
+    vehicleCommAdaptersBinder().addBinding().to(CommAdapterFactory.class);
+  }
+}

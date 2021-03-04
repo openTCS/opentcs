@@ -24,7 +24,7 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
-import org.opentcs.drivers.vehicle.VehicleCommAdapterPanel;
+import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.ExplainedBoolean;
@@ -166,7 +166,8 @@ public class LoopbackCommunicationAdapter
   }
 
   @Override
-  protected List<VehicleCommAdapterPanel> createAdapterPanels() {
+  @Deprecated
+  protected List<org.opentcs.drivers.vehicle.VehicleCommAdapterPanel> createAdapterPanels() {
     return Arrays.asList(componentsFactory.createPanel(this));
   }
 
@@ -223,10 +224,24 @@ public class LoopbackCommunicationAdapter
     return true;
   }
 
+  @Override
+  protected VehicleProcessModelTO createCustomTransferableProcessModel() {
+    return new LoopbackVehicleModelTO()
+        .setLoadOperation(getProcessModel().getLoadOperation())
+        .setMaxAcceleration(getProcessModel().getMaxAcceleration())
+        .setMaxDeceleration(getProcessModel().getMaxDecceleration())
+        .setMaxFwdVelocity(getProcessModel().getMaxFwdVelocity())
+        .setMaxRevVelocity(getProcessModel().getMaxRevVelocity())
+        .setOperatingTime(getProcessModel().getOperatingTime())
+        .setSingleStepModeEnabled(getProcessModel().isSingleStepModeEnabled())
+        .setUnloadOperation(getProcessModel().getUnloadOperation())
+        .setVehiclePaused(getProcessModel().isVehiclePaused());
+  }
+
   /**
    * Triggers a step in single step mode.
    */
-  protected synchronized void trigger() {
+  public synchronized void trigger() {
     singleStepExecutionAllowed = true;
   }
 

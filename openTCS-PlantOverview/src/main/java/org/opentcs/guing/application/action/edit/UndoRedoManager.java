@@ -16,10 +16,10 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import static org.opentcs.guing.event.SystemModelTransitionEvent.Stage.UNLOADING;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,8 @@ import org.slf4j.LoggerFactory;
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class UndoRedoManager
-    extends UndoManager {
+    extends UndoManager
+    implements EventHandler {
 
   public static final String UNDO_ACTION_ID = "edit.undo";
   public static final String REDO_ACTION_ID = "edit.redo";
@@ -97,8 +98,14 @@ public class UndoRedoManager
     setHasSignificantEdits(false);
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
+    }
+  }
+
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
     switch (evt.getStage()) {
       case UNLOADING:
         discardAllEdits();

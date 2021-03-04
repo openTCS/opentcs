@@ -8,16 +8,19 @@
 package org.opentcs.access.rmi;
 
 import java.io.Serializable;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Instances of this class represent events emitted by/for kernel proxy state
  * changes.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@code ClientConnectionMode} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class TCSProxyStateEvent
-    extends TCSEvent
+    extends org.opentcs.util.eventsystem.TCSEvent
     implements Serializable {
 
   /**

@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.DefaultComboBoxModel;
@@ -218,9 +217,8 @@ public class EditDriveOrderPanel
 
       getSelectedLocation().ifPresent(location -> {
         LocationTypeModel type = location.getLocationType();
-        StringSetProperty p = (StringSetProperty) type.getProperty(
-            LocationTypeModel.ALLOWED_OPERATIONS);
-        for (String item : new LinkedList<>(p.getItems())) {
+        StringSetProperty p = type.getPropertyAllowedOperations();
+        for (String item : new ArrayList<>(type.getPropertyAllowedOperations().getItems())) {
           model.addElement(item);
         }
 

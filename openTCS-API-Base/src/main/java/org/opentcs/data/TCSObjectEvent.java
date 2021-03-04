@@ -9,15 +9,17 @@ package org.opentcs.data;
 
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Instances of this class represent events emitted by/for business objects.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will not extend TCSEvent any more.")
+@SuppressWarnings("deprecation")
 public class TCSObjectEvent
-    extends TCSEvent
+    extends org.opentcs.util.eventsystem.TCSEvent
     implements Serializable {
 
   /**

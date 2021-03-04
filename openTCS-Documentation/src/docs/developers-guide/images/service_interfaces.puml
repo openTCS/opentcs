@@ -1,0 +1,38 @@
+@startuml
+skinparam monochrome true
+skinparam linetype ortho
+'left to right direction
+
+hide empty members
+
+together {
+  interface DispatcherService
+  interface RouterService
+  interface SchedulerService
+}
+
+together {
+  interface TCSObjectService
+
+  interface PlantModelService
+  interface TransportOrderService
+  interface VehicleService
+
+  interface InternalPlantModelService
+  interface InternalTransportOrderService
+  interface InternalVehicleService
+
+  interface NotificationService
+}
+
+TCSObjectService <|-- PlantModelService
+TCSObjectService <|-- TransportOrderService
+TCSObjectService <|-- VehicleService
+
+PlantModelService <|-- InternalPlantModelService
+TransportOrderService <|-- InternalTransportOrderService
+VehicleService <|-- InternalVehicleService
+
+DispatcherService -[hidden]-> RouterService
+RouterService -[hidden]-> SchedulerService
+@enduml

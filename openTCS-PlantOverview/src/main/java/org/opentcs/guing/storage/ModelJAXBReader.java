@@ -52,7 +52,6 @@ import org.opentcs.guing.util.JOptionPaneUtil;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
  * Implementation of <code>ModelReader</code> to deserialize a <code>SystemModel</code>.

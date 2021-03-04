@@ -8,12 +8,14 @@
 package org.opentcs.access.to.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a block in the plant model.
@@ -40,15 +42,45 @@ public class BlockCreationTO
   }
 
   /**
+   * Creates a new block.
+   *
+   * @param name the name of the new block.
+   * @param memberNames the names of the block's members.
+   * @param properties the properties.
+   */
+  private BlockCreationTO(@Nonnull String name,
+                          @Nonnull Map<String, String> properties,
+                          @Nonnull Set<String> memberNames) {
+    super(name, properties);
+    this.memberNames = requireNonNull(memberNames, "memberNames");
+  }
+
+  /**
    * Sets the name of this block.
    *
    * @param name The new name.
    * @return The modified block.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public BlockCreationTO setName(@Nonnull String name) {
     return (BlockCreationTO) super.setName(name);
+  }
+
+  /**
+   * Creates a copy of this object with the given name.
+   *
+   * @param name The new name.
+   * @return A copy of this object, differing in the given name.
+   */
+  @Override
+  public BlockCreationTO withName(@Nonnull String name) {
+    return new BlockCreationTO(name,
+                               getModifiableProperties(),
+                               memberNames);
   }
 
   /**
@@ -57,10 +89,25 @@ public class BlockCreationTO
    * @param properties The new properties.
    * @return The modified block.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public BlockCreationTO setProperties(@Nonnull Map<String, String> properties) {
     return (BlockCreationTO) super.setProperties(properties);
+  }
+
+  /**
+   * Creates a copy of this object with the given properties.
+   *
+   * @param properties The new properties.
+   * @return A copy of this object, differing in the given properties.
+   */
+  @Override
+  public BlockCreationTO withProperties(@Nonnull Map<String, String> properties) {
+    return new BlockCreationTO(getName(),
+                               properties,
+                               memberNames);
   }
 
   /**
@@ -70,10 +117,29 @@ public class BlockCreationTO
    * @param value The property value.
    * @return The modified block.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public BlockCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
     return (BlockCreationTO) super.setProperty(key, value);
+  }
+
+  /**
+   * Creates a copy of this object and adds the given property.
+   * If value == null, then the key-value pair is removed from the properties.
+   *
+   * @param key the key.
+   * @param value the value
+   * @return A copy of this object that either
+   * includes the given entry in it's current properties, if value != null or
+   * excludes the entry otherwise.
+   */
+  @Override
+  public BlockCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
+    return new BlockCreationTO(getName(),
+                               propertiesWith(key, value),
+                               memberNames);
   }
 
   /**
@@ -83,7 +149,7 @@ public class BlockCreationTO
    */
   @Nonnull
   public Set<String> getMemberNames() {
-    return memberNames;
+    return Collections.unmodifiableSet(memberNames);
   }
 
   /**
@@ -92,9 +158,23 @@ public class BlockCreationTO
    * @param memberNames The names of this block's members.
    * @return The modified block.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   public BlockCreationTO setMemberNames(@Nonnull Set<String> memberNames) {
     this.memberNames = requireNonNull(memberNames, "memberNames");
     return this;
+  }
+
+  /**
+   * Creates a copy of this object with the given members.
+   *
+   * @param memberNames The names of the block's members.
+   * @return A copy of this object, differing in the given value.
+   */
+  public BlockCreationTO withMemberNames(@Nonnull Set<String> memberNames) {
+    return new BlockCreationTO(getName(),
+                               getModifiableProperties(),
+                               memberNames);
   }
 }

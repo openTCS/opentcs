@@ -15,9 +15,7 @@ import javax.swing.undo.CannotUndoException;
 import org.jhotdraw.draw.BezierFigure;
 import org.jhotdraw.draw.event.BezierNodeEdit;
 import org.jhotdraw.geom.BezierPath;
-import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
-import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -71,15 +69,11 @@ public class BezierLinerEdit
   }
 
   private void updateProperties() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        PathConnection path = (PathConnection) fOwner;
-        path.updateControlPoints();
-        PathModel pathModel = path.getModel();
-        pathModel.getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
-        pathModel.propertiesChanged(path);
-      }
+    SwingUtilities.invokeLater(() -> {
+      PathConnection path = (PathConnection) fOwner;
+      path.updateControlPoints();
+      path.getModel().getPropertyPathControlPoints().markChanged();
+      path.getModel().propertiesChanged(path);
     });
   }
 }

@@ -110,8 +110,7 @@ public class StaticRouteModel
   public void removePoint(PointModel point) {
     if (contains(point)) {
       remove(point);
-      StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
-      pElements.getItems().remove(point.getName());
+      getPropertyElements().getItems().remove(point.getName());
     }
   }
 
@@ -122,10 +121,8 @@ public class StaticRouteModel
    */
   public void addPoint(PointModel point) {
     add(point);
-    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
-    String addedModelName = point.getName();
-    if (!pElements.getItems().contains(addedModelName)) {
-      pElements.addItem(addedModelName);
+    if (!getPropertyElements().getItems().contains(point.getName())) {
+      getPropertyElements().addItem(point.getName());
     }
   }
 
@@ -136,8 +133,7 @@ public class StaticRouteModel
     for (Object o : new ArrayList<>(Lists.reverse(getChildComponents()))) {
       remove((ModelComponent) o);
     }
-    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
-    pElements.getItems().clear();
+    getPropertyElements().getItems().clear();
   }
 
   /**
@@ -146,9 +142,7 @@ public class StaticRouteModel
    * @return The color.
    */
   public Color getColor() {
-    ColorProperty property = (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
-
-    return property.getColor();
+    return getPropertyColor().getColor();
   }
 
   /**
@@ -162,7 +156,7 @@ public class StaticRouteModel
 
   @Override  // AbstractModelComponent
   public void propertiesChanged(AttributesChangeListener l) {
-    if (getProperty(ElementPropKeys.BLOCK_COLOR).hasChanged()) {
+    if (getPropertyColor().hasChanged()) {
       colorChanged();
     }
 
@@ -171,9 +165,7 @@ public class StaticRouteModel
 
   @Override  // AbstractModelComponent
   public String getTreeViewName() {
-    String treeViewName = getName();
-
-    return treeViewName;
+    return getName();
   }
 
   @Override  // AbstractModelComponent
@@ -212,6 +204,18 @@ public class StaticRouteModel
     for (StaticRouteChangeListener listener : fListeners) {
       listener.pointsChanged(new StaticRouteChangeEvent(this));
     }
+  }
+
+  public ColorProperty getPropertyColor() {
+    return (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
+  }
+
+  public StringSetProperty getPropertyElements() {
+    return (StringSetProperty) getProperty(ELEMENTS);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
 
   /**

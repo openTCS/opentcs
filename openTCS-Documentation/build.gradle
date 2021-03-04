@@ -2,6 +2,7 @@ evaluationDependsOn(':openTCS-API-Base')
 evaluationDependsOn(':openTCS-API-Injection')
 evaluationDependsOn(':openTCS-Common')
 evaluationDependsOn(':openTCS-Kernel')
+evaluationDependsOn(':openTCS-KernelControlCenter')
 evaluationDependsOn(':openTCS-PlantOverview')
 
 apply plugin: 'distribution'
@@ -13,6 +14,7 @@ def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
 def apiCmpDir = file("$buildDir/compatibility-reports")
 def schemasDir = file("$buildDir/schemagen")
+def jsonSchemasDir = file("$buildDir/schemagen-json")
 def samplesDir = file("$buildDir/samples")
 def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
@@ -27,18 +29,26 @@ ext.collectableDistDir = file("$buildDir/install")
 configurations {
   schemagen
   configdocgen
+  baselineapibase
+  baselineapiinjection
 }
 
 dependencies {
   compile project(':openTCS-Kernel')
+  compile group: 'com.kjetland', name: 'mbknor-jackson-jsonschema_2.12', version: '1.0.29'
+  schemagen group: 'com.kjetland', name: 'mbknor-jackson-jsonschema_2.12', version: '1.0.29'
   
   schemagen project(':openTCS-Kernel')
   schemagen project(':openTCS-PlantOverview')
   schemagen jar.outputs.files
   
   configdocgen project(':openTCS-Kernel')
+  configdocgen project(':openTCS-KernelControlCenter')
   configdocgen project(':openTCS-PlantOverview')
   configdocgen jar.outputs.files
+  
+  baselineapibase  'org.opentcs:opentcs-api-base:4.0.0@jar'
+  baselineapiinjection  'org.opentcs:opentcs-api-injection:4.0.0@jar'
 }
 
 distributions {
@@ -54,6 +64,9 @@ distributions {
     }
     contents.from(schemasDir) {
       into('developer/xml-schemas')
+    }
+    contents.from(jsonSchemasDir) {
+      into('developer/json-schemas')
     }
     contents.from(devManualDir) {
       into('developer/developers-guide')
@@ -71,7 +84,8 @@ task renderDocs {
   dependsOn 'apiBase'
   dependsOn 'apiInjection'
   dependsOn 'jApiCmpAll'
-  dependsOn 'schemagen'
+  dependsOn 'schemagenXml'
+  dependsOn 'schemagenJson'
   dependsOn 'asciidoctor'
 }
 
@@ -124,22 +138,23 @@ task apiInjection(type: Javadoc, description: 'Creates Javadoc for injection API
   }
 }
 
-task jApiCmpBase(type: me.champeau.gradle.ArtifactJapicmpTask) {
+task jApiCmpBase(type: me.champeau.gradle.japicmp.JapicmpTask) {
   dependsOn project(':openTCS-API-Base').jar
-  baseline = 'org.opentcs:opentcs-api-base:4.0.0@jar'
-  to = project(':openTCS-API-Base').jar.archivePath
+  oldClasspath = configurations.baselineapibase
+  newClasspath = files(project(':openTCS-API-Base').jar)
   accessModifier = 'protected'
   onlyModified = true
   htmlOutputFile = file("$apiCmpDir/japicmp-opentcs-api-base.html")
 }
 
-task jApiCmpInjection(type: me.champeau.gradle.ArtifactJapicmpTask) {
+task jApiCmpInjection(type: me.champeau.gradle.japicmp.JapicmpTask) {
   dependsOn project(':openTCS-API-Injection').jar
-  baseline = 'org.opentcs:opentcs-api-injection:4.0.0@jar'
-  to = project(':openTCS-API-Injection').jar.archivePath
+  oldClasspath = configurations.baselineapiinjection
+  newClasspath = files(project(':openTCS-API-Injection').jar)
   accessModifier = 'protected'
   onlyModified = true
   htmlOutputFile = file("$apiCmpDir/japicmp-opentcs-api-injection.html")
+  ignoreMissingClasses = true
 }
 
 task jApiCmpAll {
@@ -344,6 +359,9 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
              'kernel-javaSrc': project(':openTCS-Kernel').javaSrcDir,
              'kernel-guiceSrc': project(':openTCS-Kernel').guiceSrcDir,
              'kernel-testSrc': project(':openTCS-Kernel').testSrcDir,
+             'controlCenter-javaSrc': project(':openTCS-KernelControlCenter').javaSrcDir,
+             'controlCenter-guiceSrc': project(':openTCS-KernelControlCenter').guiceSrcDir,
+             'controlCenter-testSrc': project(':openTCS-KernelControlCenter').testSrcDir,
              'plantoverview-javaSrc': project(':openTCS-PlantOverview').javaSrcDir,
              'plantoverview-guiceSrc': project(':openTCS-PlantOverview').guiceSrcDir,
              'plantoverview-testSrc': project(':openTCS-PlantOverview').testSrcDir,
@@ -434,7 +452,7 @@ task asciidoctorFaq(type: org.asciidoctor.gradle.AsciidoctorTask) {
   experimental: true
 }
 
-task schemagen {
+task schemagenXml {
   dependsOn 'jar'
   dependsOn ':openTCS-Kernel:jar'
   dependsOn ':openTCS-PlantOverview:jar'
@@ -442,10 +460,14 @@ task schemagen {
   File schemagenDir = schemasDir
 
   project(':openTCS-Kernel').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
-    inputs.dir srcDir
+    if (srcDir.isDirectory()) {
+      inputs.dir srcDir
+    }
   }
   project(':openTCS-PlantOverview').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
-    inputs.dir srcDir
+    if (srcDir.isDirectory()) {
+      inputs.dir srcDir
+    }
   }
   outputs.dir schemagenDir
 
@@ -456,33 +478,33 @@ task schemagen {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-order.xsd",
-             "org.opentcs.kernel.xmlhost.orders.binding.TCSOrderSet",
-             "org.opentcs.kernel.xmlhost.orders.binding.Transport",
-             "org.opentcs.kernel.xmlhost.orders.binding.TransportScript" ]
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TCSOrderSet",
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.Transport",
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TransportScript" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-orderscript.xsd",
-             "org.opentcs.kernel.xmlhost.orders.binding.TCSScriptFile",
-             "org.opentcs.kernel.xmlhost.orders.binding.Transport",
-             "org.opentcs.kernel.xmlhost.orders.binding.TransportScript" ]
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TCSScriptFile",
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.Transport",
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TransportScript" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-response.xsd",
-             "org.opentcs.kernel.xmlhost.orders.binding.TCSResponseSet",
-             "org.opentcs.kernel.xmlhost.orders.binding.TransportResponse",
-             "org.opentcs.kernel.xmlhost.orders.binding.ScriptResponse" ]
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TCSResponseSet",
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TransportResponse",
+             "org.opentcs.kernel.extensions.xmlhost.orders.binding.ScriptResponse" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-statuschannel.xsd",
-             "org.opentcs.kernel.xmlhost.status.binding.TCSStatusMessageSet",
-             "org.opentcs.kernel.xmlhost.status.binding.OrderStatusMessage",
-             "org.opentcs.kernel.xmlhost.status.binding.VehicleStatusMessage" ]
+             "org.opentcs.kernel.extensions.xmlhost.status.binding.TCSStatusMessageSet",
+             "org.opentcs.kernel.extensions.xmlhost.status.binding.OrderStatusMessage",
+             "org.opentcs.kernel.extensions.xmlhost.status.binding.VehicleStatusMessage" ]
     }
     javaexec {
       classpath configurations.schemagen
@@ -492,6 +514,34 @@ task schemagen {
              "org.opentcs.guing.persistence.CourseElement",
              "org.opentcs.guing.persistence.CourseObjectProperty",
              "org.opentcs.guing.persistence.KeyValueSetListWrapper" ]
+    }
+  }
+}
+
+task schemagenJson {
+  dependsOn 'jar'
+  dependsOn ':openTCS-Kernel:jar'
+  dependsOn ':openTCS-PlantOverview:jar'
+
+  File schemagenDir = jsonSchemasDir
+
+  project(':openTCS-Kernel').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+    if (srcDir.isDirectory()) {
+      inputs.dir srcDir
+    }
+  }
+  outputs.dir schemagenDir
+
+  doLast {
+    mkdir(schemagenDir)
+    
+    javaexec {
+      classpath configurations.schemagen
+      main = "org.opentcs.documentation.JSONSchemaGenerator"
+      args = [ "${schemagenDir}",
+            "org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport",
+            "org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList",
+      ]
     }
   }
 }
@@ -536,12 +586,25 @@ task samplesgen {
       main = 'org.opentcs.documentation.SamplesGenerator'
       args "TELEGRAM_VEHICLE_STATUS", "${samplesDir}/xml-telegram-vehicle-status.xml"
     }
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.HttpSamples'
+      args "STATUS", "${samplesDir}/sample-status.json"
+    }
+    
+    javaexec {
+      classpath configurations.runtime, jar.outputs.files
+      main = 'org.opentcs.documentation.HttpSamples'
+      args "CREATE_ORDER", "${samplesDir}/sample-create-order.json"
+    }
   }
 }
 
 task configdocgen {
   dependsOn 'jar'
   dependsOn ':openTCS-Kernel:jar'
+  dependsOn ':openTCS-KernelControlCenter:jar'
   dependsOn ':openTCS-PlantOverview:jar'
   
   doLast {
@@ -558,7 +621,14 @@ task configdocgen {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/ControlCenterConfigurationEntries.adoc",
-              "org.opentcs.kernel.controlcenter.ControlCenterConfiguration"]
+              "org.opentcs.kernel.extensions.controlcenter.ControlCenterConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
+              "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration"]
     }
     
     javaexec {
@@ -599,15 +669,36 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/AdminWebApiConfigurationEntries.adoc",
+              "org.opentcs.kernel.extensions.adminwebapi.AdminWebApiConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/ServiceWebApiConfigurationEntries.adoc",
+              "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
-              "org.opentcs.kernel.RmiKernelInterfaceConfiguration"]
+              "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration"]
     }
 
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/XMLHostInterfaceConfigurationEntries.adoc",
-              "org.opentcs.kernel.xmlhost.XMLHostInterfaceConfiguration"]
+              "org.opentcs.kernel.extensions.xmlhost.XMLHostInterfaceConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/StatisticsCollectorConfigurationEntries.adoc",
+              "org.opentcs.kernel.extensions.statistics.StatisticsCollectorConfiguration"]
     }
     
     javaexec {
@@ -623,12 +714,5 @@ task configdocgen {
       args = ["${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
               "org.opentcs.guing.util.PlantOverviewApplicationConfiguration"]
     }
-    
-    //    javaexec {
-    //      classpath configurations.configdocgen
-    //      main = "org.opentcs.documentation.ConfigDocGenerator"
-    //      args = ["${configDocDir}/DefaultRecoveryEvaluator.adoc",
-    //             "org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluatorConfiguration"]
-    //    }
   }
 }

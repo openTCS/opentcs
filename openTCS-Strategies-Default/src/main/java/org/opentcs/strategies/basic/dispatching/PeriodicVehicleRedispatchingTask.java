@@ -8,16 +8,16 @@
 package org.opentcs.strategies.basic.dispatching;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import org.opentcs.access.LocalKernel;
+import javax.inject.Inject;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.CyclicTask;
+import org.opentcs.data.order.TransportOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Periodically checks for idle vehicles that could be dispatched.
+ * Periodically checks for idle vehicles that could process a transport order.
  * The main purpose of doing this is retrying to dispatch vehicles that were not in a dispatchable
  * state when dispatching them was last tried.
  * A potential reason for this is that a vehicle temporarily reported an error because a safety
@@ -26,40 +26,59 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class PeriodicVehicleRedispatchingTask
-    extends CyclicTask {
+    implements Runnable {
 
   /**
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(PeriodicVehicleRedispatchingTask.class);
 
-  private final LocalKernel kernel;
+  private final DispatcherService dispatcherService;
+
+  private final TCSObjectService objectService;
 
   /**
    * Creates a new instance.
    *
-   * @param kernel The kernel used to dispatch vehicles.
-   * @param dispatchInterval The dispatch interval. May not be less than zero.
+   * @param dispatcherService The dispatcher service used to dispatch vehicles.
+   * @param objectService The object service.
    */
-  public PeriodicVehicleRedispatchingTask(@Nonnull LocalKernel kernel, long dispatchInterval) {
-    super(dispatchInterval);
-    this.kernel = requireNonNull(kernel, "kernel");
+  @Inject
+  public PeriodicVehicleRedispatchingTask(DispatcherService dispatcherService,
+                                          TCSObjectService objectService) {
+    this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
+    this.objectService = requireNonNull(objectService, "objectService");
   }
 
   @Override
-  protected void runActualTask() {
-    for (Vehicle vehicle : idleVehicles()) {
-      LOG.debug("Redispatching {}...", vehicle);
-      kernel.dispatchVehicle(vehicle.getReference(), false);
-    }
+  public void run() {
+    // If there are any vehicles that could process a transport order,
+    // trigger the dispatcher once.
+    objectService.fetchObjects(Vehicle.class, this::couldProcessTransportOrder).stream()
+        .findAny()
+        .ifPresent(vehicle -> {
+          LOG.debug("Vehicle {} could process transport order, triggering dispatcher ...", vehicle);
+          dispatcherService.dispatch();
+        });
   }
 
-  private Set<Vehicle> idleVehicles() {
-    return kernel.getTCSObjects(Vehicle.class,
-                                vehicle -> vehicle.hasProcState(Vehicle.ProcState.IDLE)
-                                && !vehicle.isProcessingOrder()
-                                && vehicle.hasState(Vehicle.State.IDLE)
-                                && vehicle.getCurrentPosition() != null);
+  private boolean couldProcessTransportOrder(Vehicle vehicle) {
+    return vehicle.getIntegrationLevel() ==Vehicle.IntegrationLevel.TO_BE_UTILIZED
+        && vehicle.getCurrentPosition() != null
+        && !vehicle.isEnergyLevelCritical()
+        && (processesNoOrder(vehicle)
+            || processesDispensableOrder(vehicle));
   }
 
+  private boolean processesNoOrder(Vehicle vehicle) {
+    return vehicle.hasProcState(Vehicle.ProcState.IDLE)
+        && (vehicle.hasState(Vehicle.State.IDLE)
+            || vehicle.hasState(Vehicle.State.CHARGING));
+  }
+
+  private boolean processesDispensableOrder(Vehicle vehicle) {
+    return vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+            .isDispensable();
+  }
 }

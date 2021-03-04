@@ -7,16 +7,15 @@
  */
 package org.opentcs.kernel;
 
-import org.opentcs.access.Kernel;
-import org.opentcs.access.rmi.KernelProxyBuilder;
-import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
-import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SslSocketFactoryProvider;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
+ * Shuts down a running kernel via its administration interface.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class ShutdownKernel {
 
@@ -24,37 +23,27 @@ public class ShutdownKernel {
   }
 
   public static void main(String[] args) {
-    if (args.length < 1 || args.length > 3) {
-      System.out.println("ShutdownKernel "
-          + "[<registry-hostname>] [<registry-portnummer>] <connection-encryption>");
+    if (args.length > 2) {
+      System.err.println("ShutdownKernel [<host>] [<port>]");
       return;
     }
-    String hostName = args.length > 0 ? args[0] : "localhost";
-    int port = args.length > 1 ? Integer.parseInt(args[1]) : 1099;
 
-    SocketFactoryProvider socketFactoryProvider;
-    switch (args[2]) {
-      case "NONE":
-        socketFactoryProvider = new NullSocketFactoryProvider();
-        break;
-      case "SSL_UNTRUSTED":
-        socketFactoryProvider = new AnonSslSocketFactoryProvider();
-        break;
-      case "SSL":
-        socketFactoryProvider = new SslSocketFactoryProvider();
-        break;
-      default:
-        System.out.println("Unknown connection encryption '" + args[2] + "'. Supported values: "
-            + "NONE, SSL_UNTRUSTED, SSL.");
-        return;
+    String hostName = args.length > 0 ? args[0] : "localhost";
+    int port = args.length > 1 ? Integer.parseInt(args[1]) : 55001;
+
+    try {
+      URL url = new URL("http", hostName, port, "/v1/kernel");
+      System.err.println("Calling to " + url + "...");
+      HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+      httpCon.setRequestMethod("DELETE");
+      httpCon.connect();
+      httpCon.getInputStream();
+    }
+    catch (IOException exc) {
+      System.err.println("Exception accessing admin interface:");
+      exc.printStackTrace();
     }
 
-    Kernel kernel = new KernelProxyBuilder()
-        .setSocketFactoryProvider(socketFactoryProvider)
-        .setHost(hostName)
-        .setPort(port)
-        .build();
-    kernel.setState(Kernel.State.SHUTDOWN);
   }
 
 }

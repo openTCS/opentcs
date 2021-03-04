@@ -16,11 +16,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.swing.JPanel;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * Shows every vehicle available in the system in a panel.
@@ -28,7 +28,8 @@ import org.opentcs.guing.model.elements.VehicleModel;
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class VehiclesPanel
-    extends JPanel {
+    extends JPanel
+    implements EventHandler {
 
   /**
    * Provides the current system model.
@@ -62,13 +63,17 @@ public class VehiclesPanel
     panelVehicles.setLayout(new ModifiedFlowLayout(FlowLayout.LEFT, 10, 10));
   }
 
-  /**
-   * Handles changes of the application's operation mode.
-   *
-   * @param evt The mode change event.
-   */
-  @Handler
-  public void handleModeChange(OperationModeChangeEvent evt) {
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof OperationModeChangeEvent) {
+      handleModeChange((OperationModeChangeEvent) event);
+    }
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
+    }
+  }
+
+  private void handleModeChange(OperationModeChangeEvent evt) {
     switch (evt.getNewMode()) {
       case OPERATING:
         setVehicleModels(modelManager.getModel().getVehicleModels());
@@ -127,8 +132,7 @@ public class VehiclesPanel
     }
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
     switch (evt.getStage()) {
       case UNLOADING:
         clearVehicles();

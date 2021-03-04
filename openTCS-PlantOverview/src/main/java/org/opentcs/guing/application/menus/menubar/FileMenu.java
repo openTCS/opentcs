@@ -48,6 +48,14 @@ public class FileMenu
    */
   private final JMenuItem menuItemSaveModelAs;
   /**
+   * A submenu for importers.
+   */
+  private final FileImportMenu menuImport;
+  /**
+   * A submenu for exporters.
+   */
+  private final FileExportMenu menuExport;
+  /**
    * A menu item for retrieving the system model data from the kernel.
    */
   private final JMenuItem menuItemLoadModelFromKernel;
@@ -69,11 +77,18 @@ public class FileMenu
    *
    * @param actionMap The application's action map.
    * @param menuMode The sub-menu for the application's mode of operation.
+   * @param menuImport The sub-menu for the selectable plant model importers.
+   * @param menuExport The sub-menu for the selectable plant model exporters.
    */
   @Inject
-  public FileMenu(ViewActionMap actionMap, FileModeMenu menuMode) {
+  public FileMenu(ViewActionMap actionMap,
+                  FileModeMenu menuMode,
+                  FileImportMenu menuImport,
+                  FileExportMenu menuExport) {
     requireNonNull(actionMap, "actionMap");
-    requireNonNull(menuMode, "menuMode");
+    this.menuMode = requireNonNull(menuMode, "menuMode");
+    this.menuImport = requireNonNull(menuImport, "menuImport");
+    this.menuExport = requireNonNull(menuExport, "menuExport");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
@@ -99,6 +114,11 @@ public class FileMenu
 
     addSeparator();
 
+    add(menuImport);
+    add(menuExport);
+
+    addSeparator();
+
     // Load model from kernel
     menuItemLoadModelFromKernel = new JMenuItem(actionMap.get(LoadModelFromKernelAction.ID));
     labels.configureMenu(menuItemLoadModelFromKernel, LoadModelFromKernelAction.ID);
@@ -109,7 +129,6 @@ public class FileMenu
     labels.configureMenu(menuItemPersistInKernel, PersistInKernelAction.ID);
     add(menuItemPersistInKernel);
 
-    this.menuMode = menuMode;
     add(menuMode);
 
     addSeparator();
@@ -134,6 +153,12 @@ public class FileMenu
     // Saving is also allowed in OPERATING mode, e.g. locking of Pathes
     menuItemSaveModel.setEnabled(true);
     menuItemSaveModelAs.setEnabled(true);
+
+    menuImport.setEnabled(mode == OperationMode.MODELLING);
+    menuExport.setEnabled(mode == OperationMode.MODELLING);
+    
+    menuItemLoadModelFromKernel.setEnabled(mode == OperationMode.MODELLING);
+    menuItemPersistInKernel.setEnabled(mode == OperationMode.MODELLING);
   }
 
 }

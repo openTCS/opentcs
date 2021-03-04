@@ -11,12 +11,11 @@ package org.opentcs.guing.exchange;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import net.engio.mbassy.bus.MBassador;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.guing.event.OrderSequenceEvent;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * A special event dispatcher for transport order sequences.
@@ -25,25 +24,25 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequenceDispatcher
-    implements EventListener<TCSEvent> {
+    implements EventHandler {
 
   /**
-   * The event bus to dispatch events to.
+   * Where we send events.
    */
-  private final MBassador<Object> eventBus;
+  private final EventHandler eventHandler;
 
   /**
-   * Creates a new instance of OrderSequenceDispatcher.
+   * Creates a new instance.
    *
-   * @param eventBus The event bus to dispatch events to.
+   * @param eventHandler Where this instance sends events.
    */
   @Inject
-  public OrderSequenceDispatcher(MBassador<Object> eventBus) {
-    this.eventBus = requireNonNull(eventBus, "eventBus");
+  public OrderSequenceDispatcher(@ApplicationEventBus EventHandler eventHandler) {
+    this.eventHandler = requireNonNull(eventHandler, "eventHandler");
   }
 
   @Override
-  public void processEvent(TCSEvent event) {
+  public void onEvent(Object event) {
     if (!(event instanceof TCSObjectEvent)) {
       return;
     }
@@ -57,15 +56,15 @@ public class OrderSequenceDispatcher
 
     switch (objEvent.getType()) {
       case OBJECT_CREATED:
-        eventBus.publish(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_CREATED));
+        eventHandler.onEvent(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_CREATED));
         break;
 
       case OBJECT_MODIFIED:
-        eventBus.publish(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_CHANGED));
+        eventHandler.onEvent(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_CHANGED));
         break;
 
       case OBJECT_REMOVED:
-        eventBus.publish(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_REMOVED));
+        eventHandler.onEvent(new OrderSequenceEvent(this, os, OrderSequenceEvent.Type.SEQ_REMOVED));
         break;
 
       default:

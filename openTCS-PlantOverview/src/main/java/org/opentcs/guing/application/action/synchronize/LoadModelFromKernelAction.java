@@ -9,7 +9,7 @@
 package org.opentcs.guing.application.action.synchronize;
 
 import java.awt.event.ActionEvent;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -29,10 +29,10 @@ public class LoadModelFromKernelAction
   /**
    * Creates a new instance.
    *
-   * @param openTCSView The openTCS view
+   * @param openTCSView The openTCS view.
    */
   public LoadModelFromKernelAction(OpenTCSView openTCSView) {
-    this.openTCSView = Objects.requireNonNull(openTCSView);
+    this.openTCSView = requireNonNull(openTCSView);
     ResourceBundleUtil.getBundle().configureAction(this, ID, false);
   }
 

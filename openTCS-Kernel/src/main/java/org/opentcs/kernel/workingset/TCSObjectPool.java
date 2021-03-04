@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import net.engio.mbassy.bus.MBassador;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -29,6 +29,7 @@ import org.opentcs.data.TCSObjectReference;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.UniqueStringGenerator;
 import org.opentcs.util.annotations.ScheduledApiChange;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,18 +60,18 @@ public class TCSObjectPool {
    */
   private final UniqueStringGenerator<?> objectNameGenerator = new UniqueStringGenerator<>();
   /**
-   * The event bus to publish events to.
+   * A handler we should emit object events to.
    */
-  private final MBassador<Object> eventBus;
+  private final EventHandler eventHandler;
 
   /**
-   * Creates a new instance that uses the given event listener.
+   * Creates a new instance that uses the given event handler.
    *
-   * @param eventBus The event bus to publish events to.
+   * @param eventHandler The event handler to publish events to.
    */
   @Inject
-  public TCSObjectPool(MBassador<Object> eventBus) {
-    this.eventBus = requireNonNull(eventBus, "eventBus");
+  public TCSObjectPool(@ApplicationEventBus EventHandler eventHandler) {
+    this.eventHandler = requireNonNull(eventHandler, "eventHandler");
   }
 
   /**
@@ -441,6 +442,7 @@ public class TCSObjectPool {
    * property from the object.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
+  @SuppressWarnings("deprecation")
   public void setObjectProperty(TCSObjectReference<?> ref, String key, String value)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
@@ -467,6 +469,7 @@ public class TCSObjectPool {
    * @param ref A reference to the object to be modified.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
+  @SuppressWarnings("deprecation")
   public void clearObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
@@ -512,7 +515,10 @@ public class TCSObjectPool {
    * @param suffixPattern A pattern describing the suffix of the generated name.
    * Must be of the form understood by <code>java.text.DecimalFormat</code>.
    * @return A name that is unique among all known objects.
+   * @deprecated Suggesting object names is not within this class's responsibility.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public String getUniqueObjectName(String prefix, String suffixPattern) {
     return objectNameGenerator.getUniqueString(prefix, suffixPattern);
   }
@@ -542,10 +548,7 @@ public class TCSObjectPool {
   public void emitObjectEvent(TCSObject<?> currentObjectState,
                               TCSObject<?> previousObjectState,
                               TCSObjectEvent.Type evtType) {
-    TCSObjectEvent event = new TCSObjectEvent(currentObjectState,
-                                              previousObjectState,
-                                              evtType);
-    eventBus.publish(event);
+    eventHandler.onEvent(new TCSObjectEvent(currentObjectState, previousObjectState, evtType));
   }
 
   @SuppressWarnings("deprecation")

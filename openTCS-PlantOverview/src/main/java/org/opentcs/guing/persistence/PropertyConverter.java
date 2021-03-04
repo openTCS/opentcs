@@ -60,6 +60,7 @@ import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_CRITICAL;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_GOOD;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_STATE;
+import static org.opentcs.guing.model.elements.VehicleModel.INTEGRATION_LEVEL;
 import static org.opentcs.guing.model.elements.VehicleModel.LOADED;
 import static org.opentcs.guing.model.elements.VehicleModel.NEXT_POINT;
 import static org.opentcs.guing.model.elements.VehicleModel.ORIENTATION_ANGLE;
@@ -201,6 +202,9 @@ public class PropertyConverter {
             break;
           case PROC_STATE:
             revertSelectionProperty(model, PROC_STATE, property);
+            break;
+          case INTEGRATION_LEVEL:
+            revertSelectionProperty(model, INTEGRATION_LEVEL, property);
             break;
           case POINT:
             revertStringProperty(model, POINT, property);

@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +35,7 @@ import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
-import org.opentcs.util.UniqueTimestampGenerator;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +59,6 @@ public class TransportOrderPool {
    * The system's global object pool.
    */
   private final TCSObjectPool objectPool;
-  /**
-   * The timestamp generator for order creation times.
-   */
-  private final UniqueTimestampGenerator timestampGenerator = new UniqueTimestampGenerator();
 
   /**
    * Creates a new TransportOrderPool.
@@ -121,7 +118,7 @@ public class TransportOrderPool {
         = new TransportOrder(orderID,
                              orderName,
                              destinations,
-                             timestampGenerator.getNextTimestamp());
+                             System.currentTimeMillis());
     // Store the instance in the global object pool.
     try {
       objectPool.addObject(newOrder);
@@ -146,16 +143,17 @@ public class TransportOrderPool {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    * @throws IllegalArgumentException If the order is supposed to be part of an order sequence, but
-   * the sequence is already complete, the categories of the two differ or the intended vehicles of 
+   * the sequence is already complete, the categories of the two differ or the intended vehicles of
    * the two differ.
    */
+  @SuppressWarnings("deprecation")
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
     TransportOrder newOrder = new TransportOrder(to.getName(), toDriveOrders(to.getDestinations()))
-        .withCreationTime(timestampGenerator.getNextTimestamp())
+        .withCreationTime(Instant.now())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withCategory(to.getCategory())
-        .withDeadline(to.getDeadline().toInstant().toEpochMilli())
+        .withDeadline(to.getDeadline().toInstant())
         .withDispensable(to.isDispensable())
         .withWrappingSequence(getWrappingSequence(to))
         .withDependencies(getDependencies(to))
@@ -181,7 +179,10 @@ public class TransportOrderPool {
    * @param ref A reference to the transport order to return.
    * @return The referenced transport order, or <code>null</code>, if no such
    * order exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder getTransportOrder(TCSObjectReference<TransportOrder> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(TransportOrder.class, ref);
@@ -193,7 +194,10 @@ public class TransportOrderPool {
    * @param orderName The name of the TransportOrder to return.
    * @return The transport order with the given name, or <code>null</code>, if
    * no such order exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder getTransportOrder(String orderName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(TransportOrder.class, orderName);
@@ -208,7 +212,10 @@ public class TransportOrderPool {
    * returned.
    * @return A set of transport orders whose names match the given regular
    * expression. If no such transport orders exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<TransportOrder> getTransportOrders(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(TransportOrder.class, regexp);
@@ -220,7 +227,10 @@ public class TransportOrderPool {
    * @param state The state of the transport orders to be returned.
    * @return A set of transport orders current in the given state. If no such
    * transport orders exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<TransportOrder> getTransportOrders(TransportOrder.State state) {
     LOG.debug("method entry");
     if (state == null) {
@@ -240,8 +250,11 @@ public class TransportOrderPool {
    *
    * @param predicate The predicate.
    * @return A set of transport orders for which the given predicate is true.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<TransportOrder> getTransportOrders(Predicate<? super TransportOrder> predicate) {
     return objectPool.getObjects(TransportOrder.class, predicate);
   }
@@ -283,6 +296,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public TransportOrder setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                                TransportOrder.State newState)
       throws ObjectUnknownException {
@@ -339,10 +353,57 @@ public class TransportOrderPool {
    *
    * @param orderRef A reference to the transport order to be modified.
    * @param vehicleRef A reference to the vehicle processing the order.
+   * @param driveOrders The drive orders containing the data to be copied into this transport
+   * order's drive orders.
    * @return The modified transport order.
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
+   * @throws IllegalArgumentException If the destinations of the given drive
+   * orders do not match the destinations of the drive orders in this transport
+   * order.
    */
+  @SuppressWarnings("deprecation")
+  public TransportOrder setTransportOrderProcessingVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef,
+      List<DriveOrder> driveOrders)
+      throws ObjectUnknownException, IllegalArgumentException {
+    TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
+    TransportOrder previousState = order.clone();
+    if (vehicleRef == null) {
+      order = objectPool.replaceObject(order.withProcessingVehicle(null));
+    }
+    else {
+      Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
+      order = objectPool.replaceObject(
+          order.withProcessingVehicle(vehicle.getReference())
+              .withDriveOrders(driveOrders)
+              .withCurrentDriveOrderIndex(0)
+      );
+      if (order.getCurrentDriveOrder() != null) {
+        order = objectPool.replaceObject(
+            order.withCurrentDriveOrderState(DriveOrder.State.TRAVELLING));
+      }
+    }
+    objectPool.emitObjectEvent(order.clone(),
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return order;
+  }
+
+  /**
+   * Sets a transport order's processing vehicle.
+   *
+   * @param orderRef A reference to the transport order to be modified.
+   * @param vehicleRef A reference to the vehicle processing the order.
+   * @return The modified transport order.
+   * @throws ObjectUnknownException If the referenced transport order is not
+   * in this pool.
+   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder setTransportOrderProcessingVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -376,7 +437,11 @@ public class TransportOrderPool {
    * @throws IllegalArgumentException If the destinations of the given drive
    * orders do not match the destinations of the drive orders in this transport
    * order.
+   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
                                                      List<DriveOrder> newOrders)
       throws ObjectUnknownException, IllegalArgumentException {
@@ -402,7 +467,11 @@ public class TransportOrderPool {
    * in this pool.
    * @throws IllegalStateException If there already is a current drive order or
    * if the list of future drive orders is empty.
+   * @deprecated Use {@link #setTransportOrderProcessingVehicle(org.opentcs.data.TCSObjectReference, org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder setTransportOrderInitialDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
     LOG.debug("method entry");
@@ -435,6 +504,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public TransportOrder setTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -551,6 +621,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If any of the referenced transport orders
    * does not exist.
    */
+  @SuppressWarnings("deprecation")
   public TransportOrder addTransportOrderRejection(TCSObjectReference<TransportOrder> orderRef,
                                                    Rejection newRejection)
       throws ObjectUnknownException {
@@ -639,6 +710,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public TransportOrder removeTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -691,6 +763,7 @@ public class TransportOrderPool {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     OrderSequence newSequence = new OrderSequence(to.getName())
@@ -712,7 +785,10 @@ public class TransportOrderPool {
    * @param ref A reference to the order sequence to return.
    * @return The referenced order sequence, or <code>null</code>, if no such
    * sequence exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public OrderSequence getOrderSequence(TCSObjectReference<OrderSequence> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(OrderSequence.class, ref);
@@ -724,7 +800,10 @@ public class TransportOrderPool {
    * @param seqName The name of the order sequence to return.
    * @return The order sequence with the given name, or <code>null</code>, if
    * no such sequence exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public OrderSequence getOrderSequence(String seqName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(OrderSequence.class, seqName);
@@ -738,7 +817,10 @@ public class TransportOrderPool {
    * sequences to return. If <code>null</code>, all sequences are returned.
    * @return A set of order sequences whose names match the given regular
    * expression. If no such sequences exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<OrderSequence> getOrderSequences(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(OrderSequence.class, regexp);
@@ -749,7 +831,10 @@ public class TransportOrderPool {
    *
    * @param predicate The predicate.
    * @return A set of order sequences for which the given predicate is true.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<OrderSequence> getOrderSequences(Predicate<? super OrderSequence> predicate) {
     return objectPool.getObjects(OrderSequence.class, predicate);
   }
@@ -851,6 +936,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence setOrderSequenceFinishedIndex(TCSObjectReference<OrderSequence> seqRef,
                                                      int index)
       throws ObjectUnknownException {
@@ -872,6 +958,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence setOrderSequenceComplete(
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
@@ -893,6 +980,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -982,6 +1070,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -1009,6 +1098,7 @@ public class TransportOrderPool {
    * @return The removed order sequence.
    * @throws ObjectUnknownException If the referenced order sequence is not in this pool.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence removeOrderSequence(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -1029,6 +1119,7 @@ public class TransportOrderPool {
    * @throws ObjectUnknownException If the referenced order sequence is not in this pool.
    * @throws IllegalArgumentException If the order sequence is not finished, yet.
    */
+  @SuppressWarnings("deprecation")
   public void removeFinishedOrderSequenceAndOrders(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException, IllegalArgumentException {
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, ref);

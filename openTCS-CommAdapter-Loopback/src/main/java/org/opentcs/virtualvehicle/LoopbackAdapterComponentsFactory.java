@@ -30,5 +30,6 @@ public interface LoopbackAdapterComponentsFactory {
    * @param commAdapter The comm adapter to create a panel for.
    * @return A new panel for the given comm adapter.
    */
+  @Deprecated
   LoopbackCommunicationAdapterPanel createPanel(LoopbackCommunicationAdapter commAdapter);
 }

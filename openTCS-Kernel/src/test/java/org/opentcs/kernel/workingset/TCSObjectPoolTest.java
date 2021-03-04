@@ -16,9 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import net.engio.mbassy.bus.MBassador;
-import net.engio.mbassy.bus.config.BusConfiguration;
-import net.engio.mbassy.listener.Handler;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -27,7 +24,8 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventBus;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * A test class for TCSObjectPool.
@@ -43,7 +41,7 @@ public class TCSObjectPoolTest {
 
   @Before
   public void setUp() {
-    pool = new TCSObjectPool(new MBassador<>(BusConfiguration.Default()));
+    pool = new TCSObjectPool(new SimpleEventBus());
   }
 
   @After
@@ -172,16 +170,14 @@ public class TCSObjectPoolTest {
 
   @Test
   public void shouldEmitEventForCreatedObject() {
-    MBassador<Object> eventBus = new MBassador<>(BusConfiguration.Default());
+    EventBus eventBus = new SimpleEventBus();
 
-    List<TCSEvent> receivedEvents = new LinkedList<>();
-    Object eventHandler = new Object() {
-      @Handler
-      public void handleEvent(TCSEvent event) {
-        receivedEvents.add(event);
-      }
-    };
-    eventBus.subscribe(eventHandler);
+    List<Object> receivedEvents = new LinkedList<>();
+
+    eventBus.subscribe((event) -> {
+      receivedEvents.add(event);
+    });
+
     pool = new TCSObjectPool(eventBus);
     Point point1 = new Point("Point-00001");
     pool.addObject(point1);
@@ -210,6 +206,7 @@ public class TCSObjectPoolTest {
    * Verify that the pool generates unique object names.
    */
   @Test(expected = ObjectExistsException.class)
+  @SuppressWarnings("deprecation")
   public void testUniqueNameGenerator() {
     String prefix = "ABC";
     String suffixPattern = "000";

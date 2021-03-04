@@ -14,13 +14,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.AllocationsReleased;
@@ -44,9 +48,9 @@ public class DefaultScheduler
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultScheduler.class);
   /**
-   * A Kernel instance for expanding resource sets.
+   * The plant model service.
    */
-  private final LocalKernel localKernel;
+  private final InternalPlantModelService plantModelService;
   /**
    * Takes care of modules.
    */
@@ -60,9 +64,13 @@ public class DefaultScheduler
    */
   private final ReservationPool reservationPool = new ReservationPool();
   /**
-   * Processes allocation requests.
+   * Allocations deferred because they couldn't be granted, yet.
    */
-  private AllocatorTask allocatorTask;
+  private final Queue<AllocatorCommand.Allocate> deferredAllocations = new LinkedBlockingQueue<>();
+  /**
+   * Executes scheduling tasks.
+   */
+  private final ScheduledExecutorService kernelExecutor;
   /**
    * Indicates whether this component is enabled.
    */
@@ -71,25 +79,28 @@ public class DefaultScheduler
   /**
    * Creates a new BasicScheduler instance.
    *
-   * @param kernel A kernel instance for expanding resource sets.
+   * @param plantModelService The plant model service.
    * @param allocationAdvisor Takes care of modules.
+   * @param kernelExecutor Executes scheduling tasks.
    */
   @Inject
-  public DefaultScheduler(LocalKernel kernel, AllocationAdvisor allocationAdvisor) {
-    this.localKernel = requireNonNull(kernel, "kernel");
+  public DefaultScheduler(InternalPlantModelService plantModelService,
+                          AllocationAdvisor allocationAdvisor,
+                          @KernelExecutor ScheduledExecutorService kernelExecutor) {
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
   @Override
   public void initialize() {
-    if (initialized) {
+    if (isInitialized()) {
       return;
     }
 
     reservationPool.clear();
     allocationAdvisor.initialize();
-    allocatorTask = new AllocatorTask(localKernel, reservationPool, allocationAdvisor);
-    new Thread(allocatorTask, "DefaultScheduler-allocatorTask").start();
+
     initialized = true;
   }
 
@@ -100,11 +111,10 @@ public class DefaultScheduler
 
   @Override
   public void terminate() {
-    if (!initialized) {
+    if (!isInitialized()) {
       return;
     }
 
-    allocatorTask.terminate();
     allocationAdvisor.terminate();
     initialized = false;
   }
@@ -162,7 +172,12 @@ public class DefaultScheduler
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    allocatorTask.enqueue(new Allocate(client, resources));
+    kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                            reservationPool,
+                                            deferredAllocations,
+                                            allocationAdvisor,
+                                            kernelExecutor,
+                                            new Allocate(client, resources)));
   }
 
   @Override
@@ -208,9 +223,20 @@ public class DefaultScheduler
       Set<TCSResource<?>> completelyFreeResources = resources.stream()
           .filter(resource -> reservationPool.getReservationEntry(resource).isFree())
           .collect(Collectors.toCollection(HashSet::new));
-      allocatorTask.enqueue(new AllocationsReleased(client, completelyFreeResources));
+      kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                              reservationPool,
+                                              deferredAllocations,
+                                              allocationAdvisor,
+                                              kernelExecutor,
+                                              new AllocationsReleased(client,
+                                                                      completelyFreeResources)));
     }
-    allocatorTask.enqueue(new RetryAllocates(client));
+    kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                            reservationPool,
+                                            deferredAllocations,
+                                            allocationAdvisor,
+                                            kernelExecutor,
+                                            new RetryAllocates(client)));
   }
 
   @Override
@@ -221,7 +247,12 @@ public class DefaultScheduler
       LOG.debug("{}: Releasing all resources", client.getId());
       reservationPool.freeAll(client);
     }
-    allocatorTask.enqueue(new RetryAllocates(client));
+    kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                            reservationPool,
+                                            deferredAllocations,
+                                            allocationAdvisor,
+                                            kernelExecutor,
+                                            new RetryAllocates(client)));
   }
 
   @Override
@@ -239,6 +270,11 @@ public class DefaultScheduler
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    allocatorTask.enqueue(new CheckAllocationsPrepared(client, resources));
+    kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                            reservationPool,
+                                            deferredAllocations,
+                                            allocationAdvisor,
+                                            kernelExecutor,
+                                            new CheckAllocationsPrepared(client, resources)));
   }
 }

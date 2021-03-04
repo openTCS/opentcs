@@ -9,6 +9,7 @@ package org.opentcs.access.rmi;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides helper methods for working with the RemoteKernel interface.
@@ -32,7 +33,10 @@ final class RemoteMethods {
    * @return The corresponding method of the RemoteKernel interface.
    * @throws NoSuchMethodException If <code>RemoteKernel</code> does not have a
    * corresponding method.
+   * @deprecated Is specific to <code>RemoteKernel</code>, which is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public static Method getRemoteKernelMethod(Method method)
       throws NoSuchMethodException {
     Objects.requireNonNull(method, "method is null");

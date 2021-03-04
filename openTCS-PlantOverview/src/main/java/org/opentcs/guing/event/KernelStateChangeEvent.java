@@ -31,8 +31,7 @@ public class KernelStateChangeEvent
    * @param source The source of this event.
    * @param newState The new/current kernel state.
    */
-  public KernelStateChangeEvent(Object source,
-                                State newState) {
+  public KernelStateChangeEvent(Object source, State newState) {
     super(source);
     this.newState = requireNonNull(newState, "newState");
   }
@@ -46,6 +45,14 @@ public class KernelStateChangeEvent
     return newState;
   }
 
+  @Override
+  public String toString() {
+    return "KernelStateChangeEvent{"
+        + "newState=" + newState
+        + ", source=" + getSource()
+        + '}';
+  }
+
   public static State convertKernelState(Kernel.State kernelState) {
     switch (kernelState) {
       case MODELLING:
@@ -55,12 +62,11 @@ public class KernelStateChangeEvent
       case SHUTDOWN:
         return State.SHUTDOWN;
       default:
-        return null;
+        throw new IllegalArgumentException("Unhandled state: " + kernelState);
     }
   }
 
-  public enum State {
-
+  public static enum State {
     MODELLING,
     OPERATING,
     SHUTDOWN,

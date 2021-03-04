@@ -17,7 +17,6 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
@@ -115,8 +114,7 @@ public class LocationActionPanel
   private void updateActions() {
     LocationModel selectedLocation = getSelectedLocation();
     LocationTypeModel locationType = selectedLocation.getLocationType();
-    StringSetProperty actionProperties = (StringSetProperty) locationType.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
-    List<String> actions = actionProperties.getItems();
+    List<String> actions = locationType.getPropertyAllowedOperations().getItems();
     Collections.sort(actions);
     // "No Operation" immer als erste Aktion anzeigen
     fActions = new ArrayList<>();

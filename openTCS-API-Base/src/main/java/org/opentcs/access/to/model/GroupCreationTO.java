@@ -8,12 +8,14 @@
 package org.opentcs.access.to.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a group in the plant model.
@@ -39,16 +41,36 @@ public class GroupCreationTO
     super(name);
   }
 
+  private GroupCreationTO(@Nonnull String name,
+                          @Nonnull Map<String, String> properties,
+                          @Nonnull Set<String> memberNames) {
+    super(name, properties);
+    this.memberNames = requireNonNull(memberNames, "memberNames");
+  }
+
   /**
    * Sets the name of this group.
    *
    * @param name The new name.
    * @return The modified group.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public GroupCreationTO setName(@Nonnull String name) {
     return (GroupCreationTO) super.setName(name);
+  }
+
+  /**
+   * Creates a copy of this object with the given name.
+   *
+   * @param name The new name.
+   * @return A copy of this object, differing in the given value.
+   */
+  @Override
+  public GroupCreationTO withName(@Nonnull String name) {
+    return new GroupCreationTO(name, getModifiableProperties(), memberNames);
   }
 
   /**
@@ -57,10 +79,23 @@ public class GroupCreationTO
    * @param properties The new properties.
    * @return The modified group.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public GroupCreationTO setProperties(@Nonnull Map<String, String> properties) {
     return (GroupCreationTO) super.setProperties(properties);
+  }
+
+  /**
+   * Creates a copy of this object with the given properties.
+   *
+   * @param properties the new properties.
+   * @return A copy of this object, differing in the given properties.
+   */
+  @Override
+  public GroupCreationTO withProperties(@Nonnull Map<String, String> properties) {
+    return new GroupCreationTO(getName(), properties, memberNames);
   }
 
   /**
@@ -70,10 +105,27 @@ public class GroupCreationTO
    * @param value The property value.
    * @return The modified group.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public GroupCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
     return (GroupCreationTO) super.setProperty(key, value);
+  }
+
+  /**
+   * Creates a copy of this object and adds the given property.
+   * If value == null, then the key-value pair is removed from the properties.
+   *
+   * @param key the key.
+   * @param value the value
+   * @return A copy of this object that either
+   * includes the given entry in it's current properties, if value != null or
+   * excludes the entry otherwise.
+   */
+  @Override
+  public GroupCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
+    return new GroupCreationTO(getName(), propertiesWith(key, value), memberNames);
   }
 
   /**
@@ -83,7 +135,7 @@ public class GroupCreationTO
    */
   @Nonnull
   public Set<String> getMemberNames() {
-    return memberNames;
+    return Collections.unmodifiableSet(memberNames);
   }
 
   /**
@@ -92,9 +144,21 @@ public class GroupCreationTO
    * @param memberNames The names of this group's members.
    * @return The modified group.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   public GroupCreationTO setMemberNames(@Nonnull Set<String> memberNames) {
     this.memberNames = requireNonNull(memberNames, "memberNames");
     return this;
+  }
+
+  /**
+   * Creates a copy of this object with group's members.
+   *
+   * @param memberNames The names of this group's members.
+   * @return A copy of this object, differing in the given value.
+   */
+  public GroupCreationTO withMemberNames(@Nonnull Set<String> memberNames) {
+    return new GroupCreationTO(getName(), getModifiableProperties(), memberNames);
   }
 }

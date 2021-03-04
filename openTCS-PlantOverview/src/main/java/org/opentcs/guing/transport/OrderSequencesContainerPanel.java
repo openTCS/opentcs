@@ -31,10 +31,9 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -46,6 +45,7 @@ import org.opentcs.guing.event.OrderSequenceEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,8 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequencesContainerPanel
-    extends JPanel {
+    extends JPanel
+    implements EventHandler {
 
   /**
    * The path to the icons.
@@ -68,9 +69,9 @@ public class OrderSequencesContainerPanel
    */
   private static final Logger LOG = LoggerFactory.getLogger(OrderSequencesContainerPanel.class);
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * A factory for order sequence views.
    */
@@ -99,41 +100,31 @@ public class OrderSequencesContainerPanel
   /**
    * Creates a new instance.
    *
-   * @param kernelProvider Provides a access to a kernel.
+   * @param portalProvider Provides a access to a portal.
    * @param transportViewFactory A factory for order sequence views.
    * @param dialogParent The parent component for dialogs shown by this
    * instance.
    */
   @Inject
-  public OrderSequencesContainerPanel(SharedKernelProvider kernelProvider,
+  public OrderSequencesContainerPanel(SharedKernelServicePortalProvider portalProvider,
                                       TransportViewFactory transportViewFactory,
                                       @ApplicationFrame Component dialogParent) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
-    this.transportViewFactory = requireNonNull(transportViewFactory,
-                                               "transportViewFactory");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     initComponents();
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
-    switch (evt.getStage()) {
-      case UNLOADING:
-        // XXX Clear panel?
-        break;
-      case LOADED:
-        initView();
-        break;
-      default:
-      // Do nada.
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
     }
-  }
-
-  @Handler
-  public void processEvent(KernelStateChangeEvent event) {
-    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
-      fTableModel.setRowCount(0);
-      fTableModel.fireTableDataChanged();
+    if (event instanceof KernelStateChangeEvent) {
+      handleKernelStateChange((KernelStateChangeEvent) event);
+    }
+    if (event instanceof OrderSequenceEvent) {
+      handleOrderSequenceEvent((OrderSequenceEvent) event);
     }
   }
 
@@ -145,9 +136,10 @@ public class OrderSequencesContainerPanel
   }
 
   private Set<OrderSequence> fetchSequencesIfOnline() {
-    if (kernelProvider.kernelShared()) {
-      try (SharedKernelClient client = kernelProvider.register()) {
-        return client.getKernel().getTCSObjects(OrderSequence.class);
+    if (portalProvider.portalShared()) {
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+        return sharedPortal.getPortal().getTransportOrderService()
+            .fetchObjects(OrderSequence.class);
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception fetching sequences from kernel", exc);
@@ -212,9 +204,9 @@ public class OrderSequencesContainerPanel
   }
 
   private void showOrderSequence() {
-    try (SharedKernelClient client = kernelProvider.register()) {
-      OrderSequence os = client.getKernel().getTCSObject(OrderSequence.class,
-                                                         getSelectedOrderSequence().getReference());
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      OrderSequence os = sharedPortal.getPortal().getTransportOrderService()
+          .fetchObject(OrderSequence.class, getSelectedOrderSequence().getReference());
       DialogContent content = transportViewFactory.createOrderSequenceView(os);
       StandardContentDialog dialog
           = new StandardContentDialog(dialogParent, content, true, StandardContentDialog.CLOSE);
@@ -272,8 +264,27 @@ public class OrderSequencesContainerPanel
     }
   }
 
-  @Handler
-  public void handleOrderSequenceEvent(OrderSequenceEvent evt) {
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        // XXX Clear panel?
+        break;
+      case LOADED:
+        initView();
+        break;
+      default:
+      // Do nada.
+    }
+  }
+
+  private void handleKernelStateChange(KernelStateChangeEvent event) {
+    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
+      fTableModel.setRowCount(0);
+      fTableModel.fireTableDataChanged();
+    }
+  }
+
+  private void handleOrderSequenceEvent(OrderSequenceEvent evt) {
     switch (evt.getType()) {
       case SEQ_CREATED:
         orderSequenceAdded(evt.getSequence());

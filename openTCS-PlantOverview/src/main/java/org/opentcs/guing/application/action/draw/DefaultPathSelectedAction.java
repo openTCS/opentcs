@@ -12,10 +12,8 @@ import javax.swing.ImageIcon;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.tool.Tool;
 import org.jhotdraw.gui.JPopupButton;
-import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.application.toolbar.OpenTCSConnectionTool;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
-import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -96,22 +94,14 @@ public class DefaultPathSelectedAction
     putValue(AbstractAction.SMALL_ICON, icon);
   }
 
-  /**
-   *
-   * @param e
-   */
-  // ActionListener
   @Override
   public void actionPerformed(ActionEvent e) {
     if (pathType != null) {
       OpenTCSConnectionTool connectionTool = (OpenTCSConnectionTool) tool;
       PathConnection pathConnection = (PathConnection) connectionTool.getPrototype();
       // Typ explizit setzen, sodass die ausgewählte Kurve grafisch dargestellt wird
-      pathConnection.setLinerByType(pathType);
       // Im Property muss die Kurve auch noch geändert werden
-      AbstractProperty pType
-          = (AbstractProperty) pathConnection.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
-      pType.setValue(pathType);
+      pathConnection.getModel().getPropertyPathConnType().setValue(pathType);
 
       ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "path.type." + pathType.name());
     }

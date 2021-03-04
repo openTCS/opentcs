@@ -1,3 +1,4 @@
+org.opentcs.guing.DefaultImportersExportersModule
 org.opentcs.guing.DefaultPluginPanelsModule
 org.opentcs.guing.PropertySuggestionsModule
 org.opentcs.guing.transport.OrderCategorySuggestionsModule

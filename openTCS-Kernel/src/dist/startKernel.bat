@@ -28,9 +28,6 @@ start /b %JAVA% -enableassertions ^
     -Dopentcs.home="%OPENTCS_HOME%" ^
     -Djava.util.logging.config.file="%OPENTCS_CONFIGDIR%\logging.config" ^
     -Djava.security.policy="file:%OPENTCS_CONFIGDIR%\java.policy" ^
-    -Dorg.opentcs.util.configuration.xml.file="%OPENTCS_CONFIGDIR%\openTCS-config.xml" ^
-    -Dorg.opentcs.util.configuration.saveonexit=true ^
-    -Dorg.opentcs.virtualvehicle.profiles.file="%OPENTCS_CONFIGDIR%\virtualvehicle-profiles.xml" ^
     -XX:-OmitStackTraceInFastThrow ^
     -classpath "%OPENTCS_CP%" ^
     -splash:bin/splash-image.gif ^

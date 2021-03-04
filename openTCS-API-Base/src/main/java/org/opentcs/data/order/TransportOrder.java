@@ -8,6 +8,7 @@
 package org.opentcs.data.order;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -76,17 +77,17 @@ public class TransportOrder
   @Nonnull
   private State state = State.RAW;
   /**
-   * The point of time at which this TransportOrder was created.
+   * The point of time at which this transport order was created.
    */
-  private final long creationTime;
+  private final Instant creationTime;
   /**
-   * The point of time at which this TransportOrder must have been finished.
+   * The point of time at which processing of this transport order must be finished.
    */
-  private long deadline = Long.MAX_VALUE;
+  private Instant deadline = Instant.ofEpochMilli(Long.MAX_VALUE);
   /**
-   * The point of time at which this transport order was finished.
+   * The point of time at which processing of this transport order was finished.
    */
-  private long finishedTime = Long.MIN_VALUE;
+  private Instant finishedTime = Instant.ofEpochMilli(Long.MAX_VALUE);
   /**
    * A reference to the vehicle that is intended to process this transport
    * order. If this order is free to be processed by any vehicle, this is
@@ -131,9 +132,9 @@ public class TransportOrder
     super(objectID, name);
     this.driveOrders = createDriveOrders(destinations);
     this.currentDriveOrderIndex = -1;
-    this.creationTime = creationTime;
+    this.creationTime = Instant.ofEpochMilli(creationTime);
     this.intendedVehicle = null;
-    this.deadline = Long.MAX_VALUE;
+    this.deadline = Instant.ofEpochMilli(Long.MAX_VALUE);
     this.dispensable = false;
     this.wrappingSequence = null;
     this.dependencies = new LinkedHashSet<>();
@@ -154,9 +155,9 @@ public class TransportOrder
     super(objectID, name);
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.currentDriveOrderIndex = -1;
-    this.creationTime = 0;
+    this.creationTime = Instant.EPOCH;
     this.intendedVehicle = null;
-    this.deadline = Long.MAX_VALUE;
+    this.deadline = Instant.ofEpochMilli(Long.MAX_VALUE);
     this.dispensable = false;
     this.wrappingSequence = null;
     this.dependencies = new LinkedHashSet<>();
@@ -173,9 +174,9 @@ public class TransportOrder
     super(name);
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.currentDriveOrderIndex = -1;
-    this.creationTime = 0;
+    this.creationTime = Instant.EPOCH;
     this.intendedVehicle = null;
-    this.deadline = Long.MAX_VALUE;
+    this.deadline = Instant.ofEpochMilli(Long.MAX_VALUE);
     this.dispensable = false;
     this.wrappingSequence = null;
     this.dependencies = new LinkedHashSet<>();
@@ -197,16 +198,16 @@ public class TransportOrder
                          String category,
                          List<DriveOrder> driveOrders,
                          int currentDriveOrderIndex,
-                         long creationTime,
+                         Instant creationTime,
                          TCSObjectReference<Vehicle> intendedVehicle,
-                         long deadline,
+                         Instant deadline,
                          boolean dispensable,
                          TCSObjectReference<OrderSequence> wrappingSequence,
                          Set<TCSObjectReference<TransportOrder>> dependencies,
                          List<Rejection> rejections,
                          TCSObjectReference<Vehicle> processingVehicle,
                          State state,
-                         long finishedTime) {
+                         Instant finishedTime) {
     super(objectID, name, properties);
     this.category = requireNonNull(category, "category");
     requireNonNull(driveOrders, "driveOrders");
@@ -216,16 +217,16 @@ public class TransportOrder
     }
 
     this.currentDriveOrderIndex = currentDriveOrderIndex;
-    this.creationTime = creationTime;
+    this.creationTime = requireNonNull(creationTime, "creationTime");
     this.intendedVehicle = intendedVehicle;
-    this.deadline = deadline;
+    this.deadline = requireNonNull(deadline, "deadline");
     this.dispensable = dispensable;
     this.wrappingSequence = wrappingSequence;
     this.dependencies = requireNonNull(dependencies, "dependencies");
     this.rejections = requireNonNull(rejections, "rejections");
     this.processingVehicle = processingVehicle;
     this.state = requireNonNull(state, "state");
-    this.finishedTime = finishedTime;
+    this.finishedTime = requireNonNull(finishedTime, "finishedTime");
   }
 
   @Override
@@ -339,7 +340,7 @@ public class TransportOrder
                newState);
     state = newState;
     if (state.equals(State.FINISHED)) {
-      finishedTime = System.currentTimeMillis();
+      finishedTime = Instant.now();
     }
   }
 
@@ -350,7 +351,7 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withState(@Nonnull State state) {
-    // XXX Finished time should not be set implicitly.
+    // XXX Finished time should probably not be set implicitly.
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
@@ -366,7 +367,7 @@ public class TransportOrder
                               rejections,
                               processingVehicle,
                               state,
-                              state == State.FINISHED ? System.currentTimeMillis() : finishedTime);
+                              state == State.FINISHED ? Instant.now() : finishedTime);
   }
 
   /**
@@ -374,8 +375,22 @@ public class TransportOrder
    *
    * @return This transport order's creation time.
    */
+  @ScheduledApiChange(when = "5.0", details = "Will return an Instant instead.")
   public long getCreationTime() {
-    return creationTime;
+    return creationTime.toEpochMilli();
+  }
+
+  /**
+   * Creates a copy of this object, with the given creation time.
+   *
+   * @param creationTime The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withCreationTime(java.time.Instant)} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public TransportOrder withCreationTime(long creationTime) {
+    return withCreationTime(Instant.ofEpochMilli(creationTime));
   }
 
   /**
@@ -384,7 +399,7 @@ public class TransportOrder
    * @param creationTime The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withCreationTime(long creationTime) {
+  public TransportOrder withCreationTime(Instant creationTime) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
@@ -411,8 +426,9 @@ public class TransportOrder
    * @return This transport order's deadline or the initial deadline value.
    * <code>Long.MAX_VALUE</code>, if the deadline was not changed.
    */
+  @ScheduledApiChange(when = "5.0", details = "Will return an Instant instead.")
   public long getDeadline() {
-    return deadline;
+    return deadline.toEpochMilli();
   }
 
   /**
@@ -424,7 +440,20 @@ public class TransportOrder
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public void setDeadline(long newDeadline) {
-    deadline = newDeadline;
+    deadline = Instant.ofEpochMilli(newDeadline);
+  }
+
+  /**
+   * Creates a copy of this object, with the given deadline.
+   *
+   * @param deadline The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withDeadline(java.time.Instant)} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public TransportOrder withDeadline(long deadline) {
+    return withDeadline(Instant.ofEpochMilli(deadline));
   }
 
   /**
@@ -433,7 +462,7 @@ public class TransportOrder
    * @param deadline The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withDeadline(long deadline) {
+  public TransportOrder withDeadline(Instant deadline) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
@@ -461,8 +490,22 @@ public class TransportOrder
    * <code>Long.MIN_VALUE</code>, if the transport order has not been finished,
    * yet.
    */
+  @ScheduledApiChange(when = "5.0", details = "Will return an Instant instead.")
   public long getFinishedTime() {
-    return finishedTime;
+    return finishedTime.toEpochMilli();
+  }
+
+  /**
+   * Creates a copy of this object, with the given finished time.
+   *
+   * @param finishedTime The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withFinishedTime(java.time.Instant)} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public TransportOrder withFinishedTime(long finishedTime) {
+    return withFinishedTime(Instant.ofEpochMilli(finishedTime));
   }
 
   /**
@@ -471,7 +514,7 @@ public class TransportOrder
    * @param finishedTime The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withFinishedTime(long finishedTime) {
+  public TransportOrder withFinishedTime(Instant finishedTime) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
@@ -1052,7 +1095,14 @@ public class TransportOrder
                               finishedTime);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder clone() {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
@@ -1070,6 +1120,26 @@ public class TransportOrder
                               processingVehicle,
                               state,
                               finishedTime);
+  }
+
+  @Override
+  public String toString() {
+    return "TransportOrder{"
+        + "name=" + getName()
+        + ", state=" + state
+        + ", intendedVehicle=" + intendedVehicle
+        + ", processingVehicle=" + processingVehicle
+        + ", creationTime=" + creationTime
+        + ", deadline=" + deadline
+        + ", finishedTime=" + finishedTime
+        + ", wrappingSequence=" + wrappingSequence
+        + ", dispensable=" + dispensable
+        + ", category=" + category
+        + ", dependencies=" + dependencies
+        + ", driveOrders=" + driveOrders
+        + ", currentDriveOrderIndex=" + currentDriveOrderIndex
+        + ", rejections=" + rejections
+        + '}';
   }
 
   @SuppressWarnings("deprecation")

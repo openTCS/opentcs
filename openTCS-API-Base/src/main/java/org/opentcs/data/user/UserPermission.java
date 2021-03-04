@@ -13,7 +13,10 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * Defines the possible permission flags of kernel clients.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated User management via kernel interaction will not be supported in the future.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public enum UserPermission {
 
   /**

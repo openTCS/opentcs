@@ -22,7 +22,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.course.DrawingMethod;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
@@ -85,13 +84,6 @@ public interface SystemModel
    * @return Liste aller Objekte
    */
   List<ModelComponent> getAll();
-
-  /**
-   * Returns the vent dispatcher.
-   *
-   * @return The event dispatcher
-   */
-  EventDispatcher getEventDispatcher();
 
   /**
    * Liefert die Zeichnung.
@@ -237,13 +229,37 @@ public interface SystemModel
   LocationTypeModel getLocationTypeModel(String name);
 
   /**
+   * Returns the block model for the given name.
+   *
+   * @param name The block's name.
+   * @return The block model.
+   */
+  BlockModel getBlockModel(String name);
+
+  /**
    * Liefert alle Blockbereiche.
    *
    * @return eine Liste aller Blockbereiche
    */
   List<BlockModel> getBlockModels();
 
+  /**
+   * Returns the group model for the given name.
+   *
+   * @param name The group's name.
+   * @return The group model.
+   */
+  GroupModel getGroupModel(String name);
+
   List<GroupModel> getGroupModels();
+
+  /**
+   * Returns the static route model for the given name.
+   *
+   * @param name The static route's name.
+   * @return The static route model.
+   */
+  StaticRouteModel getStaticRouteModel(String name);
 
   /**
    * Liefert alle statischen Routen.

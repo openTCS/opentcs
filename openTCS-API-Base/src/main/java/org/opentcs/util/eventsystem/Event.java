@@ -8,12 +8,16 @@
 package org.opentcs.util.eventsystem;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A generic event.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated For event handling, use classes in <code>org.opentcs.util.event</code> instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public abstract class Event
     implements Serializable {
 

@@ -7,21 +7,27 @@
  */
 package org.opentcs.util.eventsystem;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * An <code>EventListener</code> that does not do anything when an event
  * arrives.
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual event implementation.
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class DummyEventListener<E extends Event>
-implements EventListener<E> {
+    implements EventListener<E> {
+
   /**
    * Creates a new DummyEventListener.
    */
   public DummyEventListener() {
   }
-  
+
   /**
    * Does nothing.
    *

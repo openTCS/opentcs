@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,10 @@ import org.slf4j.LoggerFactory;
  * This class provides helper methods for working with RMI registries.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link org.opentcs.kernel.util.RegistryProvider} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed")
 public final class RMIRegistries {
 
   /**

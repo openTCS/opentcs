@@ -1,0 +1,15 @@
+dependencies {
+  compile project(':openTCS-%PROJECT_NAME%-Common')
+  
+  compile group: 'org.opentcs', name: 'opentcs-api-injection', version: openTcsBaselineVersion
+  compileOnly group: 'org.opentcs', name: 'opentcs-api-injection', version: openTcsBaselineVersion, classifier: 'sources'
+
+  compile group: 'org.opentcs', name: 'opentcs-common', version: openTcsBaselineVersion
+  compileOnly group: 'org.opentcs', name: 'opentcs-common', version: openTcsBaselineVersion, classifier: 'sources'
+  
+  compile group: 'de.fraunhofer.iml.toolbox', name: 'toolbox-comm-nio', version: '0.10.4-b43'
+  compileOnly group: 'de.fraunhofer.iml.toolbox', name: 'toolbox-comm-nio', version: '0.10.4-b43', classifier: 'sources'
+  
+  compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
+  compileOnly group: 'commons-codec', name: 'commons-codec', version: '1.10', classifier: 'sources'
+}

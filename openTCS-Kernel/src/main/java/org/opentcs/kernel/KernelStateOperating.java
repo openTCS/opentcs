@@ -16,24 +16,20 @@ import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.TravelCosts;
-import org.opentcs.access.UnsupportedKernelOpException;
-import org.opentcs.access.queries.Query;
-import org.opentcs.access.queries.QueryAvailableScriptFiles;
-import org.opentcs.access.queries.QueryRecoveryStatus;
-import org.opentcs.access.queries.QueryRoutingInfo;
-import org.opentcs.access.queries.QuerySchedulerAllocations;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
-import org.opentcs.components.kernel.RecoveryEvaluator;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.ActiveInOperatingMode;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -50,14 +46,14 @@ import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
-import org.opentcs.kernel.controlcenter.vehicles.AttachmentManager;
+import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
+import org.opentcs.kernel.extensions.xmlhost.orders.ScriptFileManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
-import org.opentcs.kernel.xmlhost.orders.ScriptFileManager;
 import org.opentcs.util.Comparators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +93,8 @@ class KernelStateOperating
   /**
    * The recovery evaluator to be used.
    */
-  private final RecoveryEvaluator recoveryEvaluator;
+  @SuppressWarnings("deprecation")
+  private final org.opentcs.components.kernel.RecoveryEvaluator recoveryEvaluator;
   /**
    * A pool of vehicle controllers.
    */
@@ -106,6 +103,10 @@ class KernelStateOperating
    * A script file manager.
    */
   private final ScriptFileManager scriptFileManager;
+  /**
+   * The kernel's executor.
+   */
+  private final ScheduledExecutorService kernelExecutor;
   /**
    * A task for periodically getting rid of old orders.
    */
@@ -118,6 +119,14 @@ class KernelStateOperating
    * The kernel's attachment manager.
    */
   private final AttachmentManager attachmentManager;
+  /**
+   * The vehicle service.
+   */
+  private final VehicleService vehicleService;
+  /**
+   * A handle for the cleaner task.
+   */
+  private ScheduledFuture<?> cleanerTaskFuture;
   /**
    * This instance's <em>initialized</em> flag.
    */
@@ -133,6 +142,7 @@ class KernelStateOperating
    * @param recoveryEvaluator The recovery evaluator to be used.
    */
   @Inject
+  @SuppressWarnings("deprecation")
   KernelStateOperating(@GlobalKernelSync Object globalSyncObject,
                        TCSObjectPool objectPool,
                        Model model,
@@ -140,15 +150,17 @@ class KernelStateOperating
                        NotificationBuffer messageBuffer,
                        ModelPersister modelPersister,
                        KernelApplicationConfiguration configuration,
-                       RecoveryEvaluator recoveryEvaluator,
+                       org.opentcs.components.kernel.RecoveryEvaluator recoveryEvaluator,
                        Router router,
                        Scheduler scheduler,
                        Dispatcher dispatcher,
                        LocalVehicleControllerPool controllerPool,
                        ScriptFileManager scriptFileManager,
+                       @KernelExecutor ScheduledExecutorService kernelExecutor,
                        OrderCleanerTask orderCleanerTask,
                        @ActiveInOperatingMode Set<KernelExtension> extensions,
-                       AttachmentManager attachmentManager) {
+                       AttachmentManager attachmentManager,
+                       VehicleService vehicleService) {
     super(globalSyncObject,
           objectPool,
           model,
@@ -163,13 +175,16 @@ class KernelStateOperating
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
     this.scriptFileManager = requireNonNull(scriptFileManager, "scriptFileManager");
     this.vehicleControllerPool = requireNonNull(controllerPool, "controllerPool");
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.orderCleanerTask = requireNonNull(orderCleanerTask, "orderCleanerTask");
     this.extensions = requireNonNull(extensions, "extensions");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
+    this.vehicleService = requireNonNull(vehicleService, "vehicleService");
   }
 
   // Implementation of interface Kernel starts here.
   @Override
+  @SuppressWarnings("deprecation")
   public void initialize() {
     if (initialized) {
       LOG.debug("Already initialized.");
@@ -180,6 +195,8 @@ class KernelStateOperating
     // Reset vehicle states to ensure vehicles are not dispatchable initially.
     for (Vehicle curVehicle : getTCSObjects(Vehicle.class)) {
       setVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.UNAVAILABLE);
+      vehicleService.updateVehicleIntegrationLevel(curVehicle.getReference(),
+                                                   Vehicle.IntegrationLevel.TO_BE_RESPECTED);
       setVehicleState(curVehicle.getReference(), Vehicle.State.UNKNOWN);
       setVehicleTransportOrder(curVehicle.getReference(), null);
       setVehicleOrderSequence(curVehicle.getReference(), null);
@@ -197,9 +214,14 @@ class KernelStateOperating
     vehicleControllerPool.initialize();
     LOG.debug("Initializing attachment manager '{}'...", attachmentManager);
     attachmentManager.initialize();
+    LOG.debug("Initializing script file manager '{}'...", scriptFileManager);
+    scriptFileManager.initialize();
 
-    // Start a task for cleaning up orders regularly.
-    new Thread(orderCleanerTask, "orderCleaner").start();
+    // Start a task for cleaning up old orders periodically.
+    cleanerTaskFuture = kernelExecutor.scheduleAtFixedRate(orderCleanerTask,
+                                                           orderCleanerTask.getSweepInterval(),
+                                                           orderCleanerTask.getSweepInterval(),
+                                                           TimeUnit.MILLISECONDS);
 
     // Start kernel extensions.
     for (KernelExtension extension : extensions) {
@@ -219,6 +241,7 @@ class KernelStateOperating
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void terminate() {
     if (!initialized) {
       LOG.debug("Not initialized.");
@@ -235,7 +258,9 @@ class KernelStateOperating
     LOG.debug("Terminated kernel extensions.");
 
     // No need to clean up any more - it's all going to be cleaned up very soon.
-    orderCleanerTask.terminate();
+    cleanerTaskFuture.cancel(false);
+    cleanerTaskFuture = null;
+
     // Terminate strategies.
     recoveryEvaluator.terminate();
     LOG.debug("Terminating dispatcher '{}'...", dispatcher);
@@ -248,12 +273,16 @@ class KernelStateOperating
     vehicleControllerPool.terminate();
     LOG.debug("Terminating attachment manager '{}'...", attachmentManager);
     attachmentManager.terminate();
+    LOG.debug("Terminating script file manager '{}'...", scriptFileManager);
+    scriptFileManager.terminate();
     // Grant communication adapters etc. some time to settle things.
     Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
 
     // Ensure that vehicles do not reference orders any more.
     for (Vehicle curVehicle : getTCSObjects(Vehicle.class)) {
       setVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.UNAVAILABLE);
+      vehicleService.updateVehicleIntegrationLevel(curVehicle.getReference(),
+                                                   Vehicle.IntegrationLevel.TO_BE_RESPECTED);
       setVehicleState(curVehicle.getReference(), Vehicle.State.UNKNOWN);
       setVehicleTransportOrder(curVehicle.getReference(), null);
       setVehicleOrderSequence(curVehicle.getReference(), null);
@@ -327,6 +356,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setPathLocked(TCSObjectReference<Path> ref,
                             boolean locked)
       throws ObjectUnknownException {
@@ -339,21 +369,17 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                     int energyLevel)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      Vehicle vehicle = getModel().setVehicleEnergyLevel(ref,
-                                                         energyLevel);
-      // If the vehicle is idle, dispatch it - maybe the dispatcher has an order
-      // for it.
-      if (vehicle.hasProcState(Vehicle.ProcState.IDLE)) {
-        dispatcher.dispatch(vehicle);
-      }
+      getModel().setVehicleEnergyLevel(ref, energyLevel);
     }
   }
 
   @Override
+  @Deprecated
   public void setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                           String rechargeOperation)
       throws ObjectUnknownException {
@@ -363,6 +389,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                             List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
@@ -392,6 +419,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleState(TCSObjectReference<Vehicle> ref,
                               Vehicle.State newState)
       throws ObjectUnknownException {
@@ -401,20 +429,13 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                   Vehicle.ProcState newState)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       LOG.debug("Updating procState of vehicle {} to {}...", ref.getName(), newState);
-      Vehicle vehicle = getModel().setVehicleProcState(ref, newState);
-      switch (newState) {
-        case IDLE:
-        case AWAITING_ORDER:
-          // The vehicle is waiting for an order - let the dispatcher handle it.
-          dispatcher.dispatch(vehicle);
-          break;
-        default:
-      }
+      getModel().setVehicleProcState(ref, newState);
     }
   }
 
@@ -429,15 +450,16 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
-                                              Set<String> processableCategories)
-      throws UnsupportedKernelOpException {
+                                              Set<String> processableCategories) {
     synchronized (getGlobalSyncObject()) {
       getModel().setVehicleProcessableCategories(ref, processableCategories);
     }
   }
-  
+
   @Override
+  @Deprecated
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -448,6 +470,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
                                      TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
@@ -457,6 +480,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehiclePrecisePosition(TCSObjectReference<Vehicle> vehicleRef,
                                         Triple newPosition)
       throws ObjectUnknownException {
@@ -466,6 +490,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleOrientationAngle(TCSObjectReference<Vehicle> vehicleRef,
                                          double angle)
       throws ObjectUnknownException {
@@ -475,6 +500,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleTransportOrder(
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<TransportOrder> orderRef)
@@ -485,6 +511,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
@@ -494,6 +521,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleRouteProgressIndex(
       TCSObjectReference<Vehicle> vehicleRef,
       int index)
@@ -512,6 +540,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public TransportOrder createTransportOrder(TransportOrderCreationTO to) {
     synchronized (getGlobalSyncObject()) {
       return orderPool.createTransportOrder(to).clone();
@@ -529,10 +558,11 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void activateTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      TransportOrder order = orderPool.getTransportOrder(ref);
+      TransportOrder order = getGlobalObjectPool().getObject(TransportOrder.class, ref);
       // Check if the transport order hasn't been activated before.
       checkArgument(order.hasState(TransportOrder.State.RAW),
                     "Transport order %s not in state RAW",
@@ -542,6 +572,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                      TransportOrder.State newState)
       throws ObjectUnknownException {
@@ -562,6 +593,18 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
+  public void setTransportOrderProcessingVehicle(TCSObjectReference<TransportOrder> orderRef,
+                                                 TCSObjectReference<Vehicle> vehicleRef,
+                                                 List<DriveOrder> driveOrders)
+      throws ObjectUnknownException {
+    synchronized (getGlobalSyncObject()) {
+      orderPool.setTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
+    }
+  }
+
+  @Override
+  @Deprecated
   public void setTransportOrderProcessingVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -582,6 +625,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
                                            List<DriveOrder> newOrders)
       throws ObjectUnknownException {
@@ -591,6 +635,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderInitialDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, IllegalStateException {
@@ -600,6 +645,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setTransportOrderNextDriveOrder(
       TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
@@ -631,6 +677,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void addTransportOrderRejection(
       TCSObjectReference<TransportOrder> orderRef,
       Rejection newRejection)
@@ -660,6 +707,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
     synchronized (getGlobalSyncObject()) {
       return orderPool.createOrderSequence(to).clone();
@@ -687,6 +735,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceFinishedIndex(
       TCSObjectReference<OrderSequence> ref,
       int index) {
@@ -696,9 +745,10 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceComplete(TCSObjectReference<OrderSequence> ref) {
     synchronized (getGlobalSyncObject()) {
-      OrderSequence seq = orderPool.getOrderSequence(ref);
+      OrderSequence seq = getGlobalObjectPool().getObject(OrderSequence.class, ref);
       // Make sure we don't execute this if the sequence is already marked as
       // finished, as that would make it possible to trigger disposition of a
       // vehicle at any given moment.
@@ -713,18 +763,19 @@ class KernelStateOperating
         // If the sequence was being processed by a vehicle, clear its back
         // reference to the sequence to make it available again and dispatch it.
         if (seq.getProcessingVehicle() != null) {
-          Vehicle vehicle = getModel().getVehicle(seq.getProcessingVehicle());
+          Vehicle vehicle = getGlobalObjectPool().getObject(Vehicle.class,
+                                                            seq.getProcessingVehicle());
           getModel().setVehicleOrderSequence(vehicle.getReference(), null);
-          dispatcher.dispatch(vehicle);
         }
       }
     }
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceFinished(TCSObjectReference<OrderSequence> ref) {
     synchronized (getGlobalSyncObject()) {
-      OrderSequence seq = orderPool.getOrderSequence(ref);
+      OrderSequence seq = getGlobalObjectPool().getObject(OrderSequence.class, ref);
       // Make sure we don't execute this if the sequence is already marked as
       // finished, as that would make it possible to trigger disposition of a
       // vehicle at any given moment.
@@ -735,9 +786,9 @@ class KernelStateOperating
       // If the sequence was being processed by a vehicle, clear its back
       // reference to the sequence to make it available again and dispatch it.
       if (seq.getProcessingVehicle() != null) {
-        Vehicle vehicle = getModel().getVehicle(seq.getProcessingVehicle());
+        Vehicle vehicle = getGlobalObjectPool().getObject(Vehicle.class,
+                                                          seq.getProcessingVehicle());
         getModel().setVehicleOrderSequence(vehicle.getReference(), null);
-        dispatcher.dispatch(vehicle);
       }
     }
   }
@@ -763,6 +814,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef) {
@@ -772,32 +824,37 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void withdrawTransportOrder(TCSObjectReference<TransportOrder> ref,
                                      boolean immediateAbort,
                                      boolean disableVehicle)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      dispatcher.withdrawOrder(orderPool.getTransportOrder(ref),
+      dispatcher.withdrawOrder(getGlobalObjectPool().getObject(TransportOrder.class, ref),
                                immediateAbort,
                                disableVehicle);
     }
   }
 
   @Override
+  @Deprecated
   public void withdrawTransportOrderByVehicle(TCSObjectReference<Vehicle> vehicleRef,
                                               boolean immediateAbort,
                                               boolean disableVehicle)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      dispatcher.withdrawOrder(getModel().getVehicle(vehicleRef), immediateAbort, disableVehicle);
+      dispatcher.withdrawOrder(getGlobalObjectPool().getObject(Vehicle.class, vehicleRef),
+                               immediateAbort,
+                               disableVehicle);
     }
   }
 
   @Override
+  @Deprecated
   public void dispatchVehicle(TCSObjectReference<Vehicle> vehicleRef,
                               boolean setIdleIfUnavailable) {
     synchronized (getGlobalSyncObject()) {
-      Vehicle vehicle = getModel().getVehicle(vehicleRef);
+      Vehicle vehicle = getGlobalObjectPool().getObject(Vehicle.class, vehicleRef);
       // If the vehicle's processing state is currently UNAVAILABLE and we're
       // supposed to change that to IDLE implicitly, do so.
       if (vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE)
@@ -805,26 +862,30 @@ class KernelStateOperating
         // Note: Setting the vehicle's processing state to IDLE implicitly
         // triggers the dispatcher, so that doesn't have to be done here again.
         setVehicleProcState(vehicleRef, Vehicle.ProcState.IDLE);
+        vehicleService.updateVehicleIntegrationLevel(vehicleRef,
+                                                     Vehicle.IntegrationLevel.TO_BE_UTILIZED);
       }
       else if (vehicle.hasProcState(Vehicle.ProcState.IDLE)) {
         dispatcher.dispatch(vehicle);
       }
       else {
-        LOG.warn(vehicle.getName()
-            + ": Vehicle's processing state is not IDLE but "
-            + vehicle.getProcState().name());
+        LOG.warn("{}: Vehicle's processing state is not IDLE but {}",
+                 vehicle.getName(),
+                 vehicle.getProcState());
       }
     }
   }
 
   @Override
+  @Deprecated
   public void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef) {
     synchronized (getGlobalSyncObject()) {
-      dispatcher.releaseVehicle(getModel().getVehicle(vehicleRef));
+      dispatcher.releaseVehicle(getGlobalObjectPool().getObject(Vehicle.class, vehicleRef));
     }
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef, Object message) {
     synchronized (getGlobalSyncObject()) {
       vehicleControllerPool
@@ -850,6 +911,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void updateRoutingTopology() {
     synchronized (getGlobalSyncObject()) {
       router.topologyChanged();
@@ -858,7 +920,8 @@ class KernelStateOperating
   }
 
   @Override
-  public List<TravelCosts> getTravelCosts(
+  @Deprecated
+  public List<org.opentcs.access.TravelCosts> getTravelCosts(
       TCSObjectReference<Vehicle> vRef,
       TCSObjectReference<Location> srcRef,
       Set<TCSObjectReference<Location>> destRefs)
@@ -880,12 +943,12 @@ class KernelStateOperating
     }
 
     //List containing the costs for every destination
-    List<TravelCosts> travelCosts = new ArrayList<>();
+    List<org.opentcs.access.TravelCosts> travelCosts = new ArrayList<>();
 
     //Get cheapest costs for every destination
     for (TCSObjectReference<Location> currentLoc : destRefs) {
       long costs = router.getCosts(vehicle, srcRef, currentLoc);
-      travelCosts.add(new TravelCosts(currentLoc, costs));
+      travelCosts.add(new org.opentcs.access.TravelCosts(currentLoc, costs));
     }
 
     Collections.sort(travelCosts, Comparators.travelCostsByCosts());
@@ -893,20 +956,21 @@ class KernelStateOperating
   }
 
   @Override
-  public <T extends Query<T>> T query(Class<T> clazz) {
-    if (QueryAvailableScriptFiles.class.equals(clazz)) {
-      return clazz.cast(new QueryAvailableScriptFiles(
+  @Deprecated
+  public <T extends org.opentcs.access.queries.Query<T>> T query(Class<T> clazz) {
+    if (org.opentcs.access.queries.QueryAvailableScriptFiles.class.equals(clazz)) {
+      return clazz.cast(new org.opentcs.access.queries.QueryAvailableScriptFiles(
           scriptFileManager.listScriptFileNames()));
     }
-    else if (QueryRecoveryStatus.class.equals(clazz)) {
+    else if (org.opentcs.access.queries.QueryRecoveryStatus.class.equals(clazz)) {
       return clazz.cast(recoveryEvaluator.evaluateRecovery());
     }
-    else if (QueryRoutingInfo.class.equals(clazz)) {
-      return clazz.cast(new QueryRoutingInfo(router.getInfo()));
+    else if (org.opentcs.access.queries.QueryRoutingInfo.class.equals(clazz)) {
+      return clazz.cast(new org.opentcs.access.queries.QueryRoutingInfo(router.getInfo()));
     }
-    else if (QuerySchedulerAllocations.class.equals(clazz)) {
+    else if (org.opentcs.access.queries.QuerySchedulerAllocations.class.equals(clazz)) {
       return clazz.cast(
-          new QuerySchedulerAllocations(scheduler.getAllocations()));
+          new org.opentcs.access.queries.QuerySchedulerAllocations(scheduler.getAllocations()));
     }
     else {
       return super.query(clazz);

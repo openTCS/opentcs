@@ -15,10 +15,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.TransportOrder;
@@ -34,9 +35,13 @@ class RandomOrderBatchCreator
     implements OrderBatchCreator {
 
   /**
-   * The kernel we talk to.
+   * The transport order sergice we talk to.
    */
-  private final Kernel kernel;
+  private final TransportOrderService transportOrderService;
+  /**
+   * The dispatcher service.
+   */
+  private final DispatcherService dispatcherService;
   /**
    * The number of transport orders per batch.
    */
@@ -57,17 +62,20 @@ class RandomOrderBatchCreator
   /**
    * Creates a new RandomOrderBatchCreator.
    *
-   * @param kernel The kernel
+   * @param transportOrderService The transport order service.
+   * @param dispatcherService The dispatcher service.
    * @param batchSize The number of transport orders per batch.
    * @param orderSize The number of drive orders per transport order.
    */
-  public RandomOrderBatchCreator(final Kernel kernel,
-                                 final int batchSize,
-                                 final int orderSize) {
-    this.kernel = requireNonNull(kernel, "kernel");
+  public RandomOrderBatchCreator(TransportOrderService transportOrderService,
+                                 DispatcherService dispatcherService,
+                                 int batchSize,
+                                 int orderSize) {
+    this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
+    this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.batchSize = batchSize;
     this.orderSize = orderSize;
-    locations = new ArrayList<>(kernel.getTCSObjects(Location.class));
+    locations = new ArrayList<>(transportOrderService.fetchObjects(Location.class));
   }
 
   @Override
@@ -80,6 +88,9 @@ class RandomOrderBatchCreator
     for (int i = 0; i < batchSize; i++) {
       createdOrders.add(createSingleOrder());
     }
+
+    dispatcherService.dispatch();
+
     return createdOrders;
   }
 
@@ -90,9 +101,9 @@ class RandomOrderBatchCreator
       Location destLoc = locations.get(random.nextInt(locations.size()));
       dests.add(new DestinationCreationTO(destLoc.getName(), Destination.OP_NOP));
     }
-    TransportOrder newOrder = kernel.createTransportOrder(
+    TransportOrder newOrder = transportOrderService.createTransportOrder(
         new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(), dests));
-    kernel.activateTransportOrder(newOrder.getReference());
+
     return newOrder;
   }
 }

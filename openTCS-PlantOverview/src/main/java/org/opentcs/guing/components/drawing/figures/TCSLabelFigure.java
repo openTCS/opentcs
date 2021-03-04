@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.drawing.figures;
 
 import java.awt.geom.Point2D;
@@ -27,24 +26,35 @@ import org.opentcs.guing.model.FigureComponent;
 public class TCSLabelFigure
     extends LabelFigure {
 
+  /**
+   * The default x label offset for label figures.
+   */
+  public static final double DEFAULT_LABEL_OFFSET_X = -10;
+
+  /**
+   * The default y label offset for label figures.
+   */
+  public static final double DEFAULT_LABEL_OFFSET_Y = -20;
+
   private Point2D.Double fOffset;
   private LabeledFigure fParent;
   private boolean isLabelVisible = true;
 
   /**
-   *
+   * Creates a new instance.
    */
   public TCSLabelFigure() {
     this("?");
   }
 
   /**
+   * Creates a new instance.
    *
-   * @param text
+   * @param text The text of the label
    */
   public TCSLabelFigure(String text) {
     super(text);
-    fOffset = new Point2D.Double(-10.0, -20.0);
+    fOffset = new Point2D.Double(DEFAULT_LABEL_OFFSET_X, DEFAULT_LABEL_OFFSET_Y);
   }
 
   /**
@@ -119,7 +129,6 @@ public class TCSLabelFigure
 //        sp.setText(String.format("%d", 0));  
 //        sp.markChanged();
 //      }
-
         model.propertiesChanged(fParent);
       }
     }

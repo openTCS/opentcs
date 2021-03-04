@@ -8,7 +8,7 @@
 package org.opentcs.strategies.basic.routing.jgrapht;
 
 import java.util.Collection;
-import org.jgrapht.WeightedGraph;
+import org.jgrapht.Graph;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -28,7 +28,7 @@ public interface ModelGraphMapper {
    * @param vehicle The vehicle for which to build the graph.
    * @return A weighted graph representing the topology to be used for the given vehicle.
    */
-  WeightedGraph<String, ModelEdge> translateModel(Collection<Point> points,
-                                                  Collection<Path> paths,
-                                                  Vehicle vehicle);
+  Graph<String, ModelEdge> translateModel(Collection<Point> points,
+                                          Collection<Path> paths,
+                                          Vehicle vehicle);
 }

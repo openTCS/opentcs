@@ -75,33 +75,19 @@ abstract class AllocatorCommand
   }
 
   /**
-   * Indicates the receiving task should be terminated.
-   */
-  public static class PoisonPill
-      extends AllocatorCommand {
-
-    /**
-     * Creates a new instance.
-     */
-    public PoisonPill() {
-      super(1, new DummyClient());
-    }
-  }
-  
-  /**
    * Indicates resources being released by a client.
    */
   public static class AllocationsReleased
       extends AllocatorCommand {
-    
+
     /**
      * The resources being released.
      */
     private final Set<TCSResource<?>> resources;
-    
+
     /**
      * Creates a new instance.
-     * 
+     *
      * @param client The scheduler client this command is associated with.
      * @param resources The resources being released.
      */
@@ -112,7 +98,7 @@ abstract class AllocatorCommand
 
     /**
      * Returns the resources being released.
-     * 
+     *
      * @return The resources being released.
      */
     public Set<TCSResource<?>> getResources() {
@@ -137,12 +123,12 @@ abstract class AllocatorCommand
   }
 
   /**
-   * Indicates the receiving task should check if a set of resources is prepared for client 
+   * Indicates the receiving task should check if a set of resources is prepared for client
    * allocation.
    */
   public static class CheckAllocationsPrepared
       extends AllocatorCommand {
-    
+
     /**
      * The resources to be checked.
      */
@@ -150,7 +136,7 @@ abstract class AllocatorCommand
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param client The scheduler client this command is associated with.
      * @param resources The resources to be checked.
      */
@@ -161,14 +147,14 @@ abstract class AllocatorCommand
 
     /**
      * Returns the resources to be checked.
-     * 
+     *
      * @return The resources to be checked.
      */
     public Set<TCSResource<?>> getResources() {
       return resources;
     }
   }
-  
+
   /**
    * Indicates the receiving task should try to allocate a set of resources for a client.
    */
@@ -201,24 +187,4 @@ abstract class AllocatorCommand
     }
   }
 
-  /**
-   * A dummy client for commands not really associated with a client.
-   */
-  private static class DummyClient
-      implements Client {
-
-    @Override
-    public String getId() {
-      return getClass().getName();
-    }
-
-    @Override
-    public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
-      return false;
-    }
-
-    @Override
-    public void allocationFailed(Set<TCSResource<?>> resources) {
-    }
-  }
 }

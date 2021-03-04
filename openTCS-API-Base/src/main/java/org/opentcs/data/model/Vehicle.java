@@ -89,6 +89,10 @@ public class Vehicle
    */
   private ProcState procState;
   /**
+   * This vehicle's integration level.
+   */
+  private final IntegrationLevel integrationLevel;
+  /**
    * The current state of the communication adapter controlling the physical vehicle.
    */
   @SuppressWarnings("deprecation")
@@ -154,6 +158,7 @@ public class Vehicle
     this.routeProgressIndex = ROUTE_INDEX_DEFAULT;
     this.adapterState = VehicleCommAdapter.State.UNKNOWN;
     this.state = State.UNKNOWN;
+    this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
     this.currentPosition = null;
     this.nextPosition = null;
     this.precisePosition = null;
@@ -182,6 +187,7 @@ public class Vehicle
     this.routeProgressIndex = ROUTE_INDEX_DEFAULT;
     this.adapterState = VehicleCommAdapter.State.UNKNOWN;
     this.state = State.UNKNOWN;
+    this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
     this.currentPosition = null;
     this.nextPosition = null;
     this.precisePosition = null;
@@ -207,6 +213,7 @@ public class Vehicle
                   int routeProgressIndex,
                   VehicleCommAdapter.State adapterState,
                   State state,
+                  IntegrationLevel integrationLevel,
                   TCSObjectReference<Point> currentPosition,
                   TCSObjectReference<Point> nextPosition,
                   Triple precisePosition,
@@ -230,6 +237,7 @@ public class Vehicle
     this.routeProgressIndex = routeProgressIndex;
     this.adapterState = requireNonNull(adapterState, "adapterState");
     this.state = requireNonNull(state, "state");
+    this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     this.currentPosition = currentPosition;
     this.nextPosition = nextPosition;
     this.precisePosition = precisePosition;
@@ -261,6 +269,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -287,6 +296,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -344,6 +354,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -436,6 +447,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -497,6 +509,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -553,6 +566,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -606,6 +620,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -661,6 +676,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -716,6 +732,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -779,6 +796,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -794,6 +812,47 @@ public class Vehicle
    */
   public ProcState getProcState() {
     return procState;
+  }
+
+  /**
+   * Returns this vehicle's integration level.
+   *
+   * @return This vehicle's integration level.
+   */
+  public IntegrationLevel getIntegrationLevel() {
+    return integrationLevel;
+  }
+
+  /**
+   * Creates a copy of this object, with the given integration level.
+   *
+   * @param integrationLevel The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withIntegrationLevel(IntegrationLevel integrationLevel) {
+    return new Vehicle(getIdWithoutDeprecationWarning(),
+                       getName(),
+                       getProperties(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       processableCategories,
+                       routeProgressIndex,
+                       adapterState,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices);
   }
 
   /**
@@ -843,6 +902,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -903,6 +963,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -960,6 +1021,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1017,6 +1079,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1074,6 +1137,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1114,6 +1178,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1169,6 +1234,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1223,6 +1289,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1277,6 +1344,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1334,6 +1402,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1396,6 +1465,7 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1425,7 +1495,14 @@ public class Vehicle
     clearProperties();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Vehicle clone() {
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
@@ -1443,12 +1520,40 @@ public class Vehicle
                        routeProgressIndex,
                        adapterState,
                        state,
+                       integrationLevel,
                        currentPosition,
                        nextPosition,
                        precisePosition,
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices);
+  }
+
+  @Override
+  public String toString() {
+    return "Vehicle{"
+        + "name=" + getName()
+        + ", procState=" + procState
+        + ", integrationLevel=" + integrationLevel
+        + ", state=" + state
+        + ", energyLevel=" + energyLevel
+        + ", currentPosition=" + currentPosition
+        + ", precisePosition=" + precisePosition
+        + ", orientationAngle=" + orientationAngle
+        + ", nextPosition=" + nextPosition
+        + ", loadHandlingDevices=" + loadHandlingDevices
+        + ", length=" + length
+        + ", adapterState=" + adapterState
+        + ", transportOrder=" + transportOrder
+        + ", routeProgressIndex=" + routeProgressIndex
+        + ", orderSequence=" + orderSequence
+        + ", energyLevelGood=" + energyLevelGood
+        + ", energyLevelCritical=" + energyLevelCritical
+        + ", maxVelocity=" + maxVelocity
+        + ", maxReverseVelocity=" + maxReverseVelocity
+        + ", rechargeOperation=" + rechargeOperation
+        + ", processableCategories=" + processableCategories
+        + '}';
   }
 
   @SuppressWarnings("deprecation")
@@ -1488,6 +1593,31 @@ public class Vehicle
      * The vehicle is currently recharging its battery/refilling fuel.
      */
     CHARGING
+  }
+
+  /**
+   * A vehicle's state of integration into the system.
+   */
+  public static enum IntegrationLevel {
+
+    /**
+     * @deprecated Not to be used, yet.
+     */
+    @Deprecated
+    TO_BE_IGNORED,
+    /**
+     * @deprecated Not to be used, yet.
+     */
+    @Deprecated
+    TO_BE_NOTICED,
+    /**
+     * The vehicle's reported position is respected, meaning that resources will be reserved for it.
+     */
+    TO_BE_RESPECTED,
+    /**
+     * The vehicle is fully integrated and may be assigned to transport orders.
+     */
+    TO_BE_UTILIZED
   }
 
   /**

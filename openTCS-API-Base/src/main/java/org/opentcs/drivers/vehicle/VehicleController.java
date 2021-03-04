@@ -15,6 +15,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the system to control a vehicle.
@@ -54,7 +55,7 @@ public interface VehicleController
    * commands/movements.
    */
   void clearCommandQueue();
-  
+
   /**
    * Resets the vehicle's position and precise position to <code>null</code> and frees all resources
    * held by the vehicle.
@@ -79,4 +80,13 @@ public interface VehicleController
    * @param message The message to be delivered.
    */
   void sendCommAdapterMessage(@Nullable Object message);
+
+  /**
+   * Sends a {@link AdapterCommand} to the communication adapter.
+   *
+   * @param command The adapter command to be sent.
+   */
+  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
+  default void sendCommAdapterCommand(@Nonnull AdapterCommand command) {
+  }
 }

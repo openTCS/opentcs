@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Instances of this class present a view on the complete static topology of an
- * openTCS model, i.e. Points, Paths etc., and Vehicless, contained
+ * openTCS model, i.e. Points, Paths etc., and Vehicles, contained
  * in a {@link TCSObjectPool TCSObjectPool}.
  * <p>
  * Note that no synchronization is done inside this class. Concurrent access of
@@ -234,6 +234,7 @@ public class Model {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public VisualLayout createVisualLayout(VisualLayoutCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
     VisualLayout newLayout = new VisualLayout(to.getName())
@@ -440,6 +441,7 @@ public class Model {
    * @return The newly created point.
    * @throws ObjectExistsException If an object with the point's name already exists.
    */
+  @SuppressWarnings("deprecation")
   public Point createPoint(PointCreationTO to)
       throws ObjectExistsException {
     // Get a unique ID for the new point and create an instance.
@@ -460,7 +462,10 @@ public class Model {
    * @param ref A reference to the point to return.
    * @return The referenced point, if it exists, or <code>null</code>, if it
    * doesn't.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Point getPoint(TCSObjectReference<Point> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Point.class, ref);
@@ -472,7 +477,10 @@ public class Model {
    * @param pointName The name of the point to return.
    * @return The point with the given name, if it exists, or <code>null</code>,
    * if it doesn't.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Point getPoint(String pointName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Point.class, pointName);
@@ -485,7 +493,10 @@ public class Model {
    * <code>null</code>, all points will be returned.
    * @return A set of points whose names match the given regular expression. If
    * no such points exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<Point> getPoints(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(Point.class, regexp);
@@ -579,8 +590,9 @@ public class Model {
    * @throws ObjectUnknownException If the referenced point or path do not
    * exist.
    */
-  public Point addPointIncomingPath(TCSObjectReference<Point> pointRef,
-                                    TCSObjectReference<Path> pathRef)
+  @SuppressWarnings("deprecation")
+  private Point addPointIncomingPath(TCSObjectReference<Point> pointRef,
+                                     TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
@@ -609,8 +621,9 @@ public class Model {
    * @throws ObjectUnknownException If the referenced point or path do not
    * exist.
    */
-  public Point removePointIncomingPath(TCSObjectReference<Point> pointRef,
-                                       TCSObjectReference<Path> pathRef)
+  @SuppressWarnings("deprecation")
+  private Point removePointIncomingPath(TCSObjectReference<Point> pointRef,
+                                        TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
@@ -634,8 +647,9 @@ public class Model {
    * @throws ObjectUnknownException If the referenced point or path do not
    * exist.
    */
-  public Point addPointOutgoingPath(TCSObjectReference<Point> pointRef,
-                                    TCSObjectReference<Path> pathRef)
+  @SuppressWarnings("deprecation")
+  private Point addPointOutgoingPath(TCSObjectReference<Point> pointRef,
+                                     TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
@@ -663,8 +677,9 @@ public class Model {
    * @throws ObjectUnknownException If the referenced point or path do not
    * exist.
    */
-  public Point removePointOutgoingPath(TCSObjectReference<Point> pointRef,
-                                       TCSObjectReference<Path> pathRef)
+  @SuppressWarnings("deprecation")
+  private Point removePointOutgoingPath(TCSObjectReference<Point> pointRef,
+                                        TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
@@ -774,6 +789,7 @@ public class Model {
    * @throws ObjectUnknownException If the referenced point does not exist.
    * @throws ObjectExistsException If an object with the same name as the path already exists.
    */
+  @SuppressWarnings("deprecation")
   public Path createPath(PathCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
     requireNonNull(to, "to");
@@ -809,7 +825,10 @@ public class Model {
    * @param ref A reference to the path to be returned.
    * @return The path with the given name, if it exists, or <code>null</code>,
    * if it doesn't.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Path getPath(TCSObjectReference<Path> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Path.class, ref);
@@ -821,7 +840,10 @@ public class Model {
    * @param pathName The name of the path to be returned.
    * @return The path with the given name, if it exists, or <code>null</code>,
    * if it doesn't.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Path getPath(String pathName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Path.class, pathName);
@@ -834,7 +856,10 @@ public class Model {
    * match. If <code>null</code>, all paths are returned.
    * @return A set of paths whose names match the given regular expression. If
    * no such paths exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<Path> getPaths(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(Path.class, regexp);
@@ -950,6 +975,7 @@ public class Model {
    * @return The modified path.
    * @throws ObjectUnknownException If the referenced path does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Path setPathLocked(TCSObjectReference<Path> ref, boolean newLocked)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -1026,6 +1052,7 @@ public class Model {
    * @return The newly created location type.
    * @throws ObjectExistsException If an object with the new object's name already exists.
    */
+  @SuppressWarnings("deprecation")
   public LocationType createLocationType(LocationTypeCreationTO to)
       throws ObjectExistsException {
     LocationType newType = new LocationType(to.getName())
@@ -1044,7 +1071,10 @@ public class Model {
    * @param ref A reference to the location type to be returned.
    * @return The referenced location type, or <code>null</code>, if no such
    * location type exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public LocationType getLocationType(TCSObjectReference<LocationType> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(LocationType.class, ref);
@@ -1056,7 +1086,10 @@ public class Model {
    * @param typeName The name of the location type to return.
    * @return The location type with the given name, or <code>null</code>, if no
    * such location type exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public LocationType getLocationType(String typeName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(LocationType.class, typeName);
@@ -1071,7 +1104,10 @@ public class Model {
    * returned.
    * @return A set of location types whose names match the given regular
    * expression. If no such location types exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<LocationType> getLocationTypes(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(LocationType.class, regexp);
@@ -1209,6 +1245,7 @@ public class Model {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Location createLocation(LocationCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
     LocationType type = objectPool.getObject(LocationType.class, to.getTypeName());
@@ -1254,7 +1291,10 @@ public class Model {
    * @param ref A reference to the location to be returned.
    * @return The referenced location, or <code>null</code>, if no such location
    * exists in this pool.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Location getLocation(TCSObjectReference<Location> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Location.class, ref);
@@ -1266,7 +1306,10 @@ public class Model {
    * @param locName The name of the location to return.
    * @return The location with the given name, or <code>null</code>, if no such
    * location exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Location getLocation(String locName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Location.class, locName);
@@ -1279,7 +1322,10 @@ public class Model {
    * to return. If <code>null</code>, all locations are returned.
    * @return A set of locations whose names match the given regular expression.
    * If no such locations exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<Location> getLocations(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(Location.class, regexp);
@@ -1623,6 +1669,7 @@ public class Model {
    * @return The newly created group.
    * @throws ObjectExistsException If an object with the new object's name already exists.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle createVehicle(VehicleCreationTO to)
       throws ObjectExistsException {
     Vehicle newVehicle = new Vehicle(to.getName())
@@ -1645,7 +1692,10 @@ public class Model {
    * @param ref A reference to the vehicle to be returned.
    * @return The referenced vehicle, or <code>null</code>, if no such vehicle
    * exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Vehicle getVehicle(TCSObjectReference<Vehicle> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Vehicle.class, ref);
@@ -1657,7 +1707,10 @@ public class Model {
    * @param vehicleName The name of the vehicle to return.
    * @return The vehicle with the given name, or <code>null</code>, if no
    * such vehicle exists.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Vehicle getVehicle(String vehicleName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Vehicle.class, vehicleName);
@@ -1670,7 +1723,10 @@ public class Model {
    * vehicles to return. If <code>null</code>, all vehicles are returned.
    * @return A set of Vehicles whose names match the given regular expression.
    * If no such vehicles exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<Vehicle> getVehicles(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(Vehicle.class, regexp);
@@ -1684,6 +1740,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                        int energyLevel)
       throws ObjectUnknownException {
@@ -1760,6 +1817,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                              String rechargeOperation)
       throws ObjectUnknownException {
@@ -1781,6 +1839,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                                List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
@@ -1854,6 +1913,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleState(TCSObjectReference<Vehicle> ref,
                                  Vehicle.State newState)
       throws ObjectUnknownException {
@@ -1868,6 +1928,27 @@ public class Model {
   }
 
   /**
+   * Sets a vehicle integration level.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param integrationLevel The vehicle's new integration level.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  @SuppressWarnings("deprecation")
+  public Vehicle setVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
+                                            Vehicle.IntegrationLevel integrationLevel)
+      throws ObjectUnknownException {
+    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = vehicle.clone();
+    vehicle = objectPool.replaceObject(vehicle.withIntegrationLevel(integrationLevel));
+    objectPool.emitObjectEvent(vehicle.clone(),
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+  
+  /**
    * Sets a vehicle's processing state.
    *
    * @param ref A reference to the vehicle to be modified.
@@ -1875,6 +1956,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                      Vehicle.ProcState newState)
       throws ObjectUnknownException {
@@ -1940,6 +2022,7 @@ public class Model {
     return vehicle;
   }
 
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
                                                  Set<String> processableCategories)
       throws ObjectUnknownException {
@@ -1963,6 +2046,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehiclePosition(TCSObjectReference<Vehicle> ref,
                                     TCSObjectReference<Point> newPosRef)
       throws ObjectUnknownException {
@@ -2004,6 +2088,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleNextPosition(TCSObjectReference<Vehicle> ref,
                                         TCSObjectReference<Point> newPosition)
       throws ObjectUnknownException {
@@ -2025,6 +2110,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehiclePrecisePosition(TCSObjectReference<Vehicle> ref,
                                            Triple newPosition)
       throws ObjectUnknownException {
@@ -2046,6 +2132,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleOrientationAngle(TCSObjectReference<Vehicle> ref,
                                             double angle)
       throws ObjectUnknownException {
@@ -2067,6 +2154,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                           TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
@@ -2094,6 +2182,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                          TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
@@ -2122,6 +2211,7 @@ public class Model {
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Vehicle setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
                                               int index)
       throws ObjectUnknownException {
@@ -2199,6 +2289,7 @@ public class Model {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Block createBlock(BlockCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     Set<TCSResourceReference<?>> members = new HashSet<>();
@@ -2226,7 +2317,10 @@ public class Model {
    * @param ref A reference to the block to return.
    * @return The referenced block, if it exists, or <code>null</code>, if it
    * doesn't.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Block getBlock(TCSObjectReference<Block> ref) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Block.class, ref);
@@ -2238,7 +2332,10 @@ public class Model {
    * @param blockName The name of the block to return.
    * @return The block with the given name, if it exists, or <code>null</code>,
    * if it doesn't.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Block getBlock(String blockName) {
     LOG.debug("method entry");
     return objectPool.getObjectOrNull(Block.class, blockName);
@@ -2251,7 +2348,10 @@ public class Model {
    * <code>null</code>, all points will be returned.
    * @return A set of blocks whose names match the given regular expression. If
    * no such blocks exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<Block> getBlocks(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(Block.class, regexp);
@@ -2378,6 +2478,7 @@ public class Model {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public Group createGroup(GroupCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     Set<TCSObjectReference<?>> members = new HashSet<>();
@@ -2406,7 +2507,10 @@ public class Model {
    * <code>null</code>, all points will be returned.
    * @return A set of groups whose names match the given regular expression. If
    * no such groups exist, the returned set is empty.
+   * @deprecated Use methods in {@link TCSObjectPool} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Set<Group> getGroups(Pattern regexp) {
     LOG.debug("method entry");
     return objectPool.getObjects(Group.class, regexp);

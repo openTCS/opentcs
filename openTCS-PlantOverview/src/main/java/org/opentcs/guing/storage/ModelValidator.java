@@ -435,15 +435,6 @@ public class ModelValidator {
       path.setProperty(PathModel.LENGTH, lengthProperty);
     }
 
-    //Validate the costs
-    if (((Integer) costProperty.getValue()) < 1) {
-      LOG.warn("{}: Costs property is {} but has to be > 0. Setting it to 1.",
-               path.getName(),
-               costProperty.getValue());
-      costProperty.setValue(1);
-      path.setProperty(PathModel.ROUTING_COST, costProperty);
-    }
-
     //Validate the maximum velocity
     if (((Double) maxVelocityProperty.getValue()) < 0) {
       LOG.warn("{}: Max. velocity property is {} but has to be >= 0. Setting it to 0.",
@@ -538,7 +529,8 @@ public class ModelValidator {
       Double.parseDouble(yCoordProperty.getValue().toString());
     }
     catch (NumberFormatException e) {
-      errorOccurred(location, "ModelValidator.error.location.invalidModelY");
+      errorOccurred(location, "ModelValidator.error.location.invalidModelY",
+                    yCoordProperty.getValue());
       valid = false;
     }
 
@@ -567,7 +559,9 @@ public class ModelValidator {
       Integer.parseInt(yPosProperty.getText());
     }
     catch (NumberFormatException e) {
-      errorOccurred(location, "ModelValidator.error.location.invalidPositionY");
+      errorOccurred(location,
+                    "ModelValidator.error.location.invalidPositionY",
+                    yPosProperty.getText());
       valid = false;
     }
 
@@ -683,19 +677,19 @@ public class ModelValidator {
     //Validate that all members of the block exists
     StringSetProperty elementsProperty = (StringSetProperty) block.getProperty(BlockModel.ELEMENTS);
     if (elementsProperty == null) {
-      errorOccurred(block, "Elements property for the block does not exist.");
+      errorOccurred(block, "ModelValidator.error.block.nullElementsProperty");
       return false; //Return because the next if would be a NPE
     }
 
     Set<String> elements = new HashSet<>();
     for (String element : elementsProperty.getItems()) {
       if (elements.contains(element)) {
-        errorOccurred(block, "Block element \"{}\" is listed multiple times.", element);
+        errorOccurred(block, "ModelValidator.error.block.duplicateElement", element);
         valid = false;
       }
       elements.add(element);
       if (!nameExists(model, element)) {
-        errorOccurred(block, "Block element \"{}\" does not exist.", element);
+        errorOccurred(block, "ModelValidator.error.block.notExistingElement", element);
         valid = false;
       }
     }
@@ -829,6 +823,13 @@ public class ModelValidator {
         = (AbstractProperty) vehicle.getProperty(VehicleModel.PROC_STATE);
     if (procStateproperty == null) {
       errorOccurred(vehicle, "ModelValidator.error.vehicle.missingProcState");
+      valid = false;
+    }
+
+    AbstractProperty integrationStateProperty
+        = (AbstractProperty) vehicle.getProperty(VehicleModel.INTEGRATION_LEVEL);
+    if (integrationStateProperty == null) {
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingIntegrationLevel");
       valid = false;
     }
 

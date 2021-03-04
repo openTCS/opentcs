@@ -10,8 +10,8 @@
 package org.opentcs.guing.model.elements;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
@@ -23,7 +23,6 @@ import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -48,7 +47,6 @@ public class LocationModel
    * Creates a new instance.
    */
   public LocationModel() {
-    super();
     createProperties();
   }
 
@@ -86,7 +84,7 @@ public class LocationModel
    * Refreshes the name of this location.
    */
   protected void updateName() {
-    StringProperty property = (StringProperty) getProperty(NAME);
+    StringProperty property = getPropertyName();
     String oldName = property.getText();
     String newName = getName();
     property.setText(newName);
@@ -105,26 +103,22 @@ public class LocationModel
 
   @Override // AttributesChangeListener
   public void propertiesChanged(AttributesChangeEvent e) {
-    if (fLocationType.getProperty(ModelComponent.NAME).hasChanged()) {
+    if (fLocationType.getPropertyName().hasChanged()) {
       updateName();
     }
 
-    if (fLocationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION).hasChanged()) {
+    if (fLocationType.getPropertyDefaultRepresentation().hasChanged()) {
       propertiesChanged(this);
     }
   }
 
-  /**
-   *
-   * @param types
-   */
   public void updateTypeProperty(List<LocationTypeModel> types) {
+    requireNonNull(types, "types");
+
     List<String> possibleValues = new ArrayList<>();
     String value = null;
-    Iterator<LocationTypeModel> eLocationTypes = types.iterator();
 
-    while (eLocationTypes.hasNext()) {
-      LocationTypeModel type = eLocationTypes.next();
+    for (LocationTypeModel type : types) {
       possibleValues.add(type.getName());
 
       if (type == fLocationType) {
@@ -132,10 +126,49 @@ public class LocationModel
       }
     }
 
-    LocationTypeProperty pType = (LocationTypeProperty) getProperty(LocationModel.TYPE);
-    pType.setPossibleValues(possibleValues);
-    pType.setValue(value);
-    pType.markChanged();
+    getPropertyType().setPossibleValues(possibleValues);
+    getPropertyType().setValue(value);
+    getPropertyType().markChanged();
+  }
+
+  public CoordinateProperty getPropertyModelPositionX() {
+    return (CoordinateProperty) getProperty(MODEL_X_POSITION);
+  }
+
+  public CoordinateProperty getPropertyModelPositionY() {
+    return (CoordinateProperty) getProperty(MODEL_Y_POSITION);
+  }
+
+  public LocationTypeProperty getPropertyType() {
+    return (LocationTypeProperty) getProperty(TYPE);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+
+  public SymbolProperty getPropertyDefaultRepresentation() {
+    return (SymbolProperty) getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
+  }
+
+  public StringProperty getPropertyLayoutPositionX() {
+    return (StringProperty) getProperty(ElementPropKeys.LOC_POS_X);
+  }
+
+  public StringProperty getPropertyLayoutPositionY() {
+    return (StringProperty) getProperty(ElementPropKeys.LOC_POS_Y);
+  }
+
+  public StringProperty getPropertyLabelOffsetX() {
+    return (StringProperty) getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
+  }
+
+  public StringProperty getPropertyLabelOffsetY() {
+    return (StringProperty) getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
+  }
+
+  public StringProperty getPropertyLabelOrientationAngle() {
+    return (StringProperty) getProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
   }
 
   private void createProperties() {

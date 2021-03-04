@@ -10,6 +10,7 @@ package org.opentcs.util.eventsystem;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -19,7 +20,10 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual event implementation.
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class EventBuffer<E extends Event>
     implements EventListener<E> {
 
@@ -30,11 +34,9 @@ public class EventBuffer<E extends Event>
   /**
    * This buffer's event filter.
    */
-  @SuppressWarnings("deprecation")
-  private EventFilter<E> filter;
+  private Predicate<E> eventFilter;
   /**
-   * A flag indicating whether this event buffer's client is currently waiting
-   * for an event.
+   * A flag indicating whether this event buffer's client is currently waiting for an event.
    */
   private boolean waitingClient;
 
@@ -42,19 +44,22 @@ public class EventBuffer<E extends Event>
    * Creates a new instance.
    *
    * @param eventFilter This buffer's initial event filter.
-   * @deprecated Use {@link #EventBuffer()} instead.
+   * @deprecated Use {@link #EventBuffer(java.util.function.Predicate)} instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public EventBuffer(@Nonnull EventFilter<E> eventFilter) {
-    filter = requireNonNull(eventFilter, "eventFilter");
+    requireNonNull(eventFilter, "eventFilter");
+    this.eventFilter = event -> eventFilter.accept(event);
   }
 
   /**
-   * Creates a new instance accepting all events.
+   * Creates a new instance
+   *
+   * @param eventFilter This buffer's initial event filter.
    */
-  public EventBuffer() {
-    this((event) -> true);
+  public EventBuffer(@Nonnull Predicate<E> eventFilter) {
+    this.eventFilter = requireNonNull(eventFilter, "eventFilter");
   }
 
   // Methods declared in interface EventListener start here
@@ -62,7 +67,7 @@ public class EventBuffer<E extends Event>
   public void processEvent(E event) {
     requireNonNull(event, "event");
     synchronized (events) {
-      if (filter.accept(event)) {
+      if (eventFilter.test(event)) {
         events.add(event);
         // If the client is waiting for an event, wake it up, since there is one
         // now.
@@ -125,13 +130,25 @@ public class EventBuffer<E extends Event>
    * Sets this buffer's event filter.
    *
    * @param eventFilter This buffer's new event filter.
-   * @deprecated Use of event filters is deprecated.
+   * @deprecated Use {@link #setEventFilter(java.util.function.Predicate)} instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public void setFilter(@Nonnull EventFilter<E> eventFilter) {
     synchronized (events) {
-      filter = requireNonNull(eventFilter, "eventFilter");
+      requireNonNull(eventFilter, "eventFilter");
+      this.eventFilter = event -> eventFilter.accept(event);
+    }
+  }
+
+  /**
+   * Sets this buffer's event filter.
+   *
+   * @param eventFilter This buffer's new event filter.
+   */
+  public void setEventFilter(@Nonnull Predicate<E> eventFilter) {
+    synchronized (events) {
+      this.eventFilter = requireNonNull(eventFilter);
     }
   }
 }

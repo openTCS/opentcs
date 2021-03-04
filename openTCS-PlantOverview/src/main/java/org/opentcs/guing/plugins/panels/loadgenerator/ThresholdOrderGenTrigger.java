@@ -9,14 +9,15 @@
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.LinkedHashSet;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventHandler;
+import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 class ThresholdOrderGenTrigger
-    implements EventListener<TCSEvent>,
+    implements EventHandler,
                OrderGenerationTrigger {
 
   /**
@@ -35,9 +36,13 @@ class ThresholdOrderGenTrigger
    */
   private static final Logger LOG = LoggerFactory.getLogger(ThresholdOrderGenTrigger.class);
   /**
-   * The kernel we talk to.
+   * Where we get events from.
    */
-  private final Kernel kernel;
+  private final EventSource eventSource;
+  /**
+   * The object service we talk to.
+   */
+  private final TCSObjectService objectService;
   /**
    * The orders that we know are in the system.
    */
@@ -53,19 +58,20 @@ class ThresholdOrderGenTrigger
   private final OrderBatchCreator orderBatchCreator;
 
   /**
-   * Creates a new ThresholdOrderGenTrigger.
+   * Creates a new instance.
    *
-   * @param kernel The kernel we talk to.
+   * @param eventSource Where this instance registers for events.
    * @param threshold The threshold when new order are being created
    * @param orderBatchCreator The order batch creator
    */
-  public ThresholdOrderGenTrigger(final Kernel kernel,
+  public ThresholdOrderGenTrigger(final @ApplicationEventBus EventSource eventSource,
+                                  final TCSObjectService objectService,
                                   final int threshold,
                                   final OrderBatchCreator orderBatchCreator) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
+    this.eventSource = requireNonNull(eventSource, "eventSource");
+    this.objectService = requireNonNull(objectService, "objectService");
     this.threshold = threshold;
-    this.orderBatchCreator = Objects.requireNonNull(orderBatchCreator,
-                                                    "orderBatchCreator is null");
+    this.orderBatchCreator = requireNonNull(orderBatchCreator, "orderBatchCreator");
   }
 
   @Override
@@ -73,18 +79,18 @@ class ThresholdOrderGenTrigger
     synchronized (knownOrders) {
       if (enabled) {
         // Remember all orders that are not finished, failed etc.
-        for (TransportOrder curOrder : kernel.getTCSObjects(TransportOrder.class)) {
+        for (TransportOrder curOrder : objectService.fetchObjects(TransportOrder.class)) {
           if (!curOrder.getState().isFinalState()) {
             knownOrders.add(curOrder);
           }
         }
-        kernel.addEventListener(this);
+        eventSource.subscribe(this);
         if (knownOrders.size() <= threshold) {
           triggerOrderGeneration();
         }
       }
       else {
-        kernel.removeEventListener(this);
+        eventSource.unsubscribe(this);
         knownOrders.clear();
       }
     }
@@ -97,7 +103,7 @@ class ThresholdOrderGenTrigger
   }
 
   @Override
-  public void processEvent(TCSEvent event) {
+  public void onEvent(Object event) {
     if (!(event instanceof TCSObjectEvent)) {
       return;
     }

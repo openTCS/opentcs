@@ -11,7 +11,6 @@ package org.opentcs.guing.components.drawing;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import org.jhotdraw.draw.BezierFigure;
-import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerEdit;
 import org.opentcs.guing.model.elements.PathModel;
@@ -43,7 +42,7 @@ public class BezierLinerEditHandler
     PathConnection path = (PathConnection) owner;
     path.updateControlPoints();
     PathModel pathModel = path.getModel();
-    pathModel.getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+    pathModel.getPropertyPathControlPoints().markChanged();
     pathModel.propertiesChanged(path);
   }
 }

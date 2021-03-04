@@ -7,24 +7,30 @@
  */
 package org.opentcs.util;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * Instances of this class provide a way to acquire unique timestamps, working
  * around the limitations of System.currentTimeMillis().
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Code should be able to cope with non-unique time stamps.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class UniqueTimestampGenerator {
+
   /**
    * The last timestamp returned by getNextTimestamp().
    */
   private long lastTimestamp;
-  
+
   /**
    * Creates a new UniqueTimestampGenerator.
    */
   public UniqueTimestampGenerator() {
   }
-  
+
   /**
    * Returns a unique timestamp for each call.
    * This method first acquires the current system time via

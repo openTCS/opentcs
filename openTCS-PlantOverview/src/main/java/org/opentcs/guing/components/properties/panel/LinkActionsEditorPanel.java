@@ -15,7 +15,6 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -94,8 +93,7 @@ public class LinkActionsEditorPanel
   private List<String> getPossibleItems() {
     LinkModel ref = (LinkModel) getProperty().getModel();
     LocationTypeModel type = ref.getLocation().getLocationType();
-    StringSetProperty p = (StringSetProperty) type.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
 
-    return new ArrayList<>(p.getItems());
+    return new ArrayList<>(type.getPropertyAllowedOperations().getItems());
   }
 }

@@ -123,19 +123,15 @@ public class GroupModel
   @Override
   public void add(ModelComponent component) {
     super.add(component);
-    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
-    String addedModelName = component.getName();
-    if (!pElements.getItems().contains(addedModelName)) {
-      pElements.addItem(addedModelName);
+    if (!getPropertyElements().getItems().contains(component.getName())) {
+      getPropertyElements().addItem(component.getName());
     }
   }
 
   @Override
   public void remove(ModelComponent component) {
     super.remove(component);
-    StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
-    String removedModelName = component.getName();
-    pElements.getItems().remove(removedModelName);
+    getPropertyElements().getItems().remove(component.getName());
   }
 
   @Override  // AbstractModelComponent
@@ -150,9 +146,14 @@ public class GroupModel
     return ResourceBundleUtil.getBundle().getString("group.description");
   }
 
-  /**
-   *
-   */
+  public StringSetProperty getPropertyElements() {
+    return (StringSetProperty) getProperty(ELEMENTS);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+
   private void createProperties() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 

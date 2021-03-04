@@ -1,0 +1,70 @@
+apply from: "${rootDir}/gradle/application-guice.gradle"
+
+if (!hasProperty('mainClass')) {
+  ext.mainClass = 'org.opentcs.guing.RunPlantOverview'
+}
+mainClassName = ext.mainClass
+
+ext.collectableDistDir = new File(buildDir, 'install')
+
+configurations {
+  plantoverviewJar
+}
+
+dependencies {
+  compile project(':openTCS-%PROJECT_NAME%-Common')
+  
+  compile group: 'org.opentcs', name: 'opentcs-plantoverview', version: openTcsBaselineVersion
+  compileOnly group: 'org.opentcs', name: 'opentcs-plantoverview', version: openTcsBaselineVersion, classifier: 'sources'
+  plantoverviewJar group: 'org.opentcs', name: 'opentcs-plantoverview', version: openTcsBaselineVersion, ext: 'jar'
+}
+
+distributions {
+  main {
+    contents {
+      from (zipTree(configurations.plantoverviewJar.singleFile)) {
+        include 'org/opentcs/plantoverview/distribution/**'
+          
+        eachFile { file ->
+          // Remove the top-level folders. We only want the content of '/distribution'
+          file.path = file.path.replaceFirst("(.*)/distribution", "")
+        }
+          
+        includeEmptyDirs false
+      }
+      from "${sourceSets.main.resources.srcDirs[0]}/de/fraunhofer/iml/opentcs/bmw_str/plantoverview/distribution"
+    }
+  }
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+  options.compilerArgs << "-Xlint:-rawtypes"
+  options.compilerArgs << "-Xlint:-unchecked"
+}
+
+compileTestJava {
+  options.compilerArgs << "-Xlint:all"
+}
+
+// For now, we're using hand-crafted start scripts, so disable the application
+// plugin's start script generation.
+startScripts.enabled = false
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+run {
+  systemProperties(['java.util.logging.config.file':'./config/logging.config',\
+                    'java.security.policy':'file:./config/java.policy',\
+                    'sun.java2d.d3d':'false',\
+                    'opentcs.base':'.',\
+                    'opentcs.home':'.',\
+                    'org.opentcs.util.configuration.xml.file':'./config/openTCS-config.xml',\
+                    'org.opentcs.util.configuration.saveonexit':'true'])
+  jvmArgs('-XX:-OmitStackTraceInFastThrow',\
+          '-splash:bin/splash-image.gif')
+}

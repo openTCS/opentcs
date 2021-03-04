@@ -1,0 +1,93 @@
+apply plugin: 'distribution'
+// To use AsciiDoctor for documentation
+apply plugin: 'org.asciidoctor.convert'
+
+def devDocsBuildDir = file("$buildDir/developers-doc")
+def devDocsImagesDir = file("$devDocsBuildDir/images")
+
+ext.collectableDistDir = file("$buildDir/install")
+
+installDist.dependsOn asciidoctor
+
+distributions {
+  main {
+    contents.from(devDocsBuildDir) {
+      into('developer')
+    }
+  }
+}
+
+asciidoctor {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  // sourceDir = file("src/docs/users-guide")
+  
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = devDocsBuildDir
+  
+  // Whether to put backends' outputs into separate subdirectories  
+  separateOutputDirs = false
+	
+  sources {
+    include 'opentcs-%DOC_FILE_PLACEHOLDER%-commadapter.adoc'
+  }
+  
+  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+	backends = ['html5', 'pdf']
+  
+  requires 'asciidoctor-diagram'
+  
+  attributes 'source-highlighter': 'coderay',
+             'coderay-linenums-mode': 'table',
+  // Custom attributes that we want to be substituted in the document.
+             'buildDate': new Date().format('dd.MM.yyyy'),
+             'imagesoutdir': devDocsImagesDir, // Set the images directory for the output of asciidoctor-diagram
+             // 'imagesdir': 'images',
+  // The directory where the theme file is located
+  //           'pdf-stylesdir': 'themes',
+  // The name of the YAML theme file to load. If the name ends with ".yml", it's
+  // assumed to be the complete name of the file. Otherwise, "-theme.yml" is appended
+  // to the name to make the file name.
+  //           'pdf-style': 'custom',
+  // Include a table of contents (on the left side, when rendering to HTML)
+  toc: 'left',
+  toclevels: '3',
+  // Turn on section numbering.
+  sectnums: '1',
+  // Depth of section numbering
+  sectnumlevels: '6',
+  // Whether to use icons for admonitions. Possible values: 'font' to use
+  // FontAwesome glyphs or anything else to use graphics files.
+  // Note: FontAwesome requires internet connectivity for viewing the resulting
+  // HTML output...
+  //  icons: '1',
+  icons: 'font',
+  // Where to find the icons. Default: ./images/icons.
+  // iconsdir: './images/icons',
+  // The type of the icons.
+  //  icontype: 'svg',
+  // Allow attributes in links (target="_blank" etc.) to be used.
+  linkattrs: true,
+  // Document encoding.
+  encoding: 'utf-8',
+  // Render page numbers in the PDF
+  pagenums: '1',
+  // Experimental features (rendering keyboard shortcuts, menu items, etc.)
+  experimental: true
+
+  resources {
+    from(sourceDir) {
+      include '**/*.jpg'
+      include '**/*.png'
+      include '**/*.svg'
+      exclude 'samples'
+      exclude 'themes'
+    }
+  }
+  
+  doLast{
+    delete "$devDocsBuildDir/.asciidoctor"
+  }
+}

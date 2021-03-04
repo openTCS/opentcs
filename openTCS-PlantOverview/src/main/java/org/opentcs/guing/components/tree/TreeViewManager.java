@@ -21,11 +21,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.swing.tree.TreeNode;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.components.tree.elements.UserObjectUtil;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * Der TreeViewManager spielt die Rolle einer Schnittstelle zwischen Applikation
@@ -37,7 +37,8 @@ import org.opentcs.guing.model.ModelComponent;
  * @see ModelingApplication
  * @see TreeView
  */
-public abstract class TreeViewManager {
+public abstract class TreeViewManager
+    implements EventHandler {
 
   /**
    * The tree view.
@@ -104,13 +105,20 @@ public abstract class TreeViewManager {
     }
   }
 
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof ModelNameChangeEvent) {
+      updateModelName((ModelNameChangeEvent) event);
+    }
+  }
+
   /**
    * Updates the text at the top of the <code>TreeView</code>.
    *
    * @param event The <code>ModelNameChangeEvent</code>.
    */
-  @Handler
-  public void updateModelName(ModelNameChangeEvent event) {
+  private void updateModelName(ModelNameChangeEvent event) {
+    // Updates the text at the top of the tree view.
     String newName = event.getNewName();
     getTreeView().updateText(newName);
   }

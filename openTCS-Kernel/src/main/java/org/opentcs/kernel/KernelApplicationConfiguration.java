@@ -25,26 +25,8 @@ public interface KernelApplicationConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to show the model selection dialog on startup.",
-      orderKey = "0_startup_0")
-  boolean selectModelOnStartup();
-
-  @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether to automatically load the kernel's model on startup.",
-      orderKey = "0_startup_1")
-  boolean loadModelOnStartup();
-
-  @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether to automatically attach drivers on startup.",
-      orderKey = "1_startup_0")
-  boolean autoAttachDriversOnStartup();
-
-  @ConfigurationEntry(
-      type = "Boolean",
       description = "Whether to automatically enable drivers on startup.",
-      orderKey = "1_startup_1")
+      orderKey = "1_startup_0")
   boolean autoEnableDriversOnStartup();
 
   @ConfigurationEntry(

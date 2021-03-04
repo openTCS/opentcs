@@ -12,12 +12,10 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
 import javax.inject.Inject;
-import org.opentcs.access.TCSNotificationEvent;
-import org.opentcs.customizations.kernel.CentralEventHub;
+import org.opentcs.access.NotificationPublicationEvent;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.util.eventsystem.DummyEventListener;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,22 +63,15 @@ public class NotificationBuffer {
   /**
    * A listener for events concerning the stored messages.
    */
-  private final EventListener<TCSEvent> messageEventListener;
+  private final EventHandler messageEventListener;
 
-  /**
-   * Creates a new instance.
-   */
-  public NotificationBuffer() {
-    this(new DummyEventListener<>());
-  }
-  
   /**
    * Creates a new instance that uses the given event listener.
    *
    * @param eventListener The event listener to be used.
    */
   @Inject
-  public NotificationBuffer(@CentralEventHub EventListener<TCSEvent> eventListener) {
+  public NotificationBuffer(@ApplicationEventBus EventHandler eventListener) {
     messageEventListener = requireNonNull(eventListener, "eventListener");
     cutBackCount = capacity;
   }
@@ -162,7 +153,7 @@ public class NotificationBuffer {
    */
   public void addNotification(UserNotification notification) {
     requireNonNull(notification, "notification");
-    
+
     notifications.add(notification);
     LOG.debug("New notification added: {}", notification.getText());
     // Make sure we don't have too many messages now.
@@ -219,13 +210,17 @@ public class NotificationBuffer {
       }
     }
   }
+
   /**
    * Emits an event for the given message.
    *
    * @param message The message to emit an event for.
    */
   public void emitMessageEvent(UserNotification message) {
-    TCSNotificationEvent event = new TCSNotificationEvent(message);
-    messageEventListener.processEvent(event);
+    @SuppressWarnings("deprecation")
+    org.opentcs.access.TCSNotificationEvent event
+        = new org.opentcs.access.TCSNotificationEvent(message);
+    messageEventListener.onEvent(event);
+    messageEventListener.onEvent(new NotificationPublicationEvent(message));
   }
 }

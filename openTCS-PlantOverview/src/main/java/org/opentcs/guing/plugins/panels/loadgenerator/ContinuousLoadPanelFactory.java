@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 
@@ -31,9 +31,9 @@ public class ContinuousLoadPanelFactory
   private final ResourceBundle bundle
       = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
   /**
-   * A reference to the shared kernel provider.
+   * A reference to the shared portal provider.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * A provider for the actual panels.
    */
@@ -42,13 +42,13 @@ public class ContinuousLoadPanelFactory
   /**
    * Creates a new instance.
    * 
-   * @param kernelProvider The application's kernel provider.
+   * @param portalProvider The application's portal provider.
    * @param panelProvider A provider for the actual panels.
    */
   @Inject
-  public ContinuousLoadPanelFactory(SharedKernelProvider kernelProvider,
+  public ContinuousLoadPanelFactory(SharedKernelServicePortalProvider portalProvider,
                                     Provider<ContinuousLoadPanel> panelProvider) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }
 
@@ -68,6 +68,6 @@ public class ContinuousLoadPanelFactory
 
   @Override
   public boolean providesPanel(Kernel.State state) {
-    return kernelProvider != null && Kernel.State.OPERATING.equals(state);
+    return portalProvider != null && Kernel.State.OPERATING.equals(state);
   }
 }

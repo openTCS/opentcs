@@ -9,12 +9,14 @@ package org.opentcs.util.statistics;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +30,12 @@ public class StatisticsLogParser {
   /**
    * This class's logger.
    */
-  private static final Logger log =
-      LoggerFactory.getLogger(StatisticsLogParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StatisticsLogParser.class);
 
   /**
    * Prevents undesired instantiation.
    */
   private StatisticsLogParser() {
-    // Do nada.
   }
 
   /**
@@ -48,11 +48,11 @@ public class StatisticsLogParser {
    */
   public static List<StatisticsRecord> parseLog(File inputFile)
       throws FileNotFoundException, IOException {
-    Objects.requireNonNull(inputFile, "inputFile is null");
+    requireNonNull(inputFile, "inputFile");
 
     List<StatisticsRecord> result = new LinkedList<>();
-    try (BufferedReader inputReader =
-            new BufferedReader(new FileReader(inputFile))) {
+    try (BufferedReader inputReader = new BufferedReader(
+        new InputStreamReader(new FileInputStream(inputFile), Charset.forName("UTF-8")))) {
       String inputLine = inputReader.readLine();
       while (inputLine != null) {
         StatisticsRecord record = StatisticsRecord.parseRecord(inputLine);
@@ -63,7 +63,7 @@ public class StatisticsLogParser {
       }
     }
     catch (IOException exc) {
-      log.warn("Exception parsing input file", exc);
+      LOG.warn("Exception parsing input file", exc);
       throw exc;
     }
 

@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a model layout element in the visual layout.
@@ -35,16 +36,36 @@ public class ModelLayoutElementCreationTO
     super(name);
   }
 
+  private ModelLayoutElementCreationTO(@Nonnull String name,
+                                       @Nonnull Map<String, String> properties,
+                                       int layer) {
+    super(name, properties);
+    this.layer = layer;
+  }
+
   /**
    * Sets the name of this model layout element.
    *
    * @param name The new name.
    * @return The modified model layout element.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public ModelLayoutElementCreationTO setName(@Nonnull String name) {
     return (ModelLayoutElementCreationTO) super.setName(name);
+  }
+
+  /**
+   * Creates a copy of this object with the given name.
+   *
+   * @param name The new name.
+   * @return A copy of this object, differing in the given name.
+   */
+  @Override
+  public ModelLayoutElementCreationTO withName(@Nonnull String name) {
+    return new ModelLayoutElementCreationTO(name, getModifiableProperties(), layer);
   }
 
   /**
@@ -53,10 +74,23 @@ public class ModelLayoutElementCreationTO
    * @param properties The new properties.
    * @return The modified model layout element.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public ModelLayoutElementCreationTO setProperties(@Nonnull Map<String, String> properties) {
     return (ModelLayoutElementCreationTO) super.setProperties(properties);
+  }
+
+  /**
+   * Creates a copy of this object with the given properties.
+   *
+   * @param properties The new properties.
+   * @return A copy of this object, differing in the given properties.
+   */
+  @Override
+  public ModelLayoutElementCreationTO withProperties(@Nonnull Map<String, String> properties) {
+    return new ModelLayoutElementCreationTO(getName(), properties, layer);
   }
 
   /**
@@ -66,10 +100,27 @@ public class ModelLayoutElementCreationTO
    * @param value The property value.
    * @return The modified model layout element.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   @Override
   public ModelLayoutElementCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
     return (ModelLayoutElementCreationTO) super.setProperty(key, value);
+  }
+
+  /**
+   * Creates a copy of this object and adds the given property.
+   * If value == null, then the key-value pair is removed from the properties.
+   *
+   * @param key the key.
+   * @param value the value
+   * @return A copy of this object that either
+   * includes the given entry in it's current properties, if value != null or
+   * excludes the entry otherwise.
+   */
+  @Override
+  public ModelLayoutElementCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
+    return new ModelLayoutElementCreationTO(getName(), propertiesWith(key, value), layer);
   }
 
   /**
@@ -87,9 +138,21 @@ public class ModelLayoutElementCreationTO
    * @param layer The new layer.
    * @return The modified model layout element.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   public ModelLayoutElementCreationTO setLayer(int layer) {
     this.layer = layer;
     return this;
+  }
+
+  /**
+   * Creates a copy of this object with the given layer on which this model layout element is to be displayed.
+   *
+   * @param layer The new layer
+   * @return A copy of this object, differing in the given layer.
+   */
+  public ModelLayoutElementCreationTO withLayer(int layer) {
+    return new ModelLayoutElementCreationTO(getName(), getModifiableProperties(), layer);
   }
 }

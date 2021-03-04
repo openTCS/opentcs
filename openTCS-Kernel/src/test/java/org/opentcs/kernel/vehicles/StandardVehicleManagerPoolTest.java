@@ -9,7 +9,7 @@ package org.opentcs.kernel.vehicles;
 
 import org.junit.*;
 import static org.mockito.Mockito.mock;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
@@ -29,9 +29,9 @@ public class StandardVehicleManagerPoolTest {
    */
   private static final String UNKNOWN_VEHICLE_NAME = "SomeUnknownVehicle";
   /**
-   * The (mocked) kernel.
+   * The (mocked) vehicle service.
    */
-  private LocalKernel localKernel;
+  private InternalVehicleService vehicleService;
   /**
    * A (mocked) communication adapter.
    */
@@ -43,10 +43,10 @@ public class StandardVehicleManagerPoolTest {
 
   @Before
   public void setUp() {
-    localKernel = mock(LocalKernel.class);
+    vehicleService = mock(InternalVehicleService.class);
     commAdapter = mock(VehicleCommAdapter.class);
-    vehManagerPool = new DefaultVehicleControllerPool(
-        localKernel, new MockedVehicleManagerFactory());
+    vehManagerPool = new DefaultVehicleControllerPool(vehicleService,
+                                                      new MockedVehicleManagerFactory());
   }
 
   @Test(expected = NullPointerException.class)
@@ -77,7 +77,7 @@ public class StandardVehicleManagerPoolTest {
 
     @Override
     public DefaultVehicleController createVehicleController(Vehicle vehicle,
-                                                     VehicleCommAdapter commAdapter) {
+                                                            VehicleCommAdapter commAdapter) {
       return mock(DefaultVehicleController.class);
     }
   }

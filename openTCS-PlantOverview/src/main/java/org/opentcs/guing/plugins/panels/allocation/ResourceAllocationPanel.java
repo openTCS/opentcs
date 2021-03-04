@@ -8,19 +8,19 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
-import java.util.HashMap;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.access.queries.QuerySchedulerAllocations;
-import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.access.SchedulerAllocationState;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.components.plantoverview.PluggablePanel;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventHandler;
+import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ResourceAllocationPanel
     extends PluggablePanel
-    implements EventListener<TCSEvent> {
+    implements EventHandler {
 
   /**
    * This class' logger:
@@ -41,11 +41,15 @@ public class ResourceAllocationPanel
   /**
    * The kernel to query allocations from.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
+  /**
+   * Where we register for events.
+   */
+  private final EventSource eventSource;
   /**
    * The client that is registered with the kernel provider.
    */
-  private SharedKernelClient kernelClient;
+  private SharedKernelServicePortal sharedPortal;
   /**
    * Whether this panel was initialized.
    */
@@ -58,32 +62,36 @@ public class ResourceAllocationPanel
   /**
    * Creates a new instance.
    *
-   * @param kernelProvider The kernel provider
+   * @param kernelProvider The kernel provider.
+   * @param eventSource Where this instance registers for events.
    */
   @Inject
-  public ResourceAllocationPanel(SharedKernelProvider kernelProvider) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+  public ResourceAllocationPanel(SharedKernelServicePortalProvider kernelProvider,
+                                 @ApplicationEventBus EventSource eventSource) {
+    this.portalProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.eventSource = requireNonNull(eventSource, "eventSource");
     initComponents();
   }
 
   @Override
   public void initialize() {
-    if (initialized) {
+    if (isInitialized()) {
       LOG.debug("Already initialized - skipping.");
       return;
     }
     // Register event listener in the kernel.
     try {
-      kernelClient = kernelProvider.register();
+      sharedPortal = portalProvider.register();
     }
-    catch (KernelUnavailableException exc) {
+    catch (ServiceUnavailableException exc) {
       LOG.warn("Kernel unavailable", exc);
       return;
     }
-    kernelClient.getKernel().addEventListener(this);
+
+    eventSource.subscribe(this);
 
     // Trigger an update to the table model.
-    handleVehicleStateChange(kernelClient.getKernel().query(QuerySchedulerAllocations.class));
+    handleVehicleStateChange(sharedPortal.getPortal().getSchedulerService().fetchSchedulerAllocations());
 
     initialized = true;
   }
@@ -95,19 +103,19 @@ public class ResourceAllocationPanel
 
   @Override
   public void terminate() {
-    if (!initialized) {
+    if (!isInitialized()) {
       LOG.debug("Already terminated - skipping.");
       return;
     }
     // Remove event listener in the kernel.
-    kernelClient.getKernel().removeEventListener(this);
-    kernelClient.close();
+    eventSource.subscribe(this);
+    sharedPortal.close();
 
     initialized = false;
   }
 
   @Override
-  public void processEvent(TCSEvent event) {
+  public void onEvent(Object event) {
     requireNonNull(event, "event");
 
     //Skip event if we dont want any updates
@@ -126,17 +134,17 @@ public class ResourceAllocationPanel
       return;
     }
     //Check if we have access to the kernel
-    if (kernelProvider == null || !kernelProvider.kernelShared()) {
+    if (portalProvider == null || !portalProvider.portalShared()) {
       LOG.debug("No connection to the kernel but received an event.");
       return;
     }
 
     // Ignore events if we're not operating or connected. (Vehicle objects may change a lot in modelling mode.)
-    if (kernelClient.getKernel().getState() != Kernel.State.OPERATING) {
+    if (sharedPortal.getPortal().getState() != Kernel.State.OPERATING) {
       LOG.debug("Kernel is not in operating mode - skipping.");
       return;
     }
-    handleVehicleStateChange(kernelClient.getKernel().query(QuerySchedulerAllocations.class));
+    handleVehicleStateChange(sharedPortal.getPortal().getSchedulerService().fetchSchedulerAllocations());
   }
 
   /**
@@ -145,13 +153,13 @@ public class ResourceAllocationPanel
    *
    * @param vehicle The vehicle which changed
    */
-  private void handleVehicleStateChange(QuerySchedulerAllocations query) {
-    if (query == null) {
+  private void handleVehicleStateChange(SchedulerAllocationState allocationState) {
+    if (allocationState == null) {
       LOG.debug("Kernel did not answer to the scheduled allocations query.");
       return;
     }
 
-    ((AllocationTreeModel) allocationTable.getModel()).updateAllocations(query.getAllocations());
+    ((AllocationTreeModel) allocationTable.getModel()).updateAllocations(allocationState.getAllocationStates());
   }
 
   /**

@@ -11,12 +11,17 @@ import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This class is used for calculating the costs to travel from one location to another.
  *
  * @author Philipp Seifert (Fraunhofer IML)
+ * @deprecated Providing travel costs to external clients will not be part of the standard kernel
+ * API any more.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class TravelCosts
     implements Serializable {
 

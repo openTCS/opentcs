@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Router;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Location.Link;
@@ -57,9 +57,9 @@ public class DefaultRouter
    */
   private final DefaultRouterConfiguration configuration;
   /**
-   * The kernel providing the model data.
+   * The object service providing the model data.
    */
-  private final LocalKernel kernel;
+  private final TCSObjectService objectService;
   /**
    * A builder for constructing our routing tables.
    */
@@ -84,21 +84,24 @@ public class DefaultRouter
   /**
    * Creates a new instance.
    *
-   * @param kernel The kernel providing the model data.
+   * @param objectService The object service providing the model data.
    * @param pointRouterFactory A factory for point routers.
    * @param configuration This class's configuration.
    */
   @Inject
-  public DefaultRouter(LocalKernel kernel,
+  public DefaultRouter(TCSObjectService objectService,
                        PointRouterFactory pointRouterFactory,
                        DefaultRouterConfiguration configuration) {
-    this.kernel = requireNonNull(kernel, "kernel");
+    this.objectService = requireNonNull(objectService, "objectService");
     this.pointRouterFactory = requireNonNull(pointRouterFactory, "pointRouterFactory");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
   public void initialize() {
+    if (isInitialized()) {
+      return;
+    }
     try {
       rwLock.writeLock().lock();
       routesByVehicle.clear();
@@ -117,6 +120,9 @@ public class DefaultRouter
 
   @Override
   public void terminate() {
+    if (!isInitialized()) {
+      return;
+    }
     try {
       rwLock.writeLock().lock();
       routesByVehicle.clear();
@@ -134,7 +140,7 @@ public class DefaultRouter
     try {
       rwLock.writeLock().lock();
       pointRoutersByVehicleGroup.clear();
-      for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
+      for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
         int currentGroup = getRoutingGroupOfVehicle(curVehicle);
         if (!pointRoutersByVehicleGroup.containsKey(currentGroup)) {
           pointRoutersByVehicleGroup.put(currentGroup,
@@ -266,6 +272,7 @@ public class DefaultRouter
   }
 
   @Override
+  @Deprecated
   public long getCosts(Vehicle vehicle,
                        TCSObjectReference<Location> srcRef,
                        TCSObjectReference<Location> destRef) {
@@ -276,16 +283,16 @@ public class DefaultRouter
     try {
       rwLock.readLock().lock();
       // Get all attached links for source and destination
-      Set<Link> srcLinks = kernel.getTCSObject(Location.class, srcRef).getAttachedLinks();
-      Set<Link> destLinks = kernel.getTCSObject(Location.class, destRef).getAttachedLinks();
+      Set<Link> srcLinks = objectService.fetchObject(Location.class, srcRef).getAttachedLinks();
+      Set<Link> destLinks = objectService.fetchObject(Location.class, destRef).getAttachedLinks();
 
       // Find the cheapest destination link to be used
       long costs = Long.MAX_VALUE;
       for (Link srcLink : srcLinks) {
         for (Link destLink : destLinks) {
           long linkCosts = getCosts(vehicle,
-                                    kernel.getTCSObject(Point.class, srcLink.getPoint()),
-                                    kernel.getTCSObject(Point.class, destLink.getPoint()));
+                                    objectService.fetchObject(Point.class, srcLink.getPoint()),
+                                    objectService.fetchObject(Point.class, destLink.getPoint()));
           costs = Math.min(costs, linkCosts);
         }
       }
@@ -336,17 +343,6 @@ public class DefaultRouter
         result.add(finalOrder.getRoute().getFinalDestinationPoint());
       }
       return result;
-    }
-    finally {
-      rwLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public String getInfo() {
-    try {
-      rwLock.readLock().lock();
-      return "Computed point routers: " + pointRoutersByVehicleGroup.size();
     }
     finally {
       rwLock.readLock().unlock();
@@ -487,7 +483,7 @@ public class DefaultRouter
         && (Destination.OP_MOVE.equals(dest.getOperation())
             || Destination.OP_PARK.equals(dest.getOperation()))) {
       // Route the vehicle to an user selected point if halting is allowed there.
-      Point destPoint = kernel.getTCSObject(Point.class, dest.getDestination().getName());
+      Point destPoint = objectService.fetchObject(Point.class, dest.getDestination().getName());
       requireNonNull(destPoint, "destPoint");
       final Set<Point> result = new HashSet<>();
       if (destPoint.isHaltingPosition()) {
@@ -499,8 +495,10 @@ public class DefaultRouter
     // to the destination location.
     else {
       final Set<Point> result = new HashSet<>();
-      final Location destLoc = kernel.getTCSObject(Location.class, dest.getDestination().getName());
-      final LocationType destLocType = kernel.getTCSObject(LocationType.class, destLoc.getType());
+      final Location destLoc = objectService.fetchObject(Location.class,
+                                                         dest.getDestination().getName());
+      final LocationType destLocType = objectService.fetchObject(LocationType.class,
+                                                                 destLoc.getType());
       for (Location.Link curLink : destLoc.getAttachedLinks()) {
         // A link is acceptable if any of the following conditions are true:
         // - The destination operation is OP_NOP, which is allowed everywhere.
@@ -512,7 +510,7 @@ public class DefaultRouter
             || curLink.hasAllowedOperation(dest.getOperation())
             || (curLink.getAllowedOperations().isEmpty()
                 && destLocType.isAllowedOperation(dest.getOperation()))) {
-          Point destPoint = kernel.getTCSObject(Point.class, curLink.getPoint());
+          Point destPoint = objectService.fetchObject(Point.class, curLink.getPoint());
           if (destPoint.isHaltingPosition()) {
             result.add(destPoint);
           }
@@ -530,7 +528,7 @@ public class DefaultRouter
    */
   private Set<Vehicle> getVehiclesByRoutingGroup(int routingGroup) {
     Set<Vehicle> result = new HashSet<>();
-    for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
+    for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
       if (getRoutingGroupOfVehicle(curVehicle) == routingGroup) {
         result.add(curVehicle);
       }
@@ -552,7 +550,7 @@ public class DefaultRouter
     }
     catch (NumberFormatException e) {
       LOG.debug("Invalid routing group '{}' for vehicle {}, using default ({}).",
-                routingGroup,
+                vehicle.getProperty(PROPKEY_ROUTING_GROUP),
                 vehicle,
                 DEFAULT_ROUTING_GROUP);
     }

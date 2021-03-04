@@ -8,7 +8,8 @@
 package org.opentcs.util.statistics;
 
 import java.io.IOException;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A single record in the dump file.
@@ -20,11 +21,11 @@ public class StatisticsRecord {
   /**
    * A separator for fields in the record file.
    */
-  private static final String fieldSeparator = "||";
+  private static final String FIELD_SEPARATOR = "||";
   /**
    * Regular expression to find field separators in the record file.
    */
-  private static final String fieldSepRegexp = "\\|\\|";
+  private static final String FIELD_SEPARATOR_REGEXP = "\\|\\|";
   /**
    * Point of time when the record was created.
    */
@@ -49,8 +50,8 @@ public class StatisticsRecord {
                           final StatisticsEvent event,
                           final String label) {
     this.timestamp = timestamp;
-    this.event = Objects.requireNonNull(event, "event is null");
-    this.label = Objects.requireNonNull(label, "label is null");
+    this.event = requireNonNull(event, "event");
+    this.label = requireNonNull(label, "label");
   }
 
   /**
@@ -82,7 +83,7 @@ public class StatisticsRecord {
 
   @Override
   public String toString() {
-    return timestamp + fieldSeparator + event.name() + fieldSeparator + label;
+    return timestamp + FIELD_SEPARATOR + event.name() + FIELD_SEPARATOR + label;
   }
 
   /**
@@ -94,15 +95,13 @@ public class StatisticsRecord {
    */
   public static StatisticsRecord parseRecord(String input)
       throws IOException {
-    Objects.requireNonNull(input, "input is null");
-    if (input.isEmpty()) {
-      throw new IllegalArgumentException("input is empty");
-    }
+    requireNonNull(input, "input");
+    checkArgument(!input.isEmpty(), "input is empty");
 
-    String[] splitInput = input.split(fieldSepRegexp, 3);
+    String[] splitInput = input.split(FIELD_SEPARATOR_REGEXP, 3);
     if (splitInput.length < 3) {
       throw new IOException("Splitting '" + input + "' with '"
-          + fieldSeparator + "' results in too few elements ("
+          + FIELD_SEPARATOR + "' results in too few elements ("
           + splitInput.length + ").");
     }
     long timestamp = Long.parseLong(splitInput[0]);

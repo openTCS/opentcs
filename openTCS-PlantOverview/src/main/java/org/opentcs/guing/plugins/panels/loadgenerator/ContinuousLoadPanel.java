@@ -30,16 +30,19 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.services.ServiceUnavailableException;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.plantoverview.PluggablePanel;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
 import org.opentcs.util.Comparators;
+import org.opentcs.util.event.EventSource;
 import org.opentcs.util.gui.StringListCellRenderer;
 import org.opentcs.util.gui.StringTableCellRenderer;
 import org.slf4j.Logger;
@@ -63,13 +66,21 @@ public class ContinuousLoadPanel
   private final ResourceBundle bundle
       = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
+  /**
+   * Where we get events from.
+   */
+  private final EventSource eventSource;
   /**
    * The client that is registered at the kernel.
    */
-  private SharedKernelClient kernelClient;
+  private SharedKernelServicePortal sharedPortal;
+  /**
+   * The object service.
+   */
+  private TCSObjectService objectService;
   /**
    * The instance trigger creation of new orders.
    */
@@ -84,13 +95,16 @@ public class ContinuousLoadPanel
   private boolean initialized;
 
   /**
-   * Creates a new ContinuousLoadPanel.
+   * Creates a new instance.
    *
-   * @param kernelProvider The application's kernel provider.
+   * @param portalProvider The application's portal provider.
+   * @param eventSource Where components can register for events.
    */
   @Inject
-  public ContinuousLoadPanel(SharedKernelProvider kernelProvider) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+  public ContinuousLoadPanel(SharedKernelServicePortalProvider portalProvider,
+                             @ApplicationEventBus EventSource eventSource) {
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    this.eventSource = requireNonNull(eventSource, "eventSource");
 
     initComponents();
 
@@ -114,15 +128,17 @@ public class ContinuousLoadPanel
 
     // Get a kernel reference.
     try {
-      kernelClient = kernelProvider.register();
+      sharedPortal = portalProvider.register();
     }
-    catch (KernelUnavailableException exc) {
+    catch (ServiceUnavailableException exc) {
       LOG.warn("Kernel unavailable", exc);
       return;
     }
 
+    objectService = (TCSObjectService) sharedPortal.getPortal().getPlantModelService();
+
     Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    vehicles.addAll(kernelClient.getKernel().getTCSObjects(Vehicle.class));
+    vehicles.addAll(objectService.fetchObjects(Vehicle.class));
     JComboBox<TCSObjectReference<Vehicle>> vehiclesComboBox = new JComboBox<>();
     vehiclesComboBox.addItem(null);
     vehiclesComboBox.setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()));
@@ -154,7 +170,7 @@ public class ContinuousLoadPanel
     // Disable order generation
     orderGenChkBox.setSelected(false);
 
-    kernelClient.close();
+    sharedPortal.close();
     initialized = false;
   }
 
@@ -229,7 +245,10 @@ public class ContinuousLoadPanel
     if (randomOrderSpecButton.isSelected()) {
       int orderCount = (Integer) randomOrderCountSpinner.getValue();
       int orderSize = (Integer) randomOrderSizeSpinner.getValue();
-      return new RandomOrderBatchCreator(kernelClient.getKernel(), orderCount, orderSize);
+      return new RandomOrderBatchCreator(sharedPortal.getPortal().getTransportOrderService(),
+                                         sharedPortal.getPortal().getDispatcherService(),
+                                         orderCount,
+                                         orderSize);
     }
     else if (explicitOrderSpecButton.isSelected()) {
       saveCurrentTableData();
@@ -256,7 +275,9 @@ public class ContinuousLoadPanel
           }
         }
       }
-      return new ExplicitOrderBatchGenerator(kernelClient.getKernel(), tableModel.getList());
+      return new ExplicitOrderBatchGenerator(sharedPortal.getPortal().getTransportOrderService(),
+                                             sharedPortal.getPortal().getDispatcherService(),
+                                             tableModel.getList());
     }
     else {
       throw new UnsupportedOperationException("Unsupported order spec.");
@@ -274,7 +295,8 @@ public class ContinuousLoadPanel
       return null;
     }
     if (thresholdTriggerRadioButton.isSelected()) {
-      return new ThresholdOrderGenTrigger(kernelClient.getKernel(),
+      return new ThresholdOrderGenTrigger(eventSource,
+                                          objectService,
                                           (Integer) thresholdSpinner.getValue(),
                                           batchCreator);
     }
@@ -338,7 +360,7 @@ public class ContinuousLoadPanel
     locationsComboBox.removeAllItems();
     operationTypesComboBox.removeAllItems();
     SortedSet<Location> sortedLocationSet = new TreeSet<>(Comparators.objectsByName());
-    sortedLocationSet.addAll(kernelClient.getKernel().getTCSObjects(Location.class));
+    sortedLocationSet.addAll(objectService.fetchObjects(Location.class));
     for (Location i : sortedLocationSet) {
       locationsComboBox.addItem(i.getReference());
     }
@@ -841,7 +863,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
   private void orderGenChkBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_orderGenChkBoxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
-      if (kernelClient.getKernel().getState().equals(Kernel.State.OPERATING)) {
+      if (sharedPortal.getPortal().getState().equals(Kernel.State.OPERATING)) {
         // Start order generation.
         orderGenTrigger = createOrderGenTrigger();
         if (orderGenTrigger == null) {
@@ -851,10 +873,10 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       }
     }
     else // Stop order generation.
-     if (orderGenTrigger != null) {
-        orderGenTrigger.setTriggeringEnabled(false);
-        orderGenTrigger = null;
-      }
+    if (orderGenTrigger != null) {
+      orderGenTrigger.setTriggeringEnabled(false);
+      orderGenTrigger = null;
+    }
 
     updateElementStates();
   }//GEN-LAST:event_orderGenChkBoxItemStateChanged
@@ -921,10 +943,9 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     TCSObjectReference<Location> loc
         = (TCSObjectReference<Location>) locationsComboBox.getSelectedItem();
-    Location location = kernelClient.getKernel().getTCSObject(Location.class, loc);
+    Location location = objectService.fetchObject(Location.class, loc);
     TCSObjectReference<LocationType> locationRef = location.getType();
-    LocationType locationType = kernelClient.getKernel().getTCSObject(LocationType.class,
-                                                                      locationRef);
+    LocationType locationType = objectService.fetchObject(LocationType.class, locationRef);
     Set<String> operationTypes = new TreeSet<>(locationType.getAllowedOperations());
     for (String j : operationTypes) {
       operationTypesComboBox.addItem(j);
@@ -1046,14 +1067,14 @@ toTable.getSelectionModel().addListSelectionListener(listener);
             break;
         }
         data.setIntendedVehicle(curStruc.getIntendedVehicle() == null ? null
-            : kernelClient.getKernel().getTCSObject(Vehicle.class,
-                                                    curStruc.getIntendedVehicle()).getReference());
+            : objectService.fetchObject(Vehicle.class,
+                                        curStruc.getIntendedVehicle()).getReference());
         for (TransportOrderXMLStructure.XMLMapEntry curEntry : curStruc.getProperties()) {
           data.addProperty(curEntry.getKey(), curEntry.getValue());
         }
         for (DriveOrderXMLStructure curDOXMLS : curStruc.getDriveOrders()) {
           DriveOrderStructure newDOS
-              = new DriveOrderStructure(kernelClient.getKernel().getTCSObject(
+              = new DriveOrderStructure(objectService.fetchObject(
                   Location.class, curDOXMLS.getDriveOrderLocation()).getReference(),
                                         curDOXMLS.getDriveOrderVehicleOperation());
           data.addDriveOrder(newDOS);

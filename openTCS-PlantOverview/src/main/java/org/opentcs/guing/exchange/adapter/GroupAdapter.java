@@ -9,24 +9,19 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.GroupCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Group;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.GroupModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for Groups.
@@ -37,54 +32,32 @@ import org.slf4j.LoggerFactory;
 public class GroupAdapter
     extends AbstractProcessAdapter {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(GroupAdapter.class);
+  @Override  // OpenTCSProcessAdapter
+  public void updateModelProperties(TCSObject<?> tcsObject, ModelComponent modelComponent, SystemModel systemModel, TCSObjectService objectService, @Nullable
+      ModelLayoutElement layoutElement) {
+    Group group = requireNonNull((Group) tcsObject, "tcsObject");
+    GroupModel model = (GroupModel) modelComponent;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public GroupAdapter(@Assisted GroupModel model,
-                      @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
+    model.getPropertyName().setText(group.getName());
+
+    updateMiscModelProperties(model, group);
   }
 
   @Override
-  public GroupModel getModel() {
-    return (GroupModel) super.getModel();
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    return plantModel.withGroup(
+        new GroupCreationTO(modelComponent.getName())
+            .withMemberNames(getMemberNames((GroupModel) modelComponent))
+            .withProperties(getKernelProperties(modelComponent))
+    );
   }
 
-  @Override  // OpenTCSProcessAdapter
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
-                                    @Nullable ModelLayoutElement layoutElement) {
-    Group group = requireNonNull((Group) tcsObject, "tcsObject");
-
-    StringProperty name
-        = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    name.setText(group.getName());
-
-    updateMiscModelProperties(group);
-  }
-
-  @Override  // OpenTCSProcessAdapter
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    plantModel.getGroups().add(new GroupCreationTO(getModel().getName())
-        .setMemberNames(getMemberNames())
-        .setProperties(getKernelProperties()));
-  }
-
-  private Set<String> getMemberNames() {
+  private Set<String> getMemberNames(GroupModel groupModel) {
     Set<String> result = new HashSet<>();
-    for (ModelComponent model : getModel().getChildComponents()) {
-      if (getEventDispatcher().findProcessAdapter(model) != null) {
-        result.add(model.getName());
-      }
+    for (ModelComponent model : groupModel.getChildComponents()) {
+      result.add(model.getName());
     }
 
     return result;

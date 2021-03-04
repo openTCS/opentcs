@@ -301,7 +301,14 @@ public class VisualLayout
                                                 "viewBookmarks is null");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public VisualLayout clone() {
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),

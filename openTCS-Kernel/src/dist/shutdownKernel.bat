@@ -15,4 +15,4 @@ set OPENTCS_CP=%OPENTCS_LIBDIR%\*;
 set OPENTCS_CP=%OPENTCS_CP%;%OPENTCS_LIBDIR%\openTCS-extensions\*;
 
 java -classpath "%OPENTCS_CP%" ^
-    org.opentcs.kernel.ShutdownKernel localhost 1099 SSL_UNTRUSTED
+    org.opentcs.kernel.ShutdownKernel localhost 55100

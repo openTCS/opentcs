@@ -10,13 +10,17 @@ package org.opentcs.access.queries;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A query for general information about the routing tables.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Does not serve any real purpose and will be removed.
  */
 @Availability(Kernel.State.OPERATING)
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class QueryRoutingInfo
     extends Query<QueryRoutingInfo>
     implements Serializable {

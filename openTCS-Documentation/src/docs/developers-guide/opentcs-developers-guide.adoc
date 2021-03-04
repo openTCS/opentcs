@@ -9,8 +9,14 @@ include::01_general-development.adoc[]
 
 include::02_kernel-api.adoc[]
 
-include::03_tcp-host-interface.adoc[]
+include::03a_kernel-web-api.adoc[]
 
-include::04_extending-kernel.adoc[]
+include::03b_tcp-host-interface.adoc[]
 
-include::05_extending-plantoverview.adoc[]
+include::04_generate-integration-project.adoc[]
+
+include::05_extending-kernel.adoc[]
+
+include::06_extending-control-center.adoc[]
+
+include::07_extending-plantoverview.adoc[]

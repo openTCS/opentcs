@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 import javax.inject.Provider;
-import net.engio.mbassy.bus.MBassador;
-import net.engio.mbassy.bus.config.BusConfiguration;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,6 +30,7 @@ import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  *
@@ -118,7 +117,7 @@ public class XMLFileModelPersisterTest {
   public void testLoadModelShouldReadXMLModel()
       throws IOException, InvalidModelException {
     persister.saveModel(createTestModel(MODEL_NAME), null);
-    Model model = new Model(new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
+    Model model = new Model(new TCSObjectPool(new SimpleEventBus()));
     persister.loadModel(model);
     verify(reader, atLeastOnce())
         .readXMLModel(any(InputStream.class), any(Model.class));
@@ -149,7 +148,7 @@ public class XMLFileModelPersisterTest {
   public void shouldLoadEmptyModelIfNoModelIsSaved()
       throws IOException {
     persister.removeModel();
-    Model model = new Model(new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
+    Model model = new Model(new TCSObjectPool(new SimpleEventBus()));
     persister.loadModel(model);
     assertTrue(model.getPoints(null).isEmpty());
     assertTrue(model.getBlocks(null).isEmpty());
@@ -179,7 +178,7 @@ public class XMLFileModelPersisterTest {
   }
 
   private Model createTestModel(String name) {
-    Model model = new Model(new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
+    Model model = new Model(new TCSObjectPool(new SimpleEventBus()));
     model.createPoint(new PointCreationTO("testPointName"));
     model.createVehicle(new VehicleCreationTO("testVehicleName"));
     model.setName(name);

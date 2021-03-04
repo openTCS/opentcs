@@ -19,7 +19,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.workingset.TransportOrderPool;
-import org.opentcs.util.CyclicTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 class OrderCleanerTask
-    extends CyclicTask {
+    implements Runnable {
 
   /**
    * This class's Logger.
@@ -57,7 +56,7 @@ class OrderCleanerTask
   private final OrderPoolConfiguration configuration;
 
   /**
-   * Creates a new OrderCleanerTask.
+   * Creates a new instance.
    *
    * @param kernel The kernel.
    * @param configuration This class's configuration.
@@ -68,7 +67,6 @@ class OrderCleanerTask
                           Set<TransportOrderCleanupApproval> orderCleanupApprovals,
                           Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals,
                           OrderPoolConfiguration configuration) {
-    super(configuration.sweepInterval());
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.orderPool = requireNonNull(orderPool, "orderPool");
     this.orderCleanupApprovals = requireNonNull(orderCleanupApprovals, "orderCleanupApprovals");
@@ -77,8 +75,12 @@ class OrderCleanerTask
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
+  public long getSweepInterval() {
+    return configuration.sweepInterval();
+  }
+
   @Override
-  protected void runActualTask() {
+  public void run() {
     synchronized (globalSyncObject) {
       LOG.debug("Sweeping order pool...");
       // Candidates that are created before this point of time should be removed.
@@ -86,12 +88,19 @@ class OrderCleanerTask
 
       // Remove all transport orders in a final state that do NOT belong to a sequence and that are
       // older than the threshold.
-      orderPool.getTransportOrders(new OrderApproval(creationTimeThreshold))
-          .forEach(order -> orderPool.removeTransportOrder(order.getReference()));
+      for (TransportOrder transportOrder
+               : orderPool.getObjectPool().getObjects(TransportOrder.class,
+                                                      new OrderApproval(creationTimeThreshold))) {
+        orderPool.removeTransportOrder(transportOrder.getReference());
+      }
 
       // Remove all order sequences that have been finished, including their transport orders.
-      orderPool.getOrderSequences(new SequenceApproval(creationTimeThreshold))
-          .forEach(seq -> orderPool.removeFinishedOrderSequenceAndOrders(seq.getReference()));
+      for (OrderSequence orderSequence
+               : orderPool.getObjectPool().getObjects(
+              OrderSequence.class,
+              new SequenceApproval(creationTimeThreshold))) {
+        orderPool.removeFinishedOrderSequenceAndOrders(orderSequence.getReference());
+      }
     }
   }
 
@@ -146,7 +155,9 @@ class OrderCleanerTask
       }
       List<TCSObjectReference<TransportOrder>> orderRefs = seq.getOrders();
       if (!orderRefs.isEmpty()) {
-        TransportOrder lastOrder = orderPool.getTransportOrder(Iterables.getLast(orderRefs));
+        TransportOrder lastOrder
+            = orderPool.getObjectPool().getObject(TransportOrder.class,
+                                                  Iterables.getLast(orderRefs));
         if (lastOrder.getCreationTime() >= creationTimeThreshold) {
           return false;
         }

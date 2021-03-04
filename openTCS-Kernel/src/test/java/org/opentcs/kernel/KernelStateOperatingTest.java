@@ -10,8 +10,12 @@ package org.opentcs.kernel;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import javax.annotation.Nonnull;
 import org.junit.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -19,18 +23,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
-import org.opentcs.components.kernel.RecoveryEvaluator;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.kernel.controlcenter.vehicles.AttachmentManager;
+import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
+import org.opentcs.kernel.extensions.xmlhost.orders.ScriptFileManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
-import org.opentcs.kernel.xmlhost.orders.ScriptFileManager;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  *
@@ -48,8 +53,6 @@ public class KernelStateOperatingTest {
 
   private TCSObjectPool objectPool;
 
-  private RecoveryEvaluator recoveryEvaluator;
-
   private Router router;
 
   private Scheduler scheduler;
@@ -65,7 +68,6 @@ public class KernelStateOperatingTest {
     objectID = 0;
     objectPool = mock(TCSObjectPool.class);
     configuration = mock(KernelApplicationConfiguration.class);
-    recoveryEvaluator = mock(RecoveryEvaluator.class);
     router = mock(Router.class);
     scheduler = mock(Scheduler.class);
     dispatcher = mock(Dispatcher.class);
@@ -86,7 +88,6 @@ public class KernelStateOperatingTest {
     KernelExtension extension = mock(KernelExtension.class);
     operating = createKernel(Collections.singleton(extension));
     operating.initialize();
-    verify(recoveryEvaluator, times(1)).initialize();
     verify(router, times(1)).initialize();
     verify(scheduler, times(1)).initialize();
     verify(dispatcher, times(1)).initialize();
@@ -100,7 +101,6 @@ public class KernelStateOperatingTest {
     operating = createKernel(Collections.singleton(extension));
     operating.initialize();
     operating.terminate();
-    verify(recoveryEvaluator, times(1)).terminate();
     verify(router, times(1)).terminate();
     verify(scheduler, times(1)).terminate();
     verify(dispatcher, times(1)).terminate();
@@ -109,6 +109,7 @@ public class KernelStateOperatingTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void initializeKernelWithVehiclesAsUnavailable() {
     Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
@@ -125,6 +126,7 @@ public class KernelStateOperatingTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void terminateKernelWithVehiclesAsUnavailable() {
     Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
@@ -147,22 +149,29 @@ public class KernelStateOperatingTest {
    * @param extensions The kernel extensions
    * @return The kernel to test
    */
+  @SuppressWarnings({"unchecked", "deprecation"})
   private KernelStateOperating createKernel(@Nonnull Set<KernelExtension> extensions) {
+    ScheduledExecutorService executorMock = mock(ScheduledExecutorService.class);
+    when(executorMock.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
+        .thenReturn(mock(ScheduledFuture.class));
+
     return spy(new KernelStateOperating(new Object(),
                                         objectPool,
                                         mock(Model.class),
                                         new TransportOrderPool(objectPool),
-                                        new NotificationBuffer(),
+                                        new NotificationBuffer(new SimpleEventBus()),
                                         mock(ModelPersister.class),
                                         configuration,
-                                        recoveryEvaluator,
+                                        mock(org.opentcs.components.kernel.RecoveryEvaluator.class),
                                         router,
                                         scheduler,
                                         dispatcher,
                                         controllerPool,
                                         mock(ScriptFileManager.class),
+                                        executorMock,
                                         mock(OrderCleanerTask.class),
                                         extensions,
-                                        attachmentManager));
+                                        attachmentManager,
+                                        mock(VehicleService.class)));
   }
 }

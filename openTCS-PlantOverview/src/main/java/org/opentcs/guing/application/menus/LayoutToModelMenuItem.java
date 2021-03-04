@@ -16,10 +16,10 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
-import net.engio.mbassy.bus.MBassador;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
@@ -33,6 +33,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * A menu item for copying the value of the layout properties of selected points
@@ -52,9 +53,9 @@ public class LayoutToModelMenuItem
    */
   private final UndoRedoManager undoRedoManager;
   /**
-   * The application's event bus.
+   * Where we send events.
    */
-  private final MBassador<Object> eventBus;
+  private final EventHandler eventHandler;
   /**
    * A flag if the values of ALL points and location shall be copied when
    * the menu item is clicked. If false only the selected figures will be
@@ -67,7 +68,7 @@ public class LayoutToModelMenuItem
    *
    * @param drawingEditor A <code>DrawingEditor</code> instance.
    * @param undoRedoManager The application's undo/redo manager.
-   * @param eventBus The application's event bus.
+   * @param eventHandler Where this instance sends events.
    * @param copyAll Indicates whether the values of ALL points and locations
    * shall be copied when the menu item is clicked. If false only the selected
    * figures will be considered.
@@ -75,12 +76,12 @@ public class LayoutToModelMenuItem
   @Inject
   public LayoutToModelMenuItem(OpenTCSDrawingEditor drawingEditor,
                                UndoRedoManager undoRedoManager,
-                               MBassador<Object> eventBus,
+                               @ApplicationEventBus EventHandler eventHandler,
                                @Assisted boolean copyAll) {
     super(ResourceBundleUtil.getBundle().getString("propertiesTable.fromLayout"));
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
-    this.eventBus = requireNonNull(eventBus, "eventBus");
+    this.eventHandler = requireNonNull(eventHandler, "eventHandler");
     this.copyAll = copyAll;
 
     setIcon(new ImageIcon(
@@ -102,7 +103,7 @@ public class LayoutToModelMenuItem
             updateModelX(model);
             updateModelY(model);
             model.propertiesChanged(new NullAttributesChangeListener());
-            eventBus.publish(new ResetInteractionToolCommand(this));
+            eventHandler.onEvent(new ResetInteractionToolCommand(this));
           }
         }
       }

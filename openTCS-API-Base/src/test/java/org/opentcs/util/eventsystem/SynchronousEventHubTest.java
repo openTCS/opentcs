@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public class SynchronousEventHubTest {
 
   private SynchronousEventHub<TCSEvent> hub = new SynchronousEventHub<>();

@@ -24,7 +24,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.DefaultDrawingEditor;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.DrawingView;
@@ -49,6 +48,7 @@ import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * The <code>DrawingEditor</code> coordinates <code>DrawingViews</code>
@@ -61,8 +61,13 @@ import org.opentcs.guing.util.CourseObjectFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSDrawingEditor
-    extends DefaultDrawingEditor {
+    extends DefaultDrawingEditor
+    implements EventHandler {
 
+  /**
+   * Width on the screen edge.
+   */
+  private static final int MARGIN = 20;
   /**
    * A factory for course objects.
    */
@@ -75,10 +80,6 @@ public class OpenTCSDrawingEditor
    *
    */
   private final CompositeFigureEventHandler cmpFigureEvtHandler = new CompositeFigureEventHandler();
-  /**
-   * Width on the screen edge.
-   */
-  private static final int MARGIN = 20;
   /**
    * The drawing that contains all figures.
    */
@@ -106,8 +107,17 @@ public class OpenTCSDrawingEditor
     this.modelManager = requireNonNull(modelManager, "modelManager");
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
+    }
+    if (event instanceof OperationModeChangeEvent) {
+      handleModeChange((OperationModeChangeEvent) event);
+    }
+  }
+
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
     switch (evt.getStage()) {
       case UNLOADING:
         // XXX Remove vehicles?
@@ -153,8 +163,7 @@ public class OpenTCSDrawingEditor
     vehicleFigure.propertiesChanged(new AttributesChangeEvent(new NullAttributesChangeListener(), vehicleModel));
   }
 
-  @Handler
-  public void handleModeChange(OperationModeChangeEvent evt) {
+  private void handleModeChange(OperationModeChangeEvent evt) {
     switch (evt.getNewMode()) {
       case MODELLING:
         showVehicles(modelManager.getModel().getVehicleModels(), false);

@@ -133,21 +133,15 @@ public class LinkConnection
   public void read(DOMInput in) {
   }
 
-  @Override // SimpleLineConnection
+  @Override
   public void updateModel() {
-    // Bei Link Connection ist nichts zu tun
   }
 
   @Override
   public void scaleModel(EventObject event) {
   }
 
-  @Override // LineConnectionFigure
-  public void updateConnection() {
-    super.updateConnection();
-  }
-
-  @Override // LineConnectionFigure
+  @Override
   public LinkConnection clone() {
     LinkConnection clone = (LinkConnection) super.clone();
     clone.initConnectionFigure();

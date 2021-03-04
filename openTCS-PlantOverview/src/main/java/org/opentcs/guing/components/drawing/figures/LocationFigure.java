@@ -14,24 +14,17 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
-import java.io.IOException;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.swing.Timer;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.components.plantoverview.LocationTheme;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
@@ -40,8 +33,6 @@ import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Ein Figure fï¿½r Stationen (ï¿½bergabestationen, Batterieladestationen) und
@@ -55,26 +46,11 @@ public class LocationFigure
     implements ImageObserver {
 
   /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(LocationFigure.class);
-  /**
    * The image representing the location.
    */
   private transient Image fImage;
-  /**
-   * An alternative image for a "blinking" representation.
-   * XXX Blinking is currently not implemented.
-   */
-  private transient Image fFlashImage;
-  // Die Ausdehnung der Figur
   private int fWidth;
   private int fHeight;
-  // Timer zur Darstellung eines "blinkenden" Bildes
-  private boolean showFlashImage;
-  private Timer flashTimer;
-////  // Label
-////  protected String fLabel;
   private final LocationTheme locationTheme;
 
   /**
@@ -169,26 +145,10 @@ public class LocationFigure
     g.fillRect(r.x, r.y, r.width, r.height);
 
     if (fImage != null) {
-      if (showFlashImage && fFlashImage != null) {
-        dx = (r.width - fFlashImage.getWidth(this)) / 2;
-        dy = (r.height - fFlashImage.getHeight(this)) / 2;
-        g.drawImage(fFlashImage, r.x + dx, r.y + dy, this);
-      }
-      else {
-        dx = (r.width - fImage.getWidth(this)) / 2;
-        dy = (r.height - fImage.getHeight(this)) / 2;
-        g.drawImage(fImage, r.x + dx, r.y + dy, this);
-      }
+      dx = (r.width - fImage.getWidth(this)) / 2;
+      dy = (r.height - fImage.getHeight(this)) / 2;
+      g.drawImage(fImage, r.x + dx, r.y + dy, this);
     }
-
-////    // Text
-////    g.setPaint(new Color(1.0f, 0.2f, 0.4f, 0.7f));
-////    Font font = new Font("Dialog", Font.PLAIN, 16);
-////    FontMetrics fontMetrics = g.getFontMetrics(font);
-////    dx = -fontMetrics.stringWidth(fLabel) / 2 - 1;
-////    dy = fontMetrics.getHeight() / 4;
-////    g.setFont(font);
-////    g.drawString(fLabel, (int) (r.getCenterX() + dx), (int) (r.getCenterY() + dy));
   }
 
   @Override  // AbstractAttributedFigure
@@ -213,45 +173,19 @@ public class LocationFigure
    */
   public void propertiesChanged(AttributesChangeEvent e) {
     LocationTypeModel locationType = getModel().getLocationType();
-//  // Ein Text, der im Bild dargestellt wird
-//  StringProperty pLabel = (StringProperty) model.getProperty(LocationModel.LABEL);
-//  fLabel = pLabel.getText();
 
     if (locationType != null) {
-      // Ein Symbol fï¿½r diese Location 
-      SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
+      SymbolProperty pSymbol = getModel().getPropertyDefaultRepresentation();
       LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
-      // Wenn fï¿½r diese Location kein eigenes Symbol spezifiziert ist, ...
+
       if (locationRepresentation == null
           || locationRepresentation == LocationRepresentation.DEFAULT) {
-        // ... das Default-Symbol des zugehï¿½rigen LocationTypes verwenden
-        pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+        pSymbol = locationType.getPropertyDefaultRepresentation();
         locationRepresentation = pSymbol.getLocationRepresentation();
         fImage = locationTheme.getImageFor(locationRepresentation);
       }
       else {
-        // ... sonst das eigene Symbol verwenden
         fImage = locationTheme.getImageFor(locationRepresentation);
-
-        // XXX Blinking should not depend on an image's file name. Maybe we
-        // XXX could make blinking an attribute of the representation enum?
-//        // Wenn das Symbol blinken soll: Abwechselnd das eigene Symbol ... 
-//        if (theme.getImagePathFor(locationRepresentation) != null
-//            && (theme.getImagePathFor(locationRepresentation)).contains("flash")) {
-//          fImageFileName = theme.getImagePathFor(locationRepresentation);
-//          fImage = loadImage(fImageFileName);
-//          // ... und das des LocationTypes zeichnen
-//          pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-//          locationRepresentation = pSymbol.getLocationRepresentation();
-//          fFlashImageFileName = theme.getImagePathFor(locationRepresentation);
-//          fFlashImage = loadImage(fFlashImageFileName);
-//          initTimer();
-//        }
-//        else {
-//          fFlashImage = null;
-//          fFlashImageFileName = null;
-//          stopTimer();
-//        }
       }
     }
 
@@ -269,51 +203,5 @@ public class LocationFigure
     }
 
     return (infoflags & (ALLBITS | ABORT)) == 0;
-  }
-
-  private void initTimer() {
-    if (flashTimer == null) {
-      flashTimer = new Timer(1000, new ActionListener() {
-                           @Override
-                           public void actionPerformed(ActionEvent e) {
-                             showFlashImage = !showFlashImage;
-                             fireFigureChanged();
-                           }
-                         });
-    }
-
-    flashTimer.restart();
-  }
-
-  private void stopTimer() {
-    if (flashTimer != null) {
-      flashTimer.stop();
-    }
-
-    showFlashImage = false;
-  }
-
-  /**
-   * Loads an image from the file with the given name.
-   *
-   * @param fileName The name of the file from which to load the image.
-   * @return The image, or <code>null</code>, if it could not be loaded.
-   */
-  private Image loadImage(String fileName) {
-    if (fileName == null) {
-      return null;
-    }
-    URL url = getClass().getResource(fileName);
-    if (url == null) {
-      LOG.warn("Invalid image file name " + fileName);
-      return null;
-    }
-    try {
-      return ImageIO.read(url);
-    }
-    catch (IOException exc) {
-      LOG.warn("Exception loading image", exc);
-      return null;
-    }
   }
 }

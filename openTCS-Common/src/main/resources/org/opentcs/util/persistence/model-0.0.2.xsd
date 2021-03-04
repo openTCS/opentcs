@@ -139,7 +139,7 @@
                    type="xsd:unsignedInt"
                    use="optional"/>
     <xsd:attribute name="routingCost"
-                   type="xsd:unsignedInt"
+                   type="xsd:long"
                    use="optional"/>
     <xsd:attribute name="maxVelocity"
                    type="xsd:unsignedInt"

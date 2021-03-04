@@ -13,12 +13,12 @@ import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
-import org.opentcs.components.kernel.RecoveryEvaluator;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A base class for Guice modules adding or customizing bindings for the kernel application.
@@ -53,6 +53,7 @@ public abstract class KernelInjectionModule
    * @deprecated Will be removed along with the deprecated supplier interface.
    */
   @Deprecated
+  @ScheduledApiChange(when = "5.0")
   protected void bindParkingPositionSupplier(
       Class<? extends org.opentcs.components.kernel.ParkingPositionSupplier> clazz) {
     bind(org.opentcs.components.kernel.ParkingPositionSupplier.class).to(clazz).in(Singleton.class);
@@ -65,6 +66,7 @@ public abstract class KernelInjectionModule
    * @deprecated Will be removed along with the deprecated supplier interface.
    */
   @Deprecated
+  @ScheduledApiChange(when = "5.0")
   protected void bindRechargePositionSupplier(
       Class<? extends org.opentcs.components.kernel.RechargePositionSupplier> clazz) {
     bind(org.opentcs.components.kernel.RechargePositionSupplier.class).to(clazz).in(Singleton.class);
@@ -83,9 +85,14 @@ public abstract class KernelInjectionModule
    * Sets the recovery evaluator implementation to be used.
    *
    * @param clazz The implementation.
+   * @deprecated The definition of <em>recovered</em> is unclear. Unless it is clearly specified,
+   * evaluation of a state of recovery should not be part of the API.
    */
-  protected void bindRecoveryEvaluator(Class<? extends RecoveryEvaluator> clazz) {
-    bind(RecoveryEvaluator.class).to(clazz).in(Singleton.class);
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  protected void bindRecoveryEvaluator(
+      Class<? extends org.opentcs.components.kernel.RecoveryEvaluator> clazz) {
+    bind(org.opentcs.components.kernel.RecoveryEvaluator.class).to(clazz).in(Singleton.class);
   }
 
   /**

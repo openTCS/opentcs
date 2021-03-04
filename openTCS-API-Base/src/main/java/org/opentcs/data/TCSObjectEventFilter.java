@@ -10,7 +10,6 @@ package org.opentcs.data;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
  * A filter for <code>TCSObjectEvent</code>s.
@@ -45,7 +44,7 @@ import org.opentcs.util.eventsystem.TCSEvent;
 @Deprecated
 @ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class TCSObjectEventFilter
-    implements org.opentcs.util.eventsystem.EventFilter<TCSEvent>,
+    implements org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent>,
                Serializable {
 
   /**
@@ -86,7 +85,7 @@ public class TCSObjectEventFilter
   }
 
   @Override
-  public boolean accept(TCSEvent event) {
+  public boolean accept(org.opentcs.util.eventsystem.TCSEvent event) {
     boolean result = false;
     if (!(event instanceof TCSObjectEvent)) {
       return false;

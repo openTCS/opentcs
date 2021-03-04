@@ -68,7 +68,7 @@ public class BlockModel
 
   @Override  // AbstractModelComponent
   public void propertiesChanged(AttributesChangeListener listener) {
-    if (getProperty(ElementPropKeys.BLOCK_COLOR).hasChanged()) {
+    if (getPropertyColor().hasChanged()) {
       colorChanged();
     }
 
@@ -81,9 +81,7 @@ public class BlockModel
    * @return The color.
    */
   public Color getColor() {
-    ColorProperty property = (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
-
-    return property.getColor();
+    return getPropertyColor().getColor();
   }
 
   /**
@@ -94,10 +92,9 @@ public class BlockModel
   public void addCourseElement(ModelComponent model) {
     if (!contains(model)) {
       getChildComponents().add(model);
-      StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
       String addedModelName = model.getName();
-      if (!pElements.getItems().contains(addedModelName)) {
-        pElements.addItem(addedModelName);
+      if (!getPropertyElements().getItems().contains(addedModelName)) {
+        getPropertyElements().addItem(addedModelName);
       }
     }
   }
@@ -110,9 +107,7 @@ public class BlockModel
   public void removeCourseElement(ModelComponent model) {
     if (contains(model)) {
       remove(model);
-      StringSetProperty pElements = (StringSetProperty) getProperty(ELEMENTS);
-      String removedModelName = model.getName();
-      pElements.getItems().remove(removedModelName);
+      getPropertyElements().getItems().remove(model.getName());
     }
   }
 
@@ -174,6 +169,18 @@ public class BlockModel
     for (BlockChangeListener listener : new ArrayList<>(fListeners)) {
       listener.blockRemoved(new BlockChangeEvent(this));
     }
+  }
+
+  public ColorProperty getPropertyColor() {
+    return (ColorProperty) getProperty(ElementPropKeys.BLOCK_COLOR);
+  }
+
+  public StringSetProperty getPropertyElements() {
+    return (StringSetProperty) getProperty(ELEMENTS);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
 
   private void createProperties() {

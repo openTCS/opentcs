@@ -21,9 +21,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.opentcs.guing.application.GuiManager;
-import org.opentcs.guing.components.properties.type.SpeedProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
 import org.opentcs.guing.model.elements.AbstractConnection;
-import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -161,22 +160,22 @@ public class AddNodesToStaticRoutePanel
     List<PointModel> points = new ArrayList<>();
 
     for (AbstractConnection connection : point.getConnections()) {
-      if (connection instanceof LinkModel) {
+      if (!(connection instanceof PathModel)) {
         continue;
       }
 
-      SpeedProperty p = (SpeedProperty) connection.getProperty(PathModel.MAX_VELOCITY);
+      PathModel pathConnection = (PathModel) connection;
 
       if (connection.getStartComponent() == point) { // Outgoing path
-        if ((double) p.getValue() > 0.0) { // Point can be reached driving forward
+        if (pathConnection.getPropertyMaxVelocity().getValueByUnit(Unit.MM_S) > 0.0) {
+          // Point can be reached driving forward
           points.add((PointModel) connection.getEndComponent());
         }
       }
 
-      p = (SpeedProperty) connection.getProperty(PathModel.MAX_REVERSE_VELOCITY);
-
       if (connection.getEndComponent() == point) {  // Incoming path
-        if ((double) p.getValue() > 0.0) {  // Point can be reached driving backward
+        if (pathConnection.getPropertyMaxReverseVelocity().getValueByUnit(Unit.MM_S) > 0.0) {
+          // Point can be reached driving backward
           points.add((PointModel) connection.getStartComponent());
         }
       }

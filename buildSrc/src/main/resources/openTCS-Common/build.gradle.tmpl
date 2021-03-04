@@ -1,0 +1,16 @@
+dependencies {
+  compile group: 'org.opentcs', name: 'opentcs-api-base', version: openTcsBaselineVersion
+  compileOnly group: 'org.opentcs', name: 'opentcs-api-base', version: openTcsBaselineVersion, classifier: 'sources'
+}
+
+processResources.doLast {
+  // Write a properties file with the customization build version and date.
+  def props = new Properties()
+  props.setProperty('opentcs.customization.name', '%PROJECT_NAME%')
+  props.setProperty('opentcs.customization.version', version)
+  props.setProperty('opentcs.customization.builddate', project.ext.buildDate)
+  
+  new File(sourceSets.main.output.resourcesDir, 'opentcs-customization.properties').withWriter() {
+    props.store(it, null)
+  }
+}

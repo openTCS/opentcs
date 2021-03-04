@@ -15,8 +15,8 @@ import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -44,22 +44,21 @@ public class OrderSequenceView
    */
   private final OrderSequence fOrderSequence;
   /**
-   * The proxy/connection manager to be used.
+   * The portal provider to be used.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
 
   /**
    * Creates new instance.
    *
    * @param sequence The order sequence.
-   * @param kernelProvider Provides access to a kernel.
+   * @param portalProvider Provides access to a portal.
    */
   @Inject
   public OrderSequenceView(@Assisted OrderSequence sequence,
-                           SharedKernelProvider kernelProvider) {
+                           SharedKernelServicePortalProvider portalProvider) {
     this.fOrderSequence = requireNonNull(sequence, "sequence");
-    this.kernelProvider = requireNonNull(kernelProvider,
-                                         "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     initComponents();
     initFields();
   }
@@ -348,8 +347,9 @@ public class OrderSequenceView
                                           JOptionPane.YES_NO_OPTION);
 
     if (n == JOptionPane.OK_OPTION) {
-      try (SharedKernelClient client = kernelProvider.register()) {
-        client.getKernel().setOrderSequenceComplete(fOrderSequence.getReference());
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+        sharedPortal.getPortal().getTransportOrderService()
+            .markOrderSequenceComplete(fOrderSequence.getReference());
         checkBoxComplete.setEnabled(false);
       }
       catch (KernelRuntimeException exc) {

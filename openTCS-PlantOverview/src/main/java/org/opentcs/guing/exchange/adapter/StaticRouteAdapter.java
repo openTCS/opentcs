@@ -9,27 +9,24 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.components.properties.type.ColorProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
+import org.opentcs.util.Colors;
 
 /**
  * An adapter for static routes.
@@ -41,70 +38,70 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 public class StaticRouteAdapter
     extends AbstractProcessAdapter {
 
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public StaticRouteAdapter(@Assisted StaticRouteModel model,
-                            @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
-  }
-
-  @Override
-  public StaticRouteModel getModel() {
-    return (StaticRouteModel) super.getModel();
-  }
-
   @Override // OpenTCSProcessAdapter
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
                                     @Nullable ModelLayoutElement layoutElement) {
     org.opentcs.data.model.StaticRoute route
         = requireNonNull((org.opentcs.data.model.StaticRoute) tcsObject, "tcsObject");
+    StaticRouteModel model = (StaticRouteModel) modelComponent;
 
-    StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    name.setText(route.getName());
+    model.getPropertyName().setText(route.getName());
 
-    getModel().removeAllPoints();
+    model.removeAllPoints();
 
     for (TCSObjectReference<Point> pointRef : route.getHops()) {
-      ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(pointRef);
-      getModel().addPoint((PointModel) adapter.getModel());
+      PointModel hop = systemModel.getPointModel(pointRef.getName());
+      model.addPoint(hop);
     }
 
-    updateMiscModelProperties(route);
+    updateMiscModelProperties(model, route);
+
+    if (layoutElement != null) {
+      updateModelLayoutProperties(model, layoutElement);
+    }
   }
 
   @Override // OpenTCSProcessAdapter
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    plantModel.getStaticRoutes().add(
-        new org.opentcs.access.to.model.StaticRouteCreationTO(getModel().getName())
-            .setHopNames(getHopNames())
-            .setProperties(getKernelProperties()));
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    return plantModel
+        .withStaticRoute(
+            new org.opentcs.access.to.model.StaticRouteCreationTO(modelComponent.getName())
+                .withHopNames(getHopNames((StaticRouteModel) modelComponent))
+                .withProperties(getKernelProperties(modelComponent))
+        )
+        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts()));
+  }
 
-    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-      updateLayoutElement(layout);
+  private void updateModelLayoutProperties(StaticRouteModel model,
+                                           ModelLayoutElement layoutElement) {
+    String sBlockColor = layoutElement.getProperties().get(ElementPropKeys.BLOCK_COLOR);
+    if (sBlockColor != null) {
+      model.getPropertyColor().setColor(Colors.decodeFromHexRGB(sBlockColor));
     }
   }
 
-  private List<String> getHopNames() {
+  private List<String> getHopNames(StaticRouteModel staticRouteModel) {
     List<String> result = new LinkedList<>();
-    for (ModelComponent model : getModel().getChildComponents()) {
+    for (ModelComponent model : staticRouteModel.getChildComponents()) {
       result.add(model.getName());
     }
     return result;
   }
 
-  private void updateLayoutElement(VisualLayoutCreationTO layout) {
-    ColorProperty pColor = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
-    int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
+  @Override
+  protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
+                                                 VisualLayoutCreationTO layout) {
+    StaticRouteModel staticRouteModel = (StaticRouteModel) model;
 
-    layout.getModelElements().add(
-        new ModelLayoutElementCreationTO(getModel().getName())
-            .setProperty(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb))
+    return layout.withModelElement(
+        new ModelLayoutElementCreationTO(staticRouteModel.getName())
+            .withProperty(ElementPropKeys.BLOCK_COLOR,
+                          Colors.encodeToHexRGB(staticRouteModel.getPropertyColor().getColor()))
     );
   }
 

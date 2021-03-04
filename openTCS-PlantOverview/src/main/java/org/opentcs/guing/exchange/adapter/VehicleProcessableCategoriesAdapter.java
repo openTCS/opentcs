@@ -10,15 +10,15 @@ package org.opentcs.guing.exchange.adapter;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +40,9 @@ public class VehicleProcessableCategoriesAdapter
    */
   private final VehicleModel model;
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * The state of the plant overview.
    */
@@ -55,14 +55,14 @@ public class VehicleProcessableCategoriesAdapter
   /**
    * Creates a new instance.
    *
-   * @param kernelProvider A kernel provider.
+   * @param portalProvider A kernel provider.
    * @param applicationState Keeps the plant overview's state.
    * @param model The vehicle model.
    */
-  public VehicleProcessableCategoriesAdapter(SharedKernelProvider kernelProvider,
+  public VehicleProcessableCategoriesAdapter(SharedKernelServicePortalProvider portalProvider,
                                              ApplicationState applicationState,
                                              VehicleModel model) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.applicationState = requireNonNull(applicationState, "applicationState");
     this.model = requireNonNull(model, "model");
     this.previousProcessableCategories = getProcessableCategories();
@@ -92,27 +92,26 @@ public class VehicleProcessableCategoriesAdapter
   }
 
   private Set<String> getProcessableCategories() {
-    OrderCategoriesProperty categories
-        = (OrderCategoriesProperty) model.getProperty(VehicleModel.PROCESSABLE_CATEGORIES);
-    return categories.getItems();
+    return model.getPropertyProcessableCategories().getItems();
   }
 
   private void updateProcessableCategoriesInKernel(Set<String> processableCategories) {
-    try (SharedKernelClient localKernelClient = kernelProvider.register()) {
-      Kernel kernel = localKernelClient.getKernel();
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      KernelServicePortal portal = sharedPortal.getPortal();
       // Check if the kernel is in operating mode, too.
-      if (kernel.getState() == Kernel.State.OPERATING) {
-        Vehicle vehicle = kernel.getTCSObject(Vehicle.class, model.getName());
+      if (portal.getState() == Kernel.State.OPERATING) {
+        Vehicle vehicle = portal.getVehicleService().fetchObject(Vehicle.class, model.getName());
         if (vehicle.getProcessableCategories().size() == processableCategories.size()
             && vehicle.getProcessableCategories().containsAll(processableCategories)) {
           LOG.debug("Ignoring vehicle properties update. Already up do date.");
           return;
         }
-        kernel.setVehicleProcessableCategories(vehicle.getReference(), processableCategories);
+        portal.getVehicleService().updateVehicleProcessableCategories(vehicle.getReference(),
+                                                                      processableCategories);
       }
 
     }
-    catch (KernelUnavailableException exc) {
+    catch (ServiceUnavailableException exc) {
       LOG.warn("Could not connect to kernel", exc);
     }
   }

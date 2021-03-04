@@ -8,6 +8,7 @@
 package org.opentcs.access.rmi;
 
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A proxy for a {@link Kernel} instance that hides the details of communication with a remote
@@ -17,7 +18,10 @@ import org.opentcs.access.Kernel;
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @see KernelProxyBuilder
+ * @deprecated Use {@link KernelServicePortalBuilder} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public interface KernelProxy
     extends Kernel,
             RemoteKernelConnection {

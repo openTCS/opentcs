@@ -11,7 +11,6 @@ package org.opentcs.access.rmi;
 
 import java.lang.reflect.Method;
 import org.junit.*;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import org.opentcs.access.Kernel;
 import org.slf4j.Logger;
@@ -27,29 +26,19 @@ public class RemoteKernelTest {
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(RemoteKernelTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteKernelTest.class);
 
-  @Before
-  public void setUp() {
-    // Do nada.
-  }
-
-  @After
-  public void tearDown() {
-    // Do nada.
-  }
-
-  /**
-   * Verify that RemoteKernel has corresponding methods for all methods declared
-   * in the Kernel interface.
-   */
   @Test
-  public void testEquivalenceToKernelInterface() {
+  @SuppressWarnings("deprecation")
+  public void shouldMapAllMethodsInKernelInterface() {
     for (Method kernelMethod : Kernel.class.getDeclaredMethods()) {
       try {
+        if (shouldIgnoreMethod(kernelMethod)) {
+          continue;
+        }
+
         Method neededMethod = RemoteMethods.getRemoteKernelMethod(kernelMethod);
-        log.debug("Found " + neededMethod + " corresponding to " + kernelMethod);
+        LOG.debug("Found {} corresponding to {}", neededMethod, kernelMethod);
       }
       catch (NoSuchMethodException exc) {
         fail("Did not find corresponding method for: " + kernelMethod);
@@ -57,11 +46,17 @@ public class RemoteKernelTest {
     }
   }
 
-  @Test
-  public void testPermissionAnnotations() {
-    for (Method method : RemoteKernel.class.getDeclaredMethods()) {
-      CallPermissions perms = method.getAnnotation(CallPermissions.class);
-      assertNotNull("No permissions annotation at method " + method, perms);
+  @SuppressWarnings("deprecation")
+  private boolean shouldIgnoreMethod(Method method) {
+    boolean ignore = false;
+
+    // Ignore overriden methods from EventSoruce 
+    for (Method eventSourceMethod : org.opentcs.util.eventsystem.EventSource.class.getDeclaredMethods()) {
+      if (method.getName().equals(eventSourceMethod.getName())) {
+        ignore = true;
+      }
     }
+
+    return ignore;
   }
 }

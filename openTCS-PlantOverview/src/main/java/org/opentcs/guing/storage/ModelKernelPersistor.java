@@ -14,23 +14,10 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.KernelServicePortal;
 import org.opentcs.guing.application.StatusPanel;
-import org.opentcs.guing.exchange.EventDispatcher;
-import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.model.elements.BlockModel;
-import org.opentcs.guing.model.elements.GroupModel;
-import org.opentcs.guing.model.elements.LayoutModel;
-import org.opentcs.guing.model.elements.LinkModel;
-import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.opentcs.guing.model.elements.PathModel;
-import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
-import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.JOptionPaneUtil;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
@@ -56,33 +43,40 @@ public class ModelKernelPersistor {
    */
   private final Provider<ModelValidator> validatorProvider;
 
+  private final ModelExportAdapter modelExportAdapter;
+
   /**
    * Creates a new instance.
    *
    * @param statusPanel A status panel for logging error messages.
    * @param validatorProvider Provides validators for system models.
+   * @param modelExportAdapter Converts model data on export.
    */
   @Inject
   public ModelKernelPersistor(@Nonnull StatusPanel statusPanel,
-                              @Nonnull Provider<ModelValidator> validatorProvider) {
+                              @Nonnull Provider<ModelValidator> validatorProvider,
+                              ModelExportAdapter modelExportAdapter) {
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.validatorProvider = requireNonNull(validatorProvider, "validatorProvider");
+    this.modelExportAdapter = requireNonNull(modelExportAdapter, "modelExportAdapter");
   }
 
   /**
    * Persists the given model to the given kernel.
    *
    * @param systemModel The model to be persisted.
-   * @param kernel The kernel to persist to.
+   * @param portal The plant model service used to persist to the kernel.
    * @param ignoreValidationErrors Whether to ignore any validation errors.
    * @return {@code true} if, and only if, the model was valid or validation errors were to be
    * ignored.
    * @throws IllegalStateException If there was a problem persisting the model on the kernel side.
    */
-  public boolean persist(SystemModel systemModel, Kernel kernel, boolean ignoreValidationErrors)
+  public boolean persist(SystemModel systemModel,
+                         KernelServicePortal portal,
+                         boolean ignoreValidationErrors)
       throws IllegalStateException {
     requireNonNull(systemModel, "systemModel");
-    requireNonNull(kernel, "kernel");
+    requireNonNull(portal, "plantModelService");
 
     LOG.debug("Validating model...");
     long timeBefore = System.currentTimeMillis();
@@ -93,7 +87,7 @@ public class ModelKernelPersistor {
 
     LOG.debug("Persisting model...");
     timeBefore = System.currentTimeMillis();
-    persistModelElements(kernel, systemModel);
+    portal.getPlantModelService().createPlantModel(modelExportAdapter.convert(systemModel));
     LOG.debug("Persisting to kernel took {} milliseconds.", System.currentTimeMillis() - timeBefore);
 
     return true;
@@ -119,93 +113,4 @@ public class ModelKernelPersistor {
     return valid;
   }
 
-  private void persistModelElements(Kernel kernel, SystemModel systemModel)
-      throws IllegalStateException {
-
-    PlantModelCreationTO plantModel = new PlantModelCreationTO(systemModel.getName());
-
-    long timeBefore = System.currentTimeMillis();
-    for (LayoutModel model : systemModel.getLayoutModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting LayoutModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (PointModel model : systemModel.getPointModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting PointModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (PathModel model : systemModel.getPathModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting PathModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (LocationTypeModel model : systemModel.getLocationTypeModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting LocationTypeModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (LocationModel model : systemModel.getLocationModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting LocationModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (LinkModel model : systemModel.getLinkModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting LinkModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (BlockModel model : systemModel.getBlockModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting BlockModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (GroupModel model : systemModel.getGroupModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting GroupModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (StaticRouteModel model : systemModel.getStaticRouteModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting StaticRouteModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    timeBefore = System.currentTimeMillis();
-    for (VehicleModel model : systemModel.getVehicleModels()) {
-      persist(model, systemModel.getEventDispatcher(), plantModel);
-    }
-    LOG.debug("Persisting VehicleModels to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
-
-    kernel.createPlantModel(plantModel);
-  }
-
-  private void persist(ModelComponent component,
-                       EventDispatcher eventDispatcher,
-                       PlantModelCreationTO plantModel) {
-    ProcessAdapter adapter = eventDispatcher.findProcessAdapter(component);
-    if (adapter != null) {
-      adapter.storeToPlantModel(plantModel);
-    }
-    else {
-      LOG.warn("No process adapter for model component {} was found.", component.getName());
-    }
-  }
 }

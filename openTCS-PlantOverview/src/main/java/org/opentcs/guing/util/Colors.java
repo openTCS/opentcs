@@ -12,8 +12,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
@@ -67,8 +65,7 @@ public class Colors {
 
     List<Color> usedColors = new ArrayList<>();
     for (BlockModel block : blocks) {
-      ColorProperty cp = (ColorProperty) block.getProperty(ElementPropKeys.BLOCK_COLOR);
-      usedColors.add(cp.getColor());
+      usedColors.add(block.getPropertyColor().getColor());
     }
     for (Color color : colors) {
       if (!usedColors.contains(color)) {
@@ -92,8 +89,7 @@ public class Colors {
 
     List<Color> usedColors = new ArrayList<>();
     for (VehicleModel vehicle : vehicles) {
-      ColorProperty cp = (ColorProperty) vehicle.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
-      usedColors.add(cp.getColor());
+      usedColors.add(vehicle.getPropertyRouteColor().getColor());
     }
     for (Color color : colors) {
       if (!usedColors.contains(color)) {

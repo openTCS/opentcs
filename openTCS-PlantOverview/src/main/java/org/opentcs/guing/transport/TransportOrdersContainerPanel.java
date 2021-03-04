@@ -35,10 +35,9 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
@@ -51,6 +50,7 @@ import org.opentcs.guing.event.TransportOrderEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,15 +64,16 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrdersContainerPanel
-    extends JPanel {
+    extends JPanel
+    implements EventHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransportOrdersContainerPanel.class);
 
   private static final String fIconPath = "/org/opentcs/guing/res/symbols/panel/";
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * A helper for creating transport orders with the kernel.
    */
@@ -101,40 +102,31 @@ public class TransportOrdersContainerPanel
   /**
    * Creates a new instance of TransportOrdersView.
    *
-   * @param kernelProvider Provides a access to a kernel.
+   * @param portalProvider Provides a access to a portal.
    * @param orderUtil A helper for creating transport orders with the kernel.
    * @param orderPanelProvider Provides panels for entering new transport orders.
    */
   @Inject
-  public TransportOrdersContainerPanel(SharedKernelProvider kernelProvider,
+  public TransportOrdersContainerPanel(SharedKernelServicePortalProvider portalProvider,
                                        TransportOrderUtil orderUtil,
                                        Provider<CreateTransportOrderPanel> orderPanelProvider) {
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.orderPanelProvider = requireNonNull(orderPanelProvider,
                                              "orderPanelProvider");
     initComponents();
   }
 
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
-    switch (evt.getStage()) {
-      case UNLOADING:
-        // XXX Clear panel?
-        break;
-      case LOADED:
-        initView();
-        break;
-      default:
-      // Do nada.
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof SystemModelTransitionEvent) {
+      handleSystemModelTransition((SystemModelTransitionEvent) event);
     }
-  }
-
-  @Handler
-  public void processEvent(KernelStateChangeEvent event) {
-    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
-      fTableModel.setRowCount(0);
-      fTableModel.fireTableDataChanged();
+    if (event instanceof KernelStateChangeEvent) {
+      handleKernelStateChange((KernelStateChangeEvent) event);
+    }
+    if (event instanceof TransportOrderEvent) {
+      handleOrderEvent((TransportOrderEvent) event);
     }
   }
 
@@ -146,9 +138,10 @@ public class TransportOrdersContainerPanel
   }
 
   private Set<TransportOrder> fetchOrdersIfOnline() {
-    if (kernelProvider.kernelShared()) {
-      try (SharedKernelClient kernelClient = kernelProvider.register()) {
-        return kernelClient.getKernel().getTCSObjects(TransportOrder.class);
+    if (portalProvider.portalShared()) {
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+        return sharedPortal.getPortal().getTransportOrderService()
+            .fetchObjects(TransportOrder.class);
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception fetching transport orders", exc);
@@ -204,12 +197,12 @@ public class TransportOrdersContainerPanel
   }
 
   private void showTransportOrder() {
-    try (SharedKernelClient kernelClient = kernelProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       TransportOrder transportOrder = getSelectedTransportOrder();
 
       if (transportOrder != null) {
-        transportOrder = kernelClient.getKernel().getTCSObject(TransportOrder.class,
-                                                               transportOrder.getReference());
+        transportOrder = sharedPortal.getPortal().getTransportOrderService()
+            .fetchObject(TransportOrder.class, transportOrder.getReference());
         DialogContent content = new TransportOrderView(transportOrder);
         StandardContentDialog dialog
             = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
@@ -231,8 +224,9 @@ public class TransportOrdersContainerPanel
     if (to == null) {
       return;
     }
-    try (SharedKernelClient kernelClient = kernelProvider.register()) {
-      to = kernelClient.getKernel().getTCSObject(TransportOrder.class, to.getReference());
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      to = sharedPortal.getPortal().getTransportOrderService()
+          .fetchObject(TransportOrder.class, to.getReference());
       CreateTransportOrderPanel content = orderPanelProvider.get();
       content.setPattern(to);
       StandardContentDialog dialog
@@ -383,8 +377,27 @@ public class TransportOrdersContainerPanel
     }
   }
 
-  @Handler
-  public void handleOrderEvent(TransportOrderEvent evt) {
+  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
+    switch (evt.getStage()) {
+      case UNLOADING:
+        // XXX Clear panel?
+        break;
+      case LOADED:
+        initView();
+        break;
+      default:
+      // Do nada.
+    }
+  }
+
+  private void handleKernelStateChange(KernelStateChangeEvent event) {
+    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
+      fTableModel.setRowCount(0);
+      fTableModel.fireTableDataChanged();
+    }
+  }
+
+  private void handleOrderEvent(TransportOrderEvent evt) {
     switch (evt.getType()) {
       case ORDER_CREATED:
         transportOrderAdded(evt.getOrder());
@@ -563,9 +576,10 @@ public class TransportOrdersContainerPanel
       toWithdraw.add(order);
     }
 
-    try (SharedKernelClient kernelClient = kernelProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       for (TransportOrder order : toWithdraw) {
-        kernelClient.getKernel().withdrawTransportOrder(order.getReference(), false, false);
+        sharedPortal.getPortal().getDispatcherService()
+            .withdrawByTransportOrder(order.getReference(), false, false);
       }
     }
     catch (KernelRuntimeException exc) {

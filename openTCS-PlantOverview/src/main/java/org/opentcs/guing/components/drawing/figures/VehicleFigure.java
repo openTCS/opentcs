@@ -24,6 +24,7 @@ import static java.awt.image.ImageObserver.ALLBITS;
 import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.util.Collection;
 import java.util.LinkedList;
+import static java.util.Objects.requireNonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -44,9 +45,7 @@ import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
-import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
@@ -55,7 +54,6 @@ import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -188,6 +186,7 @@ public class VehicleFigure
     String nextPositionDesc = ResourceBundleUtil.getBundle().getString("vehicle.nextPoint.text");
     String stateDesc = ResourceBundleUtil.getBundle().getString("vehicle.state.text");
     String procStateDesc = ResourceBundleUtil.getBundle().getString("vehicle.procState.text");
+    String integrationLevelDesc = ResourceBundleUtil.getBundle().getString("vehicle.integrationLevel.text");
     String energyDesc = ResourceBundleUtil.getBundle().getString("vehicle.energyLevel.text");
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(vehicleDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
@@ -195,13 +194,11 @@ public class VehicleFigure
         .append(model.getPoint() != null ? model.getPoint().getName() : "?");
     sb.append("<br>").append(nextPositionDesc).append(": ")
         .append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
-    AbstractProperty sp = (AbstractProperty) model.getProperty(VehicleModel.STATE);
-    sb.append("<br>").append(stateDesc).append(": ").append(sp.getValue().toString());
-    sp = (AbstractProperty) model.getProperty(VehicleModel.PROC_STATE);
-    sb.append("<br>").append(procStateDesc).append(": ").append(sp.getValue().toString());
-    AbstractProperty pEnergyState = (AbstractProperty) model.getProperty(VehicleModel.ENERGY_STATE);
-    VehicleModel.EnergyState state = (VehicleModel.EnergyState) pEnergyState.getValue();
+    sb.append("<br>").append(stateDesc).append(": ").append(model.getPropertyState().getValue());
+    sb.append("<br>").append(procStateDesc).append(": ").append(model.getPropertyProcState().getValue());
+    sb.append("<br>").append(integrationLevelDesc).append(": ").append(model.getPropertyIntegrationLevel().getValue());
 
+    VehicleModel.EnergyState state = (VehicleModel.EnergyState) model.getPropertyEnergyState().getValue();
     String sColor;
     switch (state) {
       case CRITICAL:
@@ -221,7 +218,7 @@ public class VehicleFigure
     }
 
     sb.append("<br>").append(energyDesc).append(": <font color=").append(sColor).append(">")
-        .append(((PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL)).getValue())
+        .append(model.getPropertyEnergyLevel().getValue())
         .append("%</font>");
     sb.append("</html>");
 
@@ -327,8 +324,8 @@ public class VehicleFigure
       fAngle = angle;
     }
     else if (currentPoint != null) {
-      // Winkelausrichtung aus Property des aktuellen Punktes bestimmen
-      AngleProperty ap = (AngleProperty) currentPoint.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
+      // Use orientation from current point.
+      AngleProperty ap = currentPoint.getPropertyVehicleOrientationAngle();
 
       if (ap != null) {
         angle = (double) ap.getValue();

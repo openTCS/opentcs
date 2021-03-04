@@ -11,10 +11,10 @@ package org.opentcs.guing.application.menus.menubar;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.JMenuBar;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
 
 /**
  * The plant overview's main menu bar.
@@ -22,7 +22,8 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class ApplicationMenuBar
-    extends JMenuBar {
+    extends JMenuBar
+    implements EventHandler {
 
   private final FileMenu menuFile;
   private final EditMenu menuEdit;
@@ -74,13 +75,14 @@ public class ApplicationMenuBar
     add(menuHelp);
   }
 
-  /**
-   * Handles changes of the application's operation mode.
-   *
-   * @param evt The mode change event.
-   */
-  @Handler
-  public void handleModeChange(OperationModeChangeEvent evt) {
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof OperationModeChangeEvent) {
+      handleModeChange((OperationModeChangeEvent) event);
+    }
+  }
+
+  private void handleModeChange(OperationModeChangeEvent evt) {
     setOperationMode(evt.getNewMode());
   }
 

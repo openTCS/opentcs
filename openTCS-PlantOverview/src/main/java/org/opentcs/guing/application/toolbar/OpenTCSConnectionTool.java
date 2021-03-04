@@ -14,6 +14,7 @@ import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.ConnectionTool;
+import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -49,6 +50,10 @@ public class OpenTCSConnectionTool
       createdFigure.willChange();
       createdFigure.setStartConnector(startConnector);
       createdFigure.setEndConnector(endConnector);
+      if (createdFigure instanceof SimpleLineConnection) {
+        ((SimpleLineConnection) createdFigure).getModel().updateName();
+      }
+
       createdFigure.changed();
 
       final Figure addedFigure = createdFigure;

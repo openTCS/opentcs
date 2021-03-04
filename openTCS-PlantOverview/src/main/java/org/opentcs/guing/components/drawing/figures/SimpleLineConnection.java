@@ -21,7 +21,6 @@ import org.jhotdraw.draw.LineConnectionFigure;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.decoration.ArrowTip;
 import org.jhotdraw.geom.BezierPath;
-import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
@@ -40,7 +39,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SimpleLineConnection
     extends LineConnectionFigure
-    implements AttributesChangeListener, OriginChangeListener {
+    implements AttributesChangeListener,
+               OriginChangeListener {
 
   protected static final AttributeKey<Color> FILL_COLOR
       = new AttributeKey<>("FillColor", Color.class);
@@ -126,28 +126,28 @@ public abstract class SimpleLineConnection
    * der Maï¿½stab des Layout geï¿½ndert hat
    */
   public abstract void updateModel();
+
   /**
    * Scales the model coodinates accodring to changes to the layout scale.
-   * 
+   *
    * @param event The event containing the layout scale change.
    */
   public abstract void scaleModel(EventObject event);
 
   /**
+   * Calculates the euclid distance between the start position and the end position.
    *
-   * @param p1
-   * @param p2
-   * @return
+   * @param startPosX The x coordiante of the start position.
+   * @param startPosY The y coordiante of the start position.
+   * @param endPosX The x coordinate of the end position.
+   * @param endPosY The y coordinate of the end position.
+   * @return the euclid distance between start and end point rounded to the next integer.
    */
-  protected double distance(ZoomPoint p1, ZoomPoint p2) {
-    double dX = p1.getX() - p2.getX();
-    double dY = p1.getY() - p2.getY();
+  protected double distance(double startPosX, double startPosY, double endPosX, double endPosY) {
+    double dX = startPosX - endPosX;
+    double dY = startPosY - endPosY;
     double dist = Math.sqrt(dX * dX + dY * dY);
-    // TODO: ScaleX, ScaleY berï¿½cksichtigen
-
-//    path.validatePath();
-//    dist = path.getLengthOfPath(1.5);  // TEST! Welcher Faktor?
-    dist = Math.floor(dist + 0.5);  // Auf ganze Zahl runden
+    dist = Math.floor(dist + 0.5);  // round to an integer value.
 
     return dist;
   }

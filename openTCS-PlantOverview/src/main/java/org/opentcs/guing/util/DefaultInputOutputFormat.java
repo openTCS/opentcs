@@ -162,6 +162,7 @@ public class DefaultInputOutputFormat
           if (srcPointFigure != null && destPointFigure != null) {
             LinkConnection link = (LinkConnection) baseFigure;
             link.connect((LabeledPointFigure) srcPointFigure, (LabeledLocationFigure) destPointFigure);
+            link.getModel().updateName();
           }
         }
       }

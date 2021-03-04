@@ -214,7 +214,7 @@ public class XMLModel002Builder
    */
   private static List<PointTO> getPoints(Model model) {
     Set<Point> points = new TreeSet<>(Comparators.objectsByName());
-    points.addAll(model.getPoints(null));
+    points.addAll(model.getObjectPool().getObjects(Point.class));
     List<PointTO> result = new ArrayList<>();
     for (Point curPoint : points) {
       PointTO point = new PointTO();
@@ -248,7 +248,7 @@ public class XMLModel002Builder
    */
   private static List<PathTO> getPath(Model model) {
     Set<Path> paths = new TreeSet<>(Comparators.objectsByName());
-    paths.addAll(model.getPaths(null));
+    paths.addAll(model.getObjectPool().getObjects(Path.class));
     List<PathTO> result = new ArrayList<>();
     for (Path curPath : paths) {
       PathTO path = new PathTO();
@@ -274,7 +274,7 @@ public class XMLModel002Builder
    */
   private static List<VehicleTO> getVehicles(Model model) {
     Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    vehicles.addAll(model.getVehicles(null));
+    vehicles.addAll(model.getObjectPool().getObjects(Vehicle.class));
     List<VehicleTO> result = new ArrayList<>();
     for (Vehicle curVehicle : vehicles) {
       VehicleTO vehicle = new VehicleTO();
@@ -299,7 +299,7 @@ public class XMLModel002Builder
    */
   private static List<LocationTypeTO> getLocationTypes(Model model) {
     Set<LocationType> locTypes = new TreeSet<>(Comparators.objectsByName());
-    locTypes.addAll(model.getLocationTypes(null));
+    locTypes.addAll(model.getObjectPool().getObjects(LocationType.class));
     List<LocationTypeTO> result = new ArrayList<>();
     for (LocationType curType : locTypes) {
       LocationTypeTO locationType = new LocationTypeTO();
@@ -327,7 +327,7 @@ public class XMLModel002Builder
    */
   private static List<LocationTO> getLocations(Model model) {
     Set<Location> locations = new TreeSet<>(Comparators.objectsByName());
-    locations.addAll(model.getLocations(null));
+    locations.addAll(model.getObjectPool().getObjects(Location.class));
     List<LocationTO> result = new ArrayList<>();
     for (Location curLoc : locations) {
       LocationTO location = new LocationTO();
@@ -367,7 +367,7 @@ public class XMLModel002Builder
    */
   private static List<BlockTO> getBlocks(Model model) {
     Set<Block> blocks = new TreeSet<>(Comparators.objectsByName());
-    blocks.addAll(model.getBlocks(null));
+    blocks.addAll(model.getObjectPool().getObjects(Block.class));
     List<BlockTO> result = new ArrayList<>();
     for (Block curBlock : blocks) {
       BlockTO block = new BlockTO();
@@ -422,7 +422,7 @@ public class XMLModel002Builder
    */
   private static List<GroupTO> getGroups(Model model) {
     Set<Group> groups = new TreeSet<>(Comparators.objectsByName());
-    groups.addAll(model.getGroups(null));
+    groups.addAll(model.getObjectPool().getObjects(Group.class));
     List<GroupTO> result = new ArrayList<>();
     for (Group curGroup : groups) {
       GroupTO group = new GroupTO();
@@ -588,12 +588,12 @@ public class XMLModel002Builder
     for (PointTO pointTO : pointTOs) {
       model.createPoint(
           new PointCreationTO(pointTO.getName())
-          .setPosition(new Triple(pointTO.getxPosition(),
-                                  pointTO.getyPosition(),
-                                  pointTO.getzPosition()))
-          .setVehicleOrientationAngle(pointTO.getVehicleOrientationAngle().doubleValue())
-          .setType(Point.Type.valueOf(pointTO.getType()))
-          .setProperties(getProperties(pointTO.getProperties())));
+              .withPosition(new Triple(pointTO.getxPosition(),
+                                       pointTO.getyPosition(),
+                                       pointTO.getzPosition()))
+              .withVehicleOrientationAngle(pointTO.getVehicleOrientationAngle().doubleValue())
+              .withType(Point.Type.valueOf(pointTO.getType()))
+              .withProperties(getProperties(pointTO.getProperties())));
     }
   }
 
@@ -609,12 +609,12 @@ public class XMLModel002Builder
     for (VehicleTO vehicleTO : vehicleTOs) {
       model.createVehicle(
           new VehicleCreationTO(vehicleTO.getName())
-          .setLength(vehicleTO.getLength().intValue())
-          .setEnergyLevelCritical(vehicleTO.getEnergyLevelCritical().intValue())
-          .setEnergyLevelGood(vehicleTO.getEnergyLevelGood().intValue())
-          .setMaxReverseVelocity(vehicleTO.getMaxReverseVelocity())
-          .setMaxVelocity(vehicleTO.getMaxVelocity())
-          .setProperties(getProperties(vehicleTO.getProperties()))
+              .withLength(vehicleTO.getLength().intValue())
+              .withEnergyLevelCritical(vehicleTO.getEnergyLevelCritical().intValue())
+              .withEnergyLevelGood(vehicleTO.getEnergyLevelGood().intValue())
+              .withMaxReverseVelocity(vehicleTO.getMaxReverseVelocity())
+              .withMaxVelocity(vehicleTO.getMaxVelocity())
+              .withProperties(getProperties(vehicleTO.getProperties()))
       );
     }
   }
@@ -633,12 +633,12 @@ public class XMLModel002Builder
           new PathCreationTO(pathTO.getName(),
                              pathTO.getSourcePoint(),
                              pathTO.getDestinationPoint())
-          .setLength(pathTO.getLength())
-          .setRoutingCost(pathTO.getRoutingCost())
-          .setLocked(pathTO.isLocked())
-          .setMaxVelocity(pathTO.getMaxVelocity().intValue())
-          .setMaxReverseVelocity(pathTO.getMaxReverseVelocity().intValue())
-          .setProperties(getProperties(pathTO.getProperties())));
+              .withLength(pathTO.getLength())
+              .withRoutingCost(pathTO.getRoutingCost())
+              .withLocked(pathTO.isLocked())
+              .withMaxVelocity(pathTO.getMaxVelocity().intValue())
+              .withMaxReverseVelocity(pathTO.getMaxReverseVelocity().intValue())
+              .withProperties(getProperties(pathTO.getProperties())));
     }
 //
 //    // Loop through all paths. Add the path to its source point as an outgoing path and to its 
@@ -661,8 +661,8 @@ public class XMLModel002Builder
     for (LocationTypeTO locationTypeTO : locationTypeTOs) {
       model.createLocationType(
           new LocationTypeCreationTO(locationTypeTO.getName())
-          .setAllowedOperations(getAllowedOperations(locationTypeTO.getAllowedOperations()))
-          .setProperties(getProperties(locationTypeTO.getProperties())));
+              .withAllowedOperations(getAllowedOperations(locationTypeTO.getAllowedOperations()))
+              .withProperties(getProperties(locationTypeTO.getProperties())));
     }
   }
 
@@ -685,12 +685,13 @@ public class XMLModel002Builder
       throws ObjectExistsException {
     for (LocationTO locationTO : locationTOs) {
       model.createLocation(
-          new LocationCreationTO(locationTO.getName(), locationTO.getType())
-          .setPosition(new Triple(locationTO.getxPosition(),
-                                  locationTO.getyPosition(),
-                                  locationTO.getzPosition()))
-          .setLinks(getLinks(locationTO))
-          .setProperties(getProperties(locationTO.getProperties()))
+          new LocationCreationTO(locationTO.getName(),
+                                 locationTO.getType(),
+                                 new Triple(locationTO.getxPosition(),
+                                            locationTO.getyPosition(),
+                                            locationTO.getzPosition()))
+              .withLinks(getLinks(locationTO))
+              .withProperties(getProperties(locationTO.getProperties()))
       );
     }
 
@@ -718,8 +719,8 @@ public class XMLModel002Builder
     for (BlockTO blockTO : blockTOs) {
       model.createBlock(
           new BlockCreationTO(blockTO.getName())
-          .setMemberNames(getMemberNames(blockTO.getMembers()))
-          .setProperties(getProperties(blockTO.getProperties())));
+              .withMemberNames(getMemberNames(blockTO.getMembers()))
+              .withProperties(getProperties(blockTO.getProperties())));
     }
   }
 
@@ -743,8 +744,8 @@ public class XMLModel002Builder
     for (GroupTO groupTO : groupTOs) {
       model.createGroup(
           new GroupCreationTO(groupTO.getName())
-          .setMemberNames(getMemberNames(groupTO.getMembers()))
-          .setProperties(getProperties(groupTO.getProperties())));
+              .withMemberNames(getMemberNames(groupTO.getMembers()))
+              .withProperties(getProperties(groupTO.getProperties())));
     }
   }
 
@@ -761,8 +762,8 @@ public class XMLModel002Builder
     for (StaticRouteTO staticRouteTO : staticRouteTOs) {
       model.createStaticRoute(
           new org.opentcs.access.to.model.StaticRouteCreationTO(staticRouteTO.getName())
-          .setHopNames(getHopNames(staticRouteTO.getHops()))
-          .setProperties(getProperties(staticRouteTO.getProperties())));
+              .setHopNames(getHopNames(staticRouteTO.getHops()))
+              .setProperties(getProperties(staticRouteTO.getProperties())));
     }
   }
 
@@ -786,11 +787,11 @@ public class XMLModel002Builder
     for (VisualLayoutTO visualLayoutTO : visuLayoutTOs) {
       model.createVisualLayout(
           new VisualLayoutCreationTO(visualLayoutTO.getName())
-          .setScaleX(visualLayoutTO.getScaleX())
-          .setScaleY(visualLayoutTO.getScaleY())
-          .setShapeElements(getShapeElements(visualLayoutTO.getShapeLayoutElements()))
-          .setModelElements(getModelElements(visualLayoutTO.getModelLayoutElements()))
-          .setProperties(getProperties(visualLayoutTO.getProperties()))
+              .withScaleX(visualLayoutTO.getScaleX())
+              .withScaleY(visualLayoutTO.getScaleY())
+              .withShapeElements(getShapeElements(visualLayoutTO.getShapeLayoutElements()))
+              .withModelElements(getModelElements(visualLayoutTO.getModelLayoutElements()))
+              .withProperties(getProperties(visualLayoutTO.getProperties()))
       );
     }
   }
@@ -800,8 +801,8 @@ public class XMLModel002Builder
     List<ModelLayoutElementCreationTO> result = new LinkedList<>();
     for (VisualLayoutTO.ModelLayoutElement mlElement : elements) {
       result.add(new ModelLayoutElementCreationTO(mlElement.getVisualizedObjectName())
-          .setLayer(mlElement.getLayer().intValue())
-          .setProperties(getProperties(mlElement.getProperties()))
+          .withLayer(mlElement.getLayer().intValue())
+          .withProperties(getProperties(mlElement.getProperties()))
       );
     }
     return result;
@@ -812,8 +813,8 @@ public class XMLModel002Builder
     List<ShapeLayoutElementCreationTO> result = new LinkedList<>();
     for (VisualLayoutTO.ShapeLayoutElement slElement : shapes) {
       result.add(new ShapeLayoutElementCreationTO("")
-          .setLayer(slElement.getLayer().intValue())
-          .setProperties(getProperties(slElement.getProperties())));
+          .withLayer(slElement.getLayer().intValue())
+          .withProperties(getProperties(slElement.getProperties())));
     }
     return result;
   }

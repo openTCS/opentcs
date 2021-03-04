@@ -10,13 +10,17 @@ package org.opentcs.access.queries;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A query for general information about the topology currently set up on the
  * kernel side.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Instead of queries, explicit service calls should be used.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 @Availability({Kernel.State.MODELLING,
                Kernel.State.OPERATING})
 public class QueryTopologyInfo

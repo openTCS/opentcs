@@ -9,12 +9,16 @@ package org.opentcs.access.rmi;
 
 import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods for logging into and out of a remote kernel.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link KernelServicePortalBuilder} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public interface RemoteKernelConnection {
 
   /**

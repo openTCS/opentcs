@@ -11,7 +11,9 @@ package org.opentcs.access;
  * Provides access to a shared kernel.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
+ * @deprecated Use {@link SharedKernelServicePortal} instead.
  */
+@Deprecated
 public interface SharedKernelClient
     extends AutoCloseable {
 
@@ -30,7 +32,18 @@ public interface SharedKernelClient
    *
    * @return the kernel.
    * @throws IllegalStateException If this instance is closed.
+   * @deprecated Use {@link #getPortal()} instead.
    */
+  @Deprecated
   Kernel getKernel()
+      throws IllegalStateException;
+
+  /**
+   * Returns the {@link KernelServicePortal} instance being shared.
+   *
+   * @return The portal instance being shared.
+   * @throws IllegalStateException If this instance is closed.
+   */
+  KernelServicePortal getPortal()
       throws IllegalStateException;
 }

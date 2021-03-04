@@ -1,0 +1,44 @@
+@startuml
+skinparam monochrome true
+skinparam linetype ortho
+'left to right direction
+
+abstract Class TCSObject {
+'  -name: String
+'  -reference: TCSObjectReference
+'  -properties: Map<String, String>
+}
+
+abstract Class TCSResource
+
+package "Plant model" {
+  package "Driving course model" {
+    Class Point
+    Class Path
+    Class Location
+    Class LocationType
+  }
+
+  Class Vehicle
+}
+
+package "Transport orders" {
+  Class TransportOrder
+  Class OrderSequence
+}
+
+TCSObject <|-- TCSResource
+
+TCSResource <|-- Point
+TCSResource <|-- Path
+TCSResource <|-- Location
+
+TCSObject <|-- LocationType
+TCSObject <|-- Vehicle
+
+TCSObject <|-- TransportOrder
+TCSObject <|-- OrderSequence
+
+' This puts the transport order package below TCSResource, which looks a bit nicer.
+TCSResource -[hidden]-> TransportOrder
+@enduml

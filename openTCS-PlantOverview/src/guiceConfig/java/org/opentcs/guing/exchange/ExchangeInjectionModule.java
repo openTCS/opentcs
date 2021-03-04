@@ -9,10 +9,15 @@
 package org.opentcs.guing.exchange;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import javax.inject.Singleton;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.guing.exchange.adapter.ProcessAdapterFactory;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.common.DefaultPortalManager;
+import org.opentcs.common.PortalManager;
+import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.util.event.EventBus;
+import org.opentcs.util.event.EventHandler;
+import org.opentcs.util.event.EventSource;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * A Guice configuration module for this package.
@@ -25,16 +30,31 @@ public class ExchangeInjectionModule
   @Override
   protected void configure() {
 
-    bind(KernelProxyManager.class)
-        .to(DefaultKernelProxyManager.class)
+    bind(PortalManager.class)
+        .to(DefaultPortalManager.class)
         .in(Singleton.class);
 
-    bind(SharedKernelProvider.class)
-        .to(ApplicationKernelProvider.class)
+    bind(KernelEventFetcher.class)
         .in(Singleton.class);
 
-    bind(EventDispatcher.class).to(OpenTCSEventDispatcher.class);
-    
-    install(new FactoryModuleBuilder().build(ProcessAdapterFactory.class));
+    EventBus eventBus = new SimpleEventBus();
+    bind(EventSource.class)
+        .annotatedWith(ApplicationEventBus.class)
+        .toInstance(eventBus);
+    bind(EventHandler.class)
+        .annotatedWith(ApplicationEventBus.class)
+        .toInstance(eventBus);
+    bind(EventBus.class)
+        .annotatedWith(ApplicationEventBus.class)
+        .toInstance(eventBus);
+
+    bind(SharedKernelServicePortalProvider.class)
+        .to(ApplicationPortalProvider.class)
+        .in(Singleton.class);
+
+    bind(AttributeAdapterRegistry.class)
+        .in(Singleton.class);
+    bind(OpenTCSEventDispatcher.class)
+        .in(Singleton.class);
   }
 }

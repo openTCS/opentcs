@@ -156,7 +156,14 @@ public class LocationType
     return getId();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public LocationType clone() {
     return new LocationType(getIdWithoutDeprecationWarning(),
                             getName(),

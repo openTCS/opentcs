@@ -8,7 +8,6 @@
 package org.opentcs.util;
 
 import java.util.Comparator;
-import org.opentcs.access.TravelCosts;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
@@ -25,6 +24,7 @@ public final class Comparators {
   /**
    * A <code>Comparator</code> for ordering <code>TCSObject</code>s ascendingly
    * by their IDs.
+   *
    * @deprecated Will be removed.
    */
   @Deprecated
@@ -86,9 +86,13 @@ public final class Comparators {
           o2.getVisualizedObject().getName());
   /**
    * Compares TravelCosts by their costs.
+   *
+   * @deprecated Will be removed.
    */
-  private static final Comparator<TravelCosts> TRAVEL_COSTS_BY_COSTS
-      = (TravelCosts t1, TravelCosts t2) -> {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  private static final Comparator<org.opentcs.access.TravelCosts> TRAVEL_COSTS_BY_COSTS
+      = (org.opentcs.access.TravelCosts t1, org.opentcs.access.TravelCosts t2) -> {
         if (t1.getCosts() < t2.getCosts()) {
           return -1;
         }
@@ -177,11 +181,15 @@ public final class Comparators {
   }
 
   /**
-   * A comparator for ordering {@link TravelCosts TravelCosts} by their respective costs.
+   * A comparator for ordering {@link org.opentcs.access.TravelCosts} by their respective costs.
    *
    * @return The comparator.
+   * @deprecated Providing travel costs to external clients will not be part of the standard kernel
+   * API any more.
    */
-  public static Comparator<TravelCosts> travelCostsByCosts() {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public static Comparator<org.opentcs.access.TravelCosts> travelCostsByCosts() {
     return TRAVEL_COSTS_BY_COSTS;
   }
 }

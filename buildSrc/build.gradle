@@ -1,0 +1,19 @@
+apply plugin: 'java-gradle-plugin'
+
+repositories {
+  jcenter()
+}
+
+dependencies { 
+  compile group: 'commons-io', name: 'commons-io', version: '2.5'
+  compile group: 'commons-io', name: 'commons-io', version: '2.5', classifier: 'sources'
+}
+
+gradlePlugin {
+  plugins {
+    TemplatePlugin {
+      id = 'opentcs-gradle-plugin'
+      implementationClass = 'org.opentcs.gradle.plugin.integration.TemplatePlugin'
+    }
+  }
+}

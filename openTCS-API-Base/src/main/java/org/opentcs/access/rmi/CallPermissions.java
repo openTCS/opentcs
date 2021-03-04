@@ -12,7 +12,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.opentcs.data.user.UserPermission;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Indicates which permissions a client needs to have to be allowed to call an
@@ -21,16 +21,19 @@ import org.opentcs.data.user.UserPermission;
  * @see RemoteKernel
  * @see org.opentcs.data.user.UserPermission
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Call permissions are implementation-specific.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CallPermissions {
-  
+
   /**
    * Returns the permissions required to call the annotated method.
    *
    * @return the permissions required to call the annotated method.
    */
-  UserPermission[] value();
+  org.opentcs.data.user.UserPermission[] value();
 }

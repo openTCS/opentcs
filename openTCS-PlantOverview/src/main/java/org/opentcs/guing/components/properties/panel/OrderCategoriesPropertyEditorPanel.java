@@ -20,8 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
-import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
+import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.transport.OrderCategorySuggestionsPool;
 import org.opentcs.guing.util.ResourceBundleUtil;
 

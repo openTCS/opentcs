@@ -31,7 +31,6 @@ public class LinkModel
    * Creates a new instance.
    */
   public LinkModel() {
-    super();
     createProperties();
   }
 
@@ -72,6 +71,10 @@ public class LinkModel
   @Override // AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("link.description");
+  }
+
+  public StringSetProperty getPropertyAllowedOperations() {
+    return (StringSetProperty) getProperty(ALLOWED_OPERATIONS);
   }
 
   private void createProperties() {

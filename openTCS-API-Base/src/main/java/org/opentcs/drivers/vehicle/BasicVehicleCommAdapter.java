@@ -14,9 +14,12 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.CyclicTask;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +64,7 @@ public abstract class BasicVehicleCommAdapter
   /**
    * This adapter's panels.
    */
+  @SuppressWarnings("deprecation")
   private final List<VehicleCommAdapterPanel> adapterPanels = new LinkedList<>();
   /**
    * Indicates whether this adapter is initialized.
@@ -77,12 +81,12 @@ public abstract class BasicVehicleCommAdapter
   /**
    * This adapter's command queue.
    */
-  private final Queue<MovementCommand> commandQueue = new LinkedList<>();
+  private final Queue<MovementCommand> commandQueue = new LinkedBlockingQueue<>();
   /**
    * Contains the orders which have been sent to the vehicle but which haven't
    * been executed by it, yet.
    */
-  private final Queue<MovementCommand> sentQueue = new LinkedList<>();
+  private final Queue<MovementCommand> sentQueue = new LinkedBlockingQueue<>();
 
   /**
    * Creates a new instance.
@@ -116,6 +120,7 @@ public abstract class BasicVehicleCommAdapter
    * </p>
    */
   @Override
+  @SuppressWarnings("deprecation")
   public void initialize() {
     if (initialized) {
       LOG.debug("{}: Already initialized.", getName());
@@ -136,6 +141,7 @@ public abstract class BasicVehicleCommAdapter
    * </p>
    */
   @Override
+  @SuppressWarnings("deprecation")
   public void terminate() {
     if (!initialized) {
       LOG.debug("{}: Not initialized.", getName());
@@ -205,6 +211,21 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
+  public VehicleProcessModelTO createTransferableProcessModel() {
+    return createCustomTransferableProcessModel()
+        .setVehicleName(getProcessModel().getName())
+        .setCommAdapterConnected(getProcessModel().isCommAdapterConnected())
+        .setCommAdapterEnabled(getProcessModel().isCommAdapterEnabled())
+        .setEnergyLevel(getProcessModel().getVehicleEnergyLevel())
+        .setLoadHandlingDevices(getProcessModel().getVehicleLoadHandlingDevices())
+        .setNotifications(getProcessModel().getNotifications())
+        .setOrientationAngle(getProcessModel().getVehicleOrientationAngle())
+        .setPrecisePosition(getProcessModel().getVehiclePrecisePosition())
+        .setVehiclePosition(getProcessModel().getVehiclePosition())
+        .setVehicleState(getProcessModel().getVehicleState());
+  }
+
+  @Override
   public int getCommandQueueCapacity() {
     return commandQueueCapacity;
   }
@@ -230,6 +251,7 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
+  @Deprecated
   public List<VehicleCommAdapterPanel> getAdapterPanels() {
     return adapterPanels;
   }
@@ -239,9 +261,9 @@ public abstract class BasicVehicleCommAdapter
     requireNonNull(newCommand, "newCommand");
 
     boolean commandAdded = false;
-    if (commandQueue.size() < getCommandQueueCapacity()) {
+    if (getCommandQueue().size() < getCommandQueueCapacity()) {
       LOG.debug("{}: Adding command: {}", getName(), newCommand);
-      commandQueue.add(newCommand);
+      getCommandQueue().add(newCommand);
       commandAdded = true;
     }
     if (commandAdded) {
@@ -253,11 +275,11 @@ public abstract class BasicVehicleCommAdapter
 
   @Override
   public synchronized void clearCommandQueue() {
-    if (!commandQueue.isEmpty()) {
-      commandQueue.clear();
-      triggerCommandDispatcherTask();
+    if (!getCommandQueue().isEmpty()) {
+      getCommandQueue().clear();
+//      triggerCommandDispatcherTask();
     }
-    sentQueue.clear();
+    getSentQueue().clear();
   }
 
   /**
@@ -321,7 +343,10 @@ public abstract class BasicVehicleCommAdapter
    * </p>
    *
    * @return The list of panels.
+   * @deprecated {@link VehicleCommAdapterPanel} is deprecated.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   protected abstract List<VehicleCommAdapterPanel> createAdapterPanels();
 
   /**
@@ -354,6 +379,19 @@ public abstract class BasicVehicleCommAdapter
 
   private synchronized void triggerCommandDispatcherTask() {
     this.notifyAll();
+  }
+
+  /**
+   * Creates a transferable process model with the specific attributes of this comm adapter's
+   * process model set.
+   * <p>
+   * This method should be overriden by implementing classes.
+   * </p>
+   *
+   * @return A transferable process model.
+   */
+  protected VehicleProcessModelTO createCustomTransferableProcessModel() {
+    return new VehicleProcessModelTO();
   }
 
   /**
@@ -390,7 +428,7 @@ public abstract class BasicVehicleCommAdapter
             try {
               sendCommand(curCmd);
               // Remember that we sent this command to the vehicle.
-              sentQueue.add(curCmd);
+              getSentQueue().add(curCmd);
               // Notify listeners that this command was sent.
               getProcessModel().commandSent(curCmd);
             }

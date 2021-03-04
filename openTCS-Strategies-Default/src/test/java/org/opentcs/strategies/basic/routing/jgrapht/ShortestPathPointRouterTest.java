@@ -13,7 +13,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.empty;
-import org.jgrapht.WeightedGraph;
+import org.jgrapht.Graph;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.junit.*;
@@ -49,7 +49,7 @@ public class ShortestPathPointRouterTest {
 
     edgeAC = new ModelEdge(pathAC, false);
 
-    WeightedGraph<String, ModelEdge> graph = new DirectedWeightedMultigraph<>(ModelEdge.class);
+    Graph<String, ModelEdge> graph = new DirectedWeightedMultigraph<>(ModelEdge.class);
 
     graph.addVertex(pointA.getName());
     graph.addVertex(pointB.getName());

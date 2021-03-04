@@ -65,6 +65,7 @@ abstract class KernelStateOnline
   }
 
   @Override
+  @Deprecated
   public void savePlantModel()
       throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {

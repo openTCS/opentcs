@@ -1,0 +1,46 @@
+@startuml
+skinparam monochrome true
+
+'left to right direction
+
+agent Kernel [
+  Kernel
+  <&caret-right> Dispatching
+  <&caret-right> Routing
+  <&caret-right> Scheduling
+]
+interface "RMI Interface" as RmiInterface
+interface "Web API" as WebApi
+interface "Vehicle driver #1" as VehicleDriver1
+interface "Vehicle driver #2" as VehicleDriver2
+interface "Vehicle driver #n" as VehicleDriverN
+
+agent "Plant Overview" as PlantOverview
+agent "Kernel Control Center" as KernelControlCenter
+
+agent "Third-party client\n(ERP, WMS, ...)" as Client1
+agent "Third-party client\n(ERP, WMS, ...)" as Client2
+agent "Third-party client\n(ERP, WMS, ...)" as Client3
+
+agent "Vehicle #1" as Vehicle1
+agent "Vehicle #2" as Vehicle2
+agent "Vehicle #n" as VehicleN
+
+RmiInterface -- Kernel : openTCS API
+WebApi -- Kernel : openTCS API
+
+PlantOverview .. RmiInterface : RMI
+KernelControlCenter .. RmiInterface : RMI
+
+Client1 .. RmiInterface : RMI
+Client2 .. WebApi : HTTP
+Client3 .. WebApi : HTTP
+
+Kernel -- VehicleDriver1 : openTCS API
+Kernel -- VehicleDriver2 : openTCS API
+Kernel -- VehicleDriverN : openTCS API
+
+VehicleDriver1 .. Vehicle1 : Vehicle Protocol
+VehicleDriver2 .. Vehicle2 : Vehicle Protocol
+VehicleDriverN .. VehicleN : Vehicle Protocol
+@enduml

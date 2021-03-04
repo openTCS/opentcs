@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -34,9 +34,9 @@ public final class DefaultVehicleControllerPool
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultVehicleControllerPool.class);
   /**
-   * The local kernel maintaining the Vehicle instances.
+   * The vehicle service.
    */
-  private final LocalKernel localKernel;
+  private final InternalVehicleService vehicleService;
   /**
    * A factory for vehicle managers.
    */
@@ -58,14 +58,13 @@ public final class DefaultVehicleControllerPool
   /**
    * Creates a new StandardVehicleManagerPool.
    *
-   * @param kernel The local kernel that maintains the
-   * {@link org.opentcs.data.model.Vehicle Vehicle} instances.
+   * @param vehicleService The vehicle service.
    * @param vehicleManagerFactory A factory for vehicle managers.
    */
   @Inject
-  public DefaultVehicleControllerPool(LocalKernel kernel,
+  public DefaultVehicleControllerPool(InternalVehicleService vehicleService,
                                       VehicleControllerFactory vehicleManagerFactory) {
-    this.localKernel = requireNonNull(kernel, "kernel");
+    this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.vehicleManagerFactory = requireNonNull(vehicleManagerFactory, "vehicleManagerFactory");
   }
 
@@ -92,8 +91,8 @@ public final class DefaultVehicleControllerPool
     // Detach all vehicles and reset their positions.
     for (PoolEntry curEntry : poolEntries.values()) {
       curEntry.vehicleController.terminate();
-      Vehicle vehicle = localKernel.getTCSObject(Vehicle.class, curEntry.vehicleName);
-      localKernel.setVehiclePosition(vehicle.getReference(), null);
+      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, curEntry.vehicleName);
+      vehicleService.updateVehiclePosition(vehicle.getReference(), null);
     }
     poolEntries.clear();
     initialized = false;
@@ -111,7 +110,7 @@ public final class DefaultVehicleControllerPool
       return;
     }
 
-    Vehicle vehicle = localKernel.getTCSObject(Vehicle.class, vehicleName);
+    Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, vehicleName);
     checkArgument(vehicle != null, "No such vehicle: %s", vehicleName);
 
     VehicleController controller = vehicleManagerFactory.createVehicleController(vehicle,

@@ -1,0 +1,20 @@
+/**
+ * Copyright (c) 2016 Fraunhofer IML
+ */
+package de.fraunhofer.iml.opentcs.%PACKAGE_NAME%.customization;
+
+import org.opentcs.customizations.kernel.KernelInjectionModule;
+
+/**
+ * A custom Guice module for %PACKAGE_NAME%-specific configuration.
+ *
+ * @author Stefan Walter (Fraunhofer IML)
+ */
+public class %JAVA_FILE_PREFIX%KernelInjectionModule
+    extends KernelInjectionModule {
+
+  @Override
+  protected void configure() {
+    install(new CommAdaptersModule());
+  }
+}

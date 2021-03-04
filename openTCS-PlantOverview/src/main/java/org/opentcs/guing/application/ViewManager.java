@@ -18,14 +18,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import net.engio.mbassy.listener.Handler;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.components.dockable.CStackDockStation;
 import org.opentcs.guing.components.dockable.DockableTitleComparator;
 import org.opentcs.guing.components.dockable.DockingManager;
@@ -35,6 +34,8 @@ import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.transport.OrderSequencesContainerPanel;
 import org.opentcs.guing.transport.TransportOrdersContainerPanel;
+import org.opentcs.util.event.EventHandler;
+import org.opentcs.util.event.EventSource;
 
 /**
  * Manages the mapping of dockables to drawing views, transport order views and
@@ -42,12 +43,17 @@ import org.opentcs.guing.transport.TransportOrdersContainerPanel;
  *
  * @author Philipp Seifert (Fraunhofer IML)
  */
-public class ViewManager {
+public class ViewManager
+    implements EventHandler {
 
   /**
    * Manages the application's docking frames.
    */
   private final DockingManager dockingManager;
+  /**
+   * Where we register event listeners.
+   */
+  private final EventSource eventSource;
   /**
    * Map for Dockable -> DrawingView + Rulers.
    */
@@ -69,13 +75,23 @@ public class ViewManager {
    * Creates a new instance.
    *
    * @param dockingManager Manages the application's docking frames.
+   * @param eventSource Where this instance registers event listeners.
    */
   @Inject
-  public ViewManager(DockingManager dockingManager) {
+  public ViewManager(DockingManager dockingManager,
+                     @ApplicationEventBus EventSource eventSource) {
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
+    this.eventSource = requireNonNull(eventSource, "eventSource");
     drawingViewMap = new TreeMap<>(new DockableTitleComparator());
     transportOrderViews = new TreeMap<>(new DockableTitleComparator());
     orderSequenceViews = new TreeMap<>(new DockableTitleComparator());
+  }
+
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof OperationModeChangeEvent) {
+      handleModeChange((OperationModeChangeEvent) event);
+    }
   }
 
   /**
@@ -116,8 +132,7 @@ public class ViewManager {
     return orderSequenceViews;
   }
 
-  @Handler
-  public void handleModeChange(OperationModeChangeEvent evt) {
+  private void handleModeChange(OperationModeChangeEvent evt) {
     switch (evt.getNewMode()) {
       case MODELLING:
         setPlantOverviewStateModelling();
@@ -172,8 +187,8 @@ public class ViewManager {
    * @param title The title of this dockable.
    */
   public void initModellingDockable(DefaultSingleCDockable dockable, String title) {
-    drawingViewModellingDockable = Objects.requireNonNull(dockable, "dockable is null");
-    drawingViewModellingDockable.setTitleText(Objects.requireNonNull(title, "title is null"));
+    drawingViewModellingDockable = requireNonNull(dockable, "dockable");
+    drawingViewModellingDockable.setTitleText(requireNonNull(title, "title"));
     drawingViewModellingDockable.setCloseable(false);
   }
 
@@ -229,11 +244,12 @@ public class ViewManager {
    * @param dockable The dockable the scrollPane is wrapped into. Used as the key.
    * @param scrollPane The scroll pane containing the drawing view and rulers.
    */
-  public void putDrawingView(DefaultSingleCDockable dockable,
+  public void addDrawingView(DefaultSingleCDockable dockable,
                              DrawingViewScrollPane scrollPane) {
-    Objects.requireNonNull(dockable, "dockable is null");
-    Objects.requireNonNull(scrollPane, "scrollPane is null");
+    requireNonNull(dockable, "dockable");
+    requireNonNull(scrollPane, "scrollPane");
 
+    eventSource.subscribe(scrollPane.getDrawingView());
     drawingViewMap.put(dockable, scrollPane);
   }
 
@@ -244,8 +260,12 @@ public class ViewManager {
    * @param dockable The dockable the panel is wrapped into. Used as the key.
    * @param panel The panel.
    */
-  public void putTransportOrderView(DefaultSingleCDockable dockable,
+  public void addTransportOrderView(DefaultSingleCDockable dockable,
                                     TransportOrdersContainerPanel panel) {
+    requireNonNull(dockable, "dockable");
+    requireNonNull(panel, "panel");
+
+    eventSource.subscribe(panel);
     transportOrderViews.put(dockable, panel);
   }
 
@@ -256,8 +276,12 @@ public class ViewManager {
    * @param dockable The dockable the panel is wrapped into. Used as the key.
    * @param panel The panel.
    */
-  public void putOrderSequenceView(DefaultSingleCDockable dockable,
+  public void addOrderSequenceView(DefaultSingleCDockable dockable,
                                    OrderSequencesContainerPanel panel) {
+    requireNonNull(dockable, "dockable");
+    requireNonNull(panel, "panel");
+
+    eventSource.subscribe(panel);
     orderSequenceViews.put(dockable, panel);
   }
 
@@ -267,9 +291,20 @@ public class ViewManager {
    * @param dockable The dockable.
    */
   public void removeDockable(DefaultSingleCDockable dockable) {
-    drawingViewMap.remove(dockable);
-    transportOrderViews.remove(dockable);
-    orderSequenceViews.remove(dockable);
+    DrawingViewScrollPane scrollPane = drawingViewMap.remove(dockable);
+    if (scrollPane != null) {
+      eventSource.unsubscribe(scrollPane.getDrawingView());
+    }
+
+    TransportOrdersContainerPanel ordersPanel = transportOrderViews.remove(dockable);
+    if (ordersPanel != null) {
+      eventSource.unsubscribe(ordersPanel);
+    }
+
+    OrderSequencesContainerPanel sequencePanel = orderSequenceViews.remove(dockable);
+    if (sequencePanel != null) {
+      eventSource.unsubscribe(sequencePanel);
+    }
   }
 
   /**

@@ -8,6 +8,7 @@
 package org.opentcs.access.queries;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * The base class of all results to Kernel queries.
@@ -21,7 +22,10 @@ import java.io.Serializable;
  * @param <E> The actual query class.
  * @see org.opentcs.access.Kernel#query(java.lang.Class)
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Instead of queries, explicit service calls should be used.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 @Availability({})
 public abstract class Query<E extends Query<E>>
     implements Serializable {

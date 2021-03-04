@@ -15,7 +15,10 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual event implementation.
+ * @deprecated For event handling, use classes in <code>org.opentcs.util.event</code> instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public interface EventSource<E extends Event> {
 
   /**

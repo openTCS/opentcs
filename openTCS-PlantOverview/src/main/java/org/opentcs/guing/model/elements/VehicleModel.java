@@ -47,6 +47,7 @@ public class VehicleModel
   public static final String LOADED = "Loaded";
   public static final String STATE = "State";
   public static final String PROC_STATE = "ProcState";
+  public static final String INTEGRATION_LEVEL = "IntegrationLevel";
   public static final String POINT = "Point";
   public static final String NEXT_POINT = "NextPoint";
   public static final String PRECISE_POSITION = "PrecisePosition";
@@ -204,9 +205,7 @@ public class VehicleModel
    * @return The color.
    */
   public Color getDriveOrderColor() {
-    ColorProperty property = (ColorProperty) getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
-
-    return property.getColor();
+    return getPropertyRouteColor().getColor();
   }
 
   /**
@@ -290,6 +289,7 @@ public class VehicleModel
    */
   public boolean isAvailableForOrder() {
     return vehicle != null
+        && vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
         && !vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE);
   }
 
@@ -303,6 +303,90 @@ public class VehicleModel
   @Override // AbstractModelComponent
   public String getDescription() {
     return ResourceBundleUtil.getBundle().getString("vehicle.description");
+  }
+
+  public LengthProperty getPropertyLength() {
+    return (LengthProperty) getProperty(LENGTH);
+  }
+
+  public ColorProperty getPropertyRouteColor() {
+    return (ColorProperty) getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
+  }
+
+  public SpeedProperty getPropertyMaxVelocity() {
+    return (SpeedProperty) getProperty(MAXIMUM_VELOCITY);
+  }
+
+  public SpeedProperty getPropertyMaxReverseVelocity() {
+    return (SpeedProperty) getProperty(MAXIMUM_REVERSE_VELOCITY);
+  }
+
+  public PercentProperty getPropertyEnergyLevelCritical() {
+    return (PercentProperty) getProperty(ENERGY_LEVEL_CRITICAL);
+  }
+
+  public PercentProperty getPropertyEnergyLevelGood() {
+    return (PercentProperty) getProperty(ENERGY_LEVEL_GOOD);
+  }
+
+  public PercentProperty getPropertyEnergyLevel() {
+    return (PercentProperty) getProperty(ENERGY_LEVEL);
+  }
+
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<EnergyState> getPropertyEnergyState() {
+    return (SelectionProperty<EnergyState>) getProperty(ENERGY_STATE);
+  }
+
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<Vehicle.State> getPropertyState() {
+    return (SelectionProperty<Vehicle.State>) getProperty(STATE);
+  }
+
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<Vehicle.ProcState> getPropertyProcState() {
+    return (SelectionProperty<Vehicle.ProcState>) getProperty(PROC_STATE);
+  }
+
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<Vehicle.IntegrationLevel> getPropertyIntegrationLevel() {
+    return (SelectionProperty<Vehicle.IntegrationLevel>) getProperty(INTEGRATION_LEVEL);
+  }
+
+  public AngleProperty getPropertyOrientationAngle() {
+    return (AngleProperty) getProperty(ORIENTATION_ANGLE);
+  }
+
+  public TripleProperty getPropertyPrecisePosition() {
+    return (TripleProperty) getProperty(PRECISE_POSITION);
+  }
+
+  public StringProperty getPropertyPoint() {
+    return (StringProperty) getProperty(POINT);
+  }
+
+  public StringProperty getPropertyNextPoint() {
+    return (StringProperty) getProperty(NEXT_POINT);
+  }
+
+  public BooleanProperty getPropertyLoaded() {
+    return (BooleanProperty) getProperty(LOADED);
+  }
+
+  public StringProperty getPropertyCurrentOrderName() {
+    return (StringProperty) getProperty(CURRENT_TRANSPORT_ORDER_NAME);
+  }
+
+  public StringProperty getPropertyCurrentSequenceName() {
+    return (StringProperty) getProperty(CURRENT_SEQUENCE_NAME);
+  }
+
+  public OrderCategoriesProperty getPropertyProcessableCategories() {
+    return (OrderCategoriesProperty) getProperty(PROCESSABLE_CATEGORIES);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
 
   private void createProperties() {
@@ -348,6 +432,7 @@ public class VehicleModel
     pMaximumReverseVelocity.setDescription(bundle.getString("vehicle.maximumReverseVelocity.text"));
     pMaximumReverseVelocity.setHelptext(bundle.getString("vehicle.maximumReverseVelocity.helptext"));
     setProperty(MAXIMUM_REVERSE_VELOCITY, pMaximumReverseVelocity);
+
     PercentProperty pEnergyLevel = new PercentProperty(this, true);
     pEnergyLevel.setDescription(bundle.getString("vehicle.energyLevel.text"));
     pEnergyLevel.setHelptext(bundle.getString("vehicle.energyLevel.helptext"));
@@ -380,6 +465,15 @@ public class VehicleModel
     pProcState.setHelptext(bundle.getString("vehicle.procState.helptext"));
     pProcState.setModellingEditable(false);
     setProperty(PROC_STATE, pProcState);
+
+    SelectionProperty<Vehicle.IntegrationLevel> pIntegrationLevel
+        = new SelectionProperty<>(this,
+                                  Arrays.asList(Vehicle.IntegrationLevel.values()),
+                                  Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+    pIntegrationLevel.setDescription(bundle.getString("vehicle.integrationLevel.text"));
+    pIntegrationLevel.setHelptext(bundle.getString("vehicle.integrationLevel.helptext"));
+    pIntegrationLevel.setModellingEditable(false);
+    setProperty(INTEGRATION_LEVEL, pIntegrationLevel);
 
     StringProperty pPoint = new StringProperty(this);
     pPoint.setDescription(bundle.getString("vehicle.point.text"));

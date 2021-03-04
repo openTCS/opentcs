@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import org.jhotdraw.draw.DefaultDrawing;
@@ -32,7 +33,6 @@ import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.guing.components.drawing.course.CoordinateBasedDrawingMethod;
 import org.opentcs.guing.components.drawing.course.DrawingMethod;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import static org.opentcs.guing.model.ModelComponent.NAME;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
@@ -47,7 +47,6 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Standardimplementierung des Datenmodells des gesamten modellierten Systems.
@@ -91,11 +90,6 @@ class StandardSystemModel
    * Die für das Modell verwendete Zeichenmethode.
    */
   private final DrawingMethod fDrawingMethod = new CoordinateBasedDrawingMethod();
-  /**
-   * Die Tabelle mit den Zuordnungen zwischen Modellkomponente und
-   * Leitsteuerungsobjekt.
-   */
-  private final EventDispatcher fEventDispatcher;
 
   private final CourseObjectFactory crsObjFactory;
 
@@ -103,10 +97,8 @@ class StandardSystemModel
    * Creates a new instance with a default drawing method.
    */
   @Inject
-  public StandardSystemModel(EventDispatcher eventDispatcher,
-                             CourseObjectFactory crsObjFactory) {
+  public StandardSystemModel(CourseObjectFactory crsObjFactory) {
     super("Model");
-    this.fEventDispatcher = requireNonNull(eventDispatcher, "eventDispatcher");
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
 
     createMainFolders();
@@ -163,11 +155,6 @@ class StandardSystemModel
       }
     }
     return items;
-  }
-
-  @Override // SystemModel
-  public EventDispatcher getEventDispatcher() {
-    return fEventDispatcher;
   }
 
   @Override // SystemModel
@@ -317,14 +304,47 @@ class StandardSystemModel
     return null;
   }
 
+  @Override
+  public BlockModel getBlockModel(String name) {
+    for (BlockModel block : getBlockModels()) {
+      if (block.getName().equals(name)) {
+        return block;
+      }
+    }
+
+    return null;
+  }
+
   @Override // SystemModel
   public List<BlockModel> getBlockModels() {
     return getAll(FolderKey.BLOCKS, BlockModel.class);
   }
 
+  @Override
+  public GroupModel getGroupModel(String name) {
+    for (GroupModel group : getGroupModels()) {
+      if (group.getName().equals(name)) {
+        return group;
+      }
+    }
+
+    return null;
+  }
+
   @Override // SystemModel
   public List<GroupModel> getGroupModels() {
     return getAll(FolderKey.GROUPS, GroupModel.class);
+  }
+
+  @Override
+  public StaticRouteModel getStaticRouteModel(String name) {
+    for (StaticRouteModel staticRoute : getStaticRouteModels()) {
+      if (staticRoute.getName().equals(name)) {
+        return staticRoute;
+      }
+    }
+
+    return null;
   }
 
   @Override // SystemModel

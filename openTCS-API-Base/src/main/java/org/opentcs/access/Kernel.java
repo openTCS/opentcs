@@ -16,10 +16,17 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentcs.access.queries.Query;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.NotificationService;
+import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.components.kernel.services.RouterService;
+import org.opentcs.components.kernel.services.SchedulerService;
+import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.TransportOrderService;
+import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -41,21 +48,17 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.data.user.UserPermission;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.eventsystem.EventSource;
-import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
- * Declares the methods the openTCS kernel must implement which are accessible
- * both to internal components and remote peers (like graphical user
- * interfaces).
+ * Declares the methods an openTCS kernel implements.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public interface Kernel
-    extends EventSource<TCSEvent> {
+    extends org.opentcs.util.eventsystem.EventSource<org.opentcs.util.eventsystem.TCSEvent> {
 
   /**
    * The default name used for the empty model created on startup.
@@ -68,8 +71,12 @@ public interface Kernel
    * @return The permissions the calling client is granted.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated User management should be strictly configuration-based and will not be supported by
+   * kernel interaction in the future.
    */
-  Set<UserPermission> getUserPermissions()
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  Set<org.opentcs.data.user.UserPermission> getUserPermissions()
       throws CredentialsException;
 
   /**
@@ -79,8 +86,6 @@ public interface Kernel
    * @param userPassword The new user's password.
    * @param userPermissions The new user's permissions.
    * @throws org.opentcs.data.user.UserExistsException If a user with the given name exists already.
-   * @throws UnsupportedKernelOpException If user management is not
-   * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @deprecated User management should be strictly configuration-based and will not be supported by
@@ -89,9 +94,8 @@ public interface Kernel
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void createUser(String userName, String userPassword,
-                  Set<UserPermission> userPermissions)
-      throws org.opentcs.data.user.UserExistsException, UnsupportedKernelOpException,
-             CredentialsException;
+                  Set<org.opentcs.data.user.UserPermission> userPermissions)
+      throws org.opentcs.data.user.UserExistsException, CredentialsException;
 
   /**
    * Changes a user's password.
@@ -100,8 +104,6 @@ public interface Kernel
    * changed.
    * @param userPassword The user's new password.
    * @throws org.opentcs.data.user.UserUnknownException If the user does not exist.
-   * @throws UnsupportedKernelOpException If user management is not
-   * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @deprecated User management should be strictly configuration-based and will not be supported by
@@ -110,8 +112,7 @@ public interface Kernel
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void setUserPassword(String userName, String userPassword)
-      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
-             CredentialsException;
+      throws org.opentcs.data.user.UserUnknownException, CredentialsException;
 
   /**
    * Changes a user's permissions.
@@ -120,8 +121,6 @@ public interface Kernel
    * changed.
    * @param userPermissions The user's new permissions.
    * @throws org.opentcs.data.user.UserUnknownException If the user does not exist.
-   * @throws UnsupportedKernelOpException If user management is not
-   * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @deprecated User management should be strictly configuration-based and will not be supported by
@@ -129,17 +128,15 @@ public interface Kernel
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  void setUserPermissions(String userName, Set<UserPermission> userPermissions)
-      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
-             CredentialsException;
+  void setUserPermissions(String userName,
+                          Set<org.opentcs.data.user.UserPermission> userPermissions)
+      throws org.opentcs.data.user.UserUnknownException, CredentialsException;
 
   /**
    * Removes a user account.
    *
    * @param userName The name of the user whose account is to be removed.
    * @throws org.opentcs.data.user.UserUnknownException If the user does not exist.
-   * @throws UnsupportedKernelOpException If user management is not
-   * implemented.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @deprecated User management should be strictly configuration-based and will not be supported by
@@ -148,8 +145,7 @@ public interface Kernel
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void removeUser(String userName)
-      throws org.opentcs.data.user.UserUnknownException, UnsupportedKernelOpException,
-             CredentialsException;
+      throws org.opentcs.data.user.UserUnknownException, CredentialsException;
 
   /**
    * Returns the current state of the kernel.
@@ -163,6 +159,9 @@ public interface Kernel
 
   /**
    * Sets the current state of the kernel.
+   * <p>
+   * Note: This method should only be used internally by the Kernel application.
+   * </p>
    *
    * @param newState The state the kernel is to be set to.
    * @throws IllegalArgumentException If setting the new state is not possible,
@@ -180,7 +179,9 @@ public interface Kernel
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @throws IllegalStateException If retrieving the model name was not possible.
+   * @deprecated Use {@link PlantModelService#getPersistentModelName()} instead.
    */
+  @Deprecated
   String getPersistentModelName()
       throws CredentialsException, IllegalStateException;
 
@@ -190,7 +191,9 @@ public interface Kernel
    * @return The name of the currently loaded model.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link PlantModelService#getLoadedModelName()} instead.
    */
+  @Deprecated
   String getLoadedModelName()
       throws CredentialsException;
 
@@ -216,7 +219,10 @@ public interface Kernel
    * @throws ObjectExistsException If an object with the same name already exists in the model.
    * @throws CredentialsException If the calling client is not allowed to execute this method.
    * @throws IllegalStateException If there was a problem persisting the model.
+   * @deprecated Use {@link PlantModelService#createPlantModel(
+   * org.opentcs.access.to.model.PlantModelCreationTO)} instead.
    */
+  @Deprecated
   void createPlantModel(PlantModelCreationTO to)
       throws CredentialsException, ObjectUnknownException, ObjectExistsException,
              IllegalStateException;
@@ -278,7 +284,10 @@ public interface Kernel
    * class.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObject(
+   * java.lang.Class, org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                           TCSObjectReference<T> ref)
       throws CredentialsException;
@@ -294,7 +303,10 @@ public interface Kernel
    * class.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObject(java.lang.Class, java.lang.String)}
+   * instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> T getTCSObject(Class<T> clazz,
                                           String name)
       throws CredentialsException;
@@ -307,7 +319,9 @@ public interface Kernel
    * @return Copies of all existing objects of the given class.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObjects(java.lang.Class)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz)
       throws CredentialsException;
 
@@ -325,7 +339,10 @@ public interface Kernel
    * empty.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObjects(
+   * java.lang.Class, java.util.function.Predicate)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> Set<T> getTCSObjects(Class<T> clazz,
                                                 @Nullable Pattern regexp)
       throws CredentialsException;
@@ -341,7 +358,10 @@ public interface Kernel
    * true. If no such objects exist, the returned set will be empty.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#fetchObjects(
+   * java.lang.Class, java.util.function.Predicate)} instead.
    */
+  @Deprecated
   <T extends TCSObject<T>> Set<T> getTCSObjects(@Nonnull Class<T> clazz,
                                                 @Nonnull Predicate<? super T> predicate)
       throws CredentialsException;
@@ -374,7 +394,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced object does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TCSObjectService#updateObjectProperty(
+   * org.opentcs.data.TCSObjectReference, java.lang.String, java.lang.String)} instead.
    */
+  @Deprecated
   void setTCSObjectProperty(TCSObjectReference<?> ref,
                             String key,
                             @Nullable String value)
@@ -388,6 +411,7 @@ public interface Kernel
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    */
+  @Deprecated
   void clearTCSObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException, CredentialsException;
 
@@ -413,7 +437,10 @@ public interface Kernel
    * @param notification The notification to be published.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use{@link NotificationService#publishUserNotification(
+   * org.opentcs.data.notification.UserNotification)} instead.
    */
+  @Deprecated
   void publishUserNotification(UserNotification notification)
       throws CredentialsException;
 
@@ -425,7 +452,10 @@ public interface Kernel
    * @return A list of user notifications.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link NotificationService#fetchUserNotifications(
+   * java.util.function.Predicate)} instead.
    */
+  @Deprecated
   List<UserNotification> getUserNotifications(Predicate<UserNotification> predicate)
       throws CredentialsException;
 
@@ -703,7 +733,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced path does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link RouterService#updatePathLock(
+   * org.opentcs.data.TCSObjectReference, boolean)} instead.
    */
+  @Deprecated
   void setPathLocked(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException, CredentialsException;
 
@@ -780,7 +813,10 @@ public interface Kernel
    * @param ref A reference to the vehicle to be modified.
    * @param processableCategories A set of transport order categories.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link VehicleService#updateVehicleProcessableCategories(
+   * org.opentcs.data.TCSObjectReference, java.util.Set)} instead.
    */
+  @Deprecated
   void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
                                        Set<String> processableCategories)
       throws ObjectUnknownException;
@@ -1173,7 +1209,11 @@ public interface Kernel
    * @throws ObjectUnknownException If any referenced object does not exist.
    * @throws ObjectExistsException If an object with the same name already exists in the model.
    * @throws CredentialsException If the calling client is not allowed to execute this method.
+   * @deprecated Use
+   * {@link TransportOrderService#createTransportOrder(
+   * org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
   TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws CredentialsException, ObjectUnknownException, ObjectExistsException;
 
@@ -1204,7 +1244,10 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TransportOrderService#createTransportOrder(
+   * org.opentcs.access.to.order.TransportOrderCreationTO)} instead.
    */
+  @Deprecated
   void activateTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, CredentialsException;
 
@@ -1319,7 +1362,11 @@ public interface Kernel
    * @throws ObjectUnknownException If any referenced object does not exist.
    * @throws ObjectExistsException If an object with the same name already exists in the model.
    * @throws CredentialsException If the calling client is not allowed to execute this method.
+   * @deprecated Use
+   * {@link TransportOrderService#createOrderSequence(
+   * org.opentcs.access.to.order.OrderSequenceCreationTO)} instead.
    */
+  @Deprecated
   OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws CredentialsException;
 
@@ -1369,7 +1416,10 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link TransportOrderService#markOrderSequenceComplete(
+   * org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
   void setOrderSequenceComplete(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException, CredentialsException;
 
@@ -1429,7 +1479,10 @@ public interface Kernel
    * exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link DispatcherService#withdrawByTransportOrder(
+   * org.opentcs.data.TCSObjectReference, boolean, boolean)} instead.
    */
+  @Deprecated
   void withdrawTransportOrder(TCSObjectReference<TransportOrder> ref,
                               boolean immediateAbort,
                               boolean disableVehicle)
@@ -1453,7 +1506,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link DispatcherService#withdrawByVehicle(
+   * org.opentcs.data.TCSObjectReference, boolean, boolean)} instead.
    */
+  @Deprecated
   void withdrawTransportOrderByVehicle(TCSObjectReference<Vehicle> vehicleRef,
                                        boolean immediateAbort,
                                        boolean disableVehicle)
@@ -1472,7 +1528,9 @@ public interface Kernel
    * execute this method.
    * @throws IllegalArgumentException If the referenced vehicle is not in a
    * dispatchable state (IDLE or, if the corresponding flag is set, UNAVAILABLE).
+   * @deprecated Use {@link DispatcherService#dispatch()} instead.
    */
+  @Deprecated
   void dispatchVehicle(TCSObjectReference<Vehicle> vehicleRef,
                        boolean setIdleIfUnavailable)
       throws ObjectUnknownException, CredentialsException,
@@ -1486,7 +1544,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use {@link DispatcherService#releaseVehicle(org.opentcs.data.TCSObjectReference)}
+   * instead.
    */
+  @Deprecated
   void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException, CredentialsException;
 
@@ -1507,7 +1568,10 @@ public interface Kernel
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use{@link VehicleService#sendCommAdapterMessage(
+   * org.opentcs.data.TCSObjectReference, java.lang.Object)} instead.
    */
+  @Deprecated
   void sendCommAdapterMessage(TCSObjectReference<Vehicle> vehicleRef,
                               Object message)
       throws ObjectUnknownException, CredentialsException;
@@ -1539,7 +1603,9 @@ public interface Kernel
    * re-evaluated.
    *
    * @throws CredentialsException If the calling client is not allowed to execute this method.
+   * @deprecated Use {@link RouterService#updateRoutingTopology()} instead.
    */
+  @Deprecated
   void updateRoutingTopology()
       throws CredentialsException;
 
@@ -1555,7 +1621,11 @@ public interface Kernel
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
    * @throws ObjectUnknownException If something is not known.
+   * @deprecated Providing travel costs to external clients will not be part of the standard kernel
+   * API any more.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   List<TravelCosts> getTravelCosts(@Nullable TCSObjectReference<Vehicle> vRef,
                                    TCSObjectReference<Location> srcRef,
                                    Set<TCSObjectReference<Location>> destRefs)
@@ -1571,8 +1641,11 @@ public interface Kernel
    * current state.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Use
+   * {@link SchedulerService#fetchSchedulerAllocations()} instead.
    */
-  <T extends Query<T>> T query(Class<T> clazz)
+  @Deprecated
+  <T extends org.opentcs.access.queries.Query<T>> T query(Class<T> clazz)
       throws CredentialsException;
 
   /**
@@ -1602,6 +1675,37 @@ public interface Kernel
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void setSimulationTimeFactor(double factor)
       throws CredentialsException;
+
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Subscribe/Unsubscribe to the application's event bus instead.
+   */
+  @Deprecated
+  @Override
+  public void removeEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener);
+
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Subscribe/Unsubscribe to the application's event bus instead.
+   */
+  @Deprecated
+  @Override
+  public void addEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener);
+
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Subscribe/Unsubscribe to the application's event bus instead.
+   */
+  @Deprecated
+  @Override
+  public void addEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener,
+      org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> filter);
 
   /**
    * The various states a kernel instance may be running in.

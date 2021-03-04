@@ -12,10 +12,10 @@ import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.model.elements.VehicleModel;
@@ -42,34 +42,36 @@ public class DispatchVehicleAction
    */
   private final VehicleModel vehicleModel;
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
 
   /**
    * Creates a new instance.
    *
    * @param vehicle The selected vehicle.
-   * @param kernelProvider Provides access to a shared kernel.
+   * @param portalProvider Provides access to a shared portal.
    */
   @Inject
   public DispatchVehicleAction(@Assisted VehicleModel vehicle,
-                               SharedKernelProvider kernelProvider) {
+                               SharedKernelServicePortalProvider portalProvider) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    try (SharedKernelClient kernelClient = kernelProvider.register()) {
-      kernelClient.getKernel().dispatchVehicle(vehicleReference(kernelClient.getKernel()), true);
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      KernelServicePortal portal = sharedPortal.getPortal();
+      TCSObjectReference<Vehicle> vehicleRef = portal.getVehicleService()
+          .fetchObject(Vehicle.class, vehicleModel.getName()).getReference();
+      portal.getVehicleService().updateVehicleIntegrationLevel(
+          vehicleRef,
+          Vehicle.IntegrationLevel.TO_BE_UTILIZED);
+      portal.getDispatcherService().dispatch();
     }
     catch (KernelRuntimeException e) {
       LOG.warn("Unexpected exception", e);
     }
-  }
-
-  private TCSObjectReference<Vehicle> vehicleReference(Kernel kernel) {
-    return kernel.getTCSObject(Vehicle.class, vehicleModel.getName()).getReference();
   }
 }

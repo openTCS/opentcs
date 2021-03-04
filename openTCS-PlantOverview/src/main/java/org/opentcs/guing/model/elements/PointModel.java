@@ -41,7 +41,6 @@ public class PointModel
    * Creates a new instance.
    */
   public PointModel() {
-    super();
     createProperties();
   }
 
@@ -53,6 +52,47 @@ public class PointModel
   @Override
   public LabeledPointFigure getFigure() {
     return (LabeledPointFigure) super.getFigure();
+  }
+
+  public CoordinateProperty getPropertyModelPositionX() {
+    return (CoordinateProperty) getProperty(MODEL_X_POSITION);
+  }
+
+  public CoordinateProperty getPropertyModelPositionY() {
+    return (CoordinateProperty) getProperty(MODEL_Y_POSITION);
+  }
+
+  public AngleProperty getPropertyVehicleOrientationAngle() {
+    return (AngleProperty) getProperty(VEHICLE_ORIENTATION_ANGLE);
+  }
+
+  @SuppressWarnings("unchecked")
+  public SelectionProperty<PointType> getPropertyType() {
+    return (SelectionProperty<PointType>) getProperty(TYPE);
+  }
+
+  public KeyValueSetProperty getPropertyMiscellaneous() {
+    return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+
+  public StringProperty getPropertyLayoutPosX() {
+    return (StringProperty) getProperty(ElementPropKeys.POINT_POS_X);
+  }
+
+  public StringProperty getPropertyLayoutPosY() {
+    return (StringProperty) getProperty(ElementPropKeys.POINT_POS_Y);
+  }
+
+  public StringProperty getPropertyPointLabelOffsetX() {
+    return (StringProperty) getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
+  }
+
+  public StringProperty getPropertyPointLabelOffsetY() {
+    return (StringProperty) getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
+  }
+
+  public StringProperty getPropertyPointLabelOrientationAngle() {
+    return (StringProperty) getProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
   }
 
   private void createProperties() {

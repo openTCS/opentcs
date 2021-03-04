@@ -7,18 +7,16 @@
  */
 package org.opentcs.access.rmi;
 
-import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
-import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import java.lang.reflect.Proxy;
 import java.rmi.registry.Registry;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.eventsystem.EventSource;
-import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
  * Builds {@link KernelProxy} instances for connections to remote kernels.
@@ -42,12 +40,15 @@ import org.opentcs.util.eventsystem.TCSEvent;
  * You can use a custom intervals and timeouts for polling by setting the respective build
  * parameters.
  * To receive these events in your client code, register an event listener with the proxy by calling
- * its {@link EventSource#addEventListener(org.opentcs.util.eventsystem.EventListener)} method.
+ * its {@link org.opentcs.util.eventsystem.EventSource#addEventListener(org.opentcs.util.eventsystem.EventListener)} method.
  * The proxy will then forward events to your registered listener.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link KernelServicePortalBuilder} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class KernelProxyBuilder {
 
   /**
@@ -74,7 +75,7 @@ public class KernelProxyBuilder {
    * An event filter for filtering events with the remote kernel.
    */
   @SuppressWarnings("deprecation")
-  private org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter
+  private org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> eventFilter
       = new org.opentcs.util.eventsystem.AcceptingTCSEventFilter();
   /**
    * The time to wait between event polls with the remote kernel (in ms).
@@ -193,7 +194,7 @@ public class KernelProxyBuilder {
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public org.opentcs.util.eventsystem.EventFilter<TCSEvent> getEventFilter() {
+  public org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> getEventFilter() {
     return eventFilter;
   }
 
@@ -207,7 +208,7 @@ public class KernelProxyBuilder {
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public KernelProxyBuilder setEventFilter(
-      @Nonnull org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter) {
+      @Nonnull org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> eventFilter) {
     this.eventFilter = requireNonNull(eventFilter, "eventFilter");
     return this;
   }

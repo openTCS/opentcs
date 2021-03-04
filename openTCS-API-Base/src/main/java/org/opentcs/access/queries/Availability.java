@@ -14,6 +14,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Indicates in which kernel states the annotated query is available.
@@ -21,11 +22,14 @@ import org.opentcs.access.Kernel;
  * @see org.opentcs.access.Kernel.State
  * @see org.opentcs.access.Kernel#getState()
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Instead of queries, explicit service calls should be used.
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public @interface Availability {
 
   /**

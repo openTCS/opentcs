@@ -7,14 +7,15 @@
  */
 package org.opentcs.access;
 
-import org.opentcs.access.rmi.KernelUnavailableException;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Pools access to a kernel for multiple clients.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link SharedKernelServicePortalProvider} instead.
  */
+@Deprecated
 public interface SharedKernelProvider {
 
   /**
@@ -36,12 +37,13 @@ public interface SharedKernelProvider {
    * preexisting client.
    *
    * @return the new client
-   * @throws KernelUnavailableException in case of connection falure with Kernel.
+   * @throws org.opentcs.access.rmi.KernelUnavailableException in case of connection failure with
+   * the Kernel.
    */
   @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
   default SharedKernelClient register()
-      throws KernelUnavailableException {
-    throw new KernelUnavailableException("No default implementation.");
+      throws org.opentcs.access.rmi.KernelUnavailableException {
+    throw new org.opentcs.access.rmi.KernelUnavailableException("No default implementation.");
   }
 
   /**
@@ -68,6 +70,17 @@ public interface SharedKernelProvider {
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   Kernel getKernel();
 
+  /**
+   * Returns a reference to the pooled portal.
+   *
+   * @return A reference to the pooled portal.
+   * @deprecated Use {@link #register()} to register and the returned
+   * {@link SharedKernelServicePortal} to provide a portal and unregister instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
+  KernelServicePortal getPortal();
+  
   /**
    * Checks whether a kernel reference is currently being shared.
    *

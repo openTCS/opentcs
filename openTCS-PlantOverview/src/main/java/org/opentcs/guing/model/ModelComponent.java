@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.Property;
+import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.TreeViewManager;
 
 /**
@@ -170,6 +171,15 @@ public interface ModelComponent
    * @param property
    */
   void setProperty(String name, Property property);
+  
+  /**
+   * Returns this component's name property.
+   *
+   * @return This component's name property.
+   */
+  default StringProperty getPropertyName() {
+    return (StringProperty) getProperty(NAME);
+  };
 
   /**
    * Fügt den übergebenen AttributesChangeListener hinzu und informiert diesen

@@ -11,37 +11,39 @@ package org.opentcs.guing.exchange;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import net.engio.mbassy.bus.MBassador;
-import net.engio.mbassy.listener.Handler;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelClient;
-import org.opentcs.access.SharedKernelProvider;
-import org.opentcs.access.TCSKernelStateEvent;
-import org.opentcs.access.TCSNotificationEvent;
-import org.opentcs.access.rmi.RemoteKernelConnection;
-import org.opentcs.access.rmi.TCSProxyStateEvent;
+import org.opentcs.access.KernelStateTransitionEvent;
+import org.opentcs.access.NotificationPublicationEvent;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.common.ClientConnectionMode;
+import org.opentcs.components.Lifecycle;
+import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
 import static org.opentcs.data.TCSObjectEvent.Type.OBJECT_MODIFIED;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
-import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
+import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
+import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.util.MessageDisplay;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.EventBus;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The openTCS implementation of the abstract event dispatcher.
+ * A central event dispatcher between the kernel and the plant overview.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSEventDispatcher
-    extends AbstractEventDispatcher
-    implements EventListener<TCSEvent> {
+    implements Lifecycle,
+               EventHandler {
 
   /**
    * This class's logger.
@@ -60,126 +62,149 @@ public class OpenTCSEventDispatcher
    */
   private final OrderSequenceDispatcher fOrderSequenceDispatcher;
   /**
-   * The application's event bus.
+   * Where we get events from and send them to.
    */
-  private final MBassador<Object> eventBus;
+  private final EventBus eventBus;
   /**
-   * A reference to a shared kernel instance.
+   * The process adapter util.
    */
-  private SharedKernelClient kernelClient;
+  private final ProcessAdapterUtil processAdapterUtil;
+  /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
+  /**
+   * Provides access to a portal.
+   */
+  private final SharedKernelServicePortalProvider portalProvider;
+  /**
+   * A reference to a shared portal instance.
+   */
+  private SharedKernelServicePortal sharedPortal;
+  /**
+   * Whether this component is initialized.
+   */
+  private boolean initialized;
 
   /**
    * Creates a new instance.
    *
-   * @param kernelProvider Provides a access to a kernel.
+   * @param portalProvider Provides a access to a portal.
    * @param messageDisplay A display for messages received from the kernel.
-   * @param eventBus The application's event bus.
+   * @param eventBus Where this instance gets events from and sends them to.
    * @param orderDispatcher Handles events concerning transport orders.
    * @param sequenceDispatcher Handles events concerning order sequences.
+   * @param processAdapterUtil The process adapter util.
+   * @param modelManager The model manager.
    */
   @Inject
-  public OpenTCSEventDispatcher(SharedKernelProvider kernelProvider,
+  public OpenTCSEventDispatcher(SharedKernelServicePortalProvider portalProvider,
                                 MessageDisplay messageDisplay,
-                                MBassador<Object> eventBus,
+                                @ApplicationEventBus EventBus eventBus,
                                 TransportOrderDispatcher orderDispatcher,
-                                OrderSequenceDispatcher sequenceDispatcher) {
-    super(kernelProvider);
+                                OrderSequenceDispatcher sequenceDispatcher,
+                                ProcessAdapterUtil processAdapterUtil,
+                                ModelManager modelManager) {
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.messageDisplay = requireNonNull(messageDisplay, "messageDisplay");
     this.eventBus = requireNonNull(eventBus, "eventBus");
-    this.fTransportOrderDispatcher = requireNonNull(orderDispatcher,
-                                                    "orderDispatcher");
-    this.fOrderSequenceDispatcher = requireNonNull(sequenceDispatcher,
-                                                   "sequenceDispatcher");
+    this.fTransportOrderDispatcher = requireNonNull(orderDispatcher, "orderDispatcher");
+    this.fOrderSequenceDispatcher = requireNonNull(sequenceDispatcher, "sequenceDispatcher");
+    this.processAdapterUtil = requireNonNull(processAdapterUtil, "processAdapterUtil");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
   }
 
   @Override
-  public void register() {
-    LOG.debug("EventDispatcher {} registering with kernel...", this);
-    if (!getKernelProvider().kernelShared()) {
-      LOG.warn("No shared kernel to register with, aborting.");
+  public void initialize() {
+    if (isInitialized()) {
       return;
     }
 
-    kernelClient = getKernelProvider().register();
+    eventBus.subscribe(fTransportOrderDispatcher);
+    eventBus.subscribe(fOrderSequenceDispatcher);
+    eventBus.subscribe(this);
 
-    kernelClient.getKernel().addEventListener(fTransportOrderDispatcher);
-    kernelClient.getKernel().addEventListener(fOrderSequenceDispatcher);
-    kernelClient.getKernel().addEventListener(this);
+    initialized = true;
   }
 
   @Override
-  public void release() {
-    LOG.debug("EventDispatcher {} unregistering with kernel...", this);
-    if (!getKernelProvider().kernelShared() || kernelClient == null) {
-      LOG.warn("No shared kernel to unregister with, aborting.");
+  public void terminate() {
+    if (!isInitialized()) {
       return;
     }
 
-    kernelClient.getKernel().removeEventListener(fTransportOrderDispatcher);
-    kernelClient.getKernel().removeEventListener(fOrderSequenceDispatcher);
-    kernelClient.getKernel().removeEventListener(this);
+    eventBus.unsubscribe(fTransportOrderDispatcher);
+    eventBus.unsubscribe(fOrderSequenceDispatcher);
+    eventBus.unsubscribe(this);
 
-    kernelClient.close();
-    kernelClient = null;
+    initialized = false;
   }
 
   @Override
-  public void processEvent(TCSEvent event) {
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  private void register() {
+    LOG.debug("EventDispatcher {} registering with portal...", this);
+    if (!portalProvider.portalShared()) {
+      LOG.warn("No shared portal to register with, aborting.");
+      return;
+    }
+
+    sharedPortal = portalProvider.register();
+
+  }
+
+  private void release() {
+    LOG.debug("EventDispatcher {} unregistering with portal...", this);
+    if (!portalProvider.portalShared() || sharedPortal == null) {
+      LOG.warn("No shared portal to unregister with, aborting.");
+      return;
+    }
+
+    sharedPortal.close();
+    sharedPortal = null;
+  }
+
+  @Override
+  public void onEvent(Object event) {
     if (event instanceof TCSObjectEvent) {
       processObjectEvent((TCSObjectEvent) event);
     }
-    else if (event instanceof TCSKernelStateEvent) {
-      TCSKernelStateEvent kse = (TCSKernelStateEvent) event;
+    else if (event instanceof KernelStateTransitionEvent) {
+      KernelStateTransitionEvent kse = (KernelStateTransitionEvent) event;
 
       // React instantly on SHUTDOWN of the kernel, otherwise wait for
       // the transition to finish
       if (kse.isTransitionFinished()
           || kse.getEnteredState() == Kernel.State.SHUTDOWN) {
-        eventBus.publish(new KernelStateChangeEvent(
+        eventBus.onEvent(new KernelStateChangeEvent(
             this,
             KernelStateChangeEvent.convertKernelState(kse.getEnteredState())));
       }
     }
-    else if (event instanceof TCSProxyStateEvent) {
-      TCSProxyStateEvent pse = (TCSProxyStateEvent) event;
-
-      if (pse.getEnteredState() == RemoteKernelConnection.State.DISCONNECTED) {
-        eventBus.publish(new KernelStateChangeEvent(this,
-                                                    KernelStateChangeEvent.State.DISCONNECTED));
-      }
+    else if (event instanceof NotificationPublicationEvent) {
+      messageDisplay.display(((NotificationPublicationEvent) event).getNotification());
     }
-    else if (event instanceof TCSNotificationEvent) {
-      messageDisplay.display(((TCSNotificationEvent) event).getNotification());
+    else if (event instanceof OperationModeChangeEvent) {
+      handleOperationModeChange((OperationModeChangeEvent) event);
     }
-  }
-
-  @Handler
-  public void handleSystemModelTransition(SystemModelTransitionEvent evt) {
-    switch (evt.getStage()) {
-      case UNLOADING:
-        release();
-        break;
-      case UNLOADED:
-        // XXX Explicitly unsubscribing from the event bus when the old
-        // XXX system model is thrown away is unelegant but currently necessary.
-        // XXX If we did not do this, the dispatcher would re-register with the
-        // XXX kernel upon the following LOADED event before the garbage
-        // XXX collection has a chance to implicitly unsubscribe it.
-        eventBus.unsubscribe(this);
-        break;
-      case LOADED:
-        register();
-        break;
-      default:
+    else if (event == ClientConnectionMode.OFFLINE) {
+      eventBus.onEvent(new KernelStateChangeEvent(this,
+                                                  KernelStateChangeEvent.State.DISCONNECTED));
     }
   }
 
-  @Handler
-  public void handleOperationModeChange(OperationModeChangeEvent evt) {
+  private void handleOperationModeChange(OperationModeChangeEvent evt) {
+    // If the application switches to OPERATING, we want to register with the kernel.
     // If the application switches to any state other than OPERATING, we will
     // not be able to permanently communicate with the kernel any more, so
     // unregister from it.
-    if (evt.getNewMode() != OperationMode.OPERATING) {
+    if (evt.getNewMode() == OperationMode.OPERATING) {
+      register();
+    }
+    else {
       release();
     }
   }
@@ -189,16 +214,23 @@ public class OpenTCSEventDispatcher
               objectEvent.getCurrentOrPreviousObjectState().getName(),
               objectEvent.getType().name());
 
+    if (sharedPortal == null) {
+      return;
+    }
+
     if (objectEvent.getType() == OBJECT_MODIFIED) {
-      ProcessAdapter adapter
-          = findProcessAdapter(objectEvent.getCurrentObjectState().getReference());
-      if (adapter == null) {
-        LOG.debug("No adapter found for {}",
+      ModelComponent modelComponent = modelManager.getModel()
+          .getModelComponent(objectEvent.getCurrentObjectState().getReference().getName());
+      if (modelComponent == null) {
+        LOG.debug("No model component found for {}",
                   objectEvent.getCurrentOrPreviousObjectState().getName());
         return;
       }
-      adapter.updateModelProperties(kernelClient.getKernel(),
-                                    objectEvent.getCurrentObjectState(),
+
+      ProcessAdapter adapter = processAdapterUtil.processAdapterFor(modelComponent);
+      adapter.updateModelProperties(objectEvent.getCurrentObjectState(),
+                                    modelComponent, modelManager.getModel(),
+                                    (TCSObjectService) sharedPortal.getPortal().getPlantModelService(),
                                     null);
     }
   }

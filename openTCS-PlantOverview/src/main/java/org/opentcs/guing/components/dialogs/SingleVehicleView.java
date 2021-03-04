@@ -21,6 +21,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -31,13 +32,10 @@ import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.properties.type.PercentProperty;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Ein Fahrzeug im {@link AllVehiclesPanel}.
@@ -136,20 +134,14 @@ public class SingleVehicleView
     figure.forcedDraw(g2d);
   }
 
-  /**
-   * Zeigt ein Popup-Menu.
-   *
-   * @param x
-   * @param y
-   */
   private void showPopup(int x, int y) {
     menuFactory.createVehiclePopupMenu(fVehicleModel).show(this, x, y);
   }
 
   private void updateVehicle() {
-    vehicleStatus.setText(((Vehicle.State) ((SelectionProperty) fVehicleModel.getProperty(VehicleModel.STATE)).getValue()).toString());
-    batteryLabel.setText(((PercentProperty) fVehicleModel.getProperty(VehicleModel.ENERGY_LEVEL)).getValue() + " %");
-    Object energyState = ((SelectionProperty) fVehicleModel.getProperty(VehicleModel.ENERGY_STATE)).getValue();
+    vehicleStatus.setText(((Vehicle.State) fVehicleModel.getPropertyState().getValue()).toString());
+    batteryLabel.setText(fVehicleModel.getPropertyEnergyLevel().getValue() + " %");
+    Object energyState = fVehicleModel.getPropertyEnergyState().getValue();
 
     if (VehicleModel.EnergyState.CRITICAL.equals(energyState)) {
       batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().

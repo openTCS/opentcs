@@ -14,12 +14,16 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A query for resources currently allocated.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Instead of queries, explicit service calls should be used.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 @Availability(Kernel.State.OPERATING)
 public class QuerySchedulerAllocations
     extends Query<QuerySchedulerAllocations>

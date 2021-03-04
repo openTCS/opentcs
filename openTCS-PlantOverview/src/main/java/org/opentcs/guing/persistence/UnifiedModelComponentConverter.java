@@ -24,25 +24,16 @@ import static org.opentcs.data.model.Point.Type.PARK_POSITION;
 import static org.opentcs.data.model.Point.Type.REPORT_POSITION;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
-import org.opentcs.guing.components.properties.type.BooleanProperty;
-import org.opentcs.guing.components.properties.type.ColorProperty;
-import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
@@ -54,6 +45,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import static org.opentcs.guing.model.elements.PointModel.PointType.HALT;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.util.Colors;
 import org.opentcs.util.persistence.binding.AllowedOperationTO;
 import org.opentcs.util.persistence.binding.BlockTO;
 import org.opentcs.util.persistence.binding.Comparators;
@@ -156,21 +148,12 @@ public class UnifiedModelComponentConverter {
   private PointTO convertPoint(PointModel pointModel, List<PathModel> pathModels) {
     PointTO point = new PointTO();
 
-    StringProperty sp = (StringProperty) pointModel.getProperty(PointModel.NAME);
-    point.setName(sp.getText());
+    point.setName(pointModel.getPropertyName().getText());
+    point.setxPosition((long) pointModel.getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM));
+    point.setyPosition((long) pointModel.getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM));
+    point.setVehicleOrientationAngle((float) pointModel.getPropertyVehicleOrientationAngle().getValueByUnit(AngleProperty.Unit.DEG));
 
-    CoordinateProperty cp = (CoordinateProperty) pointModel.getProperty(PointModel.MODEL_X_POSITION);
-    point.setxPosition((long) cp.getValueByUnit(LengthProperty.Unit.MM));
-
-    cp = (CoordinateProperty) pointModel.getProperty(PointModel.MODEL_Y_POSITION);
-    point.setyPosition((long) cp.getValueByUnit(LengthProperty.Unit.MM));
-
-    AngleProperty ap = (AngleProperty) pointModel.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
-    point.setVehicleOrientationAngle((float) ap.getValueByUnit(AngleProperty.Unit.DEG));
-
-    AbstractProperty selp = (AbstractProperty) pointModel.getProperty(PointModel.TYPE);
-    PointModel.PointType pointType = (PointModel.PointType) selp.getValue();
-    switch (pointType) {
+    switch ((PointModel.PointType) pointModel.getPropertyType().getValue()) {
       case HALT:
         point.setType(HALT_POSITION.name());
         break;
@@ -181,27 +164,21 @@ public class UnifiedModelComponentConverter {
         point.setType(PARK_POSITION.name());
         break;
       default:
-        throw new IllegalArgumentException("Unknown point type.");
+        throw new IllegalArgumentException("Unhandled point type.");
     }
 
     // Get this point's outgoing paths
     for (PathModel pathModel : pathModels) {
-      StringProperty pathStartComponent
-          = (StringProperty) pathModel.getProperty(AbstractConnection.START_COMPONENT);
-      if (Objects.equals(pathStartComponent.getText(), point.getName())) {
-        StringProperty pathName = (StringProperty) pathModel.getProperty(PathModel.NAME);
-        point.getOutgoingPaths().add(new PointTO.OutgoingPath().setName(pathName.getText()));
+      if (Objects.equals(pathModel.getPropertyStartComponent().getText(), point.getName())) {
+        point.getOutgoingPaths().add(
+            new PointTO.OutgoingPath().setName(pathModel.getPropertyName().getText())
+        );
       }
     }
     Collections.sort(point.getOutgoingPaths(), Comparators.outgoingPathsByName());
 
-    KeyValueSetProperty kvsp
-        = (KeyValueSetProperty) pointModel.getProperty(PointModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      point.getProperties().add(property);
+    for (KeyValueProperty kvp : pointModel.getPropertyMiscellaneous().getItems()) {
+      point.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
     return point;
@@ -210,36 +187,17 @@ public class UnifiedModelComponentConverter {
   private PathTO convertPath(PathModel pathModel) {
     PathTO path = new PathTO();
 
-    StringProperty sp = (StringProperty) pathModel.getProperty(PathModel.NAME);
-    path.setName(sp.getText());
+    path.setName(pathModel.getPropertyName().getText());
+    path.setSourcePoint(pathModel.getPropertyStartComponent().getText());
+    path.setDestinationPoint(pathModel.getPropertyEndComponent().getText());
+    path.setLength((long) pathModel.getPropertyLength().getValueByUnit(LengthProperty.Unit.MM));
+    path.setRoutingCost(((Integer) pathModel.getPropertyRoutingCost().getValue()).longValue());
+    path.setMaxVelocity((long) pathModel.getPropertyMaxVelocity().getValueByUnit(SpeedProperty.Unit.MM_S));
+    path.setMaxReverseVelocity((long) pathModel.getPropertyMaxReverseVelocity().getValueByUnit(SpeedProperty.Unit.MM_S));
+    path.setLocked((Boolean) pathModel.getPropertyLocked().getValue());
 
-    sp = (StringProperty) pathModel.getProperty(PathModel.START_COMPONENT);
-    path.setSourcePoint(sp.getText());
-
-    sp = (StringProperty) pathModel.getProperty(PathModel.END_COMPONENT);
-    path.setDestinationPoint(sp.getText());
-
-    LengthProperty lp = (LengthProperty) pathModel.getProperty(PathModel.LENGTH);
-    path.setLength((long) lp.getValueByUnit(LengthProperty.Unit.MM));
-
-    IntegerProperty ip = (IntegerProperty) pathModel.getProperty(PathModel.ROUTING_COST);
-    path.setRoutingCost(((Integer) ip.getValue()).longValue());
-
-    SpeedProperty spdp = (SpeedProperty) pathModel.getProperty(PathModel.MAX_VELOCITY);
-    path.setMaxVelocity((long) spdp.getValueByUnit(SpeedProperty.Unit.MM_S));
-
-    spdp = (SpeedProperty) pathModel.getProperty(PathModel.MAX_REVERSE_VELOCITY);
-    path.setMaxReverseVelocity((long) spdp.getValueByUnit(SpeedProperty.Unit.MM_S));
-
-    BooleanProperty bp = (BooleanProperty) pathModel.getProperty(PathModel.LOCKED);
-    path.setLocked((Boolean) bp.getValue());
-
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) pathModel.getProperty(PathModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      path.getProperties().add(property);
+    for (KeyValueProperty kvp : pathModel.getPropertyMiscellaneous().getItems()) {
+      path.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
     return path;
@@ -248,127 +206,96 @@ public class UnifiedModelComponentConverter {
   private VehicleTO convertVehicle(VehicleModel vehicleModel) {
     VehicleTO vehicle = new VehicleTO();
 
-    StringProperty sp = (StringProperty) vehicleModel.getProperty(VehicleModel.NAME);
-    vehicle.setName(sp.getText());
+    vehicle.setName(vehicleModel.getPropertyName().getText());
+    vehicle.setLength((long) vehicleModel.getPropertyLength().getValueByUnit(LengthProperty.Unit.MM));
+    vehicle.setMaxVelocity(((Double) vehicleModel.getPropertyMaxVelocity().getValueByUnit(Unit.MM_S)).intValue());
+    vehicle.setMaxReverseVelocity(((Double) vehicleModel.getPropertyMaxReverseVelocity().getValueByUnit(Unit.MM_S)).intValue());
+    vehicle.setEnergyLevelGood((long) vehicleModel.getPropertyEnergyLevelGood().getValueByUnit(PercentProperty.Unit.PERCENT));
+    vehicle.setEnergyLevelCritical((long) vehicleModel.getPropertyEnergyLevelCritical().getValueByUnit(PercentProperty.Unit.PERCENT));
 
-    LengthProperty lp = (LengthProperty) vehicleModel.getProperty(VehicleModel.LENGTH);
-    vehicle.setLength((long) lp.getValueByUnit(LengthProperty.Unit.MM));
-
-    SpeedProperty maximumVelocityProperty = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_VELOCITY);
-    vehicle.setMaxVelocity(((Double) maximumVelocityProperty.getValueByUnit(Unit.MM_S)).intValue());
-    SpeedProperty maximumReverseVelocityProperty = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
-    vehicle.setMaxReverseVelocity(((Double) maximumReverseVelocityProperty.getValueByUnit(Unit.MM_S)).intValue());
-
-    PercentProperty pp = (PercentProperty) vehicleModel.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
-    vehicle.setEnergyLevelGood((long) pp.getValueByUnit(PercentProperty.Unit.PERCENT));
-
-    pp = (PercentProperty) vehicleModel.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
-    vehicle.setEnergyLevelCritical((long) pp.getValueByUnit(PercentProperty.Unit.PERCENT));
-
-    KeyValueSetProperty kvsp
-        = (KeyValueSetProperty) vehicleModel.getProperty(VehicleModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      PropertyTO property = new PropertyTO();
-      property.setName(kvp.getKey());
-      property.setValue(kvp.getValue());
-      vehicle.getProperties().add(property);
+    for (KeyValueProperty kvp : vehicleModel.getPropertyMiscellaneous().getItems()) {
+      vehicle.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
     return vehicle;
   }
 
-  private LocationTypeTO convertLocationType(LocationTypeModel locationTypeModel) {
-    LocationTypeTO locationType = new LocationTypeTO();
+  private LocationTypeTO convertLocationType(LocationTypeModel locTypeModel) {
+    LocationTypeTO locType = new LocationTypeTO();
 
-    StringProperty sp = (StringProperty) locationTypeModel.getProperty(LocationTypeModel.NAME);
-    locationType.setName(sp.getText());
+    locType.setName(locTypeModel.getPropertyName().getText());
 
-    StringSetProperty ssp
-        = (StringSetProperty) locationTypeModel.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
-    for (String operation : ssp.getItems()) {
-      AllowedOperationTO allowerdOperation = new AllowedOperationTO();
-      allowerdOperation.setName(operation);
-      locationType.getAllowedOperations().add(allowerdOperation);
+    for (String operation : locTypeModel.getPropertyAllowedOperations().getItems()) {
+      AllowedOperationTO allowedOperation = new AllowedOperationTO();
+      allowedOperation.setName(operation);
+      locType.getAllowedOperations().add(allowedOperation);
     }
 
-    KeyValueSetProperty kvsp
-        = (KeyValueSetProperty) locationTypeModel.getProperty(LocationTypeModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      locationType.getProperties().add(new PropertyTO()
-          .setName(kvp.getKey())
-          .setValue(kvp.getValue()));
+    for (KeyValueProperty kvp : locTypeModel.getPropertyMiscellaneous().getItems()) {
+      locType.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
-    SymbolProperty symp
-        = (SymbolProperty) locationTypeModel.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+    SymbolProperty symp = locTypeModel.getPropertyDefaultRepresentation();
     if (symp.getLocationRepresentation() != null) {
-      locationType.getProperties().add(new PropertyTO()
+      locType.getProperties().add(
+          new PropertyTO()
           .setName(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)
-          .setValue(symp.getLocationRepresentation().name()));
+          .setValue(symp.getLocationRepresentation().name())
+      );
     }
     else {
-      locationType.getProperties().removeIf(property
-          -> property.getName().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION));
+      locType.getProperties().removeIf(
+          prop -> prop.getName().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)
+      );
     }
 
-    return locationType;
+    return locType;
   }
 
   private LocationTO convertLocation(LocationModel locationModel, List<LinkModel> linkModels) {
     LocationTO location = new LocationTO();
 
-    StringProperty sp = (StringProperty) locationModel.getProperty(LocationModel.NAME);
-    String locationName = sp.getText();
+    String locationName = locationModel.getPropertyName().getText();
+
     location.setName(locationName);
-
-    CoordinateProperty cp
-        = (CoordinateProperty) locationModel.getProperty(LocationModel.MODEL_X_POSITION);
-    location.setxPosition((long) cp.getValueByUnit(LengthProperty.Unit.MM));
-
-    cp = (CoordinateProperty) locationModel.getProperty(LocationModel.MODEL_Y_POSITION);
-    location.setyPosition((long) cp.getValueByUnit(LengthProperty.Unit.MM));
-
-    LocationTypeProperty ltp = (LocationTypeProperty) locationModel.getProperty(LocationModel.TYPE);
-    location.setType(ltp.getValue().toString());
+    location.setxPosition((long) locationModel.getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM));
+    location.setyPosition((long) locationModel.getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM));
+    location.setType(locationModel.getPropertyType().getValue().toString());
 
     // Get this location's links
     for (LinkModel linkModel : linkModels) {
-      String linkName = ((StringProperty) linkModel.getProperty(LinkModel.NAME)).getText();
-      if (!linkName.contains(locationName)) {
+      if (!linkModel.getPropertyName().getText().contains(locationName)) {
         continue;
       }
-      LocationTO.Link link = new LocationTO.Link();
 
+      LocationTO.Link link = new LocationTO.Link();
       link.setPoint(linkModel.getPoint().getName());
 
-      StringSetProperty ssp
-          = (StringSetProperty) linkModel.getProperty(LinkModel.ALLOWED_OPERATIONS);
-      for (String operation : ssp.getItems()) {
-        AllowedOperationTO allowerdOperation = new AllowedOperationTO();
-        allowerdOperation.setName(operation);
-        link.getAllowedOperations().add(allowerdOperation);
+      for (String operation : linkModel.getPropertyAllowedOperations().getItems()) {
+        AllowedOperationTO allowedOperation = new AllowedOperationTO();
+        allowedOperation.setName(operation);
+        link.getAllowedOperations().add(allowedOperation);
       }
       location.getLinks().add(link);
     }
     Collections.sort(location.getLinks(), Comparators.linksByPointName());
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) locationModel.getProperty(LocationModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      location.getProperties().add(new PropertyTO()
-          .setName(kvp.getKey())
-          .setValue(kvp.getValue()));
+    for (KeyValueProperty kvp : locationModel.getPropertyMiscellaneous().getItems()) {
+      location.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
-    SymbolProperty symp
-        = (SymbolProperty) locationModel.getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
+    SymbolProperty symp = locationModel.getPropertyDefaultRepresentation();
     if (symp.getLocationRepresentation() != null) {
-      location.getProperties().add(new PropertyTO()
+      location.getProperties().add(
+          new PropertyTO()
           .setName(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
-          .setValue(symp.getLocationRepresentation().name()));
+          .setValue(symp.getLocationRepresentation().name())
+      );
     }
     else {
-      location.getProperties().removeIf(property
-          -> property.getName().equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION));
+      location.getProperties().removeIf(
+          prop -> prop.getName().equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
+      );
     }
 
     return location;
@@ -377,141 +304,114 @@ public class UnifiedModelComponentConverter {
   private BlockTO convertBlock(BlockModel blockModel) {
     BlockTO block = new BlockTO();
 
-    StringProperty sp = (StringProperty) blockModel.getProperty(BlockModel.NAME);
-    block.setName(sp.getText());
+    block.setName(blockModel.getPropertyName().getText());
 
-    StringSetProperty ssp = (StringSetProperty) blockModel.getProperty(BlockModel.ELEMENTS);
-    for (String element : ssp.getItems()) {
+    for (String element : blockModel.getPropertyElements().getItems()) {
       MemberTO member = new MemberTO();
       member.setName(element);
       block.getMembers().add(member);
     }
     Collections.sort(block.getMembers(), Comparators.elementsByName());
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) blockModel.getProperty(BlockModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      block.getProperties().add(new PropertyTO()
-          .setName(kvp.getKey())
-          .setValue(kvp.getValue()));
+    for (KeyValueProperty kvp : blockModel.getPropertyMiscellaneous().getItems()) {
+      block.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
     return block;
   }
 
   private StaticRouteTO convertStaticRoute(StaticRouteModel staticRouteModel) {
-    StaticRouteTO staticRoute = new StaticRouteTO();
+    StaticRouteTO route = new StaticRouteTO();
 
-    StringProperty sp = (StringProperty) staticRouteModel.getProperty(StaticRouteModel.NAME);
-    staticRoute.setName(sp.getText());
+    route.setName(staticRouteModel.getPropertyName().getText());
 
-    StringSetProperty ssp
-        = (StringSetProperty) staticRouteModel.getProperty(StaticRouteModel.ELEMENTS);
-    for (String element : ssp.getItems()) {
+    for (String element : staticRouteModel.getPropertyElements().getItems()) {
       StaticRouteTO.Hop hop = new StaticRouteTO.Hop();
       hop.setName(element);
-      staticRoute.getHops().add(hop);
+      route.getHops().add(hop);
     }
-    Collections.sort(staticRoute.getHops(), Comparators.hopsByName());
+    Collections.sort(route.getHops(), Comparators.hopsByName());
 
-    KeyValueSetProperty kvsp
-        = (KeyValueSetProperty) staticRouteModel.getProperty(StaticRouteModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      staticRoute.getProperties().add(new PropertyTO()
-          .setName(kvp.getKey())
-          .setValue(kvp.getValue()));
+    for (KeyValueProperty kvp : staticRouteModel.getPropertyMiscellaneous().getItems()) {
+      route.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
-    return staticRoute;
+    return route;
   }
 
   private GroupTO convertGroup(GroupModel groupModel) {
     GroupTO group = new GroupTO();
 
-    StringProperty sp = (StringProperty) groupModel.getProperty(GroupModel.NAME);
-    group.setName(sp.getText());
+    group.setName(groupModel.getPropertyName().getText());
 
-    StringSetProperty ssp = (StringSetProperty) groupModel.getProperty(GroupModel.ELEMENTS);
-    for (String element : ssp.getItems()) {
+    for (String element : groupModel.getPropertyElements().getItems()) {
       MemberTO member = new MemberTO();
       member.setName(element);
       group.getMembers().add(member);
     }
     Collections.sort(group.getMembers(), Comparators.elementsByName());
 
-    KeyValueSetProperty kvsp
-        = (KeyValueSetProperty) groupModel.getProperty(GroupModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      group.getProperties().add(new PropertyTO()
-          .setName(kvp.getKey())
-          .setValue(kvp.getValue()));
+    for (KeyValueProperty kvp : groupModel.getPropertyMiscellaneous().getItems()) {
+      group.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
     return group;
   }
 
   private VisualLayoutTO convertVisualLayout(LayoutModel layoutModel, SystemModel systemModel) {
-    VisualLayoutTO visualLayout = new VisualLayoutTO();
+    VisualLayoutTO layout = new VisualLayoutTO();
 
-    StringProperty sp = (StringProperty) layoutModel.getProperty(LayoutModel.NAME);
-    visualLayout.setName(sp.getText());
+    layout.setName(layoutModel.getPropertyName().getText());
+    layout.setScaleX((float) layoutModel.getPropertyScaleX().getValueByUnit(LengthProperty.Unit.MM));
+    layout.setScaleY((float) layoutModel.getPropertyScaleY().getValueByUnit(LengthProperty.Unit.MM));
 
-    LengthProperty lp = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_X);
-    visualLayout.setScaleX((float) lp.getValueByUnit(LengthProperty.Unit.MM));
-
-    lp = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_Y);
-    visualLayout.setScaleY((float) lp.getValueByUnit(LengthProperty.Unit.MM));
-
-    visualLayout.getModelLayoutElements()
+    layout.getModelLayoutElements()
         .addAll(extractBlockInformation(systemModel.getBlockModels()));
-    visualLayout.getModelLayoutElements()
+    layout.getModelLayoutElements()
         .addAll(extractLocationInformation(systemModel.getLocationModels()));
-    visualLayout.getModelLayoutElements()
+    layout.getModelLayoutElements()
         .addAll(extractPointInformation(systemModel.getPointModels()));
-    visualLayout.getModelLayoutElements()
+    layout.getModelLayoutElements()
         .addAll(extractPathInformation(systemModel.getPathModels()));
-    visualLayout.getModelLayoutElements()
+    layout.getModelLayoutElements()
         .addAll(extractVehiclePathColorInformation(systemModel.getVehicleModels()));
-    Collections.sort(visualLayout.getModelLayoutElements(), Comparators.modelLayoutelementsByName());
+    Collections.sort(layout.getModelLayoutElements(), Comparators.modelLayoutelementsByName());
 
-    KeyValueSetProperty kvsp
-        = (KeyValueSetProperty) layoutModel.getProperty(LayoutModel.MISCELLANEOUS);
-    for (KeyValueProperty kvp : kvsp.getItems()) {
-      visualLayout.getProperties().add(new PropertyTO()
-          .setName(kvp.getKey())
-          .setValue(kvp.getValue()));
+    for (KeyValueProperty kvp : layoutModel.getPropertyMiscellaneous().getItems()) {
+      layout.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
     }
 
-    return visualLayout;
+    return layout;
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> extractVehiclePathColorInformation(
       List<VehicleModel> vehicleModels) {
     List<VisualLayoutTO.ModelLayoutElement> result = new LinkedList<>();
+
     for (VehicleModel vehicleModel : vehicleModels) {
       VisualLayoutTO.ModelLayoutElement mle = new VisualLayoutTO.ModelLayoutElement();
 
-      StringProperty sp = (StringProperty) vehicleModel.getProperty(VehicleModel.NAME);
-      mle.setVisualizedObjectName(sp.getText());
+      mle.setVisualizedObjectName(vehicleModel.getPropertyName().getText());
 
-      ColorProperty cp = (ColorProperty) vehicleModel
-          .getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
-      int rgb = cp.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
-      mle.getProperties().add(new PropertyTO()
+      mle.getProperties().add(
+          new PropertyTO()
           .setName(ElementPropKeys.VEHICLE_ROUTE_COLOR)
-          .setValue(String.format("#%06X", rgb)));
+          .setValue(Colors.encodeToHexRGB(vehicleModel.getPropertyRouteColor().getColor()))
+      );
 
       result.add(mle);
     }
+
     return result;
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> extractPointInformation(List<PointModel> points) {
     List<VisualLayoutTO.ModelLayoutElement> result = new ArrayList<>();
+
     for (PointModel point : points) {
       VisualLayoutTO.ModelLayoutElement mle = new VisualLayoutTO.ModelLayoutElement();
 
-      StringProperty sp = (StringProperty) point.getProperty(PointModel.NAME);
-      mle.setVisualizedObjectName(sp.getText());
+      mle.setVisualizedObjectName(point.getPropertyName().getText());
 
       mle.getProperties().add(convertStringProperty(point, ElementPropKeys.POINT_POS_X));
       mle.getProperties().add(convertStringProperty(point, ElementPropKeys.POINT_POS_Y));
@@ -521,23 +421,22 @@ public class UnifiedModelComponentConverter {
 
       result.add(mle);
     }
+
     return result;
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> extractPathInformation(List<PathModel> paths) {
     List<VisualLayoutTO.ModelLayoutElement> result = new ArrayList<>();
+
     for (PathModel path : paths) {
       VisualLayoutTO.ModelLayoutElement mle = new VisualLayoutTO.ModelLayoutElement();
 
-      StringProperty sp = (StringProperty) path.getProperty(PathModel.NAME);
-      mle.setVisualizedObjectName(sp.getText());
+      mle.setVisualizedObjectName(path.getPropertyName().getText());
 
-      AbstractProperty selp = (AbstractProperty) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
-      PathModel.LinerType pathType = (PathModel.LinerType) selp.getValue();
-      PropertyTO property = new PropertyTO();
-      property.setName(ElementPropKeys.PATH_CONN_TYPE);
-      property.setValue(pathType.name());
-      mle.getProperties().add(property);
+      PathModel.LinerType pathType = (PathModel.LinerType) path.getPropertyPathConnType().getValue();
+      mle.getProperties().add(
+          new PropertyTO().setName(ElementPropKeys.PATH_CONN_TYPE).setValue(pathType.name())
+      );
 
       if (Objects.equals(pathType, PathModel.LinerType.BEZIER)
           || Objects.equals(pathType, PathModel.LinerType.BEZIER_3)) {
@@ -547,17 +446,18 @@ public class UnifiedModelComponentConverter {
 
       result.add(mle);
     }
+
     return result;
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> extractLocationInformation(
       List<LocationModel> locations) {
     List<VisualLayoutTO.ModelLayoutElement> result = new ArrayList<>();
+
     for (LocationModel location : locations) {
       VisualLayoutTO.ModelLayoutElement mle = new VisualLayoutTO.ModelLayoutElement();
 
-      StringProperty sp = (StringProperty) location.getProperty(PathModel.NAME);
-      mle.setVisualizedObjectName(sp.getText());
+      mle.setVisualizedObjectName(location.getPropertyName().getText());
 
       mle.getProperties().add(convertStringProperty(location, ElementPropKeys.LOC_LABEL_OFFSET_X));
       mle.getProperties().add(convertStringProperty(location, ElementPropKeys.LOC_LABEL_OFFSET_Y));
@@ -567,113 +467,106 @@ public class UnifiedModelComponentConverter {
 
       result.add(mle);
     }
+
     return result;
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> extractBlockInformation(List<BlockModel> blocks) {
     List<VisualLayoutTO.ModelLayoutElement> result = new ArrayList<>();
+
     for (BlockModel block : blocks) {
       VisualLayoutTO.ModelLayoutElement mle = new VisualLayoutTO.ModelLayoutElement();
 
-      StringProperty sp = (StringProperty) block.getProperty(PathModel.NAME);
-      mle.setVisualizedObjectName(sp.getText());
+      mle.setVisualizedObjectName(block.getPropertyName().getText());
 
-      ColorProperty cp = (ColorProperty) block.getProperty(ElementPropKeys.BLOCK_COLOR);
-      PropertyTO property = new PropertyTO();
-      property.setName(ElementPropKeys.BLOCK_COLOR);
-      int rgb = cp.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
-      property.setValue(String.format("#%06X", rgb));
-      mle.getProperties().add(property);
+      mle.getProperties().add(
+          new PropertyTO()
+          .setName(ElementPropKeys.BLOCK_COLOR)
+          .setValue(Colors.encodeToHexRGB(block.getPropertyColor().getColor()))
+      );
 
       result.add(mle);
     }
+
     return result;
   }
 
   private PropertyTO convertStringProperty(AbstractFigureComponent component, String propertyKey) {
-    PropertyTO property = new PropertyTO();
     StringProperty sp = (StringProperty) component.getProperty(propertyKey);
-    property.setName(propertyKey);
-    property.setValue(sp.getText());
-    return property;
+
+    return new PropertyTO()
+        .setName(propertyKey)
+        .setValue(sp.getText());
   }
 
   public PointModel convertPointTO(PointTO pointTO, VisualLayoutTO visualLayoutTO) {
     PointModel model = new PointModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(PointModel.NAME);
-    sp.setText(pointTO.getName());
+    model.getPropertyName().setText(pointTO.getName());
 
-    CoordinateProperty cp = (CoordinateProperty) model.getProperty(PointModel.MODEL_X_POSITION);
-    cp.setValueAndUnit(pointTO.getxPosition(), LengthProperty.Unit.MM);
+    model.getPropertyModelPositionX().setValueAndUnit(pointTO.getxPosition(),
+                                                      LengthProperty.Unit.MM);
+    model.getPropertyModelPositionY().setValueAndUnit(pointTO.getyPosition(),
+                                                      LengthProperty.Unit.MM);
+    model.getPropertyVehicleOrientationAngle().setValueAndUnit(
+        pointTO.getVehicleOrientationAngle().doubleValue(), AngleProperty.Unit.DEG
+    );
 
-    cp = (CoordinateProperty) model.getProperty(PointModel.MODEL_Y_POSITION);
-    cp.setValueAndUnit(pointTO.getyPosition(), LengthProperty.Unit.MM);
-
-    AngleProperty ap = (AngleProperty) model.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
-    ap.setValueAndUnit(pointTO.getVehicleOrientationAngle().doubleValue(), AngleProperty.Unit.DEG);
-
-    AbstractProperty selp = (AbstractProperty) model.getProperty(PointModel.TYPE);
-    Point.Type pointType = Point.Type.valueOf(pointTO.getType());
-    switch (pointType) {
+    switch (Point.Type.valueOf(pointTO.getType())) {
       case HALT_POSITION:
-        selp.setValue(PointModel.PointType.HALT);
+        model.getPropertyType().setValue(PointModel.PointType.HALT);
         break;
       case PARK_POSITION:
-        selp.setValue(PointModel.PointType.PARK);
+        model.getPropertyType().setValue(PointModel.PointType.PARK);
         break;
       case REPORT_POSITION:
-        selp.setValue(PointModel.PointType.REPORT);
+        model.getPropertyType().setValue(PointModel.PointType.REPORT);
         break;
       default:
         throw new IllegalArgumentException("Unknown point type.");
     }
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(PointModel.MISCELLANEOUS);
     for (PropertyTO property : pointTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     // Gather information contained in visual layout
     if (visualLayoutTO != null) {
-      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_X);
       String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                               pointTO.getName(),
                                                               ElementPropKeys.POINT_POS_X);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLayoutPosX().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_Y);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        pointTO.getName(),
                                                        ElementPropKeys.POINT_POS_Y);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLayoutPosY().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        pointTO.getName(),
                                                        ElementPropKeys.POINT_LABEL_OFFSET_X);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyPointLabelOffsetX().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        pointTO.getName(),
                                                        ElementPropKeys.POINT_LABEL_OFFSET_Y);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyPointLabelOffsetY().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        pointTO.getName(),
                                                        ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyPointLabelOrientationAngle().setText(propertyValue);
       }
     }
 
@@ -683,89 +576,69 @@ public class UnifiedModelComponentConverter {
   public PathModel convertPathTO(PathTO pathTO, VisualLayoutTO visualLayoutTO) {
     PathModel model = new PathModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(PathModel.NAME);
-    sp.setText(pathTO.getName());
+    model.getPropertyName().setText(pathTO.getName());
+    model.getPropertyLength().setValueAndUnit(pathTO.getLength(), LengthProperty.Unit.MM);
+    model.getPropertyRoutingCost().setValue(pathTO.getRoutingCost().intValue());
+    model.getPropertyMaxVelocity().setValueAndUnit(pathTO.getMaxVelocity(),
+                                                   SpeedProperty.Unit.MM_S);
+    model.getPropertyMaxReverseVelocity().setValueAndUnit(pathTO.getMaxReverseVelocity(),
+                                                          SpeedProperty.Unit.MM_S);
+    model.getPropertyStartComponent().setText(pathTO.getSourcePoint());
+    model.getPropertyEndComponent().setText(pathTO.getDestinationPoint());
+    model.getPropertyLocked().setValue(pathTO.isLocked());
 
-    LengthProperty lp = (LengthProperty) model.getProperty(PathModel.LENGTH);
-    lp.setValueAndUnit(pathTO.getLength(), LengthProperty.Unit.MM);
-
-    IntegerProperty ip = (IntegerProperty) model.getProperty(PathModel.ROUTING_COST);
-    ip.setValue(pathTO.getRoutingCost().intValue());
-
-    SpeedProperty spp = (SpeedProperty) model.getProperty(PathModel.MAX_VELOCITY);
-    spp.setValueAndUnit(pathTO.getMaxVelocity(), SpeedProperty.Unit.MM_S);
-
-    spp = (SpeedProperty) model.getProperty(PathModel.MAX_REVERSE_VELOCITY);
-    spp.setValueAndUnit(pathTO.getMaxReverseVelocity(), SpeedProperty.Unit.MM_S);
-
-    sp = (StringProperty) model.getProperty(PathModel.START_COMPONENT);
-    sp.setText(pathTO.getSourcePoint());
-
-    sp = (StringProperty) model.getProperty(PathModel.END_COMPONENT);
-    sp.setText(pathTO.getDestinationPoint());
-
-    BooleanProperty bp = (BooleanProperty) model.getProperty(PathModel.LOCKED);
-    bp.setValue(pathTO.isLocked());
-
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(PointModel.MISCELLANEOUS);
     for (PropertyTO property : pathTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     // Gather information contained in visual layout
     if (visualLayoutTO != null) {
-      AbstractProperty selp = (AbstractProperty) model.getProperty(ElementPropKeys.PATH_CONN_TYPE);
       String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                               pathTO.getName(),
                                                               ElementPropKeys.PATH_CONN_TYPE);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        selp.setValue(PathModel.LinerType.valueOf(propertyValue));
+        model.getPropertyPathConnType().setValue(PathModel.LinerType.valueOf(propertyValue));
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        pathTO.getName(),
                                                        ElementPropKeys.PATH_CONTROL_POINTS);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyPathControlPoints().setText(propertyValue);
       }
     }
+
     return model;
   }
 
   public VehicleModel convertVehicleTO(VehicleTO vehicleTO, VisualLayoutTO visualLayoutTO) {
     VehicleModel model = new VehicleModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(VehicleModel.NAME);
-    sp.setText(vehicleTO.getName());
+    model.getPropertyName().setText(vehicleTO.getName());
+    model.getPropertyLength().setValueAndUnit(vehicleTO.getLength(), LengthProperty.Unit.MM);
+    model.getPropertyMaxVelocity().setValueAndUnit(((double) vehicleTO.getMaxVelocity()),
+                                                   Unit.MM_S);
+    model.getPropertyMaxReverseVelocity().setValueAndUnit(
+        ((double) vehicleTO.getMaxReverseVelocity()), Unit.MM_S);
+    model.getPropertyEnergyLevelCritical().setValueAndUnit(vehicleTO.getEnergyLevelCritical(),
+                                                           PercentProperty.Unit.PERCENT);
+    model.getPropertyEnergyLevelGood().setValueAndUnit(vehicleTO.getEnergyLevelGood(),
+                                                       PercentProperty.Unit.PERCENT);
 
-    LengthProperty lp = (LengthProperty) model.getProperty(VehicleModel.LENGTH);
-    lp.setValueAndUnit(vehicleTO.getLength(), LengthProperty.Unit.MM);
-
-    SpeedProperty maximumVelocity = (SpeedProperty) model.getProperty(VehicleModel.MAXIMUM_VELOCITY);
-    maximumVelocity.setValueAndUnit(((double) vehicleTO.getMaxVelocity()), Unit.MM_S);
-
-    SpeedProperty maximumReverseVelocity = (SpeedProperty) model.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
-    maximumReverseVelocity.setValueAndUnit(((double) vehicleTO.getMaxReverseVelocity()), Unit.MM_S);
-
-    PercentProperty pp = (PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
-    pp.setValueAndUnit(vehicleTO.getEnergyLevelCritical(), PercentProperty.Unit.PERCENT);
-
-    pp = (PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
-    pp.setValueAndUnit(vehicleTO.getEnergyLevelGood(), PercentProperty.Unit.PERCENT);
-
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(VehicleModel.MISCELLANEOUS);
     for (PropertyTO property : vehicleTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     // Gather information contained in visual layout
-    ColorProperty cp = (ColorProperty) model.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR);
     String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                             vehicleTO.getName(),
                                                             ElementPropKeys.VEHICLE_ROUTE_COLOR);
     if (!Strings.isNullOrEmpty(propertyValue)) {
-      cp.setColor(Color.decode(propertyValue));
+      model.getPropertyRouteColor().setColor(Colors.decodeFromHexRGB(propertyValue));
     }
 
     return model;
@@ -774,25 +647,23 @@ public class UnifiedModelComponentConverter {
   public LocationTypeModel convertLocationTypeTO(LocationTypeTO locationTypeTO) {
     LocationTypeModel model = new LocationTypeModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(LocationTypeModel.NAME);
-    sp.setText(locationTypeTO.getName());
+    model.getPropertyName().setText(locationTypeTO.getName());
 
-    StringSetProperty ssp
-        = (StringSetProperty) model.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
     for (AllowedOperationTO operation : locationTypeTO.getAllowedOperations()) {
-      ssp.addItem(operation.getName());
+      model.getPropertyAllowedOperations().addItem(operation.getName());
     }
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(LocationTypeModel.MISCELLANEOUS);
     for (PropertyTO property : locationTypeTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
 
       // Set the default location type symbol since its value is not synchronized with the model's
       // properties
       if (Objects.equals(property.getName(), ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
-        SymbolProperty symp
-            = (SymbolProperty) model.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
-        symp.setLocationRepresentation(LocationRepresentation.valueOf(property.getValue()));
+        model.getPropertyDefaultRepresentation().setLocationRepresentation(
+            LocationRepresentation.valueOf(property.getValue())
+        );
       }
     }
 
@@ -804,78 +675,70 @@ public class UnifiedModelComponentConverter {
                                          VisualLayoutTO visualLayoutTO) {
     LocationModel model = new LocationModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(LocationModel.NAME);
-    sp.setText(locationTO.getName());
+    model.getPropertyName().setText(locationTO.getName());
+    model.getPropertyModelPositionX().setValueAndUnit(locationTO.getxPosition(),
+                                                      LengthProperty.Unit.MM);
+    model.getPropertyModelPositionY().setValueAndUnit(locationTO.getyPosition(),
+                                                      LengthProperty.Unit.MM);
 
-    CoordinateProperty cp = (CoordinateProperty) model.getProperty(LocationModel.MODEL_X_POSITION);
-    cp.setValueAndUnit(locationTO.getxPosition(), LengthProperty.Unit.MM);
-
-    cp = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);
-    cp.setValueAndUnit(locationTO.getyPosition(), LengthProperty.Unit.MM);
-
-    LocationTypeProperty ltp = (LocationTypeProperty) model.getProperty(LocationModel.TYPE);
     List<String> possibleLocationTypes = new ArrayList<>();
     for (LocationTO location : locations) {
       if (!possibleLocationTypes.contains(location.getType())) {
         possibleLocationTypes.add(location.getType());
       }
     }
-    ltp.setPossibleValues(possibleLocationTypes);
-    ltp.setValue(locationTO.getType());
+    model.getPropertyType().setPossibleValues(possibleLocationTypes);
+    model.getPropertyType().setValue(locationTO.getType());
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(LocationTypeModel.MISCELLANEOUS);
     for (PropertyTO property : locationTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
 
       // Set the location symbol (overwriting the default location type symbol) since its value is
       // not synchronized with the model's properties
       if (Objects.equals(property.getName(), ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)) {
-        SymbolProperty symp
-            = (SymbolProperty) model.getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
-        symp.setLocationRepresentation(LocationRepresentation.valueOf(property.getValue()));
+        model.getPropertyDefaultRepresentation().setLocationRepresentation(
+            LocationRepresentation.valueOf(property.getValue())
+        );
       }
     }
 
     // Gather information contained in visual layout
     if (visualLayoutTO != null) {
-      sp = (StringProperty) model.getProperty(ElementPropKeys.LOC_POS_X);
       String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                               locationTO.getName(),
                                                               ElementPropKeys.LOC_POS_X);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLayoutPositionX().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.LOC_POS_Y);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        locationTO.getName(),
                                                        ElementPropKeys.LOC_POS_Y);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLayoutPositionY().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        locationTO.getName(),
                                                        ElementPropKeys.LOC_LABEL_OFFSET_X);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLabelOffsetX().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        locationTO.getName(),
                                                        ElementPropKeys.LOC_LABEL_OFFSET_Y);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLabelOffsetY().setText(propertyValue);
       }
 
-      sp = (StringProperty) model.getProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                        locationTO.getName(),
                                                        ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        sp.setText(propertyValue);
+        model.getPropertyLabelOrientationAngle().setText(propertyValue);
       }
     }
 
@@ -885,21 +748,16 @@ public class UnifiedModelComponentConverter {
   public LinkModel convertLinkTO(LocationTO.Link linkTO, LocationTO locationTO) {
     LinkModel model = new LinkModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(LinkModel.NAME);
-    sp.setText(String.format("%s --- %s",
-                             linkTO.getPoint(),
-                             locationTO.getName()));
+    model.getPropertyName().setText(String.format("%s --- %s",
+                                                  linkTO.getPoint(),
+                                                  locationTO.getName()));
 
-    StringSetProperty ssp = (StringSetProperty) model.getProperty(LinkModel.ALLOWED_OPERATIONS);
     for (AllowedOperationTO operation : linkTO.getAllowedOperations()) {
-      ssp.addItem(operation.getName());
+      model.getPropertyAllowedOperations().addItem(operation.getName());
     }
 
-    sp = (StringProperty) model.getProperty(LinkModel.START_COMPONENT);
-    sp.setText(linkTO.getPoint());
-
-    sp = (StringProperty) model.getProperty(LinkModel.END_COMPONENT);
-    sp.setText(locationTO.getName());
+    model.getPropertyStartComponent().setText(linkTO.getPoint());
+    model.getPropertyEndComponent().setText(locationTO.getName());
 
     return model;
   }
@@ -907,29 +765,25 @@ public class UnifiedModelComponentConverter {
   public BlockModel convertBlockTO(BlockTO blockTO, VisualLayoutTO visualLayoutTO) {
     BlockModel model = new BlockModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(BlockModel.NAME);
-    sp.setText(blockTO.getName());
+    model.getPropertyName().setText(blockTO.getName());
 
-    StringSetProperty ssp = (StringSetProperty) model.getProperty(BlockModel.ELEMENTS);
     for (MemberTO member : blockTO.getMembers()) {
-      ssp.addItem(member.getName());
+      model.getPropertyElements().addItem(member.getName());
     }
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(BlockModel.MISCELLANEOUS);
     for (PropertyTO property : blockTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     // Gather information contained in visual layout
     if (visualLayoutTO != null) {
-      ColorProperty cp = (ColorProperty) model.getProperty(ElementPropKeys.BLOCK_COLOR);
-
       String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                               blockTO.getName(),
                                                               ElementPropKeys.BLOCK_COLOR);
-
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        cp.setColor(Color.decode(propertyValue));
+        model.getPropertyColor().setColor(Color.decode(propertyValue));
       }
     }
 
@@ -940,29 +794,25 @@ public class UnifiedModelComponentConverter {
                                                VisualLayoutTO visualLayoutTO) {
     StaticRouteModel model = new StaticRouteModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(StaticRouteModel.NAME);
-    sp.setText(staticRouteTO.getName());
+    model.getPropertyName().setText(staticRouteTO.getName());
 
-    StringSetProperty ssp = (StringSetProperty) model.getProperty(StaticRouteModel.ELEMENTS);
     for (StaticRouteTO.Hop hop : staticRouteTO.getHops()) {
-      ssp.addItem(hop.getName());
+      model.getPropertyElements().addItem(hop.getName());
     }
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(StaticRouteModel.MISCELLANEOUS);
     for (PropertyTO property : staticRouteTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     // Gather information contained in visual layout
     if (visualLayoutTO != null) {
-      ColorProperty cp = (ColorProperty) model.getProperty(ElementPropKeys.BLOCK_COLOR);
-
       String propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
                                                               staticRouteTO.getName(),
                                                               ElementPropKeys.BLOCK_COLOR);
-
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        cp.setColor(Color.decode(propertyValue));
+        model.getPropertyColor().setColor(Color.decode(propertyValue));
       }
     }
 
@@ -972,17 +822,16 @@ public class UnifiedModelComponentConverter {
   public GroupModel convertGroupTO(GroupTO groupTO) {
     GroupModel model = new GroupModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(GroupModel.NAME);
-    sp.setText(groupTO.getName());
+    model.getPropertyName().setText(groupTO.getName());
 
-    StringSetProperty ssp = (StringSetProperty) model.getProperty(GroupModel.ELEMENTS);
     for (MemberTO member : groupTO.getMembers()) {
-      ssp.addItem(member.getName());
+      model.getPropertyElements().addItem(member.getName());
     }
 
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(GroupModel.MISCELLANEOUS);
     for (PropertyTO property : groupTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     return model;
@@ -991,18 +840,14 @@ public class UnifiedModelComponentConverter {
   public LayoutModel convertVisualLayoutTO(VisualLayoutTO visualLayoutTO) {
     LayoutModel model = new LayoutModel();
 
-    StringProperty sp = (StringProperty) model.getProperty(LayoutModel.NAME);
-    sp.setText(visualLayoutTO.getName());
+    model.getPropertyName().setText(visualLayoutTO.getName());
+    model.getPropertyScaleX().setValueAndUnit(visualLayoutTO.getScaleX(), LengthProperty.Unit.MM);
+    model.getPropertyScaleY().setValueAndUnit(visualLayoutTO.getScaleY(), LengthProperty.Unit.MM);
 
-    LengthProperty lp = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
-    lp.setValueAndUnit(visualLayoutTO.getScaleX(), LengthProperty.Unit.MM);
-
-    lp = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
-    lp.setValueAndUnit(visualLayoutTO.getScaleY(), LengthProperty.Unit.MM);
-
-    KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(LayoutModel.MISCELLANEOUS);
     for (PropertyTO property : visualLayoutTO.getProperties()) {
-      kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
+      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
+                                                                    property.getName(),
+                                                                    property.getValue()));
     }
 
     return model;

@@ -8,22 +8,27 @@
 package org.opentcs.kernel;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.Multibinder;
 import java.util.Locale;
 import javax.inject.Singleton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.opentcs.components.kernel.ControlCenterPanel;
-import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
-import org.opentcs.kernel.controlcenter.ControlCenterConfiguration;
-import org.opentcs.kernel.controlcenter.ControlCenterInfoHandlerFactory;
-import org.opentcs.kernel.controlcenter.KernelControlCenter;
-import org.opentcs.kernel.controlcenter.vehicles.DriverGUI;
-import org.opentcs.kernel.statistics.StatisticsCollector;
-import org.opentcs.kernel.xmlhost.XMLHostInterfaceConfiguration;
-import org.opentcs.kernel.xmlhost.orders.XMLTelegramOrderReceiver;
-import org.opentcs.kernel.xmlhost.status.StatusMessageDispatcher;
+import org.opentcs.kernel.extensions.adminwebapi.AdminWebApi;
+import org.opentcs.kernel.extensions.adminwebapi.AdminWebApiConfiguration;
+import org.opentcs.kernel.extensions.controlcenter.ControlCenterConfiguration;
+import org.opentcs.kernel.extensions.controlcenter.ControlCenterInfoHandlerFactory;
+import org.opentcs.kernel.extensions.controlcenter.KernelControlCenter;
+import org.opentcs.kernel.extensions.controlcenter.vehicles.DriverGUI;
+import org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration;
+import org.opentcs.kernel.extensions.rmi.StandardRemoteKernel;
+import org.opentcs.kernel.extensions.rmi.StandardRemoteKernelClientPortal;
+import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApi;
+import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
+import org.opentcs.kernel.extensions.statistics.StatisticsCollector;
+import org.opentcs.kernel.extensions.statistics.StatisticsCollectorConfiguration;
+import org.opentcs.kernel.extensions.xmlhost.XMLHostInterfaceConfiguration;
+import org.opentcs.kernel.extensions.xmlhost.orders.XMLTelegramOrderReceiver;
+import org.opentcs.kernel.extensions.xmlhost.status.StatusMessageDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,64 +40,138 @@ import org.slf4j.LoggerFactory;
 public class DefaultKernelExtensionsModule
     extends KernelInjectionModule {
 
+  /**
+   * This class's logger.
+   */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultKernelExtensionsModule.class);
 
   @Override
   protected void configure() {
-    configureControlCenterDependencies();
-    configureKernelExtensionsDependencies();
-    // Kernel extensions for StandardKernel (permanent extensions)
-    Multibinder<KernelExtension> allStatesBinder = extensionsBinderAllModes();
-    allStatesBinder.addBinding()
-        .to(StandardRemoteKernel.class)
-        .in(Singleton.class);
-    allStatesBinder.addBinding()
-        .to(StatusMessageDispatcher.class)
-        .in(Singleton.class);
+    // Ensure all kernel extensions binders are initialized.
+    extensionsBinderAllModes();
+    extensionsBinderModelling();
+    extensionsBinderOperating();
 
-    // Kernel extensions for KernelStateModelling
-    Multibinder<KernelExtension> modellingBinder = extensionsBinderModelling();
-    // No extensions for modelling mode, yet.
-
-    // Kernel extensions for KernelStateOperating
-    Multibinder<KernelExtension> operatingBinder = extensionsBinderOperating();
-    operatingBinder.addBinding().to(XMLTelegramOrderReceiver.class);
-    operatingBinder.addBinding().to(StatisticsCollector.class);
+    configureAdminInterface();
+    configureRestfulOrderInterface();
+    configureRmiInterface();
+    configureControlCenter();
+    configureXmlHostInterface();
+    configureStatisticsCollector();
   }
 
-  private void configureControlCenterDependencies() {
-    ControlCenterConfiguration configuration
-        = getConfigBindingProvider().get(ControlCenterConfiguration.PREFIX,
-                                         ControlCenterConfiguration.class);
-    bind(ControlCenterConfiguration.class)
-        .toInstance(configuration);
+  private void configureAdminInterface() {
+    AdminWebApiConfiguration configuration
+        = getConfigBindingProvider().get(AdminWebApiConfiguration.PREFIX,
+                                         AdminWebApiConfiguration.class);
 
     if (!configuration.enable()) {
       return;
     }
 
-    Multibinder<ControlCenterPanel> modellingBinder = controlCenterPanelBinderModelling();
-    // No extensions for modelling mode, yet.
+    bind(AdminWebApiConfiguration.class)
+        .toInstance(configuration);
 
-    Multibinder<ControlCenterPanel> operatingBinder = controlCenterPanelBinderOperating();
-    operatingBinder.addBinding().to(DriverGUI.class);
+    extensionsBinderAllModes().addBinding()
+        .to(AdminWebApi.class)
+        .in(Singleton.class);
+  }
+
+  private void configureRestfulOrderInterface() {
+    ServiceWebApiConfiguration configuration
+        = getConfigBindingProvider().get(ServiceWebApiConfiguration.PREFIX,
+                                         ServiceWebApiConfiguration.class);
+
+    if (!configuration.enable()) {
+      return;
+    }
+
+    bind(ServiceWebApiConfiguration.class)
+        .toInstance(configuration);
+
+    extensionsBinderOperating().addBinding()
+        .to(ServiceWebApi.class)
+        .in(Singleton.class);
+  }
+
+  private void configureRmiInterface() {
+    RmiKernelInterfaceConfiguration configuration
+        = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
+                                         RmiKernelInterfaceConfiguration.class);
+    if (configuration.enable()) {
+      extensionsBinderAllModes().addBinding()
+          .to(StandardRemoteKernelClientPortal.class)
+          .in(Singleton.class);
+      extensionsBinderAllModes().addBinding()
+          .to(StandardRemoteKernel.class)
+          .in(Singleton.class);
+    }
+  }
+
+  private void configureControlCenter() {
+    ControlCenterConfiguration configuration
+        = getConfigBindingProvider().get(ControlCenterConfiguration.PREFIX,
+                                         ControlCenterConfiguration.class);
+
+    if (!configuration.enable()) {
+      return;
+    }
+
+    bind(ControlCenterConfiguration.class)
+        .toInstance(configuration);
+
+    // Bindings for modelling mode panels.
+    // No extensions for modelling mode, yet.
+    controlCenterPanelBinderModelling();
+
+    // Bindings for operating mode panels.
+    controlCenterPanelBinderOperating().addBinding().to(DriverGUI.class);
 
     install(new FactoryModuleBuilder().build(ControlCenterInfoHandlerFactory.class));
 
-    configureKernelControlCenter(configuration);
+    configureControlCenterLocale(configuration);
+    configureControlCenterLookAndFeel();
 
     extensionsBinderAllModes().addBinding()
         .to(KernelControlCenter.class)
         .in(Singleton.class);
   }
 
-  private void configureKernelExtensionsDependencies() {
+  private void configureXmlHostInterface() {
+    XMLHostInterfaceConfiguration configuration
+        = getConfigBindingProvider().get(XMLHostInterfaceConfiguration.PREFIX,
+                                         XMLHostInterfaceConfiguration.class);
+    if (!configuration.enable()) {
+      return;
+    }
+
     bind(XMLHostInterfaceConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(XMLHostInterfaceConfiguration.PREFIX,
-                                                   XMLHostInterfaceConfiguration.class));
+        .toInstance(configuration);
+    // The status channel is available in all modes.
+    extensionsBinderAllModes().addBinding()
+        .to(StatusMessageDispatcher.class)
+        .in(Singleton.class);
+
+    // The order interface is available only in operating mode.
+    extensionsBinderOperating().addBinding()
+        .to(XMLTelegramOrderReceiver.class);
   }
 
-  private void configureKernelControlCenter(ControlCenterConfiguration configuration) {
+  private void configureStatisticsCollector() {
+    StatisticsCollectorConfiguration configuration
+        = getConfigBindingProvider().get(StatisticsCollectorConfiguration.PREFIX,
+                                         StatisticsCollectorConfiguration.class);
+    if (!configuration.enable()) {
+      return;
+    }
+
+    bind(StatisticsCollectorConfiguration.class)
+        .toInstance(configuration);
+    extensionsBinderOperating().addBinding()
+        .to(StatisticsCollector.class);
+  }
+
+  private void configureControlCenterLocale(ControlCenterConfiguration configuration) {
     if (configuration.language().toLowerCase().equals("german")) {
       Locale.setDefault(Locale.GERMAN);
     }
@@ -100,6 +179,9 @@ public class DefaultKernelExtensionsModule
       Locale.setDefault(Locale.ENGLISH);
     }
 
+  }
+
+  private void configureControlCenterLookAndFeel() {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }

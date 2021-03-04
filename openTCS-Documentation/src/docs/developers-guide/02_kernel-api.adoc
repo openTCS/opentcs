@@ -1,17 +1,47 @@
 
-== Using the kernel API
+== The kernel's Java API
 
 The interfaces and classes required to use the kernel API are part of the `opentcs-api-base` JAR file, so you should add that to your classpath/declare a dependency on it.
 (See <<Available artifacts and API compatibility>>.)
-The central interface that is usually interacted with is the `Kernel` interface.
+The basic data structures for plant model components and transport orders you will encounter often are:
 
-To use the kernel API in code running inside the kernel JVM, e.g. a vehicle driver, simply request an instance of `Kernel` to be provided via dependency injection.
-You may also work with an instance of `LocalKernel` here, which provides additional methods available only to kernel application components.
+.Basic data structures
+image::tcsobject_classes.png[]
 
-To access the kernel API from another JVM, e.g. in a client that is supposed to create transport orders or to receive status updates for transport orders or vehicles, you need to connect to the kernel via Remote Method Invocation (RMI).
-The easiest way to do this is by creating an instance of the `KernelProxyBuilder` class and letting it build a `KernelProxy` instance for you.
+The service interfaces that are most often interacted with to fetch and manipulate such objects are:
+
+.Service interfaces
+image::service_interfaces.png[]
+
+=== Acquiring service objects
+
+To use the services in code running inside the kernel JVM, e.g. a vehicle driver, simply request an instance of e.g. `PlantModelService` to be provided via dependency injection.
+You may also work with an instance of `InternalPlantModelService` here, which provides additional methods available only to kernel application components.
+
+To access the services from another JVM, e.g. in a client that is supposed to create transport orders or to receive status updates for transport orders or vehicles, you need to connect to them via Remote Method Invocation (RMI).
+The easiest way to do this is by creating an instance of the `KernelServicePortalBuilder` class and letting it build a `KernelServicePortal` instance for you.
 (For now, there isn't much support for user management, so it is recommended to ignore the methods that require user credentials.)
-See also the class documentation for `KernelProxyBuilder` in the base API's JavaDoc documentation.
+After creating the `KernelServicePortal` instance, you can use it to get service instances and fetch kernel events from it.
+See also the class documentation for `KernelServicePortalBuilder` in the base API's JavaDoc documentation.
+
+// XXX Move this example into a test class.
+
+[source, java]
+----
+KernelServicePortal servicePortal = new KernelServicePortalBuilder().build();
+
+// Connect and log in with a kernel somewhere.
+servicePortal.login("someHost", 1099);
+
+// Get a reference to the plant model service...
+PlantModelService plantModelService = servicePortal.getPlantModelService();
+// ...and find out the name of the currently loaded model.
+String modelName = plantModelService.getLoadedModelName();
+
+// Poll events, waiting up to a second if none are currently there.
+// This should be done periodically, and probably in a separate thread.
+List<Object> events = servicePortal.fetchEvents(1000);
+----
 
 === Working with transport orders
 
@@ -36,8 +66,8 @@ All of the following are examples for "transport orders" in openTCS, even if not
 
 . When a transport order is created, its initial state is `RAW`.
 . A user/client sets parameters for the transport order that are supposed to influence the transport process.
-  These parameters may be e.g. the transport order's deadline, the vehicle supposed to process the transport order or a set of generic, usually project-specific properties.
-. The transport order is activated.
+  These parameters may be e.g. the transport order's deadline, the vehicle that is supposed to process the transport order or a set of generic, usually project-specific properties.
+. The transport order is activated, i.e. parameter setup is finished.
   Its state is set to `ACTIVE`.
 . The kernel's router checks whether routing between the transport order's destinations is possible at all.
   If yes, its state is changed to `DISPATCHABLE`.
@@ -46,90 +76,46 @@ All of the following are examples for "transport orders" in openTCS, even if not
   As long as there are any requirements not yet fulfilled or no vehicle can execute it, the transport order is left waiting.
 . The kernel's dispatcher assigns the transport order to a vehicle for processing.
   Its state is changed to `BEING_PROCESSED`.
-** If a transport order that is being processed is withdrawn (by a client/user), its state first changes to `WITHDRAWN`, then to `FAILED`.
+** If a transport order that is being processed is withdrawn (by a client/user), its state first changes to `WITHDRAWN` while the vehicle executes any orders that had already been sent to it.
+   Then the transport order's state changes to `FAILED`.
    It is not processed any further.
 ** If processing of the transport order fails for any reason, it is marked as `FAILED` and not processed any further.
-** If the vehicle successfully processes the transport order, it is marked as `FINISHED`.
+** If the vehicle successfully processes the transport order as a whole, it is marked as `FINISHED`.
 . Eventually -- after a longer while or when too many transport orders in a final state have accumulated in the kernel's order pool -- the kernel removes the transport order.
 
 The following state machine visualizes this life cycle:
 
-image::transport_order_states.png[]
+.Transport order states
+image::transportorder_states.png[]
 
 ==== Structure and processing of transport orders
 
-image::transport_order_course.png[]
+.Transport order classes
+image::transportorder_classes.png[]
 
-. A `TransportOrder` is created by passing a list of `DriveOrder.Destination` instances to the `Kernel` instance's `createTransportOrder()` method.
-.. The Kernel wraps each `Destination` in a newly-created `DriveOrder` instance.
-.. These ``DriveOrder``s are themselves wrapped by the kernel in a single, newly-created `TransportOrder` instance in their given order (see figure below).
-. Once a `TransportOrder` is being assigned to a vehicle by the `Dispatcher`, a `Route` is computed for each of its ``DriveOrder``s.
+A transport order is created by calling `TransportOrderService.createTransportOrder()`.
+As its parameter, it expects an instance of `TransportOrderCreationTO` containing the sequence of destinations to visit and the operations a vehicle is supposed to perform there.
+The kernel wraps each `Destination` in a newly-created `DriveOrder` instance.
+These ``DriveOrder``s are themselves wrapped by the kernel in a single, newly-created `TransportOrder` instance in their given order.
+
+Once a `TransportOrder` is being assigned to a vehicle by the `Dispatcher`, a `Route` is computed for each of its ``DriveOrder``s.
 These ``Route``s are then stored in the corresponding ``DriveOrder``s.
 
-[ditaa, "create_transport_order_process_ditaa"]
-....
+image::transport_order_course.png[]
 
-                                                                                                             +------------------------------+
-                                                                                                             |cEEE                          |
-                                                                                                             |TransportOrder                |
-                                                                                                             |+----------------------------+|
-                                                                                                             ||cDDD                        ||
-                                                                                                             ||DriveOrder                  ||
-                                                                                                             ||+--------------------------+||
-                                                                                                             |||cEEE                      |||
-                                                                                                             |||DriveOrder.Destination (1)|||
-                                                                       +------------------------------+      |||                          |||
-                                                                       |cEEE                          |      ||+--------------------------+||
-                                   +----------------------------+      |TransportOrder                |      ||                            ||
-                                   |cDDD                        |      |+----------------------------+|      ||+--------------------------+||
-                                   |DriveOrder                  |      ||cDDD                        ||      |||cEEE                      |||
-                                   |+--------------------------+|      ||DriveOrder                  ||      |||Route (1)                 |||
-                                   ||cEEE                      ||      ||+--------------------------+||      |||                          |||
-                                   ||DriveOrder.Destination (1)||      |||cEEE                      |||      ||+--------------------------+||
- +--------------------------+      ||                          ||      |||DriveOrder.Destination (1)|||      |+----------------------------+|
- |cEEE                      |      |+--------------------------+|      |||                          |||      |                              |
- |DriveOrder.Destination (1)|      +----------------------------+      ||+--------------------------+||      |+----------------------------+|
- |                          |                                          |+----------------------------+|      ||cDDD                        ||
- +--------------------------+      +----------------------------+      |                              |      ||DriveOrder                  ||
-                                   |cDDD                        |      |+----------------------------+|      ||+--------------------------+||
- +--------------------------+      |DriveOrder                  |      ||cDDD                        ||      |||cEEE                      |||
- |cEEE                      |      |+--------------------------+|      ||DriveOrder                  ||      |||DriveOrder.Destination (2)|||
- |DriveOrder.Destination (2)|----->||cEEE                      ||----->||+--------------------------+||----->|||                          |||
- |                          |      ||DriveOrder.Destination (2)||      |||cEEE                      |||      ||+--------------------------+||
- +--------------------------+      ||                          ||      |||DriveOrder.Destination (2)|||      ||                            ||
-                                   |+--------------------------+|      |||                          |||      ||+--------------------------+||
- +--------------------------+      +----------------------------+      ||+--------------------------+||      |||cEEE                      |||
- |cEEE                      |                                          |+----------------------------+|      |||Route (2)                 |||
- |DriveOrder.Destination (3)|      +----------------------------+      |                              |      |||                          |||
- |                          |      |cDDD                        |      |+----------------------------+|      ||+--------------------------+||
- +--------------------------+      |DriveOrder                  |      ||cDDD                        ||      |+----------------------------+|
-                                   |+--------------------------+|      ||DriveOrder                  ||      |                              |
-                                   ||cEEE                      ||      ||+--------------------------+||      |+----------------------------+|
-                                   ||DriveOrder.Destination (3)||      |||cEEE                      |||      ||cDDD                        ||
-                                   ||                          ||      |||DriveOrder.Destination (3)|||      ||DriveOrder                  ||
-                                   |+--------------------------+|      |||                          |||      ||+--------------------------+||
-                                   +----------------------------+      ||+--------------------------+||      |||cEEE                      |||
-                                                                       |+----------------------------+|      |||DriveOrder.Destination (3)|||
-                                                                       +------------------------------+      |||                          |||
-                                                                                                             ||+--------------------------+||
-                                                                                                             ||                            ||
-                                                                                                             ||+--------------------------+||
-                                                                                                             |||cEEE                      |||
-                                                                                                             |||Route (3)                 |||
-                                                                                                             |||                          |||
-                                                                                                             ||+--------------------------+||
-                                                                                                             |+----------------------------+|
-                                                                                                             +------------------------------+
-....
-
-[start=3]
-. As soon as a vehicle (driver) is able to process a `DriveOrder`, the single ``Step``s of its `Route` are mapped to ``MovementCommand``s.
+As soon as a vehicle (driver) is able to process a `DriveOrder`, the single ``Step``s of its `Route` are mapped to ``MovementCommand``s.
 These ``MovementCommand``s contain all information the vehicle driver needs to reach the final destination and to perform the desired operation there.
-. The ``MovementCommand``s for the partial routes to be travelled are sent to the vehicle driver bit by bit.
-The kernel only sends as many ``MovementCommands``s in advance as is required for the vehicle driver to function properly; it does this to maintain fine-grained control over the paths/resources used by all vehicles.
+
+.MovementCommand-related classes
+image::movementcommand_classes.png[]
+
+The ``MovementCommand``s for the partial routes to be travelled are sent to the vehicle driver bit by bit.
+The kernel only sends as many ``MovementCommands``s in advance as is required for the vehicle driver to function properly.
+It does this to maintain fine-grained control over the paths/resources used by all vehicles.
 A vehicle driver may set the maximum number of ``MovementCommand``s it gets in advance by adjusting its command queue capacity.
-. As soon as a `DriveOrder` is finished, the `Route` of the next `DriveOrder` is mapped to ``MovementCommand``s.
-. Once the last `DriveOrder` of a `TransportOrder` is finished, the whole `TransportOrder` is finished, as well.
+
+As soon as a `DriveOrder` is finished, the `Route` of the next `DriveOrder` is mapped to ``MovementCommand``s.
+Once the last `DriveOrder` of a `TransportOrder` is finished, the whole `TransportOrder` is finished, as well.
 
 ==== How to create a new transport order
 

@@ -19,4 +19,4 @@ else
 fi
 
 ${JAVA} -classpath "${OPENTCS_CP}" \
-    org.opentcs.kernel.ShutdownKernel localhost 1099 SSL_UNTRUSTED
+    org.opentcs.kernel.ShutdownKernel localhost 55100

@@ -9,21 +9,19 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
+import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
+import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LinkModel;
-import org.opentcs.guing.model.elements.LocationModel;
-import org.opentcs.guing.model.elements.PointModel;
 
 /**
  * An adapter for <code>Links</code>.
@@ -34,43 +32,34 @@ import org.opentcs.guing.model.elements.PointModel;
 public class LinkAdapter
     extends AbstractProcessAdapter {
 
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public LinkAdapter(@Assisted LinkModel model,
-                     @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
-  }
-
   @Override
-  public LinkModel getModel() {
-    return (LinkModel) super.getModel();
-  }
-
-  @Override
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
                                     @Nullable ModelLayoutElement layoutElement) {
   }
 
   @Override
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    PointModel point = getModel().getPoint();
-    LocationModel location = getModel().getLocation();
-
-    plantModel.getLocations().stream()
-        .filter(loc -> Objects.equals(loc.getName(), location.getName()))
-        .findFirst()
-        .ifPresent(loc -> loc.getLinks().put(point.getName(), getAllowedOperations()));
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    return plantModel.withLocations(
+        plantModel.getLocations().stream()
+            .map(loc -> mapLocation((LinkModel) modelComponent, loc))
+            .collect(Collectors.toList())
+    );
   }
 
-  private Set<String> getAllowedOperations() {
-    StringSetProperty pOperations
-        = (StringSetProperty) getModel().getProperty(LinkModel.ALLOWED_OPERATIONS);
-    return new HashSet<>(pOperations.getItems());
+  private LocationCreationTO mapLocation(LinkModel model, LocationCreationTO location) {
+    if (!Objects.equals(location.getName(), model.getLocation().getName())) {
+      return location;
+    }
+    return location.withLink(model.getPoint().getName(), getAllowedOperations(model));
   }
+
+  private Set<String> getAllowedOperations(LinkModel model) {
+    return new HashSet<>(model.getPropertyAllowedOperations().getItems());
+  }
+
 }

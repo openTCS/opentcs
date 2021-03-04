@@ -12,12 +12,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.opentcs.access.Kernel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A query for all script files available on the kernel side.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Instead of queries, explicit service calls should be used.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 @Availability(Kernel.State.OPERATING)
 public class QueryAvailableScriptFiles
     extends Query<QueryAvailableScriptFiles>

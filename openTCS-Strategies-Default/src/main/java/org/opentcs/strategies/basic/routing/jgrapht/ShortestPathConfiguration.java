@@ -23,13 +23,14 @@ public interface ShortestPathConfiguration {
    * This configuration's prefix.
    */
   String PREFIX = "defaultrouter.shortestpath";
-  
+
   @ConfigurationEntry(
       type = "Strings",
       description = {
         "The routing algorithm to be used. Valid values:",
         "'DIJKSTRA': Routes are computed using Dijkstra's algorithm.",
-        "'FLOYD_WARSHALL': Routes are computed using Floyd-Warshall algorithm."})
+        "'BELLMAN_FORD': Routes are computed using the Bellman-Ford algorithm.",
+        "'FLOYD_WARSHALL': Routes are computed using the Floyd-Warshall algorithm."})
   Algorithm algorithm();
 
   @ConfigurationEntry(
@@ -39,15 +40,25 @@ public interface ShortestPathConfiguration {
         "Results of multiple evaluators are added up. Valid values:",
         "'DISTANCE': A route's cost is the sum of the lengths of its paths.",
         "'TRAVELTIME': A route's cost is the vehicle's expected driving time to the destination.",
-        "'TURNS': A route's cost is the number of turns/direction changes on it.",
         "'EXPLICIT': A route's cost is the sum of the explicitly given costs of its paths."})
   List<EvaluatorType> edgeEvaluators();
 
   enum Algorithm {
-    DIJKSTRA,
-    FLOYD_WARSHALL
+    DIJKSTRA(false),
+    BELLMAN_FORD(true),
+    FLOYD_WARSHALL(false);
+
+    private final boolean handlingNegativeCosts;
+
+    private Algorithm(boolean handlingNegativeCosts) {
+      this.handlingNegativeCosts = handlingNegativeCosts;
+    }
+
+    public boolean isHandlingNegativeCosts() {
+      return handlingNegativeCosts;
+    }
   }
-  
+
   enum EvaluatorType {
     DISTANCE,
     TRAVELTIME,

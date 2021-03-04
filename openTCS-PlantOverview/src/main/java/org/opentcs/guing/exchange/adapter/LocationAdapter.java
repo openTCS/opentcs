@@ -9,17 +9,15 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
 import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 import org.opentcs.data.TCSObject;
@@ -35,14 +33,8 @@ import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.LocationTypeProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
-import org.opentcs.guing.model.AbstractFigureComponent;
-import static org.opentcs.guing.model.AbstractFigureComponent.MODEL_X_POSITION;
-import static org.opentcs.guing.model.AbstractFigureComponent.MODEL_Y_POSITION;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,55 +53,34 @@ public class LocationAdapter
    */
   private static final Logger LOG = LoggerFactory.getLogger(LocationAdapter.class);
 
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public LocationAdapter(@Assisted LocationModel model,
-                         @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
-  }
-
-  @Override
-  public LocationModel getModel() {
-    return (LocationModel) super.getModel();
-  }
-
   @Override  // OpenTCSProcessAdapter
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
                                     @Nullable ModelLayoutElement layoutElement) {
     Location location = requireNonNull((Location) tcsObject, "tcsObject");
+    LocationModel model = (LocationModel) modelComponent;
+
     try {
       // Name 
-      StringProperty pName = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-      pName.setText(location.getName());
+      model.getPropertyName().setText(location.getName());
 
       // Position in model
-      CoordinateProperty cpx = (CoordinateProperty) getModel()
-          .getProperty(AbstractFigureComponent.MODEL_X_POSITION);
-      cpx.setValueAndUnit(location.getPosition().getX(), LengthProperty.Unit.MM);
-
-      CoordinateProperty cpy = (CoordinateProperty) getModel()
-          .getProperty(AbstractFigureComponent.MODEL_Y_POSITION);
-      cpy.setValueAndUnit(location.getPosition().getY(), LengthProperty.Unit.MM);
+      model.getPropertyModelPositionX().setValueAndUnit(location.getPosition().getX(),
+                                                        LengthProperty.Unit.MM);
+      model.getPropertyModelPositionY().setValueAndUnit(location.getPosition().getY(),
+                                                        LengthProperty.Unit.MM);
 
       // Type
-      LocationTypeProperty pType
-          = (LocationTypeProperty) getModel().getProperty(LocationModel.TYPE);
-      pType.setValue(location.getType().getName());
+      model.getPropertyType().setValue(location.getType().getName());
 
       // Misc properties
-      updateMiscModelProperties(location);
+      updateMiscModelProperties(model, location);
       // look for label and symbol
-      KeyValueSetProperty miscellaneous
-          = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
-      updateRepresentation(miscellaneous);
+      updateRepresentation(model, model.getPropertyMiscellaneous());
       if (layoutElement != null) {
-        updateModelLayoutElements(layoutElement);
+        updateModelLayoutElements(model, layoutElement);
       }
     }
     catch (IllegalArgumentException e) {
@@ -117,35 +88,29 @@ public class LocationAdapter
     }
   }
 
-  @Override  // OpenTCSProcessAdapter
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    plantModel.getLocations().add(
-        new LocationCreationTO(getModel().getName(), getModel().getLocationType().getName())
-            .setPosition(getPosition())
-            .setProperties(getKernelProperties())
-    );
+  @Override
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    PlantModelCreationTO result = plantModel
+        .withLocation(
+            new LocationCreationTO(modelComponent.getName(),
+                                   ((LocationModel) modelComponent).getLocationType().getName(),
+                                   getPosition((LocationModel) modelComponent))
+                .withProperties(getKernelProperties(modelComponent))
+        )
+        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts()));
 
-    // Write new position into the model layout element
-    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-      updateLayoutElement(layout);
-    }
+    unmarkAllPropertiesChanged(modelComponent);
 
-    unmarkAllPropertiesChanged();
+    return result;
   }
 
-  private void updateRepresentation(KeyValueSetProperty miscellaneous) {
+  private void updateRepresentation(LocationModel model, KeyValueSetProperty miscellaneous) {
     for (KeyValueProperty kvp : miscellaneous.getItems()) {
       switch (kvp.getKey()) {
-////          case LocationModel.LABEL:
-////            StringProperty pLabel = (StringProperty) getModel().getProperty(LocationModel.LABEL);
-////            pLabel.setText(value);
-////            pLabel.unmarkChanged();          
-////            break;
-
         case ObjectPropConstants.LOC_DEFAULT_REPRESENTATION:
-          SymbolProperty pSymbol = (SymbolProperty) getModel()
-              .getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
-          pSymbol.setLocationRepresentation(
+          model.getPropertyDefaultRepresentation().setLocationRepresentation(
               LocationRepresentation.valueOf(kvp.getValue()));
           break;
         default:
@@ -153,40 +118,27 @@ public class LocationAdapter
     }
   }
 
-  private void updateModelLayoutElements(ModelLayoutElement layoutElement) {
+  private void updateModelLayoutElements(LocationModel model, ModelLayoutElement layoutElement) {
     Map<String, String> properties = layoutElement.getProperties();
     // Save the properties of the kernel object in the model
-    StringProperty sp
-        = (StringProperty) getModel().getProperty(ElementPropKeys.LOC_POS_X);
-    sp.setText(properties.get(ElementPropKeys.LOC_POS_X));
-
-    sp = (StringProperty) getModel().getProperty(ElementPropKeys.LOC_POS_Y);
-    sp.setText(properties.get(ElementPropKeys.LOC_POS_Y));
-
-    sp = (StringProperty) getModel()
-        .getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
-    sp.setText(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X));
-
-    sp = (StringProperty) getModel()
-        .getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
-    sp.setText(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y));
-
-    sp = (StringProperty) getModel()
-        .getProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
-    sp.setText(properties.get(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE));
+    model.getPropertyLayoutPositionX().setText(properties.get(ElementPropKeys.LOC_POS_X));
+    model.getPropertyLayoutPositionY().setText(properties.get(ElementPropKeys.LOC_POS_Y));
+    model.getPropertyLabelOffsetX().setText(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X));
+    model.getPropertyLabelOffsetY().setText(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y));
+    model.getPropertyLabelOrientationAngle().setText(properties.get(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE));
   }
 
-  private Triple getPosition() {
-    return convertToTriple((CoordinateProperty) getModel().getProperty(MODEL_X_POSITION),
-                           (CoordinateProperty) getModel().getProperty(MODEL_Y_POSITION));
+  private Triple getPosition(LocationModel model) {
+    return convertToTriple(model.getPropertyModelPositionX(),
+                           model.getPropertyModelPositionY());
   }
 
   @Override
-  protected Map<String, String> getKernelProperties() {
-    Map<String, String> result = super.getKernelProperties();
+  protected Map<String, String> getKernelProperties(ModelComponent model) {
+    Map<String, String> result = super.getKernelProperties(model);
 
-    SymbolProperty pSymbol = (SymbolProperty) getModel().getProperty(LOC_DEFAULT_REPRESENTATION);
-    LocationRepresentation locationRepresentation = pSymbol.getLocationRepresentation();
+    LocationRepresentation locationRepresentation
+        = ((LocationModel) model).getPropertyDefaultRepresentation().getLocationRepresentation();
 
     if (locationRepresentation != null) {
       result.put(LOC_DEFAULT_REPRESENTATION, locationRepresentation.name());
@@ -203,13 +155,11 @@ public class LocationAdapter
     return result;
   }
 
-  /**
-   * Refreshes the properties of the layout element and saves it in the kernel.
-   *
-   * @param layout The VisualLayout.
-   */
-  private void updateLayoutElement(VisualLayoutCreationTO layout) {
-    LabeledLocationFigure llf = getModel().getFigure();
+  @Override
+  protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
+                                                 VisualLayoutCreationTO layout) {
+    LocationModel locationModel = (LocationModel) model;
+    LabeledLocationFigure llf = locationModel.getFigure();
     LocationFigure lf = llf.getPresentationFigure();
     double scaleX = layout.getScaleX();
     double scaleY = layout.getScaleY();
@@ -218,12 +168,12 @@ public class LocationAdapter
     TCSLabelFigure label = llf.getLabel();
     Point2D.Double offset = label.getOffset();
 
-    layout.getModelElements().add(
-        new ModelLayoutElementCreationTO(getModel().getName())
-            .setProperty(ElementPropKeys.LOC_POS_X, xPos + "")
-            .setProperty(ElementPropKeys.LOC_POS_Y, yPos + "")
-            .setProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, (int) offset.x + "")
-            .setProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, (int) offset.y + "")
+    return layout.withModelElement(
+        new ModelLayoutElementCreationTO(locationModel.getName())
+            .withProperty(ElementPropKeys.LOC_POS_X, xPos + "")
+            .withProperty(ElementPropKeys.LOC_POS_Y, yPos + "")
+            .withProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, (int) offset.x + "")
+            .withProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, (int) offset.y + "")
     );
   }
 }

@@ -11,6 +11,9 @@ package org.opentcs.guing.components.properties.panel;
 
 import com.google.inject.Inject;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.opentcs.components.plantoverview.PropertySuggestions;
@@ -19,7 +22,7 @@ import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.MergedPropertySuggestions;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.gui.WideComboBox;
+import org.opentcs.util.gui.BoundsPopupMenuListener;
 
 /**
  * A panel for editing a property (key-value pair).
@@ -56,8 +59,9 @@ public class KeyValuePropertyEditorPanel
   @Inject
   public KeyValuePropertyEditorPanel(MergedPropertySuggestions propertySuggestions) {
     this.propertySuggestions = requireNonNull(propertySuggestions, "propertySuggestions");
-
     initComponents();
+    valueComboBox.addPopupMenuListener(new BoundsPopupMenuListener());
+    keyComboBox.addPopupMenuListener(new BoundsPopupMenuListener());
     fProperty = new KeyValueProperty(null, "", "");
     keyTextField = (JTextField) (keyComboBox.getEditor().getEditorComponent());
     valueTextField = (JTextField) (valueComboBox.getEditor().getEditorComponent());
@@ -97,8 +101,8 @@ public class KeyValuePropertyEditorPanel
 
     keyLabel = new javax.swing.JLabel();
     valueLabel = new javax.swing.JLabel();
-    keyComboBox = new WideComboBox<>(propertySuggestions.getKeySuggestions().toArray(new String[propertySuggestions.getKeySuggestions().size()]));
-    valueComboBox = new WideComboBox<>(propertySuggestions.getValueSuggestions().toArray(new String[propertySuggestions.getValueSuggestions().size()]));
+    keyComboBox = new JComboBox<>(propertySuggestions.getKeySuggestions().toArray(new String[propertySuggestions.getKeySuggestions().size()]));
+    valueComboBox = new JComboBox<>(propertySuggestions.getValueSuggestions().toArray(new String[propertySuggestions.getValueSuggestions().size()]));
 
     setLayout(new java.awt.GridBagLayout());
 
@@ -121,6 +125,11 @@ public class KeyValuePropertyEditorPanel
 
     keyComboBox.setEditable(true);
     keyComboBox.setPrototypeDisplayValue("tenletters");
+    keyComboBox.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        keyValueChangedListener(evt);
+      }
+    });
     add(keyComboBox, new java.awt.GridBagConstraints());
 
     valueComboBox.setEditable(true);
@@ -130,6 +139,21 @@ public class KeyValuePropertyEditorPanel
     gridBagConstraints.gridy = 1;
     add(valueComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+
+  private void keyValueChangedListener(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_keyValueChangedListener
+
+    Set<String> specSuggestions = propertySuggestions.getValueSuggestionsFor(
+        String.valueOf(keyComboBox.getSelectedItem()));
+    if (specSuggestions.isEmpty()) {
+      specSuggestions = propertySuggestions.getValueSuggestions();
+    }
+    String[] valueSuggestions = specSuggestions
+        .toArray(new String[specSuggestions.size()]);
+    Object currentSuggestion = valueComboBox.getEditor().getItem();
+    valueComboBox.setModel(new DefaultComboBoxModel<>(valueSuggestions));
+    valueComboBox.validate();
+    valueComboBox.getEditor().setItem(currentSuggestion);
+  }//GEN-LAST:event_keyValueChangedListener
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> keyComboBox;

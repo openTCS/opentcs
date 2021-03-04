@@ -11,7 +11,8 @@ This is achieved by integrating vehicles into the system via pluggable drivers, 
 
 === System requirements
 
-To run openTCS, a Java Runtime Environment (JRE) version 1.8 or later is required. (The directory `bin` of the installed JRE, for example `C:/Program Files/Java/jre1.8.0/bin`, should be included in the enviroment variable PATH to be able to use the included start scripts.)
+To run openTCS, a Java Runtime Environment (JRE) version 1.8 is required.
+(The directory `bin` of the installed JRE, for example `C:/Program Files/Java/jre1.8.0/bin`, should be included in the enviroment variable PATH to be able to use the included start scripts.)
 
 === Further documentation
 

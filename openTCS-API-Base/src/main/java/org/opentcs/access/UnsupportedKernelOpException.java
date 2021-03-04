@@ -8,12 +8,16 @@
 package org.opentcs.access;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Thrown when there are insufficient user permissions to perform an operation.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Not required any more.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class UnsupportedKernelOpException
     extends KernelRuntimeException
     implements Serializable {

@@ -7,7 +7,6 @@
  */
 package org.opentcs.access.rmi;
 
-import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,16 +19,10 @@ import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.TCSKernelStateEvent;
-import org.opentcs.access.UnsupportedKernelOpException;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.annotations.ScheduledApiChange;
-import org.opentcs.util.eventsystem.EventHub;
-import org.opentcs.util.eventsystem.EventListener;
-import org.opentcs.util.eventsystem.EventSource;
-import org.opentcs.util.eventsystem.SynchronousEventHub;
-import org.opentcs.util.eventsystem.TCSEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +31,14 @@ import org.slf4j.LoggerFactory;
  * kernel.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link KernelServicePortalBuilder} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 class ProxyInvocationHandler
     implements InvocationHandler,
                RemoteKernelConnection,
-               EventSource<TCSEvent> {
+               org.opentcs.util.eventsystem.EventSource<org.opentcs.util.eventsystem.TCSEvent> {
 
   /**
    * This class's Logger.
@@ -67,8 +63,7 @@ class ProxyInvocationHandler
   /**
    * An event filter for the remote kernel.
    */
-  @SuppressWarnings("deprecation")
-  private final org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter;
+  private final org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> eventFilter;
   /**
    * The time to wait between event polls with the remote kernel (in ms).
    */
@@ -80,7 +75,8 @@ class ProxyInvocationHandler
   /**
    * This proxy's event hub for dispatching polled events.
    */
-  private final EventHub<TCSEvent> eventHub = new SynchronousEventHub<>();
+  private final org.opentcs.util.eventsystem.EventHub<org.opentcs.util.eventsystem.TCSEvent> eventHub
+      = new org.opentcs.util.eventsystem.SynchronousEventHub<>();
   /**
    * Provides socket factories used for RMI.
    */
@@ -128,7 +124,7 @@ class ProxyInvocationHandler
       int port,
       @Nonnull String userName,
       @Nonnull String password,
-      @Nonnull org.opentcs.util.eventsystem.EventFilter<TCSEvent> eventFilter,
+      @Nonnull org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> eventFilter,
       long eventPollInterval,
       long eventPollTimeout)
       throws CredentialsException {
@@ -186,7 +182,7 @@ class ProxyInvocationHandler
       if (RemoteKernelConnection.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       }
-      else if (EventSource.class.equals(method.getDeclaringClass())) {
+      else if (org.opentcs.util.eventsystem.EventSource.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       }
       else if (Kernel.class.equals(method.getDeclaringClass())) {
@@ -208,7 +204,7 @@ class ProxyInvocationHandler
         return remoteMethod.invoke(remoteKernel, extArgs);
       }
       else {
-        throw new UnsupportedKernelOpException("Unexpected declaring class: "
+        throw new org.opentcs.access.UnsupportedKernelOpException("Unexpected declaring class: "
             + method.getDeclaringClass().getName());
       }
     }
@@ -230,24 +226,26 @@ class ProxyInvocationHandler
   // Implementation of interface EventSource<TCSObjectEvent> starts here.
   @Override
   @Deprecated
-  public void addEventListener(EventListener<TCSEvent> listener,
-                               org.opentcs.util.eventsystem.EventFilter<TCSEvent> filter) {
+  public void addEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener,
+      org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> filter) {
     eventHub.addEventListener(listener, filter);
   }
 
   @Override
-  public void addEventListener(EventListener<TCSEvent> listener) {
+  public void addEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener) {
     eventHub.addEventListener(listener);
   }
 
   @Override
-  public void removeEventListener(EventListener<TCSEvent> listener) {
+  public void removeEventListener(
+      org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent> listener) {
     eventHub.removeEventListener(listener);
   }
 
   // Implementation of interface RemoteKernelConnection starts here.
   @Override
-  @SuppressWarnings("deprecation")
   public void login()
       throws CredentialsException {
     if (loggedIn()) {
@@ -354,9 +352,9 @@ class ProxyInvocationHandler
       try {
         boolean doLogOut = false;
         LOG.debug("Polling remote kernel for events");
-        List<TCSEvent> events = remoteKernel.pollEvents(clientID,
-                                                        timeout);
-        for (TCSEvent curEvent : events) {
+        List<org.opentcs.util.eventsystem.TCSEvent> events = remoteKernel.pollEvents(clientID,
+                                                                                     timeout);
+        for (org.opentcs.util.eventsystem.TCSEvent curEvent : events) {
           if (LOG.isDebugEnabled()) {
             LOG.debug("Processing fetched event: " + curEvent);
           }
@@ -364,8 +362,9 @@ class ProxyInvocationHandler
           eventHub.processEvent(curEvent);
 
           // Check if the kernel notifies us about a state change.
-          if (curEvent instanceof TCSKernelStateEvent) {
-            TCSKernelStateEvent stateEvent = (TCSKernelStateEvent) curEvent;
+          if (curEvent instanceof org.opentcs.access.TCSKernelStateEvent) {
+            org.opentcs.access.TCSKernelStateEvent stateEvent
+                = (org.opentcs.access.TCSKernelStateEvent) curEvent;
             if (Kernel.State.SHUTDOWN.equals(stateEvent.getEnteredState())) {
               // If the kernel switches to SHUTDOWN, remember to log out.
               doLogOut = true;

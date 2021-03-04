@@ -100,7 +100,6 @@ public abstract class AbstractConnection
         || !Objects.equals(fEndComponent, endComponent)) {
       fStartComponent = startComponent;
       fEndComponent = endComponent;
-      updateName();
       connectionChanged();
     }
   }
@@ -150,11 +149,18 @@ public abstract class AbstractConnection
     fConnectionChangeListeners.remove(listener);
   }
 
+  public StringProperty getPropertyStartComponent() {
+    return (StringProperty) getProperty(START_COMPONENT);
+  }
+
+  public StringProperty getPropertyEndComponent() {
+    return (StringProperty) getProperty(END_COMPONENT);
+  }
+
   @Override // AttributesChangeListener
   public void propertiesChanged(AttributesChangeEvent e) {
-    if (getStartComponent().getProperty(NAME).hasChanged()
-        || getEndComponent().getProperty(NAME).hasChanged()) {
-      updateName();
+    if (getStartComponent().getPropertyName().hasChanged()
+        || getEndComponent().getPropertyName().hasChanged()) {
     }
   }
 
@@ -231,8 +237,8 @@ public abstract class AbstractConnection
   /**
    * Refreshes the name of this connection.
    */
-  private void updateName() {
-    StringProperty property = (StringProperty) getProperty(NAME);
+  public void updateName() {
+    StringProperty property = getPropertyName();
 
     if (property != null) {
       String oldName = property.getText();
@@ -245,9 +251,7 @@ public abstract class AbstractConnection
 
       propertiesChanged(new NullAttributesChangeListener());
     }
-    StringProperty stringProperty = (StringProperty) getProperty(START_COMPONENT);
-    stringProperty.setText(fStartComponent.getName());
-    stringProperty = (StringProperty) getProperty(END_COMPONENT);
-    stringProperty.setText(fEndComponent.getName());
+    getPropertyStartComponent().setText(fStartComponent.getName());
+    getPropertyEndComponent().setText(fEndComponent.getName());
   }
 }

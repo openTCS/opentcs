@@ -15,6 +15,7 @@ import com.google.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -23,8 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.util.eventsystem.EventHub;
-import org.opentcs.util.eventsystem.TCSEvent;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * A test case for StandardKernel.
@@ -44,8 +44,9 @@ public class StandardKernelTest {
 
   @Before
   public void setUp() {
-    @SuppressWarnings("unchecked")
-    EventHub<TCSEvent> eventHub = mock(EventHub.class);
+    @SuppressWarnings({"unchecked", "deprecation"})
+    org.opentcs.util.eventsystem.EventHub<org.opentcs.util.eventsystem.TCSEvent> eventHub
+        = mock(org.opentcs.util.eventsystem.EventHub.class);
 
     // Build a map of providers for our mocked state objects.
     Map<Kernel.State, Provider<KernelState>> stateMap = new HashMap<>();
@@ -53,26 +54,21 @@ public class StandardKernelTest {
     when(kernelStateShutdown.getState()).thenReturn(Kernel.State.SHUTDOWN);
     stateMap.put(Kernel.State.SHUTDOWN,
                  new KernelStateProvider(kernelStateShutdown));
-    
+
     kernelStateModelling = mock(KernelState.class);
     when(kernelStateModelling.getState()).thenReturn(Kernel.State.MODELLING);
     stateMap.put(Kernel.State.MODELLING,
                  new KernelStateProvider(kernelStateModelling));
-    
+
     kernelStateOperating = mock(KernelState.class);
     when(kernelStateOperating.getState()).thenReturn(Kernel.State.OPERATING);
     stateMap.put(Kernel.State.OPERATING,
                  new KernelStateProvider(kernelStateOperating));
 
-    kernel = new StandardKernel(eventHub, stateMap);
-  }
-
-  @After
-  public void tearDown() {
-    kernel = null;
-    kernelStateShutdown = null;
-    kernelStateModelling = null;
-    kernelStateOperating = null;
+    kernel = new StandardKernel(eventHub,
+                                new SimpleEventBus(),
+                                mock(ScheduledExecutorService.class),
+                                stateMap);
   }
 
   @Test

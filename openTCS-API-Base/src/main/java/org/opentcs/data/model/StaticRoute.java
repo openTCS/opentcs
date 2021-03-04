@@ -177,7 +177,14 @@ public class StaticRoute
     return hops.size() >= 2;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public StaticRoute clone() {
     return new StaticRoute(getIdWithoutDeprecationWarning(), getName(), getProperties(), hops);
   }

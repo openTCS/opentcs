@@ -23,9 +23,7 @@ import javax.inject.Inject;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
-import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
-import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
@@ -137,13 +135,11 @@ public class PointFigure
   @Override  // AbstractAttributedFigure
   protected void drawFill(Graphics2D g) {
     Rectangle rect = fDisplayBox;
-    FigureComponent model = get(FigureConstants.MODEL);
-    AbstractProperty property = (AbstractProperty) model.getProperty(PointModel.TYPE);
 
-    if (property.getValue() == PointModel.PointType.PARK) {
+    if (getModel().getPropertyType().getValue() == PointModel.PointType.PARK) {
       g.setColor(C_PARK);
     }
-    else if (property.getValue() == PointModel.PointType.REPORT) {
+    else if (getModel().getPropertyType().getValue() == PointModel.PointType.REPORT) {
       g.setColor(C_REPORT);
     }
     else {
@@ -154,12 +150,9 @@ public class PointFigure
       g.fillOval(rect.x, rect.y, rect.width, rect.height);
     }
 
-    if (property.getValue() == PointModel.PointType.PARK) {
+    if (getModel().getPropertyType().getValue() == PointModel.PointType.PARK) {
       g.setColor(Color.white);
       Font oldFont = g.getFont();
-      // bei fDiameter = 20
-//      g.drawString("P", (int) (rect.x + 6), (int) (rect.y + rect.height - 5));
-      // bei fDiameter = 10
       Font newFont = new Font(Font.DIALOG, Font.BOLD, 7);
       g.setFont(newFont);
       g.drawString("P", rect.x + 3, rect.y + rect.height - 3);

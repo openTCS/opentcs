@@ -1,0 +1,46 @@
+
+== Customizing and extending the control center application
+
+=== Guice modules
+
+The openTCS kernel control center application uses Guice to configure its components.
+To modify the wiring of components within the application and to add your own components, you can register custom Guice modules.
+Modules are found and registered automatically via `java.util.ServiceLoader`.
+
+Basically, the following steps are required for customizing the application:
+
+. Build a JAR file for your custom injection module with the following content:
+.. A subclass of `org.opentcs.customizations.controlcenter.ControlCenterInjectionModule` must be contained.
+   Configure your custom components or adjust the application's default wiring in this module.
+   `ControlCenterInjectionModule` provides a few supporting methods you can use.
+.. A plain text file named `META-INF/services/org.opentcs.customizations.controlcenter.ControlCenterInjectionModule` must also be contained.
+   This file should contain a single line of text with the fully qualified class name of your module.
+. Ensure that the JAR file(s) containing your Guice modules and the implementation of your custom component(s) are part of the class path when you start the control center application.
+
+For more information on how the automatic registration works, see the documentation of `java.util.ServiceLoader` in the Java class library.
+For more information on how Guice works, see the Guice documentation.
+
+=== Registering driver panels with the control center
+
+. Create a Guice module for your vehicle driver by creating a subclass of `ControlCenterInjectionModule`.
+Implement the `configure()` method and register a binding to your `VehicleCommAdapterPanelFactory`.
+The following example demonstrates how this module's `configure()` method looks like for the loopback driver that is part of the openTCS distribution:
++
+[source, java]
+----
+include::{controlCenter-guiceSrc}/org/opentcs/kernelcontrolcenter/LoopbackCommAdapterPanelsModule.java[tags=documentation_createCommAdapterPanelsModule]
+----
+
+. In the JAR file containing your driver, ensure that there exists a folder named `META-INF/services/` with a file named `org.opentcs.customizations.controlcenter.ControlCenterInjectionModule`.
+This file should consist of a single line of text holding simply the name of the Guice module class, e.g.:
++
+[source]
+----
+org.opentcs.controlcenter.LoopbackCommAdapterPanelsModule
+----
+NOTE: Background: openTCS uses `java.util.ServiceLoader` to automatically find Guice modules on startup, which depends on this file (with this name) being present.
+See the JDK's API documentation for more information about how this mechanism works.
+. Place the JAR file of your driver including all neccessary resources in the subdirectory `lib/openTCS-extensions/` of the control center application's installation directory _before_ the application is started.
+(The openTCS start scripts include all JAR files in that directory in the application's classpath.)
+
+Panels meeting these requirements are found automatically when you start the kernel control center application.

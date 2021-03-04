@@ -8,6 +8,7 @@
 package org.opentcs.util.eventsystem;
 
 import javax.annotation.Nonnull;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interfaces declares the method that is called to notify an object of an
@@ -15,7 +16,10 @@ import javax.annotation.Nonnull;
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual event implementation.
+ * @deprecated For event handling, use classes in <code>org.opentcs.util.event</code> instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public interface EventListener<E extends Event> {
 
   /**

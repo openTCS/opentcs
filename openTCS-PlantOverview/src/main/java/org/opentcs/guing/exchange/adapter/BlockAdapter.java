@@ -9,29 +9,24 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import com.google.inject.assistedinject.Assisted;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.components.properties.type.ColorProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.BlockModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentcs.util.Colors;
 
 /**
  * An adapter for blocks.
@@ -42,82 +37,67 @@ import org.slf4j.LoggerFactory;
 public class BlockAdapter
     extends AbstractProcessAdapter {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(BlockAdapter.class);
+  @Override  // OpenTCSProcessAdapter
+  public void updateModelProperties(TCSObject<?> tcsObject,
+                                    ModelComponent modelComponent,
+                                    SystemModel systemModel,
+                                    TCSObjectService objectService,
+                                    @Nullable ModelLayoutElement layoutElement) {
+    Block block = requireNonNull((Block) tcsObject, "tcsObject");
+    BlockModel model = (BlockModel) modelComponent;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param model The corresponding model component.
-   * @param eventDispatcher The event dispatcher.
-   */
-  @Inject
-  public BlockAdapter(@Assisted BlockModel model,
-                      @Assisted EventDispatcher eventDispatcher) {
-    super(model, eventDispatcher);
+    model.getPropertyName().setText(block.getName());
+    model.removeAllCourseElements();
+
+    for (TCSResourceReference<?> resRef : block.getMembers()) {
+      ModelComponent blockMember = systemModel.getModelComponent(resRef.getName());
+      model.addCourseElement(blockMember);
+    }
+
+    updateMiscModelProperties(model, block);
+
+    if (layoutElement != null) {
+      updateModelLayoutProperties(model, layoutElement);
+    }
   }
 
   @Override
-  public BlockModel getModel() {
-    return (BlockModel) super.getModel();
+  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
+                                                SystemModel systemModel,
+                                                PlantModelCreationTO plantModel) {
+    return plantModel
+        .withBlock(new BlockCreationTO(modelComponent.getName())
+            .withMemberNames(getMemberNames((BlockModel) modelComponent))
+            .withProperties(getKernelProperties(modelComponent))
+        )
+        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts()));
   }
 
-  @Override  // OpenTCSProcessAdapter
-  public void updateModelProperties(Kernel kernel,
-                                    TCSObject<?> tcsObject,
-                                    @Nullable ModelLayoutElement layoutElement) {
-    Block block = requireNonNull((Block) tcsObject, "tcsObject");
-
-    StringProperty name = (StringProperty) getModel().getProperty(ModelComponent.NAME);
-    name.setText(block.getName());
-
-    getModel().removeAllCourseElements();
-
-    for (TCSResourceReference<?> resRef : block.getMembers()) {
-      ProcessAdapter adapter = getEventDispatcher().findProcessAdapter(resRef);
-      getModel().addCourseElement(adapter.getModel());
-    }
-
-    updateMiscModelProperties(block);
-  }
-
-  @Override  // OpenTCSProcessAdapter
-  public void storeToPlantModel(PlantModelCreationTO plantModel) {
-    plantModel.getBlocks().add(new BlockCreationTO(getModel().getName())
-        .setMemberNames(getMemberNames())
-        .setProperties(getKernelProperties()));
-
-    // Write the block color into the model layout element
-    for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
-      updateLayoutElement(layout);
+  private void updateModelLayoutProperties(BlockModel model, ModelLayoutElement layoutElement) {
+    String sBlockColor = layoutElement.getProperties().get(ElementPropKeys.BLOCK_COLOR);
+    if (sBlockColor != null) {
+      model.getPropertyColor().setColor(Colors.decodeFromHexRGB(sBlockColor));
     }
   }
 
-  private Set<String> getMemberNames() {
+  private Set<String> getMemberNames(BlockModel blockModel) {
     Set<String> result = new HashSet<>();
-    for (ModelComponent model : getModel().getChildComponents()) {
-      if (getEventDispatcher().findProcessAdapter(model) != null) {
-        result.add(model.getName());
-      }
+    for (ModelComponent model : blockModel.getChildComponents()) {
+      result.add(model.getName());
     }
 
     return result;
   }
 
-  /**
-   * Refreshes the properties of the layout element and saves it in the kernel.
-   *
-   * @param layout The VisualLayout.
-   */
-  private void updateLayoutElement(VisualLayoutCreationTO layout) {
-    ColorProperty pColor = (ColorProperty) getModel().getProperty(ElementPropKeys.BLOCK_COLOR);
-    int rgb = pColor.getColor().getRGB() & 0x00FFFFFF;  // mask alpha bits
+  @Override
+  protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
+                                                 VisualLayoutCreationTO layout) {
+    BlockModel blockModel = (BlockModel) model;
 
-    layout.getModelElements().add(
-        new ModelLayoutElementCreationTO(getModel().getName())
-            .setProperty(ElementPropKeys.BLOCK_COLOR, String.format("#%06X", rgb))
+    return layout.withModelElement(
+        new ModelLayoutElementCreationTO(blockModel.getName())
+            .withProperty(ElementPropKeys.BLOCK_COLOR, 
+                          Colors.encodeToHexRGB(blockModel.getPropertyColor().getColor()))
     );
   }
 

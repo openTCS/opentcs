@@ -61,4 +61,13 @@ public class OperationModeChangeEvent
   public OperationMode getNewMode() {
     return newMode;
   }
+
+  @Override
+  public String toString() {
+    return "OperationModeChangeEvent{"
+        + "oldMode=" + oldMode
+        + ", newMode=" + newMode
+        + ", source=" + getSource()
+        + '}';
+  }
 }

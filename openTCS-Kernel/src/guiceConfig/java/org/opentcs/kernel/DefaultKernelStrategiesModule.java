@@ -8,35 +8,45 @@
 package org.opentcs.kernel;
 
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import java.util.Comparator;
 import javax.inject.Singleton;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcher;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.TransportOrderSelectionVeto;
-import org.opentcs.strategies.basic.dispatching.TransportOrderSelector;
-import org.opentcs.strategies.basic.dispatching.TransportOrderService;
-import org.opentcs.strategies.basic.dispatching.VehicleSelector;
-import org.opentcs.strategies.basic.dispatching.orderselection.NoOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.orderselection.ParkingOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.orderselection.RechargeOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.orderselection.ReservedOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.orderselection.TransportOrderSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.orderselection.parking.DefaultParkingPositionSupplier;
-import org.opentcs.strategies.basic.dispatching.orderselection.recharging.DefaultRechargePositionSupplier;
-import org.opentcs.strategies.basic.dispatching.vehicleselection.AssignedVehicleSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.vehicleselection.AvailableVehicleSelectionStrategy;
-import org.opentcs.strategies.basic.dispatching.vehicleselection.ClosestVehicleComparator;
-import org.opentcs.strategies.basic.dispatching.vehicleselection.VehicleCandidate;
-import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluator;
+import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.AssignmentCandidate;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByCompleteRoutingCosts;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByDeadline;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByEnergyLevel;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByInitialRoutingCosts;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByOrderAge;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByOrderName;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorByVehicleName;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CandidateComparatorIdleFirst;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeOrderCandidateComparator;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeOrderComparator;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeVehicleCandidateComparator;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.CompositeVehicleComparator;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.TransportOrderComparatorByAge;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.TransportOrderComparatorByDeadline;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.TransportOrderComparatorByName;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.VehicleComparatorByEnergyLevel;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.VehicleComparatorByName;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.priorization.VehicleComparatorIdleFirst;
+import org.opentcs.strategies.basic.dispatching.phase.parking.DefaultParkingPositionSupplier;
+import org.opentcs.strategies.basic.dispatching.phase.recharging.DefaultRechargePositionSupplier;
 import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluatorConfiguration;
 import org.opentcs.strategies.basic.routing.DefaultRouter;
 import org.opentcs.strategies.basic.routing.DefaultRouterConfiguration;
 import org.opentcs.strategies.basic.routing.PointRouterFactory;
+import org.opentcs.strategies.basic.routing.jgrapht.BellmanFordPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.DefaultModelGraphMapper;
 import org.opentcs.strategies.basic.routing.jgrapht.DijkstraPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluator;
@@ -51,7 +61,6 @@ import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
 import static org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration.EvaluatorType.EXPLICIT;
 import static org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration.EvaluatorType.TRAVELTIME;
 import org.opentcs.strategies.basic.scheduling.DefaultScheduler;
-import org.opentcs.util.Comparators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,11 +84,10 @@ public class DefaultKernelStrategiesModule
     configureSchedulerDependencies();
     configureRouterDependencies();
     configureDispatcherDependencies();
-    configureRecoveryEvaluatorDependencies();
     bindScheduler(DefaultScheduler.class);
     bindRouter(DefaultRouter.class);
     bindDispatcher(DefaultDispatcher.class);
-    bindRecoveryEvaluator(DefaultRecoveryEvaluator.class);
+    configureRecoveryEvaluator();
   }
   // end::documentation_configureDefaultStrategies[]
 
@@ -105,6 +113,10 @@ public class DefaultKernelStrategiesModule
       case DIJKSTRA:
         bind(PointRouterFactory.class)
             .to(DijkstraPointRouterFactory.class);
+        break;
+      case BELLMAN_FORD:
+        bind(PointRouterFactory.class)
+            .to(BellmanFordPointRouterFactory.class);
         break;
       case FLOYD_WARSHALL:
         bind(PointRouterFactory.class)
@@ -165,41 +177,87 @@ public class DefaultKernelStrategiesModule
         .to(DefaultRechargePositionSupplier.class)
         .in(Singleton.class);
 
-    bind(new TypeLiteral<Comparator<VehicleCandidate>>() {
-    })
-        .annotatedWith(AvailableVehicleSelectionStrategy.VehicleCandidateComparator.class)
-        .toInstance(new ClosestVehicleComparator());
-    bind(AssignedVehicleSelectionStrategy.class)
+    MapBinder<String, Comparator<Vehicle>> vehicleComparatorBinder
+        = MapBinder.newMapBinder(binder(),
+                                 new TypeLiteral<String>() {
+                             },
+                                 new TypeLiteral<Comparator<Vehicle>>() {
+                             });
+    vehicleComparatorBinder
+        .addBinding(VehicleComparatorByEnergyLevel.CONFIGURATION_KEY)
+        .to(VehicleComparatorByEnergyLevel.class);
+    vehicleComparatorBinder
+        .addBinding(VehicleComparatorByName.CONFIGURATION_KEY)
+        .to(VehicleComparatorByName.class);
+    vehicleComparatorBinder
+        .addBinding(VehicleComparatorIdleFirst.CONFIGURATION_KEY)
+        .to(VehicleComparatorIdleFirst.class);
+
+    MapBinder<String, Comparator<TransportOrder>> orderComparatorBinder
+        = MapBinder.newMapBinder(binder(),
+                                 new TypeLiteral<String>() {
+                             },
+                                 new TypeLiteral<Comparator<TransportOrder>>() {
+                             });
+    orderComparatorBinder
+        .addBinding(TransportOrderComparatorByAge.CONFIGURATION_KEY)
+        .to(TransportOrderComparatorByAge.class);
+    orderComparatorBinder
+        .addBinding(TransportOrderComparatorByDeadline.CONFIGURATION_KEY)
+        .to(TransportOrderComparatorByDeadline.class);
+    orderComparatorBinder
+        .addBinding(TransportOrderComparatorByName.CONFIGURATION_KEY)
+        .to(TransportOrderComparatorByName.class);
+
+    MapBinder<String, Comparator<AssignmentCandidate>> candidateComparatorBinder
+        = MapBinder.newMapBinder(binder(),
+                                 new TypeLiteral<String>() {
+                             },
+                                 new TypeLiteral<Comparator<AssignmentCandidate>>() {
+                             });
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByCompleteRoutingCosts.CONFIGURATION_KEY)
+        .to(CandidateComparatorByCompleteRoutingCosts.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByDeadline.CONFIGURATION_KEY)
+        .to(CandidateComparatorByDeadline.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByEnergyLevel.CONFIGURATION_KEY)
+        .to(CandidateComparatorByEnergyLevel.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByInitialRoutingCosts.CONFIGURATION_KEY)
+        .to(CandidateComparatorByInitialRoutingCosts.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByOrderAge.CONFIGURATION_KEY)
+        .to(CandidateComparatorByOrderAge.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByOrderName.CONFIGURATION_KEY)
+        .to(CandidateComparatorByOrderName.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByVehicleName.CONFIGURATION_KEY)
+        .to(CandidateComparatorByVehicleName.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorIdleFirst.CONFIGURATION_KEY)
+        .to(CandidateComparatorIdleFirst.class);
+
+    bind(CompositeVehicleComparator.class)
         .in(Singleton.class);
-    bind(AvailableVehicleSelectionStrategy.class)
+    bind(CompositeOrderComparator.class)
         .in(Singleton.class);
-    bind(VehicleSelector.class)
+    bind(CompositeOrderCandidateComparator.class)
+        .in(Singleton.class);
+    bind(CompositeVehicleCandidateComparator.class)
         .in(Singleton.class);
 
-    bind(new TypeLiteral<Comparator<TransportOrder>>() {
-    })
-        .annotatedWith(TransportOrderSelectionStrategy.OrderComparator.class)
-        .toInstance(Comparators.ordersByDeadline());
-    bind(NoOrderSelectionStrategy.class)
-        .in(Singleton.class);
-    bind(ReservedOrderSelectionStrategy.class)
-        .in(Singleton.class);
-    bind(TransportOrderSelectionStrategy.class)
-        .in(Singleton.class);
-    bind(RechargeOrderSelectionStrategy.class)
-        .in(Singleton.class);
-    bind(ParkingOrderSelectionStrategy.class)
-        .in(Singleton.class);
-    bind(TransportOrderSelector.class)
-        .in(Singleton.class);
-
-    bind(TransportOrderService.class)
+    bind(TransportOrderUtil.class)
         .in(Singleton.class);
   }
 
-  private void configureRecoveryEvaluatorDependencies() {
+  @SuppressWarnings("deprecation")
+  private void configureRecoveryEvaluator() {
     bind(DefaultRecoveryEvaluatorConfiguration.class)
         .toInstance(getConfigBindingProvider().get(DefaultRecoveryEvaluatorConfiguration.PREFIX,
                                                    DefaultRecoveryEvaluatorConfiguration.class));
+    bindRecoveryEvaluator(org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluator.class);
   }
 }

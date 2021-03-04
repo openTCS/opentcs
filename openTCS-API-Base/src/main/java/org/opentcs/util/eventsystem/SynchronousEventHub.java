@@ -9,6 +9,7 @@ package org.opentcs.util.eventsystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual event implementation.
+ * @deprecated For event handling, use classes in <code>org.opentcs.util.event</code> instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class SynchronousEventHub<E extends Event>
     extends EventHub<E> {
 

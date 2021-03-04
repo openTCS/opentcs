@@ -9,7 +9,7 @@ openTCS (short for "open Transportation Control System") is a free platform for 
 It should generally be possible to control any track-guided vehicle with it, even if the tracks are only virtual, but AGVSs are the main target.
 It is being maintained at the Fraunhofer Institute for Material Flow and Logistics in Dortmund, Germany.
 
-The software runs on the Java platform (version 1.8 or later).
+The software runs on the Java platform (version 1.8).
 All libraries required for compiling and/or using it are freely available, too.
 
 openTCS itself is not a complete product you can use "out-of-the-box" to control an AGVS with.
@@ -48,6 +48,25 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 == Change log
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
+
+=== Version 4.9 (2018-04-16)
+
+* Bugs fixed:
+** Fix jumping mouse cursor when dragging/moving model elements in the Plant Overview in some cases.
+* New features:
+** Allow the kernel to work headless, i.e. without a GUI.
+   Introduce a separate Kernel Control Center application that provides the same functionality and can be attached to the kernel as a client.
+** Provide a single-threaded executor for sequential processing of tasks in the kernel, which helps avoiding locking and visibility issues.
+   Use this executor for most tasks, especially the ones manipulating kernel state, that were previously executed concurrently.
+** Introduce a web API (HTTP + JSON), intended to replace the proprietary TCP/IP host interface, which is now deprecated.
+** Introduce an API for pluggable model import and export implementations in the Plant Overview.
+* Other changes:
+** Split the Kernel interface into aspect-specific service interfaces.
+** Provide a (more) simple event API, including an event bus implementation as a replacement for the previously used MBassador and event hub.
+** Overhaul the default dispatcher implementation to improve maintainability and extensibility.
+** Allow suggestions for property values in the Plant Overview to depend on the key.
+** Improve API and deprecate classes and methods in lots of places.
+** Improve default formatting of log output for better readability.
 
 === Version 4.8.4 (2018-02-12)
 

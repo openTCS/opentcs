@@ -7,8 +7,8 @@
  */
 package org.opentcs.documentation;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,10 +17,11 @@ import org.junit.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.InternalTransportOrderService;
+import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.order.DriveOrder;
@@ -36,12 +37,14 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class CreateTransportOrderTest {
 
-  private LocalKernel localKernel;
+  private TransportOrderService internalTransportOrderService;
+  private DispatcherService dispatcherService;
 
   @Before
   public void setUp() {
-    localKernel = mock(LocalKernel.class);
-    when(localKernel.createTransportOrder(any(TransportOrderCreationTO.class)))
+    internalTransportOrderService = mock(InternalTransportOrderService.class);
+    dispatcherService = mock(DispatcherService.class);
+    when(internalTransportOrderService.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenReturn(new TransportOrder(
             "Transportorder",
             Collections.singletonList(new DriveOrder(
@@ -52,8 +55,11 @@ public class CreateTransportOrderTest {
   @Test
   public void shouldCreateAndActivateTransportOrder() {
     // tag::documentation_createNewTransportOrder[]
-    // The Kernel instance we're working with
-    Kernel kernel = getAKernelReference();
+    // The transport order service instance we're working with
+    TransportOrderService transportOrderService = getATransportOrderServiceReference();
+
+    // The dispatcher service instance we're working with
+    DispatcherService dispatcherService = getADispatcherServiceReference();
 
     // A list of destinations the transport order the vehicle is supposed
     // to travel to:
@@ -72,24 +78,26 @@ public class CreateTransportOrderTest {
         = new TransportOrderCreationTO("MyTransportOrder-" + UUID.randomUUID(),
                                        destinations);
     // Optionally, assign a specific vehicle to the transport order:
-    orderTO.setIntendedVehicleName("Some vehicle name");
+    orderTO = orderTO.withIntendedVehicleName("Some vehicle name");
     // Optionally, set a deadline for the transport order:
-    orderTO.setDeadline(ZonedDateTime.of(2099, 12, 31, 23, 59, 59, 0, ZoneId.of("Europe/Berlin")));
+    orderTO = orderTO.withDeadline(Instant.now().plus(1, ChronoUnit.HOURS));
 
     // Create a new transport order for the given description:
-    TransportOrder newOrder = kernel.createTransportOrder(orderTO);
-    // And at last activate the transport order
-    kernel.activateTransportOrder(newOrder.getReference());
-    // Once a vehicle is available and able to process the transport order,
-    // the kernel will assign it.
+    TransportOrder newOrder = transportOrderService.createTransportOrder(orderTO);
+
+    // Trigger the dispatch process for the created transport order.
+    dispatcherService.dispatch();
     // end::documentation_createNewTransportOrder[]
   }
 
   @Test
   public void shouldCreateTransportOrderToAPoint() {
     // tag::documentation_createNewTransportOrderToPoint[]
-    // The Kernel instance we're working with
-    Kernel kernel = getAKernelReference();
+    // The transport order service instance we're working with
+    TransportOrderService transportOrderService = getATransportOrderServiceReference();
+
+    // The dispatcher service instance we're working with
+    DispatcherService dispatcherService = getADispatcherServiceReference();
 
     // Create a list containing a single destination to a point.
     // Use Destination.OP_MOVE as the operation to be executed:
@@ -101,12 +109,13 @@ public class CreateTransportOrderTest {
     TransportOrderCreationTO orderTO
         = new TransportOrderCreationTO("MyTransportOrder-" + UUID.randomUUID(),
                                        destinations)
-            .setIntendedVehicleName("Some vehicle name");
+            .withIntendedVehicleName("Some vehicle name");
 
     // Create a transport order using the description:
-    TransportOrder dummyOrder = kernel.createTransportOrder(orderTO);
-    // Activate the new transport order:
-    kernel.activateTransportOrder(dummyOrder.getReference());
+    TransportOrder dummyOrder = transportOrderService.createTransportOrder(orderTO);
+
+    // Trigger the dispatch process for the created transport order.
+    dispatcherService.dispatch();
     // end::documentation_createNewTransportOrderToPoint[]
   }
 
@@ -114,8 +123,12 @@ public class CreateTransportOrderTest {
     return new Location("Location", new LocationType("LocationType").getReference());
   }
 
-  private LocalKernel getAKernelReference() {
-    return localKernel;
+  private TransportOrderService getATransportOrderServiceReference() {
+    return internalTransportOrderService;
+  }
+
+  private DispatcherService getADispatcherServiceReference() {
+    return dispatcherService;
   }
 
   private String getDestinationOperation() {

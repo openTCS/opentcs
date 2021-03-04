@@ -13,8 +13,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
@@ -30,22 +30,23 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class WithdrawTransportOrderTest {
 
-  private LocalKernel localKernel;
-
+  private DispatcherService dispatcherService;
+  private TCSObjectService objectService;
   private Vehicle vehicle;
 
   @Before
   public void setUp() {
-    localKernel = mock(LocalKernel.class);
+    dispatcherService = mock(DispatcherService.class);
+    objectService = mock(TCSObjectService.class);
     vehicle = new Vehicle("Vehicle");
-    when(localKernel.getTCSObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
+    when(objectService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
   }
 
   @Test
   public void shouldWithdrawTransportOrder() {
     // tag::documentation_withdrawTransportOrder[]
-    // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    // The dispatcher service instance we're working with
+    DispatcherService dispatcherService = getDispatcherServiceFromSomewhere();
 
     // Get the transport order to be withdrawn.
     TransportOrder curOrder = getTransportOrderToWithdraw();
@@ -55,26 +56,30 @@ public class WithdrawTransportOrderTest {
     // The third argument indicates whether the vehicle's processing state should
     // be changed to UNAVAILABLE so it cannot be assigned another transport order
     // right after the withdrawal.
-    kernel.withdrawTransportOrder(curOrder.getReference(), true, false);
+    dispatcherService.withdrawByTransportOrder(curOrder.getReference(), true, false);
     // end::documentation_withdrawTransportOrder[]
   }
 
   @Test
   public void shouldWithdrawTransportOrderByVehicle() {
     // tag::documentation_withdrawTransportOrderByVehicle[]
-    // The Kernel instance we're working with
-    Kernel kernel = getKernelFromSomewhere();
+    // The object service instance we're working with
+    TCSObjectService objectService = getTCSObjectServiceFromSomewhere();
 
     // Get the vehicle from which the transport order shall be withdrawn
-    Vehicle curVehicle = kernel.getTCSObject(Vehicle.class,
-                                             getSampleVehicle());
+    Vehicle curVehicle = objectService.fetchObject(Vehicle.class,
+                                                   getSampleVehicle());
+
+    // The dispatcher service instance we're working with
+    DispatcherService dispatcherService = getDispatcherServiceFromSomewhere();
+
     // Withdraw the order.
     // The second argument indicates if the vehicle should finish the movements
     // it is already assigned to (false) or abort immediately (true).
     // The third argument indicates whether the vehicle's processing state should
     // be changed to UNAVAILABLE so it cannot be assigned another transport order
     // right after the withdrawal.
-    kernel.withdrawTransportOrderByVehicle(curVehicle.getReference(), true, false);
+    dispatcherService.withdrawByVehicle(curVehicle.getReference(), true, false);
     // end::documentation_withdrawTransportOrderByVehicle[]
   }
 
@@ -86,8 +91,12 @@ public class WithdrawTransportOrderTest {
     return "";
   }
 
-  private LocalKernel getKernelFromSomewhere() {
-    return localKernel;
+  private DispatcherService getDispatcherServiceFromSomewhere() {
+    return dispatcherService;
+  }
+
+  private TCSObjectService getTCSObjectServiceFromSomewhere() {
+    return objectService;
   }
 
   private TransportOrder getTransportOrderToWithdraw() {

@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
@@ -40,9 +40,9 @@ public class AboutAction
    */
   private final ApplicationState appState;
   /**
-   * Provides access to a kernel.
+   * Provides access to a portal.
    */
-  private final SharedKernelProvider kernelProvider;
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * The parent component for dialogs shown by this action.
    */
@@ -52,15 +52,15 @@ public class AboutAction
    * Creates a new instance.
    *
    * @param appState Stores the application's current state.
-   * @param kernelProvider Provides access to a kernel.
+   * @param portalProvider Provides access to a portal.
    * @param dialogParent The parent component for dialogs shown by this action.
    */
   @Inject
   public AboutAction(ApplicationState appState,
-                     SharedKernelProvider kernelProvider,
+                     SharedKernelServicePortalProvider portalProvider,
                      @ApplicationFrame Component dialogParent) {
     this.appState = requireNonNull(appState, "appState");
-    this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
 
     ResourceBundleUtil.getBundle().configureAction(this, ID);
@@ -82,7 +82,7 @@ public class AboutAction
         + "JVM: " + System.getProperty("java.vm.version") + ", " + System.getProperty("java.vm.vendor") + "<br>"
         + "OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + "<br>"
         + "<b>Kernel</b><br>"
-        + kernelProvider.getKernelDescription()
+        + portalProvider.getPortalDescription()
         + "<br>" + bundle.getFormatted("openTCS.about.mode", appState.getOperationMode())
         + "</p></html>",
         bundle.getString("openTCS.about.title"),

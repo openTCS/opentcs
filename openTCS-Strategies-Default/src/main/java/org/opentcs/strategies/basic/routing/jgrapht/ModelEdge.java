@@ -35,4 +35,12 @@ public class ModelEdge
     return travellingReverse;
   }
 
+  @Override
+  public String toString() {
+    return "ModelEdge{"
+        + "modelPath=" + modelPath
+        + ", travellingReverse=" + travellingReverse
+        + '}';
+  }
+
 }

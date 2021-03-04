@@ -11,7 +11,6 @@ package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Color;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.Collection;
@@ -22,17 +21,16 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
-import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.handle.BezierOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.liner.ElbowLiner;
+import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
-import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerControlPointHandle;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
@@ -40,7 +38,6 @@ import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
-import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
@@ -119,6 +116,7 @@ public class PathConnection
   @Override
   public void updateConnection() {
     super.updateConnection();
+    initializePreviousOrigin();
     updateControlPoints();
   }
 
@@ -153,7 +151,7 @@ public class PathConnection
     path.add(new BezierPath.Node(sp));
     path.add(new BezierPath.Node(ep));
     cp1 = cp2 = cp3 = cp4 = cp5 = null;
-    getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+    getModel().getPropertyPathControlPoints().markChanged();
   }
 
   /**
@@ -223,7 +221,7 @@ public class PathConnection
                                      ep.x, ep.y)); //Next point - not in use because of C1_MASK
       }
 
-      getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
+      getModel().getPropertyPathControlPoints().markChanged();
       path.invalidatePath();
     }
   }
@@ -289,8 +287,7 @@ public class PathConnection
                                  ep.x, ep.y, //Current point
                                  cp5.x, cp5.y, //Previous point
                                  cp4.x, cp4.y)); //Next point
-    StringProperty sProp
-        = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
+    StringProperty sProp = getModel().getPropertyPathControlPoints();
     sProp.setText(String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d;",
                                 (int) cp1.x, (int) cp1.y,
                                 (int) cp2.x, (int) cp2.y,
@@ -343,15 +340,21 @@ public class PathConnection
   }
 
   /**
-   * Die BEZIER-Kontrollpunkte aktualisieren
+   * Initializes the previous origin which is used to scale the control points of this path.
    */
-  public void updateControlPoints() {
+  private void initializePreviousOrigin() {
     if (previousOrigin == null) {
       Origin origin = get(FigureConstants.ORIGIN);
       previousOrigin = new Origin();
       previousOrigin.setScale(origin.getScaleX(), origin.getScaleY());
     }
+  }
 
+  /**
+   * Die BEZIER-Kontrollpunkte aktualisieren
+   */
+  public void updateControlPoints() {
+    StringProperty sProp = getModel().getPropertyPathControlPoints();
     if (cp1 != null && cp2 != null) {
       if (cp3 != null) {
         cp1 = path.get(0, BezierPath.C2_MASK);
@@ -395,10 +398,8 @@ public class PathConnection
         sControlPoints = String.format("%d,%d", (int) (cp1.x), (int) (cp1.y));
       }
     }
-
-    StringProperty sProp
-        = (StringProperty) getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     sProp.setText(sControlPoints);
+    invalidate();
     sProp.markChanged();
     getModel().propertiesChanged(this);
   }
@@ -428,52 +429,67 @@ public class PathConnection
                                       end.get(FigureConstants.MODEL));
   }
 
+  /**
+   * Returns the type of this path.
+   *
+   * @return The type of this path
+   */
+  public PathModel.LinerType getLinerType() {
+    return (PathModel.LinerType) getModel().getPropertyPathConnType().getValue();
+  }
+
   public void setLinerByType(PathModel.LinerType type) {
     switch (type) {
       case DIRECT:
-        setLiner(null);
         resetPath();
+        updateLiner(null);
         break;
 
       case ELBOW:
         if (!(getLiner() instanceof ElbowLiner)) {
-          setLiner(new ElbowLiner());
           resetPath();
+          updateLiner(new ElbowLiner());
         }
 
         break;
 
       case SLANTED:
         if (!(getLiner() instanceof SlantedLiner)) {
-          setLiner(new SlantedLiner());
           resetPath();
+          updateLiner(new SlantedLiner());
         }
 
         break;
 
       case BEZIER:
         if (!(getLiner() instanceof TupelBezierLiner)) {
-          setLiner(new TupelBezierLiner());
           initControlPoints(type);
-          getModel().propertiesChanged(this);
+          updateLiner(new TupelBezierLiner());
         }
         break;
       case BEZIER_3:
         if (!(getLiner() instanceof TripleBezierLiner)) {
-          setLiner(new TripleBezierLiner());
           initControlPoints(type);
-          getModel().propertiesChanged(this);
+          updateLiner(new TripleBezierLiner());
         }
-
         break;
       default:
         setLiner(null);
     }
   }
 
+  private void updateLiner(Liner newLiner) {
+    setLiner(newLiner);
+    fireFigureHandlesChanged();
+    fireAreaInvalidated();
+    updateControlPoints();
+    invalidate();
+    getModel().propertiesChanged(this);
+  }
+
   private LengthProperty calculateLength() {
     try {
-      LengthProperty property = (LengthProperty) getModel().getProperty(PathModel.LENGTH);
+      LengthProperty property = getModel().getPropertyLength();
 
       if (property != null) {
         double length = (double) property.getValue();
@@ -481,10 +497,12 @@ public class PathConnection
         if (length <= 0.0) {
           PointFigure start = ((LabeledPointFigure) getStartFigure()).getPresentationFigure();
           PointFigure end = ((LabeledPointFigure) getEndFigure()).getPresentationFigure();
-          length = distance(start.getZoomPoint(), end.getZoomPoint());
-          LengthProperty.Unit unit = property.getUnit();
+          double startPosX = start.getModel().getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM);
+          double startPosY = start.getModel().getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM);
+          double endPosX = end.getModel().getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM);
+          double endPosY = end.getModel().getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM);
+          length = distance(startPosX, startPosY, endPosX, endPosY);
           property.setValueAndUnit(length, LengthProperty.Unit.MM);
-          property.convertTo(unit);
           property.markChanged();
         }
       }
@@ -568,27 +586,13 @@ public class PathConnection
 
   @Override
   public void read(DOMInput in) {
-    // Das bringt nichts, da bei Paste ein neues PathModel mit den Default-Parametern erzeugt wird
-//    String sLinerType = PathModel.LinerType.DIRECT.name();
-//    sLinerType = in.getAttribute("liner", sLinerType);
-//    setLinerByName(sLinerType);
-  }
-
-  @Override
-  public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
-    boolean ret = super.handleMouseClick(p, evt, drawingView);
-
-    return ret;
+    // Don't do anything, as a new PathModel with default values is created on paste.
   }
 
   @Override
   public void propertiesChanged(AttributesChangeEvent e) {
     if (!e.getInitiator().equals(this)) {
-      AbstractProperty pType
-          = (AbstractProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
-      PathModel.LinerType type = (PathModel.LinerType) pType.getValue();
-      setLinerByType(type);
-      // Lï¿½nge neu berechnen
+      setLinerByType((PathModel.LinerType) getModel().getPropertyPathConnType().getValue());
       calculateLength();
       lineout();
     }
@@ -606,9 +610,7 @@ public class PathConnection
     set(AttributeKeys.END_DECORATION, navigableForward() ? ARROW_FORWARD : null);
 
     // Mark locked path.
-    BooleanProperty pLocked = (BooleanProperty) getModel().getProperty(PathModel.LOCKED);
-
-    if (Boolean.TRUE.equals(pLocked.getValue())) {
+    if (Boolean.TRUE.equals(getModel().getPropertyLocked().getValue())) {
       set(AttributeKeys.STROKE_COLOR, Color.red);
       set(AttributeKeys.STROKE_DASHES, LOCKED_DASH);
     }
@@ -634,10 +636,8 @@ public class PathConnection
       return;
     }
 
-    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
-    pSpeed.markChanged();
-    pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
-    pSpeed.markChanged();
+    getModel().getPropertyMaxVelocity().markChanged();
+    getModel().getPropertyMaxReverseVelocity().markChanged();
 
     getModel().propertiesChanged(this);
   }
@@ -680,15 +680,11 @@ public class PathConnection
   }
 
   private boolean navigableForward() {
-    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_VELOCITY);
-
-    return ((double) pSpeed.getValue()) > 0.0;
+    return getModel().getPropertyMaxVelocity().getValueByUnit(SpeedProperty.Unit.MM_S) > 0.0;
   }
 
   private boolean navigableBackward() {
-    SpeedProperty pSpeed = (SpeedProperty) getModel().getProperty(PathModel.MAX_REVERSE_VELOCITY);
-
-    return ((double) pSpeed.getValue()) > 0.0;
+    return getModel().getPropertyMaxReverseVelocity().getValueByUnit(SpeedProperty.Unit.MM_S) > 0.0;
   }
 
   private Point2D.Double scaleControlPoint(Point2D.Double p, Origin newScale) {
@@ -707,8 +703,8 @@ public class PathConnection
   @Override // LineConnectionFigure
   public PathConnection clone() {
     PathConnection clone = (PathConnection) super.clone();
-    AbstractProperty pConnType
-        = (AbstractProperty) clone.getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
+
+    AbstractProperty pConnType = (AbstractProperty) clone.getModel().getPropertyPathConnType();
     if (getLiner() instanceof TupelBezierLiner) {
       pConnType.setValue(PathModel.LinerType.BEZIER);
     }

@@ -51,9 +51,7 @@ run {
                     'java.security.policy':'file:./config/java.policy',\
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
-                    'opentcs.home':'.',\
-                    'org.opentcs.util.configuration.xml.file':'./config/openTCS-config.xml',\
-                    'org.opentcs.util.configuration.saveonexit':'true'])
+                    'opentcs.home':'.'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\
           '-splash:bin/splash-image.gif')
 }

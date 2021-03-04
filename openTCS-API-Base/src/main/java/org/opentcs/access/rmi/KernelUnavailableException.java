@@ -8,12 +8,17 @@
 package org.opentcs.access.rmi;
 
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.ServiceUnavailableException;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Thrown when a kernel is not available for processing a request.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated use {@link ServiceUnavailableException} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class KernelUnavailableException
     extends KernelRuntimeException {
 

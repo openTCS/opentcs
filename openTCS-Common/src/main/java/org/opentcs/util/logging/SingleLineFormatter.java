@@ -7,6 +7,7 @@
  */
 package org.opentcs.util.logging;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -46,41 +47,44 @@ public class SingleLineFormatter
 
   @Override
   public synchronized String format(LogRecord record) {
-    StringBuilder result = new StringBuilder();
     date.setTime(record.getMillis());
-    result.append(DATE_FORMAT.format(date));
-    result.append(" [");
-    result.append(record.getLevel().getLocalizedName());
-    result.append("|");
+    StringBuilder result = new StringBuilder();
 
-    if (record.getSourceClassName() != null) {
-      result.append(record.getSourceClassName());
-    }
-    else {
-      result.append(record.getLoggerName());
-    }
-
-    result.append("@").append(Thread.currentThread().getName()).append("] ");
-
-    if (record.getSourceMethodName() != null) {
-      result.append('[');
-      result.append(record.getSourceMethodName());
-      result.append("()]");
-    }
-
-    result.append(": ");
-    result.append(formatMessage(record));
+    result.append('[')
+        .append(DATE_FORMAT.format(date))
+        .append("] ")
+        .append(String.format("%1$-7.7s", record.getLevel().getName()))
+        .append(' ')
+        .append(String.format("%1$-20s", Thread.currentThread().getName()))
+        .append(' ')
+        .append(String.format("%1$-55s", source(record)))
+        .append(": ")
+        .append(formatMessage(record))
+        .append(lineSeparator);
 
     if (record.getThrown() != null) {
-      StringWriter sWriter = new StringWriter();
-      PrintWriter pWriter = new PrintWriter(sWriter);
-      record.getThrown().printStackTrace(pWriter);
-      pWriter.close();
+      result.append(stackTrace(record.getThrown()));
       result.append(lineSeparator);
-      result.append(sWriter.toString());
     }
 
-    result.append(lineSeparator);
     return result.toString();
+  }
+
+  private String source(LogRecord record) {
+    return record.getSourceClassName() != null
+        ? record.getSourceClassName().replaceAll("\\B\\w+(\\.[a-z])", "$1") + "." + record.getSourceMethodName() + "()"
+        : record.getLoggerName();
+  }
+
+  private String stackTrace(Throwable thrown) {
+    try (StringWriter sWriter = new StringWriter();
+         PrintWriter pWriter = new PrintWriter(sWriter)) {
+      thrown.printStackTrace(pWriter);
+      pWriter.flush();
+      return sWriter.toString();
+    }
+    catch (IOException exc) {
+      throw new IllegalStateException("Could not print stack trace for log output", exc);
+    }
   }
 }

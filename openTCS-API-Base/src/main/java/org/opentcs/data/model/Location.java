@@ -243,7 +243,14 @@ public class Location
                         attachedLinks);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @deprecated Will become immutable and not implement Cloneable any more.
+   */
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public Location clone() {
     return new Location(getIdWithoutDeprecationWarning(),
                         getName(),
@@ -427,7 +434,14 @@ public class Location
       return location.hashCode() ^ point.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Will become immutable and not implement Cloneable any more.
+     */
     @Override
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
     public Link clone() {
       return new Link(location, point, allowedOperations);
     }

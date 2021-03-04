@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a dispatcher module for the openTCS
@@ -61,19 +62,32 @@ public interface Dispatcher
   String PROPKEY_PREFERRED_RECHARGE_LOCATION = "tcs:preferredRechargeLocation";
 
   /**
+   * Notifies the dispatcher that it should start the dispatching process.
+   */
+  void dispatch();
+
+  /**
    * Notifies the dispatcher that the given vehicle may now be dispatched.
    *
    * @param vehicle The dispatchable vehicle.
+   * @deprecated Use {@link #dispatch()} instead.
    */
-  void dispatch(@Nonnull Vehicle vehicle);
+  @Deprecated
+  default void dispatch(@Nonnull Vehicle vehicle) {
+    dispatch();
+  }
 
   /**
    * Notifies the dispatcher that the given transport order may now be
    * dispatched.
    *
    * @param order The dispatchable order.
+   * @deprecated Use {@link #dispatch()} instead.
    */
-  void dispatch(@Nonnull TransportOrder order);
+  @Deprecated
+  default void dispatch(@Nonnull TransportOrder order) {
+    dispatch();
+  }
 
   /**
    * Notifies the dispatcher that the given transport order is to be
@@ -113,10 +127,15 @@ public interface Dispatcher
   void releaseVehicle(@Nonnull Vehicle vehicle);
 
   /**
-   * Returns a human readable text describing this router's internal state.
+   * Returns a human readable text describing this dispatcher's internal state.
    *
-   * @return A human readable text describing this router's internal state.
+   * @return A human readable text describing this dispatcher's internal state.
+   * @deprecated Does not serve any real purpose and will be removed.
    */
   @Nonnull
-  String getInfo();
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  default String getInfo() {
+    return "";
+  }
 }

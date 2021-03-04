@@ -1,4 +1,3 @@
-
 == Development with openTCS in general
 
 === System requirements
@@ -58,18 +57,23 @@ This is required in integration projects customizing these applications, e.g. ad
 |No
 |Contains the kernel application.
 
+|`opentcs-kernelcontrolcenter`
+|No
+|Contains the kernel control center application.
+
 |`opentcs-plantoverview`
 |No
 |Contains the plant overview application.
 
 |===
 
-Note that only the basic API libraries provide a documented API that the openTCS developers try to keep compatible between releases.
+Note that only the basic API libraries provide a documented API that the openTCS developers try to keep compatible between minor releases.
+(For these libraries, the rules of https://semver.org/[semantic versioning] are applied.)
 All other artifacts' contents can and will change regardless of any compatibility concerns, so if you use these and switch to a different version of openTCS, you may have to adjust and recompile your code.
 
 === Third-party dependencies
 
-Both the kernel and the plant overview application depend on the following external frameworks and libraries:
+The kernel and the client applications depend on the following external frameworks and libraries:
 
 * SLF4J (https://www.slf4j.org/):
   A simple logging facade to keep the actual logging implementation replaceable.
@@ -79,19 +83,17 @@ Both the kernel and the plant overview application depend on the following exter
   A configuration library supporting binding interfaces.
 * Google Guava (https://github.com/google/guava):
   A collection of small helper classes and methods.
-* MBassador (https://github.com/bennidi/mbassador):
-  A light-weight event bus implementation.
-* JUnit (http://junit.org/junit4/):
-  A simple unit-testing framework.
-* Mockito (http://mockito.org/):
-  A mocking framework for unit tests.
 
 The kernel application also depends on the following libraries:
 
-* JDOM (http://www.jdom.org/):
-  A library for reading and writing XML data.
 * JGraphT (http://jgrapht.org/):
   A library for working with graphs and using algorithms on them.
+* Spark (http://sparkjava.com/):
+  A framework for creating web applications.
+* Jackson (https://github.com/FasterXML/jackson):
+  Provides JSON bindings for Java objects.
+* JDOM (http://www.jdom.org/):
+  A library for reading and writing XML data.
 
 The plant overview application has the following additional dependencies:
 
@@ -100,13 +102,24 @@ The plant overview application has the following additional dependencies:
 * Docking Frames (http://www.docking-frames.org/):
   A framework for docking and undocking of GUI panels
 
+For automatic tests, the following dependencies are used:
+
+* JUnit (http://junit.org/junit4/):
+  A simple unit-testing framework.
+* JUnitParams (https://pragmatists.github.io/JUnitParams/):
+  Provides improved parameterised testing support for JUnit.
+* Mockito (http://mockito.org/):
+  A framework for creating mock objects.
+* Hamcrest (http://hamcrest.org/):
+  A framework for assertion matchers that can be used in tests.
+
 The artifacts for these dependencies are downloaded automatically when building the applications.
 
 === Modularity and extensibility
 
 The openTCS project heavily relies on link:https://github.com/google/guice[Guice] for dependency injection and wiring of components as well as for providing plugin-like extension mechanisms.
 In the injection API, relevant classes can be found in the package `org.opentcs.customizations`.
-For examples, see <<Customizing and extending the kernel application>> and <<Customizing and extending the plant overview application>>.
+For examples, see <<Customizing and extending the kernel application>>, <<Customizing and extending the plant overview application>> and <<Customizing and extending the control center application>>.
 
 === Logging
 

@@ -35,7 +35,7 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  */
 public interface Router
     extends Lifecycle {
-  
+
   /**
    * The key of a vehicle property defining the group of vehicles that may share the same routing.
    * <p>
@@ -43,7 +43,7 @@ public interface Router
    * </p>
    */
   String PROPKEY_ROUTING_GROUP = "tcs:routingGroup";
-  
+
   /**
    * Notifies the router of changes in the topology.
    */
@@ -62,7 +62,7 @@ public interface Router
   void updateRoutingTables();
 
   /**
-   * Checks the routability of a given transport order.
+   * Checks the general routability of a given transport order.
    *
    * @param order The transport order to check for routability.
    * @return A set of vehicles for which a route for the given transport order
@@ -179,7 +179,12 @@ public interface Router
    * Returns a human readable text describing this router's internal state.
    *
    * @return A human readable text describing this router's internal state.
+   * @deprecated Does not serve any real purpose and will be removed.
    */
   @Nonnull
-  String getInfo();
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  default String getInfo() {
+    return "";
+  }
 }
