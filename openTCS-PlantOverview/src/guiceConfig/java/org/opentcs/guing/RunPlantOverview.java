@@ -14,17 +14,12 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.ServiceLoader;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import org.opentcs.customizations.ConfigurableInjectionModule;
+import org.opentcs.customizations.ConfigurationBindingProvider;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.application.PlantOverviewStarter;
-import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.util.Environment;
-import org.opentcs.util.configuration.Configuration;
-import org.opentcs.util.configuration.XMLConfiguration;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +47,16 @@ public class RunPlantOverview {
    *
    * @param args the command line arguments
    */
+  @SuppressWarnings("deprecation")
   public static void main(final String[] args) {
     System.setSecurityManager(new SecurityManager());
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
-    System.setProperty(Configuration.PROPKEY_IMPL_CLASS, XMLConfiguration.class.getName());
+    System.setProperty(org.opentcs.util.configuration.Configuration.PROPKEY_IMPL_CLASS,
+                       org.opentcs.util.configuration.XMLConfiguration.class.getName());
 
     Environment.logSystemInfo();
 
     Injector injector = Guice.createInjector(customConfigurationModule());
-
-    initialize(injector.getInstance(ApplicationConfiguration.class));
-
     injector.getInstance(PlantOverviewStarter.class).startPlantOverview();
   }
 
@@ -73,7 +67,12 @@ public class RunPlantOverview {
    * @return The custom configuration module.
    */
   private static Module customConfigurationModule() {
-    return Modules.override(new FixedPlantOverviewInjectionModule()).with(findRegisteredModules());
+    ConfigurationBindingProvider bindingProvider = new DefaultConfigurationBindingProvider();
+    ConfigurableInjectionModule plantOverviewInjectionModule
+        = new DefaultPlantOverviewInjectionModule();
+    plantOverviewInjectionModule.setConfigBindingProvider(bindingProvider);
+    return Modules.override(plantOverviewInjectionModule)
+        .with(findRegisteredModules(bindingProvider));
   }
 
   /**
@@ -81,32 +80,15 @@ public class RunPlantOverview {
    *
    * @return The registered/found modules.
    */
-  private static List<PlantOverviewInjectionModule> findRegisteredModules() {
+  private static List<PlantOverviewInjectionModule> findRegisteredModules(
+      ConfigurationBindingProvider bindingProvider) {
     List<PlantOverviewInjectionModule> registeredModules = new LinkedList<>();
     for (PlantOverviewInjectionModule module
-         : ServiceLoader.load(PlantOverviewInjectionModule.class)) {
+             : ServiceLoader.load(PlantOverviewInjectionModule.class)) {
       LOG.info("Integrating injection module {}", module.getClass().getName());
+      module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }
     return registeredModules;
-  }
-
-  /**
-   * Initializes the application according to the given configuration.
-   *
-   * @param appConfig The configuration.
-   */
-  private static void initialize(ApplicationConfiguration appConfig) {
-    Locale.setDefault(appConfig.getLocale());
-    // Look and feel
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    }
-    catch (ClassNotFoundException | InstantiationException |
-           IllegalAccessException | UnsupportedLookAndFeelException ex) {
-      LOG.warn("Could not set look-and-feel", ex);
-    }
-    // Show tooltips for 30 seconds (Default: 4 sec)
-    ToolTipManager.sharedInstance().setDismissDelay(30 * 1000);
   }
 }

@@ -14,6 +14,7 @@ def injectionApiDir = file("$buildDir/api-injection")
 def apiCmpDir = file("$buildDir/compatibility-reports")
 def schemasDir = file("$buildDir/schemagen")
 def samplesDir = file("$buildDir/samples")
+def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
 def devManualDir = file("$buildDir/developers-guide")
 def devManualImagesDir = file("$devManualDir/images")
@@ -24,13 +25,19 @@ ext.collectableDistDir = file("$buildDir/install")
 
 configurations {
   schemagen
+  configdocgen
 }
 
 dependencies {
   compile project(':openTCS-Kernel')
+  
   schemagen project(':openTCS-Kernel')
   schemagen project(':openTCS-PlantOverview')
   schemagen jar.outputs.files
+  
+  configdocgen project(':openTCS-Kernel')
+  configdocgen project(':openTCS-PlantOverview')
+  configdocgen jar.outputs.files
 }
 
 distributions {
@@ -216,7 +223,7 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.AsciidoctorTask) {
   // FontAwesome glyphs or anything else to use graphics files.
   // Note: FontAwesome requires internet connectivity for viewing the resulting
   // HTML output...
-//  icons: '1',
+  //  icons: '1',
   icons: 'font',
   // Where to find the icons. Default: ./images/icons.
   // iconsdir: './images/icons',
@@ -233,6 +240,8 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.AsciidoctorTask) {
 }
 
 task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
+  dependsOn 'configdocgen'
+  
   // Document type: article (default), book, inline, manpage)
   options doctype: 'book'
 
@@ -261,6 +270,7 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
   // assumed to be the complete name of the file. Otherwise, "-theme.yml" is appended
   // to the name to make the file name.
              'pdf-style': 'custom',
+             'configdoc': configDocDir,
   // Include a table of contents (on the left side, when rendering to HTML)
   toc: 'left',
   toclevels: '3',
@@ -272,7 +282,7 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
   // FontAwesome glyphs or anything else to use graphics files.
   // Note: FontAwesome requires internet connectivity for viewing the resulting
   // HTML output...
-//  icons: '1',
+  //  icons: '1',
   icons: 'font',
   // Where to find the icons. Default: ./images/icons.
   // iconsdir: './images/icons',
@@ -344,7 +354,7 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
   // FontAwesome glyphs or anything else to use graphics files.
   // Note: FontAwesome requires internet connectivity for viewing the resulting
   // HTML output...
-//  icons: '1',
+  //  icons: '1',
   icons: 'font',
   // Where to find the icons. Default: ./images/icons.
   // iconsdir: './images/icons',
@@ -393,33 +403,33 @@ task schemagen {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-order.xsd",
-             "org.opentcs.kernel.xmlorders.binding.TCSOrderSet",
-             "org.opentcs.kernel.xmlorders.binding.Transport",
-             "org.opentcs.kernel.xmlorders.binding.TransportScript" ]
+             "org.opentcs.kernel.xmlhost.orders.binding.TCSOrderSet",
+             "org.opentcs.kernel.xmlhost.orders.binding.Transport",
+             "org.opentcs.kernel.xmlhost.orders.binding.TransportScript" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-orderscript.xsd",
-             "org.opentcs.kernel.xmlorders.binding.TCSScriptFile",
-             "org.opentcs.kernel.xmlorders.binding.Transport",
-             "org.opentcs.kernel.xmlorders.binding.TransportScript" ]
+             "org.opentcs.kernel.xmlhost.orders.binding.TCSScriptFile",
+             "org.opentcs.kernel.xmlhost.orders.binding.Transport",
+             "org.opentcs.kernel.xmlhost.orders.binding.TransportScript" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-response.xsd",
-             "org.opentcs.kernel.xmlorders.binding.TCSResponseSet",
-             "org.opentcs.kernel.xmlorders.binding.TransportResponse",
-             "org.opentcs.kernel.xmlorders.binding.ScriptResponse" ]
+             "org.opentcs.kernel.xmlhost.orders.binding.TCSResponseSet",
+             "org.opentcs.kernel.xmlhost.orders.binding.TransportResponse",
+             "org.opentcs.kernel.xmlhost.orders.binding.ScriptResponse" ]
     }
     javaexec {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-host-statuschannel.xsd",
-             "org.opentcs.kernel.xmlstatus.binding.TCSStatusMessageSet",
-             "org.opentcs.kernel.xmlstatus.binding.OrderStatusMessage",
-             "org.opentcs.kernel.xmlstatus.binding.VehicleStatusMessage" ]
+             "org.opentcs.kernel.xmlhost.status.binding.TCSStatusMessageSet",
+             "org.opentcs.kernel.xmlhost.status.binding.OrderStatusMessage",
+             "org.opentcs.kernel.xmlhost.status.binding.VehicleStatusMessage" ]
     }
     javaexec {
       classpath configurations.schemagen
@@ -467,5 +477,92 @@ task samplesgen {
       main = 'org.opentcs.documentation.SamplesGenerator'
       args "TELEGRAM_BATCH", "${samplesDir}/xml-telegram-batch.xml"
     }
+  }
+}
+
+task configdocgen {
+  dependsOn 'jar'
+  dependsOn ':openTCS-Kernel:jar'
+  dependsOn ':openTCS-PlantOverview:jar'
+  
+  doLast {
+    mkdir(configDocDir)
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/KernelApplicationConfigurationEntries.adoc",
+              "org.opentcs.kernel.KernelApplicationConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/ControlCenterConfigurationEntries.adoc",
+              "org.opentcs.kernel.controlcenter.ControlCenterConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/OrderPoolConfigurationEntries.adoc",
+              "org.opentcs.kernel.OrderPoolConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/VehiclesConfigurationEntries.adoc",
+              "org.opentcs.kernel.vehicles.VehiclesConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/DefaultDispatcherConfigurationEntries.adoc",
+              "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/DefaultRouterConfigurationEntries.adoc",
+              "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
+              "org.opentcs.kernel.RmiKernelInterfaceConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/XMLHostInterfaceConfigurationEntries.adoc",
+              "org.opentcs.kernel.xmlhost.XMLHostInterfaceConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
+              "org.opentcs.virtualvehicle.VirtualVehicleConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
+              "org.opentcs.guing.util.PlantOverviewApplicationConfiguration"]
+    }
+    
+    //    javaexec {
+    //      classpath configurations.configdocgen
+    //      main = "org.opentcs.documentation.ConfigDocGenerator"
+    //      args = ["${configDocDir}/DefaultRecoveryEvaluator.adoc",
+    //             "org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluatorConfiguration"]
+    //    }
   }
 }

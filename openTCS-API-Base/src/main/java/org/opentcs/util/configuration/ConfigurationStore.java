@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This abstract class declares methods for storing and loading configuration
@@ -26,7 +27,11 @@ import java.util.TreeSet;
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class ConfigurationStore
     implements Serializable {
 

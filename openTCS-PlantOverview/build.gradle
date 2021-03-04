@@ -16,6 +16,9 @@ dependencies {
   compile files(rootProject.file('lib/docking-frames-common-1.1.2p11.jar'))
   compile files(rootProject.file('lib/docking-frames-core-1.1.2p11.jar'))
   
+  compile group: "org.cfg4j", name:"cfg4j-core", version: "4.4.0"
+  compileOnly group: "org.cfg4j", name:"cfg4j-core", version: "4.4.0", classifier: 'javadoc'
+  
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 

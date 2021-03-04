@@ -7,14 +7,9 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import com.google.inject.BindingAnnotation;
 import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,10 +66,9 @@ public class DefaultVehicleController
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultVehicleController.class);
   /**
-   * Indicates whether to ignore unknown positions completely or to reset the vehicle's position
-   * when encountering them.
+   * This class's configuration.
    */
-  private final boolean ignoringUnknownPositions;
+  private final VehiclesConfiguration configuration;
   /**
    * The local kernel.
    */
@@ -155,7 +149,7 @@ public class DefaultVehicleController
    * @param kernel The kernel instance maintaining the model.
    * @param scheduler The scheduler managing resource allocations.
    * @param eventBus The application's event bus.
-   * @param ignoreUnknownPositions Whether to ignore unknown positions.
+   * @param configuration This class's configuration.
    */
   @Inject
   public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
@@ -163,13 +157,13 @@ public class DefaultVehicleController
                                   @Nonnull LocalKernel kernel,
                                   @Nonnull Scheduler scheduler,
                                   @Nonnull MBassador<Object> eventBus,
-                                  @IgnoreUnknownPositions boolean ignoreUnknownPositions) {
+                                  @Nonnull VehiclesConfiguration configuration) {
     this.controlledVehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.localKernel = requireNonNull(kernel, "kernel");
     this.scheduler = requireNonNull(scheduler, "scheduler");
     this.eventBus = requireNonNull(eventBus, "eventBus");
-    this.ignoringUnknownPositions = ignoreUnknownPositions;
+    this.configuration = requireNonNull(configuration, "configuration");
 
     this.vehicleModel = commAdapter.getProcessModel();
     this.adapterCommandQueueCapacity = adapter.getCommandQueueCapacity();
@@ -361,16 +355,14 @@ public class DefaultVehicleController
       commandsSent.clear();
       futureCommands.clear();
       pendingCommand = null;
-      // Free all resources that were reserved for future commands...
+      // Free all resource sets that were reserved for future commands, except the current one...
       Set<TCSResource<?>> neededResources = allocatedResources.poll();
-      Iterator<Set<TCSResource<?>>> resIter = allocatedResources.iterator();
-      while (resIter.hasNext()) {
-        Set<TCSResource<?>> resSet = resIter.next();
+      for (Set<TCSResource<?>> resSet : allocatedResources) {
         if (resSet != null) {
           scheduler.free(this, resSet);
         }
-        resIter.remove();
       }
+      allocatedResources.clear();
       // Put the resources for the current command/position back in...
       allocatedResources.add(neededResources);
     }
@@ -488,7 +480,7 @@ public class DefaultVehicleController
       // the model.
       if (point == null) {
         LOG.warn("{}: At unknown position {}", vehicleName, position);
-        if (ignoringUnknownPositions) {
+        if (configuration.ignoreUnknownReportedPositions()) {
           return;
         }
       }
@@ -982,14 +974,5 @@ public class DefaultVehicleController
       result.add(new HashSet<>(Arrays.asList(step.getDestinationPoint(), step.getPath())));
     }
     return result;
-  }
-
-  /**
-   * Annotation type for configuring the adapter's queue capacity.
-   */
-  @BindingAnnotation
-  @Target(value = {ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(value = RetentionPolicy.RUNTIME)
-  public @interface IgnoreUnknownPositions {
   }
 }

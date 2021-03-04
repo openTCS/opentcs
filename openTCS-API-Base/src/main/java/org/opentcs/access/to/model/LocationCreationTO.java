@@ -36,7 +36,8 @@ public class LocationCreationTO
   @Nonnull
   private Triple position;
   /**
-   * The link names attached to this location.
+   * The links attaching points to this location.
+   * This is a map of point names to allowed operations.
    */
   @Nonnull
   private Map<String, Set<String>> links = new HashMap<>();
@@ -109,9 +110,10 @@ public class LocationCreationTO
   }
 
   /**
-   * Returns the link names attached to this location.
+   * Returns the links attaching points to this location.
+   * This is a map of point names to allowed operations.
    *
-   * @return The link names attached to this location.
+   * @return The links attaching points to this location.
    */
   @Nonnull
   public Map<String, Set<String>> getLinks() {
@@ -119,9 +121,9 @@ public class LocationCreationTO
   }
 
   /**
-   * Sets the link names attached to this location.
+   * Sets the links attaching points to this location.
    *
-   * @param links The new links.
+   * @param links The new links. This is supposed to be a map of point names to allowed operations.
    * @return The modified location.
    */
   @Nonnull

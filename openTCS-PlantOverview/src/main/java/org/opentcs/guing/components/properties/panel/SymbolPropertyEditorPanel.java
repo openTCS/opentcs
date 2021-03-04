@@ -24,7 +24,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.util.LocationThemeManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -45,8 +44,7 @@ public class SymbolPropertyEditorPanel
   /**
    * Die Enum-Namen der Symbole.
    */
-  private final List<LocationRepresentation> fRepresentations
-      = new LinkedList<>();
+  private final List<LocationRepresentation> fRepresentations = new LinkedList<>();
   /**
    * Die Symbole.
    */
@@ -56,23 +54,18 @@ public class SymbolPropertyEditorPanel
    */
   private int fIndex;
   /**
-   * Die LocationThemeRegistry.
+   * The location theme to be used.
    */
-  private final LocationThemeManager locationThemeManager;
-  /**
-   * The factory used for the images.
-   */
-  private LocationTheme locationTheme;
+  private final LocationTheme locationTheme;
 
   /**
    * Creates new instance.
    *
-   * @param locationThemeManager Provides the available location themes.
+   * @param locationTheme The location theme to be used.
    */
   @Inject
-  public SymbolPropertyEditorPanel(LocationThemeManager locationThemeManager) {
-    this.locationThemeManager = requireNonNull(locationThemeManager,
-                                               "locationThemeManager");
+  public SymbolPropertyEditorPanel(LocationTheme locationTheme) {
+    this.locationTheme = requireNonNull(locationTheme, "locationTheme");
     initComponents();
     init();
   }
@@ -112,8 +105,6 @@ public class SymbolPropertyEditorPanel
 
   private void init() {
     Collections.addAll(fRepresentations, LocationRepresentation.values());
-
-    locationTheme = locationThemeManager.getDefaultTheme();
 
     for (LocationRepresentation cur : LocationRepresentation.values()) {
       Image image = locationTheme.getImageFor(cur);

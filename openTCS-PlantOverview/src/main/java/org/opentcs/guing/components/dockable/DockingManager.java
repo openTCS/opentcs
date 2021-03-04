@@ -22,8 +22,6 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +32,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.opentcs.guing.components.tree.TreeView;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for working with dockables.
@@ -86,11 +83,6 @@ public class DockingManager {
    * The listeners for closing events.
    */
   private final List<PropertyChangeListener> listeners = new ArrayList<>();
-  /**
-   * File for saving the docking configuration.
-   */
-  private static final String DOCKING_CONFIG
-      = System.getProperty("opentcs.dockinglayout");
 
   /**
    * Creates a new instance.
@@ -173,34 +165,6 @@ public class DockingManager {
                                             comp.getWidth(),
                                             comp.getHeight()));
     return dockable;
-  }
-
-  /**
-   * Loads the last layout (position of undocked dockables etc).
-   */
-  public void loadLayout() {
-    // not working currently @ 24.01.14
-//    try {
-//      File file = new File(DOCKING_CONFIG);
-//      if (file.exists()) {
-//        control.readXML(file);
-//      }
-//    }
-//    catch (IOException ex) {
-//      LoggerFactory.getLogger(DockingManager.class).log(Level.WARNING, null, ex);
-//    }
-  }
-
-  /**
-   * Saves the current layout (position of undocked dockables etc).
-   */
-  public void saveLayout() {
-    try {
-      control.writeXML(new File(DOCKING_CONFIG));
-    }
-    catch (IOException ex) {
-      LoggerFactory.getLogger(DockingManager.class).warn("", ex);
-    }
   }
 
   /**

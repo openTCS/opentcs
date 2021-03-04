@@ -53,9 +53,17 @@ public class LoopbackCommunicationAdapterFactory
   private static final Logger LOG
       = LoggerFactory.getLogger(LoopbackCommunicationAdapterFactory.class);
   /**
+   * The default energy storage capacity.
+   */
+  private static final double DEFAULT_CAPACITY = 1000.0;
+  /**
    * The adapter components factory.
    */
   private final LoopbackAdapterComponentsFactory adapterFactory;
+  /**
+   * The energy storage factory.
+   */
+  private final EnergyStorageFactory energyStorageFactory;
   /**
    * Indicates whether this component is initialized or not.
    */
@@ -65,10 +73,13 @@ public class LoopbackCommunicationAdapterFactory
    * Creates a new factory.
    *
    * @param componentsFactory The adapter components factory.
+   * @param energyStorageFactory The energy storage factory.
    */
   @Inject
-  public LoopbackCommunicationAdapterFactory(LoopbackAdapterComponentsFactory componentsFactory) {
+  public LoopbackCommunicationAdapterFactory(LoopbackAdapterComponentsFactory componentsFactory,
+                                             EnergyStorageFactory energyStorageFactory) {
     this.adapterFactory = requireNonNull(componentsFactory, "componentsFactory");
+    this.energyStorageFactory = requireNonNull(energyStorageFactory, "energyStorageFactory");
   }
 
   @Override
@@ -102,9 +113,9 @@ public class LoopbackCommunicationAdapterFactory
   public LoopbackCommunicationAdapter getAdapterFor(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
-    LoopbackCommunicationAdapter adapter = adapterFactory.createLoopbackCommAdapter(vehicle);
-
-    adapter.setEnergyStorage(EnergyStorage.createInstance());
+    LoopbackCommunicationAdapter adapter
+        = adapterFactory.createLoopbackCommAdapter(vehicle,
+                                                   energyStorageFactory.createInstance(DEFAULT_CAPACITY));
 
     // Get energy usage of moving vehicle
     String movementEnergyProp = vehicle.getProperty(PROP_MOVEMENT_ENERGY);

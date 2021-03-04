@@ -21,7 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.TreeMap;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -31,7 +33,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,53 +44,32 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tobias Marquardt (Fraunhofer IML)
  */
-public abstract class VehicleProfiles {
+public class VehicleProfiles {
 
-  /**
-   * The default properties file name.
-   */
-  private static final String xmlFileDefault = "virtualvehicle-profiles.xml";
-  /**
-   * This class's ConfigurationStore.
-   */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(VehicleProfiles.class.getName());
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(VehicleProfiles.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleProfiles.class);
   /**
-   * VehicleProfile's XML configuration file.
+   * The default properties file name.
    */
-  private static final String xmlFile;
+  private static final String XML_FILE_DEFAULT = "virtualvehicle-profiles.xml";
   /**
-   * The name of the property which may contain the name of the desired
-   * properties file.
+   * This class's configuration.
    */
-  private static final String xmlFileProperty
-      = "org.opentcs.virtualvehicle.profiles.file";
-  /**
-   * The maximum allowed size for the xmlFile (in bytes). If the file is larger
-   * than this will not be parsed.
-   */
-  private static final int maxAllowedFileSize;
+  private final VirtualVehicleConfiguration configuration;
   /**
    * A map of profile names to profiles.
    */
-  private static final Map<String, VehicleProfile> profiles = new TreeMap<>();
+  private final Map<String, VehicleProfile> profiles = new TreeMap<>();
   /**
    * Name of the currently selected profile.
    */
-  private static String selectedProfile;
+  private String selectedProfile;
 
-  /**
-   * Initialize VehicleProfile from the xml configuration file.
-   */
-  static {
-    maxAllowedFileSize = configStore.getInt("maxAllowedFileSize", 100 * 1024);
-    xmlFile = System.getProperty(xmlFileProperty, xmlFileDefault);
-    //loadProfilesFromFile();
+  @Inject
+  public VehicleProfiles(VirtualVehicleConfiguration configuration) {
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   /**
@@ -97,7 +77,7 @@ public abstract class VehicleProfiles {
    *
    * @return profile names
    */
-  public static List<String> getProfileNames() {
+  public List<String> getProfileNames() {
     return new LinkedList<>(profiles.keySet());
   }
 
@@ -107,14 +87,9 @@ public abstract class VehicleProfiles {
    * @param name Name of the profile
    * @return the loaded profile, {@literal null} if there is no such profile.
    */
-  public static VehicleProfile getProfile(String name) {
+  public VehicleProfile getProfile(String name) {
     VehicleProfile origProfile = profiles.get(Objects.requireNonNull(name));
-    if (origProfile == null) {
-      return null;
-    }
-    else {
-      return new VehicleProfile(origProfile);
-    }
+    return origProfile == null ? null : new VehicleProfile(origProfile);
   }
 
   /**
@@ -124,7 +99,7 @@ public abstract class VehicleProfiles {
    *
    * @param name name of the profile to delete
    */
-  public static void remove(String name) {
+  public void remove(String name) {
     if (profiles.containsKey(name)) {
       profiles.remove(name);
       if (selectedProfile != null && selectedProfile.equals(name)) {
@@ -137,7 +112,7 @@ public abstract class VehicleProfiles {
   /**
    * Remove all profiles. The currently selected profile is deselected.
    */
-  public static void removeAll() {
+  public void removeAll() {
     profiles.clear();
     selectedProfile = null;
     saveProfilesToFile();
@@ -152,7 +127,7 @@ public abstract class VehicleProfiles {
    *
    * @param profile the new profile
    */
-  public static void saveProfile(VehicleProfile profile) {
+  public void saveProfile(VehicleProfile profile) {
     if (profile != null) {
       profiles.put(profile.getName(), new VehicleProfile(profile));
     }
@@ -168,7 +143,7 @@ public abstract class VehicleProfiles {
    * @param name name of the currently selected profile, might be null, to
    * indicate that no profile is selected
    */
-  public static void setSelectedProfile(String name) {
+  public void setSelectedProfile(String name) {
     if (getProfileNames().contains(name)) {
       selectedProfile = name;
       saveProfilesToFile();
@@ -182,7 +157,7 @@ public abstract class VehicleProfiles {
    * @return the name of the currently selected profile or null if no profile
    * selected (e.g. when profile list is empty).
    */
-  public static String getSelectedProfile() {
+  public String getSelectedProfile() {
     return selectedProfile;
   }
 
@@ -191,8 +166,8 @@ public abstract class VehicleProfiles {
    * the xml configuration. If the configuration does not contain any profiles,
    * a default profile will be created and selected.
    */
-  private static void loadProfilesFromFile() {
-    File file = new File(xmlFile);
+  private void loadProfilesFromFile() {
+    File file = new File(XML_FILE_DEFAULT);
     boolean loadDefault = false;
     InputStream inStream = null;
     // Clear any values in case VehicleProfiles was initialized before
@@ -210,11 +185,11 @@ public abstract class VehicleProfiles {
         throw new IOException(file.getAbsolutePath() + ": file not readable.");
       }
       int fileSize = (int) file.length();
-      if (fileSize > maxAllowedFileSize) {
+      if (fileSize > configuration.profilesMaxFileSize()) {
         StringBuilder message = new StringBuilder();
         message.append(file.getAbsolutePath());
         message.append(": file size exceeds limit.\nIs: ").append(fileSize);
-        message.append(", limit: ").append(maxAllowedFileSize).append(" Bytes.");
+        message.append(", limit: ").append(configuration.profilesMaxFileSize()).append(" Bytes.");
         throw new IOException(message.toString());
       }
       // Read the configuration from file.
@@ -259,14 +234,14 @@ public abstract class VehicleProfiles {
       message.append("Vehicle profile configuration file does not exist: ");
       message.append(file.getAbsolutePath());
       message.append(". Using default configuration instead.");
-      log.info(message.toString());
+      LOG.info(message.toString());
     }
     catch (IOException e) {
       loadDefault = true;
       StringBuilder message = new StringBuilder();
       message.append("Can't read vehicle profile configuration from file. ");
       message.append(e.getMessage());
-      log.warn(message.toString());
+      LOG.warn(message.toString());
     }
     finally {
       if (inStream != null) {
@@ -274,7 +249,7 @@ public abstract class VehicleProfiles {
           inStream.close();
         }
         catch (IOException e) {
-          log.warn("Can't close InputStream: " + e.getMessage());
+          LOG.warn("Can't close InputStream: " + e.getMessage());
         }
       }
     }
@@ -289,9 +264,9 @@ public abstract class VehicleProfiles {
   /**
    * Writes the profile configuration to the XML file.
    */
-  private static void saveProfilesToFile() {
+  private void saveProfilesToFile() {
     OutputStream outStream = null;
-    File file = new File(xmlFile);
+    File file = new File(XML_FILE_DEFAULT);
     StringWriter stringWriter = new StringWriter();
     // Create VehicleProfilsXML object with current profiles
     VehicleProfilesXML profileData = new VehicleProfilesXML();
@@ -319,7 +294,7 @@ public abstract class VehicleProfiles {
       StringBuilder message = new StringBuilder();
       message.append("Can't write vehicle profile configuration to file. ");
       message.append(e.getMessage());
-      log.error(message.toString());
+      LOG.error(message.toString());
     }
     finally {
       if (outStream != null) {
@@ -327,7 +302,7 @@ public abstract class VehicleProfiles {
           outStream.close();
         }
         catch (IOException e) {
-          log.warn("Can't close OutputStream: " + e.getMessage());
+          LOG.warn("Can't close OutputStream: " + e.getMessage());
         }
       }
     }
@@ -340,7 +315,7 @@ public abstract class VehicleProfiles {
    */
   @XmlRootElement(name = "VehicleProfiles")
   @XmlAccessorType(XmlAccessType.NONE)
-  private static final class VehicleProfilesXML {
+  private final class VehicleProfilesXML {
 
     /**
      * List of vehicle profiles.

@@ -100,6 +100,7 @@ public final class DefaultVehicleControllerPool
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public synchronized void attachVehicleController(String vehicleName,
                                                    VehicleCommAdapter commAdapter) {
     requireNonNull(vehicleName, "vehicleName");
@@ -158,11 +159,13 @@ public final class DefaultVehicleControllerPool
   }
 
   @Override
+  @Deprecated
   public double getSimulationTimeFactor() {
     return simulationTimeFactor;
   }
 
   @Override
+  @Deprecated
   public void setSimulationTimeFactor(double factor)
       throws IllegalArgumentException {
     if (factor <= 0.0) {

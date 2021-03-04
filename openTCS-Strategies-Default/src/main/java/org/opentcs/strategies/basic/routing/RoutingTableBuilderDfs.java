@@ -8,11 +8,6 @@
 package org.opentcs.strategies.basic.routing;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -40,36 +35,23 @@ public class RoutingTableBuilderDfs
    */
   private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderDfs.class);
   /**
-   * The maximum search depth.
+   * This class's configuration.
    */
-  private final int searchDepth;
-  /**
-   * Whether to terminate the DFS early when a cheaper route to a point has
-   * already been found.
-   */
-  private final boolean terminateEarly;
+  private final DefaultRouterConfiguration configuration;
 
   /**
    * Creates a new instance.
    *
    * @param kernel The kernel providing the model data.
    * @param routeEvaluator The evaluator to be used to compute costs for routes.
-   * @param searchDepth The maximum depth for the DFS algorithm.
-   * @param terminateEarly Whether to terminate a branch of the search early
-   * if a cheaper route to a point has already been found. Setting this can
-   * dramatically increase performance, but note that - depending on the route
-   * evaluator implementation, the existence of a different, cheaper route to
-   * the current point does not necessarily mean that route is cheaper for
-   * subsequent points, too.
+   * @param configuration This class's configuration.
    */
   @Inject
   RoutingTableBuilderDfs(LocalKernel kernel,
                          RouteEvaluator routeEvaluator,
-                         @SearchDepth int searchDepth,
-                         @TerminateEarly boolean terminateEarly) {
+                         DefaultRouterConfiguration configuration) {
     super(kernel, routeEvaluator);
-    this.searchDepth = searchDepth;
-    this.terminateEarly = terminateEarly;
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -123,11 +105,11 @@ public class RoutingTableBuilderDfs
     // (Not knowing the cost function applied to the route, terminating here
     // might mean that a shorter route to one of the successors will not be
     // found. An exhaustive search might take much longer, however.)
-    else if (terminateEarly) {
+    else if (configuration.terminateSearchEarly()) {
       return;
     }
     // If we have reached the maximum search depth, terminate the recursion.
-    if (steps.size() > searchDepth) {
+    if (steps.size() > configuration.dfsMaxDepth()) {
       return;
     }
     descendSuccessors(startPoint, curPoint, steps);
@@ -182,25 +164,5 @@ public class RoutingTableBuilderDfs
         steps.removeLast();
       }
     }
-  }
-
-  /**
-   * Annotation type for injecting the maximum search depth.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface SearchDepth {
-    // Nothing here.
-  }
-
-  /**
-   * Annotation type for injecting whether to do a complete search or not.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface TerminateEarly {
-    // Nothing here.
   }
 }

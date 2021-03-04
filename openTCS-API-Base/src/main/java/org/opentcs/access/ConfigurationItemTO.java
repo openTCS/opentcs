@@ -9,13 +9,17 @@ package org.opentcs.access;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentcs.util.configuration.ItemConstraint;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object for configuration data.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class ConfigurationItemTO
     implements Serializable {
 
@@ -38,7 +42,7 @@ public class ConfigurationItemTO
   /**
    * A constraint containing the data type of an Item.
    */
-  private ItemConstraint constraint;
+  private org.opentcs.util.configuration.ItemConstraint constraint;
 
   /**
    * Creates a new ConfigurationItemTO.
@@ -125,7 +129,7 @@ public class ConfigurationItemTO
    *
    * @return A constraint containing the data type of an Item.
    */
-  public ItemConstraint getConstraint() {
+  public org.opentcs.util.configuration.ItemConstraint getConstraint() {
     return constraint;
   }
 
@@ -134,7 +138,7 @@ public class ConfigurationItemTO
    *
    * @param newConstraint The new data constraint.
    */
-  public void setConstraint(ItemConstraint newConstraint) {
+  public void setConstraint(org.opentcs.util.configuration.ItemConstraint newConstraint) {
     this.constraint = Objects.requireNonNull(newConstraint, "newType is null");
   }
 

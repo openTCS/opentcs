@@ -55,8 +55,7 @@ import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.ApplicationConfiguration;
-import org.opentcs.guing.util.VehicleThemeManager;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
 /**
  * The graphical representation of a vehicle.
@@ -82,9 +81,9 @@ public class VehicleFigure
    */
   private static final double WIDTH = 20.0;
   /**
-   * A manager vor vehicle themes.
+   * The vehicle theme to be used.
    */
-  private final VehicleThemeManager vehicleThemeManager;
+  private final VehicleTheme vehicleTheme;
   /**
    * A factory for popup menus.
    */
@@ -112,7 +111,7 @@ public class VehicleFigure
    * @param componentsTreeManager The manager for the components tree view.
    * @param propertiesComponent Displays properties of the currently selected
    * model component(s).
-   * @param vehicleThemeManager A manager for vehicle themes.
+   * @param vehicleTheme The vehicle theme to be used.
    * @param menuFactory A factory for popup menus.
    * @param appConfig The application's configuration.
    * @param model The model corresponding to this graphical object.
@@ -120,22 +119,21 @@ public class VehicleFigure
   @Inject
   public VehicleFigure(ComponentsTreeViewManager componentsTreeManager,
                        SelectionPropertiesComponent propertiesComponent,
-                       VehicleThemeManager vehicleThemeManager,
+                       VehicleTheme vehicleTheme,
                        MenuFactory menuFactory,
-                       ApplicationConfiguration appConfig,
+                       PlantOverviewApplicationConfiguration appConfig,
                        @Assisted VehicleModel model) {
     super(componentsTreeManager, propertiesComponent, model);
-    this.vehicleThemeManager = requireNonNull(vehicleThemeManager,
-                                              "vehicleThemeManager");
+    this.vehicleTheme = requireNonNull(vehicleTheme, "vehicleTheme");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
 
     fDisplayBox = new Rectangle((int) LENGTH, (int) WIDTH);
     fZoomPoint = new ZoomPoint(0.5 * LENGTH, 0.5 * WIDTH);
 
-    setIgnorePrecisePosition(appConfig.getIgnoreVehiclePrecisePosition());
-    setIgnoreOrientationAngle(appConfig.getIgnoreVehicleOrientationAngle());
+    setIgnorePrecisePosition(appConfig.ignoreVehiclePrecisePosition());
+    setIgnoreOrientationAngle(appConfig.ignoreVehicleOrientationAngle());
 
-    fImage = vehicleThemeManager.getDefaultTheme().getThemeImage();
+    fImage = vehicleTheme.getThemeImage();
   }
 
   @Override
@@ -491,10 +489,8 @@ public class VehicleFigure
       return;
     }
 
-    VehicleTheme theme = vehicleThemeManager.getDefaultTheme();
-
     Vehicle vehicle = model.getVehicle();
-    fImage = vehicle == null ? null : theme.getImageFor(model.getVehicle());
+    fImage = vehicle == null ? null : vehicleTheme.getImageFor(model.getVehicle());
 
     PointModel point = model.getPoint();
     Triple precisePosition = model.getPrecisePosition();

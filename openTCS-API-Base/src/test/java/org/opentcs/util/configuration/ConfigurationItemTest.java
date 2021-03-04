@@ -16,6 +16,7 @@ import static org.junit.Assert.assertFalse;
  *
  * @author Preity Gupta (Fraunhofer IML)
  */
+@Deprecated
 public class ConfigurationItemTest {
 
   /**

@@ -9,7 +9,6 @@
 package org.opentcs.guing.exchange;
 
 import java.rmi.registry.Registry;
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.DefaultComboBoxModel;
@@ -17,7 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.opentcs.guing.components.dialogs.CancelButton;
-import org.opentcs.guing.util.ApplicationConfiguration;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.gui.Icons;
 
@@ -39,10 +38,6 @@ public class ConnectToServerDialog
    */
   public static final int RET_OK = 1;
   /**
-   * Max amount of bookmarks to keep.
-   */
-  private static final int connectionBookmarksMaxAmount = 5;
-  /**
    * The host to connect to.
    */
   private String host;
@@ -51,13 +46,9 @@ public class ConnectToServerDialog
    */
   private int port;
   /**
-   * List of the ConnectionsBookmarks.
-   */
-  private final LinkedList<ConnectionParamSet> bookmarks = new LinkedList<>();
-  /**
    * The application's configuration.
    */
-  private final ApplicationConfiguration appConfig;
+  private final PlantOverviewApplicationConfiguration appConfig;
   /**
    * This kernel proxy/connection manager to be used.
    */
@@ -74,23 +65,22 @@ public class ConnectToServerDialog
    * @param kernelProxyManager The kernel proxy manager to be used.
    */
   @Inject
-  public ConnectToServerDialog(ApplicationConfiguration appConfig,
+  public ConnectToServerDialog(PlantOverviewApplicationConfiguration appConfig,
                                KernelProxyManager kernelProxyManager) {
     super((JFrame) null, true);
     this.appConfig = requireNonNull(appConfig, "appConfig");
-    this.kernelProxyManager = requireNonNull(kernelProxyManager,
-                                             "kernelProxyManager");
+    this.kernelProxyManager = requireNonNull(kernelProxyManager, "kernelProxyManager");
 
     initComponents();
     initConnectionBookmarks();
-
-    if (bookmarks.isEmpty()) {
+    
+    if (appConfig.connectionBookmarks().isEmpty()) {
       host = "localhost";
       port = Registry.REGISTRY_PORT;
     }
     else {
-      host = bookmarks.getFirst().getHost();
-      port = bookmarks.getFirst().getPort();
+      host = appConfig.connectionBookmarks().get(0).getHost();
+      port = appConfig.connectionBookmarks().get(0).getPort();
     }
 
     textFieldServer.setText(host);
@@ -106,21 +96,19 @@ public class ConnectToServerDialog
     return port;
   }
 
-  public String getServer() {
+  public String getHost() {
     return host;
   }
 
   /**
-   * @return the return status of this dialog - one of RET_OK or RET_CANCEL
+   * Returns the return status of this dialog.
+   *
+   * @return the return status of this dialog - one of {@link #RET_OK} or {@link #RET_CANCEL}.
    */
   public int getReturnStatus() {
     return returnStatus;
   }
 
-  /**
-   *
-   * @param retStatus
-   */
   private void doClose(int retStatus) {
     returnStatus = retStatus;
     setVisible(false);
@@ -132,9 +120,8 @@ public class ConnectToServerDialog
    * erfolgreich war.
    */
   private void handleError() {
-    String message = "Keine Verbindung zum Kernel";
-    String title = "Mit Kernel verbinden";
-    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+    String message = "No connection to kernel";
+    JOptionPane.showMessageDialog(this, message, message, JOptionPane.ERROR_MESSAGE);
   }
 
   /**
@@ -144,25 +131,8 @@ public class ConnectToServerDialog
     DefaultComboBoxModel<ConnectionParamSet> model
         = (DefaultComboBoxModel<ConnectionParamSet>) cbComboBox.getModel();
 
-    for (int i = 0; i < connectionBookmarksMaxAmount; i++) {
-      ConnectionParamSet bookmark = appConfig.getConnectionParamSet(i);
-
-      if (bookmark != null) {
-        model.addElement(bookmark);
-        bookmarks.add(bookmark);
-      }
-    }
-  }
-
-  /**
-   * Writes the connection bookmarks to the config.
-   */
-  private void writeBookmarks() {
-    int i = 0;
-
-    for (ConnectionParamSet bookmark : bookmarks) {
-      appConfig.setConnectionParamSet(i, bookmark);
-      i++;
+    for (ConnectionParamSet bookmark : appConfig.connectionBookmarks()) {
+      model.addElement(bookmark);
     }
   }
 
@@ -303,15 +273,6 @@ public class ConnectToServerDialog
     }
 
     if (kernelProxyManager.connect(host, port)) {
-      ConnectionParamSet connParamSet = new ConnectionParamSet(host, port);
-      if (bookmarks.isEmpty() || !connParamSet.equals(bookmarks.getFirst())) {
-        bookmarks.addFirst(connParamSet);
-        if (bookmarks.size() > connectionBookmarksMaxAmount) {
-          bookmarks.removeLast();
-        }
-        writeBookmarks();
-      }
-
       doClose(RET_OK);
     }
     else {

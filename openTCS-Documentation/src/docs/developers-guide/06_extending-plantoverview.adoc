@@ -49,30 +49,12 @@ org.opentcs.guing.DefaultPluginPanelsModule
 
 === How to create a location/vehicle theme for openTCS
 
-Locations and vehicles are visualized in the plant overview client using pluggable themes.
+Locations and vehicles are visualized in the plant overview client using configurable themes.
 To customize the appearance of locations and vehicles, new theme implementations can be created and integrated into the plant overview client.
 
 . Create a new class which implements `LocationTheme` or `VehicleTheme`.
-. Create a Guice module for your theme by creating a class inheriting `PlantOverviewInjectionModule`.
-Implement the `configure()` method and add a binding to your theme using `vehicleThemeBinder()` or `locationThemeBinder()`.
-The following example demonstrates how this module looks like for the themes that are part of the openTCS distribution:
-+
-[source, java]
-----
-include::{plantoverview-guiceSrc}/org/opentcs/guing/DefaultThemesModule.java[tags=documentation_createThemeModule]
-----
-
-. Ensure that the JAR file containing your theme(s) also contains a folder named `META-INF/services/` with a file named `org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule`.
-This file should consist of a single line of text holding simply the name of the implementing class, e.g.:
-+
-[source]
-----
-org.opentcs.guing.DefaultThemesModule
-----
-+
-NOTE: Background: openTCS uses `java.util.ServiceLoader` to automatically find Guice modules on startup, which depends on this file (with this name) being present.
 . Place the JAR file of your theme, containing all required resources, in the subdirectory `lib/openTCS-extensions/` of the openTCS plant overview application's installation directory _before_ the application is started.
 (The openTCS start scripts include all JAR files in that directory in the application's classpath.)
+. Set the `locationThemeClass` or `vehicleThemeClass` in the Plant Overview application's configuration file (`config/opentcs-plantoverview.properties`).
 
-Themes meeting these requirements are found automatically when you start the plant overview client.
-
+Vehicles or locations in plant models are then rendered using your custom theme.

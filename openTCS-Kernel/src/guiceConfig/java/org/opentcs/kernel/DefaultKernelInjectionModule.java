@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
@@ -16,13 +15,13 @@ import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import java.io.File;
-import java.rmi.registry.Registry;
 import javax.inject.Singleton;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.customizations.ApplicationHome;
+import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.kernel.CentralEventHub;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.kernel.persistence.ModelPersister;
@@ -32,16 +31,15 @@ import org.opentcs.kernel.persistence.XMLFileOrderPersister;
 import org.opentcs.kernel.persistence.XMLModel002Builder;
 import org.opentcs.kernel.persistence.XMLModelReader;
 import org.opentcs.kernel.persistence.XMLModelWriter;
-import org.opentcs.kernel.vehicles.DefaultVehicleController;
 import org.opentcs.kernel.vehicles.DefaultVehicleControllerPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
+import org.opentcs.kernel.vehicles.VehiclesConfiguration;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.eventsystem.EventHub;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.EventSource;
@@ -56,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultKernelInjectionModule
-    extends AbstractModule {
+    extends ConfigurableInjectionModule {
 
   /**
    * This class's logger.
@@ -101,20 +99,17 @@ public class DefaultKernelInjectionModule
     bind(LocalKernel.class)
         .to(StandardKernel.class);
 
-    configureOrderCleanerTask();
-    configureKernelStates();
-    configureStandardRemoteKernel();
-    configureKernelStarter();
+    configureKernelStatesDependencies();
+    configureKernelStarterDependencies();
+    configureStandardRemoteKernelDependencies();
   }
 
   private void configureVehicleControllers() {
-    install(new FactoryModuleBuilder().build(VehicleControllerFactory.class));
+    bind(VehiclesConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(VehiclesConfiguration.PREFIX,
+                                                   VehiclesConfiguration.class));
 
-    ConfigurationStore configStoreStdVehicleCtrl
-        = ConfigurationStore.getStore(DefaultVehicleController.class.getName());
-    bindConstant()
-        .annotatedWith(DefaultVehicleController.IgnoreUnknownPositions.class)
-        .to(configStoreStdVehicleCtrl.getBoolean("ignoreUnknownPositions", true));
+    install(new FactoryModuleBuilder().build(VehicleControllerFactory.class));
 
     bind(DefaultVehicleControllerPool.class)
         .in(Singleton.class);
@@ -171,66 +166,28 @@ public class DefaultKernelInjectionModule
         .toInstance(kernelEventHub);
   }
 
-  private void configureKernelStarter() {
-    ConfigurationStore configStore
-        = ConfigurationStore.getStore(KernelStarter.class.getName());
-    bindConstant()
-        .annotatedWith(KernelStarter.ShowStartupDialog.class)
-        .to(configStore.getBoolean("showStartupDialog", true));
-    bindConstant()
-        .annotatedWith(KernelStarter.LoadModelOnStartup.class)
-        .to(configStore.getBoolean("loadModelOnStartup", false));
-  }
-
-  private void configureKernelStates() {
-    ConfigurationStore modellingConfigStore
-        = ConfigurationStore.getStore(KernelStateModelling.class.getName());
-    bindConstant()
-        .annotatedWith(KernelStateModelling.SaveModelOnTerminate.class)
-        .to(modellingConfigStore.getBoolean("saveModelOnTerminate", false));
-
-    ConfigurationStore operatingConfigStore
-        = ConfigurationStore.getStore(KernelStateOperating.class.getName());
-    bindConstant()
-        .annotatedWith(KernelStateOperating.SaveModelOnTerminate.class)
-        .to(operatingConfigStore.getBoolean("saveModelOnTerminate", false));
-
+  private void configureKernelStatesDependencies() {
     // A map for KernelState instances to be provided at runtime.
     MapBinder<Kernel.State, KernelState> stateMapBinder
         = MapBinder.newMapBinder(binder(), Kernel.State.class, KernelState.class);
     stateMapBinder.addBinding(Kernel.State.SHUTDOWN).to(KernelStateShutdown.class);
     stateMapBinder.addBinding(Kernel.State.MODELLING).to(KernelStateModelling.class);
     stateMapBinder.addBinding(Kernel.State.OPERATING).to(KernelStateOperating.class);
+
+    bind(OrderPoolConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(OrderPoolConfiguration.PREFIX,
+                                                   OrderPoolConfiguration.class));
   }
 
-  private void configureOrderCleanerTask() {
-    ConfigurationStore cleanerConfigStore
-        = ConfigurationStore.getStore(OrderCleanerTask.class.getName());
-
-    bindConstant()
-        .annotatedWith(OrderCleanerTask.SweepInterval.class)
-        .to(cleanerConfigStore.getLong("orderSweepInterval", 1 * 60 * 1000));
-
-    bindConstant()
-        .annotatedWith(OrderCleanerTask.SweepAge.class)
-        .to(cleanerConfigStore.getInt("orderSweepAge", 24 * 60 * 60 * 1000));
+  private void configureKernelStarterDependencies() {
+    bind(KernelApplicationConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(KernelApplicationConfiguration.PREFIX,
+                                                   KernelApplicationConfiguration.class));
   }
 
-  private void configureStandardRemoteKernel() {
-    // Configuration for StandardRemoteKernel
-    ConfigurationStore rmiConfigStore
-        = ConfigurationStore.getStore(StandardRemoteKernel.class.getName());
-    long sweepInterval = rmiConfigStore.getLong("sweepInterval", 5 * 60 * 1000);
-    bindConstant()
-        .annotatedWith(StandardRemoteKernel.ClientSweepInterval.class)
-        .to(sweepInterval);
-
-    String registryHost = rmiConfigStore.getString("rmiRegistryHost",
-                                                   "localhost");
-    int registryPort = rmiConfigStore.getInt("rmiRegistryPort",
-                                             Registry.REGISTRY_PORT);
-    bind(StandardRemoteKernel.RegistryAddress.class)
-        .toInstance(new StandardRemoteKernel.RegistryAddress(registryHost,
-                                                             registryPort));
+  private void configureStandardRemoteKernelDependencies() {
+    bind(RmiKernelInterfaceConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
+                                                   RmiKernelInterfaceConfiguration.class));
   }
 }

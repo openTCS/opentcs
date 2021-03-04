@@ -9,10 +9,12 @@ package org.opentcs.kernel;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
-import org.opentcs.util.configuration.ConfigurationStore;
+import org.opentcs.virtualvehicle.EnergyStorage;
+import org.opentcs.virtualvehicle.EnergyStorageFactory;
 import org.opentcs.virtualvehicle.LoopbackAdapterComponentsFactory;
-import org.opentcs.virtualvehicle.LoopbackCommunicationAdapter;
 import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterFactory;
+import org.opentcs.virtualvehicle.StaticEnergyStorage;
+import org.opentcs.virtualvehicle.VirtualVehicleConfiguration;
 
 /**
  * Configures/binds the loopback communication adapters of the openTCS kernel.
@@ -32,14 +34,12 @@ public class LoopbackCommAdapterModule
 
   private void configureLoopbackAdapterDependencies() {
     install(new FactoryModuleBuilder().build(LoopbackAdapterComponentsFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(EnergyStorage.class, StaticEnergyStorage.class)
+        .build(EnergyStorageFactory.class));
 
-    ConfigurationStore configStore
-        = ConfigurationStore.getStore(LoopbackCommunicationAdapter.class.getName());
-    bindConstant()
-        .annotatedWith(LoopbackCommunicationAdapter.CommandQueueCapacity.class)
-        .to(configStore.getInt("commandQueueCapacity", 2));
-    bindConstant()
-        .annotatedWith(LoopbackCommunicationAdapter.RechargeOperation.class)
-        .to(configStore.getString("rechargeOperation", "CHARGE"));
+    bind(VirtualVehicleConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(VirtualVehicleConfiguration.PREFIX,
+                                                   VirtualVehicleConfiguration.class));
   }
 }

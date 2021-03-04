@@ -17,7 +17,6 @@ import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.Property;
@@ -26,7 +25,6 @@ import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
-import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.BlockModel;
@@ -219,19 +217,6 @@ public class ModelValidator {
       valid = false;
     }
 
-    //Validate the location theme in the model view
-    LocationThemeProperty locThemeProperty = (LocationThemeProperty) layoutModel.getProperty(LayoutModel.LOCATION_THEME);
-    if (locThemeProperty == null) {
-      errorOccurred(layoutModel, "Location theme does not exist.");
-      valid = false;
-    }
-
-    //Validate the vehicle theme in the model view
-    VehicleThemeProperty vehicleThemeProperty = (VehicleThemeProperty) layoutModel.getProperty(LayoutModel.VEHICLE_THEME);
-    if (vehicleThemeProperty == null) {
-      errorOccurred(layoutModel, "Vehicle theme does not exist.");
-      valid = false;
-    }
     return valid;
   }
 

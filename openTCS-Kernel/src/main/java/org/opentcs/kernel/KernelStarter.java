@@ -7,13 +7,8 @@
  */
 package org.opentcs.kernel;
 
-import com.google.inject.BindingAnnotation;
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,33 +42,26 @@ public class KernelStarter {
    */
   private final Set<KernelExtension> extensions;
   /**
-   * Whether to automatically load a persisted model into the kernel.
+   * This class's configuration.
    */
-  private final boolean loadModelOnStartup;
-  /**
-   * Whether to show the startup dialog for the user.
-   */
-  private final boolean showStartupDialog;
+  private final KernelApplicationConfiguration configuration;
 
   /**
    * Creates a new instance.
    *
    * @param kernel The kernel we're working with.
    * @param extensions The kernel extensions to be registered.
-   * @param loadModelOnStartup Whether to automatically load a persisted model
-   * into the kernel.
-   * @param showStartupDialog Whether to show the startup dialog for the user.
+   * @param configuration This class's configuration.
    */
   @Inject
   protected KernelStarter(LocalKernel kernel,
                           @ActiveInAllModes Set<KernelExtension> extensions,
-                          @LoadModelOnStartup boolean loadModelOnStartup,
-                          @ShowStartupDialog boolean showStartupDialog) {
-    this.kernel = Objects.requireNonNull(kernel, "kernel is null");
-    this.extensions = Objects.requireNonNull(extensions, "extensions is null");
-    this.showStartupDialog = showStartupDialog;
-    this.loadModelOnStartup = loadModelOnStartup && !showStartupDialog;
-    if (loadModelOnStartup && showStartupDialog) {
+                          KernelApplicationConfiguration configuration) {
+    this.kernel = requireNonNull(kernel, "kernel is null");
+    this.extensions = requireNonNull(extensions, "extensions is null");
+    this.configuration = requireNonNull(configuration, "configuration");
+    
+    if (configuration.selectModelOnStartup()) {
       LOG.debug("Model will not be loaded automatically because startup dialog is to be shown");
     }
   }
@@ -96,9 +84,9 @@ public class KernelStarter {
     String savedModelName = kernel.getPersistentModelName();
     boolean modelingMode = false;
 
-    boolean loadModel = loadModelOnStartup;
+    boolean loadModel = configuration.loadModelOnStartup() && !configuration.selectModelOnStartup();
     // Show ChooseModelDialog and see if we should load a model
-    if (showStartupDialog) {
+    if (configuration.selectModelOnStartup()) {
       ChooseModelDialog chooseModelDialog = new ChooseModelDialog(savedModelName);
       chooseModelDialog.setVisible(true);
       String modelName = chooseModelDialog.savedModelSelected() ? savedModelName : null;
@@ -119,26 +107,5 @@ public class KernelStarter {
     else {
       kernel.createPlantModel(new PlantModelCreationTO(Kernel.DEFAULT_MODEL_NAME));
     }
-  }
-
-  /**
-   * Annotation type for marking/binding the "load model on startup" parameter.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface LoadModelOnStartup {
-    // Nothing here.
-  }
-
-  /**
-   * Annotation type for marking/binding the "show user dialog on startup"
-   * parameter.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface ShowStartupDialog {
-    // Nothing here.
   }
 }

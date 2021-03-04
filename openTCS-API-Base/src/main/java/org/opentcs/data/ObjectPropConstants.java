@@ -15,6 +15,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Defines some reserved/commonly used property keys and values.
@@ -37,7 +38,11 @@ public interface ObjectPropConstants {
    * <p>
    * Type: String (the fully qualified class name of an implementation of {@link LocationTheme})
    * </p>
+   *
+   * @deprecated The theme to be used is now set directly via configuration.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   String LOCATION_THEME_CLASS = "tcs:locationThemeClass";
   /**
    * A property key for {@link LocationType} instances used to provide a hint for the visualization
@@ -70,6 +75,10 @@ public interface ObjectPropConstants {
    * <p>
    * Type: String (the fully qualified class name of an implementation of {@link VehicleTheme})
    * </p>
+   *
+   * @deprecated The theme to be used is now set directly via configuration.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   String VEHICLE_THEME_CLASS = "tcs:vehicleThemeClass";
 }

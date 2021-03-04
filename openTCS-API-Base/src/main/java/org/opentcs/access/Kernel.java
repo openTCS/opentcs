@@ -1230,7 +1230,11 @@ public interface Kernel
    * @throws IllegalArgumentException If the destinations of the given drive
    * orders do not match the destinations of the drive orders in this transport
    * order.
+   * @deprecated Use {@link LocalKernel#setTransportOrderFutureDriveOrders(org.opentcs.data.TCSObjectReference, java.util.List)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setTransportOrderFutureDriveOrders(
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
@@ -1551,7 +1555,11 @@ public interface Kernel
    * @return The current time factor for simulation.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Simulation is out of scope for the openTCS project. Simulation-related components
+   * should be configured individually.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   double getSimulationTimeFactor()
       throws CredentialsException;
 
@@ -1561,7 +1569,11 @@ public interface Kernel
    * @param factor The new time factor.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Simulation is out of scope for the openTCS project. Simulation-related components
+   * should be configured individually.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void setSimulationTimeFactor(double factor)
       throws CredentialsException;
 

@@ -46,8 +46,7 @@ public class DrawingViewFactory {
                             OpenTCSDrawingEditor drawingEditor,
                             StatusPanel statusPanel,
                             ModelManager modelManager) {
-    this.drawingViewProvider = requireNonNull(drawingViewProvider,
-                                              "drawingViewProvider");
+    this.drawingViewProvider = requireNonNull(drawingViewProvider, "drawingViewProvider");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.modelManager = requireNonNull(modelManager, "modelManager");
@@ -75,16 +74,13 @@ public class DrawingViewFactory {
     OpenTCSDrawingView drawingView = drawingViewProvider.get();
     drawingEditor.add(drawingView);
     drawingEditor.setActiveView(drawingView);
-    drawingView.setBlocks(
-        systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
-    drawingView.setStaticRoutes(
-        systemModel.getMainFolder(SystemModel.FolderKey.STATIC_ROUTES));
+    drawingView.setBlocks(systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
+    drawingView.setStaticRoutes(systemModel.getMainFolder(SystemModel.FolderKey.STATIC_ROUTES));
 
-    DrawingViewPlacardPanel placardPanel
-        = new DrawingViewPlacardPanel(drawingView);
+    DrawingViewPlacardPanel placardPanel = new DrawingViewPlacardPanel(drawingView);
 
-    DrawingViewScrollPane scrollPane
-        = new DrawingViewScrollPane(drawingView, placardPanel);
+    DrawingViewScrollPane scrollPane = new DrawingViewScrollPane(drawingView, placardPanel);
+    scrollPane.originChanged(systemModel.getDrawingMethod().getOrigin());
 
     // --- Listens to draggings in the drawing ---
     ViewDragScrollListener dragScrollListener

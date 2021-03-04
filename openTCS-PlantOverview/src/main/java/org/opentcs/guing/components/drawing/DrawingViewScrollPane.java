@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -21,6 +22,7 @@ import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import org.jhotdraw.gui.PlacardScrollPaneLayout;
+import org.opentcs.guing.components.drawing.course.Origin;
 
 /**
  * A custom scroll pane to wrap an <code>OpenTCSDrawingView</code>.
@@ -42,17 +44,20 @@ public class DrawingViewScrollPane
    * Whether the rulers are currently visible or not.
    */
   private boolean rulersVisible = true;
+  private Origin origin = new Origin();
 
   /**
    * Creates a new instance.
    *
    * @param drawingView The drawing view.
    * @param placardPanel The view's placard panel.
+   * @param origin The current system model's origin.
    */
   public DrawingViewScrollPane(OpenTCSDrawingView drawingView,
                                DrawingViewPlacardPanel placardPanel) {
     this.drawingView = requireNonNull(drawingView, "drawingView");
     this.placardPanel = requireNonNull(placardPanel, "placardPanel");
+    requireNonNull(origin, "origin");
 
     setViewport(new JViewport());
     getViewport().setView(drawingView);
@@ -117,6 +122,13 @@ public class DrawingViewScrollPane
       getVerticalRuler().setPreferredSize(new Dimension(0, 0));
       getPlacardPanel().getToggleRulersButton().setSelected(false);
     }
+  }
+
+  public void originChanged(@Nonnull Origin origin) {
+    requireNonNull(origin, "origin");
+    origin.addListener(getHorizontalRuler());
+    origin.addListener(getVerticalRuler());
+    origin.notifyScaleChanged();
   }
 
   private class PlacardScrollbar

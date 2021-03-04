@@ -7,11 +7,17 @@
  */
 package org.opentcs.util.configuration;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * Item Constraint for Boolean type value.
  *
  * @author Preity Gupta (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class ItemConstraintBoolean
     extends ItemConstraint {
 

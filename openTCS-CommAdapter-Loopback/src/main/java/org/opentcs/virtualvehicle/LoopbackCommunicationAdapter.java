@@ -7,12 +7,7 @@
  */
 package org.opentcs.virtualvehicle;
 
-import com.google.inject.BindingAnnotation;
 import com.google.inject.assistedinject.Assisted;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -52,17 +47,17 @@ public class LoopbackCommunicationAdapter
    */
   private static final int ADVANCE_TIME = 100;
   /**
+   * This instance's configuration.
+   */
+  private final VirtualVehicleConfiguration configuration;
+  /**
    * The adapter components factory.
    */
   private final LoopbackAdapterComponentsFactory componentsFactory;
   /**
    * The energy storage of this vehicle.
    */
-  private EnergyStorage energyStorage = new StaticEnergyStorage(1000);
-  /**
-   * This driver's simulation time factor.
-   */
-  private double simTimeFactor = 1.0;
+  private EnergyStorage energyStorage;
   /**
    * The task simulating the virtual vehicle's behaviour.
    */
@@ -76,17 +71,22 @@ public class LoopbackCommunicationAdapter
    * Creates a new instance.
    *
    * @param componentsFactory The factory providing additional components for this adapter.
-   * @param commandQueue The adapter's command queue capacity.
-   * @param rechargeOperation The string to recognize as a recharge operation.
+   * @param configuration This class's configuration.
    * @param vehicle The vehicle this adapter is associated with.
+   * @param energyStorage The energy storage of this vehicle.
    */
   @Inject
   public LoopbackCommunicationAdapter(LoopbackAdapterComponentsFactory componentsFactory,
-                                      @CommandQueueCapacity int commandQueue,
-                                      @RechargeOperation String rechargeOperation,
-                                      @Assisted Vehicle vehicle) {
-    super(new LoopbackVehicleModel(vehicle), commandQueue, 1, rechargeOperation);
+                                      VirtualVehicleConfiguration configuration,
+                                      @Assisted Vehicle vehicle,
+                                      @Assisted EnergyStorage energyStorage) {
+    super(new LoopbackVehicleModel(vehicle),
+          configuration.commandQueueCapacity(),
+          1,
+          configuration.rechargeOperation());
+    this.configuration = requireNonNull(configuration, "configuration");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
+    this.energyStorage = requireNonNull(energyStorage, "energyStorage");
   }
 
   @Override
@@ -153,15 +153,6 @@ public class LoopbackCommunicationAdapter
     final boolean canProcess = isEnabled();
     final String reason = canProcess ? "" : "adapter not enabled";
     return new ExplainedBoolean(canProcess, reason);
-  }
-
-  // Implementation of interface SimulatingCommunicationAdapter starts here.
-  @Override
-  public synchronized void setSimTimeFactor(double factor) {
-    if (factor <= 0.0) {
-      throw new IllegalArgumentException("Illegal factor value: " + factor);
-    }
-    simTimeFactor = factor;
   }
 
   /**
@@ -319,7 +310,7 @@ public class LoopbackCommunicationAdapter
         synchronized (LoopbackCommunicationAdapter.this) {
           curCommand = getSentQueue().peek();
         }
-        simAdvanceTime = (int) (ADVANCE_TIME * simTimeFactor);
+        simAdvanceTime = (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
         if (curCommand == null) {
           Thread.sleep(ADVANCE_TIME);
           dischargeEnergy(getProcessModel().getIdlePower());
@@ -466,23 +457,5 @@ public class LoopbackCommunicationAdapter
         }
       }
     }
-  }
-
-  /**
-   * Annotation type for configuring the adapter's queue capacity.
-   */
-  @BindingAnnotation
-  @Target(value = {ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(value = RetentionPolicy.RUNTIME)
-  public @interface CommandQueueCapacity {
-  }
-
-  /**
-   * Annotation type for configuring the adapter's queue capacity.
-   */
-  @BindingAnnotation
-  @Target(value = {ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(value = RetentionPolicy.RUNTIME)
-  public @interface RechargeOperation {
   }
 }

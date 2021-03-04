@@ -7,17 +7,25 @@
  */
 package org.opentcs.kernel;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import java.util.Locale;
 import javax.inject.Singleton;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
-import org.opentcs.kernel.controlcenter.KernelConfigurationPanel;
+import org.opentcs.kernel.controlcenter.ControlCenterConfiguration;
+import org.opentcs.kernel.controlcenter.ControlCenterInfoHandlerFactory;
 import org.opentcs.kernel.controlcenter.KernelControlCenter;
 import org.opentcs.kernel.controlcenter.vehicles.DriverGUI;
 import org.opentcs.kernel.statistics.StatisticsCollector;
-import org.opentcs.kernel.xmlorders.XMLTelegramOrderReceiver;
-import org.opentcs.kernel.xmlstatus.StatusMessageDispatcher;
-import org.opentcs.util.configuration.ConfigurationStore;
+import org.opentcs.kernel.xmlhost.XMLHostInterfaceConfiguration;
+import org.opentcs.kernel.xmlhost.orders.XMLTelegramOrderReceiver;
+import org.opentcs.kernel.xmlhost.status.StatusMessageDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configures the default extensions of the openTCS kernel.
@@ -27,9 +35,12 @@ import org.opentcs.util.configuration.ConfigurationStore;
 public class DefaultKernelExtensionsModule
     extends KernelInjectionModule {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultKernelExtensionsModule.class);
+
   @Override
   protected void configure() {
     configureControlCenterDependencies();
+    configureKernelExtensionsDependencies();
     // Kernel extensions for StandardKernel (permanent extensions)
     Multibinder<KernelExtension> allStatesBinder = extensionsBinderAllModes();
     allStatesBinder.addBinding()
@@ -38,7 +49,9 @@ public class DefaultKernelExtensionsModule
     allStatesBinder.addBinding()
         .to(StandardRemoteKernel.class)
         .in(Singleton.class);
-    configureStatusChannel();
+    allStatesBinder.addBinding()
+        .to(StatusMessageDispatcher.class)
+        .in(Singleton.class);
 
     // Kernel extensions for KernelStateModelling
     Multibinder<KernelExtension> modellingBinder = extensionsBinderModelling();
@@ -46,47 +59,47 @@ public class DefaultKernelExtensionsModule
 
     // Kernel extensions for KernelStateOperating
     Multibinder<KernelExtension> operatingBinder = extensionsBinderOperating();
-    configureOrderChannel();
+    operatingBinder.addBinding().to(XMLTelegramOrderReceiver.class);
     operatingBinder.addBinding().to(StatisticsCollector.class);
   }
 
   private void configureControlCenterDependencies() {
-    controlCenterPanelBinderModelling().addBinding().to(KernelConfigurationPanel.class);
+    Multibinder<ControlCenterPanel> modellingBinder = controlCenterPanelBinderModelling();
+    // No extensions for modelling mode, yet.
 
-    controlCenterPanelBinderOperating().addBinding().to(KernelConfigurationPanel.class);
-    controlCenterPanelBinderOperating().addBinding().to(DriverGUI.class);
+    Multibinder<ControlCenterPanel> operatingBinder = controlCenterPanelBinderOperating();
+    operatingBinder.addBinding().to(DriverGUI.class);
+
+    install(new FactoryModuleBuilder().build(ControlCenterInfoHandlerFactory.class));
+
+    ControlCenterConfiguration configuration
+        = getConfigBindingProvider().get(ControlCenterConfiguration.PREFIX,
+                                         ControlCenterConfiguration.class);
+    bind(ControlCenterConfiguration.class)
+        .toInstance(configuration);
+    configureKernelControlCenter(configuration);
   }
 
-  private void configureOrderChannel() {
-    Multibinder<KernelExtension> operatingBinder = extensionsBinderOperating();
-    ConfigurationStore xmlOrderConfigStore
-        = ConfigurationStore.getStore(XMLTelegramOrderReceiver.class.getName());
-    bindConstant()
-        .annotatedWith(XMLTelegramOrderReceiver.ListenPort.class)
-        .to(xmlOrderConfigStore.getInt("listenPort", 55555));
-    bindConstant()
-        .annotatedWith(XMLTelegramOrderReceiver.InputTimeout.class)
-        .to(xmlOrderConfigStore.getInt("inputTimeout", 10000));
-    bindConstant()
-        .annotatedWith(XMLTelegramOrderReceiver.MaxInputLength.class)
-        .to(xmlOrderConfigStore.getInt("maxInputLength", 100 * 1024));
-
-    operatingBinder.addBinding().to(XMLTelegramOrderReceiver.class);
+  private void configureKernelExtensionsDependencies() {
+    bind(XMLHostInterfaceConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(XMLHostInterfaceConfiguration.PREFIX,
+                                                   XMLHostInterfaceConfiguration.class));
   }
 
-  private void configureStatusChannel() {
-    Multibinder<KernelExtension> allStatesBinder = extensionsBinderAllModes();
-    ConfigurationStore xmlStatusConfigStore
-        = ConfigurationStore.getStore(StatusMessageDispatcher.class.getName());
-    bindConstant()
-        .annotatedWith(StatusMessageDispatcher.ListenPort.class)
-        .to(xmlStatusConfigStore.getInt("listenPort", 44444));
-    bindConstant()
-        .annotatedWith(StatusMessageDispatcher.MessageSeparator.class)
-        .to(xmlStatusConfigStore.getString("messageSeparator", "|"));
+  private void configureKernelControlCenter(ControlCenterConfiguration configuration) {
+    if (configuration.language().toLowerCase().equals("german")) {
+      Locale.setDefault(Locale.GERMAN);
+    }
+    else {
+      Locale.setDefault(Locale.ENGLISH);
+    }
 
-    allStatesBinder.addBinding()
-        .to(StatusMessageDispatcher.class)
-        .in(Singleton.class);
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    }
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+               | UnsupportedLookAndFeelException ex) {
+      LOG.warn("Exception setting look and feel", ex);
+    }
   }
 }

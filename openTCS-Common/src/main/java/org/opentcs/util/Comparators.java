@@ -8,7 +8,6 @@
 package org.opentcs.util;
 
 import java.util.Comparator;
-import org.opentcs.access.ConfigurationItemTO;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -96,17 +95,6 @@ public final class Comparators {
           return 0;
         }
       };
-  /**
-   * Compares configuration items by their namespaces, then by their keys.
-   */
-  private static final Comparator<ConfigurationItemTO> CONFIG_ITEM_TO_BY_FQN
-      = (ConfigurationItemTO t1, ConfigurationItemTO t2) -> {
-        int result = t1.getNamespace().compareTo(t2.getNamespace());
-        if (result == 0) {
-          result = t1.getKey().compareTo(t2.getKey());
-        }
-        return result;
-      };
 
   /**
    * Prevents undesired instantiation.
@@ -188,15 +176,5 @@ public final class Comparators {
    */
   public static Comparator<TravelCosts> travelCostsByCosts() {
     return TRAVEL_COSTS_BY_COSTS;
-  }
-
-  /**
-   * A comparator for ordering {@link ConfigurationItemTO ConfigurationItemTO} instances by their
-   * fully qualified names (namespaces and keys).
-   *
-   * @return The comparator.
-   */
-  public static Comparator<ConfigurationItemTO> configItemsByFullyQualifiedName() {
-    return CONFIG_ITEM_TO_BY_FQN;
   }
 }

@@ -9,12 +9,17 @@ package org.opentcs.util.configuration;
 
 import java.util.Objects;
 import java.util.Set;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Constraints on a configuration item.
  *
  * @author Preity Gupta (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public abstract class ItemConstraint {
 
   /**

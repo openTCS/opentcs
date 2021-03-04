@@ -9,6 +9,7 @@ package org.opentcs.util.configuration;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A single configuration item.
@@ -26,7 +27,11 @@ import java.util.Objects;
  * </ul>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class ConfigurationItem
     implements Serializable {
 

@@ -40,7 +40,6 @@ import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.opentcs.guing.util.LocationThemeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +75,7 @@ public class LocationFigure
   private Timer flashTimer;
 ////  // Label
 ////  protected String fLabel;
-  private final LocationThemeManager locationThemeManager;
+  private final LocationTheme locationTheme;
 
   /**
    * Creates a new instance.
@@ -84,17 +83,16 @@ public class LocationFigure
    * @param componentsTreeManager The manager for the components tree view.
    * @param propertiesComponent Displays properties of the currently selected
    * model component(s).
-   * @param locationThemeManager A manager for location themes.
+   * @param locationTheme The location theme to be used.
    * @param model The model corresponding to this graphical object.
    */
   @Inject
   public LocationFigure(ComponentsTreeViewManager componentsTreeManager,
                         SelectionPropertiesComponent propertiesComponent,
-                        LocationThemeManager locationThemeManager,
+                        LocationTheme locationTheme,
                         @Assisted LocationModel model) {
     super(componentsTreeManager, propertiesComponent, model);
-    this.locationThemeManager = requireNonNull(locationThemeManager,
-                                               "locationThemeManager");
+    this.locationTheme = requireNonNull(locationTheme, "locationTheme");
 
     fWidth = 30;
     fHeight = 30;
@@ -215,7 +213,6 @@ public class LocationFigure
    */
   public void propertiesChanged(AttributesChangeEvent e) {
     LocationTypeModel locationType = getModel().getLocationType();
-    LocationTheme theme = locationThemeManager.getDefaultTheme();
 //  // Ein Text, der im Bild dargestellt wird
 //  StringProperty pLabel = (StringProperty) model.getProperty(LocationModel.LABEL);
 //  fLabel = pLabel.getText();
@@ -230,11 +227,11 @@ public class LocationFigure
         // ... das Default-Symbol des zugehï¿½rigen LocationTypes verwenden
         pSymbol = (SymbolProperty) locationType.getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
         locationRepresentation = pSymbol.getLocationRepresentation();
-        fImage = theme.getImageFor(locationRepresentation);
+        fImage = locationTheme.getImageFor(locationRepresentation);
       }
       else {
         // ... sonst das eigene Symbol verwenden
-        fImage = theme.getImageFor(locationRepresentation);
+        fImage = locationTheme.getImageFor(locationRepresentation);
 
         // XXX Blinking should not depend on an image's file name. Maybe we
         // XXX could make blinking an attribute of the representation enum?

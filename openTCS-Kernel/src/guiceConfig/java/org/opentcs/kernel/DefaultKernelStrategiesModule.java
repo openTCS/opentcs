@@ -7,16 +7,33 @@
  */
 package org.opentcs.kernel;
 
-import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
-import java.util.Objects;
+import java.util.Comparator;
+import javax.inject.Singleton;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcher;
-import org.opentcs.strategies.basic.parking.DefaultParkingPositionSupplier;
-import org.opentcs.strategies.basic.recharging.DefaultRechargePositionSupplier;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.strategies.basic.dispatching.NoOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
+import org.opentcs.strategies.basic.dispatching.ParkingOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.RechargeOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.ReservedOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.TransportOrderSelectionStrategy;
+import org.opentcs.strategies.basic.dispatching.TransportOrderSelector;
+import org.opentcs.strategies.basic.dispatching.TransportOrderService;
+import org.opentcs.strategies.basic.dispatching.VehicleSelector;
+import org.opentcs.strategies.basic.dispatching.parking.DefaultParkingPositionSupplier;
+import org.opentcs.strategies.basic.dispatching.recharging.DefaultRechargePositionSupplier;
 import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluator;
+import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluatorConfiguration;
 import org.opentcs.strategies.basic.routing.DefaultRouter;
+import org.opentcs.strategies.basic.routing.DefaultRouterConfiguration;
+import org.opentcs.strategies.basic.routing.DefaultRouterConfiguration.TableBuilderType;
+import static org.opentcs.strategies.basic.routing.DefaultRouterConfiguration.TableBuilderType.BFS;
+import static org.opentcs.strategies.basic.routing.DefaultRouterConfiguration.TableBuilderType.DFS;
 import org.opentcs.strategies.basic.routing.RouteEvaluator;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorComposite;
 import org.opentcs.strategies.basic.routing.RouteEvaluatorDistance;
@@ -28,7 +45,7 @@ import org.opentcs.strategies.basic.routing.RoutingTableBuilder;
 import org.opentcs.strategies.basic.routing.RoutingTableBuilderBfs;
 import org.opentcs.strategies.basic.routing.RoutingTableBuilderDfs;
 import org.opentcs.strategies.basic.scheduling.DefaultScheduler;
-import org.opentcs.util.configuration.ConfigurationStore;
+import org.opentcs.util.Comparators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,21 +67,12 @@ public class DefaultKernelStrategiesModule
   @Override
   protected void configure() {
     configureSchedulerDependencies();
-    bindScheduler(DefaultScheduler.class);
-
     configureRouterDependencies();
-    bindRouter(DefaultRouter.class);
-
-    configureParkingPositionSupplierDependencies();
-    bindParkingPositionSupplier(DefaultParkingPositionSupplier.class);
-
-    configureRechargePositionSupplierDependencies();
-    bindRechargePositionSupplier(DefaultRechargePositionSupplier.class);
-
     configureDispatcherDependencies();
-    bindDispatcher(DefaultDispatcher.class);
-
     configureRecoveryEvaluatorDependencies();
+    bindScheduler(DefaultScheduler.class);
+    bindRouter(DefaultRouter.class);
+    bindDispatcher(DefaultDispatcher.class);
     bindRecoveryEvaluator(DefaultRecoveryEvaluator.class);
   }
   // end::documentation_configureDefaultStrategies[]
@@ -74,107 +82,102 @@ public class DefaultKernelStrategiesModule
   }
 
   private void configureRouterDependencies() {
-    ConfigurationStore routerConfig
-        = ConfigurationStore.getStore(DefaultRouter.class.getName());
+    DefaultRouterConfiguration configuration
+        = getConfigBindingProvider().get(DefaultRouterConfiguration.PREFIX,
+                                         DefaultRouterConfiguration.class);
+    bind(DefaultRouterConfiguration.class)
+        .toInstance(configuration);
+    configureTableBuilder(configuration.tableBuilderType());
 
-    configureTableBuilder(routerConfig.getString("tableBuilderType", "BFS"));
-
-    bindConstant()
-        .annotatedWith(DefaultRouter.RouteToCurrentPos.class)
-        .to(routerConfig.getBoolean("routeToCurrentPosition", false));
+    bind(RouteEvaluator.class)
+        .toProvider(() -> {
+          RouteEvaluatorComposite result = new RouteEvaluatorComposite();
+          for (DefaultRouterConfiguration.EvaluatorType type : configuration.routeEvaluators()) {
+            switch (type) {
+              case DISTANCE:
+                result.getComponents().add(new RouteEvaluatorDistance());
+                break;
+              case TRAVELTIME:
+                result.getComponents().add(new RouteEvaluatorTravelTime());
+                break;
+              case HOPS:
+                result.getComponents().add(new RouteEvaluatorHops());
+                break;
+              case TURNS:
+                result.getComponents().add(new RouteEvaluatorTurns(configuration.turnCosts()));
+                break;
+              case EXPLICIT:
+                result.getComponents().add(new RouteEvaluatorExplicit());
+                break;
+              default:
+                throw new IllegalArgumentException("Unhandled evaluator type: " + type);
+            }
+          }
+          // Make sure at least one evaluator is used.
+          if (result.getComponents().isEmpty()) {
+            LOG.warn("No route evaluator enabled, falling back to distance.");
+            result.getComponents().add(new RouteEvaluatorDistance());
+          }
+          return result;
+        });
   }
 
-  private void configureParkingPositionSupplierDependencies() {
+  private void configureTableBuilder(TableBuilderType type) {
+    switch (type) {
+      case DFS:
+        bind(RoutingTableBuilder.class).to(RoutingTableBuilderDfs.class);
+        break;
+      case BFS:
+        bind(RoutingTableBuilder.class).to(RoutingTableBuilderBfs.class);
+        break;
+      default:
+        throw new IllegalArgumentException("No handling for builder type '" + type.name() + "'");
+    }
   }
 
-  private void configureRechargePositionSupplierDependencies() {
-  }
-
+  @SuppressWarnings("deprecation")
   private void configureDispatcherDependencies() {
-    ConfigurationStore configStore
-        = ConfigurationStore.getStore(DefaultDispatcher.class.getName());
-    bindConstant()
-        .annotatedWith(DefaultDispatcher.ParkWhenIdle.class)
-        .to(configStore.getBoolean("parkIdleVehicles", false));
-    bindConstant()
-        .annotatedWith(DefaultDispatcher.RechargeWhenIdle.class)
-        .to(configStore.getBoolean("rechargeVehiclesWhenIdle", false));
-    bindConstant()
-        .annotatedWith(DefaultDispatcher.RechargeWhenEnergyCritical.class)
-        .to(configStore.getBoolean("rechargeVehiclesWhenEnergyCritical", false));
+    bind(DefaultDispatcherConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(DefaultDispatcherConfiguration.PREFIX,
+                                                   DefaultDispatcherConfiguration.class));
+
+    bind(OrderReservationPool.class)
+        .in(Singleton.class);
+
+    bind(org.opentcs.components.kernel.ParkingPositionSupplier.class)
+        .to(DefaultParkingPositionSupplier.class)
+        .in(Singleton.class);
+    bind(org.opentcs.components.kernel.RechargePositionSupplier.class)
+        .to(DefaultRechargePositionSupplier.class)
+        .in(Singleton.class);
+
+    bind(VehicleSelector.class)
+        .in(Singleton.class);
+
+    bind(new TypeLiteral<Comparator<TransportOrder>>() {
+    })
+        .annotatedWith(TransportOrderSelectionStrategy.OrderComparator.class)
+        .toInstance(Comparators.ordersByDeadline());
+    bind(NoOrderSelectionStrategy.class)
+        .in(Singleton.class);
+    bind(ReservedOrderSelectionStrategy.class)
+        .in(Singleton.class);
+    bind(TransportOrderSelectionStrategy.class)
+        .in(Singleton.class);
+    bind(RechargeOrderSelectionStrategy.class)
+        .in(Singleton.class);
+    bind(ParkingOrderSelectionStrategy.class)
+        .in(Singleton.class);
+    bind(TransportOrderSelector.class)
+        .in(Singleton.class);
+
+    bind(TransportOrderService.class)
+        .in(Singleton.class);
   }
 
   private void configureRecoveryEvaluatorDependencies() {
-    ConfigurationStore evalConfigStore
-        = ConfigurationStore.getStore(DefaultRecoveryEvaluator.class.getName());
-    bindConstant()
-        .annotatedWith(DefaultRecoveryEvaluator.Threshold.class)
-        .to(evalConfigStore.getDouble("threshold", 0.7));
-  }
-
-  @Provides
-  RouteEvaluator provideRouteEvaluator() {
-    ConfigurationStore routerCfg = ConfigurationStore.getStore(DefaultRouter.class.getName());
-    RouteEvaluatorComposite result = new RouteEvaluatorComposite();
-    if (routerCfg.getBoolean("evaluateByDistance", true)) {
-      result.getComponents().add(new RouteEvaluatorDistance());
-    }
-    if (routerCfg.getBoolean("evaluateByTravelTime", false)) {
-      result.getComponents().add(new RouteEvaluatorTravelTime());
-    }
-    if (routerCfg.getBoolean("evaluateByHops", false)) {
-      result.getComponents().add(new RouteEvaluatorHops());
-    }
-    if (routerCfg.getBoolean("evaluateByTurns", false)) {
-      ConfigurationStore turnsCfg
-          = ConfigurationStore.getStore(RouteEvaluatorTurns.class.getName());
-      result.getComponents().add(new RouteEvaluatorTurns(turnsCfg.getLong("penaltyPerTurn", 5000)));
-    }
-    if (routerCfg.getBoolean("evaluateExplicit", false)) {
-      result.getComponents().add(new RouteEvaluatorExplicit());
-    }
-    // Make sure at least one evaluator is used.
-    if (result.getComponents().isEmpty()) {
-      LOG.warn("No route evaluator enabled, falling back to distance.");
-      result.getComponents().add(new RouteEvaluatorDistance());
-    }
-    return result;
-  }
-
-  private void configureTableBuilder(String builderType) {
-    if (Objects.equals(builderType, "DFS")) {
-      configureTableBuilderDfs();
-    }
-    else if (Objects.equals(builderType, "BFS")) {
-      configureTableBuilderBfs();
-    }
-    else {
-      LOG.warn("Unknown builder type '{}', using BFS", builderType);
-      configureTableBuilderBfs();
-    }
-  }
-
-  private void configureTableBuilderDfs() {
-    ConfigurationStore dfsConfigStore
-        = ConfigurationStore.getStore(RoutingTableBuilderBfs.class.getName());
-
-    bindConstant()
-        .annotatedWith(RoutingTableBuilderDfs.SearchDepth.class)
-        .to(dfsConfigStore.getInt("searchDepth", Integer.MAX_VALUE));
-    bindConstant()
-        .annotatedWith(RoutingTableBuilderDfs.TerminateEarly.class)
-        .to(dfsConfigStore.getBoolean("terminateEarly", true));
-    bind(RoutingTableBuilder.class).to(RoutingTableBuilderDfs.class);
-  }
-
-  private void configureTableBuilderBfs() {
-    ConfigurationStore bfsConfigStore
-        = ConfigurationStore.getStore(RoutingTableBuilderBfs.class.getName());
-
-    bindConstant()
-        .annotatedWith(RoutingTableBuilderBfs.TerminateEarly.class)
-        .to(bfsConfigStore.getBoolean("terminateEarly", true));
-
-    bind(RoutingTableBuilder.class).to(RoutingTableBuilderBfs.class);
+    bind(DefaultRecoveryEvaluatorConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(DefaultRecoveryEvaluatorConfiguration.PREFIX,
+                                                   DefaultRecoveryEvaluatorConfiguration.class));
   }
 }

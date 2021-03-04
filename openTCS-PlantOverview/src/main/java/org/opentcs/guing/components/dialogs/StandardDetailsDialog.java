@@ -19,7 +19,6 @@ import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 
 /**
  * Ein Dialog, in den eine Komponente vom Typ DialogContent zum Ändern von
@@ -190,13 +189,12 @@ public class StandardDetailsDialog
   private void doClose(int retStatus) {
     returnStatus = retStatus;
 
-    if (fParentComponent instanceof OpenTCSView
-        && fContent.getProperty() instanceof SymbolProperty) {
-      ((OpenTCSView) fParentComponent).updateLocationThemes();
-    }
-    else if (fParentComponent instanceof OpenTCSView
-        && fContent.getProperty() instanceof VehicleThemeProperty) {
-      ((OpenTCSView) fParentComponent).updateVehicleThemes();
+    // If we cancle we don't have to update any themes.
+    if (retStatus != RET_CANCEL) {
+      if (fParentComponent instanceof OpenTCSView
+          && fContent.getProperty() instanceof SymbolProperty) {
+        ((OpenTCSView) fParentComponent).updateLocationThemes(fContent.getProperty().getModel());
+      }
     }
 
     setVisible(false);

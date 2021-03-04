@@ -7,8 +7,11 @@
  */
 package org.opentcs.kernel.xmlorders.binding;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.*;
+import static org.junit.Assert.assertTrue;
+import org.opentcs.kernel.xmlhost.orders.binding.ScriptResponse;
+import org.opentcs.kernel.xmlhost.orders.binding.TCSResponseSet;
+import org.opentcs.kernel.xmlhost.orders.binding.TransportResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

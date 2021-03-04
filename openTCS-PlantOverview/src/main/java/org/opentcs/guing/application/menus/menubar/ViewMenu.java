@@ -11,7 +11,6 @@ package org.opentcs.guing.application.menus.menubar;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -54,14 +53,6 @@ public class ViewMenu
    */
   private final ViewToolBarsMenu menuViewToolBars;
   /**
-   * A menu for selecting a location theme.
-   */
-  private final ViewLocationThemeMenu menuLocationTheme;
-  /**
-   * A menu for selecting a vehicle theme.
-   */
-  private final ViewVehicleThemeMenu menuVehicleTheme;
-  /**
    * A menu for showing/hiding plugin panels.
    */
   private final ViewPluginPanelsMenu menuPluginPanels;
@@ -69,10 +60,6 @@ public class ViewMenu
    * A menu item for restoring the default GUI layout.
    */
   private final JMenuItem menuItemRestoreDockingLayout;
-  /**
-   * A menu for selecting the application's GUI language.
-   */
-  private final ViewLanguageMenu menuLanguage;
 
   /**
    * Creates a new instance.
@@ -82,21 +69,14 @@ public class ViewMenu
    * @param menuLocationTheme A menu for selecting a location theme.
    * @param menuVehicleTheme A menu for selecting a vehicle theme.
    * @param menuPluginPanels A menu for showing/hiding plugin panels.
-   * @param viewLanguageMenuProvider  A menu for selecting the GUI's language.
    */
   @Inject
   public ViewMenu(ViewActionMap actionMap,
                   OpenTCSView view,
-                  ViewLocationThemeMenu menuLocationTheme,
-                  ViewVehicleThemeMenu menuVehicleTheme,
-                  ViewPluginPanelsMenu menuPluginPanels,
-                  Provider<ViewLanguageMenu> viewLanguageMenuProvider) {
+                  ViewPluginPanelsMenu menuPluginPanels) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(view, "view");
-    requireNonNull(menuLocationTheme, "menuLocationTheme");
-    requireNonNull(menuVehicleTheme, "menuVehicleTheme");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
-    requireNonNull(viewLanguageMenuProvider, "viewLanguageMenuProvider");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
@@ -138,14 +118,6 @@ public class ViewMenu
       menuViewToolBars = null;
     }
 
-    // Menu item Actions -> Location theme
-    this.menuLocationTheme = menuLocationTheme;
-    add(menuLocationTheme);
-
-    // Menu item Actions -> Vehicle theme
-    this.menuVehicleTheme = menuVehicleTheme;
-    add(menuVehicleTheme);
-
     // Menu item View -> Plugins
     this.menuPluginPanels = menuPluginPanels;
     add(menuPluginPanels);
@@ -154,14 +126,6 @@ public class ViewMenu
     menuItemRestoreDockingLayout = new JMenuItem(actionMap.get(RestoreDockingLayoutAction.ID));
     menuItemRestoreDockingLayout.setText(labels.getString("view.restoreDockingLayout.text"));
     add(menuItemRestoreDockingLayout);
-
-    addSeparator();
-
-    // Menu item View -> Language
-    menuLanguage = viewLanguageMenuProvider.get();
-    labels.configureMenu(menuLanguage, "view.language");
-    add(menuLanguage);
-
   }
 
   /**
@@ -181,10 +145,7 @@ public class ViewMenu
       menuViewToolBars.setOperationMode(mode);
     }
 
-    menuLocationTheme.setOperationMode(mode);
-    menuVehicleTheme.setOperationMode(mode);
     menuPluginPanels.setOperationMode(mode);
-    menuLanguage.setOperationMode(mode);
   }
 
 }

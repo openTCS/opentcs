@@ -46,7 +46,7 @@ compileTestJava {
 }
 
 checkstyle {
-  toolVersion = '6.18'
+  toolVersion = '7.8'
   configFile = rootProject.file("config/checkstyle/checkstyle.xml")
   configProperties = [suppressions_file:rootDir.absolutePath + "/config/checkstyle/suppressions.xml"]
   ignoreFailures = true

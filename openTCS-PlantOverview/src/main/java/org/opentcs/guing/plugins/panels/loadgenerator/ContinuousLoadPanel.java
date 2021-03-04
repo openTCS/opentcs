@@ -8,8 +8,6 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
-import org.opentcs.util.gui.TCSObjectRefNameListCellRenderer;
-import org.opentcs.util.gui.TCSObjectRefNameTableCellRenderer;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -17,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -42,9 +41,10 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.UniqueStringGenerator;
+import org.opentcs.util.gui.TCSObjectRefNameListCellRenderer;
+import org.opentcs.util.gui.TCSObjectRefNameTableCellRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A panel for continously creating transport orders.

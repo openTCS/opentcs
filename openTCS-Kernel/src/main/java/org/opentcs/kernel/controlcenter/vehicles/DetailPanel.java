@@ -230,17 +230,16 @@ final class DetailPanel
    * Update the list of custom panels in the tabbed pane.
    */
   private void updateCustomPanels() {
-    for (JPanel curPanel : customPanelList) {
+    for (VehicleCommAdapterPanel curPanel : customPanelList) {
       LOG.debug("Removing {} from tabbedPane.", curPanel);
       tabbedPane.remove(curPanel);
     }
     customPanelList.clear();
     if (commAdapter != null) {
       customPanelList.addAll(commAdapter.getAdapterPanels());
-      for (JPanel curPanel : customPanelList) {
-        String title = curPanel.getAccessibleContext().getAccessibleName();
-        LOG.debug("Adding {} with title {} to tabbedPane.", curPanel, title);
-        tabbedPane.addTab(title, curPanel);
+      for (VehicleCommAdapterPanel curPanel : customPanelList) {
+        LOG.debug("Adding {} with title {} to tabbedPane.", curPanel, curPanel.getTitle());
+        tabbedPane.addTab(curPanel.getTitle(), curPanel);
       }
     }
   }
@@ -251,7 +250,7 @@ final class DetailPanel
   private void removeCustomPanels() {
     LOG.debug("Setting selected component of tabbedPane to overviewTabPanel.");
     tabbedPane.setSelectedComponent(overviewTabPanel);
-    for (JPanel panel : customPanelList) {
+    for (VehicleCommAdapterPanel panel : customPanelList) {
       LOG.debug("Removing {} from tabbedPane.", panel);
       tabbedPane.remove(panel);
     }

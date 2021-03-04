@@ -12,12 +12,17 @@ import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A strategy for finding parking positions for vehicles.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Implementation-specific interface does not belong into generic API.
+ * Moved to implementation.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public interface ParkingPositionSupplier
     extends Lifecycle {
 

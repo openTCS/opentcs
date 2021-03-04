@@ -18,16 +18,16 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.xmlorders.binding.Destination;
-import org.opentcs.kernel.xmlorders.binding.Property;
-import org.opentcs.kernel.xmlorders.binding.ScriptResponse;
-import org.opentcs.kernel.xmlorders.binding.TCSOrderSet;
-import org.opentcs.kernel.xmlorders.binding.TCSResponseSet;
-import org.opentcs.kernel.xmlorders.binding.Transport;
-import org.opentcs.kernel.xmlorders.binding.TransportResponse;
-import org.opentcs.kernel.xmlorders.binding.TransportScript;
-import org.opentcs.kernel.xmlstatus.binding.OrderStatusMessage;
-import org.opentcs.kernel.xmlstatus.binding.TCSStatusMessageSet;
+import org.opentcs.kernel.xmlhost.orders.binding.Destination;
+import org.opentcs.kernel.xmlhost.orders.binding.Property;
+import org.opentcs.kernel.xmlhost.orders.binding.ScriptResponse;
+import org.opentcs.kernel.xmlhost.orders.binding.TCSOrderSet;
+import org.opentcs.kernel.xmlhost.orders.binding.TCSResponseSet;
+import org.opentcs.kernel.xmlhost.orders.binding.Transport;
+import org.opentcs.kernel.xmlhost.orders.binding.TransportResponse;
+import org.opentcs.kernel.xmlhost.orders.binding.TransportScript;
+import org.opentcs.kernel.xmlhost.status.binding.OrderStatusMessage;
+import org.opentcs.kernel.xmlhost.status.binding.TCSStatusMessageSet;
 import org.slf4j.LoggerFactory;
 
 /**

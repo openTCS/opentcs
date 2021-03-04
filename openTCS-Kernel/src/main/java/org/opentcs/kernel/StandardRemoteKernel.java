@@ -8,13 +8,8 @@
 package org.opentcs.kernel;
 
 import static com.google.common.base.Preconditions.checkState;
-import com.google.inject.BindingAnnotation;
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -72,7 +67,7 @@ import org.slf4j.LoggerFactory;
  *
  * <h4>Configuration entries</h4>
  * <dl>
- * <dt><b>sweepInterval:</b></dt>
+ * <dt><b>clientSweepInterval:</b></dt>
  * <dd>The interval for cleaning out inactive clients (in ms), defaulting to
  * five minutes.</dd>
  * </dl>
@@ -98,9 +93,9 @@ class StandardRemoteKernel
    */
   private final Kernel localKernel;
   /**
-   * The RMI registry's host and port.
+   * Provides configuration data.
    */
-  private final RegistryAddress registryAddress;
+  private final RmiKernelInterfaceConfiguration configuration;
   /**
    * The persister loading and storing account data.
    */
@@ -118,11 +113,11 @@ class StandardRemoteKernel
    * A task that periodically cleans up the list of known clients and event
    * buffers.
    */
-  private final ClientCleanerTask cleanerTask;
+  private ClientCleanerTask cleanerTask;
   /**
    * The proxy passing method calls to our invoke().
    */
-  private final RemoteKernel proxy;
+  private RemoteKernel proxy;
   /**
    * The registry with which this <code>RemoteKernel</code> registers.
    */
@@ -145,11 +140,10 @@ class StandardRemoteKernel
   @Inject
   StandardRemoteKernel(@ApplicationHome File homeDirectory,
                        LocalKernel kernel,
-                       @ClientSweepInterval long sweepInterval,
-                       RegistryAddress registryAddress) {
+                       RmiKernelInterfaceConfiguration configuration) {
     requireNonNull(homeDirectory, "homeDirectory");
     this.localKernel = requireNonNull(kernel, "kernel");
-    this.registryAddress = requireNonNull(registryAddress, "registryAddress");
+    this.configuration = requireNonNull(configuration, "configuration");
     dataDir = new File(homeDirectory, "data");
     if (!dataDir.isDirectory() && !dataDir.mkdirs()) {
       throw new IllegalArgumentException(dataDir.getPath()
@@ -181,12 +175,6 @@ class StandardRemoteKernel
     for (UserAccount curAccount : accounts) {
       knownUsers.put(curAccount.getUserName(), curAccount);
     }
-    // Prepare a CleanerTask.
-    cleanerTask = new ClientCleanerTask(sweepInterval);
-
-    proxy = (RemoteKernel) Proxy.newProxyInstance(Kernel.class.getClassLoader(),
-                                                  new Class<?>[] {RemoteKernel.class},
-                                                  this);
   }
 
   // Implementation of interface KernelExtension starts here.
@@ -196,29 +184,32 @@ class StandardRemoteKernel
       return;
     }
     // Register as event listener with the kernel.
-    LOG.debug("Registering as event listener with local kernel.");
-    localKernel.addEventListener(this,
-                                 new AcceptingTCSEventFilter());
+    LOG.debug("Registering as event listener with local kernel...");
+    localKernel.addEventListener(this, new AcceptingTCSEventFilter());
     // Start the thread that periodically cleans up the list of known clients
     // and event buffers.
-    LOG.debug("Starting cleanerThread.");
+    LOG.debug("Starting cleanerThread...");
+    cleanerTask = new ClientCleanerTask(configuration.clientSweepInterval());
     Thread cleanerThread = new Thread(cleanerTask, "cleanerThread");
     cleanerThread.setPriority(Thread.MIN_PRIORITY);
     cleanerThread.start();
     // Ensure a registry is running.
-    LOG.debug("Checking for RMI registry on host " + registryAddress.getHost());
+    LOG.debug("Checking for RMI registry on host '{}'...", configuration.registryHost());
     Optional<Registry> registry;
-    if (Objects.equals(registryAddress.getHost(), "localhost")) {
-      registry = RMIRegistries.lookupOrInstallRegistry(registryAddress.getPort());
+    if (Objects.equals(configuration.registryHost(), "localhost")) {
+      registry = RMIRegistries.lookupOrInstallRegistry(configuration.registryPort());
     }
     else {
-      registry = RMIRegistries.lookupRegistry(registryAddress.getHost(),
-                                              registryAddress.getPort());
+      registry = RMIRegistries.lookupRegistry(configuration.registryHost(),
+                                              configuration.registryPort());
     }
     checkState(registry.isPresent(), "RMI registry unavailable");
     rmiRegistry = registry.get();
     // Export this instance via RMI.
     try {
+      proxy = (RemoteKernel) Proxy.newProxyInstance(Kernel.class.getClassLoader(),
+                                                    new Class<?>[] {RemoteKernel.class},
+                                                    this);
       LOG.debug("Exporting proxy...");
       UnicastRemoteObject.exportObject(proxy, 0);
       LOG.debug("Binding instance with RMI registry...");
@@ -243,8 +234,10 @@ class StandardRemoteKernel
     catch (RemoteException | NotBoundException exc) {
       LOG.warn("Exception shutting down RMI interface", exc);
     }
+    proxy = null;
     LOG.debug("Terminating cleaner task...");
     cleanerTask.terminate();
+    cleanerTask = null;
     LOG.debug("Unregistering event listener...");
     localKernel.removeEventListener(this);
     enabled = false;
@@ -606,16 +599,6 @@ class StandardRemoteKernel
 
   // Private classes start here.
   /**
-   * Annotation type for injecting whether to do a complete search or not.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  static @interface ClientSweepInterval {
-    // Nothing here.
-  }
-
-  /**
    * Instances of this class are used as containers for data kept about known
    * clients.
    */
@@ -668,50 +651,6 @@ class StandardRemoteKernel
      */
     public void setAlive(boolean isAlive) {
       alive = isAlive;
-    }
-  }
-
-  /**
-   * A pair of RMI registry host and port.
-   */
-  static class RegistryAddress {
-
-    /**
-     * The RMI registry host.
-     */
-    private final String host;
-    /**
-     * The RMI registry port.
-     */
-    private final int port;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param host The RMI registry host.
-     * @param port The RMI registry port.
-     */
-    RegistryAddress(String host, int port) {
-      this.host = requireNonNull(host, "host");
-      this.port = port;
-    }
-
-    /**
-     * Returns the RMI registry host.
-     *
-     * @return The RMI registry host.
-     */
-    public String getHost() {
-      return host;
-    }
-
-    /**
-     * Returns the RMI registry port.
-     *
-     * @return The RMI registry port.
-     */
-    public int getPort() {
-      return port;
     }
   }
 

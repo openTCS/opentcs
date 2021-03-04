@@ -7,11 +7,6 @@
  */
 package org.opentcs.strategies.basic.routing;
 
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,10 +59,9 @@ public class DefaultRouter
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRouter.class);
   /**
-   * Whether to explicitly look for a (static or computed) route even if the
-   * destination position is the source position.
+   * This class's configuration.
    */
-  private final boolean routeToCurrentPosition;
+  private final DefaultRouterConfiguration configuration;
   /**
    * The kernel providing the model data.
    */
@@ -94,16 +88,15 @@ public class DefaultRouter
    *
    * @param kernel The kernel providing the model data.
    * @param tableBuilder A builder for constructing routing tables.
-   * @param routeToCurrentPosition Whether to explicitly look for a (static or
-   * computed) route even if the destination position is the source position.
+   * @param configuration This class's configuration.
    */
   @Inject
   public DefaultRouter(LocalKernel kernel,
                        RoutingTableBuilder tableBuilder,
-                       @RouteToCurrentPos boolean routeToCurrentPosition) {
+                       DefaultRouterConfiguration configuration) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.tableBuilder = requireNonNull(tableBuilder, "tableBuilder");
-    this.routeToCurrentPosition = routeToCurrentPosition;
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -348,7 +341,7 @@ public class DefaultRouter
       Set<Point> destPoints = getDestinationPoints(params.driveOrders[hopIndex]);
       // If the set of destination points contains the starting point, keep only
       // that one. This is just a shortcut - it is the cheapest way to go.
-      if (!routeToCurrentPosition && destPoints.contains(startPoint)) {
+      if (!configuration.routeToCurrentPosition() && destPoints.contains(startPoint)) {
         LOG.debug("Shortcutting route to {}", startPoint);
         destPoints.clear();
         destPoints.add(startPoint);
@@ -493,17 +486,6 @@ public class DefaultRouter
                 DEFAULT_ROUTING_GROUP);
     }
     return routingGroup;
-  }
-
-  /**
-   * Annotation type for injecting whether to route to the vehicle's current
-   * position.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface RouteToCurrentPos {
-    // Nothing here.
   }
 
   /**

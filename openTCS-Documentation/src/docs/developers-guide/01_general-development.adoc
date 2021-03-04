@@ -75,6 +75,8 @@ Both the kernel and the plant overview application depend on the following exter
   A simple logging facade to keep the actual logging implementation replaceable.
 * Google Guice (https://github.com/google/guice):
   A light-weight dependency injection framework.
+* Cfg4j (http://www.cfg4j.org/):
+  A configuration library supporting binding interfaces.
 * Google Guava (https://github.com/google/guava):
   A collection of small helper classes and methods.
 * MBassador (https://github.com/bennidi/mbassador):
@@ -96,7 +98,7 @@ The plant overview application has the following additional dependencies:
 * Docking Frames (http://www.docking-frames.org/):
   A framework for docking and undocking of GUI panels
 
-The artifacts for these dependencies are either downloaded automatically when building the applications or are included in the source distribution's `lib/` directory.
+The artifacts for these dependencies are either downloaded automatically when building the applications or are included in the source distribution's `lib/` directory if they are not available in online artifact repositories.
 
 === Modularity and extensibility
 
@@ -124,6 +126,9 @@ These are the main Gradle tasks of the root project you need to know to get star
 * `clean`: Cleans up everything produced by the other tasks.
 
 To work with the source code in your IDE, see the IDE's documentation for Gradle integration.
+There is no general recommendation for any specific IDE.
+Note, however, that the openTCS source code contains GUI components that have been created with the NetBeans GUI builder.
+If you want to edit these, you may want to use the NetBeans IDE.
 
 In case you use NetBeans, install the link:http://plugins.netbeans.org/plugin/44510/gradle-support[Gradle Support] plugin from the NetBeans plugin portal.
 You should then be able to open the source distribution's root directory as a Gradle project and compile and run the components from within NetBeans.

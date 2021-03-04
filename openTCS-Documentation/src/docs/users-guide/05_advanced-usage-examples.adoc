@@ -1,0 +1,91 @@
+
+== Advanced usage examples
+
+=== Configuring automatic startup
+
+. To have the kernel automatically load a plant model on startup, set the kernel application's configuration parameter `kernelapp.loadModelOnStartup` to `true`.
+. To suppress the startup dialog that is normally shown by the kernel application on startup, set its configuration parameter `kernelapp.selectModelOnStartup` to `false`.
+. For automatic attachment of vehicle drivers to vehicles on startup, set the kernel application's configuration parameter `kernelapp.autoAttachDriversOnStartup` to `true`.
+. To automatically enable vehicle drivers on startup, set the kernel application's configuration parameter `kernelapp.autoEnableDriversOnStartup` to `true`.
+
+=== Running kernel and plant overview on separate systems
+
+The kernel and the plant overview client communicate via Java's Remote Method Invocation (RMI) mechanism.
+This makes it possible to run the kernel and the plant overview client on separate systems, as long as a network connection between these systems exists and is usable.
+
+By default, the plant overview client is configured to connect to a kernel running on the same system.
+To connect it to a kernel running on a remote system, e.g. on a host named myhost.example.com, set the plant overview application's configuration parameter `plantoverviewapp.connectionBookmarks` to `myhost.example.com:1099`.
+The configuration value can be a comma-separated list of host:port pairs.
+The plant overview will automatically try to connect to the first host in the list.
+If that fails, it will show a dialog to select an entry or enter a different address.
+
+=== Configuring automatic parking and recharging
+
+By default, idle vehicles remain where they are after processing their last transport order.
+You can change this in the kernel's configuration file:
+
+* To order vehicles to charging locations automatically, set the configuration parameter `defaultdispatcher.rechargeIdleVehicles` to `true`.
+  The default dispatcher will then look for locations at which the idle vehicle's recharge operation is possible and create orders to send it to such a location (if unoccupied).
+  (Note that the string used for the operation is driver-specific.)
+* To order vehicles to parking positions automatically, set the configuration parameter `defaultdispatcher.parkIdleVehicles` to `true`.
+  The default dispatcher will then look for unoccupied parking positions and create orders to send the idle vehicle there.
+
+=== Selecting the cost factors used for routing
+
+The default router can evaluate the costs for routes based on different factors.
+You can select which factors should be taken into account by setting the configuration parameter `defaultrouter.routeEvaluators` in the kernel's configuration file to one or more of the following key words (separated by commas):
+
+* `HOPS`: Routing costs are measured by the number of hops/paths travelled along the route.
+* `DISTANCE`: Routing costs are measured by the sum of the lengths of paths travelled.
+* `TRAVELTIME`: Routing costs are measured by the sum of the times required for travelling each path on a route.
+The travel times are computed using the length of the respective path and the maximum speed with which a vehicle may move on it.
+* `TURNS`: Routing costs are measured by the number of changes of the vehicle's orientation on a route.
+  To specify an orientation for a vehicle on a path, set a property on that path with a key of `"tcs:travelOrientation"` and an arbitrary string as the value.
+  If, and only if, the values of subsequent paths on a route differ, a penalty is added to the costs of that route.
+  This penalty can be configured by setting the configuration entry `defaultrouter.turnCosts` to an integer value (default: 5000).
+* `EXPLICIT`: Routing costs are measured by the sum of the costs explicitly specified by the modelling user.
+  Explicit costs can be specified for every single path in the model using the plant overview client.
+  (Select a path and set its btn:[Costs] property to an arbitrary integer value.)
+
+NOTE: When specifying more than one of these key words, the respective costs computed are added up.
+For example, when set to `"DISTANCE, TURNS"`, costs for routes are computed as the sum of the paths' lengths and the penalties for orientation changes.
+If none of these entries is set, costs for routes are computed by the paths' lengths by default (`DISTANCE`).
+
+=== Configuring order pool cleanup
+
+By default, openTCS checks every minute for finished or failed transport orders that are older than 24 hours.
+These orders are removed from the pool.
+To customize this behaviour, do the following:
+
+. Set the configuration entry `orderpool.sweepInterval` to a value according to your needs.
+  The default value is 60.000 (milliseconds, corresponding to an interval of one minute).
+. Set the configuration entry `orderpool.sweepAge` to a maximum age of finished orders according to your needs.
+  The default value is 86.400.000 (milliseconds, corresponding to 24 hours that a finished order should be kept in the pool).
+
+=== Initializing a virtual vehicle's position automatically on startup
+
+Even during the development or simulation phase of a project, repeatedly setting a virtual vehicle's initial position manually via the loopback driver's user interface can be tiresome and possibly error-prone.
+To automatically set a vehicle's initial position when the loopback driver is enabled, you can store the initial position in the respective plant model by doing the following:
+
+. Start the plant overview client in modelling mode.
+. In the plant overview client's tree view of the plant model, select a vehicle.
+. In the table showing the vehicle's properties, click into the value field labelled btn:[Initial position].
+In the dialog shown, select the initial position for this vehicle from the model's list of points.
+. Save the model and persist it in the kernel as described in <<Saving the plant model>>.
+
+Whenever you attach the loopback driver to the modified vehicle after doing this, it will automatically report the vehicle's position to be the one that you selected.
+
+=== Using model element properties for project-specific data
+
+Every object in the plant model - i.e. points, paths, locations, location types and vehicles - can be augmented with arbitrary project-specific data that can be used, e.g. by vehicle drivers, custom client applications, etc..
+Possible uses for such data could be informing the vehicle driver about additional actions to be performed by a vehicle when moving along a path in the model (e.g. flashing direction indicators, displaying a text string on a display, giving an acoustic warning) or controlling the behaviour of peripheral systems (e.g. automatic fire protection gates).
+
+The data can be stored in properties, i.e. key-value pairs attached to the model elements, where both the key and the corresponding value are text strings.
+These key-value pairs can be created and edited using the plant overview client:
+Simply select the model element you want to add a key-value pair to and click into the value field labelled btn:[Miscellaneous] in the properties table.
+In the dialog shown, set the key-value pairs you need to store your project-specific information.
+
+NOTE: For your project-specific key-value pairs, you may specify arbitrary keys.
+openTCS itself will not make any use of this data; it will merely store it and provide it for custom vehicle drivers and/or other extensions.
+You should, however, not use any keys starting with `"tcs:"` for storing project-specific data.
+Any keys with this prefix are reserved for official openTCS features, and using them could lead to collisions.

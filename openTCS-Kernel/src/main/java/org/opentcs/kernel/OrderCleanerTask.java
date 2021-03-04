@@ -8,11 +8,6 @@
 package org.opentcs.kernel;
 
 import com.google.common.collect.Iterables;
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.regex.Pattern;
@@ -45,25 +40,24 @@ class OrderCleanerTask
    */
   private final TransportOrderPool orderPool;
   /**
-   * The minimum age of orders to remove if orderSweepType is BY_AGE.
+   * This class's configuration.
    */
-  private final int orderSweepAge;
+  private final OrderPoolConfiguration configuration;
 
   /**
    * Creates a new OrderCleanerTask.
    *
    * @param kernel The kernel.
-   * @param orderSweepInterval The interval between sweeps (in milliseconds).
+   * @param configuration This class's configuration.
    */
   @Inject
   public OrderCleanerTask(@GlobalKernelSync Object globalSyncObject,
                           TransportOrderPool orderPool,
-                          @SweepInterval long orderSweepInterval,
-                          @SweepAge int orderSweepAge) {
-    super(orderSweepInterval);
+                          OrderPoolConfiguration configuration) {
+    super(configuration.sweepInterval());
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.orderPool = requireNonNull(orderPool, "orderPool");
-    this.orderSweepAge = orderSweepAge;
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -71,7 +65,7 @@ class OrderCleanerTask
     synchronized (globalSyncObject) {
       LOG.debug("Sweeping order pool...");
       // Candidates that are created before this point of time should be removed.
-      long creationTimeThreshold = System.currentTimeMillis() - orderSweepAge;
+      long creationTimeThreshold = System.currentTimeMillis() - configuration.sweepAge();
 
       // Remove all transport orders in a final state that do NOT belong to a sequence and that are
       // older than the threshold.
@@ -94,25 +88,5 @@ class OrderCleanerTask
           })
           .forEach(seq -> orderPool.removeFinishedOrderSequenceAndOrders(seq.getReference()));
     }
-  }
-
-  /**
-   * Annotation type for injecting the sweep age.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  static @interface SweepAge {
-    // Nothing here.
-  }
-
-  /**
-   * Annotation type for injecting the sweep interval.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  static @interface SweepInterval {
-    // Nothing here.
   }
 }

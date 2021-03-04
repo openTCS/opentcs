@@ -8,6 +8,25 @@ Since the classes of the default implementations are part of the openTCS distrib
 Note, however, that these classes are not considered part of openTCS's official API -- they might change even between minor releases without maintaining backwards-compatibility.
 (See <<Available artifacts and API compatibility>>.)
 
+=== Default dispatcher
+
+When a transport order becomes dispatchable, the dispatcher needs to decide which vehicle should process it.
+To make this decision, the default dispatcher takes the following steps:
+
+. The default dispatcher checks which vehicles are available and not currently processing a transport order.
+  If there are no such vehicles, the incoming transport order is postponed without a vehicle assignment.
+. The default dispatcher requests the potential routes from the router for all vehicle candidates in case they were selected for the incoming transport order.
+  If no viable route is available for any of the vehicles, the incoming transport order is postponed without a vehicle assignment.
+. From all vehicles with viable routes, the one with the lowest routing costs is assigned to the incoming transport order.
+
+When a vehicle becomes available, the dispatcher needs to decide which transport order it should process.
+To make this decision, the default dispatcher takes the following steps:
+
+. If the vehicle's energy level is not _critical_ and transport orders are available, the default dispatcher will select the most urgent one (according to its deadline) for which a route can be computed.
+. If the vehicle's energy level is _degraded_ and automatic recharging is enabled, an order is created for the vehicle to recharge at the closest recharging location.
+. If the vehicle is not currently at a parking position and there are unoccupied parking positions, an order is created for the vehicle to move to the closest one.
+. If none of the previous steps assigned an order to the vehicle, it is left at its current position.
+
 === Default router
 
 At runtime, the default router uses precomputed routing tables to look up the route a vehicle should take to get from one position in the driving course to another one.
@@ -34,3 +53,19 @@ Instead, it is built to allow an arbitrary cost function to evaluate every route
 This implementation is considered sufficient for a lot of use cases -- especially those that are related to classic AGVs, since the topology in such systems usually changes rather infrequently.
 For concrete, more demanding use cases, using a different implementation, e.g. one based on Dijkstra's algorithm, to compute the routing tables may provide better performance with less memory usage.
 Future versions of openTCS may thus provide alternative router implementations to choose from.
+
+=== Default scheduler
+
+The default scheduler implements a simple strategy for mutually exclusive use of resources in the plant model (points and paths, primarily):
+
+* When an allocation of a set of resources for a vehicle is requested, the scheduler expands this set to the effective resource set (in case any resources are part of a block area) and checks whether the allocation can be granted immediately.
+  If yes, the allocation is made.
+  If not, the allocation is queued for later.
+* Whenever resources are freed (e.g. when a vehicle has finished its movement to the next point and the vehicle driver reports this to the kernel), the allocations waiting in the queue are checked (in the order the requests happened).
+  Any allocations that can now be made are made.
+  Allocations that cannot be made are kept waiting.
+
+This strategy ensures that resources are used when they are available.
+It does not, however, strictly ensure fairness/avoid starvation:
+Vehicles waiting for allocation of a large resource set may theoretically wait forever if other vehicles can keep allocating subsets of those resources continuously.
+Such situations are likely a hint at problems in the plant model graph's topology, which is why this deficiency is considered acceptable for the default implementation.

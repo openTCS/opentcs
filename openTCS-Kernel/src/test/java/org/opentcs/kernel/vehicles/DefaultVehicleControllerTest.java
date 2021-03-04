@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.opentcs.DataObjectFactory;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Scheduler;
@@ -82,6 +83,10 @@ public class DefaultVehicleControllerTest {
    * The instance we're testing.
    */
   private DefaultVehicleController stdVehicleController;
+  /**
+   * The configuration;
+   */
+  private VehiclesConfiguration configuration;
 
   @Before
   public void setUp() {
@@ -98,13 +103,14 @@ public class DefaultVehicleControllerTest {
 
     scheduler = new DummyScheduler();
     scheduler.initialize();
-
+    configuration = mock(VehiclesConfiguration.class);
+    when(configuration.ignoreUnknownReportedPositions()).thenReturn(true);
     stdVehicleController = new DefaultVehicleController(vehicle,
                                                         commAdapter,
                                                         localKernel,
                                                         scheduler,
                                                         eventBus,
-                                                        true);
+                                                        configuration);
     stdVehicleController.initialize();
   }
 

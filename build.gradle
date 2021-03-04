@@ -58,6 +58,10 @@ task subDists {
   dependsOn(':openTCS-Documentation:installDist')
 }
 
+task install {
+  dependsOn subprojects*.install
+}
+
 installDist.dependsOn subDists
 
 distZip {
@@ -107,5 +111,5 @@ task release {
 }
 
 task wrapper(type: Wrapper, description: 'Creates and deploys the Gradle wrapper to the current directory.') {
-  gradleVersion = '2.13'
+  gradleVersion = '3.5'
 }

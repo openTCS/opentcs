@@ -40,11 +40,17 @@ public class NESRecoveryEvaluatorTest {
    * The evaluator instance which is tested.
    */
   private DefaultRecoveryEvaluator evaluator;
+  /**
+   * The configuration.
+   */
+  private DefaultRecoveryEvaluatorConfiguration configuration;
 
   @Before
   public void setUp() {
     kernel = mock(LocalKernel.class);
-    evaluator = new DefaultRecoveryEvaluator(kernel, 0.7);
+    configuration = mock(DefaultRecoveryEvaluatorConfiguration.class);
+    when(configuration.threshold()).thenReturn(0.7);
+    evaluator = new DefaultRecoveryEvaluator(kernel, configuration);
   }
 
   /**

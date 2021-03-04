@@ -18,21 +18,17 @@ import org.opentcs.guing.components.properties.panel.CoursePointPropertyEditorPa
 import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValueSetPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.LinkActionsEditorPanel;
-import org.opentcs.guing.components.properties.panel.LocationThemePropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.PropertiesPanelFactory;
 import org.opentcs.guing.components.properties.panel.StringSetPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.SymbolPropertyEditorPanel;
-import org.opentcs.guing.components.properties.panel.VehicleThemePropertyEditorPanel;
 import org.opentcs.guing.components.properties.table.CellEditorFactory;
 import org.opentcs.guing.components.properties.type.AbstractComplexProperty;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
-import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 
 /**
  * A Guice module for this package.
@@ -67,17 +63,11 @@ public class PropertiesInjectionModule
         .addBinding(LinkActionsProperty.class)
         .to(LinkActionsEditorPanel.class);
     dialogContentMapBinder
-        .addBinding(LocationThemeProperty.class)
-        .to(LocationThemePropertyEditorPanel.class);
-    dialogContentMapBinder
         .addBinding(StringSetProperty.class)
         .to(StringSetPropertyEditorPanel.class);
     dialogContentMapBinder
         .addBinding(SymbolProperty.class)
         .to(SymbolPropertyEditorPanel.class);
-    dialogContentMapBinder
-        .addBinding(VehicleThemeProperty.class)
-        .to(VehicleThemePropertyEditorPanel.class);
 
     bind(SelectionPropertiesComponent.class)
         .in(Singleton.class);

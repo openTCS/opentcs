@@ -14,10 +14,10 @@ import com.google.inject.util.Modules;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
+import org.opentcs.customizations.ConfigurableInjectionModule;
+import org.opentcs.customizations.ConfigurationBindingProvider;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.util.Environment;
-import org.opentcs.util.configuration.Configuration;
-import org.opentcs.util.configuration.XMLConfiguration;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +46,13 @@ public class RunKernel {
    * @param args The command line arguments.
    * @throws Exception If there was a problem starting the kernel.
    */
+  @SuppressWarnings("deprecation")
   public static void main(String[] args)
       throws Exception {
     System.setSecurityManager(new SecurityManager());
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
-    System.setProperty(Configuration.PROPKEY_IMPL_CLASS, XMLConfiguration.class.getName());
+    System.setProperty(org.opentcs.util.configuration.Configuration.PROPKEY_IMPL_CLASS,
+                       org.opentcs.util.configuration.XMLConfiguration.class.getName());
 
     Environment.logSystemInfo();
 
@@ -66,9 +68,14 @@ public class RunKernel {
    * @return The custom configuration module.
    */
   private static Module customConfigurationModule() {
-    return Modules.override(new DefaultKernelInjectionModule(),
-                            new DefaultKernelStrategiesModule())
-        .with(findRegisteredModules());
+    ConfigurationBindingProvider bindingProvider = new DefaultConfigurationBindingProvider();
+    ConfigurableInjectionModule kernelInjectionModule = new DefaultKernelInjectionModule();
+    kernelInjectionModule.setConfigBindingProvider(bindingProvider);
+    ConfigurableInjectionModule kernelStrategiesModule = new DefaultKernelStrategiesModule();
+    kernelStrategiesModule.setConfigBindingProvider(bindingProvider);
+
+    return Modules.override(kernelInjectionModule, kernelStrategiesModule)
+        .with(findRegisteredModules(bindingProvider));
   }
 
   /**
@@ -76,10 +83,12 @@ public class RunKernel {
    *
    * @return The registered/found modules.
    */
-  private static List<KernelInjectionModule> findRegisteredModules() {
+  private static List<KernelInjectionModule> findRegisteredModules(
+      ConfigurationBindingProvider bindingProvider) {
     List<KernelInjectionModule> registeredModules = new LinkedList<>();
     for (KernelInjectionModule module : ServiceLoader.load(KernelInjectionModule.class)) {
       LOG.info("Integrating injection module {}", module.getClass().getName());
+      module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }
     return registeredModules;

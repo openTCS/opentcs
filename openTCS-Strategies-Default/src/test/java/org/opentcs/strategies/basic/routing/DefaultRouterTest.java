@@ -55,6 +55,11 @@ public class DefaultRouterTest {
    * The object id for the next created object.
    */
   private int nextObjectId;
+  
+  /**
+   * The configuration.
+   */
+  private DefaultRouterConfiguration configuration;
 
   @Before
   public void setUp() {
@@ -66,6 +71,8 @@ public class DefaultRouterTest {
         .then(o -> vehicles.stream()
             .filter(t -> filterByName(o, t))
             .findFirst().orElse(null));
+    configuration = mock(DefaultRouterConfiguration.class);
+    when(configuration.routeToCurrentPosition()).thenReturn(false);
     router = spy(createRouter());
   }
 
@@ -139,7 +146,7 @@ public class DefaultRouterTest {
 
     return new DefaultRouter(kernel,
                              builder,
-                             true);
+                             configuration);
   }
 
   /**

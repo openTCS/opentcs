@@ -1,0 +1,11 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}Copyright (c) The openTCS Authors.
+${licensePrefix?replace(" +$", "", "r")}
+${licensePrefix}This program is free software and subject to the MIT license. (For details,
+${licensePrefix}see the licensing information (LICENSE.txt) you should have received with
+${licensePrefix}this copy of the software.)
+<#if licenseLast??>
+${licenseLast}
+</#if>

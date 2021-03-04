@@ -21,13 +21,11 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LayoutModel;
@@ -163,22 +161,6 @@ public class ModelValidatorTest {
     LayoutModel layoutModel = createLayoutModel(LAYOUT_NAME);
     addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_Y, "abc");
     Assert.assertFalse("Validator said valid for corrupt scale y.",
-                       validator.isValidWith(model, layoutModel));
-  }
-
-  @Test
-  public void testLayoutMissingLocationTheme() {
-    LayoutModel layoutModel = createLayoutModel(LAYOUT_NAME);
-    removeProperty(layoutModel, LayoutModel.LOCATION_THEME);
-    Assert.assertFalse("Validator said valid for missing location theme.",
-                       validator.isValidWith(model, layoutModel));
-  }
-
-  @Test
-  public void testLayoutMissingVehicleTheme() {
-    LayoutModel layoutModel = createLayoutModel(LAYOUT_NAME);
-    removeProperty(layoutModel, LayoutModel.VEHICLE_THEME);
-    Assert.assertFalse("Validator said valid for missing vehicle theme.",
                        validator.isValidWith(model, layoutModel));
   }
 
@@ -616,8 +598,6 @@ public class ModelValidatorTest {
     LayoutModel layoutModel = createComponentWithName(LayoutModel.class, name);
     addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_X, 0d);
     addProperty(layoutModel, LengthProperty.class, LayoutModel.SCALE_Y, 0d);
-    addProperty(layoutModel, LocationThemeProperty.class, LayoutModel.LOCATION_THEME, LOCATION_THEME_NAME);
-    addProperty(layoutModel, VehicleThemeProperty.class, LayoutModel.VEHICLE_THEME, VEHICLE_THEME_NAME);
     return layoutModel;
   }
 

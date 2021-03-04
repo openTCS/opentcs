@@ -10,7 +10,6 @@
 package org.opentcs.guing.exchange.adapter;
 
 import com.google.inject.assistedinject.Assisted;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -18,24 +17,14 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.guing.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.LocationThemeProperty;
-import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 import org.opentcs.guing.exchange.EventDispatcher;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LayoutModel;
-import org.opentcs.guing.plugins.themes.StandardLocationTheme;
-import org.opentcs.guing.plugins.themes.StandardVehicleTheme;
-import org.opentcs.guing.util.LocationThemeManager;
-import org.opentcs.guing.util.VehicleThemeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,33 +41,17 @@ public class LayoutAdapter
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(LayoutAdapter.class);
-  /**
-   * Manages the location themes.
-   */
-  private final LocationThemeManager locationThemeManager;
-  /**
-   * Manages the vehicle themes.
-   */
-  private final VehicleThemeManager vehicleThemeManager;
 
   /**
    * Creates a new instance.
    *
    * @param model The corresponding model comoponent.
    * @param eventDispatcher The event dispatcher.
-   * @param locationThemeManager Manages the location themes.
-   * @param vehicleThemeManager Manages the vehicle themes.
    */
   @Inject
   public LayoutAdapter(@Assisted LayoutModel model,
-                       @Assisted EventDispatcher eventDispatcher,
-                       LocationThemeManager locationThemeManager,
-                       VehicleThemeManager vehicleThemeManager) {
+                       @Assisted EventDispatcher eventDispatcher) {
     super(model, eventDispatcher);
-    this.locationThemeManager = requireNonNull(locationThemeManager,
-                                               "locationThemeManager");
-    this.vehicleThemeManager = requireNonNull(vehicleThemeManager,
-                                              "vehicleThemeManager");
   }
 
   @Override
@@ -97,7 +70,6 @@ public class LayoutAdapter
       name.setText(layout.getName());
       name.markChanged();
       updateModelLengthProperty(layout);
-      updateModelThemes(layout);
 
       updateMiscModelProperties(layout);
     }
@@ -131,34 +103,6 @@ public class LayoutAdapter
     return pScale.getValueByUnit(LengthProperty.Unit.MM);
   }
 
-  private void updateModelThemes(VisualLayout layout) {
-    LocationThemeProperty tp = (LocationThemeProperty) getModel().getProperty(LayoutModel.LOCATION_THEME);
-    String themeName = layout.getProperties().get(ObjectPropConstants.LOCATION_THEME_CLASS);
-
-    if (themeName == null || "".equals(themeName)) {
-      themeName = StandardLocationTheme.class.getName();
-    }
-
-    if (!themeName.equals(tp.getTheme())) {
-      tp.setTheme(themeName);
-      locationThemeManager.setThemeProperty(tp);
-      tp.markChanged();
-    }
-
-    VehicleThemeProperty vtp = (VehicleThemeProperty) getModel().getProperty(LayoutModel.VEHICLE_THEME);
-    themeName = layout.getProperties().get(ObjectPropConstants.VEHICLE_THEME_CLASS);
-
-    if (themeName == null || "".equals(themeName)) {
-      themeName = StandardVehicleTheme.class.getName();
-    }
-
-    if (!themeName.equals(vtp.getTheme())) {
-      vtp.setTheme(themeName);
-      vehicleThemeManager.setThemeProperty(vtp);
-      vtp.markChanged();
-    }
-  }
-
   private void updateModelLengthProperty(VisualLayout layout)
       throws Exception {
     LengthProperty lp = (LengthProperty) getModel().getProperty(LayoutModel.SCALE_X);
@@ -170,52 +114,5 @@ public class LayoutAdapter
     scale = layout.getScaleY();
     lp.setValueAndUnit(scale, LengthProperty.Unit.MM);
     lp.markChanged();
-  }
-
-  private void updateProcessThemes() {
-
-    KeyValueSetProperty misc
-        = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
-
-    LocationThemeProperty pLocationTheme
-        = (LocationThemeProperty) getModel().getProperty(LayoutModel.LOCATION_THEME);
-    if (misc != null) {
-      KeyValueProperty kvp
-          = new KeyValueProperty(getModel(),
-                                 ObjectPropConstants.LOCATION_THEME_CLASS,
-                                 pLocationTheme.getTheme());
-      misc.addItem(kvp);
-      kvp.setChangeState(ModelAttribute.ChangeState.CHANGED);
-    }
-
-    locationThemeManager.updateDefaultTheme();
-
-    VehicleThemeProperty pVehicleTheme
-        = (VehicleThemeProperty) getModel().getProperty(LayoutModel.VEHICLE_THEME);
-    if (misc != null) {
-      KeyValueProperty kvp
-          = new KeyValueProperty(getModel(),
-                                 ObjectPropConstants.VEHICLE_THEME_CLASS,
-                                 pVehicleTheme.getTheme());
-      misc.addItem(kvp);
-      kvp.setChangeState(ModelAttribute.ChangeState.CHANGED);
-    }
-
-    vehicleThemeManager.updateDefaultTheme();
-  }
-
-  @Override
-  protected Map<String, String> getKernelProperties() {
-    Map<String, String> result = super.getKernelProperties();
-
-    LocationThemeProperty pLocationTheme
-        = (LocationThemeProperty) getModel().getProperty(LayoutModel.LOCATION_THEME);
-    result.put(ObjectPropConstants.LOCATION_THEME_CLASS, pLocationTheme.getTheme());
-
-    VehicleThemeProperty pVehicleTheme
-        = (VehicleThemeProperty) getModel().getProperty(LayoutModel.VEHICLE_THEME);
-    result.put(ObjectPropConstants.VEHICLE_THEME_CLASS, pVehicleTheme.getTheme());
-
-    return result;
   }
 }

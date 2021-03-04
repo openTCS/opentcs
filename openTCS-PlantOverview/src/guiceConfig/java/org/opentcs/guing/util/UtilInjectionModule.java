@@ -10,8 +10,6 @@ package org.opentcs.guing.util;
 
 import com.google.inject.AbstractModule;
 import javax.inject.Singleton;
-import org.opentcs.guing.plugins.themes.LocationThemeRegistry;
-import org.opentcs.guing.plugins.themes.VehicleThemeRegistry;
 
 /**
  * A default Guice module for this package.
@@ -23,21 +21,6 @@ public class UtilInjectionModule
 
   @Override
   protected void configure() {
-
-    bind(ApplicationConfiguration.class).in(Singleton.class);
-    
     bind(PanelRegistry.class).in(Singleton.class);
-
-    bind(VehicleThemeRegistry.class)
-        .in(Singleton.class);
-    bind(VehicleThemeManager.class)
-        .to(DefaultVehicleThemeManager.class)
-        .in(Singleton.class);
-
-    bind(LocationThemeRegistry.class)
-        .in(Singleton.class);
-    bind(LocationThemeManager.class)
-        .to(DefaultLocationThemeManager.class)
-        .in(Singleton.class);
   }
 }

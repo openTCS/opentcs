@@ -25,9 +25,6 @@ set JAVA=javaw
 rem Start plant overview
 start /b %JAVA% -enableassertions ^
     -Dopentcs.home="%OPENTCS_HOME%" ^
-    -Dopentcs.dockinglayout="%OPENTCS_CONFIGDIR%\plantoverview-docking-layout.xml" ^
-    -Dopentcs.kernel.host=localhost ^
-    -Dopentcs.kernel.port=1099 ^
     -Djava.util.logging.config.file="%OPENTCS_CONFIGDIR%\logging.config" ^
     -Djava.security.policy="file:%OPENTCS_CONFIGDIR%\java.policy" ^
     -Dorg.opentcs.util.configuration.xml.file="%OPENTCS_CONFIGDIR%\openTCS-plantoverview-config.xml" ^

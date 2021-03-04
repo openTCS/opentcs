@@ -98,7 +98,7 @@ public class VehicleAction
   /**
    * This class's logger.
    */
-  private static final Logger log = LoggerFactory.getLogger(VehicleAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleAction.class);
   /**
    * The vehicle.
    */
@@ -186,6 +186,7 @@ public class VehicleAction
       if (!pointModels.isEmpty()) {
         PointPanel contentPanel = new PointPanel(pointModels);
         StandardContentDialog fDialog = new StandardContentDialog(view, contentPanel);
+        contentPanel.addInputValidationListener(fDialog);
         fDialog.setTitle(evt.getActionCommand());
         fDialog.setVisible(true);
 
@@ -222,7 +223,7 @@ public class VehicleAction
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), false, false);
       }
       catch (KernelRuntimeException e) {
-        log.warn("Unexpected exception", e);
+        LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY + ".text"))) {
@@ -230,7 +231,7 @@ public class VehicleAction
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), true, true);
       }
       catch (KernelRuntimeException e) {
-        log.warn("Unexpected exception", e);
+        LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE + ".text"))) {
@@ -238,7 +239,7 @@ public class VehicleAction
         kernel().withdrawTransportOrderByVehicle(vehicleReference(), false, true);
       }
       catch (KernelRuntimeException e) {
-        log.warn("Unexpected exception", e);
+        LOG.warn("Unexpected exception", e);
       }
     }
     else if (evt.getActionCommand().equals(labels.getString(RELEASE_VEHICLE + ".text"))) {
@@ -252,7 +253,7 @@ public class VehicleAction
           kernel().releaseVehicle(vehicleReference());
         }
         catch (KernelRuntimeException e) {
-          log.warn("Unexpected exception", e);
+          LOG.warn("Unexpected exception", e);
         }
       }
     }
@@ -261,7 +262,7 @@ public class VehicleAction
         kernel().dispatchVehicle(vehicleReference(), true);
       }
       catch (KernelRuntimeException e) {
-        log.warn("Unexpected exception", e);
+        LOG.warn("Unexpected exception", e);
       }
     }
   }

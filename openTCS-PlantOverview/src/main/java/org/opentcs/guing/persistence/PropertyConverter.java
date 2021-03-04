@@ -25,7 +25,6 @@ import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
-import org.opentcs.guing.components.properties.type.LocationThemeProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.Property;
@@ -35,7 +34,6 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
-import org.opentcs.guing.components.properties.type.VehicleThemeProperty;
 import static org.opentcs.guing.model.AbstractFigureComponent.MODEL_X_POSITION;
 import static org.opentcs.guing.model.AbstractFigureComponent.MODEL_Y_POSITION;
 import org.opentcs.guing.model.ModelComponent;
@@ -45,10 +43,8 @@ import static org.opentcs.guing.model.elements.AbstractConnection.END_COMPONENT;
 import static org.opentcs.guing.model.elements.AbstractConnection.START_COMPONENT;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
-import static org.opentcs.guing.model.elements.LayoutModel.LOCATION_THEME;
 import static org.opentcs.guing.model.elements.LayoutModel.SCALE_X;
 import static org.opentcs.guing.model.elements.LayoutModel.SCALE_Y;
-import static org.opentcs.guing.model.elements.LayoutModel.VEHICLE_THEME;
 import static org.opentcs.guing.model.elements.LinkModel.ALLOWED_OPERATIONS;
 import org.opentcs.guing.model.elements.LocationModel;
 import static org.opentcs.guing.model.elements.PathModel.LENGTH;
@@ -82,7 +78,6 @@ import org.opentcs.guing.persistence.CourseObjectProperty.KeyValueCourseProperty
 import org.opentcs.guing.persistence.CourseObjectProperty.KeyValueSetCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.LengthCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.LinkActionsCourseProperty;
-import org.opentcs.guing.persistence.CourseObjectProperty.LocationThemeCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.LocationTypeCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.PercentCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.SelectionCourseProperty;
@@ -91,7 +86,6 @@ import org.opentcs.guing.persistence.CourseObjectProperty.StringCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.StringSetCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.SymbolCourseProperty;
 import org.opentcs.guing.persistence.CourseObjectProperty.TripleCourseProperty;
-import org.opentcs.guing.persistence.CourseObjectProperty.VehicleThemeCourseProperty;
 
 /**
  * Converts OpenTCS Properties to JAXB classes.
@@ -134,9 +128,6 @@ public class PropertyConverter {
     if (property instanceof LinkActionsProperty) {
       return convertLinkActionsProperty(key, (LinkActionsProperty) property);
     }
-    if (property instanceof LocationThemeProperty) {
-      return convertLocationThemeProperty(key, (LocationThemeProperty) property);
-    }
     if (property instanceof LocationTypeProperty) {
       return convertLocationTypeProperty(key, (LocationTypeProperty) property);
     }
@@ -157,9 +148,6 @@ public class PropertyConverter {
     }
     if (property instanceof TripleProperty) {
       return convertTripleProperty(key, (TripleProperty) property);
-    }
-    if (property instanceof VehicleThemeProperty) {
-      return convertVehicleThemeProperty(key, (VehicleThemeProperty) property);
     }
 
     return null;
@@ -280,12 +268,6 @@ public class PropertyConverter {
             break;
           case ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION:
             revertSymbolProperty(model, ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, property);
-            break;
-          case LOCATION_THEME:
-            revertLocationThemeProperty(model, property);
-            break;
-          case VEHICLE_THEME:
-            revertVehicleThemeProperty(model, property);
             break;
           case ALLOWED_OPERATIONS:
             revertStringSetProperty(model, ALLOWED_OPERATIONS, property);
@@ -492,13 +474,6 @@ public class PropertyConverter {
     wrapper.getEntries().stream().forEach(item -> ssp.addItem(item));
   }
 
-  private void revertLocationThemeProperty(ModelComponent model,
-                                           CourseObjectProperty property) {
-    LocationThemeProperty ltp = (LocationThemeProperty) model.getProperty(LOCATION_THEME);
-    String value = (String) property.getValue();
-    ltp.setTheme(value);
-  }
-
   private void revertMiscellaneosProperty(ModelComponent model,
                                           KeyValueSetListWrapper wrapper,
                                           KeyValueSetProperty property) {
@@ -525,13 +500,6 @@ public class PropertyConverter {
     LengthProperty lp = (LengthProperty) model.getProperty(key);
     double valueByMM = (double) property.getValue();
     lp.setValueAndUnit(valueByMM, LengthProperty.Unit.MM);
-  }
-
-  private void revertVehicleThemeProperty(ModelComponent model,
-                                          CourseObjectProperty property) {
-    VehicleThemeProperty vtp = (VehicleThemeProperty) model.getProperty(VEHICLE_THEME);
-    String value = (String) property.getValue();
-    vtp.setTheme(value);
   }
 
   private StringCourseProperty convertStringProperty(
@@ -617,13 +585,6 @@ public class PropertyConverter {
     return property;
   }
 
-  private LocationThemeCourseProperty convertLocationThemeProperty(String key,
-                                                                   LocationThemeProperty locThemeProperty) {
-    String value = locThemeProperty.getTheme();
-    LocationThemeCourseProperty property = new LocationThemeCourseProperty(key, value);
-    return property;
-  }
-
   private PercentCourseProperty convertPercentProperty(String key,
                                                        PercentProperty percentProperty) {
     Object value = percentProperty.getValueByUnit(PercentProperty.Unit.PERCENT);
@@ -682,10 +643,4 @@ public class PropertyConverter {
     return property;
   }
 
-  private VehicleThemeCourseProperty convertVehicleThemeProperty(String key,
-                                                                 VehicleThemeProperty vehicleThemeProperty) {
-    String value = vehicleThemeProperty.getTheme();
-    VehicleThemeCourseProperty property = new VehicleThemeCourseProperty(key, value);
-    return property;
-  }
 }

@@ -15,6 +15,12 @@ import java.util.LinkedList;
 import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
+import org.opentcs.kernel.xmlhost.orders.binding.Destination;
+import org.opentcs.kernel.xmlhost.orders.binding.Property;
+import org.opentcs.kernel.xmlhost.orders.binding.TCSOrder;
+import org.opentcs.kernel.xmlhost.orders.binding.TCSOrderSet;
+import org.opentcs.kernel.xmlhost.orders.binding.Transport;
+import org.opentcs.kernel.xmlhost.orders.binding.TransportScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

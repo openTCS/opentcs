@@ -60,12 +60,7 @@ abstract class KernelStateOnline
   @Override
   public void terminate() {
     if (saveModelOnTerminate) {
-      try {
-        saveModel(null);
-      }
-      catch (IOException exc) {
-        LOG.warn("Could not save model on termination", exc);
-      }
+      savePlantModel();
     }
   }
 

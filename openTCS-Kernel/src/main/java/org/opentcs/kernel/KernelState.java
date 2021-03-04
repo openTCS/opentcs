@@ -19,7 +19,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentcs.access.ConfigurationItemTO;
 import org.opentcs.access.Kernel.State;
 import org.opentcs.access.TravelCosts;
 import org.opentcs.access.UnsupportedKernelOpException;
@@ -61,8 +60,6 @@ import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.opentcs.util.configuration.Configuration;
-import org.opentcs.util.configuration.ConfigurationItem;
 
 /**
  * The abstract base class for classes that implement state specific kernel
@@ -898,20 +895,23 @@ abstract class KernelState
     }
   }
 
+  @Deprecated
   public double getSimulationTimeFactor() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setSimulationTimeFactor(double angle) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
-  public final Set<ConfigurationItemTO> getConfigurationItems() {
-    Set<ConfigurationItemTO> result = new HashSet<>();
-    Set<ConfigurationItem> allItems
-        = Configuration.getInstance().getConfigurationItems();
-    for (ConfigurationItem item : allItems) {
-      ConfigurationItemTO itemTO = new ConfigurationItemTO();
+  @Deprecated
+  public final Set<org.opentcs.access.ConfigurationItemTO> getConfigurationItems() {
+    Set<org.opentcs.access.ConfigurationItemTO> result = new HashSet<>();
+    Set<org.opentcs.util.configuration.ConfigurationItem> allItems
+        = org.opentcs.util.configuration.Configuration.getInstance().getConfigurationItems();
+    for (org.opentcs.util.configuration.ConfigurationItem item : allItems) {
+      org.opentcs.access.ConfigurationItemTO itemTO = new org.opentcs.access.ConfigurationItemTO();
       itemTO.setNamespace(item.getNamespace());
       itemTO.setKey(item.getKey());
       itemTO.setValue(item.getValue());
@@ -922,14 +922,16 @@ abstract class KernelState
     return result;
   }
 
-  public final void setConfigurationItem(ConfigurationItemTO itemTO) {
+  @Deprecated
+  public final void setConfigurationItem(org.opentcs.access.ConfigurationItemTO itemTO) {
     requireNonNull(itemTO, "itemTO");
-    ConfigurationItem item = new ConfigurationItem(itemTO.getNamespace(),
-                                                   itemTO.getKey(),
-                                                   itemTO.getDescription(),
-                                                   itemTO.getConstraint(),
-                                                   itemTO.getValue());
-    Configuration.getInstance().setConfigurationItem(item);
+    org.opentcs.util.configuration.ConfigurationItem item
+        = new org.opentcs.util.configuration.ConfigurationItem(itemTO.getNamespace(),
+                                                               itemTO.getKey(),
+                                                               itemTO.getDescription(),
+                                                               itemTO.getConstraint(),
+                                                               itemTO.getValue());
+    org.opentcs.util.configuration.Configuration.getInstance().setConfigurationItem(item);
   }
 
   public Object getGlobalSyncObject() {

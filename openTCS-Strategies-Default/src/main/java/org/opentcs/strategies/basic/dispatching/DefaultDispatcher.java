@@ -8,50 +8,27 @@
 package org.opentcs.strategies.basic.dispatching;
 
 import static com.google.common.base.Preconditions.checkState;
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.to.order.DestinationCreationTO;
-import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.Dispatcher;
-import org.opentcs.components.kernel.ParkingPositionSupplier;
-import org.opentcs.components.kernel.RechargePositionSupplier;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.data.order.DriveOrder.Destination;
-import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
-import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.QueueProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Dispatches new transport orders to idle vehicles that need the least time to
- * process them.
+ * Dispatches transport orders and vehicles.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -75,32 +52,33 @@ public class DefaultDispatcher
    */
   private final VehicleControllerPool vehicleControllerPool;
   /**
+   *
+   */
+  private final Assignments assignments;
+  /**
+   * Selects vehicles for available transport orders.
+   */
+  private final VehicleSelector vehicleSelector;
+  /**
+   * Selects transport orders for available vehicles.
+   */
+  private final TransportOrderSelector orderSelector;
+  /**
+   * Stores reservations of transport orders for vehicles.
+   */
+  private final OrderReservationPool orderReservationPool;
+  /**
+   * Provides services/utility methods for working with transport orders.
+   */
+  private final TransportOrderService transportOrderService;
+  /**
+   * This class's configuration.
+   */
+  private final DefaultDispatcherConfiguration configuration;
+  /**
    * The task doing the actual dispatching.
    */
   private DispatcherTask dispatcherTask;
-  /**
-   * A flag indiciating whether to park vehicles that have finished their order
-   * and for which a new order is not available.
-   */
-  private final boolean parkIdleVehicles;
-  /**
-   * The strategy used for finding suitable parking positions.
-   */
-  private final ParkingPositionSupplier parkingPosSupplier;
-  /**
-   * A flag indicating whether to automatically create recharge orders for
-   * vehicles that do not have an order.
-   */
-  private final boolean rechargeVehiclesWhenIdle;
-  /**
-   * A flag indicating whether to automatically create recharge orders for
-   * vehicles whose energy level is critical.
-   */
-  private final boolean rechargeVehiclesWhenEnergyCritical;
-  /**
-   * The strategy used for finding suitable recharge locations.
-   */
-  private final RechargePositionSupplier rechargePosSupplier;
   /**
    * Indicates whether this component is enabled.
    */
@@ -109,48 +87,40 @@ public class DefaultDispatcher
    * A list of vehicles that are to be disabled/made UNAVAILABLE after they have
    * finished/aborted their current transport orders.
    */
-  private final Set<TCSObjectReference<Vehicle>> vehiclesToDisable
-      = Collections.synchronizedSet(new HashSet<TCSObjectReference<Vehicle>>());
-  /**
-   * Reservations of orders for vehicles.
-   */
-  private final Map<TCSObjectReference<TransportOrder>, TCSObjectReference<Vehicle>> orderReservations
-      = Collections.synchronizedMap(new HashMap<TCSObjectReference<TransportOrder>, TCSObjectReference<Vehicle>>());
+  private final Set<TCSObjectReference<Vehicle>> vehiclesToDisable = ConcurrentHashMap.newKeySet();
 
   /**
    * Creates a new instance.
    *
-   * @param newRouter The <code>Router</code> instance calculating route costs.
-   * @param newKernel The local kernel instance.
-   * @param parkingPosSupplier The strategy used for finding suitable parking
-   * positions.
-   * @param rechargeStrategy The strategy used for finding suitable recharge
-   * locations.
-   * @param vehicleControllerPool The vehicle controller pool.
-   * @param parkIdleVehicles Whether to park vehicles that have finished their
-   * order and for which a new order is not available.
-   * @param rechargeVehiclesWhenIdle Whether to automatically create recharge
-   * orders for vehicles that do not have an order.
-   * @param rechargeVehiclesWhenEnergyCritical Whether to automatically create
-   * recharge orders for vehicles whose energy level is critical.
+   * @param newRouter Computes route costs.
+   * @param kernel The kernel instance to work with.
+   * @param vehicleControllerPool The vehicle controller pool to work with.
+   * @param assignments
+   * @param orderReservationPool Stores reservations of transport orders for vehicles.
+   * @param vehicleSelector Selects vehicles for available transport orders.
+   * @param orderSelector Selects transport orders for available vehicles.
+   * @param transportOrderService Provides services for working with transport orders.
+   * @param configuration Provides runtime configuration data.
    */
   @Inject
   public DefaultDispatcher(Router newRouter,
-                           LocalKernel newKernel,
-                           ParkingPositionSupplier parkingPosSupplier,
-                           RechargePositionSupplier rechargeStrategy,
+                           LocalKernel kernel,
                            VehicleControllerPool vehicleControllerPool,
-                           @ParkWhenIdle boolean parkIdleVehicles,
-                           @RechargeWhenIdle boolean rechargeVehiclesWhenIdle,
-                           @RechargeWhenEnergyCritical boolean rechargeVehiclesWhenEnergyCritical) {
+                           Assignments assignments,
+                           OrderReservationPool orderReservationPool,
+                           VehicleSelector vehicleSelector,
+                           TransportOrderSelector orderSelector,
+                           TransportOrderService transportOrderService,
+                           DefaultDispatcherConfiguration configuration) {
     this.router = requireNonNull(newRouter, "newRouter");
-    this.kernel = requireNonNull(newKernel, "newKernel");
-    this.parkingPosSupplier = requireNonNull(parkingPosSupplier, "parkingPosSupplier");
-    this.rechargePosSupplier = requireNonNull(rechargeStrategy, "rechargeStrategy");
+    this.kernel = requireNonNull(kernel, "newKernel");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
-    this.parkIdleVehicles = parkIdleVehicles;
-    this.rechargeVehiclesWhenIdle = rechargeVehiclesWhenIdle;
-    this.rechargeVehiclesWhenEnergyCritical = rechargeVehiclesWhenEnergyCritical;
+    this.assignments = requireNonNull(assignments, "assignments");
+    this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
+    this.vehicleSelector = requireNonNull(vehicleSelector, "vehicleSelector");
+    this.orderSelector = requireNonNull(orderSelector, "orderSelector");
+    this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   // Methods declared in interface Dispatcher start here.
@@ -161,9 +131,7 @@ public class DefaultDispatcher
       return;
     }
     vehiclesToDisable.clear();
-    orderReservations.clear();
-    parkingPosSupplier.initialize();
-    rechargePosSupplier.initialize();
+    orderReservationPool.clear();
     // Initialize the dispatching thread.
     dispatcherTask = new DispatcherTask();
     new Thread(dispatcherTask, getClass().getName() + "-DispatcherTask").start();
@@ -183,8 +151,6 @@ public class DefaultDispatcher
     }
     LOG.info("Terminating...");
     dispatcherTask.terminate();
-    parkingPosSupplier.terminate();
-    rechargePosSupplier.terminate();
     initialized = false;
   }
 
@@ -267,332 +233,6 @@ public class DefaultDispatcher
 
   // Class-specific methods start here.
   /**
-   * Returns available vehicles for the given order.
-   *
-   * @param order The order for which to find available vehicles.
-   * @return Available vehicles for the given order, or an empty list.
-   */
-  protected List<Vehicle> findVehiclesForOrder(TransportOrder order) {
-    requireNonNull(order, "order");
-
-    List<Vehicle> result = new LinkedList<>();
-    // Check if the order or its wrapping sequence have an intended vehicle.
-    TCSObjectReference<Vehicle> vRefIntended = null;
-    // If the order belongs to an order sequence, check if a vehicle is already
-    // processing it or, if not, if the sequence is intended for a specific
-    // vehicle.
-    if (order.getWrappingSequence() != null) {
-      OrderSequence seq = kernel.getTCSObject(OrderSequence.class, order.getWrappingSequence());
-      if (seq.getProcessingVehicle() != null) {
-        vRefIntended = seq.getProcessingVehicle();
-      }
-      else if (seq.getIntendedVehicle() != null) {
-        vRefIntended = seq.getIntendedVehicle();
-      }
-    }
-    // If there's no order sequence, but the order itself is intended for a
-    // specific vehicle, take that.
-    else if (order.getIntendedVehicle() != null) {
-      vRefIntended = order.getIntendedVehicle();
-    }
-    // If the transport order has an intended vehicle, get only that one - but
-    // only if it is at a known position, is IDLE and either isn't processing
-    // any order sequence or is processing exactly the one that this order
-    // belongs to.
-    if (vRefIntended != null) {
-      Vehicle intendedVehicle = kernel.getTCSObject(Vehicle.class, vRefIntended);
-      if (availableForTransportOrder(intendedVehicle)
-          && (intendedVehicle.getOrderSequence() == null
-              || Objects.equals(intendedVehicle.getOrderSequence(),
-                                order.getWrappingSequence()))) {
-        result.add(intendedVehicle);
-      }
-    }
-    // If there's no intended vehicle, get all vehicles that are at a known
-    // position, are IDLE, aren't processing any order sequences or are
-    // processing exactly the one that this order belongs to.
-    else {
-      for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
-        if (availableForTransportOrder(curVehicle)
-            && (curVehicle.getOrderSequence() == null
-                || Objects.equals(curVehicle.getOrderSequence(),
-                                  order.getWrappingSequence()))) {
-          result.add(curVehicle);
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Returns available transport orders for the given vehicle.
-   *
-   * @param vehicle The vehicle for which to find available transport orders.
-   * @return Available transport orders for the given vehicle.
-   */
-  protected Set<TransportOrder> findOrdersForVehicle(Vehicle vehicle) {
-    requireNonNull(vehicle, "vehicle");
-
-    Optional<TransportOrder> reservedOrder = findReservedOrder(vehicle);
-    if (reservedOrder.isPresent()) {
-      return Collections.singleton(reservedOrder.get());
-    }
-    // No reservation for this vehicle? Select available orders from the pool.
-    Set<TransportOrder> result = Assignments.getOrdersForVehicle(
-        kernel.getTCSObjects(OrderSequence.class),
-        kernel.getTCSObjects(TransportOrder.class),
-        vehicle);
-    // Filter out all transport orders with reservations. (If there was a
-    // reservation for this vehicle, we would have found it above.)
-    if (result != null) {
-      Iterator<TransportOrder> iter = result.iterator();
-      while (iter.hasNext()) {
-        if (orderReservations.containsKey(iter.next().getReference())) {
-          iter.remove();
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Returns the order reserved for the given vehicle, if one such order exists
-   * and it is in an assignable state (i.e. not in a final state and not
-   * withdrawn).
-   *
-   * @param vehicle The vehicle for which to find the reserved order.
-   * @return The order reserved for the given vehicle, if one such order exists.
-   */
-  protected Optional<TransportOrder> findReservedOrder(Vehicle vehicle) {
-    requireNonNull(vehicle, "vehicle");
-
-    // Check if there's an order reserved for this vehicle that is in an
-    // assignable state. If yes, return that.
-    return orderReservations.entrySet().stream()
-        .filter(entry -> vehicle.getReference().equals(entry.getValue()))
-        .findFirst()
-        .map(entry -> kernel.getTCSObject(TransportOrder.class, entry.getKey()))
-        .filter(order -> !order.getState().isFinalState()
-        && !order.hasState(TransportOrder.State.WITHDRAWN));
-  }
-
-  private boolean orderMandatory(TransportOrder order,
-                                 Set<OrderSequence> sequences) {
-    // Check if the selected order MUST be assigned right now or if an order for
-    // recharging would be possible. If the selected order is part of an order
-    // sequence and is already being processed, we cannot shove in another order
-    // but have to finish the sequence first.
-    if (order.getWrappingSequence() != null) {
-      for (OrderSequence seq : sequences) {
-        if (order.getWrappingSequence().equals(seq.getReference())
-            && seq.getProcessingVehicle() != null) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Assigns the most acceptable/best fitting transport order from the given set
-   * to the given vehicle, or sends it parking, if no acceptable order was found
-   * and auto parking is enabled.
-   *
-   * @param vehicle The vehicle.
-   * @param transportOrders The set of transport orders to choose from.
-   */
-  private void assignBestOrderToVehicle(Vehicle vehicle,
-                                        Set<TransportOrder> transportOrders,
-                                        Set<OrderSequence> sequences) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(transportOrders, "transportOrders");
-    requireNonNull(sequences, "sequences");
-
-    final Point vehiclePosition = kernel.getTCSObject(Point.class, vehicle.getCurrentPosition());
-    // Assuming the transport orders are sorted correctly, we can now just
-    // grab the first one that can be processed by the given vehicle.
-    final Iterator<TransportOrder> orderIter = transportOrders.iterator();
-    TransportOrder selectedOrder = null;
-    Optional<List<DriveOrder>> driveOrders = Optional.empty();
-    while (selectedOrder == null && orderIter.hasNext()) {
-      TransportOrder curOrder = orderIter.next();
-      boolean canProcess;
-      // Get a route for the vehicle.
-      driveOrders = router.getRoute(vehicle, vehiclePosition, curOrder);
-      canProcess = driveOrders.isPresent();
-      if (!canProcess) {
-        LOG.debug("{}: No route for order {}", vehicle.getName(), curOrder);
-        kernel.addTransportOrderRejection(curOrder.getReference(),
-                                          new Rejection(vehicle.getReference(), "Unroutable"));
-      }
-      // Check if the vehicle can process the order right now.
-      canProcess = canProcess && checkProcessability(vehicle, curOrder);
-      // If the vehicle can process this order, choose it.
-      if (canProcess) {
-        selectedOrder = curOrder;
-      }
-    }
-    // A flag to remember if we already created an order for the vehicle.
-    boolean orderCreated = false;
-    // If automatic creation of recharge orders is enabled, the vehicle's energy
-    // level is critical and the selected order (if any) is not mandatory,
-    // create an order to recharge and assign that instead.
-    if (rechargeVehiclesWhenEnergyCritical
-        && vehicle.isEnergyLevelCritical()
-        && (selectedOrder == null
-            || !orderMandatory(selectedOrder, sequences))) {
-      // If the vehicle is already charging, don't create a new order but leave
-      // it like that.
-      if (vehicle.hasState(Vehicle.State.CHARGING)) {
-        LOG.debug("{}: Energy level critical, but vehicle is already charging - leaving it alone.",
-                  vehicle.getName());
-        orderCreated = true;
-      }
-      else {
-        LOG.debug("{}: Energy level critical, looking for recharge location.", vehicle.getName());
-        orderCreated = rechargeVehicle(vehicle, vehiclePosition);
-      }
-    }
-
-    if (!orderCreated) {
-      // If we found a transport order, assign it to the vehicle.
-      if (selectedOrder != null) {
-        LOG.debug("{}: Selected transport order {} for assignment",
-                  vehicle.getName(),
-                  selectedOrder.getName());
-        assignTransportOrder(vehicle, selectedOrder, driveOrders.get());
-        orderCreated = true;
-      }
-      else {
-        LOG.debug("{}: Didn't find acceptable transport order for assignment", vehicle.getName());
-      }
-    }
-    // If the vehicle's energy level is not "good" any more, send it to a
-    // charging station.
-    if (!orderCreated && rechargeVehiclesWhenIdle && vehicle.isEnergyLevelDegraded()) {
-      // If the vehicle is already charging, don't create a new order but leave
-      // it like that.
-      if (vehicle.hasState(Vehicle.State.CHARGING)) {
-        LOG.debug("{}: No transport order, but vehicle is already charging - leaving it alone.",
-                  vehicle.getName());
-        orderCreated = true;
-      }
-      else {
-        LOG.debug("{}: No transport order, looking for recharge location.", vehicle.getName());
-        orderCreated = rechargeVehicle(vehicle, vehiclePosition);
-      }
-    }
-    // If auto parking is enabled and the vehicle's not at a parking position,
-    // yet, send it to one.
-    if (!orderCreated && parkIdleVehicles && !vehiclePosition.isParkingPosition()) {
-      if (vehicle.hasState(Vehicle.State.CHARGING) && vehicle.getEnergyLevel() < 100) {
-        LOG.debug("{}: Not at parking position, but charging and energy < 100% - leaving it alone.",
-                  vehicle.getName());
-        orderCreated = true;
-      }
-      else {
-        LOG.debug("{}: Not at a parking position, looking for one.", vehicle.getName());
-        orderCreated = parkVehicle(vehicle, vehiclePosition);
-      }
-    }
-    LOG.debug("{}: orderCreated is {}", vehicle.getName(), orderCreated);
-    // Make sure there are no reservations left for the vehicle. (Theoretically,
-    // it would be possible that an order was reserved for a vehicle and then
-    // refused by it...)
-    clearOrderReservations(vehicle.getReference());
-  }
-
-  /**
-   * Sends a vehicle to a parking position.
-   *
-   * @param vehicle The vehicle to be parked.
-   * @param vehiclePosition The vehicle's current position.
-   * @return <code>true</code> if, and only if, a parking order was actually
-   * created and assigned.
-   */
-  private boolean parkVehicle(Vehicle vehicle,
-                              Point vehiclePosition) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(vehiclePosition, "vehiclePosition");
-
-    // Get a suitable parking position for the vehicle.
-    Optional<Point> parkPos = parkingPosSupplier.findParkingPosition(vehicle);
-    LOG.debug("Parking position for {}: {}", vehicle, parkPos);
-    // If we could not find a suitable parking position at all, just leave the
-    // vehicle where it is.
-    if (!parkPos.isPresent()) {
-      LOG.warn("{}: Did not find a suitable parking position.", vehicle.getName());
-      return false;
-    }
-    // Create a destination for the point.
-    List<DestinationCreationTO> parkDests = new LinkedList<>();
-    parkDests.add(new DestinationCreationTO(parkPos.get().getName(), Destination.OP_PARK));
-    // Create a transport order for parking and verify its processability.
-    TransportOrder parkOrder = kernel.createTransportOrder(
-        new TransportOrderCreationTO("Park-" + UUID.randomUUID(), parkDests)
-            .setDispensable(true)
-            .setIntendedVehicleName(vehicle.getName())
-    );
-    Optional<List<DriveOrder>> driveOrders = router.getRoute(vehicle, vehiclePosition, parkOrder);
-    if (checkProcessability(vehicle, parkOrder)) {
-      // Assign the parking order.
-      assignTransportOrder(vehicle, parkOrder, driveOrders.get());
-      return true;
-    }
-    else {
-      // Mark the order as failed, since the vehicle does not want to execute it.
-      updateTransportOrderState(parkOrder.getReference(), TransportOrder.State.FAILED);
-      return false;
-    }
-  } // void parkVehicle()
-
-  /**
-   * Sends a vehicle to a charging location.
-   *
-   * @param vehicle The vehicle to be parked.
-   * @param vehiclePosition The vehicle's current position.
-   * @return <code>true</code> if, and only if, a charging order was actually
-   * created and assigned.
-   */
-  private boolean rechargeVehicle(Vehicle vehicle, Point vehiclePosition) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(vehiclePosition, "vehiclePosition");
-
-    List<Destination> rechargeDests = rechargePosSupplier.findRechargeSequence(vehicle);
-    if (rechargeDests.isEmpty()) {
-      LOG.warn("{}: Did not find a suitable recharge sequence for vehicle", vehicle.getName());
-      return false;
-    }
-    List<DestinationCreationTO> chargeDests = new LinkedList<>();
-    for (Destination dest : rechargeDests) {
-      chargeDests.add(
-          new DestinationCreationTO(dest.getLocation().getName(), dest.getOperation())
-              .setProperties(dest.getProperties())
-      );
-    }
-    // Create a transport order for recharging and verify its processability.
-    // The recharge order may be withdrawn unless its energy level is critical.
-    TransportOrder rechargeOrder = kernel.createTransportOrder(
-        new TransportOrderCreationTO("Recharge-" + UUID.randomUUID(), chargeDests)
-            .setIntendedVehicleName(vehicle.getName())
-            .setDispensable(!vehicle.isEnergyLevelCritical())
-    );
-
-    Optional<List<DriveOrder>> driveOrders
-        = router.getRoute(vehicle, vehiclePosition, rechargeOrder);
-    if (checkProcessability(vehicle, rechargeOrder)) {
-      // Assign the recharge order.
-      assignTransportOrder(vehicle, rechargeOrder, driveOrders.get());
-      return true;
-    }
-    else {
-      // Mark the order as failed, since the vehicle does not want to execute it.
-      updateTransportOrderState(rechargeOrder.getReference(), TransportOrder.State.FAILED);
-      return false;
-    }
-  }
-
-  /**
    * Assigns a transport order to a vehicle, stores a route for the vehicle in
    * the transport order, adjusts the state of vehicle and transport order
    * and starts processing.
@@ -614,10 +254,10 @@ public class DefaultDispatcher
     final TCSObjectReference<Vehicle> vehicleRef = vehicle.getReference();
     final TCSObjectReference<TransportOrder> orderRef = transportOrder.getReference();
     // If the transport order was reserved, forget the reservation now.
-    orderReservations.remove(orderRef);
+    orderReservationPool.removeReservation(orderRef);
     // Set the vehicle's and transport order's state.
     kernel.setVehicleProcState(vehicleRef, Vehicle.ProcState.PROCESSING_ORDER);
-    updateTransportOrderState(orderRef, TransportOrder.State.BEING_PROCESSED);
+    transportOrderService.updateTransportOrderState(orderRef, TransportOrder.State.BEING_PROCESSED);
     // Add cross references between vehicle and transport order/order sequence.
     kernel.setVehicleTransportOrder(vehicleRef, orderRef);
     if (transportOrder.getWrappingSequence() != null) {
@@ -633,7 +273,7 @@ public class DefaultDispatcher
     transportOrder = kernel.getTCSObject(TransportOrder.class, orderRef);
     DriveOrder driveOrder = transportOrder.getCurrentDriveOrder();
     // If the drive order must be assigned, do so.
-    if (Assignments.mustAssign(driveOrder, vehicle)) {
+    if (assignments.mustAssign(driveOrder, vehicle)) {
       // Let the vehicle controller know about the first drive order.
       vehicleControllerPool.getVehicleController(vehicle.getName())
           .setDriveOrder(driveOrder, transportOrder.getProperties());
@@ -645,38 +285,6 @@ public class DefaultDispatcher
       kernel.setVehicleProcState(vehicleRef, Vehicle.ProcState.AWAITING_ORDER);
     }
   } // void assignTransportOrder()
-
-  /**
-   * Checks if the given vehicle could process the given order right now.
-   *
-   * @param vehicle The vehicle.
-   * @param order The order.
-   * @return <code>true</code> if, and only if, the given vehicle can process
-   * the given order.
-   */
-  private boolean checkProcessability(Vehicle vehicle, TransportOrder order) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(order, "order");
-
-    // If there isn't any vehicle controller for this vehicle, it cannot process
-    // the order.
-    ExplainedBoolean result = vehicleControllerPool.getVehicleController(vehicle.getName())
-        .canProcess(Assignments.getOperations(order));
-    if (result.isTrue()) {
-      return true;
-    }
-    else {
-      // The vehicle controller/communication adapter does not want to process
-      // the order. Add a rejection for it.
-      Rejection rejection = new Rejection(vehicle.getReference(), result.getReason());
-      LOG.debug("Order {} rejected by {}, reason: {}",
-                order.getName(),
-                vehicle.getName(),
-                rejection.getReason());
-      kernel.addTransportOrderRejection(order.getReference(), rejection);
-      return false;
-    }
-  }
 
   private static boolean vehicleDispatchable(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
@@ -708,72 +316,6 @@ public class DefaultDispatcher
     return true;
   }
 
-  /**
-   * Checks if the given vehicle is available for processing a transport order.
-   *
-   * @param vehicle The vehicle to be checked.
-   * @return <code>true</code> if, and only if, the given vehicle is available
-   * for processing a transport order.
-   */
-  private boolean availableForTransportOrder(Vehicle vehicle) {
-    requireNonNull(vehicle, "vehicle");
-
-    // A vehicle must be at a known position.
-    if (vehicle.getCurrentPosition() == null) {
-      return false;
-    }
-    boolean hasDispensableOrder = false;
-    // The vehicle must not be processing any order. If it is, the order must be
-    // dispensable.
-    if (!vehicle.hasProcState(Vehicle.ProcState.IDLE)) {
-      if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)) {
-        TransportOrder order = kernel.getTCSObject(TransportOrder.class,
-                                                   vehicle.getTransportOrder());
-        if (order.isDispensable()) {
-          hasDispensableOrder = true;
-
-          // Check if there's already an order reservation for this vehicle.
-          // There should not be more than one reservation in advance, so if we
-          // already have one, this vehicle is not available.
-          for (TCSObjectReference<Vehicle> curEntry : orderReservations.values()) {
-            if (vehicle.getReference().equals(curEntry)) {
-              return false;
-            }
-          }
-        }
-        else {
-          // Vehicle is processing an order and it's not dispensable.
-          return false;
-        }
-      }
-      else {
-        // Vehicle's state is not PROCESSING_ORDER (and not IDLE, either).
-        return false;
-      }
-    }
-    // The physical vehicle must either be processing a dispensable order, or be
-    // in an idle state, or it must be charging and have reached an acceptable
-    // energy level already.
-    if (!(hasDispensableOrder
-          || vehicle.hasState(Vehicle.State.IDLE)
-          || (vehicle.hasState(Vehicle.State.CHARGING)
-              && !vehicle.isEnergyLevelCritical()))) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Removes any order reservation for the given vehicle.
-   *
-   * @param vehicleRef The vehicle.
-   */
-  private void clearOrderReservations(TCSObjectReference<Vehicle> vehicleRef) {
-    requireNonNull(vehicleRef, "vehicleRef");
-
-    orderReservations.values().removeIf(value -> vehicleRef.equals(value));
-  }
-
   private void finishAbortion(TCSObjectReference<TransportOrder> orderRef,
                               Vehicle vehicle,
                               boolean disableVehicle) {
@@ -782,7 +324,7 @@ public class DefaultDispatcher
 
     // The current transport order has been aborted - update its state
     // and that of the vehicle.
-    updateTransportOrderState(orderRef, TransportOrder.State.FAILED);
+    transportOrderService.updateTransportOrderState(orderRef, TransportOrder.State.FAILED);
     // Check if we're supposed to disable the vehicle and set its proc
     // state accordingly.
     if (disableVehicle) {
@@ -797,184 +339,7 @@ public class DefaultDispatcher
     router.selectRoute(vehicle, null);
   }
 
-  private void updateTransportOrderState(TCSObjectReference<TransportOrder> ref,
-                                         TransportOrder.State newState) {
-    switch (newState) {
-      case FINISHED:
-        setTOStateFinished(ref);
-        break;
-      case FAILED:
-        setTOStateFailed(ref);
-        break;
-      default:
-        // Set the transport order's state.
-        kernel.setTransportOrderState(ref, newState);
-    }
-  }
-
-  /**
-   * Properly sets a transport order to a finished state, setting related
-   * properties.
-   *
-   * @param ref A reference to the transport order to be modified.
-   * @throws ObjectUnknownException If the referenced order could not be found.
-   */
-  private void setTOStateFinished(TCSObjectReference<TransportOrder> ref) {
-    requireNonNull(ref, "ref");
-
-    // Set the transport order's state.
-    kernel.setTransportOrderState(ref, TransportOrder.State.FINISHED);
-    TransportOrder order = kernel.getTCSObject(TransportOrder.class, ref);
-    // If it is part of an order sequence, we should proceed to its next order.
-    if (order.getWrappingSequence() != null) {
-      OrderSequence seq = kernel.getTCSObject(OrderSequence.class,
-                                              order.getWrappingSequence());
-      // Sanity check: The finished order must be the next one in the sequence;
-      // if it is not, something has already gone wrong.
-      checkState(ref.equals(seq.getNextUnfinishedOrder()),
-                 "Finished TO %s != next unfinished TO %s in sequence %s",
-                 ref,
-                 seq.getNextUnfinishedOrder(),
-                 seq);
-      kernel.setOrderSequenceFinishedIndex(seq.getReference(),
-                                           seq.getFinishedIndex() + 1);
-      // If the sequence is complete and this was its last order, the sequence
-      // is also finished.
-      if (seq.isComplete() && seq.getNextUnfinishedOrder() == null) {
-        kernel.setOrderSequenceFinished(seq.getReference());
-        // Reset the processing vehicle's back reference on the sequence.
-        kernel.setVehicleOrderSequence(seq.getProcessingVehicle(), null);
-      }
-    }
-    // A transport order has been finished - look for others for which all
-    // dependencies have been finished now, mark them as dispatchable and put
-    // them into the queue.
-    kernel.getTCSObjects(TransportOrder.class).stream()
-        .filter(o -> o.hasState(TransportOrder.State.ACTIVE))
-        .filter(o -> !hasUnfinishedDependencies(o))
-        .forEach(o -> {
-          updateTransportOrderState(o.getReference(), TransportOrder.State.DISPATCHABLE);
-          LOG.debug("Dispatching order {} which has just become dispatchable", o.getName());
-          this.dispatch(o);
-        });
-  }
-
-  /**
-   * Properly sets a transport order to a failed state, setting related
-   * properties.
-   *
-   * @param ref A reference to the transport order to be modified.
-   * @throws ObjectUnknownException If the referenced order could not be found.
-   */
-  private void setTOStateFailed(TCSObjectReference<TransportOrder> ref) {
-    requireNonNull(ref, "ref");
-
-    TransportOrder failedOrder = kernel.getTCSObject(TransportOrder.class, ref);
-    kernel.setTransportOrderState(ref, TransportOrder.State.FAILED);
-    // A transport order has failed - check if it's part of an order
-    // sequence that we need to take care of.
-    if (failedOrder.getWrappingSequence() != null) {
-      OrderSequence sequence = kernel.getTCSObject(OrderSequence.class,
-                                                   failedOrder.getWrappingSequence());
-
-      if (sequence.isFailureFatal()) {
-        // Mark the sequence as complete to make sure no further orders are
-        // added.
-        kernel.setOrderSequenceComplete(sequence.getReference());
-        // Mark all orders of the sequence that are not in a final state as
-        // FAILED.
-        sequence.getOrders().stream()
-            .map(curRef -> kernel.getTCSObject(TransportOrder.class, curRef))
-            .filter(o -> !o.getState().isFinalState())
-            .forEach(o -> updateTransportOrderState(o.getReference(), TransportOrder.State.FAILED));
-        // Move the finished index of the sequence to its end.
-        kernel.setOrderSequenceFinishedIndex(sequence.getReference(),
-                                             sequence.getOrders().size() - 1);
-      }
-      else {
-        // Since failure of an order in the sequence is not fatal, increment the
-        // finished index of the sequence by one to move to the next order.
-        kernel.setOrderSequenceFinishedIndex(sequence.getReference(),
-                                             sequence.getFinishedIndex() + 1);
-      }
-      // Mark the sequence as finished if there's nothing more to do in it.
-      if (sequence.isComplete() && sequence.getNextUnfinishedOrder() == null) {
-        kernel.setOrderSequenceFinished(sequence.getReference());
-        // If the sequence was assigned to a vehicle, reset its back reference
-        // on the sequence to make it available for orders again.
-        if (sequence.getProcessingVehicle() != null) {
-          kernel.setVehicleOrderSequence(sequence.getProcessingVehicle(), null);
-        }
-      }
-    }
-  }
-
-  /**
-   * Checks if a transport order's dependencies are completely satisfied or not.
-   *
-   * @param orderRef A reference to the transport order to be checked.
-   * @return <code>false</code> if all the order's dependencies are finished (or
-   * don't exist any more), else <code>true</code>.
-   */
-  private boolean hasUnfinishedDependencies(TransportOrder order) {
-    requireNonNull(order, "order");
-
-    // Assume that FINISHED orders do not have unfinished dependencies.
-    if (order.hasState(TransportOrder.State.FINISHED)) {
-      return false;
-    }
-    // Check if any transport order referenced as a an explicit dependency
-    // (really still exists and) is not finished.
-    if (order.getDependencies().stream()
-        .map(depRef -> kernel.getTCSObject(TransportOrder.class, depRef))
-        .anyMatch(dep -> dep != null && !dep.hasState(TransportOrder.State.FINISHED))) {
-      return true;
-    }
-
-    // Check if the transport order is part of an order sequence and if yes,
-    // if it's the next unfinished order in the sequence.
-    if (order.getWrappingSequence() != null) {
-      OrderSequence seq = kernel.getTCSObject(OrderSequence.class, order.getWrappingSequence());
-      if (!order.getReference().equals(seq.getNextUnfinishedOrder())) {
-        return true;
-      }
-    }
-    // All referenced transport orders either don't exist (any more) or have
-    // been finished already.
-    return false;
-  }
-
 // Inner classes start here.
-  /**
-   * Annotation type for injecting whether to park when idle.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface ParkWhenIdle {
-    // Nothing here.
-  }
-
-  /**
-   * Annotation type for injecting whether to recharge when idle.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface RechargeWhenIdle {
-    // Nothing here.
-  }
-
-  /**
-   * Annotation type for injecting whether to recharge when energy is critical.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface RechargeWhenEnergyCritical {
-    // Nothing here.
-  }
-
   /**
    * The task doing the actual dispatching of transport orders and vehicles.
    */
@@ -989,6 +354,15 @@ public class DefaultDispatcher
 
     @Override
     protected void processQueueElement(Object dispatchable) {
+      try {
+        doProcessQueueElement(dispatchable);
+      }
+      catch (Exception exc) {
+        LOG.error("Unhandled exception processing {}", dispatchable, exc);
+      }
+    }
+
+    private void doProcessQueueElement(Object dispatchable) {
       // If dispatchable is null, we've been terminated or the queue was
       // empty.
       if (dispatchable == null) {
@@ -1021,8 +395,8 @@ public class DefaultDispatcher
       }
       // If dispatchable is of an unhandled subtype, we just ignore it.
       else {
-        LOG.debug("Dispatchable content of unhandled class {}, ignored",
-                  dispatchable.getClass().getName());
+        LOG.warn("Dispatchable content of unhandled class {}, ignored",
+                 dispatchable.getClass().getName());
       }
     }
 
@@ -1055,16 +429,19 @@ public class DefaultDispatcher
       // Check if the transport order is routable.
       if (router.checkRoutability(order).isEmpty()) {
         LOG.info("Marking transport order {} as UNROUTABLE", order.getName());
-        updateTransportOrderState(order.getReference(), TransportOrder.State.UNROUTABLE);
+        transportOrderService.updateTransportOrderState(order.getReference(),
+                                                        TransportOrder.State.UNROUTABLE);
       }
       else {
         LOG.info("Marking transport order {} as ACTIVE", order.getName());
-        updateTransportOrderState(order.getReference(), TransportOrder.State.ACTIVE);
+        transportOrderService.updateTransportOrderState(order.getReference(),
+                                                        TransportOrder.State.ACTIVE);
         // The transport order has been activated - dispatch it.
         // Check if it has unfinished dependencies.
-        if (!hasUnfinishedDependencies(order)) {
+        if (!transportOrderService.hasUnfinishedDependencies(order)) {
           LOG.info("Marking transport order {} as DISPATCHABLE", order.getName());
-          updateTransportOrderState(order.getReference(), TransportOrder.State.DISPATCHABLE);
+          transportOrderService.updateTransportOrderState(order.getReference(),
+                                                          TransportOrder.State.DISPATCHABLE);
         }
       }
     }
@@ -1072,50 +449,31 @@ public class DefaultDispatcher
     private void dispatchTransportOrderDispatchable(TransportOrder order) {
       requireNonNull(order, "order");
 
-      List<Vehicle> vehicles = findVehiclesForOrder(order);
       // Get the vehicle that needs the least time to process the
       // transport order.
-      Vehicle closestVehicle = null;
-      long closestCosts = Long.MAX_VALUE;
-      List<DriveOrder> closestDriveOrders = null;
-      for (Vehicle curVehicle : vehicles) {
-        Point curPosition = kernel.getTCSObject(Point.class, curVehicle.getCurrentPosition());
-        // Get a route for the vehicle, starting at it's current position.
-        Optional<List<DriveOrder>> tmpDriveOrders = router.getRoute(curVehicle, curPosition, order);
-        // Check if the vehicle can process the order right now.
-        if (tmpDriveOrders.isPresent() && checkProcessability(curVehicle, order)) {
-          long costs = 0;
-          for (DriveOrder curDriveOrder : tmpDriveOrders.get()) {
-            costs += curDriveOrder.getRoute().getCosts();
-          }
-          if (costs < closestCosts) {
-            closestVehicle = curVehicle;
-            closestDriveOrders = tmpDriveOrders.get();
-            closestCosts = costs;
-          }
-        }
-      }
+      VehicleOrderSelection vehicleSelection = vehicleSelector.selectVehicle(order);
       // If we found a vehicle that can process the transport order, assign the
       // order to it, store the computed route in the transport order, correct
       // the state of vehicle and transport order and start processing of the
       // order.
-      if (closestVehicle != null) {
+      if (vehicleSelection.getVehicle() != null) {
+        Vehicle selectedVehicle = vehicleSelection.getVehicle();
         // If the vehicle still has an order, just remember that the new order
         // is reserved for this vehicle and initiate abortion of the old one.
         // Once the abortion is complete, the vehicle will automatically be
         // re-dispatched and will then pick up the new order.
-        if (closestVehicle.getTransportOrder() != null) {
-          LOG.debug("Reserving {} for {} ", order, closestVehicle);
+        if (selectedVehicle.getTransportOrder() != null) {
+          LOG.debug("Reserving {} for {} ", order, selectedVehicle);
           // Remember that the new order is reserved for this vehicle.
-          orderReservations.put(order.getReference(), closestVehicle.getReference());
+          orderReservationPool.addReservation(order.getReference(), selectedVehicle.getReference());
           // Abort the vehicle's current order.
-          abortOrder(closestVehicle, false, false, false);
+          abortOrder(selectedVehicle, false, false, false);
         }
         else {
           // Make sure the vehicle is not in the queue any more before we
           // re-dispatch it.
-          removeFromQueue(closestVehicle);
-          assignTransportOrder(closestVehicle, order, closestDriveOrders);
+          removeFromQueue(selectedVehicle);
+          assignTransportOrder(selectedVehicle, order, vehicleSelection.getDriveOrders());
         }
       }
       else {
@@ -1164,16 +522,12 @@ public class DefaultDispatcher
       requireNonNull(vehicle, "vehicle");
 
       LOG.debug("{}: IDLE, looking for a transport order", vehicle.getName());
-      Set<TransportOrder> transportOrders = findOrdersForVehicle(vehicle);
-      // If the result was null, the vehicle should not receive any order at
-      // this point. Otherwise select one.
-      if (transportOrders != null) {
-        assignBestOrderToVehicle(vehicle,
-                                 transportOrders,
-                                 kernel.getTCSObjects(OrderSequence.class));
+      VehicleOrderSelection orderSelection = orderSelector.selectTransportOrder(vehicle);
+      if (orderSelection.getTransportOrder() != null) {
+        assignTransportOrder(vehicle, orderSelection.getTransportOrder(), orderSelection.getDriveOrders());
       }
       else {
-        LOG.debug("{}: Suppressing order assignment.", vehicle.getName());
+        LOG.debug("{}: No order to be assigned to vehicle.", vehicle.getName());
       }
     }
 
@@ -1212,12 +566,18 @@ public class DefaultDispatcher
             + ". Provided properties: " + vehicleOrder.getProperties());
         // The current transport order has been finished - update its state
         // and that of the vehicle.
-        updateTransportOrderState(vehicleOrderRef, TransportOrder.State.FINISHED);
+        transportOrderService.updateTransportOrderState(vehicleOrderRef,
+                                                        TransportOrder.State.FINISHED);
         // Update the vehicle's procState, implicitly dispatching it again.
         kernel.setVehicleProcState(vehicleRef, Vehicle.ProcState.IDLE);
         kernel.setVehicleTransportOrder(vehicleRef, null);
         // Let the router know that the vehicle doesn't have a route any more.
         router.selectRoute(vehicle, null);
+        // Dispatch transport orders that are dispatchable now that this one has been finished.
+        for (TransportOrder order : transportOrderService.findNewDispatchableOrders()) {
+          LOG.debug("Dispatching order {} which has just become dispatchable", order.getName());
+          DefaultDispatcher.this.dispatch(order);
+        }
       }
       else {
         LOG.debug("{}: Assigning next drive order", vehicle.getName());
@@ -1225,7 +585,7 @@ public class DefaultDispatcher
         // drive order to be processed from the kernel (and not from our
         // possibly outdated copy of the transport order).
         DriveOrder currentDriveOrder = vehicleOrder.getCurrentDriveOrder();
-        if (Assignments.mustAssign(currentDriveOrder, vehicle)) {
+        if (assignments.mustAssign(currentDriveOrder, vehicle)) {
           // Let the vehicle controller know about the new drive order.
           vehicleControllerPool.getVehicleController(vehicle.getName())
               .setDriveOrder(currentDriveOrder, vehicleOrder.getProperties());
@@ -1261,7 +621,7 @@ public class DefaultDispatcher
           // Since the vehicle is now disabled, release any order reservations
           // for it, too. Disabled vehicles should not keep reservations, and
           // this is a good fallback trigger to get rid of them in general.
-          clearOrderReservations(vehicle.getReference());
+          orderReservationPool.removeReservations(vehicle.getReference());
         }
         else {
           kernel.setVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
@@ -1289,8 +649,8 @@ public class DefaultDispatcher
       // sure it's not going to be processed later, either.
       if (vehicleRef == null) {
         if (!order.getState().isFinalState()) {
-          updateTransportOrderState(order.getReference(),
-                                    TransportOrder.State.FAILED);
+          transportOrderService.updateTransportOrderState(order.getReference(),
+                                                          TransportOrder.State.FAILED);
         }
       }
       else {
@@ -1322,7 +682,8 @@ public class DefaultDispatcher
       // vehicle reports the remaining movements as finished
       if (!order.getState().isFinalState()
           && !order.hasState(TransportOrder.State.WITHDRAWN)) {
-        updateTransportOrderState(order.getReference(), TransportOrder.State.WITHDRAWN);
+        transportOrderService.updateTransportOrderState(order.getReference(),
+                                                        TransportOrder.State.WITHDRAWN);
       }
 
       VehicleController vehicleController

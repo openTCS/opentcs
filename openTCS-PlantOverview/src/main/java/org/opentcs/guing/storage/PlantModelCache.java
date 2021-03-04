@@ -11,6 +11,7 @@ package org.opentcs.guing.storage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.Location;
@@ -18,7 +19,6 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.VisualLayout;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Caches some elements a plant model contains of.

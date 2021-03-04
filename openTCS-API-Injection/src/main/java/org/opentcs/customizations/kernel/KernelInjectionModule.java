@@ -7,17 +7,15 @@
  */
 package org.opentcs.customizations.kernel;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
-import org.opentcs.components.kernel.ParkingPositionSupplier;
-import org.opentcs.components.kernel.RechargePositionSupplier;
 import org.opentcs.components.kernel.RecoveryEvaluator;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
@@ -26,7 +24,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class KernelInjectionModule
-    extends AbstractModule {
+    extends ConfigurableInjectionModule {
 
   /**
    * Sets the scheduler implementation to be used.
@@ -50,18 +48,22 @@ public abstract class KernelInjectionModule
    * Sets the parking position supplier implementation to be used.
    *
    * @param clazz The implementation.
+   * @deprecated Will be removed along with the deprecated supplier interface.
    */
-  protected void bindParkingPositionSupplier(Class<? extends ParkingPositionSupplier> clazz) {
-    bind(ParkingPositionSupplier.class).to(clazz).in(Singleton.class);
+  @Deprecated
+  protected void bindParkingPositionSupplier(Class<? extends org.opentcs.components.kernel.ParkingPositionSupplier> clazz) {
+    bind(org.opentcs.components.kernel.ParkingPositionSupplier.class).to(clazz).in(Singleton.class);
   }
 
   /**
    * Sets the recharge position supplier implementation to be used.
    *
    * @param clazz The implementation.
+   * @deprecated Will be removed along with the deprecated supplier interface.
    */
-  protected void bindRechargePositionSupplier(Class<? extends RechargePositionSupplier> clazz) {
-    bind(RechargePositionSupplier.class).to(clazz).in(Singleton.class);
+  @Deprecated
+  protected void bindRechargePositionSupplier(Class<? extends org.opentcs.components.kernel.RechargePositionSupplier> clazz) {
+    bind(org.opentcs.components.kernel.RechargePositionSupplier.class).to(clazz).in(Singleton.class);
   }
 
   /**

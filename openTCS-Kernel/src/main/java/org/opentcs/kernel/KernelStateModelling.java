@@ -7,13 +7,8 @@
  */
 package org.opentcs.kernel;
 
-import com.google.inject.BindingAnnotation;
 import java.awt.Color;
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -72,7 +67,7 @@ class KernelStateModelling
    * @param objectPool The object pool to be used.
    * @param messageBuffer The message buffer to be used.
    * @param modelPersister The model persister to be used.
-   * @param saveModelOnTerminate Whether to save the model when this state is terminated.
+   * @param configuration This class's configuration.
    */
   @Inject
   KernelStateModelling(@GlobalKernelSync Object globalSyncObject,
@@ -80,9 +75,14 @@ class KernelStateModelling
                        Model model,
                        NotificationBuffer messageBuffer,
                        ModelPersister modelPersister,
-                       @SaveModelOnTerminate boolean saveModelOnTerminate,
+                       KernelApplicationConfiguration configuration,
                        @ActiveInModellingMode Set<KernelExtension> extensions) {
-    super(globalSyncObject, objectPool, model, messageBuffer, modelPersister, saveModelOnTerminate);
+    super(globalSyncObject,
+          objectPool,
+          model,
+          messageBuffer,
+          modelPersister,
+          configuration.saveModelOnTerminateModelling());
     this.extensions = requireNonNull(extensions, "extensions");
   }
 
@@ -538,15 +538,5 @@ class KernelStateModelling
     synchronized (getGlobalSyncObject()) {
       getModel().clearStaticRouteHops(ref);
     }
-  }
-
-  /**
-   * Annotation type for marking/binding the "save on terminate" parameter.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface SaveModelOnTerminate {
-    // Nothing here.
   }
 }

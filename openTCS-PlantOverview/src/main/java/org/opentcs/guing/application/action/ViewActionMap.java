@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import org.opentcs.components.plantoverview.LocationTheme;
-import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.action.actions.CreateBlockAction;
 import org.opentcs.guing.application.action.actions.CreateGroupAction;
@@ -42,12 +40,8 @@ import org.opentcs.guing.application.action.view.AddDrawingViewAction;
 import org.opentcs.guing.application.action.view.AddTransportOrderSequenceView;
 import org.opentcs.guing.application.action.view.AddTransportOrderView;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
-import org.opentcs.guing.application.action.view.LocationThemeAction;
 import org.opentcs.guing.application.action.view.PauseAllVehiclesAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
-import org.opentcs.guing.application.action.view.VehicleThemeAction;
-import org.opentcs.guing.util.LocationThemeManager;
-import org.opentcs.guing.util.VehicleThemeManager;
 
 /**
  * A custom ActionMap for the plant overview application.
@@ -60,8 +54,6 @@ public class ViewActionMap
   @Inject
   public ViewActionMap(OpenTCSView view,
                        UndoRedoManager undoRedoManager,
-                       LocationThemeManager locationThemeManager,
-                       VehicleThemeManager vehicleThemeManager,
                        ActionFactory actionFactory,
                        CreateTransportOrderAction createTransportOrderAction,
                        FindVehicleAction findVehicleAction,
@@ -70,8 +62,6 @@ public class ViewActionMap
                        AboutAction aboutAction) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
-    requireNonNull(locationThemeManager, "locationThemeManager");
-    requireNonNull(vehicleThemeManager, "vehicleThemeManager");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(createTransportOrderAction, "createTransportOrderAction");
     requireNonNull(findVehicleAction, "findVehicleAction");
@@ -128,30 +118,6 @@ public class ViewActionMap
     action = new AddTransportOrderSequenceView(view);
     put(AddTransportOrderSequenceView.ID, action);
     action.putValue(Action.NAME, AddTransportOrderSequenceView.ID);
-
-    // Menu View -> Location theme
-    action = actionFactory.createLocationThemeAction(null);
-    put(LocationThemeAction.ID, action);
-    action.putValue(Action.NAME, LocationThemeAction.UNDEFINED);
-
-    for (LocationTheme curTheme : locationThemeManager.getThemes()) {
-      String id = curTheme.getName();
-      action = actionFactory.createLocationThemeAction(curTheme);
-      put(id, action);
-      action.putValue(Action.NAME, id);
-    }
-
-    // Menu View -> Vehicle theme
-    action = actionFactory.createVehicleThemeAction(null);
-    put(VehicleThemeAction.ID, action);
-    action.putValue(Action.NAME, VehicleThemeAction.UNDEFINED);
-
-    for (VehicleTheme curTheme : vehicleThemeManager.getThemes()) {
-      String id = curTheme.getName();
-      action = actionFactory.createVehicleThemeAction(curTheme);
-      put(id, action);
-      action.putValue(Action.NAME, id);
-    }
 
     put(AddBitmapAction.ID, new AddBitmapAction(view));
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));

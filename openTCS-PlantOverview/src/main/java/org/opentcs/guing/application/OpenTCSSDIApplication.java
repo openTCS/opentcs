@@ -16,13 +16,12 @@ import javax.swing.JFrame;
 import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.app.SDIApplication;
 import org.jhotdraw.app.View;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
 import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.model.ModelManager;
-import org.opentcs.guing.util.ApplicationConfiguration;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.util.gui.Icons;
 
 /**
@@ -48,7 +47,7 @@ public class OpenTCSSDIApplication
   /**
    * The application's configuration.
    */
-  private final ApplicationConfiguration appConfig;
+  private final PlantOverviewApplicationConfiguration appConfig;
 
   /**
    * Creates a new instance.
@@ -62,7 +61,7 @@ public class OpenTCSSDIApplication
   public OpenTCSSDIApplication(@ApplicationFrame JFrame frame,
                                SharedKernelProvider kernelProvider,
                                ModelManager modelManager,
-                               ApplicationConfiguration appConfig) {
+                               PlantOverviewApplicationConfiguration appConfig) {
     this.contentFrame = requireNonNull(frame, "frame");
     this.kernelProvider = requireNonNull(kernelProvider, "kernelProvider");
     this.modelManager = requireNonNull(modelManager, "modelManager");
@@ -142,26 +141,15 @@ public class OpenTCSSDIApplication
     contentFrame.setSize(1024, 768); // Default size
 
     // Restore the window's dimensions from the configuration.
-    contentFrame.setExtendedState(appConfig.getFrameExtendedState());
+    contentFrame.setExtendedState(appConfig.frameMaximized() ? Frame.MAXIMIZED_BOTH : Frame.NORMAL);
 
     if (contentFrame.getExtendedState() != Frame.MAXIMIZED_BOTH) {
-      contentFrame.setBounds(appConfig.getFrameBounds());
+      contentFrame.setBounds(appConfig.frameBoundsX(),
+                             appConfig.frameBoundsY(),
+                             appConfig.frameBoundsWidth(),
+                             appConfig.frameBoundsHeight());
     }
 
-    if (kernelProvider.kernelShared()) {
-      final Kernel kernel = kernelProvider.getKernel();
-      if (kernel.getLoadedModelName()
-          .equals(appConfig.getLastLoadedModelName())) {
-        int n = 1;
-        for (OpenTCSDrawingView drawView : opentcsView
-            .getOperatingDrawingViews()) {
-          opentcsView.scaleAndScrollTo(drawView, appConfig
-                                       .getDrawingViewBookmark(n));
-          n++;
-        }
-      }
-
-    }
     // Action "Frame schließen" abfangen
     contentFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     // Fenster-Dimensionen beim Schließen in openTCS Configuration speichern
@@ -209,12 +197,12 @@ public class OpenTCSSDIApplication
 
     @Override
     public void windowClosed(WindowEvent e) {
-      appConfig.setFrameExtendedState(contentFrame.getExtendedState());
-      appConfig.setFrameBounds(contentFrame.getBounds());
-      appConfig.setLastLoadedModelName(modelManager.getModel().getName());
+//      appConfig.setFrameExtendedState(contentFrame.getExtendedState());
+//      appConfig.setFrameBounds(contentFrame.getBounds());
+//      appConfig.setLastLoadedModelName(modelManager.getModel().getName());
       int n = 1;
       for (OpenTCSDrawingView drawView : opentcsView.getOperatingDrawingViews()) {
-        appConfig.setDrawingViewBookmark(n, drawView.bookmark());
+//        appConfig.setDrawingViewBookmark(n, drawView.bookmark());
         n++;
       }
 

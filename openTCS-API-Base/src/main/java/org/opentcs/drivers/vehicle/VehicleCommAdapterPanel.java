@@ -18,5 +18,14 @@ import javax.swing.JPanel;
 public abstract class VehicleCommAdapterPanel
     extends JPanel
     implements PropertyChangeListener {
-
+  
+  /**
+   * Returns the title for this comm adapter panel.
+   * The default implementation returns the accessible name from the panel's accessible context.
+   *
+   * @return The title for this comm adapter panel.
+   */
+  public String getTitle() {
+    return getAccessibleContext().getAccessibleName();
+  }
 }

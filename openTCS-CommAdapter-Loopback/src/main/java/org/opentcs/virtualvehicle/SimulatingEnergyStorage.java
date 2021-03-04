@@ -7,13 +7,16 @@
  */
 package org.opentcs.virtualvehicle;
 
+import com.google.inject.assistedinject.Assisted;
+import javax.inject.Inject;
+
 /**
- * A simple implementation of a linear energy storage model. 
- * 
+ * A simple implementation of a linear energy storage model.
+ *
  * @author Hubert Buechter (Fraunhofer IML)
  */
-class SimulatingEnergyStorage
-    extends EnergyStorage {
+public class SimulatingEnergyStorage
+    implements EnergyStorage {
 
   /**
    * Capacity of the energy storage in Ws.
@@ -26,11 +29,12 @@ class SimulatingEnergyStorage
 
   /**
    * Creates a new <code>SimulatingEnergyStorage</code>.
-   * 
+   *
    * @param capacity The capacity of this storage in watt seconds [Ws].
-   *                 The value cannot be changed later.
+   * The value cannot be changed later.
    */
-  protected SimulatingEnergyStorage(double capacity) {
+  @Inject
+  public SimulatingEnergyStorage(@Assisted double capacity) {
     this.capacity = capacity; // Initialize the capacity
     energy = capacity;        // Start with a full stoarage
   }

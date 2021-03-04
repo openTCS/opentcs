@@ -8,11 +8,6 @@
 package org.opentcs.strategies.basic.routing;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -44,10 +39,9 @@ public class RoutingTableBuilderBfs
    */
   private static final Logger LOG = LoggerFactory.getLogger(RoutingTableBuilderBfs.class);
   /**
-   * Whether to terminate the BFS early when a cheaper route to a point has
-   * already been found.
+   * This class's configuration.
    */
-  private final boolean terminateEarly;
+  private final DefaultRouterConfiguration configuration;
   /**
    * The queue of nodes/points in the model that still need to be visited by the
    * BFS algorithm.
@@ -59,19 +53,14 @@ public class RoutingTableBuilderBfs
    *
    * @param kernel The kernel providing the model data.
    * @param routeEvaluator The evaluator to be used to compute costs for routes.
-   * @param terminateEarly Whether to terminate a branch of the search early
-   * if a cheaper route to a point has already been found. Setting this can
-   * dramatically increase performance, but note that - depending on the route
-   * evaluator implementation, the existence of a different, cheaper route to
-   * the current point does not necessarily mean that route is cheaper for
-   * subsequent points, too.
+   * @param configuration This class's configuration.
    */
   @Inject
   RoutingTableBuilderBfs(LocalKernel kernel,
                          RouteEvaluator routeEvaluator,
-                         @TerminateEarly boolean terminateEarly) {
+                         DefaultRouterConfiguration configuration) {
     super(kernel, routeEvaluator);
-    this.terminateEarly = terminateEarly;
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -169,20 +158,10 @@ public class RoutingTableBuilderBfs
     // (Not knowing the cost function applied to the route, terminating here
     // might mean that a shorter route to one of the successors will not be
     // found. An exhaustive search might take much longer, however.)
-    else if (terminateEarly) {
+    else if (configuration.terminateSearchEarly()) {
       return;
     }
     queue.add(new QueueEntry(currentPoint, steps, costs));
-  }
-
-  /**
-   * Annotation type for injecting whether to do a complete search or not.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface TerminateEarly {
-    // Nothing here.
   }
 
   private static class QueueEntry

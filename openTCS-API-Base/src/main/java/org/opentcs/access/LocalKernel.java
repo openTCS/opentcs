@@ -21,6 +21,7 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
@@ -371,6 +372,29 @@ public interface LocalKernel
       throws ObjectUnknownException;
 
   /**
+   * Copies drive order data from a list of drive orders to the given transport
+   * order's future drive orders.
+   *
+   * @param orderRef A reference to the transport order to be modified.
+   * @param newOrders The drive orders containing the data to be copied into
+   * this transport order's drive orders.
+   * @throws ObjectUnknownException If the referenced transport order is not
+   * in this pool.
+   * @throws CredentialsException If the calling client is not allowed to
+   * execute this method.
+   * @throws IllegalArgumentException If the destinations of the given drive
+   * orders do not match the destinations of the drive orders in this transport
+   * order.
+   */
+  @Override
+  @SuppressWarnings("deprecation")
+  void setTransportOrderFutureDriveOrders(
+      TCSObjectReference<TransportOrder> orderRef,
+      List<DriveOrder> newOrders)
+      throws ObjectUnknownException, CredentialsException,
+             IllegalArgumentException;
+
+  /**
    * Sets a transport order's initial drive order.
    * Makes the first of the future drive orders the current one for the given
    * transport order. Fails if there already is a current drive order or if the
@@ -515,7 +539,10 @@ public interface LocalKernel
    * @return All configuration items existing in the kernel.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Configuration management is out of scope for the kernel.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   Set<ConfigurationItemTO> getConfigurationItems()
       throws CredentialsException;
 
@@ -525,7 +552,10 @@ public interface LocalKernel
    * @param itemTO The configuration item to be set.
    * @throws CredentialsException If the calling client is not allowed to
    * execute this method.
+   * @deprecated Configuration management is out of scope for the kernel.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   void setConfigurationItem(ConfigurationItemTO itemTO)
       throws CredentialsException;
 

@@ -9,25 +9,19 @@
 package org.opentcs.guing;
 
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
-import org.opentcs.guing.plugins.themes.StandardLocationTheme;
-import org.opentcs.guing.plugins.themes.StandardVehicleTheme;
-import org.opentcs.guing.plugins.themes.StandardVehicleTheme2;
 
 /**
  * Configures/binds the default vehicle and location themes of the openTCS plant overview.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-// tag::documentation_createThemeModule[]
 public class DefaultThemesModule
     extends PlantOverviewInjectionModule {
 
   @Override
+  @SuppressWarnings("deprecation")
   protected void configure() {
-    vehicleThemeBinder().addBinding().to(StandardVehicleTheme.class);
-    vehicleThemeBinder().addBinding().to(StandardVehicleTheme2.class);
-
-    locationThemeBinder().addBinding().to(StandardLocationTheme.class);
+    vehicleThemeBinder();
+    locationThemeBinder();
   }
 }
-// end::documentation_createThemeModule[]

@@ -7,11 +7,6 @@
  */
 package org.opentcs.strategies.basic.recovery;
 
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
@@ -36,26 +31,25 @@ public class DefaultRecoveryEvaluator
    */
   private final LocalKernel kernel;
   /**
-   * The minimum NES value for a positive recovery status.
-   */
-  private final double threshold;
-  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
+  /**
+   * This class's configuration.
+   */
+  private final DefaultRecoveryEvaluatorConfiguration configuration;
 
   /**
    * Creates a new NESRecoveryEvaluator.
    *
    * @param kernel The local kernel.
-   * @param threshold The minimum NES value interpreted as a positive recovery
-   * status.
+   * @param configuration
    */
   @Inject
   public DefaultRecoveryEvaluator(LocalKernel kernel,
-                                  @Threshold double threshold) {
+                                  DefaultRecoveryEvaluatorConfiguration configuration) {
     this.kernel = requireNonNull(kernel, "kernel is null");
-    this.threshold = threshold;
+    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -75,7 +69,7 @@ public class DefaultRecoveryEvaluator
 
   @Override
   public QueryRecoveryStatus evaluateRecovery() {
-    boolean recovered = (currentNESValue() >= threshold) && allOrdersFinished();
+    boolean recovered = (currentNESValue() >= configuration.threshold()) && allOrdersFinished();
     return new QueryRecoveryStatus(recovered);
   }
 
@@ -110,15 +104,5 @@ public class DefaultRecoveryEvaluator
       }
     }
     return true;
-  }
-
-  /**
-   * Annotation type for injecting the threshold.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public static @interface Threshold {
-    // Nothing here.
   }
 }

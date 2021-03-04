@@ -9,12 +9,7 @@ package org.opentcs.kernel;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.inject.BindingAnnotation;
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -60,7 +55,7 @@ import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
-import org.opentcs.kernel.xmlorders.ScriptFileManager;
+import org.opentcs.kernel.xmlhost.orders.ScriptFileManager;
 import org.opentcs.util.Comparators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +119,7 @@ class KernelStateOperating
    * @param objectPool The object pool to be used.
    * @param messageBuffer The message buffer to be used.
    * @param modelPersister The model persister to be used.
-   * @param saveModelOnTerminate Whether to save the model when this state is terminated.
+   * @param configuration This class's configuration.
    * @param recoveryEvaluator The recovery evaluator to be used.
    */
   @Inject
@@ -134,7 +129,7 @@ class KernelStateOperating
                        TransportOrderPool orderPool,
                        NotificationBuffer messageBuffer,
                        ModelPersister modelPersister,
-                       @SaveModelOnTerminate boolean saveModelOnTerminate,
+                       KernelApplicationConfiguration configuration,
                        RecoveryEvaluator recoveryEvaluator,
                        Router router,
                        Scheduler scheduler,
@@ -143,7 +138,12 @@ class KernelStateOperating
                        ScriptFileManager scriptFileManager,
                        OrderCleanerTask orderCleanerTask,
                        @ActiveInOperatingMode Set<KernelExtension> extensions) {
-    super(globalSyncObject, objectPool, model, messageBuffer, modelPersister, saveModelOnTerminate);
+    super(globalSyncObject,
+          objectPool,
+          model,
+          messageBuffer,
+          modelPersister,
+          configuration.saveModelOnTerminateOperating());
     this.orderPool = requireNonNull(orderPool, "orderPool");
     this.recoveryEvaluator = requireNonNull(recoveryEvaluator, "recoveryEvaluator");
     this.router = requireNonNull(router, "router");
@@ -159,22 +159,19 @@ class KernelStateOperating
   @Override
   public void initialize() {
     if (initialized) {
-      throw new IllegalStateException("Already initialized");
+      LOG.debug("Already initialized.");
+      return;
     }
     LOG.debug("Initializing operating state...");
+
     // Reset vehicle states to ensure vehicles are not dispatchable initially.
     for (Vehicle curVehicle : getTCSObjects(Vehicle.class)) {
-      setVehicleProcState(curVehicle.getReference(),
-                          Vehicle.ProcState.UNAVAILABLE);
+      setVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.UNAVAILABLE);
       setVehicleState(curVehicle.getReference(), Vehicle.State.UNKNOWN);
       setVehicleTransportOrder(curVehicle.getReference(), null);
       setVehicleOrderSequence(curVehicle.getReference(), null);
     }
-    // Start kernel extensions.
-    for (KernelExtension extension : extensions) {
-      extension.initialize();
-    }
-    // (Re-)initialize strategies.
+
     scheduler.initialize();
     router.initialize();
     dispatcher.initialize();
@@ -183,8 +180,12 @@ class KernelStateOperating
     vehicleControllerPool.initialize();
 
     // Start a task for cleaning up orders regularly.
-    Thread cleanerThread = new Thread(orderCleanerTask, "orderCleaner");
-    cleanerThread.start();
+    new Thread(orderCleanerTask, "orderCleaner").start();
+
+    // Start kernel extensions.
+    for (KernelExtension extension : extensions) {
+      extension.initialize();
+    }
 
     initialized = true;
 
@@ -199,7 +200,8 @@ class KernelStateOperating
   @Override
   public void terminate() {
     if (!initialized) {
-      throw new IllegalStateException("Not initialized, cannot terminate");
+      LOG.debug("Not initialized.");
+      return;
     }
     LOG.debug("Terminating operating state...");
     super.terminate();
@@ -223,8 +225,7 @@ class KernelStateOperating
 
     // Ensure that vehicles do not reference orders any more.
     for (Vehicle curVehicle : getTCSObjects(Vehicle.class)) {
-      setVehicleProcState(curVehicle.getReference(),
-                          Vehicle.ProcState.UNAVAILABLE);
+      setVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.UNAVAILABLE);
       setVehicleState(curVehicle.getReference(), Vehicle.State.UNKNOWN);
       setVehicleTransportOrder(curVehicle.getReference(), null);
       setVehicleOrderSequence(curVehicle.getReference(), null);
@@ -859,22 +860,14 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public double getSimulationTimeFactor() {
     return vehicleControllerPool.getSimulationTimeFactor();
   }
 
   @Override
+  @Deprecated
   public void setSimulationTimeFactor(double angle) {
     vehicleControllerPool.setSimulationTimeFactor(angle);
-  }
-
-  /**
-   * Annotation type for marking/binding the "save on terminate" parameter.
-   */
-  @BindingAnnotation
-  @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface SaveModelOnTerminate {
-    // Nothing here.
   }
 }

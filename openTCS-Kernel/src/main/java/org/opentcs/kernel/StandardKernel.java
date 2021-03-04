@@ -18,12 +18,12 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opentcs.access.ConfigurationItemTO;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.Kernel.State;
@@ -112,10 +112,9 @@ final class StandardKernel
    */
   private final Set<KernelExtension> kernelExtensions = new HashSet<>();
   /**
-   * An object that is used for synchronizing the thread executing this kernel's
-   * {@link #run() run()} method.
+   * Functions as a barrier for the kernel's {@link #run() run()} method.
    */
-  private final Object waitObject = new Object();
+  private final Semaphore terminationSemaphore = new Semaphore(0);
   /**
    * This kernel's <em>initialized</em> flag.
    */
@@ -172,27 +171,16 @@ final class StandardKernel
     }
     // Note that the actual shutdown of extensions should happen when the kernel
     // thread (see run()) finishes, not here.
-    // Set the terminated flag and wake up this kernel's thread.
+    // Set the terminated flag and wake up this kernel's thread for termination.
     initialized = false;
-    synchronized (waitObject) {
-      waitObject.notifyAll();
-    }
+    terminationSemaphore.release();
   }
 
   @Override
   public void run() {
-    synchronized (waitObject) {
-      // Wait until terminated.
-      while (initialized) {
-        try {
-          waitObject.wait();
-        }
-        catch (InterruptedException exc) {
-          throw new IllegalStateException("Unexpectedly interrupted", exc);
-        }
-      }
-    }
-    LOG.info("Termination flag set, terminating...");
+    // Wait until terminated.
+    terminationSemaphore.acquireUninterruptibly();
+    LOG.info("Terminating...");
     // Sleep a bit so clients have some time to receive an event for the
     // SHUTDOWN state change and shut down gracefully themselves.
     Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
@@ -1038,6 +1026,7 @@ final class StandardKernel
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setTransportOrderFutureDriveOrders(
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
@@ -1247,25 +1236,29 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public double getSimulationTimeFactor() {
     LOG.debug("method entry");
     return kernelState.getSimulationTimeFactor();
   }
 
   @Override
+  @Deprecated
   public void setSimulationTimeFactor(double angle) {
     LOG.debug("method entry");
     kernelState.setSimulationTimeFactor(angle);
   }
 
   @Override
-  public Set<ConfigurationItemTO> getConfigurationItems() {
+  @Deprecated
+  public Set<org.opentcs.access.ConfigurationItemTO> getConfigurationItems() {
     LOG.debug("method entry");
     return kernelState.getConfigurationItems();
   }
 
   @Override
-  public void setConfigurationItem(ConfigurationItemTO itemTO) {
+  @Deprecated
+  public void setConfigurationItem(org.opentcs.access.ConfigurationItemTO itemTO) {
     LOG.debug("method entry");
     kernelState.setConfigurationItem(itemTO);
   }

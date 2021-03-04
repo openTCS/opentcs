@@ -49,6 +49,17 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.3 (2017-06-30)
+
+* Introduced configuration based on binding interfaces and cfg4j to provide implementations for these, and deprecated the previously used configuration classes.
+  Implications and side effects:
+** Made documentation of configuration entries (for users) easy via annotations.
+** Switched configuration files from XML to properties.
+** Switched to read-only configuration.
+* Improved maintainability and reusability of the default dispatcher implementation.
+* Updated Gradle wrapper to 3.5.
+* Many small bugfixes and improvements.
+
 === Version 4.2 (2017-05-29)
 
 * Simplify the kernel API by using transfer objects to create plant models and transport orders. 

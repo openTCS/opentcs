@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
 /**
  *
@@ -36,6 +37,10 @@ public class ApplicationKernelProviderTest {
    */
   private ConnectToServerDialog dialog;
   /**
+   * A (mocked) configuration.
+   */
+  private PlantOverviewApplicationConfiguration appConfig;
+  /**
    * The kernel provider to be tested.
    */
   private SharedKernelProvider kernelProvider;
@@ -46,8 +51,8 @@ public class ApplicationKernelProviderTest {
     kernelProxyManager = mock(KernelProxyManager.class);
     dialogProvider = (Provider<ConnectToServerDialog>) mock(Provider.class);
     dialog = mock(ConnectToServerDialog.class);
-    kernelProvider = new ApplicationKernelProvider(kernelProxyManager,
-                                                   dialogProvider);
+    appConfig = mock(PlantOverviewApplicationConfiguration.class);
+    kernelProvider = new ApplicationKernelProvider(kernelProxyManager, dialogProvider, appConfig);
   }
 
   @Test

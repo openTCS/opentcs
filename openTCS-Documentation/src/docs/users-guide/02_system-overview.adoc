@@ -17,6 +17,16 @@ The purpose of the openTCS kernel is to provide an abstract driving model of a t
 Clients can communicate with this server process to, for instance, modify the plant model, to visualize the driving course and the processing of transport orders and to create new transport orders.
 For user interaction, the kernel provides a graphical user interface titled Kernel Control Center.
 
+Three major strategy modules within the kernel implement processing of transport orders:
+
+* A dispatcher that decides which transport order should be processed by which vehicle.
+  Additionally, it needs to decide what vehicles should do in certain situation, e.g. when there aren't any transport orders or when a vehicle is running low on energy.
+* A router which finds optimal routes for vehicles to reach their destinations.
+* A scheduler that manages resource allocations for traffic management, i.e. to avoid vehicles crashing into each other.
+
+The openTCS distribution comes with default implementations for each of these strategies.
+These implementations can be easily replaced by a developer to adapt to environment-specific requirements.
+
 The driver framework that is part of the openTCS kernel manages communication channels and associates vehicle drivers with vehicles.
 A vehicle driver is an adapter between kernel and vehicle and translates each vehicle-specific communication protocol to the kernel's internal communication schemes and vice versa.
 Furthermore, a driver may offer low-level functionality to the user via the kernel's graphical user interface, e.g. manually sending telegrams to the associated vehicle.
@@ -60,9 +70,8 @@ Furthermore, there is an abstract element that is only used indirectly:
 
 The attributes of these elements that are relevant for the driving course model, e.g. the coordinates of a point or the length of a path, can be edited using the plant overview client.
 
-[NOTE]
-.Layout coordinates vs model coordinates
-====
+==== Layout coordinates vs model coordinates
+
 A point has two sets of coordinates: layout coordinates and model coordinates.
 The layout coordinates are merely intended for the graphical presentation in the plant overview client, while the model coordinates are data that a vehicle driver could potentially use or send to the vehicle it communicates with (e.g. if the vehicle needs the exact coordinates of a destination point for navigation).
 Both coordinate sets are not tied to each other per se, i.e. they may differ.
@@ -74,7 +83,8 @@ To synchronize the layout coordinates with the model coordinates or the other wa
 
 * Select menu:Actions[Copy model values to layout] or menu:Actions[Copy layout values to model] to synchronize them globally.
 * Select a single layout element, right click it and select menu:Context menu[Copy model values to layout] or menu:Context menu[Copy layout values to model] to synchronize them only for the selected element.
-====
+
+==== Generic element properties
 
 Furthermore, it is possible to define arbitrary additional attributes as key-value pairs for all driving course elements, which for example can be read and evaluated by vehicle drivers or client software.
 Both the key and the value can be arbitrary character strings.

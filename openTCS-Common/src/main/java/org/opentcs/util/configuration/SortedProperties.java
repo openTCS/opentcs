@@ -13,13 +13,18 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A subclass of <code>Properties</code> for storing properties in
  * lexicographical order.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class SortedProperties
 extends Properties {
 

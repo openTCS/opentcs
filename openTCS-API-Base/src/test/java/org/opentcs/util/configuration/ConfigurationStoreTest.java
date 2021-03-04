@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Preity Gupta (Fraunhofer IML)
  */
+@Deprecated
 public class ConfigurationStoreTest {
 
   /**

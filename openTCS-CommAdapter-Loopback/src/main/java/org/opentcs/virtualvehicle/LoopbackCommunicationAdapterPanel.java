@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
@@ -41,7 +42,9 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterPanel;
+import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.Comparators;
+import org.opentcs.util.gui.TCSObjectNameListCellRenderer;
 import org.opentcs.virtualvehicle.inputcomponents.DropdownListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.InputDialog;
 import org.opentcs.virtualvehicle.inputcomponents.InputPanel;
@@ -49,13 +52,9 @@ import org.opentcs.virtualvehicle.inputcomponents.SingleTextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TripleTextInputPanel;
-import org.opentcs.util.gui.TCSObjectNameListCellRenderer;
-import org.opentcs.drivers.vehicle.VehicleProcessModel;
-import static java.util.Objects.requireNonNull;
 
 /**
- * The LoopbackCommunicationAdapterPanel corresponding to the
- * LoopbackCommunicationAdapter.
+ * The LoopbackCommunicationAdapterPanel corresponding to the LoopbackCommunicationAdapter.
  *
  * @author Iryna Felko (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -73,6 +72,14 @@ public class LoopbackCommunicationAdapterPanel
    */
   private final LocalKernel kernel;
   /**
+   * The vehicle profiles.
+   */
+  private final VehicleProfiles vehicleProfiles;
+  /**
+   * The energy storage factory.
+   */
+  private final EnergyStorageFactory energyStorageFactory;
+  /**
    * This panel's communication adapter.
    */
   private final LoopbackCommunicationAdapter commAdapter;
@@ -88,8 +95,12 @@ public class LoopbackCommunicationAdapterPanel
    */
   @Inject
   LoopbackCommunicationAdapterPanel(LocalKernel kernel,
+                                    VehicleProfiles vehicleProfiles,
+                                    EnergyStorageFactory energyStorageFactory,
                                     @Assisted LoopbackCommunicationAdapter adapter) {
     this.kernel = requireNonNull(kernel, "kernel");
+    this.vehicleProfiles = requireNonNull(vehicleProfiles, "vehicleProfiles");
+    this.energyStorageFactory = requireNonNull(energyStorageFactory, "energyStorageFactory");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.vehicleModel = adapter.getProcessModel();
     initComponents();
@@ -112,7 +123,7 @@ public class LoopbackCommunicationAdapterPanel
                                                   false, false);
       }
     });
-    
+
     updateCommAdapterEnabled(adapter.getProcessModel().isCommAdapterEnabled());
 
     /* // Load vehicle profile 
@@ -282,7 +293,7 @@ public class LoopbackCommunicationAdapterPanel
   private void updateVehicleLoadHandlingDevices(List<LoadHandlingDevice> loadHandlingDevices) {
     SwingUtilities.invokeLater(()
         -> ((LoadHandlingDeviceTableModel) devicesTable.getModel())
-        .updateLoadHandlingDevices(loadHandlingDevices));
+            .updateLoadHandlingDevices(loadHandlingDevices));
   }
 
   private void updateDefaultOperatingTime(int defaultOperatingTime) {
@@ -1568,8 +1579,8 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
   private void saveProfileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveProfileButtonActionPerformed
     // Create dialog
-    List<String> profiles = VehicleProfiles.getProfileNames();
-    String currentProfileName = VehicleProfiles.getSelectedProfile();
+    List<String> profiles = vehicleProfiles.getProfileNames();
+    String currentProfileName = vehicleProfiles.getSelectedProfile();
     InputPanel panel = new TextListInputPanel.Builder(
         bundle.getString("saveVehicleProfileTitle"),
         profiles)
@@ -1586,15 +1597,15 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       newProfileName = newProfileName.trim().replaceAll("\\s+", " ");
 
       VehicleProfile profile = storePropertiesInProfile(newProfileName);
-      VehicleProfiles.saveProfile(profile);
-      VehicleProfiles.setSelectedProfile(newProfileName);
+      vehicleProfiles.saveProfile(profile);
+      vehicleProfiles.setSelectedProfile(newProfileName);
     }
   }//GEN-LAST:event_saveProfileButtonActionPerformed
 
   private void loadProfileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadProfileButtonActionPerformed
     // Create dialog
-    List<String> profiles = VehicleProfiles.getProfileNames();
-    String currentProfileName = VehicleProfiles.getSelectedProfile();
+    List<String> profiles = vehicleProfiles.getProfileNames();
+    String currentProfileName = vehicleProfiles.getSelectedProfile();
     InputPanel panel = new DropdownListInputPanel.Builder<>(
         bundle.getString("loadVehicleProfileTitle"),
         profiles)
@@ -1607,7 +1618,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED
         && dialog.getInput() != null) {
       VehicleProfile profile
-          = VehicleProfiles.getProfile((String) dialog.getInput());
+          = vehicleProfiles.getProfile((String) dialog.getInput());
       loadPropertiesFromProfile(profile);
     }
   }//GEN-LAST:event_loadProfileButtonActionPerformed
@@ -1620,8 +1631,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
   private void loadPropertiesFromProfile(VehicleProfile profile) {
     EnergyStorage currentStorage = commAdapter.getEnergyStorage();
     if (currentStorage.getCapacity() != profile.getCapacity()) {
-      EnergyStorage newStorage
-          = EnergyStorage.createInstance(profile.getCapacity());
+      EnergyStorage newStorage = energyStorageFactory.createInstance(profile.getCapacity());
       newStorage.setEnergyLevel(currentStorage.getEnergyLevel());
       commAdapter.setEnergyStorage(newStorage);
     }
@@ -1647,7 +1657,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     vehicleModel.setOperationSpecs(opSpecs);
     // Load operation specs into the list and update gui accordingly
     loadOperationSpecList();
-    VehicleProfiles.setSelectedProfile(profile.getName());
+    vehicleProfiles.setSelectedProfile(profile.getName());
     // updateGui();
   }
 
@@ -1688,11 +1698,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxFwdVelocityTitle"))
-        .setInitialValue(maxFwdVeloTxt.getText())
-        .setLabel(bundle.getString("maxFwdVelocityLabel"))
-        .setUnitLabel(bundle.getString("maxFwdVelocityUnit"))
-        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
-        .build());
+            .setInitialValue(maxFwdVeloTxt.getText())
+            .setLabel(bundle.getString("maxFwdVelocityLabel"))
+            .setUnitLabel(bundle.getString("maxFwdVelocityUnit"))
+            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
+            .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int velocity = Integer.parseInt((String) dialog.getInput());
@@ -1704,11 +1714,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxRevVelocityTitle"))
-        .setInitialValue(maxRevVeloTxt.getText())
-        .setLabel(bundle.getString("maxRevVelocityLabel"))
-        .setUnitLabel(bundle.getString("maxRevVelocityUnit"))
-        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
-        .build());
+            .setInitialValue(maxRevVeloTxt.getText())
+            .setLabel(bundle.getString("maxRevVelocityLabel"))
+            .setUnitLabel(bundle.getString("maxRevVelocityUnit"))
+            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
+            .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int velocity = Integer.parseInt((String) dialog.getInput());
@@ -1720,11 +1730,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxAccelerationTitle"))
-        .setInitialValue(maxAccelTxt.getText())
-        .setLabel(bundle.getString("maxAccelerationLabel"))
-        .setUnitLabel(bundle.getString("maxAccelerationUnit"))
-        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
-        .build());
+            .setInitialValue(maxAccelTxt.getText())
+            .setLabel(bundle.getString("maxAccelerationLabel"))
+            .setUnitLabel(bundle.getString("maxAccelerationUnit"))
+            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
+            .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int acceleration = Integer.parseInt((String) dialog.getInput());
@@ -1736,11 +1746,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxDecelerationTitle"))
-        .setInitialValue(maxDecelTxt.getText())
-        .setLabel(bundle.getString("maxDecelerationLabel"))
-        .setUnitLabel(bundle.getString("maxDecelerationUnit"))
-        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
-        .build());
+            .setInitialValue(maxDecelTxt.getText())
+            .setLabel(bundle.getString("maxDecelerationLabel"))
+            .setUnitLabel(bundle.getString("maxDecelerationUnit"))
+            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
+            .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int deceleration = Integer.parseInt((String) dialog.getInput());
@@ -1752,11 +1762,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("operationTimeTitle"))
-        .setInitialValue(defaultOpTimeTxt.getText())
-        .setUnitLabel(bundle.getString("operationTimeUnit"))
-        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
-        .setMessage(bundle.getString("operationTimeMessage"))
-        .build());
+            .setInitialValue(defaultOpTimeTxt.getText())
+            .setUnitLabel(bundle.getString("operationTimeUnit"))
+            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
+            .setMessage(bundle.getString("operationTimeMessage"))
+            .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int opTime = Integer.parseInt((String) dialog.getInput());
@@ -1769,10 +1779,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("movementPowerTitle"))
-          .setInitialValue(movementPowerTxt.getText())
-          .setUnitLabel(bundle.getString("movementPowerUnit"))
-          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-          .build());
+              .setInitialValue(movementPowerTxt.getText())
+              .setUnitLabel(bundle.getString("movementPowerUnit"))
+              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+              .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double power = Double.parseDouble((String) dialog.getInput());
@@ -1786,10 +1796,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("operationPowerTitle"))
-          .setInitialValue(operationPowerTxt.getText())
-          .setUnitLabel(bundle.getString("operationPowerUnit"))
-          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-          .build());
+              .setInitialValue(operationPowerTxt.getText())
+              .setUnitLabel(bundle.getString("operationPowerUnit"))
+              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+              .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double power = Double.parseDouble((String) dialog.getInput());
@@ -1803,10 +1813,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("idlePowerTitle"))
-          .setInitialValue(idlePowerTxt.getText())
-          .setUnitLabel(bundle.getString("idlePowerUnit"))
-          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-          .build());
+              .setInitialValue(idlePowerTxt.getText())
+              .setUnitLabel(bundle.getString("idlePowerUnit"))
+              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+              .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double power = Double.parseDouble((String) dialog.getInput());
@@ -1820,16 +1830,16 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("capacityTitle"))
-          .setInitialValue(energyCapacityText.getText())
-          .setUnitLabel(bundle.getString("capacityUnit"))
-          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-          .build());
+              .setInitialValue(energyCapacityText.getText())
+              .setUnitLabel(bundle.getString("capacityUnit"))
+              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+              .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double capacity = Double.parseDouble((String) dialog.getInput());
         EnergyStorage currentStorage = commAdapter.getEnergyStorage();
         if (capacity != currentStorage.getCapacity()) {
-          EnergyStorage newStorage = EnergyStorage.createInstance(capacity);
+          EnergyStorage newStorage = energyStorageFactory.createInstance(capacity);
           // Capacity changed, but energy level should remain the same.
           // => Absolute energy value changes!
           newStorage.setEnergyLevel(currentStorage.getEnergyLevel());
@@ -1842,8 +1852,8 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
   private void deleteProfilesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteProfilesButtonActionPerformed
     // Create dialog
-    List<String> profiles = VehicleProfiles.getProfileNames();
-    String currentProfileName = VehicleProfiles.getSelectedProfile();
+    List<String> profiles = vehicleProfiles.getProfileNames();
+    String currentProfileName = vehicleProfiles.getSelectedProfile();
     InputPanel panel = new DropdownListInputPanel.Builder<>(
         bundle.getString("deleteVehicleProfileTitle"),
         profiles)
@@ -1855,7 +1865,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     // Get input from dialog
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED
         && dialog.getInput() != null) {
-      VehicleProfiles.remove((String) dialog.getInput());
+      vehicleProfiles.remove((String) dialog.getInput());
     }
   }//GEN-LAST:event_deleteProfilesButtonActionPerformed
 

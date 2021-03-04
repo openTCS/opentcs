@@ -7,16 +7,19 @@
  */
 package org.opentcs.virtualvehicle;
 
+import com.google.inject.assistedinject.Assisted;
+import javax.inject.Inject;
+
 /**
  * Energy storage that is not affected by charge and discharge operations.
- * The energy level only changes, when set directly via 
- * {@link #setEnergy(double) setEnergy} or 
- * {@link #setEnergyLevel(int) setEnergsyLevel}.
+ * The energy level only changes, when set directly via
+ * {@link #setEnergy(double) setEnergy} or
+ * {@link #setEnergyLevel(int) setEnergyLevel}.
  *
  * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class StaticEnergyStorage
-    extends EnergyStorage {
+    implements EnergyStorage {
 
   /**
    * Capacity of the energy storage in Ws.
@@ -29,11 +32,12 @@ public class StaticEnergyStorage
 
   /**
    * Creates a new <code>StaticEnergyStorage</code>.
-   * 
+   *
    * @param capacity The capacity of this storage in watt seconds [Ws].
-   *                 The value cannot be changed later.
+   * The value cannot be changed later.
    */
-  protected StaticEnergyStorage(double capacity) {
+  @Inject
+  public StaticEnergyStorage(@Assisted double capacity) {
     this.capacity = capacity; // Initialize the capacity
     energy = capacity;        // Start with a full stoarage
   }

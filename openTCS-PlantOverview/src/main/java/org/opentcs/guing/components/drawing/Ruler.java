@@ -17,9 +17,12 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import org.opentcs.guing.components.drawing.course.Origin;
+import org.opentcs.guing.components.drawing.course.OriginChangeListener;
 
 /**
  * A ruler.
@@ -29,7 +32,8 @@ import javax.swing.SwingUtilities;
  */
 public abstract class Ruler
     extends JComponent
-    implements PropertyChangeListener {
+    implements PropertyChangeListener,
+               OriginChangeListener {
 
   /**
    * Size of the rulers (height of the horizontal ruler, width of the vertical).
@@ -48,6 +52,14 @@ public abstract class Ruler
    * The current scale factor.
    */
   protected double scaleFactor = 1.0;
+  /**
+   * The scale factor for the horizontal ruler.
+   */
+  protected double horizontalRulerScale = Origin.DEFAULT_SCALE;
+  /**
+   * The scale factor for the vertical ruler.
+   */
+  protected double verticalRulerScale = Origin.DEFAULT_SCALE;
 
   /**
    * Creates a new instance.
@@ -56,6 +68,7 @@ public abstract class Ruler
    */
   private Ruler(OpenTCSDrawingView drawingView) {
     this.drawingView = requireNonNull(drawingView, "drawingView");
+
   }
 
   /**
@@ -147,9 +160,8 @@ public abstract class Ruler
 
         if (drawTranslated % (100 * scaleFactor) == 0) {
           g2d.drawLine(draw, SIZE - 1, draw, SIZE - 11);
-          int value = (int) (drawTranslated / scaleFactor);
+          int value = (int) (drawTranslated / scaleFactor) * (int) horizontalRulerScale;
           String textValue = Integer.toString(value);
-
           if (scaleFactor < 0.06) {
             if (value % 5000 == 0) {
               g2d.drawString(textValue, value == 0 ? draw - 2 : draw - 8, 9);
@@ -200,6 +212,20 @@ public abstract class Ruler
       }
     }
 
+    @Override
+    public void originLocationChanged(EventObject evt) {
+    }
+
+    @Override
+    public void originScaleChanged(EventObject evt) {
+      if (evt.getSource() instanceof Origin) {
+        Origin origin = (Origin) evt.getSource();
+        SwingUtilities.invokeLater(() -> {
+          horizontalRulerScale = origin.getScaleX();
+          repaint();
+        });
+      }
+    }
   }
 
   /**
@@ -295,7 +321,7 @@ public abstract class Ruler
 
         if (drawTranslated % (100 * scaleFactor) == 0) {
           g2d.drawLine(SIZE - 1, draw, SIZE - 11, draw);
-          int value = -(int) (drawTranslated / scaleFactor);
+          int value = -(int) (drawTranslated / scaleFactor) * (int) verticalRulerScale;
           String textValue = Integer.toString(value);
 
           if (scaleFactor < 0.06) {
@@ -347,5 +373,19 @@ public abstract class Ruler
       }
     }
 
+    @Override
+    public void originLocationChanged(EventObject evt) {
+    }
+
+    @Override
+    public void originScaleChanged(EventObject evt) {
+      if (evt.getSource() instanceof Origin) {
+        Origin origin = (Origin) evt.getSource();
+        SwingUtilities.invokeLater(() -> {
+          verticalRulerScale = origin.getScaleY();
+          repaint();
+        });
+      }
+    }
   }
 }

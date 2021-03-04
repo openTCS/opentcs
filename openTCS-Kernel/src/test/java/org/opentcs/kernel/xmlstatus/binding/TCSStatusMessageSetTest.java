@@ -15,6 +15,8 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.xmlhost.status.binding.OrderStatusMessage;
+import org.opentcs.kernel.xmlhost.status.binding.TCSStatusMessageSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

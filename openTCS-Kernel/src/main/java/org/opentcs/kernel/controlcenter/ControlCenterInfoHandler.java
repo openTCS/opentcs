@@ -7,26 +7,26 @@
  */
 package org.opentcs.kernel.controlcenter;
 
+import com.google.inject.assistedinject.Assisted;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import org.opentcs.access.TCSNotificationEvent;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.util.configuration.ConfigurationStore;
 import org.opentcs.util.eventsystem.EventListener;
 import org.opentcs.util.eventsystem.TCSEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A logging handler that writes all INFO-logs to KernelControlCenter's
- * logging text area.
+ * A logging handler that writes all INFO-logs to KernelControlCenter's logging text area.
  *
  * @author Philipp Seifert (Fraunhofer IML)
  */
@@ -36,17 +36,15 @@ public class ControlCenterInfoHandler
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(ControlCenterInfoHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ControlCenterInfoHandler.class);
   /**
-   * This class's ConfigurationStore.
+   * This class's configuration.
    */
-  private static final ConfigurationStore configStore
-      = ConfigurationStore.getStore(ControlCenterInfoHandler.class.getName());
+  private final ControlCenterConfiguration configuration;
   /**
    * Formats time stamps.
    */
-  private static final DateTimeFormatter dateFormat = DateTimeFormatter
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
       .ofLocalizedDateTime(FormatStyle.SHORT)
       .withLocale(Locale.getDefault())
       .withZone(ZoneId.systemDefault());
@@ -54,10 +52,6 @@ public class ControlCenterInfoHandler
    * The text area we're writing in.
    */
   private final JTextArea textArea;
-  /**
-   * The max length of the text area.
-   */
-  private int maxDocLength;
   /**
    * A flag whether the text area scrolls.
    */
@@ -67,11 +61,14 @@ public class ControlCenterInfoHandler
    * Creates a new ControlCenterInfoHandler.
    *
    * @param textArea The textArea we are writing to.
+   * @param configuration This class' configuration.
    */
-  public ControlCenterInfoHandler(JTextArea textArea) {
-    this.textArea = Objects.requireNonNull(textArea);
-    maxDocLength = configStore.getInt("maxCharactersAllowedInKernelLoggingArea",
-                                      3000);
+  @Inject
+  public ControlCenterInfoHandler(@Assisted JTextArea textArea,
+                                  ControlCenterConfiguration configuration) {
+    this.textArea = requireNonNull(textArea, "textArea");
+    this.configuration = requireNonNull(configuration, "configuration");
+
     autoScroll = true;
   }
 
@@ -95,31 +92,6 @@ public class ControlCenterInfoHandler
   }
 
   /**
-   * Sets a new maximum length of the text area.
-   *
-   * @param length The new length
-   */
-  public void setMaxDocLength(int length) {
-    if (length >= 1000) {
-      configStore.setInt("maxCharactersAllowedInKernelLoggingArea", length);
-      this.maxDocLength = length;
-      this.checkLength();
-    }
-    else {
-      throw new IllegalArgumentException("New length is too short.");
-    }
-  }
-
-  /**
-   * Returns the maximum length of the text area.
-   *
-   * @return The maximum length of the text area.
-   */
-  public int getMaxDocLength() {
-    return maxDocLength;
-  }
-
-  /**
    * Displays the notification.
    *
    * @param notification The notification
@@ -140,7 +112,7 @@ public class ControlCenterInfoHandler
   }
 
   private String format(UserNotification notification) {
-    return dateFormat.format(notification.getTimestamp())
+    return DATE_FORMAT.format(notification.getTimestamp())
         + " " + notification.getLevel()
         + ": [" + notification.getSource() + "] "
         + notification.getText();
@@ -154,12 +126,12 @@ public class ControlCenterInfoHandler
     SwingUtilities.invokeLater(() -> {
       int docLength = textArea.getDocument().getLength();
 
-      if (docLength > maxDocLength) {
+      if (docLength > configuration.loggingAreaCapacity()) {
         try {
-          textArea.getDocument().remove(0, docLength - maxDocLength);
+          textArea.getDocument().remove(0, docLength - configuration.loggingAreaCapacity());
         }
         catch (BadLocationException e) {
-          log.warn("Caught exception", e);
+          LOG.warn("Caught exception", e);
         }
       }
     });

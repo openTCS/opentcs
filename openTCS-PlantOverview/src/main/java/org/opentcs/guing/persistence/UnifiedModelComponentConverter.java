@@ -47,7 +47,6 @@ import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
-import org.opentcs.guing.model.elements.OtherGraphicalElement;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import static org.opentcs.guing.model.elements.PointModel.PointType.HALT;

@@ -9,12 +9,14 @@
 package org.opentcs.guing.exchange;
 
 import java.util.HashSet;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,20 +44,25 @@ public class ApplicationKernelProvider
    * A provider for dialogs to be shown when trying to connect to the kernel.
    */
   private final Provider<ConnectToServerDialog> dialogProvider;
+  /**
+   * The application's configuration.
+   */
+  private final PlantOverviewApplicationConfiguration appConfig;
 
   /**
    * Creates a new instance.
    *
-   * @param kernelProxyManager The kernel proxy manager taking care of the
-   * kernel connection.
-   * @param dialogProvider A provider for dialogs to be shown when trying to
-   * connect to the kernel.
+   * @param kernelProxyManager The kernel proxy manager taking care of the kernel connection.
+   * @param dialogProvider A provider for dialogs to be shown when trying to connect to the kernel.
+   * @param appConfig The application's configuration.
    */
   @Inject
   public ApplicationKernelProvider(KernelProxyManager kernelProxyManager,
-                                   Provider<ConnectToServerDialog> dialogProvider) {
+                                   Provider<ConnectToServerDialog> dialogProvider,
+                                   PlantOverviewApplicationConfiguration appConfig) {
     this.kernelProxyManager = requireNonNull(kernelProxyManager, "kernelProxyManager");
     this.dialogProvider = requireNonNull(dialogProvider, "dialogProvider");
+    this.appConfig = requireNonNull(appConfig, "appConfig");
   }
 
   @Override
@@ -106,18 +113,16 @@ public class ApplicationKernelProvider
    * @return Whether a connection was established or not.
    */
   private boolean connectKernel() {
-    // If connection parameters are given in the system properties, try
-    // connecting with them.
-    ConnectionParamSet connParamSet = ConnectionParamSet.getParamSet(System.getProperties());
-    if (connParamSet != null) {
-      boolean didConnect = kernelProxyManager.connect(connParamSet);
+    // Use the first bookmark by default.
+    List<ConnectionParamSet> bookmarks = appConfig.connectionBookmarks();
+    if (!bookmarks.isEmpty()) {
+      boolean didConnect = kernelProxyManager.connect(bookmarks.get(0));
       if (didConnect) {
         return true;
       }
     }
 
-    // If we are not connected, yet, show a dialog for entering the connection
-    // parameters.
+    // If we are not connected, yet, show a dialog for entering the connection parameters.
     if (!kernelProxyManager.isConnected()) {
       ConnectToServerDialog dialog = dialogProvider.get();
       dialog.setVisible(true);

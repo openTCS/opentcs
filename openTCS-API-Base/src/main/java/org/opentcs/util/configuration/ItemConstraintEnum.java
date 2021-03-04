@@ -11,12 +11,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentcs.util.Enums;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Item Constraint for Boolean type value.
  *
  * @author Preity Gupta (Fraunhofer IML)
+ * @deprecated Use interface bindings and configuration mechanism provided via applications'
+ * dependency injection.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class ItemConstraintEnum
     extends ItemConstraint {
 

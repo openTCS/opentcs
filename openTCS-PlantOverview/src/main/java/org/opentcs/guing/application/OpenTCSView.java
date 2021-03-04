@@ -42,6 +42,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -157,12 +158,12 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.storage.OpenTCSFactory;
 import org.opentcs.guing.transport.OrderSequencesContainerPanel;
 import org.opentcs.guing.transport.TransportOrdersContainerPanel;
-import org.opentcs.guing.util.ApplicationConfiguration;
 import org.opentcs.guing.util.Colors;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.Cursors;
 import org.opentcs.guing.util.DefaultInputOutputFormat;
 import org.opentcs.guing.util.PanelRegistry;
+import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
 import org.opentcs.util.UniqueStringGenerator;
@@ -367,7 +368,7 @@ public class OpenTCSView
   /**
    * The application's configuration.
    */
-  private final ApplicationConfiguration appConfig;
+  private final PlantOverviewApplicationConfiguration appConfig;
   /**
    * The application frame's menu bar.
    */
@@ -432,7 +433,7 @@ public class OpenTCSView
    * @param dockableHandlerFactory A factory for handlers related to dockables.
    */
   @Inject
-  public OpenTCSView(ApplicationConfiguration appConfig,
+  public OpenTCSView(PlantOverviewApplicationConfiguration appConfig,
                      ApplicationState appState,
                      @ApplicationFrame JFrame fFrame,
                      ProgressIndicator progressIndicator,
@@ -544,13 +545,6 @@ public class OpenTCSView
   @Override // AbstractView
   public void stop() {
     LOG.info("GUI terminating...");
-    // Exclude the modelling view here.
-    appConfig.setDrawingViewCount(viewManager.getDrawingViewMap().size() - 1);
-    appConfig.setOrderViewCount(viewManager.getTransportOrderMap().size());
-    appConfig
-        .setOrderSequenceViewCount(viewManager.getOrderSequenceMap().size());
-    dockingManager.saveLayout();
-
     System.exit(0);
   }
 
@@ -800,10 +794,9 @@ public class OpenTCSView
     closeOpenedPluginPanels();
     viewManager.reset();
 
-    appConfig.setDrawingViewCount(1);
-    appConfig.setOrderViewCount(1);
-    appConfig.setOrderSequenceViewCount(1);
-
+//    appConfig.setDrawingViewCount(1);
+//    appConfig.setOrderViewCount(1);
+//    appConfig.setOrderSequenceViewCount(1);
     initializeFrame();
 
     // Depending on the current kernel state there may exist panels, now, that
@@ -945,20 +938,43 @@ public class OpenTCSView
   }
 
   /**
-   * Informs all locations the theme has changed and they have to repaint.
+   * Informs locations the theme has changed and they have to repaint:
+   * <ul>
+   * <li>If an update is triggered by a {@link LocationTypeModel} (e.g. a LocationType's symbol has
+   * changed), all Locations associated to this LocationType are updated.</li>
+   * <li>If an update is triggered by a {@link LocationModel} (e.g. a Location's symbol has
+   * changed), only that Location is updated.</li>
+   * <li>If the {@code triggeringComponent} is {@code null}, all Locations are updated.</li>
+   * </ul>
+   *
+   * @param triggerComponent The {@link ModelComponent} triggering the update.
    */
-  public void updateLocationThemes() {
-    for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-      for (Figure figure : drawView.getDrawing().getChildren()) {
-        if (figure instanceof LabeledLocationFigure) {
-          LabeledLocationFigure locFigure = (LabeledLocationFigure) figure;
-          locFigure.propertiesChanged(
-              new AttributesChangeEvent(attributesEventHandler,
-                                        locFigure.getPresentationFigure()
-                                            .getModel()));
-        }
-      }
+  public void updateLocationThemes(@Nullable ModelComponent triggerComponent) {
+    if (triggerComponent instanceof LocationTypeModel) {
+      updateFilteredLocationThemes(figure -> figure.getPresentationFigure().getModel()
+          .getLocationType().equals((LocationTypeModel) triggerComponent));
     }
+    else if (triggerComponent instanceof LocationModel) {
+      updateFilteredLocationThemes(figure -> figure.getPresentationFigure().getModel()
+          .equals((LocationModel) triggerComponent));
+    }
+    else {
+      // Update all location themes
+      updateFilteredLocationThemes(figure -> true);
+    }
+  }
+
+  private void updateFilteredLocationThemes(Predicate<LabeledLocationFigure> locationFilter) {
+    fDrawingEditor.getDrawingViews().stream()
+        .flatMap(drawView -> drawView.getDrawing().getChildren().stream())
+        .filter(figure -> figure instanceof LabeledLocationFigure)
+        .map(figure -> (LabeledLocationFigure) figure)
+        .filter(locationFilter)
+        .forEach(figure -> {
+          figure.propertiesChanged(
+              new AttributesChangeEvent(attributesEventHandler,
+                                        figure.getPresentationFigure().getModel()));
+        });
   }
 
   /**
@@ -1165,6 +1181,7 @@ public class OpenTCSView
 
   @Handler
   public void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
+    closeOpenedPluginPanels();
     switch (event.getNewState()) {
       case MODELLING:
         if (appState.hasOperationMode(OperationMode.OPERATING)) {
@@ -1880,7 +1897,7 @@ public class OpenTCSView
    * @param selected
    */
   public void ignorePrecisePosition(boolean selected) {
-    appConfig.setIgnoreVehiclePrecisePosition(selected);
+//    appConfig.setIgnoreVehiclePrecisePosition(selected);
 
     for (Figure figure : fDrawingEditor.getDrawing().getChildren()) {
       if (figure instanceof VehicleFigure) {
@@ -1895,7 +1912,7 @@ public class OpenTCSView
    * @param selected
    */
   public void ignoreOrientationAngle(boolean selected) {
-    appConfig.setIgnoreVehicleOrientationAngle(selected);
+//    appConfig.setIgnoreVehicleOrientationAngle(selected);
 
     for (Figure figure : fDrawingEditor.getDrawing().getChildren()) {
       if (figure instanceof VehicleFigure) {
@@ -2276,6 +2293,12 @@ public class OpenTCSView
   public void setSystemModel(SystemModel systemModel) {
     requireNonNull(systemModel, "systemModel is null");
 
+    // Notify the view's scroll panes about the new systemModel and therefore about the new/changed
+    // origin. This way they can handle changes made to the origin's scale.
+    for (DrawingViewScrollPane scrollPane : viewManager.getDrawingViewMap().values()) {
+      scrollPane.originChanged(systemModel.getDrawingMethod().getOrigin());
+    }
+
     // Clear the name generator
     modelCompNameGen.clear();
     fDrawingEditor.setSystemModel(systemModel);
@@ -2373,7 +2396,7 @@ public class OpenTCSView
     fFrame.add(wrapViewComponent(), BorderLayout.NORTH);
     fFrame.add(dockingManager.getCControl().getContentArea());
     fFrame.add(statusPanel, BorderLayout.SOUTH);
-    restoreSavedDockables();
+    restoreDockables();
     // Ensure that, after initialization, the selection tool is active.
     // This needs to be done after the initial drawing views have been set
     // up so they reflect the behaviour of the selected tool.
@@ -2382,31 +2405,21 @@ public class OpenTCSView
     toolBarManager.getSelectionToolButton().doClick();
   }
 
-  /**
-   * Restores the dockables that were saved after the last exit.
-   */
-  private void restoreSavedDockables() {
+  private void restoreDockables() {
     // --- DrawingView for modelling ---
     DefaultSingleCDockable modellingDockable = addDrawingView();
-    viewManager.initModellingDockable(modellingDockable,
-                                      ResourceBundleUtil.getBundle().getString(
-                                          "modellingDrawingView.name"));
-    for (int i = 0; i < appConfig.getDrawingViewCount(); i++) {
-      addDrawingView();
-    }
+    viewManager.initModellingDockable(
+        modellingDockable,
+        ResourceBundleUtil.getBundle().getString("modellingDrawingView.name"));
+
+    addDrawingView();
 
     boolean shouldInit = fModelManager.getModel().getEventDispatcher() != null;
-    for (int i = 0; i < appConfig.getOrderViewCount(); i++) {
-      addTransportOrderView(shouldInit);
-    }
-
-    for (int i = 0; i < appConfig.getOrderSequenceViewCount(); i++) {
-      addTransportOrderSequenceView(shouldInit);
-    }
+    addTransportOrderView(shouldInit);
+    addTransportOrderSequenceView(shouldInit);
 
     dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID)
         .getStation().setFrontDockable(viewManager.evaluateFrontDockable());
-    dockingManager.loadLayout();
   }
 
   private class AttributesEventHandler
@@ -2442,7 +2455,7 @@ public class OpenTCSView
             = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
         LengthProperty pScaleY
             = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
-        updateLocationThemes();
+        updateLocationThemes(null);
 
         if (pScaleX.hasChanged() || pScaleY.hasChanged()) {
           double scaleX = (double) pScaleX.getValue();
