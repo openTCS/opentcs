@@ -30,7 +30,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -1094,7 +1093,7 @@ public interface Kernel
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
-  StaticRoute createStaticRoute()
+  org.opentcs.data.model.StaticRoute createStaticRoute()
       throws CredentialsException;
 
   /**
@@ -1111,7 +1110,7 @@ public interface Kernel
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
-  void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
+  void addStaticRouteHop(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref,
                          TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException, CredentialsException;
 
@@ -1127,7 +1126,7 @@ public interface Kernel
    */
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
-  void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
+  void clearStaticRouteHops(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws ObjectUnknownException, CredentialsException;
 
   /**

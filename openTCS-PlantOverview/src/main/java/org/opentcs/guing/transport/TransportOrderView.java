@@ -78,10 +78,6 @@ public class TransportOrderView
 
   @Override
   public final void initFields() {
-    // --- Allgemeine Angaben ---
-    // ID
-    int id = getTransportOrder().getId();
-    idTextField.setText(Integer.toString(id));
     // Name
     String name = getTransportOrder().getName();
     nameTextField.setText(name);
@@ -126,17 +122,11 @@ public class TransportOrderView
       "Status"});
     // Past drive orders
     fDriveOrders = new LinkedList<>();
-    fDriveOrders.addAll(getTransportOrder().getPastDriveOrders());
-    // Current drive order
-    if (getTransportOrder().getCurrentDriveOrder() != null) {
-      fDriveOrders.add(getTransportOrder().getCurrentDriveOrder());
-    }
-    // Future drive orders
-    fDriveOrders.addAll(getTransportOrder().getFutureDriveOrders());
+    fDriveOrders.addAll(getTransportOrder().getAllDriveOrders());
 
     for (DriveOrder o : fDriveOrders) {
       String[] row = new String[3];
-      row[0] = o.getDestination().getLocation().getName();
+      row[0] = o.getDestination().getDestination().getName();
       row[1] = o.getDestination().getOperation();
       row[2] = o.getState().toString();
       tableModel.addRow(row);
@@ -271,8 +261,6 @@ public class TransportOrderView
     java.awt.GridBagConstraints gridBagConstraints;
 
     generalPanel = new javax.swing.JPanel();
-    idLabel = new javax.swing.JLabel();
-    idTextField = new javax.swing.JTextField();
     nameLabel = new javax.swing.JLabel();
     nameTextField = new javax.swing.JTextField();
     createdLabel = new javax.swing.JLabel();
@@ -311,40 +299,20 @@ public class TransportOrderView
     generalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.generalPanel.title"))); // NOI18N
     generalPanel.setLayout(new java.awt.GridBagLayout());
 
-    idLabel.setFont(idLabel.getFont());
-    idLabel.setText("Id:");
+    nameLabel.setFont(nameLabel.getFont());
+    nameLabel.setText("Name:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
-    generalPanel.add(idLabel, gridBagConstraints);
-
-    idTextField.setColumns(10);
-    idTextField.setEditable(false);
-    idTextField.setFont(idTextField.getFont());
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.5;
-    generalPanel.add(idTextField, gridBagConstraints);
-
-    nameLabel.setFont(nameLabel.getFont());
-    nameLabel.setText("Name:");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
     generalPanel.add(nameLabel, gridBagConstraints);
 
-    nameTextField.setColumns(10);
     nameTextField.setEditable(false);
+    nameTextField.setColumns(10);
     nameTextField.setFont(nameTextField.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 3;
+    gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -632,8 +600,6 @@ public class TransportOrderView
   private javax.swing.JLabel finishedLabel;
   private javax.swing.JTextField finishedTextField;
   private javax.swing.JPanel generalPanel;
-  private javax.swing.JLabel idLabel;
-  private javax.swing.JTextField idTextField;
   private javax.swing.JLabel nameLabel;
   private javax.swing.JTextField nameTextField;
   private javax.swing.JPanel propertiesPanel;

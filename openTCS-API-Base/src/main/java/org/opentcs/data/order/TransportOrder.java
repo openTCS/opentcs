@@ -9,9 +9,11 @@ package org.opentcs.data.order;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -21,6 +23,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class TransportOrder
     extends TCSObject<TransportOrder>
     implements Serializable,
@@ -56,22 +60,11 @@ public class TransportOrder
    */
   @Nonnull
   private List<Rejection> rejections = new LinkedList<>();
-  /**
-   * A list of drive orders that have been finished already.
-   */
+
   @Nonnull
-  private List<DriveOrder> pastDriveOrders = new LinkedList<>();
-  /**
-   * A list of drive orders that still have to be processed as part of this
-   * transport order (in the order they have to be processed in).
-   */
-  @Nonnull
-  private List<DriveOrder> futureDriveOrders = new LinkedList<>();
-  /**
-   * The drive order that is currently being processed.
-   */
-  @Nullable
-  private DriveOrder currentDriveOrder;
+  private List<DriveOrder> driveOrders = new ArrayList<>();
+
+  private int currentDriveOrderIndex = -1;
   /**
    * This transport order's current state.
    */
@@ -122,24 +115,150 @@ public class TransportOrder
    * @param destinations A list of destinations that are to be travelled to
    * when processing this transport order.
    * @param creationTime The creation time stamp to be set.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public TransportOrder(int objectID,
                         String name,
                         List<DriveOrder.Destination> destinations,
                         long creationTime) {
     super(objectID, name);
-    requireNonNull(destinations, "destinations");
-    checkArgument(!destinations.isEmpty(), "destinations may not be empty");
-
-    for (DriveOrder.Destination curDest : destinations) {
-      DriveOrder driveOrder = new DriveOrder(curDest);
-      driveOrder.setTransportOrder(this.getReference());
-      futureDriveOrders.add(driveOrder);
-    }
+    this.driveOrders = createDriveOrders(destinations);
+    this.currentDriveOrderIndex = -1;
     this.creationTime = creationTime;
+    this.intendedVehicle = null;
+    this.deadline = Long.MAX_VALUE;
+    this.dispensable = false;
+    this.wrappingSequence = null;
+    this.dependencies = new LinkedHashSet<>();
   }
 
-  // Methods not declared in any interface start here
+  /**
+   * Creates a new TransportOrder.
+   *
+   * @param objectID This transport order's ID.
+   * @param name This transport order's name.
+   * @param driveOrders A list of drive orders to be processed when processing this transport
+   * order.
+   * @deprecated Will be removed.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public TransportOrder(int objectID, String name, List<DriveOrder> driveOrders) {
+    super(objectID, name);
+    this.driveOrders = requireNonNull(driveOrders, "driveOrders");
+    this.currentDriveOrderIndex = -1;
+    this.creationTime = 0;
+    this.intendedVehicle = null;
+    this.deadline = Long.MAX_VALUE;
+    this.dispensable = false;
+    this.wrappingSequence = null;
+    this.dependencies = new LinkedHashSet<>();
+  }
+
+  /**
+   * Creates a new TransportOrder.
+   *
+   * @param name This transport order's name.
+   * @param driveOrders A list of drive orders to be processed when processing this transport
+   * order.
+   */
+  public TransportOrder(String name, List<DriveOrder> driveOrders) {
+    super(name);
+    this.driveOrders = requireNonNull(driveOrders, "driveOrders");
+    this.currentDriveOrderIndex = -1;
+    this.creationTime = 0;
+    this.intendedVehicle = null;
+    this.deadline = Long.MAX_VALUE;
+    this.dispensable = false;
+    this.wrappingSequence = null;
+    this.dependencies = new LinkedHashSet<>();
+  }
+
+  /**
+   * Creates a new TransportOrder.
+   *
+   * @param objectID This transport order's ID.
+   * @param name This transport order's name.
+   * @param destinations A list of destinations that are to be travelled to
+   * when processing this transport order.
+   * @param creationTime The creation time stamp to be set.
+   */
+  @SuppressWarnings("deprecation")
+  private TransportOrder(int objectID,
+                         String name,
+                         Map<String, String> properties,
+                         List<DriveOrder> driveOrders,
+                         int currentDriveOrderIndex,
+                         long creationTime,
+                         TCSObjectReference<Vehicle> intendedVehicle,
+                         long deadline,
+                         boolean dispensable,
+                         TCSObjectReference<OrderSequence> wrappingSequence,
+                         Set<TCSObjectReference<TransportOrder>> dependencies,
+                         List<Rejection> rejections,
+                         TCSObjectReference<Vehicle> processingVehicle,
+                         State state,
+                         long finishedTime) {
+    super(objectID, name, properties);
+    requireNonNull(driveOrders, "driveOrders");
+    this.driveOrders = new LinkedList<>();
+    for (DriveOrder driveOrder : driveOrders) {
+      this.driveOrders.add(driveOrder.withTransportOrder(this.getReference()));
+    }
+
+    this.currentDriveOrderIndex = currentDriveOrderIndex;
+    this.creationTime = creationTime;
+    this.intendedVehicle = intendedVehicle;
+    this.deadline = deadline;
+    this.dispensable = dispensable;
+    this.wrappingSequence = wrappingSequence;
+    this.dependencies = requireNonNull(dependencies, "dependencies");
+    this.rejections = requireNonNull(rejections, "rejections");
+    this.processingVehicle = processingVehicle;
+    this.state = requireNonNull(state, "state");
+    this.finishedTime = finishedTime;
+  }
+
+  @Override
+  public TransportOrder withProperty(String key, String value) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              propertiesWith(key, value),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  @Override
+  public TransportOrder withProperties(Map<String, String> properties) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              properties,
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
   /**
    * Returns this transport order's current state.
    *
@@ -165,7 +284,10 @@ public class TransportOrder
    * Changes this transport order's current state.
    *
    * @param newState The new state this transport order is supposed to be in.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setState(State newState) {
     requireNonNull(newState, "newState");
     checkState(!state.isFinalState(),
@@ -179,12 +301,61 @@ public class TransportOrder
   }
 
   /**
+   * Creates a copy of this object, with the given state.
+   *
+   * @param state The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withState(@Nonnull State state) {
+    // XXX Finished time should not be set implicitly.
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              state == State.FINISHED ? System.currentTimeMillis() : finishedTime);
+  }
+
+  /**
    * Returns this transport order's creation time.
    *
    * @return This transport order's creation time.
    */
   public long getCreationTime() {
     return creationTime;
+  }
+
+  /**
+   * Creates a copy of this object, with the given creation time.
+   *
+   * @param creationTime The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withCreationTime(long creationTime) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -203,9 +374,36 @@ public class TransportOrder
    * Sets this transport order's deadline.
    *
    * @param newDeadline This transport order's new deadline.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setDeadline(long newDeadline) {
     deadline = newDeadline;
+  }
+
+  /**
+   * Creates a copy of this object, with the given deadline.
+   *
+   * @param deadline The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withDeadline(long deadline) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -219,6 +417,30 @@ public class TransportOrder
    */
   public long getFinishedTime() {
     return finishedTime;
+  }
+
+  /**
+   * Creates a copy of this object, with the given finished time.
+   *
+   * @param finishedTime The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withFinishedTime(long finishedTime) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -239,9 +461,36 @@ public class TransportOrder
    * order.
    *
    * @param vehicle The reference to the vehicle intended to process this order.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setIntendedVehicle(@Nullable TCSObjectReference<Vehicle> vehicle) {
     intendedVehicle = vehicle;
+  }
+
+  /**
+   * Creates a copy of this object, with the given intended vehicle.
+   *
+   * @param intendedVehicle The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withIntendedVehicle(@Nullable TCSObjectReference<Vehicle> intendedVehicle) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -262,9 +511,37 @@ public class TransportOrder
    *
    * @param vehicle The reference to the vehicle currently processing this
    * transport order.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setProcessingVehicle(@Nullable TCSObjectReference<Vehicle> vehicle) {
     processingVehicle = vehicle;
+  }
+
+  /**
+   * Creates a copy of this object, with the given processing vehicle.
+   *
+   * @param processingVehicle The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withProcessingVehicle(
+      @Nullable TCSObjectReference<Vehicle> processingVehicle) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -283,7 +560,10 @@ public class TransportOrder
    * before this one may be started.
    * @return <code>true</code> if, and only if, the given transport order was
    * not already a dependency for this one.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public boolean addDependency(@Nonnull TCSObjectReference<TransportOrder> newDep) {
     requireNonNull(newDep, "newDep");
     return dependencies.add(newDep);
@@ -296,10 +576,38 @@ public class TransportOrder
    * dependency for this one.
    * @return <code>true</code> if, and only if, the given transport order was
    * a dependency for this one.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public boolean removeDependency(@Nonnull TCSObjectReference<TransportOrder> rmDep) {
     requireNonNull(rmDep, "rmDep");
     return dependencies.remove(rmDep);
+  }
+
+  /**
+   * Creates a copy of this object, with the given dependencies.
+   *
+   * @param dependencies The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withDependencies(
+      @Nonnull Set<TCSObjectReference<TransportOrder>> dependencies) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -309,17 +617,44 @@ public class TransportOrder
    */
   @Nonnull
   public List<Rejection> getRejections() {
-    return new ArrayList<>(rejections);
+    return Collections.unmodifiableList(rejections);
   }
 
   /**
    * Adds a rejection for this transport order.
    *
    * @param newRejection The new rejection.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void addRejection(@Nonnull Rejection newRejection) {
     requireNonNull(newRejection, "newRejection");
     rejections.add(newRejection);
+  }
+
+  /**
+   * Creates a copy of this object, with the given rejection.
+   *
+   * @param rejection The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withRejection(@Nonnull Rejection rejection) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejectionsWithAppended(rejection),
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -329,7 +664,11 @@ public class TransportOrder
    */
   @Nonnull
   public List<DriveOrder> getPastDriveOrders() {
-    return new ArrayList<>(pastDriveOrders);
+    List<DriveOrder> result = new ArrayList<>();
+    for (int i = 0; i < currentDriveOrderIndex; i++) {
+      result.add(driveOrders.get(i));
+    }
+    return result;
   }
 
   /**
@@ -339,7 +678,11 @@ public class TransportOrder
    */
   @Nonnull
   public List<DriveOrder> getFutureDriveOrders() {
-    return new ArrayList<>(futureDriveOrders);
+    List<DriveOrder> result = new ArrayList<>();
+    for (int i = currentDriveOrderIndex + 1; i < driveOrders.size(); i++) {
+      result.add(driveOrders.get(i));
+    }
+    return result;
   }
 
   /**
@@ -351,32 +694,73 @@ public class TransportOrder
    * @throws IllegalArgumentException If the destinations of the given drive
    * orders do not match the destinations of the drive orders in this transport
    * order.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setFutureDriveOrders(@Nonnull List<DriveOrder> newOrders)
       throws IllegalArgumentException {
     requireNonNull(newOrders, "newOrders");
+
+    checkState(currentDriveOrderIndex < 0,
+               "Already processing drive order with index %s",
+               currentDriveOrderIndex);
+
     int orderCount = newOrders.size();
-    checkArgument(orderCount == futureDriveOrders.size(),
+    checkArgument(orderCount == driveOrders.size(),
                   "newOrders has wrong size: %s, should be %s",
                   orderCount,
-                  futureDriveOrders.size());
+                  driveOrders.size());
     // Check if the destinations of the given drive orders are equivalent to the
     // ones we have.
     for (int i = 0; i < orderCount; i++) {
-      DriveOrder myOrder = futureDriveOrders.get(i);
+      DriveOrder myOrder = driveOrders.get(i);
       DriveOrder newOrder = newOrders.get(i);
-      if (!myOrder.getDestination().equals(newOrder.getDestination())) {
-        throw new IllegalArgumentException(
-            "newOrders' destinations do not equal mine");
-      }
+      checkArgument(myOrder.getDestination().equals(newOrder.getDestination()),
+                    "newOrders' destinations do not equal mine");
     }
     // Copy the given drive orders' data to ours.
     for (int i = 0; i < orderCount; i++) {
-      DriveOrder myOrder = futureDriveOrders.get(i);
       DriveOrder newOrder = newOrders.get(i);
-      myOrder.setRoute(newOrder.getRoute());
-      myOrder.setState(newOrder.getState());
+      driveOrders.set(i,
+                      driveOrders.get(i)
+                          .withRoute(newOrder.getRoute())
+                          .withState(newOrder.getState()));
     }
+  }
+
+  /**
+   * Creates a copy of this object, with the given drive orders.
+   *
+   * @param driveOrders The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withDriveOrders(@Nonnull List<DriveOrder> driveOrders) {
+    requireNonNull(driveOrders, "driveOrders");
+
+    checkState(currentDriveOrderIndex < 0,
+               "Already processing drive order with index %s",
+               currentDriveOrderIndex);
+    checkArgument(driveOrders.size() == this.driveOrders.size(),
+                  "newOrders has wrong size: %s, should be %s",
+                  driveOrders.size(),
+                  this.driveOrders.size());
+
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -388,7 +772,9 @@ public class TransportOrder
    */
   @Nullable
   public DriveOrder getCurrentDriveOrder() {
-    return currentDriveOrder;
+    return (currentDriveOrderIndex >= 0 && currentDriveOrderIndex < driveOrders.size())
+        ? driveOrders.get(currentDriveOrderIndex)
+        : null;
   }
 
   /**
@@ -400,13 +786,7 @@ public class TransportOrder
    */
   @Nonnull
   public List<DriveOrder> getAllDriveOrders() {
-    List<DriveOrder> result = new LinkedList<>();
-    result.addAll(pastDriveOrders);
-    if (currentDriveOrder != null) {
-      result.add(currentDriveOrder);
-    }
-    result.addAll(futureDriveOrders);
-    return result;
+    return new ArrayList<>(driveOrders);
   }
 
   /**
@@ -416,13 +796,16 @@ public class TransportOrder
    *
    * @throws IllegalStateException If there already is a current drive order or
    * if the list of future drive orders is empty.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setInitialDriveOrder()
       throws IllegalStateException {
-    checkState(currentDriveOrder == null, "currentDriveOrder already set");
-    checkState(!futureDriveOrders.isEmpty(), "futureDriveOrders is empty");
-    currentDriveOrder = futureDriveOrders.remove(0);
-    currentDriveOrder.setState(DriveOrder.State.TRAVELLING);
+    checkState(currentDriveOrderIndex < 0, "currentDriveOrder already set");
+    checkState(!driveOrders.isEmpty(), "driveOrders is empty");
+
+    currentDriveOrderIndex = 0;
   }
 
   /**
@@ -431,37 +814,90 @@ public class TransportOrder
    * of future drive orders (or <code>null</code>, if that list is empty).
    * If the current drive order is <code>null</code> because all drive orders
    * have been finished already or none has been started, yet, nothing happens.
+   *
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setNextDriveOrder() {
-    // Mark the current drive order as finished and push it to the list of past
-    // drive orders.
-    if (currentDriveOrder != null) {
-      pastDriveOrders.add(currentDriveOrder);
-    }
-    else {
-      LOG.warn("Cannot finish current drive order as it is null.");
-    }
-    // Pull in the next drive order, if there is any.
-    if (futureDriveOrders.isEmpty()) {
-      currentDriveOrder = null;
-    }
-    else {
-      currentDriveOrder = futureDriveOrders.remove(0);
-    }
+    currentDriveOrderIndex++;
+  }
+
+  public int getCurrentDriveOrderIndex() {
+    return currentDriveOrderIndex;
+  }
+
+  /**
+   * Creates a copy of this object, with the given drive order index.
+   *
+   * @param currentDriveOrderIndex The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withCurrentDriveOrderIndex(int currentDriveOrderIndex) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
    * Sets the current drive order's state to the given one.
    *
    * @param newState The current drive order's new state.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setCurrentDriveOrderState(@Nonnull DriveOrder.State newState) {
     requireNonNull(newState, "newState");
-    if (currentDriveOrder == null) {
+    if (currentDriveOrderIndex < 0 || currentDriveOrderIndex >= driveOrders.size()) {
       LOG.warn("currentDriveOrder is null");
       return;
     }
-    currentDriveOrder.setState(newState);
+
+    driveOrders.set(currentDriveOrderIndex,
+                    driveOrders.get(currentDriveOrderIndex).withState(newState));
+  }
+
+  /**
+   * Creates a copy of this object, with the given current drive order state.
+   *
+   * @param driveOrderState The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withCurrentDriveOrderState(@Nonnull DriveOrder.State driveOrderState) {
+    requireNonNull(driveOrderState, "driveOrderState");
+
+    List<DriveOrder> driveOrders = new ArrayList<>(this.driveOrders);
+    driveOrders.set(currentDriveOrderIndex,
+                    driveOrders.get(currentDriveOrderIndex).withState(driveOrderState));
+
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -482,9 +918,37 @@ public class TransportOrder
    * @param sequence The order sequence this order belongs to. May be
    * <code>null</code> to indicate that this order does not belong to any
    * sequence.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setWrappingSequence(@Nullable TCSObjectReference<OrderSequence> sequence) {
     wrappingSequence = sequence;
+  }
+
+  /**
+   * Creates a copy of this object, with the given wrapping sequence.
+   *
+   * @param wrappingSequence The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withWrappingSequence(
+      @Nullable TCSObjectReference<OrderSequence> wrappingSequence) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
   }
 
   /**
@@ -500,31 +964,75 @@ public class TransportOrder
    * Sets this order's <em>dispensable</em> flag.
    *
    * @param dispensable This order's new <em>dispensable</em> flag.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setDispensable(boolean dispensable) {
     this.dispensable = dispensable;
   }
 
+  /**
+   * Creates a copy of this object, with the given dispensable flag.
+   *
+   * @param dispensable The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withDispensable(boolean dispensable) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
   @Override
   public TransportOrder clone() {
-    TransportOrder clone = (TransportOrder) super.clone();
-    clone.dependencies = new LinkedHashSet<>();
-    for (TCSObjectReference<TransportOrder> curRef : dependencies) {
-      clone.dependencies.add(curRef.clone());
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  @SuppressWarnings("deprecation")
+  private int getIdWithoutDeprecationWarning() {
+    return getId();
+  }
+
+  private List<Rejection> rejectionsWithAppended(@Nonnull Rejection rejection) {
+    List<Rejection> result = new ArrayList<>(rejections.size() + 1);
+    result.addAll(rejections);
+    result.add(rejection);
+    return result;
+  }
+
+  private static List<DriveOrder> createDriveOrders(List<DriveOrder.Destination> destinations) {
+    List<DriveOrder> result = new ArrayList<>(destinations.size());
+    for (DriveOrder.Destination curDest : destinations) {
+      result.add(new DriveOrder(curDest));
     }
-    clone.rejections = new LinkedList<>();
-    clone.rejections.addAll(this.rejections);
-    clone.pastDriveOrders = new LinkedList<>();
-    for (DriveOrder curDriveOrder : pastDriveOrders) {
-      clone.pastDriveOrders.add(curDriveOrder.clone());
-    }
-    clone.futureDriveOrders = new LinkedList<>();
-    for (DriveOrder curDriveOrder : futureDriveOrders) {
-      clone.futureDriveOrders.add(curDriveOrder.clone());
-    }
-    clone.currentDriveOrder
-        = (currentDriveOrder == null) ? null : currentDriveOrder.clone();
-    return clone;
+    return result;
   }
 
   /**

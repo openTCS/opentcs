@@ -37,6 +37,14 @@ public interface Router
     extends Lifecycle {
   
   /**
+   * The key of a vehicle property defining the group of vehicles that may share the same routing.
+   * <p>
+   * The value is expected to be an integer.
+   * </p>
+   */
+  String PROPKEY_ROUTING_GROUP = "tcs:routingGroup";
+  
+  /**
    * Notifies the router of changes in the topology.
    */
   @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")

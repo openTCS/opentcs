@@ -11,7 +11,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import javax.annotation.Nonnull;
@@ -20,6 +19,7 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An observable model of a vehicle's and its comm adapter's attributes.
@@ -58,6 +58,22 @@ public class VehicleProcessModel {
    */
   private final Queue<UserNotification> notifications = new LinkedList<>();
 
+  private Triple precisePosition;
+
+  private double orientationAngle = Double.NaN;
+
+  private int energyLevel = 100;
+
+  private List<LoadHandlingDevice> loadHandlingDevices = new LinkedList<>();
+
+  private int maxVelocity;
+
+  private int maxReverseVelocity;
+
+  private Vehicle.State state = Vehicle.State.UNKNOWN;
+
+  private VehicleCommAdapter.State adapterState = VehicleCommAdapter.State.UNKNOWN;
+
   /**
    * Creates a new instance.
    *
@@ -75,15 +91,14 @@ public class VehicleProcessModel {
     pcs.removePropertyChangeListener(listener);
   }
 
-  protected PropertyChangeSupport getPropertyChangeSupport() {
-    return pcs;
-  }
-
   /**
    * Returns a copy of the kernel's Vehicle instance.
    *
    * @return A copy of the kernel's Vehicle instance.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   @Nonnull
   public Vehicle getVehicle() {
     return vehicle;
@@ -218,7 +233,7 @@ public class VehicleProcessModel {
    */
   @Nullable
   public Triple getVehiclePrecisePosition() {
-    return vehicle.getPrecisePosition();
+    return precisePosition;
   }
 
   /**
@@ -228,11 +243,8 @@ public class VehicleProcessModel {
    */
   public void setVehiclePrecisePosition(@Nullable Triple position) {
     // Otherwise update the position, notify listeners and let the kernel know.
-    Triple oldValue;
-    synchronized (vehicle) {
-      oldValue = vehicle.getPrecisePosition();
-      vehicle.setPrecisePosition(position);
-    }
+    Triple oldValue = this.precisePosition;
+    this.precisePosition = position;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.PRECISE_POSITION.name(),
                                                   oldValue,
@@ -246,7 +258,7 @@ public class VehicleProcessModel {
    * @see Vehicle#getOrientationAngle()
    */
   public double getVehicleOrientationAngle() {
-    return vehicle.getOrientationAngle();
+    return orientationAngle;
   }
 
   /**
@@ -256,11 +268,8 @@ public class VehicleProcessModel {
    * @see Vehicle#setOrientationAngle(double)
    */
   public void setVehicleOrientationAngle(double angle) {
-    double oldValue;
-    synchronized (vehicle) {
-      oldValue = vehicle.getOrientationAngle();
-      vehicle.setOrientationAngle(angle);
-    }
+    double oldValue = this.orientationAngle;
+    this.orientationAngle = angle;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.ORIENTATION_ANGLE.name(),
                                                   oldValue,
@@ -273,7 +282,7 @@ public class VehicleProcessModel {
    * @return The vehicle's current energy level.
    */
   public int getVehicleEnergyLevel() {
-    return vehicle.getEnergyLevel();
+    return energyLevel;
   }
 
   /**
@@ -282,11 +291,8 @@ public class VehicleProcessModel {
    * @param newLevel The new level.
    */
   public void setVehicleEnergyLevel(int newLevel) {
-    int oldValue;
-    synchronized (vehicle) {
-      oldValue = vehicle.getEnergyLevel();
-      vehicle.setEnergyLevel(newLevel);
-    }
+    int oldValue = this.energyLevel;
+    this.energyLevel = newLevel;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.ENERGY_LEVEL.name(),
                                                   oldValue,
@@ -300,7 +306,7 @@ public class VehicleProcessModel {
    */
   @Nonnull
   public List<LoadHandlingDevice> getVehicleLoadHandlingDevices() {
-    return vehicle.getLoadHandlingDevices();
+    return loadHandlingDevices;
   }
 
   /**
@@ -313,13 +319,8 @@ public class VehicleProcessModel {
     for (LoadHandlingDevice lhd : devices) {
       devs.add(new LoadHandlingDevice(lhd));
     }
-    List<LoadHandlingDevice> oldValue;
-    // Otherwise update the devices list, notify listeners and let the kernel
-    // know.
-    synchronized (vehicle) {
-      oldValue = vehicle.getLoadHandlingDevices();
-      vehicle.setLoadHandlingDevices(devs);
-    }
+    List<LoadHandlingDevice> oldValue = this.loadHandlingDevices;
+    this.loadHandlingDevices = devs;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.LOAD_HANDLING_DEVICES.name(),
                                                   oldValue,
@@ -330,22 +331,25 @@ public class VehicleProcessModel {
    * Returns the vehicle's maximum velocity.
    *
    * @return The vehicle's maximum velocity.
+   * @deprecated The maximum velocity is not a dynamic vehicle attribute.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public int getVehicleMaxVelocity() {
-    return vehicle.getMaxVelocity();
+    return maxVelocity;
   }
 
   /**
    * Sets the vehicle's maximum velocity.
    *
    * @param newVelocity The new maximum velocity.
+   * @deprecated The maximum velocity is not a dynamic vehicle attribute.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setVehicleMaxVelocity(int newVelocity) {
-    int oldValue;
-    synchronized (vehicle) {
-      oldValue = vehicle.getMaxVelocity();
-      vehicle.setMaxVelocity(newVelocity);
-    }
+    int oldValue = this.maxVelocity;
+    this.maxVelocity = newVelocity;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.MAX_VELOCITY.name(),
                                                   oldValue,
@@ -356,22 +360,25 @@ public class VehicleProcessModel {
    * Returns the vehicle's maximum reverse velocity.
    *
    * @return The vehicle's maximum reverse velocity.
+   * @deprecated The maximum reverse velocity is not a dynamic vehicle attribute.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public int getVehicleMaxReverseVelocity() {
-    return vehicle.getMaxReverseVelocity();
+    return maxReverseVelocity;
   }
 
   /**
    * Sets the vehicle's maximum reverse velocity.
    *
    * @param newVelocity The new maximum reverse velocity.
+   * @deprecated The maximum reverse velocity is not a dynamic vehicle attribute.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setVehicleMaxReverseVelocity(int newVelocity) {
-    int oldValue;
-    synchronized (vehicle) {
-      oldValue = vehicle.getMaxReverseVelocity();
-      vehicle.setMaxReverseVelocity(newVelocity);
-    }
+    int oldValue = this.maxReverseVelocity;
+    this.maxReverseVelocity = newVelocity;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.MAX_REVERSE_VELOCITY.name(),
                                                   oldValue,
@@ -386,13 +393,6 @@ public class VehicleProcessModel {
    * @see Vehicle#setProperty(java.lang.String, java.lang.String)
    */
   public void setVehicleProperty(@Nonnull String key, @Nullable String value) {
-    if (Objects.equals(value, vehicle.getProperty(key))) {
-      return;
-    }
-    synchronized (vehicle) {
-      vehicle.setProperty(key, value);
-    }
-
     getPropertyChangeSupport().firePropertyChange(Attribute.VEHICLE_PROPERTY.name(),
                                                   null,
                                                   new VehiclePropertyUpdate(key, value));
@@ -405,9 +405,7 @@ public class VehicleProcessModel {
    */
   @Nonnull
   public Vehicle.State getVehicleState() {
-    synchronized (vehicle) {
-      return vehicle.getState();
-    }
+    return state;
   }
 
   /**
@@ -416,20 +414,18 @@ public class VehicleProcessModel {
    * @param newState The new state
    */
   public void setVehicleState(@Nonnull Vehicle.State newState) {
-    Vehicle.State oldState = vehicle.getState();
-    synchronized (vehicle) {
-      vehicle.setState(newState);
-    }
+    Vehicle.State oldState = this.state;
+    this.state = newState;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.STATE.name(), oldState, newState);
 
     if (oldState != Vehicle.State.ERROR && newState == Vehicle.State.ERROR) {
-      publishUserNotification(new UserNotification(vehicle.getName(),
+      publishUserNotification(new UserNotification(getName(),
                                                    "Vehicle state changed to ERROR",
                                                    UserNotification.Level.NOTEWORTHY));
     }
     else if (oldState == Vehicle.State.ERROR && newState != Vehicle.State.ERROR) {
-      publishUserNotification(new UserNotification(vehicle.getName(),
+      publishUserNotification(new UserNotification(getName(),
                                                    "Vehicle state is no longer ERROR",
                                                    UserNotification.Level.NOTEWORTHY));
     }
@@ -442,7 +438,7 @@ public class VehicleProcessModel {
    */
   @Nonnull
   public VehicleCommAdapter.State getVehicleAdapterState() {
-    return vehicle.getAdapterState();
+    return adapterState;
   }
 
   /**
@@ -451,11 +447,8 @@ public class VehicleProcessModel {
    * @param newState The new state.
    */
   public void setVehicleAdapterState(@Nonnull VehicleCommAdapter.State newState) {
-    VehicleCommAdapter.State oldValue;
-    synchronized (vehicle) {
-      oldValue = vehicle.getAdapterState();
-      vehicle.setAdapterState(newState);
-    }
+    VehicleCommAdapter.State oldValue = this.adapterState;
+    this.adapterState = newState;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.COMM_ADAPTER_STATE.name(),
                                                   oldValue,
@@ -518,6 +511,10 @@ public class VehicleProcessModel {
     getPropertyChangeSupport().firePropertyChange(Attribute.COMMAND_FAILED.name(),
                                                   null,
                                                   failedCommand);
+  }
+
+  protected PropertyChangeSupport getPropertyChangeSupport() {
+    return pcs;
   }
 
   /**
@@ -632,11 +629,17 @@ public class VehicleProcessModel {
     LOAD_HANDLING_DEVICES,
     /**
      * Indicates a change of the vehicle's maximum velocity.
+     *
+     * @deprecated The maximum velocity is not a dynamic vehicle attribute.
      */
+    @Deprecated
     MAX_VELOCITY,
     /**
      * Indicates a change of the vehicle's maximum reverse velocity.
+     *
+     * @deprecated The maximum velocity is not a dynamic vehicle attribute.
      */
+    @Deprecated
     MAX_REVERSE_VELOCITY,
     /**
      * Indicates a change of the vehicle's state.

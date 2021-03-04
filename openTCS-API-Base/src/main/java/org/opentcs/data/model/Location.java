@@ -8,30 +8,33 @@
 package org.opentcs.data.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * A location at which a vehicle may perform an action.
- * <ul>
- * <li>A <code>Location</code> must be linked to at least one <code>Point</code>
- * to be reachable for a vehicle.</li>
- * <li>It may be linked to multiple <code>Point</code>s.</li>
- * <li>As long as a link's specific set of allowed operations is empty (which is
- * the default), all operations defined by the <code>Location</code>'s
- * referenced <code>LocationType</code> are allowed at the linked
- * <code>Point</code>. If the link's set of allowed operations is not empty,
- * only the operations contained in it are allowed at the linked
- * <code>Point</code>.</li>
- * </ul>
+ * A location at which a {@link Vehicle} may perform an action.
+ * <p>
+ * A location must be linked to at least one {@link Point} to be reachable for a vehicle.
+ * It may be linked to multiple points.
+ * As long as a link's specific set of allowed operations is empty (which is the default), all
+ * operations defined by the location's referenced {@link LocationType} are allowed at the linked
+ * point.
+ * If the link's set of allowed operations is not empty, only the operations contained in it are
+ * allowed at the linked point.
+ * </p>
  *
+ * @see LocationType
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Location
     extends TCSResource<Location>
     implements Serializable,
@@ -48,20 +51,69 @@ public class Location
   /**
    * A set of links attached to this location.
    */
-  private Set<Link> attachedLinks = new HashSet<>();
+  private final Set<Link> attachedLinks;
 
   /**
    * Creates a new Location.
    *
    * @param objectID The new location's object ID.
    * @param name The new location's name.
-   * @param locationType The new location's type.
+   * @param type The new location's type.
+   * @deprecated Will be removed.
    */
-  public Location(int objectID,
-                  String name,
-                  TCSObjectReference<LocationType> locationType) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public Location(int objectID, String name, TCSObjectReference<LocationType> type) {
     super(objectID, name);
-    type = Objects.requireNonNull(locationType, "locationType is null");
+    this.type = requireNonNull(type, "type");
+    this.position = new Triple(0, 0, 0);
+    this.attachedLinks = new HashSet<>();
+  }
+
+  /**
+   * Creates a new Location.
+   *
+   * @param name The new location's name.
+   * @param type The new location's type.
+   */
+  public Location(String name, TCSObjectReference<LocationType> type) {
+    super(name);
+    this.type = requireNonNull(type, "type");
+    this.position = new Triple(0, 0, 0);
+    this.attachedLinks = new HashSet<>();
+  }
+
+  @SuppressWarnings("deprecation")
+  private Location(int objectID,
+                   String name,
+                   Map<String, String> properties,
+                   TCSObjectReference<LocationType> locationType,
+                   Triple position,
+                   Set<Link> attachedLinks) {
+    super(objectID, name, properties);
+    type = requireNonNull(locationType, "locationType");
+    this.position = requireNonNull(position, "position");
+    this.attachedLinks = new HashSet<>(requireNonNull(attachedLinks, "attachedLinks"));
+  }
+
+  @Override
+  public Location withProperty(String key, String value) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        propertiesWith(key, value),
+                        type,
+                        position,
+                        attachedLinks);
+  }
+
+  @Override
+  public Location withProperties(Map<String, String> properties) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        properties,
+                        type,
+                        position,
+                        attachedLinks);
   }
 
   /**
@@ -78,9 +130,27 @@ public class Location
    *
    * @param newPosition The new physical coordinates of this location. May not
    * be <code>null</code>.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setPosition(Triple newPosition) {
     position = requireNonNull(newPosition, "newPosition is null");
+  }
+
+  /**
+   * Creates a copy of this object, with the given position.
+   *
+   * @param position The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Location withPosition(Triple position) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        getProperties(),
+                        type,
+                        position,
+                        attachedLinks);
   }
 
   /**
@@ -96,9 +166,12 @@ public class Location
    * Sets this location's type.
    *
    * @param newType This location's new type.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setType(TCSObjectReference<LocationType> newType) {
-    type = Objects.requireNonNull(newType, "newType is null");
+    type = requireNonNull(newType, "newType");
   }
 
   /**
@@ -107,7 +180,7 @@ public class Location
    * @return A set of links attached to this location.
    */
   public Set<Link> getAttachedLinks() {
-    return new HashSet<>(attachedLinks);
+    return Collections.unmodifiableSet(attachedLinks);
   }
 
   /**
@@ -118,9 +191,12 @@ public class Location
    * attached to this location.
    * @throws IllegalArgumentException If the location end of the given link is
    * not this location.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public boolean attachLink(Link newLink) {
-    Objects.requireNonNull(newLink, "newLink is null");
+    requireNonNull(newLink, "newLink");
     if (!newLink.getLocation().equals(this.getReference())) {
       throw new IllegalArgumentException(
           "location end of link is not this location");
@@ -135,9 +211,12 @@ public class Location
    * location.
    * @return <code>true</code> if, and only if, there was a link to the given
    * point attached to this location.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public boolean detachLink(TCSObjectReference<Point> pointRef) {
-    Objects.requireNonNull(pointRef, "pointRef is null");
+    requireNonNull(pointRef, "pointRef");
     Iterator<Link> linkIter = attachedLinks.iterator();
     while (linkIter.hasNext()) {
       Link curLink = linkIter.next();
@@ -149,22 +228,41 @@ public class Location
     return false;
   }
 
+  /**
+   * Creates a copy of this object, with the given attached links.
+   *
+   * @param attachedLinks The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Location withAttachedLinks(@Nonnull Set<Link> attachedLinks) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        getProperties(),
+                        type,
+                        position,
+                        attachedLinks);
+  }
+
   @Override
   public Location clone() {
-    Location clone = (Location) super.clone();
-    clone.position = (position == null) ? null : position.clone();
-    clone.type = type.clone();
-    clone.attachedLinks = new HashSet<>();
-    for (Link curLink : attachedLinks) {
-      clone.attachedLinks.add(curLink.clone());
-    }
-    return clone;
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        getProperties(),
+                        type,
+                        position,
+                        attachedLinks);
+  }
+
+  @SuppressWarnings("deprecation")
+  private int getIdWithoutDeprecationWarning() {
+    return getId();
   }
 
   /**
    * A link connecting a point and a location, expressing that the location is
    * reachable from the point.
    */
+  @ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
   public static class Link
       implements Serializable,
                  Cloneable {
@@ -172,26 +270,36 @@ public class Location
     /**
      * A reference to the location end of this link.
      */
-    private TCSResourceReference<Location> location;
+    private final TCSResourceReference<Location> location;
     /**
      * A reference to the point end of this link.
      */
-    private TCSResourceReference<Point> point;
+    private final TCSResourceReference<Point> point;
     /**
      * The operations allowed at this link.
      */
-    private Set<String> allowedOperations = new TreeSet<>();
+    private final Set<String> allowedOperations;
 
     /**
      * Creates a new Link.
      *
-     * @param linkLocation A reference to the location end of this link.
-     * @param linkPoint A reference to the point end of this link.
+     * @param location A reference to the location end of this link.
+     * @param point A reference to the point end of this link.
      */
-    public Link(TCSResourceReference<Location> linkLocation,
-                TCSResourceReference<Point> linkPoint) {
-      location = Objects.requireNonNull(linkLocation, "linkLocation is null");
-      point = Objects.requireNonNull(linkPoint, "linkPoint is null");
+    public Link(TCSResourceReference<Location> location,
+                TCSResourceReference<Point> point) {
+      this.location = requireNonNull(location, "location");
+      this.point = requireNonNull(point, "point");
+      this.allowedOperations = new TreeSet<>();
+    }
+
+    private Link(TCSResourceReference<Location> location,
+                 TCSResourceReference<Point> point,
+                 Set<String> allowedOperations) {
+      this.location = requireNonNull(location, "location");
+      this.point = requireNonNull(point, "point");
+      this.allowedOperations = new TreeSet<>(requireNonNull(allowedOperations,
+                                                            "allowedOperations"));
     }
 
     /**
@@ -218,7 +326,7 @@ public class Location
      * @return The operations allowed at this link.
      */
     public Set<String> getAllowedOperations() {
-      return new TreeSet<>(allowedOperations);
+      return Collections.unmodifiableSet(allowedOperations);
     }
 
     /**
@@ -229,13 +337,17 @@ public class Location
      * execute the given operation at his link.
      */
     public boolean hasAllowedOperation(String operation) {
-      Objects.requireNonNull(operation, "operation is null");
+      requireNonNull(operation, "operation");
       return allowedOperations.contains(operation);
     }
 
     /**
      * Removes all allowed operations from this link.
+     *
+     * @deprecated Will become immutable.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
     public void clearAllowedOperations() {
       allowedOperations.clear();
     }
@@ -246,9 +358,12 @@ public class Location
      * @param operation The operation to be allowed.
      * @return <code>true</code> if, and only if, the given operation wasn't
      * already allowed before.
+     * @deprecated Will become immutable.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
     public boolean addAllowedOperation(String operation) {
-      Objects.requireNonNull(operation, "operation is null");
+      requireNonNull(operation, "operation");
       return allowedOperations.add(operation);
     }
 
@@ -258,10 +373,23 @@ public class Location
      * @param operation The operation to be disallowed.
      * @return <code>true</code> if, and only if, the given operation was
      * allowed before.
+     * @deprecated Will become immutable.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
     public boolean removeAllowedOperation(String operation) {
-      Objects.requireNonNull(operation, "operation is null");
+      requireNonNull(operation, "operation");
       return allowedOperations.remove(operation);
+    }
+
+    /**
+     * Creates a copy of this object, with the given allowed operations.
+     *
+     * @param allowedOperations The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Link withAllowedOperations(Set<String> allowedOperations) {
+      return new Link(location, point, allowedOperations);
     }
 
     /**
@@ -301,17 +429,7 @@ public class Location
 
     @Override
     public Link clone() {
-      Link clone;
-      try {
-        clone = (Link) super.clone();
-      }
-      catch (CloneNotSupportedException exc) {
-        throw new IllegalStateException("Unexpected exception", exc);
-      }
-      clone.location = location.clone();
-      clone.point = point.clone();
-      clone.allowedOperations = getAllowedOperations();
-      return clone;
+      return new Link(location, point, allowedOperations);
     }
   }
 }

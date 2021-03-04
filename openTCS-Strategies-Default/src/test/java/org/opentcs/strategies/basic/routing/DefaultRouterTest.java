@@ -10,9 +10,9 @@ package org.opentcs.strategies.basic.routing;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.*;
-import org.mockito.Matchers;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -49,13 +49,8 @@ public class DefaultRouterTest {
   /**
    * The builder for routing tables.
    */
-  private RoutingTableBuilder builder;
+  private PointRouterFactory builder;
 
-  /**
-   * The object id for the next created object.
-   */
-  private int nextObjectId;
-  
   /**
    * The configuration.
    */
@@ -63,14 +58,13 @@ public class DefaultRouterTest {
 
   @Before
   public void setUp() {
-    nextObjectId = 0;
     kernel = mock(LocalKernel.class);
-    builder = mock(RoutingTableBuilder.class);
+    builder = mock(PointRouterFactory.class);
     when(kernel.getTCSObjects(Vehicle.class)).thenReturn(vehicles);
-    when(kernel.getTCSObject(Matchers.eq(Vehicle.class), anyString()))
+    when(kernel.getTCSObject(eq(Vehicle.class), anyString()))
         .then(o -> vehicles.stream()
-            .filter(t -> filterByName(o, t))
-            .findFirst().orElse(null));
+        .filter(t -> filterByName(o, t))
+        .findFirst().orElse(null));
     configuration = mock(DefaultRouterConfiguration.class);
     when(configuration.routeToCurrentPosition()).thenReturn(false);
     router = spy(createRouter());
@@ -83,7 +77,7 @@ public class DefaultRouterTest {
     createVehicle("Vehicle-002", -1);
     router.initialize();
 
-    verify(builder, times(1)).computeTable(any());
+    verify(builder, times(1)).createPointRouter(any());
   }
 
   @Test
@@ -93,7 +87,7 @@ public class DefaultRouterTest {
     createVehicle("Vehicle-002", 1);
     router.initialize();
 
-    verify(builder, times(1)).computeTable(any());
+    verify(builder, times(1)).createPointRouter(any());
   }
 
   @Test
@@ -103,7 +97,7 @@ public class DefaultRouterTest {
     createVehicle("Vehicle-002", -1);
     router.initialize();
 
-    verify(builder, times(2)).computeTable(any());
+    verify(builder, times(2)).createPointRouter(any());
   }
 
   @Test
@@ -113,7 +107,7 @@ public class DefaultRouterTest {
     }
     router.initialize();
 
-    verify(builder, times(15)).computeTable(any());
+    verify(builder, times(15)).createPointRouter(any());
   }
 
   /**
@@ -126,9 +120,9 @@ public class DefaultRouterTest {
    * @return The vehicle
    */
   private Vehicle createVehicle(String name, int routingGroup) {
-    Vehicle vehicle = new Vehicle(nextObjectId++, name);
+    Vehicle vehicle = new Vehicle(name);
     if (routingGroup >= 0) {
-      vehicle.setProperty(DefaultRouter.PROPKEY_ROUTING_GROUP, String.valueOf(routingGroup));
+      vehicle = vehicle.withProperty(Router.PROPKEY_ROUTING_GROUP, String.valueOf(routingGroup));
     }
     vehicles.add(vehicle);
 
@@ -142,7 +136,7 @@ public class DefaultRouterTest {
    * @return The router
    */
   private Router createRouter() {
-    when(builder.computeTable(any())).thenReturn(mock(RoutingTable.class));
+    when(builder.createPointRouter(any())).thenReturn(mock(PointRouter.class));
 
     return new DefaultRouter(kernel,
                              builder,

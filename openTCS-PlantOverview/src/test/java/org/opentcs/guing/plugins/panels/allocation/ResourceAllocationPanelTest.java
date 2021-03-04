@@ -2,7 +2,7 @@ package org.opentcs.guing.plugins.panels.allocation;
 
 import com.google.common.collect.Maps;
 import org.junit.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -20,11 +20,6 @@ import org.opentcs.data.model.Vehicle;
  * @author Mats Wilhelm
  */
 public class ResourceAllocationPanelTest {
-
-  /**
-   * Provides a unique object id.
-   */
-  private int nextObjectId;
 
   /**
    * The provider for the kernel.
@@ -84,10 +79,10 @@ public class ResourceAllocationPanelTest {
   public void testKernelQueryNull() {
     kernelConnected = true;
     when(kernel.getState()).thenReturn(Kernel.State.OPERATING);
-    Vehicle vehicle = createVehicle("Vehicle-000");
-    vehicle.setCurrentPosition(createPoint("Point-000").getReference());
-    Vehicle vehicle2 = createVehicle("Vehicle-000");
-    vehicle2.setCurrentPosition(createPoint("Point-001").getReference());
+    Vehicle vehicle = createVehicle("Vehicle-000")
+        .withCurrentPosition(createPoint("Point-000").getReference());
+    Vehicle vehicle2 = createVehicle("Vehicle-000")
+        .withCurrentPosition(createPoint("Point-001").getReference());
     TCSObjectEvent event = new TCSObjectEvent(vehicle, vehicle2, TCSObjectEvent.Type.OBJECT_MODIFIED);
     panel.processEvent(event);
     verify(kernel, times(1)).query(any());
@@ -99,10 +94,10 @@ public class ResourceAllocationPanelTest {
     kernelConnected = true;
     when(kernel.getState()).thenReturn(Kernel.State.OPERATING);
     when(kernel.query(any())).thenReturn(new QuerySchedulerAllocations(Maps.newHashMap()));
-    Vehicle vehicle = createVehicle("Vehicle-000");
-    vehicle.setCurrentPosition(createPoint("Point-000").getReference());
-    Vehicle vehicle2 = createVehicle("Vehicle-000");
-    vehicle2.setCurrentPosition(createPoint("Point-001").getReference());
+    Vehicle vehicle = createVehicle("Vehicle-000")
+        .withCurrentPosition(createPoint("Point-000").getReference());
+    Vehicle vehicle2 = createVehicle("Vehicle-000")
+        .withCurrentPosition(createPoint("Point-001").getReference());
     TCSObjectEvent event = new TCSObjectEvent(vehicle, vehicle2, TCSObjectEvent.Type.OBJECT_MODIFIED);
     panel.processEvent(event);
     verify(kernel, times(1)).query(any());
@@ -114,8 +109,8 @@ public class ResourceAllocationPanelTest {
     kernelConnected = true;
     when(kernel.getState()).thenReturn(Kernel.State.OPERATING);
     when(kernel.query(any())).thenReturn(new QuerySchedulerAllocations(Maps.newHashMap()));
-    Vehicle vehicle = createVehicle("Vehicle-000");
-    vehicle.setCurrentPosition(createPoint("Point-000").getReference());
+    Vehicle vehicle = createVehicle("Vehicle-000")
+        .withCurrentPosition(createPoint("Point-000").getReference());
     TCSObjectEvent event = new TCSObjectEvent(vehicle, null, TCSObjectEvent.Type.OBJECT_CREATED);
     panel.processEvent(event);
     verify(kernel, times(1)).query(any());
@@ -127,8 +122,8 @@ public class ResourceAllocationPanelTest {
     kernelConnected = true;
     when(kernel.getState()).thenReturn(Kernel.State.OPERATING);
     when(kernel.query(any())).thenReturn(new QuerySchedulerAllocations(Maps.newHashMap()));
-    Vehicle vehicle = createVehicle("Vehicle-000");
-    vehicle.setCurrentPosition(createPoint("Point-000").getReference());
+    Vehicle vehicle = createVehicle("Vehicle-000")
+        .withCurrentPosition(createPoint("Point-000").getReference());
     TCSObjectEvent event = new TCSObjectEvent(null, vehicle, TCSObjectEvent.Type.OBJECT_REMOVED);
     panel.processEvent(event);
     verify(kernel, times(1)).query(any());
@@ -142,7 +137,7 @@ public class ResourceAllocationPanelTest {
    * @return The vehicle
    */
   private Vehicle createVehicle(String name) {
-    Vehicle vehicle = new Vehicle(nextObjectId++, name);
+    Vehicle vehicle = new Vehicle(name);
 
     return vehicle;
   }
@@ -154,7 +149,7 @@ public class ResourceAllocationPanelTest {
    * @return The point
    */
   private Point createPoint(String name) {
-    Point point = new Point(nextObjectId++, name);
+    Point point = new Point(name);
 
     return point;
   }

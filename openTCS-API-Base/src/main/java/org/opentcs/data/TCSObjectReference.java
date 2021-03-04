@@ -10,24 +10,20 @@ package org.opentcs.data;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import org.opentcs.data.order.DriveOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * Instances of this class provide transient references to business objects.
- * They can be used to prevent serialization of whole object graphs but still
- * keep a reference to the actual object (i.e. its ID and name, which both are
- * unique in a model).
+ * A transient reference to a {@link TCSObject}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual object class.
  */
+@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class TCSObjectReference<E extends TCSObject<E>>
-    implements Serializable, Cloneable {
+    implements Serializable,
+               Cloneable {
 
-  /**
-   * The referenced object.
-   * (Transient to prevent serialization of whole object graphs.)
-   */
-  private transient TCSObject<E> referent;
   /**
    * The referenced object's class.
    */
@@ -49,28 +45,33 @@ public class TCSObjectReference<E extends TCSObject<E>>
   /**
    * Creates a new TCSObjectReference.
    *
-   * @param newReferent The object this reference references.
+   * @param referent The object this reference references.
    */
-  protected TCSObjectReference(@Nonnull TCSObject<E> newReferent) {
-    referent = requireNonNull(newReferent, "newReferent");
+  @SuppressWarnings("deprecation")
+  protected TCSObjectReference(@Nonnull TCSObject<E> referent) {
+    requireNonNull(referent, "newReferent");
+
     referentClass = referent.getClass();
     id = referent.getId();
     name = referent.getName();
     dummy = false;
   }
 
-  /**
-   * Creates a dummy reference, referencing nothing.
-   *
-   * @param clazz The class of the object being referenced.
-   * @param newName The new reference's name.
-   */
   private TCSObjectReference(@Nonnull Class<?> clazz, @Nonnull String newName) {
     name = requireNonNull(newName, "newName");
     referentClass = requireNonNull(clazz, "clazz");
-    referent = null;
     id = Integer.MAX_VALUE;
     dummy = true;
+  }
+
+  private TCSObjectReference(@Nonnull Class<?> clazz,
+                             @Nonnull String newName,
+                             int id,
+                             boolean dummy) {
+    referentClass = requireNonNull(clazz, "clazz");
+    name = requireNonNull(newName, "newName");
+    this.id = id;
+    this.dummy = dummy;
   }
 
   /**
@@ -86,7 +87,10 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * Returns the referenced object's ID.
    *
    * @return The referenced object's ID.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public final int getId() {
     return id;
   }
@@ -107,7 +111,10 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * change the name of the referenced object.
    *
    * @param newName The referenced object's new name.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public final void setName(@Nonnull String newName) {
     name = requireNonNull(newName, "newName");
   }
@@ -118,47 +125,29 @@ public class TCSObjectReference<E extends TCSObject<E>>
    *
    * @return <code>false</code> if this reference really references an object,
    * or <code>true</code> if it's a dummy reference without a real object.
+   * @deprecated Dummy references are deprecated. In case of drive order destinations, use
+   * {@link DriveOrder.Destination#Destination(org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public boolean isDummy() {
     return dummy;
   }
 
-  /**
-   * Indicates whether a TCSObjectReference is equal to another one.
-   * Two TCSObjectReferences are equal if
-   * <ul>
-   * <li>the IDs of the TCSObjects they refer to are equal and
-   * <li>the classes of the TCSObjects they refer to are equal.
-   * </ul>
-   *
-   * @param otherObj The object to check for equality.
-   * @return <code>true</code> if <code>otherObj</code> is not
-   * <code>null</code>, is a TCSObjectReference, too, and both its ID and
-   * the implementing class of TCSObject refers to are equal, else
-   * <code>false</code>.
-   */
   @Override
   public boolean equals(Object otherObj) {
     if (otherObj instanceof TCSObjectReference) {
       TCSObjectReference<?> otherRef = (TCSObjectReference<?>) otherObj;
-      return id == otherRef.id;
+      return referentClass.equals(otherRef.referentClass) && name.equals(otherRef.name);
     }
     else {
       return false;
     }
   }
 
-  /**
-   * Returns a hash code for this TCSObjectReference.
-   * The hash code for a TCSObjectReference is computed as the exclusive
-   * OR (XOR) of the hash codes of the ID and the class name of the TCSObject
-   * the reference refers to.
-   *
-   * @return A hash code for this TCSObjectReference.
-   */
   @Override
   public int hashCode() {
-    return id;
+    return name.hashCode();
   }
 
   @Override
@@ -174,18 +163,9 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * @return A distinct copy of this reference, with its <code>referent</code>
    * attribute set to <code>null</code>.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public TCSObjectReference<E> clone() {
-    TCSObjectReference<E> clone = null;
-    try {
-      clone = (TCSObjectReference<E>) super.clone();
-    }
-    catch (CloneNotSupportedException exc) {
-      throw new RuntimeException("Unexpected exception", exc);
-    }
-    clone.referent = null;
-    return clone;
+    return new TCSObjectReference<>(referentClass, name, id, dummy);
   }
 
   /**
@@ -195,7 +175,11 @@ public class TCSObjectReference<E extends TCSObject<E>>
    * @param clazz The class of the dummy reference to be returned.
    * @param name The name of the dummy reference to be returned.
    * @return A dummy reference, referencing nothing.
+   * @deprecated Dummy references are deprecated. In case of drive order destinations, use
+   * {@link DriveOrder.Destination#Destination(org.opentcs.data.TCSObjectReference)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public static <T extends TCSObject<T>> TCSObjectReference<T>
       getDummyReference(Class<T> clazz, String name) {
     return new TCSObjectReference<>(clazz, name);

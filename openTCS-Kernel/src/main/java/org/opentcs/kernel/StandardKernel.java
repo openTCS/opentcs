@@ -48,7 +48,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
@@ -692,6 +691,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref,
                                     int velocity)
       throws ObjectUnknownException {
@@ -700,6 +700,7 @@ final class StandardKernel
   }
 
   @Override
+  @Deprecated
   public void setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                            int velocity)
       throws ObjectUnknownException {
@@ -946,14 +947,14 @@ final class StandardKernel
 
   @Override
   @Deprecated
-  public StaticRoute createStaticRoute() {
+  public org.opentcs.data.model.StaticRoute createStaticRoute() {
     LOG.debug("method entry");
     return kernelState.createStaticRoute();
   }
 
   @Override
   @Deprecated
-  public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
+  public void addStaticRouteHop(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -962,7 +963,7 @@ final class StandardKernel
 
   @Override
   @Deprecated
-  public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
+  public void clearStaticRouteHops(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     kernelState.clearStaticRouteHops(ref);
@@ -1025,13 +1026,20 @@ final class StandardKernel
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public void setTransportOrderFutureDriveOrders(
-      TCSObjectReference<TransportOrder> orderRef,
-      List<DriveOrder> newOrders)
+  @Deprecated
+  public void setTransportOrderFutureDriveOrders(TCSObjectReference<TransportOrder> orderRef,
+                                                 List<DriveOrder> newOrders)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     kernelState.setTransportOrderFutureDriveOrders(orderRef, newOrders);
+  }
+
+  @Override
+  public void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
+                                           List<DriveOrder> newOrders)
+      throws ObjectUnknownException {
+    LOG.debug("method entry");
+    kernelState.setTransportOrderDriveOrders(orderRef, newOrders);
   }
 
   @Override

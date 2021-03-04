@@ -37,9 +37,12 @@ public class VehicleOrderSelection {
    * Creates a new instance.
    *
    * @param transportOrder The transport order to be processed.
+   * May be {@code null} to mark this selection as not assignable.
    * @param vehicle The transport order to be processed.
+   * May be {@code null} to mark this selection as not assignable.
    * @param driveOrders The drive orders describing the route the vehicle would need to take for
    * processing the order.
+   * May be {@code null} to mark this selection as not assignable.
    */
   public VehicleOrderSelection(@Nullable TransportOrder transportOrder,
                                @Nullable Vehicle vehicle,
@@ -62,5 +65,15 @@ public class VehicleOrderSelection {
   @Nullable
   public List<DriveOrder> getDriveOrders() {
     return driveOrders;
+  }
+  
+  /**
+   * Checks whether this instance represents a selection that is actually assignable.
+   *
+   * @return {@code true} if, and only if, this instance represents a selection that is actually
+   * assignable.
+   */
+  public boolean isAssignable() {
+    return transportOrder != null && vehicle != null && driveOrders != null;
   }
 }

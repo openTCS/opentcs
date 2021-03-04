@@ -89,8 +89,8 @@ public class TransportOrderData {
   public List<DriveOrder.Destination> getDestinations() {
     List<DriveOrder.Destination> destinations = new LinkedList<>();
     for (DriveOrderStructure i : driveOrders) {
-      destinations.add(new DriveOrder.Destination(i.getDriveOrderLocation(),
-                                                  i.getDriveOrderVehicleOperation()));
+      destinations.add(new DriveOrder.Destination(i.getDriveOrderLocation())
+          .withOperation(i.getDriveOrderVehicleOperation()));
     }
     return destinations;
   }

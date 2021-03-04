@@ -34,7 +34,6 @@ import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.ShapeLayoutElementCreationTO;
-import org.opentcs.access.to.model.StaticRouteCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.ObjectExistsException;
@@ -46,7 +45,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -382,11 +380,12 @@ public class XMLModel002Builder
    * @param model The model data.
    * @return A list of {@link StaticRouteTO StaticRoutes} for all static routes in a model.
    */
+  @SuppressWarnings("deprecation")
   private static List<StaticRouteTO> getStaticRoutes(Model model) {
-    Set<StaticRoute> routes = new TreeSet<>(Comparators.objectsByName());
+    Set<org.opentcs.data.model.StaticRoute> routes = new TreeSet<>(Comparators.objectsByName());
     routes.addAll(model.getStaticRoutes(null));
     List<StaticRouteTO> result = new ArrayList<>();
-    for (StaticRoute curRoute : routes) {
+    for (org.opentcs.data.model.StaticRoute curRoute : routes) {
       StaticRouteTO staticRoute = new StaticRouteTO();
       staticRoute.setName(curRoute.getName());
 
@@ -436,6 +435,7 @@ public class XMLModel002Builder
    * @param model The model data.
    * @return A list of {@link VisualLayoutTO VisualLayouts} for all visual layouts in a model.
    */
+  @SuppressWarnings("deprecation")
   private static List<VisualLayoutTO> getVisualLayouts(Model model) {
     Set<VisualLayout> layouts = new TreeSet<>(Comparators.objectsByName());
     layouts.addAll(model.getObjectPool().getObjects(VisualLayout.class));
@@ -740,11 +740,12 @@ public class XMLModel002Builder
    * @param model The model.
    * @throws ObjectExistsException In case of duplicate objects.
    */
+  @SuppressWarnings("deprecation")
   private void readStaticRoutes(List<StaticRouteTO> staticRouteTOs, Model model)
       throws ObjectExistsException {
     for (StaticRouteTO staticRouteTO : staticRouteTOs) {
       model.createStaticRoute(
-          new StaticRouteCreationTO(staticRouteTO.getName())
+          new org.opentcs.access.to.model.StaticRouteCreationTO(staticRouteTO.getName())
               .setHopNames(getHopNames(staticRouteTO.getHops()))
               .setProperties(getProperties(staticRouteTO.getProperties())));
     }

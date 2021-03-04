@@ -38,7 +38,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
@@ -441,12 +440,14 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref,
                                     int velocity)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                            int velocity)
       throws ObjectUnknownException {
@@ -653,23 +654,24 @@ abstract class KernelState
   }
 
   @Deprecated
-  public StaticRoute createStaticRoute() {
+  public org.opentcs.data.model.StaticRoute createStaticRoute() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   @Deprecated
-  public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
+  public void addStaticRouteHop(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
   @Deprecated
-  public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
+  public void clearStaticRouteHops(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public TransportOrder createTransportOrder(List<Destination> destinations) {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
@@ -678,6 +680,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setTransportOrderDeadline(TCSObjectReference<TransportOrder> ref,
                                         long deadline)
       throws ObjectUnknownException {
@@ -697,6 +700,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setTransportOrderIntendedVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef)
@@ -711,9 +715,16 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setTransportOrderFutureDriveOrders(
       TCSObjectReference<TransportOrder> orderRef,
       List<DriveOrder> newOrders)
+      throws ObjectUnknownException {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
+  public void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
+                                           List<DriveOrder> newOrders)
       throws ObjectUnknownException {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
@@ -730,6 +741,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void addTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> newDepRef)
@@ -737,6 +749,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void removeTransportOrderDependency(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<TransportOrder> rmDepRef)
@@ -751,6 +764,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setTransportOrderWrappingSequence(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<OrderSequence> seqRef)
@@ -758,6 +772,7 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  @Deprecated
   public void setTransportOrderDispensable(
       TCSObjectReference<TransportOrder> orderRef,
       boolean dispensable)
@@ -864,7 +879,7 @@ abstract class KernelState
       return getModel().expandResources(resources);
     }
   }
-  
+
   public void updateRoutingTopology() {
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
@@ -933,19 +948,19 @@ abstract class KernelState
     org.opentcs.util.configuration.Configuration.getInstance().setConfigurationItem(item);
   }
 
-  public Object getGlobalSyncObject() {
+  protected Object getGlobalSyncObject() {
     return globalSyncObject;
   }
 
-  public ModelPersister getModelPersister() {
+  protected ModelPersister getModelPersister() {
     return modelPersister;
   }
 
-  public TCSObjectPool getGlobalObjectPool() {
+  protected TCSObjectPool getGlobalObjectPool() {
     return globalObjectPool;
   }
 
-  public Model getModel() {
+  protected Model getModel() {
     return model;
   }
 

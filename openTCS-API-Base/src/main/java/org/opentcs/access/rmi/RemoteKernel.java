@@ -34,7 +34,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -47,6 +46,7 @@ import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.user.UserPermission;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.eventsystem.TCSEvent;
 
 /**
@@ -468,18 +468,25 @@ public interface RemoteKernel
                          TCSObjectReference<?> rmMemberRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   @CallPermissions({UserPermission.MODIFY_MODEL})
-  StaticRoute createStaticRoute(ClientID clientID)
+  org.opentcs.data.model.StaticRoute createStaticRoute(ClientID clientID)
       throws CredentialsException, RemoteException;
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   @CallPermissions({UserPermission.MODIFY_MODEL})
-  void addStaticRouteHop(ClientID clientID, TCSObjectReference<StaticRoute> ref,
+  void addStaticRouteHop(ClientID clientID,
+                         TCSObjectReference<org.opentcs.data.model.StaticRoute> ref,
                          TCSObjectReference<Point> newHopRef)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void clearStaticRouteHops(ClientID clientID,
-                            TCSObjectReference<StaticRoute> ref)
+                            TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_ORDER})
@@ -598,7 +605,7 @@ public interface RemoteKernel
                                                        String fileName)
       throws CredentialsException, ObjectUnknownException, IOException,
              RemoteException;
-  
+
   @CallPermissions({UserPermission.MODIFY_MODEL})
   void updateRoutingTopology(ClientID clientID)
       throws CredentialsException, RemoteException;

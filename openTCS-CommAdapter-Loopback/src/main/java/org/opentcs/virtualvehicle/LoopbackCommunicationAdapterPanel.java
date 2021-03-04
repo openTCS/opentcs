@@ -54,6 +54,7 @@ import org.opentcs.virtualvehicle.inputcomponents.SingleTextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TextListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.TripleTextInputPanel;
+import org.slf4j.LoggerFactory;
 
 /**
  * The LoopbackCommunicationAdapterPanel corresponding to the LoopbackCommunicationAdapter.
@@ -295,7 +296,7 @@ public class LoopbackCommunicationAdapterPanel
   private void updateVehicleLoadHandlingDevices(List<LoadHandlingDevice> loadHandlingDevices) {
     SwingUtilities.invokeLater(()
         -> ((LoadHandlingDeviceTableModel) devicesTable.getModel())
-            .updateLoadHandlingDevices(loadHandlingDevices));
+        .updateLoadHandlingDevices(loadHandlingDevices));
   }
 
   private void updateDefaultOperatingTime(int defaultOperatingTime) {
@@ -1794,11 +1795,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxFwdVelocityTitle"))
-            .setInitialValue(maxFwdVeloTxt.getText())
-            .setLabel(bundle.getString("maxFwdVelocityLabel"))
-            .setUnitLabel(bundle.getString("maxFwdVelocityUnit"))
-            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
-            .build());
+        .setInitialValue(maxFwdVeloTxt.getText())
+        .setLabel(bundle.getString("maxFwdVelocityLabel"))
+        .setUnitLabel(bundle.getString("maxFwdVelocityUnit"))
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
+        .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int velocity = Integer.parseInt((String) dialog.getInput());
@@ -1810,11 +1811,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxRevVelocityTitle"))
-            .setInitialValue(maxRevVeloTxt.getText())
-            .setLabel(bundle.getString("maxRevVelocityLabel"))
-            .setUnitLabel(bundle.getString("maxRevVelocityUnit"))
-            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
-            .build());
+        .setInitialValue(maxRevVeloTxt.getText())
+        .setLabel(bundle.getString("maxRevVelocityLabel"))
+        .setUnitLabel(bundle.getString("maxRevVelocityUnit"))
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
+        .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int velocity = Integer.parseInt((String) dialog.getInput());
@@ -1826,11 +1827,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxAccelerationTitle"))
-            .setInitialValue(maxAccelTxt.getText())
-            .setLabel(bundle.getString("maxAccelerationLabel"))
-            .setUnitLabel(bundle.getString("maxAccelerationUnit"))
-            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
-            .build());
+        .setInitialValue(maxAccelTxt.getText())
+        .setLabel(bundle.getString("maxAccelerationLabel"))
+        .setUnitLabel(bundle.getString("maxAccelerationUnit"))
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
+        .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int acceleration = Integer.parseInt((String) dialog.getInput());
@@ -1842,11 +1843,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("maxDecelerationTitle"))
-            .setInitialValue(maxDecelTxt.getText())
-            .setLabel(bundle.getString("maxDecelerationLabel"))
-            .setUnitLabel(bundle.getString("maxDecelerationUnit"))
-            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
-            .build());
+        .setInitialValue(maxDecelTxt.getText())
+        .setLabel(bundle.getString("maxDecelerationLabel"))
+        .setUnitLabel(bundle.getString("maxDecelerationUnit"))
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_NEG)
+        .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int deceleration = Integer.parseInt((String) dialog.getInput());
@@ -1858,11 +1859,11 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     InputDialog dialog = new InputDialog(
         new SingleTextInputPanel.Builder(
             bundle.getString("operationTimeTitle"))
-            .setInitialValue(defaultOpTimeTxt.getText())
-            .setUnitLabel(bundle.getString("operationTimeUnit"))
-            .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
-            .setMessage(bundle.getString("operationTimeMessage"))
-            .build());
+        .setInitialValue(defaultOpTimeTxt.getText())
+        .setUnitLabel(bundle.getString("operationTimeUnit"))
+        .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_POS)
+        .setMessage(bundle.getString("operationTimeMessage"))
+        .build());
     dialog.setVisible(true);
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       int opTime = Integer.parseInt((String) dialog.getInput());
@@ -1875,10 +1876,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("movementPowerTitle"))
-              .setInitialValue(movementPowerTxt.getText())
-              .setUnitLabel(bundle.getString("movementPowerUnit"))
-              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-              .build());
+          .setInitialValue(movementPowerTxt.getText())
+          .setUnitLabel(bundle.getString("movementPowerUnit"))
+          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+          .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double power = Double.parseDouble((String) dialog.getInput());
@@ -1892,10 +1893,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("operationPowerTitle"))
-              .setInitialValue(operationPowerTxt.getText())
-              .setUnitLabel(bundle.getString("operationPowerUnit"))
-              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-              .build());
+          .setInitialValue(operationPowerTxt.getText())
+          .setUnitLabel(bundle.getString("operationPowerUnit"))
+          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+          .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double power = Double.parseDouble((String) dialog.getInput());
@@ -1909,10 +1910,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("idlePowerTitle"))
-              .setInitialValue(idlePowerTxt.getText())
-              .setUnitLabel(bundle.getString("idlePowerUnit"))
-              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-              .build());
+          .setInitialValue(idlePowerTxt.getText())
+          .setUnitLabel(bundle.getString("idlePowerUnit"))
+          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+          .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double power = Double.parseDouble((String) dialog.getInput());
@@ -1926,10 +1927,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
       InputDialog dialog = new InputDialog(
           new SingleTextInputPanel.Builder(
               bundle.getString("capacityTitle"))
-              .setInitialValue(energyCapacityText.getText())
-              .setUnitLabel(bundle.getString("capacityUnit"))
-              .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
-              .build());
+          .setInitialValue(energyCapacityText.getText())
+          .setUnitLabel(bundle.getString("capacityUnit"))
+          .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT_POS)
+          .build());
       dialog.setVisible(true);
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         double capacity = Double.parseDouble((String) dialog.getInput());
@@ -2055,6 +2056,7 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
           bundle.getString("positionTitle"),
           pointList)
           .setLabel(bundle.getString("positionLabel"))
+          .setEditable(true)
           .setInitialSelection(currentPoint)
           .setRenderer(new TCSObjectNameListCellRenderer())
           .build();
@@ -2066,9 +2068,10 @@ private void rmOpSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         if (item == null) {
           vehicleModel.setVehiclePosition(null);
         }
-        else {
+        else{
           vehicleModel.setVehiclePosition(((Point) item).getName());
         }
+
       }
     }
   }//GEN-LAST:event_positionTxtMouseClicked

@@ -22,8 +22,8 @@ import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * A route for a vehicle, consisting of a sequence of steps (pairs of paths and
- * points) that need to be processed in their given order.
+ * A route for a {@link Vehicle}, consisting of a sequence of steps (pairs of {@link Path}s and
+ * {@link Point}s) that need to be processed in their given order.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -90,8 +90,7 @@ public class Route
   }
 
   /**
-   * A single step in a route, consisting of a path to travel and a point that
-   * is reached by travelling the path.
+   * A single step in a route.
    */
   public static class Step
       implements Serializable {

@@ -7,8 +7,9 @@
  */
 package org.opentcs.virtualvehicle.inputcomponents;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
+import static java.util.Objects.requireNonNull;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListCellRenderer;
@@ -28,6 +29,11 @@ public final class DropdownListInputPanel<E>
     extends InputPanel {
 
   /**
+   * The editor for comboBox. Only used if the comboBox is editable.
+   */
+  private final EditableComboBoxEditor editableCBEditor;
+
+  /**
    * Create a new panel.
    *
    * @param title Title of the panel.
@@ -35,11 +41,16 @@ public final class DropdownListInputPanel<E>
   private DropdownListInputPanel(String title) {
     super(title);
     initComponents();
+    editableCBEditor = new EditableComboBoxEditor(
+        Collections.unmodifiableList(getValidationListeners()), comboBox);
   }
 
   @Override
   protected void captureInput() {
-    input = comboBox.getSelectedItem();
+    //if the combobox is editable and the input was entered using the jTextField and 
+    //confirmed using the enter button, then the textField's input is not yet saved as the comboBox selection.
+    //Thats why it is safer to get the input from the textfield, if the combobox is editable.
+    input = comboBox.isEditable() ? comboBox.getEditor().getItem() : comboBox.getSelectedItem();
   }
 
   // CHECKSTYLE:OFF
@@ -56,7 +67,7 @@ public final class DropdownListInputPanel<E>
 
     messageLabel = new javax.swing.JLabel();
     label = new javax.swing.JLabel();
-    comboBox = new javax.swing.JComboBox<E>();
+    comboBox = new javax.swing.JComboBox<>();
 
     setLayout(new java.awt.GridBagLayout());
 
@@ -124,7 +135,10 @@ public final class DropdownListInputPanel<E>
      * Default is 0.
      */
     private int initialIndex;
-
+    /**
+     * Whether the combo box should be editable.
+     */
+    private boolean editable;
     /**
      * Strategy for presenting the E-Objects in View.
      */
@@ -137,8 +151,8 @@ public final class DropdownListInputPanel<E>
      * @param content List of items
      */
     public Builder(String title, List<E> content) {
-      this.title = title;
-      this.content = content;
+      this.title = requireNonNull(title, "title");
+      this.content = requireNonNull(content, "content");
     }
 
     @Override
@@ -146,9 +160,15 @@ public final class DropdownListInputPanel<E>
       DropdownListInputPanel<E> panel = new DropdownListInputPanel<>(title);
       panel.messageLabel.setText(message);
       panel.label.setText(label);
-      ComboBoxModel<E> model
-          = new DefaultComboBoxModel<>(new Vector<>(content));
+      panel.comboBox.setEditable(editable);
+      ComboBoxModel<E> model = new DefaultComboBoxModel<>();
       panel.comboBox.setModel(model);
+      model.addListDataListener(panel.editableCBEditor);
+      //to notify the editor about new input
+      for (E c : content) {
+        ((DefaultComboBoxModel<E>) model).addElement(c);
+      }
+      panel.comboBox.setEditor(panel.editableCBEditor);
       if (this.renderer != null) {
         panel.comboBox.setRenderer(this.renderer);
       }
@@ -168,6 +188,17 @@ public final class DropdownListInputPanel<E>
      */
     public Builder<E> setMessage(String message) {
       this.message = message;
+      return this;
+    }
+
+    /**
+     * Sets the editable flag for the combo box.
+     *
+     * @param editable The editable flag.
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder<E> setEditable(boolean editable) {
+      this.editable = editable;
       return this;
     }
 
@@ -227,4 +258,5 @@ public final class DropdownListInputPanel<E>
       return setInitialSelection(index);
     }
   }
+
 }

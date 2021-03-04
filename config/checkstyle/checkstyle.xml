@@ -151,7 +151,7 @@
       <property name="max" value="2"/>
     </module>
     <module name="NestedTryDepth"/>
-    <module name="SuperClone"/>
+    <!-- module name="SuperClone"/ -->
     <module name="IllegalCatch"/>
     <module name="IllegalThrows"/>
     <module name="PackageDeclaration"/>

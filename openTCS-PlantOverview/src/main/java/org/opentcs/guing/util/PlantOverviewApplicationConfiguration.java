@@ -30,69 +30,81 @@ public interface PlantOverviewApplicationConfiguration {
 
   @ConfigurationEntry(
       type = "String",
-      description = {"The plant overview application's mode on startup.",
-                     "Valid values: 'MODELLING', 'OPERATING', 'ASK'"})
-  InitialMode initialMode();
-
-  @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether reported precise positions should be ignored displaying vehicles."
-  )
-  boolean ignoreVehiclePrecisePosition();
-
-  @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether reported orientation angles should be ignored displaying vehicles.")
-  boolean ignoreVehicleOrientationAngle();
-
-  @ConfigurationEntry(
-      type = "String",
       description = {"The plant overview application's locale.",
-                     "Valid values: 'English', 'German'"})
+                     "Valid values: 'English', 'German'"},
+      orderKey = "0_init_0")
   String language();
 
   @ConfigurationEntry(
+      type = "String",
+      description = {"The plant overview application's mode on startup.",
+                     "Valid values: 'MODELLING', 'OPERATING', 'ASK'"},
+      orderKey = "0_init_1")
+  InitialMode initialMode();
+
+  @ConfigurationEntry(
       type = "Integer",
-      description = "Whether the GUI window should be maximized on startup.")
+      description = "Whether the GUI window should be maximized on startup.",
+      orderKey = "1_size_0")
   boolean frameMaximized();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The GUI window's configured height in pixels.")
-  int frameBoundsHeight();
-
-  @ConfigurationEntry(
-      type = "Integer",
-      description = "The GUI window's configured width in pixels.")
+      description = "The GUI window's configured width in pixels.",
+      orderKey = "1_size_1")
   int frameBoundsWidth();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The GUI window's configured x-coordinate on screen in pixels.")
+      description = "The GUI window's configured height in pixels.",
+      orderKey = "1_size_2")
+  int frameBoundsHeight();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The GUI window's configured x-coordinate on screen in pixels.",
+      orderKey = "1_size_3")
   int frameBoundsX();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The GUI window's configured y-coordinate on screen in pixels.")
+      description = "The GUI window's configured y-coordinate on screen in pixels.",
+      orderKey = "1_size_4")
   int frameBoundsY();
 
   @ConfigurationEntry(
       type = "List of <hostname:port>",
-      description = "The configured connection bookmarks.")
+      description = "The configured connection bookmarks.",
+      orderKey = "2_bookmarks")
   List<ConnectionParamSet> connectionBookmarks();
 
   @ConfigurationEntry(
       type = "Class name",
       description = {"The name of the class to be used for the location theme.",
-                     "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"}
+                     "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"},
+      orderKey = "3_themes"
   )
   Class<? extends LocationTheme> locationThemeClass();
 
   @ConfigurationEntry(
       type = "Class name",
       description = {"The name of the class to be used for the vehicle theme.",
-                     "Must be a class extending org.opentcs.components.plantoverview.VehicleTheme"})
+                     "Must be a class extending org.opentcs.components.plantoverview.VehicleTheme"},
+      orderKey = "3_themes")
   Class<? extends VehicleTheme> vehicleThemeClass();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether reported precise positions should be ignored displaying vehicles.",
+      orderKey = "4_behaviour_0"
+  )
+  boolean ignoreVehiclePrecisePosition();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether reported orientation angles should be ignored displaying vehicles.",
+      orderKey = "4_behaviour_1")
+  boolean ignoreVehicleOrientationAngle();
 
   enum InitialMode {
     MODELLING,

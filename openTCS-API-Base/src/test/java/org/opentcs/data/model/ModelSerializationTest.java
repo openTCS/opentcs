@@ -31,7 +31,7 @@ public class ModelSerializationTest {
   @Test
   public void shouldSerializeAndDeserializeBlock()
       throws Exception {
-    Block originalObject = new Block(0, "Block1");
+    Block originalObject = new Block("Block1");
     Block deserializedObject = (Block) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -40,7 +40,7 @@ public class ModelSerializationTest {
   @Test
   public void shouldSerializeAndDeserializeGroup()
       throws Exception {
-    Group originalObject = new Group(0, "Group1");
+    Group originalObject = new Group("Group1");
     Group deserializedObject = (Group) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -50,7 +50,7 @@ public class ModelSerializationTest {
   public void shouldSerializeAndDeserializeLocation()
       throws Exception {
     @SuppressWarnings("unchecked")
-    Location originalObject = new Location(0, "Location1", mock(TCSObjectReference.class));
+    Location originalObject = new Location("Location1", mock(TCSObjectReference.class));
     Location deserializedObject = (Location) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -59,7 +59,7 @@ public class ModelSerializationTest {
   @Test
   public void shouldSerializeAndDeserializeLocationType()
       throws Exception {
-    LocationType originalObject = new LocationType(0, "LocationType1");
+    LocationType originalObject = new LocationType("LocationType1");
     LocationType deserializedObject = (LocationType) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -69,7 +69,7 @@ public class ModelSerializationTest {
   public void shouldSerializeAndDeserializePath()
       throws Exception {
     @SuppressWarnings("unchecked")
-    Path originalObject = new Path(0, "Path1", mock(TCSObjectReference.class), mock(TCSObjectReference.class));
+    Path originalObject = new Path("Path1", mock(TCSObjectReference.class), mock(TCSObjectReference.class));
     Path deserializedObject = (Path) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -78,16 +78,17 @@ public class ModelSerializationTest {
   @Test
   public void shouldSerializeAndDeserializePoint()
       throws Exception {
-    Point originalObject = new Point(0, "Point1");
+    Point originalObject = new Point("Point1");
     Point deserializedObject = (Point) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
   }
 
   @Test
+  @Deprecated
   public void shouldSerializeAndDeserializeStaticRoute()
       throws Exception {
-    StaticRoute originalObject = new StaticRoute(0, "StaticRoute1");
+    StaticRoute originalObject = new StaticRoute("StaticRoute1");
     StaticRoute deserializedObject = (StaticRoute) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -96,7 +97,7 @@ public class ModelSerializationTest {
   @Test
   public void shouldSerializeAndDeserializeVehicle()
       throws Exception {
-    Vehicle originalObject = new Vehicle(0, "Vehicle1");
+    Vehicle originalObject = new Vehicle("Vehicle1");
     Vehicle deserializedObject = (Vehicle) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);

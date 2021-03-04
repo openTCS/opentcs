@@ -24,18 +24,21 @@ public interface RmiKernelInterfaceConfiguration {
   String PREFIX = "rmikernelinterface";
 
   @ConfigurationEntry(
-      type = "Long",
-      description = "The interval for cleaning out inactive clients (in ms).")
-  long clientSweepInterval();
-
-  @ConfigurationEntry(
       type = "String",
       description = {"The host name/IP address of the RMI registry.",
-                     "If 'localhost' and not running already, a RMI registry will be started."})
+                     "If 'localhost' and not running already, a RMI registry will be started."},
+      orderKey = "0_address_0")
   String registryHost();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The TCP port of the RMI.")
+      description = "The TCP port of the RMI.",
+      orderKey = "0_address_1")
   int registryPort();
+
+  @ConfigurationEntry(
+      type = "Long",
+      description = "The interval for cleaning out inactive clients (in ms).",
+      orderKey = "1_sweeping")
+  long clientSweepInterval();
 }

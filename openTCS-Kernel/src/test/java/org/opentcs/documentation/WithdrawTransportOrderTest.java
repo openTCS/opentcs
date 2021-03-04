@@ -9,8 +9,8 @@ package org.opentcs.documentation;
 
 import java.util.Collections;
 import org.junit.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
@@ -37,7 +37,7 @@ public class WithdrawTransportOrderTest {
   @Before
   public void setUp() {
     localKernel = mock(LocalKernel.class);
-    vehicle = new Vehicle(3, "Vehicle");
+    vehicle = new Vehicle("Vehicle");
     when(localKernel.getTCSObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
   }
 
@@ -79,7 +79,7 @@ public class WithdrawTransportOrderTest {
   }
 
   private Location getSampleDestinationLocation() {
-    return new Location(0, "Location", new LocationType(1, "LocationType").getReference());
+    return new Location("Location", new LocationType("LocationType").getReference());
   }
 
   private String getSampleVehicle() {
@@ -92,12 +92,10 @@ public class WithdrawTransportOrderTest {
 
   private TransportOrder getTransportOrderToWithdraw() {
     return new TransportOrder(
-        2,
         "Transportorder",
-        Collections.singletonList(
-            new DriveOrder.Destination(getSampleDestinationLocation().getReference(),
-                                       getDestinationOperation())),
-        0);
+        Collections.singletonList(new DriveOrder(
+            new DriveOrder.Destination(getSampleDestinationLocation().getReference())
+                .withOperation(getDestinationOperation()))));
   }
 
   private String getDestinationOperation() {

@@ -72,9 +72,6 @@ public class OrderSequenceView
 
   @Override
   public final void initFields() {
-    // Allgemeine Angaben: ID
-    int id = getOrderSequence().getId();
-    textFieldId.setText(Integer.toString(id));
     // Name
     String name = getOrderSequence().getName();
     textFieldName.setText(name);
@@ -131,8 +128,6 @@ public class OrderSequenceView
 
     generalPanel = new javax.swing.JPanel();
     jPanel1 = new javax.swing.JPanel();
-    labelId = new javax.swing.JLabel();
-    textFieldId = new javax.swing.JTextField();
     labelName = new javax.swing.JLabel();
     textFieldName = new javax.swing.JTextField();
     labelFinishedIndex = new javax.swing.JLabel();
@@ -157,42 +152,21 @@ public class OrderSequenceView
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
 
-    labelId.setFont(labelId.getFont());
-    labelId.setText("Id:");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    gridBagConstraints.weightx = 0.5;
-    gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
-    jPanel1.add(labelId, gridBagConstraints);
-
-    textFieldId.setColumns(10);
-    textFieldId.setEditable(false);
-    textFieldId.setFont(textFieldId.getFont());
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.5;
-    jPanel1.add(textFieldId, gridBagConstraints);
-
     labelName.setFont(labelName.getFont());
     labelName.setText("Name:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     jPanel1.add(labelName, gridBagConstraints);
 
-    textFieldName.setColumns(10);
     textFieldName.setEditable(false);
+    textFieldName.setColumns(10);
     textFieldName.setFont(textFieldName.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
@@ -203,17 +177,17 @@ public class OrderSequenceView
     labelFinishedIndex.setToolTipText(bundle.getString("OrderSequenceView.finishedIndex.toolTipText")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     jPanel1.add(labelFinishedIndex, gridBagConstraints);
 
-    textFieldFinishedIndex.setColumns(10);
     textFieldFinishedIndex.setEditable(false);
+    textFieldFinishedIndex.setColumns(10);
     textFieldFinishedIndex.setFont(textFieldFinishedIndex.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
@@ -223,17 +197,17 @@ public class OrderSequenceView
     labelIntendedVehicle.setText(bundle.getString("OrderSequenceView.intendedVehicle")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     jPanel1.add(labelIntendedVehicle, gridBagConstraints);
 
-    textFieldIntendedVehicle.setColumns(10);
     textFieldIntendedVehicle.setEditable(false);
+    textFieldIntendedVehicle.setColumns(10);
     textFieldIntendedVehicle.setFont(textFieldIntendedVehicle.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
@@ -243,17 +217,17 @@ public class OrderSequenceView
     labelProcessingVehicle.setText(bundle.getString("OrderSequenceView.executingVehicle")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     jPanel1.add(labelProcessingVehicle, gridBagConstraints);
 
-    textFieldProcessingVehicle.setColumns(10);
     textFieldProcessingVehicle.setEditable(false);
+    textFieldProcessingVehicle.setColumns(10);
     textFieldProcessingVehicle.setFont(textFieldProcessingVehicle.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
@@ -355,12 +329,10 @@ public class OrderSequenceView
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JLabel labelFinishedIndex;
-  private javax.swing.JLabel labelId;
   private javax.swing.JLabel labelIntendedVehicle;
   private javax.swing.JLabel labelName;
   private javax.swing.JLabel labelProcessingVehicle;
   private javax.swing.JTextField textFieldFinishedIndex;
-  private javax.swing.JTextField textFieldId;
   private javax.swing.JTextField textFieldIntendedVehicle;
   private javax.swing.JTextField textFieldName;
   private javax.swing.JTextField textFieldProcessingVehicle;

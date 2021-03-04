@@ -10,8 +10,8 @@ package org.opentcs.documentation;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
@@ -19,6 +19,7 @@ import org.opentcs.access.LocalKernel;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.TransportOrder;
 
@@ -80,21 +81,21 @@ public class ReceiveCommAdapterMessageTest {
   }
 
   private TransportOrder createSampleTransportOrder() {
-    List<Destination> destinations = new ArrayList<>();
-    Destination dest = new Destination(getSampleDestinationLocation().getReference(), "");
-    destinations.add(dest);
-    TransportOrder someTransportOrder = new TransportOrder(3, "TransportOrder-01", destinations, 0);
-    someTransportOrder.setProperty("someKey", "someValue");
+    List<DriveOrder> driveOrders = new ArrayList<>();
+    Destination dest = new Destination(getSampleDestinationLocation().getReference());
+    driveOrders.add(new DriveOrder(dest));
+    TransportOrder someTransportOrder = new TransportOrder("TransportOrder-01", driveOrders)
+        .withProperty("someKey", "someValue");
     return someTransportOrder;
   }
 
   private Location getSampleDestinationLocation() {
-    return new Location(0, "Location-01", new LocationType(1, "LocationType-01").getReference());
+    return new Location("Location-01", new LocationType("LocationType-01").getReference());
   }
 
   private Vehicle createSampleVehicle() {
-    Vehicle someVehicle = new Vehicle(1, "Vehicle-01");
-    someVehicle.setProperty("someKey", "someValue");
+    Vehicle someVehicle = new Vehicle("Vehicle-01")
+        .withProperty("someKey", "someValue");
     return someVehicle;
   }
 

@@ -8,91 +8,81 @@
 package org.opentcs.data.order;
 
 import java.io.Serializable;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * Describes a process spanning multiple transport orders which are to be
- * executed one after the other by the same vehicle.
+ * Describes a process spanning multiple {@link TransportOrder}s which are to be executed
+ * subsequently by the same {@link Vehicle}.
  * <p>
- * The most important rules for <code>OrderSequence</code> processing are:
+ * The most important rules for order sequence processing are:
  * </p>
  * <ul>
- * <li>Only <code>TransportOrder</code>s that have not yet been activated may be
- * added to an <code>OrderSequence</code>. Allowing them to be added at a later
- * point of time would imply that, due to concurrency in the kernel, a transport
- * order might happen to be dispatched at the same time or shortly after it is
- * added to a sequence, regardless of if its predecessors in the sequence have
- * already been finished or not.</li>
- * <li>The <em>intendedVehicle</em> of a <code>TransportOrder</code> being added
- * to an <code>OrderSequence</code> must be the same as that of the sequence
- * itself. If it is <code>null</code> in the sequence (and the orders belonging
- * to it), a vehicle that will process all orders in the sequence will be chosen
- * automatically once the first order in the sequence is dispatched.</li>
- * <li>If an <code>OrderSequence</code> is marked as <em>complete</em> and all
- * <code>TransportOrder</code>s belonging to it have arrived in state
- * <code>FINISHED</code> or <code>FAILED</code>, it will be marked as
- * <em>finished</em> implicitly.
- * <li>If a <code>TransportOrder</code> belonging to an
- * <code>OrderSequence</code> fails and the sequence's <em>failureFatal</em>
- * flag is set, all subsequent orders in the sequence will automatically be
- * considered (and marked as) failed, too, and the order sequence will
- * implicitly be marked as <em>complete</em> (and <em>finished</em>).</li>
- * <li>If an <code>OrderSequence</code> is removed from the kernel, the
- * contained <code>TransportOrder</code>s will remain in the kernel (with their
- * references on the wrapping sequence cleared) and may be dispatched to
- * vehicles.</li>
- * <li>If a <code>TransportOrder</code> belonging to an
- * <code>OrderSequence</code> is removed from the kernel, the reference on it in
- * the sequence will be removed as well without any further action. (This
- * behaviour is likely to change in future versions.)</li>
+ * <li>Only transport orders that have not yet been activated may be added to an order sequence.
+ * Allowing them to be added at a later point of time would imply that, due to concurrency in the
+ * kernel, a transport order might happen to be dispatched at the same time or shortly after it is
+ * added to a sequence, regardless of if its predecessors in the sequence have already been finished
+ * or not.</li>
+ * <li>The <em>intendedVehicle</em> of a transport order being added to an order sequence must be
+ * the same as that of the sequence itself.
+ * If it is <code>null</code> in the sequence, a vehicle that will process all orders in the
+ * sequence will be chosen automatically once the first order in the sequence is dispatched.</li>
+ * <li>If an order sequence is marked as <em>complete</em> and all transport orders belonging to it
+ * have arrived in state <code>FINISHED</code> or <code>FAILED</code>, it will be marked as
+ * <em>finished</em> implicitly.</li>
+ * <li>If a transport order belonging to an order sequence fails and the sequence's
+ * <em>failureFatal</em> flag is set, all subsequent orders in the sequence will automatically be
+ * considered (and marked as) failed, too, and the order sequence will implicitly be marked as
+ * <em>complete</em> (and <em>finished</em>).</li>
  * </ul>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class OrderSequence
     extends TCSObject<OrderSequence>
-    implements Serializable, Cloneable {
+    implements Serializable,
+               Cloneable {
 
   /**
-   * Transport orders belonging to this sequence that still need to be
-   * processed.
+   * Transport orders belonging to this sequence that still need to be processed.
    */
-  private List<TCSObjectReference<TransportOrder>> orders = new LinkedList<>();
+  private final List<TCSObjectReference<TransportOrder>> orders;
   /**
-   * The index of the order that was last finished in the sequence. -1 if none
-   * was finished, yet.
+   * The index of the order that was last finished in the sequence.
+   * -1 if none was finished, yet.
    */
-  private int finishedIndex = -1;
+  private int finishedIndex;
   /**
-   * A flag indicating whether this order sequence is complete and will not be
-   * extended by more orders.
+   * Indicates whether this order sequence is complete and will not be extended by more orders.
    */
   private boolean complete;
   /**
-   * A flag indicating whether this order sequence has been processed
-   * completely.
+   * Indicates whether this order sequence has been processed completely.
    */
   private boolean finished;
   /**
-   * Whether the failure of one order in this sequence is fatal to all
-   * subsequent orders.
+   * Indicates whether the failure of one order in this sequence is fatal to all subsequent orders.
    */
   private boolean failureFatal;
   /**
-   * The vehicle that is intended to process this order sequence. If this
-   * sequence is free to be processed by any vehicle, this is <code>null</code>.
+   * The vehicle that is intended to process this order sequence.
+   * If this sequence is free to be processed by any vehicle, this is <code>null</code>.
    */
   private TCSObjectReference<Vehicle> intendedVehicle;
   /**
-   * The vehicle processing this order sequence, or <code>null</code>, if no
-   * vehicle has been assigned to it, yet.
+   * The vehicle processing this order sequence, or <code>null</code>, if no vehicle has been
+   * assigned to it, yet.
    */
   private TCSObjectReference<Vehicle> processingVehicle;
 
@@ -101,9 +91,84 @@ public class OrderSequence
    *
    * @param objectID This sequence's ID.
    * @param name This sequence's name.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public OrderSequence(int objectID, String name) {
     super(objectID, name);
+    this.orders = new ArrayList<>();
+    this.finishedIndex = -1;
+    this.complete = false;
+    this.finished = false;
+    this.failureFatal = false;
+    this.intendedVehicle = null;
+    this.processingVehicle = null;
+  }
+
+  /**
+   * Creates a new OrderSequence.
+   *
+   * @param name This sequence's name.
+   */
+  public OrderSequence(String name) {
+    super(name);
+    this.orders = new ArrayList<>();
+    this.finishedIndex = -1;
+    this.complete = false;
+    this.finished = false;
+    this.failureFatal = false;
+    this.intendedVehicle = null;
+    this.processingVehicle = null;
+  }
+
+  @SuppressWarnings("deprecation")
+  private OrderSequence(int objectID,
+                        String name,
+                        Map<String, String> properties,
+                        TCSObjectReference<Vehicle> intendedVehicle,
+                        List<TCSObjectReference<TransportOrder>> orders,
+                        int finishedIndex,
+                        boolean complete,
+                        boolean failureFatal,
+                        boolean finished,
+                        TCSObjectReference<Vehicle> processingVehicle) {
+    super(objectID, name, properties);
+    this.intendedVehicle = intendedVehicle;
+    this.orders = new ArrayList<>(requireNonNull(orders, "orders"));
+    this.finishedIndex = finishedIndex;
+    this.complete = complete;
+    this.failureFatal = failureFatal;
+    this.finished = finished;
+    this.processingVehicle = processingVehicle;
+  }
+
+  @Override
+  public OrderSequence withProperty(String key, String value) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             propertiesWith(key, value),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
+  }
+
+  @Override
+  public OrderSequence withProperties(Map<String, String> properties) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             properties,
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -112,7 +177,7 @@ public class OrderSequence
    * @return The list of orders making up this sequence.
    */
   public List<TCSObjectReference<TransportOrder>> getOrders() {
-    return new LinkedList<>(orders);
+    return Collections.unmodifiableList(orders);
   }
 
   /**
@@ -121,7 +186,10 @@ public class OrderSequence
    * @param newOrder The new order.
    * @throws IllegalArgumentException If this sequence is already marked as
    * <em>complete</em> or if this sequence already contains the given order.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void addOrder(TCSObjectReference<TransportOrder> newOrder)
       throws IllegalArgumentException {
     requireNonNull(newOrder, "newOrder");
@@ -136,10 +204,32 @@ public class OrderSequence
    * Removes an order from this sequence.
    *
    * @param order The order to be removed.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void removeOrder(TCSObjectReference<TransportOrder> order) {
     requireNonNull(order, "order is null");
     orders.remove(order);
+  }
+
+  /**
+   * Creates a copy of this object, with the given order.
+   *
+   * @param order The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withOrder(TCSObjectReference<TransportOrder> order) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             ordersWithAppended(order),
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -179,9 +269,32 @@ public class OrderSequence
    * Sets the index of the order that was last finished in the sequence.
    *
    * @param finishedIndex The new index.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setFinishedIndex(int finishedIndex) {
     this.finishedIndex = checkInRange(finishedIndex, 0, orders.size() - 1, "finishedIndex");
+  }
+
+  /**
+   * Creates a copy of this object, with the given finished index.
+   *
+   * @param finishedIndex The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withFinishedIndex(int finishedIndex) {
+    checkInRange(finishedIndex, 0, orders.size() - 1, "finishedIndex");
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -197,9 +310,32 @@ public class OrderSequence
 
   /**
    * Sets this sequence's <em>complete</em> flag.
+   *
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setComplete() {
     this.complete = true;
+  }
+
+  /**
+   * Creates a copy of this object, with the given complete flag.
+   *
+   * @param complete The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withComplete(boolean complete) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -217,9 +353,32 @@ public class OrderSequence
 
   /**
    * Sets this sequence's <em>finished</em> flag.
+   *
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setFinished() {
     this.finished = true;
+  }
+
+  /**
+   * Creates a copy of this object, with the given finished flag.
+   *
+   * @param finished The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withFinished(boolean finished) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -238,9 +397,31 @@ public class OrderSequence
    * Sets this sequence's <em>failureFatal</em> flag.
    *
    * @param failureFatal The new value.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setFailureFatal(boolean failureFatal) {
     this.failureFatal = failureFatal;
+  }
+
+  /**
+   * Creates a copy of this object, with the given failure-fatal flag.
+   *
+   * @param failureFatal The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withFailureFatal(boolean failureFatal) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -258,11 +439,32 @@ public class OrderSequence
   /**
    * Sets a reference to the vehicle that is intended to process this sequence.
    *
-   * @param vehicle The reference to the vehicle intended to process this
-   * sequence.
+   * @param vehicle The reference to the vehicle intended to process this sequence.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setIntendedVehicle(TCSObjectReference<Vehicle> vehicle) {
     intendedVehicle = vehicle;
+  }
+
+  /**
+   * Creates a copy of this object, with the given intended vehicle.
+   *
+   * @param intendedVehicle The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withIntendedVehicle(TCSObjectReference<Vehicle> intendedVehicle) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 
   /**
@@ -281,16 +483,57 @@ public class OrderSequence
    *
    * @param vehicle The reference to the vehicle currently processing this
    * sequence.
+   * @deprecated Will become immutable.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setProcessingVehicle(TCSObjectReference<Vehicle> vehicle) {
     processingVehicle = vehicle;
   }
 
+  /**
+   * Creates a copy of this object, with the given processing vehicle.
+   *
+   * @param processingVehicle The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withProcessingVehicle(TCSObjectReference<Vehicle> processingVehicle) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
+  }
+
+  @SuppressWarnings("deprecation")
+  private int getIdWithoutDeprecationWarning() {
+    return getId();
+  }
+
+  private List<TCSObjectReference<TransportOrder>> ordersWithAppended(
+      @Nonnull TCSObjectReference<TransportOrder> order) {
+    List<TCSObjectReference<TransportOrder>> result = new ArrayList<>(orders.size() + 1);
+    result.addAll(orders);
+    result.add(order);
+    return result;
+  }
+
   @Override
   public OrderSequence clone() {
-    OrderSequence clone = (OrderSequence) super.clone();
-    clone.orders = new LinkedList<>();
-    clone.orders.addAll(this.orders);
-    return clone;
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
   }
 }

@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
@@ -37,21 +37,17 @@ public class CreateTransportOrderSequenceTest {
 
   private LocalKernel localKernel;
 
-  private int idCounter;
-
   @Before
   public void setUp() {
     localKernel = mock(LocalKernel.class);
     when(localKernel.createOrderSequence(any(OrderSequenceCreationTO.class)))
-        .thenReturn(new OrderSequence(idCounter++, "OrderSequence"));
+        .thenReturn(new OrderSequence("OrderSequence"));
     when(localKernel.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenReturn(new TransportOrder(
-            idCounter++,
             "Transportorder",
-            Collections.singletonList(
-                new DriveOrder.Destination(getSampleDestinationLocation().getReference(),
-                                           "some operation")),
-            0));
+            Collections.singletonList(new DriveOrder(
+                new DriveOrder.Destination(getSampleDestinationLocation().getReference())
+                    .withOperation("some operation")))));
   }
 
   @Test
@@ -92,9 +88,8 @@ public class CreateTransportOrderSequenceTest {
   }
 
   private Location getSampleDestinationLocation() {
-    return new Location(idCounter++,
-                        "Location",
-                        new LocationType(idCounter++, "LocationType").getReference());
+    return new Location("Location",
+                        new LocationType("LocationType").getReference());
   }
 
   private LocalKernel getAKernelReference() {

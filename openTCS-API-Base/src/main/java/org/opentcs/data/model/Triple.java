@@ -11,11 +11,11 @@ import java.io.Serializable;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * A generic 3-tuple of long integer values, usable for 3D coordinates and
- * vectors, for instance.
+ * A generic 3-tuple of long integer values, usable for 3D coordinates and vectors, for instance.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Triple
     implements Serializable,
                Cloneable {

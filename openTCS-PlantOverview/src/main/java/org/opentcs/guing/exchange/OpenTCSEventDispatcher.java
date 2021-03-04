@@ -178,8 +178,7 @@ public class OpenTCSEventDispatcher
   }
 
   private void processObjectEvent(TCSObjectEvent objectEvent) {
-    LOG.debug("TCSObjectEvent received. ID: {} Name: {} Event type: {}",
-              objectEvent.getCurrentOrPreviousObjectState().getId(),
+    LOG.debug("TCSObjectEvent received. Name: {} Event type: {}",
               objectEvent.getCurrentOrPreviousObjectState().getName(),
               objectEvent.getType().name());
 

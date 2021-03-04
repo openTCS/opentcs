@@ -50,6 +50,7 @@ public class PlantModelCreationTO
   /**
    * The plant model's static routes.
    */
+  @SuppressWarnings("deprecation")
   private List<StaticRouteCreationTO> staticRoutes = new LinkedList<>();
   /**
    * The plant model's vehicles.
@@ -200,6 +201,7 @@ public class PlantModelCreationTO
    *
    * @return This plant model's static routes.
    */
+  @Deprecated
   public List<StaticRouteCreationTO> getStaticRoutes() {
     return staticRoutes;
   }
@@ -210,6 +212,7 @@ public class PlantModelCreationTO
    * @param staticRoutes The new static routes.
    * @return The modified plant model.
    */
+  @Deprecated
   @Nonnull
   public PlantModelCreationTO setStaticRoutes(@Nonnull List<StaticRouteCreationTO> staticRoutes) {
     this.staticRoutes = requireNonNull(staticRoutes, "staticRoutes");

@@ -11,13 +11,16 @@ dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
   // There does not seem to be an official binary release for JHotDraw...
-  compile files(rootProject.file('lib/jhotdraw-7.6.jar'))
+  compile group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6'
+  compileOnly group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6', classifier: 'sources'
   // This preview version of Docking Frames is not in Maven Central, yet.
-  compile files(rootProject.file('lib/docking-frames-common-1.1.2p11.jar'))
-  compile files(rootProject.file('lib/docking-frames-core-1.1.2p11.jar'))
+  compile group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11'
+  compileOnly group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11', classifier: 'sources'
+  compile group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11'
+  compileOnly group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11', classifier: 'sources'
   
-  compile group: "org.cfg4j", name:"cfg4j-core", version: "4.4.0"
-  compileOnly group: "org.cfg4j", name:"cfg4j-core", version: "4.4.0", classifier: 'javadoc'
+  compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
+  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
   
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }

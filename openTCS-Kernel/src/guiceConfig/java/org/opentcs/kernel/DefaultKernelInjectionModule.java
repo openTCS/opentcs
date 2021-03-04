@@ -25,9 +25,7 @@ import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.kernel.CentralEventHub;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.persistence.OrderPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
-import org.opentcs.kernel.persistence.XMLFileOrderPersister;
 import org.opentcs.kernel.persistence.XMLModel002Builder;
 import org.opentcs.kernel.persistence.XMLModelReader;
 import org.opentcs.kernel.persistence.XMLModelWriter;
@@ -121,7 +119,6 @@ public class DefaultKernelInjectionModule
 
   private void configurePersistence() {
     bind(ModelPersister.class).to(XMLFileModelPersister.class);
-    bind(OrderPersister.class).to(XMLFileOrderPersister.class);
     bind(XMLModelReader.class).to(XMLModel002Builder.class);
     bind(XMLModelWriter.class).to(XMLModel002Builder.class);
   }

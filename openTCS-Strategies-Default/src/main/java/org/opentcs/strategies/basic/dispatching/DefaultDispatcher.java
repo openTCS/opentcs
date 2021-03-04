@@ -269,7 +269,7 @@ public class DefaultDispatcher
       kernel.setOrderSequenceProcessingVehicle(transportOrder.getWrappingSequence(), vehicleRef);
     }
     kernel.setTransportOrderProcessingVehicle(orderRef, vehicleRef);
-    kernel.setTransportOrderFutureDriveOrders(orderRef, driveOrders);
+    kernel.setTransportOrderDriveOrders(orderRef, driveOrders);
     kernel.setTransportOrderInitialDriveOrder(orderRef);
     // Let the router know about the route chosen.
     router.selectRoute(vehicle, Collections.unmodifiableList(driveOrders));
@@ -431,22 +431,22 @@ public class DefaultDispatcher
       requireNonNull(order, "order");
 
       // Check if the transport order is routable.
-      if (router.checkRoutability(order).isEmpty()) {
+      if (configuration.dismissUnroutableTransportOrders()
+          && router.checkRoutability(order).isEmpty()) {
         LOG.info("Marking transport order {} as UNROUTABLE", order.getName());
         transportOrderService.updateTransportOrderState(order.getReference(),
                                                         TransportOrder.State.UNROUTABLE);
+        return;
       }
-      else {
-        LOG.info("Marking transport order {} as ACTIVE", order.getName());
+      LOG.info("Marking transport order {} as ACTIVE", order.getName());
+      transportOrderService.updateTransportOrderState(order.getReference(),
+                                                      TransportOrder.State.ACTIVE);
+      // The transport order has been activated - dispatch it.
+      // Check if it has unfinished dependencies.
+      if (!transportOrderService.hasUnfinishedDependencies(order)) {
+        LOG.info("Marking transport order {} as DISPATCHABLE", order.getName());
         transportOrderService.updateTransportOrderState(order.getReference(),
-                                                        TransportOrder.State.ACTIVE);
-        // The transport order has been activated - dispatch it.
-        // Check if it has unfinished dependencies.
-        if (!transportOrderService.hasUnfinishedDependencies(order)) {
-          LOG.info("Marking transport order {} as DISPATCHABLE", order.getName());
-          transportOrderService.updateTransportOrderState(order.getReference(),
-                                                          TransportOrder.State.DISPATCHABLE);
-        }
+                                                        TransportOrder.State.DISPATCHABLE);
       }
     }
 
@@ -460,7 +460,7 @@ public class DefaultDispatcher
       // order to it, store the computed route in the transport order, correct
       // the state of vehicle and transport order and start processing of the
       // order.
-      if (vehicleSelection.getVehicle() != null) {
+      if (vehicleSelection.isAssignable()) {
         Vehicle selectedVehicle = vehicleSelection.getVehicle();
         // If the vehicle still has an order, just remember that the new order
         // is reserved for this vehicle and initiate abortion of the old one.
@@ -527,7 +527,7 @@ public class DefaultDispatcher
 
       LOG.debug("{}: IDLE, looking for a transport order", vehicle.getName());
       VehicleOrderSelection orderSelection = orderSelector.selectTransportOrder(vehicle);
-      if (orderSelection.getTransportOrder() != null) {
+      if (orderSelection.isAssignable()) {
         assignTransportOrder(vehicle, orderSelection.getTransportOrder(), orderSelection.getDriveOrders());
       }
       else {

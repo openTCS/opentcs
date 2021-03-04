@@ -32,6 +32,10 @@ public class VehicleSelector
    */
   private final AvailableVehicleSelectionStrategy availableVehicleStrategy;
   /**
+   * A collection of predicates for filtering transport orders.
+   */
+  private final CompositeTransportOrderSelectionVeto transportOrderSelectionVeto;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -43,14 +47,18 @@ public class VehicleSelector
    * given transport order.
    * @param availableVehicleStrategy Checks for the closest available vehicle for a given transport
    * order.
+   * @param transportOrderSelectionVeto
    */
   @Inject
   public VehicleSelector(@Nonnull AssignedVehicleSelectionStrategy assignedVehicleStrategy,
-                         @Nonnull AvailableVehicleSelectionStrategy availableVehicleStrategy) {
+                         @Nonnull AvailableVehicleSelectionStrategy availableVehicleStrategy,
+                         @Nonnull CompositeTransportOrderSelectionVeto transportOrderSelectionVeto) {
     this.assignedVehicleStrategy = requireNonNull(assignedVehicleStrategy,
                                                   "assignedVehicleStrategy");
     this.availableVehicleStrategy = requireNonNull(availableVehicleStrategy,
                                                    "availableVehicleStrategy");
+    this.transportOrderSelectionVeto = requireNonNull(transportOrderSelectionVeto,
+                                                      "transportOrderSelectionVeto");
   }
 
   @Override
@@ -88,6 +96,10 @@ public class VehicleSelector
 
     VehicleOrderSelection result;
 
+    if (transportOrderSelectionVeto.test(order)) {
+      return new VehicleOrderSelection(order, null, null);
+    }
+
     result = assignedVehicleStrategy.selectVehicle(order);
     if (result != null) {
       return result;
@@ -99,6 +111,5 @@ public class VehicleSelector
     }
 
     return new VehicleOrderSelection(order, null, null);
-
   }
 }

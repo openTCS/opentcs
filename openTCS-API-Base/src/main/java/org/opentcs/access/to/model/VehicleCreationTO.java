@@ -35,6 +35,14 @@ public class VehicleCreationTO
    * The energy level value at/above which the vehicle can be dispatched again when charging.
    */
   private int energyLevelGood = 90;
+  /**
+   * The vehicle's maximum velocity (in mm/s).
+   */
+  private int maxVelocity = 1000;
+  /**
+   * The vehicle's maximum reverse velocity (in mm/s).
+   */
+  private int maxReverseVelocity = 1000;
 
   /**
    * Creates a new instance.
@@ -139,6 +147,23 @@ public class VehicleCreationTO
    */
   public int getEnergyLevelGood() {
     return energyLevelGood;
+  }
+
+  public int getMaxVelocity() {
+    return maxVelocity;
+  }
+
+  public VehicleCreationTO setMaxVelocity(int maxVelocity) {
+    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
+    return this;
+  }
+
+  public int getMaxReverseVelocity() {
+    return maxReverseVelocity;
+  }
+
+  public void setMaxReverseVelocity(int maxReverseVelocity) {
+    this.maxReverseVelocity = checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
   }
 
   /**

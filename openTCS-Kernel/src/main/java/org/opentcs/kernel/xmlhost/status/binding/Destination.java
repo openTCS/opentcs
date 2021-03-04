@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A {@link org.opentcs.data.order.DriveOrder DriveOrder}'s destination.
@@ -108,7 +109,7 @@ public class Destination {
   public void setProperties(List<Property> properties) {
     this.properties = properties;
   }
-  
+
   /**
    * This enumeration defines the various states a DriveOrder may be in.
    */
@@ -122,7 +123,11 @@ public class Destination {
     PRISTINE,
     /**
      * Indicates a DriveOrder is part of a TransportOrder.
+     *
+     * @deprecated Unused. Will be removed.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0")
     ACTIVE,
     /**
      * Indicates this drive order being processed at the moment.

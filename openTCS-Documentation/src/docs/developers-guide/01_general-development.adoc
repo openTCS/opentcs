@@ -90,6 +90,8 @@ The kernel application also depends on the following libraries:
 
 * JDOM (http://www.jdom.org/):
   A library for reading and writing XML data.
+* JGraphT (http://jgrapht.org/):
+  A library for working with graphs and using algorithms on them.
 
 The plant overview application has the following additional dependencies:
 
@@ -98,7 +100,7 @@ The plant overview application has the following additional dependencies:
 * Docking Frames (http://www.docking-frames.org/):
   A framework for docking and undocking of GUI panels
 
-The artifacts for these dependencies are either downloaded automatically when building the applications or are included in the source distribution's `lib/` directory if they are not available in online artifact repositories.
+The artifacts for these dependencies are downloaded automatically when building the applications.
 
 === Modularity and extensibility
 

@@ -93,6 +93,13 @@ public abstract class InputPanel
       }
     }
   }
+/**
+ * 
+ * @return The validation Listeners.
+ */
+  public List<ValidationListener> getValidationListeners() {
+    return validationListeners;
+  }
 
   /**
    * Determine if the current input in the panel is valid.

@@ -26,7 +26,8 @@ import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
 
 /**
- * Checks whether a specific vehicle is assigned to/intended for a given transport order.
+ * Checks whether a specific vehicle is assigned to/intended for a given transport order, and
+ * selects it if it's available.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

@@ -25,26 +25,31 @@ public interface XMLHostInterfaceConfiguration {
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The TCP port on which to listen for incoming order connections.")
+      description = "The TCP port on which to listen for incoming order connections.",
+      orderKey = "0_orders_0")
   int ordersServerPort();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The time (in ms) after which idle connections are closed.")
+      description = "The time (in ms) after which idle connections are closed.",
+      orderKey = "0_orders_1")
   int ordersIdleTimeout();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The maximum number of bytes read from sockets before closing the connection.")
+      description = "The maximum number of bytes read from sockets before closing the connection.",
+      orderKey = "0_orders_2")
   int ordersInputLimit();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The TCP port on which to listen for incoming status channel connections.")
+      description = "The TCP port on which to listen for incoming status channel connections.",
+      orderKey = "1_status_0")
   int statusServerPort();
 
   @ConfigurationEntry(
       type = "String",
-      description = "A string to be used for separating subsequent status messages in the stream.")
+      description = "A string to be used for separating subsequent status messages in the stream.",
+      orderKey = "1_status_1")
   String statusMessageSeparator();
 }

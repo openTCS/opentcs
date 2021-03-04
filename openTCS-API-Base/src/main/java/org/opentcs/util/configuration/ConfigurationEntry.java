@@ -36,4 +36,11 @@ public @interface ConfigurationEntry {
    * @return A list of paragraphs describing what the key/value configures.
    */
   String[] description();
+
+  /**
+   * Returns the optional ordering key that this entry belongs to (for grouping/sorting of entries).
+   *
+   * @return The optional ordering key that this entry belongs to (for grouping/sorting of entries).
+   */
+  String orderKey() default "";
 }

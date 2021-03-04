@@ -89,7 +89,7 @@ public class KernelStateOperatingTest {
     verify(controllerPool, times(1)).initialize();
     verify(extension, times(1)).initialize();
   }
-  
+
   @Test
   public void shouldTerminateExtensionsAndComponents() {
     KernelExtension extension = mock(KernelExtension.class);
@@ -106,7 +106,7 @@ public class KernelStateOperatingTest {
 
   @Test
   public void initializeKernelWithVehiclesAsUnavailable() {
-    Vehicle vehicle = new Vehicle(objectID++, "Vehicle-" + objectID);
+    Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());
     operating.initialize();
@@ -119,10 +119,10 @@ public class KernelStateOperatingTest {
     verify(operating, times(1)).setVehicleOrderSequence(vehicle.getReference(),
                                                         null);
   }
-  
+
   @Test
   public void terminateKernelWithVehiclesAsUnavailable() {
-    Vehicle vehicle = new Vehicle(objectID++, "Vehicle-" + objectID);
+    Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());
     operating.initialize();

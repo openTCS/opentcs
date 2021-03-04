@@ -27,9 +27,10 @@ import javax.swing.JToolBar;
 public class PaletteToolBarBorder
     extends org.jhotdraw.gui.plaf.palette.PaletteToolBarBorder {
 
-  private final static float[] enabledStops = new float[] {0f, 0.5f, 1f};
-  private final static Color[] enabledStopColors = new Color[] {
-    new Color(0xf8f8f8), new Color(0xc8c8c8), new Color(0xf8f8f8)};
+  private final static float[] ENABLED_STOPS = new float[] {0f, 0.5f, 1f};
+  private final static Color[] ENABLED_STOP_COLORS = new Color[] {
+    new Color(0xf8f8f8), new Color(0xc8c8c8), new Color(0xf8f8f8)
+  };
 
   @Override
   public void paintBorder(Component component, Graphics gr, int x, int y, int w, int h) {
@@ -44,8 +45,8 @@ public class PaletteToolBarBorder
 
       if (c.isFloatable()) {
         int borderColor = 0x80ff0000;
-        float[] stops = enabledStops;
-        Color[] stopColors = enabledStopColors;
+        float[] stops = ENABLED_STOPS;
+        Color[] stopColors = ENABLED_STOP_COLORS;
 
         g.setColor(new Color(borderColor, true));
         LinearGradientPaint lgp = new LinearGradientPaint(

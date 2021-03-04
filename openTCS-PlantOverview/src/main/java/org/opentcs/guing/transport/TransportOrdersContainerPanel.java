@@ -487,34 +487,27 @@ public class TransportOrdersContainerPanel
   private Vector toTableRow(TransportOrder t) {
     Vector<String> row = new Vector<>();
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    // Spalte 0: Name
+    // Column 0: Name
     row.addElement(t.getName());
 
-    // Alle Einzel-Fahraufträge
-    Vector<DriveOrder> driveOrders = new Vector<>();
-    driveOrders.addAll(t.getPastDriveOrders());
+    Vector<DriveOrder> driveOrders = new Vector<>(t.getAllDriveOrders());
 
-    if (t.getCurrentDriveOrder() != null) {
-      driveOrders.addElement(t.getCurrentDriveOrder());
-    }
+    TCSObjectReference<?> ref;
 
-    driveOrders.addAll(t.getFutureDriveOrders());
-    TCSObjectReference ref = null;
-
-    // Spalte 1: Quelle
+    // Column 1: Source
     if (driveOrders.size() == 1) {
       row.addElement("");
     }
     else {
-      ref = driveOrders.firstElement().getDestination().getLocation();
+      ref = driveOrders.firstElement().getDestination().getDestination();
       row.addElement(ref.getName());
     }
 
-    // Spalte 2: Ziel
-    ref = driveOrders.lastElement().getDestination().getLocation();
+    // Column 2: Destination
+    ref = driveOrders.lastElement().getDestination().getDestination();
     row.addElement(ref.getName());
 
-    // Spalte 3: Gewünschtes Fahrzeug
+    // Column 3: Intended vehicle
     ref = t.getIntendedVehicle();
 
     if (ref != null) {
@@ -524,7 +517,7 @@ public class TransportOrdersContainerPanel
       row.addElement(bundle.getString("TransportOrdersContainerPanel.table.determineAutomatic"));
     }
 
-    // Spalte 4: Ausführendes Fahrzeug
+    // Column 4: Processing vehicle
     ref = t.getProcessingVehicle();
 
     if (ref != null) {
@@ -534,10 +527,10 @@ public class TransportOrdersContainerPanel
       row.addElement("?");
     }
 
-    // Spalte 5: Status
+    // Column 5: Status
     row.addElement(t.getState().toString());
 
-    // Spalte 6: Order Sequence
+    // Column 6: Order Sequence
     TCSObjectReference<OrderSequence> wrappingSequence = t.getWrappingSequence();
 
     if (wrappingSequence != null) {

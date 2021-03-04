@@ -27,7 +27,7 @@ public class StaticRouteTO
     extends PlantModelElementTO {
 
   private List<Hop> hops = new ArrayList<>();
-  
+
   @XmlElement(name = "hop")
   public List<Hop> getHops() {
     return hops;

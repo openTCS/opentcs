@@ -102,9 +102,9 @@ public class ReservedOrderSelectionStrategy
     // assignable state. If yes, return that.
     TransportOrder transportOrder
         = orderReservationPool.findReservations(vehicle.getReference()).stream()
-            .findFirst()
             .map(orderRef -> kernel.getTCSObject(TransportOrder.class, orderRef))
             .filter(order -> !order.getState().isFinalState() && !order.hasState(TransportOrder.State.WITHDRAWN))
+            .findFirst()
             .orElse(null);
     if (transportOrder == null) {
       return null;

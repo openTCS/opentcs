@@ -26,7 +26,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -199,8 +198,8 @@ class KernelStateModelling
       else if (object instanceof Point) {
         getModel().removePoint(((Point) object).getReference());
       }
-      else if (object instanceof StaticRoute) {
-        getModel().removeStaticRoute(((StaticRoute) object).getReference());
+      else if (object instanceof org.opentcs.data.model.StaticRoute) {
+        getModel().removeStaticRoute(((org.opentcs.data.model.StaticRoute) object).getReference());
       }
       else if (object instanceof Vehicle) {
         getModel().removeVehicle(((Vehicle) object).getReference());
@@ -511,7 +510,7 @@ class KernelStateModelling
 
   @Override
   @Deprecated
-  public StaticRoute createStaticRoute() {
+  public org.opentcs.data.model.StaticRoute createStaticRoute() {
     synchronized (getGlobalSyncObject()) {
       // Return a copy of the point
       return getModel().createStaticRoute((Integer) null).clone();
@@ -520,7 +519,7 @@ class KernelStateModelling
 
   @Override
   @Deprecated
-  public void addStaticRouteHop(TCSObjectReference<StaticRoute> ref,
+  public void addStaticRouteHop(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref,
                                 TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
@@ -530,7 +529,7 @@ class KernelStateModelling
 
   @Override
   @Deprecated
-  public void clearStaticRouteHops(TCSObjectReference<StaticRoute> ref)
+  public void clearStaticRouteHops(TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       getModel().clearStaticRouteHops(ref);

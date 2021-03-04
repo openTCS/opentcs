@@ -25,36 +25,43 @@ public interface KernelApplicationConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to automatically load the kernel's model on startup.")
-  boolean loadModelOnStartup();
-
-  @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether to show the model selection dialog on startup.")
+      description = "Whether to show the model selection dialog on startup.",
+      orderKey = "0_startup_0")
   boolean selectModelOnStartup();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to automatically attach drivers on startup.")
+      description = "Whether to automatically load the kernel's model on startup.",
+      orderKey = "0_startup_1")
+  boolean loadModelOnStartup();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to automatically attach drivers on startup.",
+      orderKey = "1_startup_0")
   boolean autoAttachDriversOnStartup();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to automatically enable drivers on startup.")
+      description = "Whether to automatically enable drivers on startup.",
+      orderKey = "1_startup_1")
   boolean autoEnableDriversOnStartup();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to implicitly save the model when leaving modelling state.")
+      description = "Whether to implicitly save the model when leaving modelling state.",
+      orderKey = "2_autosave")
   boolean saveModelOnTerminateModelling();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to implicitly save the model when leaving operating state.")
+      description = "Whether to implicitly save the model when leaving operating state.",
+      orderKey = "2_autosave")
   boolean saveModelOnTerminateOperating();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to implicitly update the router's topology when a path is (un)locked.")
+      description = "Whether to implicitly update the router's topology when a path is (un)locked.",
+      orderKey = "3_topologyUpdate")
   boolean updateRoutingTopologyOnPathLockChange();
 }

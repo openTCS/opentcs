@@ -203,7 +203,11 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param velocity The vehicle's new maximum velocity.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref, int velocity)
       throws ObjectUnknownException;
 
@@ -213,7 +217,11 @@ public interface LocalKernel
    * @param ref A reference to the vehicle to be modified.
    * @param velocity The vehicle's new maximum velocity.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link #createPlantModel(org.opentcs.access.to.model.PlantModelCreationTO)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   void setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                     int velocity)
       throws ObjectUnknownException;
@@ -372,8 +380,7 @@ public interface LocalKernel
       throws ObjectUnknownException;
 
   /**
-   * Copies drive order data from a list of drive orders to the given transport
-   * order's future drive orders.
+   * Sets drive order data from for the given transport order.
    *
    * @param orderRef A reference to the transport order to be modified.
    * @param newOrders The drive orders containing the data to be copied into
@@ -386,11 +393,8 @@ public interface LocalKernel
    * orders do not match the destinations of the drive orders in this transport
    * order.
    */
-  @Override
-  @SuppressWarnings("deprecation")
-  void setTransportOrderFutureDriveOrders(
-      TCSObjectReference<TransportOrder> orderRef,
-      List<DriveOrder> newOrders)
+  void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
+                                    List<DriveOrder> newOrders)
       throws ObjectUnknownException, CredentialsException,
              IllegalArgumentException;
 

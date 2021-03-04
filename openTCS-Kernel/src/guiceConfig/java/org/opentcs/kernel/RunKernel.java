@@ -17,6 +17,7 @@ import java.util.ServiceLoader;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.ConfigurationBindingProvider;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
+import org.opentcs.kernel.configuration.DefaultConfigurationBindingProvider;
 import org.opentcs.util.Environment;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
 import org.slf4j.Logger;

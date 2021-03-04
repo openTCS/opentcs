@@ -13,6 +13,7 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Some commonly used comparator implementations.
@@ -24,7 +25,10 @@ public final class Comparators {
   /**
    * A <code>Comparator</code> for ordering <code>TCSObject</code>s ascendingly
    * by their IDs.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   private static final Comparator<TCSObject<?>> OBJECTS_BY_ID
       = (TCSObject<?> o1, TCSObject<?> o2) -> o1.getId() - o2.getId();
 
@@ -108,7 +112,10 @@ public final class Comparators {
    *
    * @return A comparator for ordering <code>TCSObject</code>s ascendingly
    * by their IDs.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public static Comparator<TCSObject<?>> objectsById() {
     return OBJECTS_BY_ID;
   }

@@ -19,6 +19,7 @@ import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.ConfigurationBindingProvider;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.application.PlantOverviewStarter;
+import org.opentcs.guing.configuration.DefaultConfigurationBindingProvider;
 import org.opentcs.util.Environment;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
 import org.slf4j.Logger;

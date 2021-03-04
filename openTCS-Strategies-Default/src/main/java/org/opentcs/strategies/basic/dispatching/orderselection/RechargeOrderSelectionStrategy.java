@@ -88,7 +88,7 @@ public class RechargeOrderSelectionStrategy
       return;
     }
     rechargePosSupplier.initialize();
-    
+
     initialized = true;
   }
 
@@ -98,7 +98,7 @@ public class RechargeOrderSelectionStrategy
       return;
     }
     rechargePosSupplier.terminate();
-    
+
     initialized = false;
   }
 
@@ -129,7 +129,7 @@ public class RechargeOrderSelectionStrategy
     List<DestinationCreationTO> chargeDests = new LinkedList<>();
     for (DriveOrder.Destination dest : rechargeDests) {
       chargeDests.add(
-          new DestinationCreationTO(dest.getLocation().getName(), dest.getOperation())
+          new DestinationCreationTO(dest.getDestination().getName(), dest.getOperation())
               .setProperties(dest.getProperties())
       );
     }

@@ -30,10 +30,6 @@ public class TCSStatusMessageSetTest {
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(TCSStatusMessageSetTest.class);
-  /**
-   * A counter for unique object IDs.
-   */
-  private int objectIdCounter;
 
   public TCSStatusMessageSetTest() {
   }
@@ -48,17 +44,19 @@ public class TCSStatusMessageSetTest {
 
   @Test
   public void shouldMapToOrderStatusMessage() {
-    List<DriveOrder.Destination> destinations = new LinkedList<>();
-    LocationType locType = new LocationType(objectIdCounter++, "testLocType");
-    Location loc1 = new Location(objectIdCounter++, "Storage 01", locType.getReference());
-    Location loc2 = new Location(objectIdCounter++, "Storage 02", locType.getReference());
-    DriveOrder.Destination dest1 = new DriveOrder.Destination(loc1.getReference(), "Load cargo");
-    DriveOrder.Destination dest2 = new DriveOrder.Destination(loc2.getReference(), "Unload cargo");
-    destinations.add(dest1);
-    destinations.add(dest2);
-    TransportOrder order = new TransportOrder(0, "TOrder-0001", destinations, System.currentTimeMillis());
-    order.setProperty("waitBefore", "Unload");
-    order.setState(TransportOrder.State.ACTIVE);
+    List<DriveOrder> driveOrders = new LinkedList<>();
+    LocationType locType = new LocationType("testLocType");
+    Location loc1 = new Location("Storage 01", locType.getReference());
+    Location loc2 = new Location("Storage 02", locType.getReference());
+    DriveOrder.Destination dest1 = new DriveOrder.Destination(loc1.getReference())
+        .withOperation("Load cargo");
+    DriveOrder.Destination dest2 = new DriveOrder.Destination(loc2.getReference())
+        .withOperation("Unload cargo");
+    driveOrders.add(new DriveOrder(dest1));
+    driveOrders.add(new DriveOrder(dest2));
+    TransportOrder order = new TransportOrder("TOrder-0001", driveOrders)
+        .withProperty("waitBefore", "Unload")
+        .withState(TransportOrder.State.ACTIVE);
 
     OrderStatusMessage message = OrderStatusMessage.fromTransportOrder(order);
     TCSStatusMessageSet messageSet = new TCSStatusMessageSet();

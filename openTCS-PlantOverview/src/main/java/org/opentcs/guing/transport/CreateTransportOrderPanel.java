@@ -170,40 +170,31 @@ public class CreateTransportOrderPanel
     timeTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("HH:mm")));
 
     if (fPattern != null) {
-      // Frist
       newDeadline = ZonedDateTime.ofInstant(Instant.ofEpochMilli(fPattern.getDeadline()),
                                             ZoneId.systemDefault());
       dateTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
       timeTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("HH:mm")));
 
-      // Gewolltes Fahrzeug
       if (fPattern.getIntendedVehicle() != null) {
         vehicleComboBox.setSelectedItem(fPattern.getIntendedVehicle().getName());
       }
 
-      // Fahraufträge
       List<DriveOrder> driveOrders = new LinkedList<>();
-      driveOrders.addAll(fPattern.getPastDriveOrders());
-
-      if (fPattern.getCurrentDriveOrder() != null) {
-        driveOrders.add(fPattern.getCurrentDriveOrder());
-      }
-
-      driveOrders.addAll(fPattern.getFutureDriveOrders());
+      driveOrders.addAll(fPattern.getAllDriveOrders());
 
       DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
       for (DriveOrder o : driveOrders) {
-        String location = o.getDestination().getLocation().getName();
+        String destination = o.getDestination().getDestination().getName();
         String action = o.getDestination().getOperation();
         Map<String, String> properties = o.getDestination().getProperties();
 
         String[] row = new String[2];
-        row[0] = location;
+        row[0] = destination;
         row[1] = action;
         model.addRow(row);
-        AbstractFigureComponent destModel = fModelManager.getModel().getLocationModel(location);
+        AbstractFigureComponent destModel = fModelManager.getModel().getLocationModel(destination);
         if (destModel == null) {
-          destModel = fModelManager.getModel().getPointModel(location);
+          destModel = fModelManager.getModel().getPointModel(destination);
         }
         fDestinationModels.add(destModel);
         fActions.add(action);

@@ -8,12 +8,12 @@
 package org.opentcs.kernel.workingset;
 
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,7 +25,9 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.UniqueStringGenerator;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,19 +43,11 @@ public class TCSObjectPool {
   /**
    * This class's Logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(TCSObjectPool.class);
-  /**
-   * The objects contained in this pool, indexed by their IDs.
-   * Note that this has to be an <code>AutoGrowingArrayList</code> because its
-   * <code>set()</code> method will be called with indices greater than its
-   * <code>size()</code>!
-   */
-  private final List<TCSObject<?>> objectsById = new AutoGrowingArrayList<>();
+  private static final Logger LOG = LoggerFactory.getLogger(TCSObjectPool.class);
   /**
    * The objects contained in this pool, mapped by their names.
    */
-  private final Map<String, TCSObject<?>> objectsByName = new LinkedHashMap<>();
+  private final Map<String, TCSObject<?>> objectsByName = new ConcurrentHashMap<>();
   /**
    * A set of bits representing the IDs used in this object pool. Each bit in
    * the set represents the ID equivalent to the bit's index.
@@ -62,8 +56,7 @@ public class TCSObjectPool {
   /**
    * The generator providing unique names for objects in this pool.
    */
-  private final UniqueStringGenerator<?> objectNameGenerator
-      = new UniqueStringGenerator<>();
+  private final UniqueStringGenerator<?> objectNameGenerator = new UniqueStringGenerator<>();
   /**
    * The event bus to publish events to.
    */
@@ -90,22 +83,22 @@ public class TCSObjectPool {
       throws ObjectExistsException {
     requireNonNull(newObject, "newObject");
 
-    int newObjectId = newObject.getId();
-    if (objectsById.get(newObjectId) != null) {
-      throw new ObjectExistsException(
-          "Object ID " + newObject.getId() + " occupied by object named "
-          + objectsById.get(newObjectId).getName());
-    }
     if (objectsByName.containsKey(newObject.getName())) {
-      throw new ObjectExistsException(
-          "Object name " + newObject.getName()
-          + " occupied by object with ID "
-          + objectsByName.get(newObject.getName()).getId());
+      throw new ObjectExistsException("Object name " + newObject.getName() + " already exists.");
     }
-    objectsById.set(newObjectId, newObject);
     objectsByName.put(newObject.getName(), newObject);
-    idBits.set(newObject.getId());
+    idBits.set(extractId(newObject.getReference()));
     objectNameGenerator.addString(newObject.getName());
+  }
+
+  public <E extends TCSObject<E>> E replaceObject(E object) {
+    requireNonNull(object, "object");
+    checkArgument(objectsByName.containsKey(object.getName()),
+                  "Object named '%s' does not exist",
+                  object.getName());
+
+    objectsByName.put(object.getName(), object);
+    return object;
   }
 
   /**
@@ -118,7 +111,7 @@ public class TCSObjectPool {
   public TCSObject<?> getObject(TCSObjectReference<?> ref) {
     requireNonNull(ref);
 
-    return objectsById.get(ref.getId());
+    return objectsByName.get(ref.getName());
   }
 
   /**
@@ -136,7 +129,7 @@ public class TCSObjectPool {
     requireNonNull(clazz, "clazz");
     requireNonNull(ref, "ref");
 
-    TCSObject<?> result = objectsById.get(ref.getId());
+    TCSObject<?> result = objectsByName.get(ref.getName());
     if (clazz.isInstance(result)) {
       return clazz.cast(result);
     }
@@ -259,7 +252,7 @@ public class TCSObjectPool {
     requireNonNull(clazz, "clazz");
     requireNonNull(predicate, "predicate");
 
-    return objectsById.stream()
+    return objectsByName.values().stream()
         .filter(obj -> clazz.isInstance(obj))
         .map(obj -> clazz.cast(obj))
         .filter(predicate)
@@ -282,7 +275,7 @@ public class TCSObjectPool {
     requireNonNull(ref, "ref");
     requireNonNull(newName, "newName");
 
-    TCSObject<?> object = objectsById.get(ref.getId());
+    TCSObject<?> object = objectsByName.get(ref.getName());
     if (object == null) {
       throw new ObjectUnknownException("No such object in this pool.");
     }
@@ -333,13 +326,11 @@ public class TCSObjectPool {
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
-    TCSObject<?> rmObject = objectsById.get(ref.getId());
+    TCSObject<?> rmObject = objectsByName.remove(ref.getName());
     if (rmObject == null) {
       throw new ObjectUnknownException(ref);
     }
-    objectsById.set(ref.getId(), null);
-    objectsByName.remove(rmObject.getName());
-    idBits.clear(ref.getId());
+    idBits.clear(extractId(ref));
     objectNameGenerator.removeString(rmObject.getName());
     return rmObject;
   }
@@ -359,8 +350,7 @@ public class TCSObjectPool {
       TCSObject<?> removedObject = objectsByName.remove(curName);
       if (removedObject != null) {
         result.add(removedObject);
-        objectsById.set(removedObject.getId(), null);
-        idBits.clear(removedObject.getId());
+        idBits.clear(extractId(removedObject.getReference()));
         objectNameGenerator.removeString(removedObject.getName());
       }
     }
@@ -382,13 +372,17 @@ public class TCSObjectPool {
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
-    final TCSObject<?> object = objectsById.get(ref.getId());
+    TCSObject<?> object = objectsByName.get(ref.getName());
     if (object == null) {
-      throw new ObjectUnknownException("No object with ID " + ref.getId());
+      throw new ObjectUnknownException("No object with name " + ref.getName());
     }
-    final TCSObject<?> previousState = object.clone();
-    log.debug("Setting property: " + ref.getName() + ", " + key + ", " + value);
-    object.setProperty(key, value);
+    TCSObject<?> previousState = object.clone();
+    LOG.debug("Setting property on object named '{}': key='{}', value='{}'",
+              ref.getName(),
+              key,
+              value);
+    object = object.withProperty(key, value);
+    objectsByName.put(object.getName(), object);
     emitObjectEvent(object.clone(),
                     previousState,
                     TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -404,12 +398,13 @@ public class TCSObjectPool {
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
-    final TCSObject<?> object = objectsById.get(ref.getId());
+    TCSObject<?> object = objectsByName.get(ref.getName());
     if (object == null) {
-      throw new ObjectUnknownException("No object with ID " + ref.getId());
+      throw new ObjectUnknownException("No object with name " + ref.getName());
     }
-    final TCSObject<?> previousState = object.clone();
-    object.clearProperties();
+    TCSObject<?> previousState = object.clone();
+    object = object.withProperties(new HashMap<>());
+    objectsByName.put(object.getName(), object);
     emitObjectEvent(object.clone(),
                     previousState,
                     TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -454,7 +449,10 @@ public class TCSObjectPool {
    * pool.
    *
    * @return An object ID that is unique among all known objects in this pool.
+   * @deprecated Will be removed.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public int getUniqueObjectId() {
     return idBits.nextClearBit(0);
   }
@@ -475,5 +473,10 @@ public class TCSObjectPool {
                                               previousObjectState,
                                               evtType);
     eventBus.publish(event);
+  }
+
+  @SuppressWarnings("deprecation")
+  private int extractId(TCSObjectReference<?> ref) {
+    return ref.getId();
   }
 }

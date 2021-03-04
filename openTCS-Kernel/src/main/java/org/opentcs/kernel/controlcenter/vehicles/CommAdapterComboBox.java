@@ -25,7 +25,7 @@ public class CommAdapterComboBox
   /**
    * This instance's resource bundle.
    */
-  private final ResourceBundle BUNDLE
+  private final ResourceBundle bundle
       = ResourceBundle.getBundle("org/opentcs/kernel/controlcenter/vehicles/Bundle");
 
   /**
@@ -48,8 +48,8 @@ public class CommAdapterComboBox
     // Since the previously selected item was not a dummy, let the user confirm the change.
     int reply = JOptionPane.showConfirmDialog(
         null,
-        BUNDLE.getString("CommAdapterComboBox.confirmation.driverChange.text"),
-        BUNDLE.getString("CommAdapterComboBox.confirmation.driverChange.title"),
+        bundle.getString("CommAdapterComboBox.confirmation.driverChange.text"),
+        bundle.getString("CommAdapterComboBox.confirmation.driverChange.title"),
         JOptionPane.YES_NO_OPTION);
     if (reply == JOptionPane.YES_OPTION) {
       super.setSelectedItem(anObject);

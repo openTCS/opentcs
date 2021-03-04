@@ -223,15 +223,14 @@ public class DefaultVehicleControllerTest {
   @Test(expected = IllegalStateException.class)
   public void shouldNotAcceptMultipleDriveOrders() {
     Location location = dataObjectFactory.createLocation();
-    DriveOrder driveOrder = new DriveOrder(new DriveOrder.Destination(
-        location.getReference(), DriveOrder.Destination.OP_NOP));
 
     Point dstPoint = dataObjectFactory.createPoint();
     Path stepPath = dataObjectFactory.createPath(dstPoint.getReference());
     List<Route.Step> steps = Collections.singletonList(
         new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0));
 
-    driveOrder.setRoute(new Route(steps, 1));
+    DriveOrder driveOrder = new DriveOrder(new DriveOrder.Destination(location.getReference()))
+        .withRoute(new Route(steps, 1));
 
     stdVehicleController.setDriveOrder(driveOrder, new HashMap<>());
     // Should result in an IllegalStateException:

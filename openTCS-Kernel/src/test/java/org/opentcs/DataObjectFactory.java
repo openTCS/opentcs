@@ -58,16 +58,13 @@ public class DataObjectFactory {
 
   public Point createPoint() {
     ++uniqueIdCounter;
-    return new Point(uniqueIdCounter, pointNamePrefix + uniqueIdCounter);
+    return new Point(pointNamePrefix + uniqueIdCounter);
   }
 
   public Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> dstRef) {
     ++uniqueIdCounter;
-    return new Path(uniqueIdCounter,
-                    pathNamePrefix + uniqueIdCounter,
-                    srcRef,
-                    dstRef);
+    return new Path(pathNamePrefix + uniqueIdCounter, srcRef, dstRef);
   }
 
   public Path createPath(TCSObjectReference<Point> dstRef) {
@@ -84,28 +81,23 @@ public class DataObjectFactory {
 
   public Vehicle createVehicle() {
     ++uniqueIdCounter;
-    return new Vehicle(uniqueIdCounter, vehicleNamePrefix + uniqueIdCounter);
+    return new Vehicle(vehicleNamePrefix + uniqueIdCounter);
   }
 
   public LocationType createLocationType() {
     ++uniqueIdCounter;
-    return new LocationType(uniqueIdCounter,
-                            locTypeNamePrefix + uniqueIdCounter);
+    return new LocationType(locTypeNamePrefix + uniqueIdCounter);
   }
 
   public Location createLocation(TCSObjectReference<LocationType> locTypeRef) {
     ++uniqueIdCounter;
-    return new Location(uniqueIdCounter,
-                        locationNamePrefix + uniqueIdCounter,
-                        locTypeRef);
+    return new Location(locationNamePrefix + uniqueIdCounter, locTypeRef);
   }
 
   public Location createLocation() {
     LocationType locType = createLocationType();
     ++uniqueIdCounter;
-    return new Location(uniqueIdCounter,
-                        locationNamePrefix + uniqueIdCounter,
-                        locType.getReference());
+    return new Location(locationNamePrefix + uniqueIdCounter, locType.getReference());
   }
 
 }

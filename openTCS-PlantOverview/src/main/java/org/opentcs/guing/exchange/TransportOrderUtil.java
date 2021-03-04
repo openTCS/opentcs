@@ -202,20 +202,14 @@ public class TransportOrderUtil {
 
   private List<DestinationCreationTO> copyDestinations(TransportOrder original) {
     List<DestinationCreationTO> result = new LinkedList<>();
-    for (DriveOrder driveOrder : original.getPastDriveOrders()) {
-      result.add(copyDestination(driveOrder));
-    }
-    if (original.getCurrentDriveOrder() != null) {
-      result.add(copyDestination(original.getCurrentDriveOrder()));
-    }
-    for (DriveOrder driveOrder : original.getFutureDriveOrders()) {
+    for (DriveOrder driveOrder : original.getAllDriveOrders()) {
       result.add(copyDestination(driveOrder));
     }
     return result;
   }
 
   private DestinationCreationTO copyDestination(DriveOrder driveOrder) {
-    return new DestinationCreationTO(driveOrder.getDestination().getLocation().getName(),
+    return new DestinationCreationTO(driveOrder.getDestination().getDestination().getName(),
                                      driveOrder.getDestination().getOperation())
         .setProperties(driveOrder.getDestination().getProperties());
   }

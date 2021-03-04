@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import javax.inject.Provider;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
@@ -20,7 +19,7 @@ import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -62,12 +61,6 @@ public class XMLFileModelPersisterTest {
    */
   private Model persistedModel;
 
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.io.IOException
-   * @throws org.opentcs.kernel.persistence.InvalidModelException
-   */
   @Before
   public void setUp()
       throws IOException, InvalidModelException {
@@ -81,8 +74,7 @@ public class XMLFileModelPersisterTest {
           throws Throwable {
         Object[] args = invocation.getArguments();
         persistedModel = (Model) args[0];
-        persistedModel.setName(
-            args[1] != null ? (String) args[1] : persistedModel.getName());
+        persistedModel.setName(args[1] != null ? (String) args[1] : persistedModel.getName());
         return null;
       }
     }).when(writer).writeXMLModel(any(Model.class),
@@ -106,15 +98,8 @@ public class XMLFileModelPersisterTest {
         new XMLModelWriterProvider(writer));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @After
   public void tearDown() {
-    persister = null;
-    reader = null;
-    writer = null;
-    persistedModel = null;
     deleteBackups();
   }
 
@@ -123,8 +108,6 @@ public class XMLFileModelPersisterTest {
       throws IOException {
     Model model = createTestModel(MODEL_NAME);
     persister.saveModel(model, null);
-    //TODO How to use Hamcrest's Matchers.sameInstance(model) here?
-    //     We would not need the assertEquals and the persistedModel member anymore...
     verify(writer, times(1))
         .writeXMLModel(any(Model.class), any(), any(OutputStream.class));
     assertEquals(persistedModel, model);
@@ -135,8 +118,7 @@ public class XMLFileModelPersisterTest {
   public void testLoadModelShouldReadXMLModel()
       throws IOException, InvalidModelException {
     persister.saveModel(createTestModel(MODEL_NAME), null);
-    Model model = new Model(
-        new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
+    Model model = new Model(new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
     persister.loadModel(model);
     verify(reader, atLeastOnce())
         .readXMLModel(any(InputStream.class), any(Model.class));
@@ -163,32 +145,32 @@ public class XMLFileModelPersisterTest {
   }
 
   @Test
-  public void testLoadModelShouldReturnEmptyModelIfNoModelIsSaved()
+  @SuppressWarnings("deprecation")
+  public void shouldLoadEmptyModelIfNoModelIsSaved()
       throws IOException {
     persister.removeModel();
-    Model model = new Model(
-        new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
+    Model model = new Model(new TCSObjectPool(new MBassador<>(BusConfiguration.Default())));
     persister.loadModel(model);
-    assertTrue(model.getPoints(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getBlocks(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getGroups(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getLocations(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getLocationTypes(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getPaths(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getStaticRoutes(Pattern.compile(".*")).isEmpty());
-    assertTrue(model.getVehicles(Pattern.compile(".*")).isEmpty());
+    assertTrue(model.getPoints(null).isEmpty());
+    assertTrue(model.getBlocks(null).isEmpty());
+    assertTrue(model.getGroups(null).isEmpty());
+    assertTrue(model.getLocations(null).isEmpty());
+    assertTrue(model.getLocationTypes(null).isEmpty());
+    assertTrue(model.getPaths(null).isEmpty());
+    assertTrue(model.getStaticRoutes(null).isEmpty());
+    assertTrue(model.getVehicles(null).isEmpty());
     assertTrue(model.getName().isEmpty());
   }
 
   @Test
-  public void testShouldHaveModelAfterSavingModel()
+  public void shouldHaveModelAfterSavingModel()
       throws IOException {
     persister.saveModel(createTestModel(MODEL_NAME), MODEL_NAME);
     assertTrue(persister.hasSavedModel());
   }
 
   @Test
-  public void testShouldNotHaveModelAfterRemovingModel()
+  public void shouldNotHaveModelAfterRemovingModel()
       throws IOException {
     persister.saveModel(createTestModel(MODEL_NAME), MODEL_NAME);
     deleteBackups();
@@ -208,8 +190,7 @@ public class XMLFileModelPersisterTest {
    * Delete all backup files from the backups-directory if it does exist.
    */
   private void deleteBackups() {
-    File backupDir
-        = new File(TestEnvironment.getKernelHomeDirectory(), "data/backups");
+    File backupDir = new File(TestEnvironment.getKernelHomeDirectory(), "data/backups");
     if (!backupDir.isDirectory()) {
       return;
     }

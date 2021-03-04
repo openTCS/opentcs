@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
@@ -51,13 +52,11 @@ public class DrawingViewScrollPane
    *
    * @param drawingView The drawing view.
    * @param placardPanel The view's placard panel.
-   * @param origin The current system model's origin.
    */
   public DrawingViewScrollPane(OpenTCSDrawingView drawingView,
                                DrawingViewPlacardPanel placardPanel) {
     this.drawingView = requireNonNull(drawingView, "drawingView");
     this.placardPanel = requireNonNull(placardPanel, "placardPanel");
-    requireNonNull(origin, "origin");
 
     setViewport(new JViewport());
     getViewport().setView(drawingView);
@@ -126,9 +125,23 @@ public class DrawingViewScrollPane
 
   public void originChanged(@Nonnull Origin origin) {
     requireNonNull(origin, "origin");
+    if (origin == this.origin) {
+      return;
+    }
+
+    this.origin.removeListener(getHorizontalRuler());
+    this.origin.removeListener(getVerticalRuler());
+    this.origin = origin;
+
     origin.addListener(getHorizontalRuler());
     origin.addListener(getVerticalRuler());
-    origin.notifyScaleChanged();
+
+    // Notify the rulers directly. This is necessary to initialize/update the rulers scale when a 
+    // model is created or loaded.
+    // Calling origin.notifyScaleChanged() would lead to all model elements being notified (loading
+    // times for bigger models would suffer).
+    getHorizontalRuler().originScaleChanged(new EventObject(origin));
+    getVerticalRuler().originScaleChanged(new EventObject(origin));
   }
 
   private class PlacardScrollbar

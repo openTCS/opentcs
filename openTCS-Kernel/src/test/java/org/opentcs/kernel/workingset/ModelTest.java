@@ -84,12 +84,7 @@ public class ModelTest {
     }
     // Verify that, after removing all objects from the model, the global pool
     // is empty.
-    for (Path curPath : model.getPaths(null)) {
-      model.removePath(curPath.getReference());
-    }
-    for (Point curPoint : model.getPoints(null)) {
-      model.removePoint(curPoint.getReference());
-    }
+    model.clear();
     assertTrue("globalPool is not empty after removing all objects",
                globalPool.isEmpty());
   }

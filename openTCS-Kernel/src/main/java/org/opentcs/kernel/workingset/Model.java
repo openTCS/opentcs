@@ -10,6 +10,7 @@ package org.opentcs.kernel.workingset;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,7 +28,6 @@ import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.ShapeLayoutElementCreationTO;
-import org.opentcs.access.to.model.StaticRouteCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.ObjectExistsException;
@@ -41,7 +41,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
@@ -132,9 +131,9 @@ public class Model {
   }
 
   /**
-   * Removes all model objects from this model and the object pool by which it
-   * is backed.
+   * Removes all model objects from this model and the object pool by which it is backed.
    */
+  @SuppressWarnings("deprecation")
   public void clear() {
     LOG.debug("method entry");
     for (TCSObject<?> curObject : objectPool.getObjects((Pattern) null)) {
@@ -145,7 +144,7 @@ public class Model {
           || curObject instanceof Location
           || curObject instanceof Block
           || curObject instanceof Group
-          || curObject instanceof StaticRoute
+          || curObject instanceof org.opentcs.data.model.StaticRoute
           || curObject instanceof VisualLayout) {
         objectPool.removeObject(curObject.getReference());
         objectPool.emitObjectEvent(null,
@@ -163,6 +162,7 @@ public class Model {
    * @throws ObjectExistsException If an object with a new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public void createPlantModelObjects(PlantModelCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     for (PointCreationTO point : to.getPoints()) {
@@ -183,7 +183,7 @@ public class Model {
     for (GroupCreationTO group : to.getGroups()) {
       createGroup(group);
     }
-    for (StaticRouteCreationTO route : to.getStaticRoutes()) {
+    for (org.opentcs.access.to.model.StaticRouteCreationTO route : to.getStaticRoutes()) {
       createStaticRoute(route);
     }
     for (VehicleCreationTO vehicle : to.getVehicles()) {
@@ -239,9 +239,9 @@ public class Model {
    */
   public VisualLayout createVisualLayout(VisualLayoutCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
-    VisualLayout newLayout = new VisualLayout(objectPool.getUniqueObjectId(), to.getName());
-    newLayout.setScaleX(to.getScaleX());
-    newLayout.setScaleY(to.getScaleY());
+    VisualLayout newLayout = new VisualLayout(to.getName())
+        .withScaleX(to.getScaleX())
+        .withScaleY(to.getScaleY());
     for (ModelLayoutElementCreationTO mleTO : to.getModelElements()) {
       TCSObject<?> object = objectPool.getObject(mleTO.getName());
       if (object == null) {
@@ -449,13 +449,11 @@ public class Model {
   public Point createPoint(PointCreationTO to)
       throws ObjectExistsException {
     // Get a unique ID for the new point and create an instance.
-    Point newPoint = new Point(objectPool.getUniqueObjectId(), to.getName());
-    newPoint.setPosition(to.getPosition());
-    newPoint.setType(to.getType());
-    newPoint.setVehicleOrientationAngle(to.getVehicleOrientationAngle());
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newPoint.setProperty(entry.getKey(), entry.getValue());
-    }
+    Point newPoint = new Point(to.getName())
+        .withPosition(to.getPosition())
+        .withType(to.getType())
+        .withVehicleOrientationAngle(to.getVehicleOrientationAngle())
+        .withProperties(to.getProperties());
     objectPool.addObject(newPoint);
     objectPool.emitObjectEvent(newPoint.clone(), null, TCSObjectEvent.Type.OBJECT_CREATED);
     // Return the newly created point.
@@ -605,7 +603,9 @@ public class Model {
           "Point is not the path's destination.");
     }
     Path previousState = path.clone();
-    point.addIncomingPath(path.getReference());
+    Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
+    incomingPaths.add(path.getReference());
+    point = objectPool.replaceObject(point.withIncomingPaths(incomingPaths));
     objectPool.emitObjectEvent(point.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -634,7 +634,9 @@ public class Model {
       throw new ObjectUnknownException(pathRef);
     }
     Path previousState = path.clone();
-    point.removeIncomingPath(path.getReference());
+    Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
+    incomingPaths.remove(path.getReference());
+    point = objectPool.replaceObject(point.withIncomingPaths(incomingPaths));
     objectPool.emitObjectEvent(point.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -667,7 +669,9 @@ public class Model {
       throw new IllegalArgumentException("Point is not the path's source.");
     }
     Path previousState = path.clone();
-    point.addOutgoingPath(path.getReference());
+    Set<TCSObjectReference<Path>> outgoingPaths = new HashSet<>(point.getOutgoingPaths());
+    outgoingPaths.add(path.getReference());
+    point = objectPool.replaceObject(point.withOutgoingPaths(outgoingPaths));
     objectPool.emitObjectEvent(point.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -696,7 +700,9 @@ public class Model {
       throw new ObjectUnknownException(pathRef);
     }
     Path previousState = path.clone();
-    point.removeOutgoingPath(path.getReference());
+    Set<TCSObjectReference<Path>> outgoingPaths = new HashSet<>(point.getOutgoingPaths());
+    outgoingPaths.remove(path.getReference());
+    point = objectPool.replaceObject(point.withOutgoingPaths(outgoingPaths));
     objectPool.emitObjectEvent(point.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -709,7 +715,9 @@ public class Model {
    * @param ref A reference to the point to be removed.
    * @return The removed point.
    * @throws ObjectUnknownException If the referenced point does not exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public Point removePoint(TCSObjectReference<Point> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -808,18 +816,16 @@ public class Model {
     if (destPoint == null) {
       throw new ObjectUnknownException(to.getDestPointName());
     }
-    Path newPath = new Path(objectPool.getUniqueObjectId(),
-                            to.getName(),
+    Path newPath = new Path(to.getName(),
                             srcPoint.getReference(),
-                            destPoint.getReference());
-    newPath.setLength(to.getLength());
-    newPath.setMaxVelocity(to.getMaxVelocity());
-    newPath.setMaxReverseVelocity(to.getMaxReverseVelocity());
-    newPath.setRoutingCost(to.getRoutingCost());
-    newPath.setLocked(to.isLocked());
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newPath.setProperty(entry.getKey(), entry.getValue());
-    }
+                            destPoint.getReference())
+        .withLength(to.getLength())
+        .withRoutingCost(to.getRoutingCost())
+        .withMaxVelocity(to.getMaxVelocity())
+        .withMaxReverseVelocity(to.getMaxReverseVelocity())
+        .withProperties(to.getProperties())
+        .withLocked(to.isLocked());
+
     // Store the instance in the global object pool.
     objectPool.addObject(newPath);
 
@@ -988,7 +994,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Path previousState = path.clone();
-    path.setLocked(newLocked);
+    path = objectPool.replaceObject(path.withLocked(newLocked));
     objectPool.emitObjectEvent(path.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1001,7 +1007,9 @@ public class Model {
    * @param ref A reference to the path to be removed.
    * @return The removed path.
    * @throws ObjectUnknownException If the referenced path does not exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public Path removePath(TCSObjectReference<Path> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -1059,13 +1067,9 @@ public class Model {
    */
   public LocationType createLocationType(LocationTypeCreationTO to)
       throws ObjectExistsException {
-    LocationType newType = new LocationType(objectPool.getUniqueObjectId(), to.getName());
-    for (String operation : to.getAllowedOperations()) {
-      newType.addAllowedOperation(operation);
-    }
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newType.setProperty(entry.getKey(), entry.getValue());
-    }
+    LocationType newType = new LocationType(to.getName())
+        .withAllowedOperations(to.getAllowedOperations())
+        .withProperties(to.getProperties());
     objectPool.addObject(newType);
     objectPool.emitObjectEvent(newType.clone(),
                                null,
@@ -1175,7 +1179,9 @@ public class Model {
    * @return The removed location type.
    * @throws ObjectUnknownException If the referenced location type does not
    * exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public LocationType removeLocationType(TCSObjectReference<LocationType> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -1248,24 +1254,21 @@ public class Model {
     if (type == null) {
       throw new ObjectUnknownException(to.getTypeName());
     }
-    Location newLocation = new Location(objectPool.getUniqueObjectId(),
-                                        to.getName(),
-                                        type.getReference());
-    newLocation.setPosition(to.getPosition());
+    Location newLocation = new Location(to.getName(), type.getReference())
+        .withPosition(to.getPosition())
+        .withProperties(to.getProperties());
+
+    Set<Location.Link> attachedLinks = new HashSet<>();
     for (Map.Entry<String, Set<String>> linkEntry : to.getLinks().entrySet()) {
       Point point = objectPool.getObject(Point.class, linkEntry.getKey());
       if (point == null) {
         throw new ObjectUnknownException(linkEntry.getKey());
       }
-      Location.Link link = new Location.Link(newLocation.getReference(), point.getReference());
-      for (String operation : linkEntry.getValue()) {
-        link.addAllowedOperation(operation);
-      }
-      newLocation.attachLink(link);
+      Location.Link link = new Location.Link(newLocation.getReference(), point.getReference())
+          .withAllowedOperations(linkEntry.getValue());
+      attachedLinks.add(link);
     }
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newLocation.setProperty(entry.getKey(), entry.getValue());
-    }
+    newLocation = newLocation.withAttachedLinks(attachedLinks);
 
     objectPool.addObject(newLocation);
     objectPool.emitObjectEvent(newLocation.clone(),
@@ -1591,7 +1594,9 @@ public class Model {
    * @param ref A reference to the location to be removed.
    * @return The removed location.
    * @throws ObjectUnknownException If the referenced location does not exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public Location removeLocation(TCSObjectReference<Location> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -1650,13 +1655,13 @@ public class Model {
    */
   public Vehicle createVehicle(VehicleCreationTO to)
       throws ObjectExistsException {
-    Vehicle newVehicle = new Vehicle(objectPool.getUniqueObjectId(), to.getName());
-    newVehicle.setLength(to.getLength());
-    newVehicle.setEnergyLevelCritical(to.getEnergyLevelCritical());
-    newVehicle.setEnergyLevelGood(to.getEnergyLevelGood());
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newVehicle.setProperty(entry.getKey(), entry.getValue());
-    }
+    Vehicle newVehicle = new Vehicle(to.getName())
+        .withLength(to.getLength())
+        .withEnergyLevelGood(to.getEnergyLevelGood())
+        .withEnergyLevelCritical(to.getEnergyLevelCritical())
+        .withMaxVelocity(to.getMaxVelocity())
+        .withMaxReverseVelocity(to.getMaxReverseVelocity())
+        .withProperties(to.getProperties());
     objectPool.addObject(newVehicle);
     objectPool.emitObjectEvent(newVehicle.clone(),
                                null,
@@ -1718,7 +1723,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setEnergyLevel(energyLevel);
+    vehicle = objectPool.replaceObject(vehicle.withEnergyLevel(energyLevel));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1744,7 +1749,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setEnergyLevelCritical(energyLevel);
+    vehicle = objectPool.replaceObject(vehicle.withEnergyLevelCritical(energyLevel));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1770,7 +1775,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setEnergyLevelGood(energyLevel);
+    vehicle = objectPool.replaceObject(vehicle.withEnergyLevelGood(energyLevel));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1794,7 +1799,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setRechargeOperation(rechargeOperation);
+    vehicle = objectPool.replaceObject(vehicle.withRechargeOperation(rechargeOperation));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1818,7 +1823,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setLoadHandlingDevices(devices);
+    vehicle = objectPool.replaceObject(vehicle.withLoadHandlingDevices(devices));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1832,7 +1837,9 @@ public class Model {
    * @param velocity The vehicle's new maximum velocity.
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link #createVehicle(org.opentcs.access.to.VehicleCreationTO)} instead.
    */
+  @Deprecated
   public Vehicle setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref,
                                        int velocity)
       throws ObjectUnknownException {
@@ -1842,7 +1849,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setMaxVelocity(velocity);
+    vehicle = objectPool.replaceObject(vehicle.withMaxVelocity(velocity));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1856,7 +1863,9 @@ public class Model {
    * @param velocity The vehicle's new maximum reverse velocity.
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link #createVehicle(org.opentcs.access.to.VehicleCreationTO)} instead.
    */
+  @Deprecated
   public Vehicle setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                               int velocity)
       throws ObjectUnknownException {
@@ -1866,7 +1875,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setMaxReverseVelocity(velocity);
+    vehicle = objectPool.replaceObject(vehicle.withMaxReverseVelocity(velocity));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1890,7 +1899,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setState(newState);
+    vehicle = objectPool.replaceObject(vehicle.withState(newState));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1914,7 +1923,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setProcState(newState);
+    vehicle = objectPool.replaceObject(vehicle.withProcState(newState));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1938,7 +1947,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setAdapterState(newState);
+    vehicle = objectPool.replaceObject(vehicle.withAdapterState(newState));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1963,7 +1972,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setLength(length);
+    vehicle = objectPool.replaceObject(vehicle.withLength(length));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -1989,24 +1998,23 @@ public class Model {
     Vehicle previousVehicleState = vehicle.clone();
     // If the vehicle was occupying a point before, clear it and send an event.
     if (vehicle.getCurrentPosition() != null) {
-      Point oldPos = objectPool.getObject(Point.class,
-                                          vehicle.getCurrentPosition());
-      Point previousPointState = oldPos.clone();
-      oldPos.setOccupyingVehicle(null);
-      objectPool.emitObjectEvent(oldPos.clone(),
+      Point oldVehiclePos = objectPool.getObject(Point.class, vehicle.getCurrentPosition());
+      Point previousPointState = oldVehiclePos.clone();
+      oldVehiclePos = objectPool.replaceObject(oldVehiclePos.withOccupyingVehicle(null));
+      objectPool.emitObjectEvent(oldVehiclePos.clone(),
                                  previousPointState,
                                  TCSObjectEvent.Type.OBJECT_MODIFIED);
     }
     // If the vehicle is occupying a point now, set that and send an event.
     if (newPosRef != null) {
-      Point newPos = objectPool.getObject(Point.class, newPosRef);
-      Point previousPointState = newPos.clone();
-      newPos.setOccupyingVehicle(ref);
-      objectPool.emitObjectEvent(newPos.clone(),
+      Point newVehiclePos = objectPool.getObject(Point.class, newPosRef);
+      Point previousPointState = newVehiclePos.clone();
+      newVehiclePos = objectPool.replaceObject(newVehiclePos.withOccupyingVehicle(ref));
+      objectPool.emitObjectEvent(newVehiclePos.clone(),
                                  previousPointState,
                                  TCSObjectEvent.Type.OBJECT_MODIFIED);
     }
-    vehicle.setCurrentPosition(newPosRef);
+    vehicle = objectPool.replaceObject(vehicle.withCurrentPosition(newPosRef));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousVehicleState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2032,7 +2040,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setNextPosition(newPosition);
+    vehicle = objectPool.replaceObject(vehicle.withNextPosition(newPosition));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2056,7 +2064,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setPrecisePosition(newPosition);
+    vehicle = objectPool.replaceObject(vehicle.withPrecisePosition(newPosition));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2080,7 +2088,7 @@ public class Model {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setOrientationAngle(angle);
+    vehicle = objectPool.replaceObject(vehicle.withOrientationAngle(angle));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2106,7 +2114,7 @@ public class Model {
     }
     Vehicle previousState = vehicle.clone();
     if (orderRef == null) {
-      vehicle.setTransportOrder(null);
+      vehicle = objectPool.replaceObject(vehicle.withTransportOrder(null));
     }
     else {
       TransportOrder order = objectPool.getObject(TransportOrder.class,
@@ -2114,7 +2122,7 @@ public class Model {
       if (order == null) {
         throw new ObjectUnknownException(orderRef);
       }
-      vehicle.setTransportOrder(order.getReference());
+      vehicle = objectPool.replaceObject(vehicle.withTransportOrder(order.getReference()));
     }
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
@@ -2141,14 +2149,14 @@ public class Model {
     }
     Vehicle previousState = vehicle.clone();
     if (seqRef == null) {
-      vehicle.setOrderSequence(null);
+      vehicle = objectPool.replaceObject(vehicle.withOrderSequence(null));
     }
     else {
       OrderSequence seq = objectPool.getObject(OrderSequence.class, seqRef);
       if (seq == null) {
         throw new ObjectUnknownException(seqRef);
       }
-      vehicle.setOrderSequence(seq.getReference());
+      vehicle = objectPool.replaceObject(vehicle.withOrderSequence(seq.getReference()));
     }
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
@@ -2175,7 +2183,7 @@ public class Model {
       throw new ObjectUnknownException(vehicleRef);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle.setRouteProgressIndex(index);
+    vehicle = objectPool.replaceObject(vehicle.withRouteProgressIndex(index));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2188,7 +2196,9 @@ public class Model {
    * @param ref A reference to the vehicle to be removed.
    * @return The removed vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public Vehicle removeVehicle(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -2246,18 +2256,17 @@ public class Model {
    */
   public Block createBlock(BlockCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
-    Block newBlock = new Block(objectPool.getUniqueObjectId(), to.getName());
+    Set<TCSResourceReference<?>> members = new HashSet<>();
     for (String memberName : to.getMemberNames()) {
       TCSObject<?> object = objectPool.getObject(memberName);
       if (!(object instanceof TCSResource)) {
         throw new ObjectUnknownException(memberName);
       }
-      TCSResourceReference<?> memberRef = ((TCSResource) object).getReference();
-      newBlock.addMember(memberRef);
+      members.add(((TCSResource) object).getReference());
     }
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newBlock.setProperty(entry.getKey(), entry.getValue());
-    }
+    Block newBlock = new Block(to.getName())
+        .withMembers(members)
+        .withProperties(to.getProperties());
     objectPool.addObject(newBlock);
     objectPool.emitObjectEvent(newBlock.clone(),
                                null,
@@ -2365,7 +2374,9 @@ public class Model {
    * @param ref A reference to the block to be removed.
    * @return The removed block.
    * @throws ObjectUnknownException If the referenced block does not exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public Block removeBlock(TCSObjectReference<Block> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -2424,17 +2435,17 @@ public class Model {
    */
   public Group createGroup(GroupCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
-    Group newGroup = new Group(objectPool.getUniqueObjectId(), to.getName());
+    Set<TCSObjectReference<?>> members = new HashSet<>();
     for (String memberName : to.getMemberNames()) {
       TCSObject<?> object = objectPool.getObject(memberName);
       if (object == null) {
         throw new ObjectUnknownException(memberName);
       }
-      newGroup.addMember(object.getReference());
+      members.add(object.getReference());
     }
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newGroup.setProperty(entry.getKey(), entry.getValue());
-    }
+    Group newGroup = new Group(to.getName())
+        .withMembers(members)
+        .withProperties(to.getProperties());
     objectPool.addObject(newGroup);
     objectPool.emitObjectEvent(newGroup.clone(),
                                null,
@@ -2517,7 +2528,9 @@ public class Model {
    * @param ref A reference to the group to be removed.
    * @return The removed group.
    * @throws ObjectUnknownException If the referenced group does not exist.
+   * @deprecated Use {@link #clear()} instead.
    */
+  @Deprecated
   public Group removeGroup(TCSObjectReference<Group> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
@@ -2540,16 +2553,16 @@ public class Model {
    * @param objectID The object ID of the newly created route. If
    * <code>null</code>, a new, unique one will be generated.
    * @return The newly created static route.
-   * @deprecated Use {@link #createStaticRoute(org.opentcs.access.to.StaticRouteCreationTO)}
-   * instead.
+   * @deprecated Support for static routes will be removed.
    */
   @Deprecated
-  public StaticRoute createStaticRoute(Integer objectID) {
+  public org.opentcs.data.model.StaticRoute createStaticRoute(Integer objectID) {
     LOG.debug("method entry");
     // Get a unique ID and name for the new object and create an instance.
     int routeID = objectID != null ? objectID : objectPool.getUniqueObjectId();
     String routeName = objectPool.getUniqueObjectName("Route-", "0000");
-    StaticRoute newRoute = new StaticRoute(routeID, routeName);
+    org.opentcs.data.model.StaticRoute newRoute = new org.opentcs.data.model.StaticRoute(routeID,
+                                                                                         routeName);
     // Store the instance in the global object pool.
     try {
       objectPool.addObject(newRoute);
@@ -2574,20 +2587,24 @@ public class Model {
    * @return The newly created route.
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   * @deprecated Support for static routes will be removed.
    */
-  public StaticRoute createStaticRoute(StaticRouteCreationTO to)
+  @Deprecated
+  public org.opentcs.data.model.StaticRoute createStaticRoute(
+      org.opentcs.access.to.model.StaticRouteCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
-    StaticRoute newRoute = new StaticRoute(objectPool.getUniqueObjectId(), to.getName());
+    List<TCSObjectReference<Point>> hops = new LinkedList<>();
     for (String memberName : to.getHopNames()) {
       TCSObject<?> object = objectPool.getObject(memberName);
       if (!(object instanceof Point)) {
         throw new ObjectUnknownException(memberName);
       }
-      newRoute.addHop(((Point) object).getReference());
+      hops.add(((Point) object).getReference());
     }
-    for (Map.Entry<String, String> entry : to.getProperties().entrySet()) {
-      newRoute.setProperty(entry.getKey(), entry.getValue());
-    }
+    org.opentcs.data.model.StaticRoute newRoute
+        = new org.opentcs.data.model.StaticRoute(to.getName())
+            .withHops(hops)
+            .withProperties(to.getProperties());
     objectPool.addObject(newRoute);
     objectPool.emitObjectEvent(newRoute.clone(),
                                null,
@@ -2602,10 +2619,13 @@ public class Model {
    * @param ref A reference to the route to return.
    * @return The referenced route, if it exists, or <code>null</code>, if it
    * doesn't.
+   * @deprecated Support for static routes will be removed.
    */
-  public StaticRoute getStaticRoute(TCSObjectReference<StaticRoute> ref) {
+  @Deprecated
+  public org.opentcs.data.model.StaticRoute getStaticRoute(
+      TCSObjectReference<org.opentcs.data.model.StaticRoute> ref) {
     LOG.debug("method entry");
-    return objectPool.getObject(StaticRoute.class, ref);
+    return objectPool.getObject(org.opentcs.data.model.StaticRoute.class, ref);
   }
 
   /**
@@ -2614,10 +2634,12 @@ public class Model {
    * @param routeName The name of the route to return.
    * @return The route with the given name, if it exists, or <code>null</code>,
    * if it doesn't.
+   * @deprecated Support for static routes will be removed.
    */
-  public StaticRoute getStaticRoute(String routeName) {
+  @Deprecated
+  public org.opentcs.data.model.StaticRoute getStaticRoute(String routeName) {
     LOG.debug("method entry");
-    return objectPool.getObject(StaticRoute.class, routeName);
+    return objectPool.getObject(org.opentcs.data.model.StaticRoute.class, routeName);
   }
 
   /**
@@ -2627,10 +2649,12 @@ public class Model {
    * <code>null</code>, all routes will be returned.
    * @return A set of routes whose names match the given regular expression. If
    * no such routes exist, the returned set is empty.
+   * @deprecated Support for static routes will be removed.
    */
-  public Set<StaticRoute> getStaticRoutes(Pattern regexp) {
+  @Deprecated
+  public Set<org.opentcs.data.model.StaticRoute> getStaticRoutes(Pattern regexp) {
     LOG.debug("method entry");
-    return objectPool.getObjects(StaticRoute.class, regexp);
+    return objectPool.getObjects(org.opentcs.data.model.StaticRoute.class, regexp);
   }
 
   /**
@@ -2642,17 +2666,20 @@ public class Model {
    * @throws ObjectUnknownException If a parameter is unknown
    * @deprecated Use {@link #createStaticRoute(org.opentcs.access.to.StaticRouteCreationTO)}
    * instead.
+   * @deprecated Support for static routes will be removed.
    */
   @Deprecated
-  public StaticRoute addStaticRouteHop(TCSObjectReference<StaticRoute> routeRef,
-                                       TCSObjectReference<Point> newHopRef)
+  public org.opentcs.data.model.StaticRoute addStaticRouteHop(
+      TCSObjectReference<org.opentcs.data.model.StaticRoute> routeRef,
+      TCSObjectReference<Point> newHopRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    StaticRoute route = objectPool.getObject(StaticRoute.class, routeRef);
+    org.opentcs.data.model.StaticRoute route
+        = objectPool.getObject(org.opentcs.data.model.StaticRoute.class, routeRef);
     if (route == null) {
       throw new ObjectUnknownException(routeRef);
     }
-    StaticRoute previousState = route.clone();
+    org.opentcs.data.model.StaticRoute previousState = route.clone();
     Point point = objectPool.getObject(Point.class, newHopRef);
     if (point == null) {
       throw new ObjectUnknownException(newHopRef);
@@ -2672,17 +2699,19 @@ public class Model {
    * @throws ObjectUnknownException If a parameter is unknown
    * @deprecated Use {@link #createStaticRoute(org.opentcs.access.to.StaticRouteCreationTO)}
    * instead.
+   * @deprecated Support for static routes will be removed.
    */
   @Deprecated
-  public StaticRoute clearStaticRouteHops(
-      TCSObjectReference<StaticRoute> routeRef)
+  public org.opentcs.data.model.StaticRoute clearStaticRouteHops(
+      TCSObjectReference<org.opentcs.data.model.StaticRoute> routeRef)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    StaticRoute route = objectPool.getObject(StaticRoute.class, routeRef);
+    org.opentcs.data.model.StaticRoute route
+        = objectPool.getObject(org.opentcs.data.model.StaticRoute.class, routeRef);
     if (route == null) {
       throw new ObjectUnknownException(routeRef);
     }
-    StaticRoute previousState = route.clone();
+    org.opentcs.data.model.StaticRoute previousState = route.clone();
     route.clearHops();
     objectPool.emitObjectEvent(route.clone(),
                                previousState,
@@ -2696,15 +2725,20 @@ public class Model {
    * @param ref A reference to the block to be removed.
    * @return The removed block.
    * @throws ObjectUnknownException If the referenced block does not exist.
+   * @deprecated Use {@link #clear()} instead.
+   * @deprecated Support for static routes will be removed.
    */
-  public StaticRoute removeStaticRoute(TCSObjectReference<StaticRoute> ref)
+  @Deprecated
+  public org.opentcs.data.model.StaticRoute removeStaticRoute(
+      TCSObjectReference<org.opentcs.data.model.StaticRoute> ref)
       throws ObjectUnknownException {
     LOG.debug("method entry");
-    StaticRoute route = objectPool.getObject(StaticRoute.class, ref);
+    org.opentcs.data.model.StaticRoute route
+        = objectPool.getObject(org.opentcs.data.model.StaticRoute.class, ref);
     if (route == null) {
       throw new ObjectUnknownException(ref);
     }
-    StaticRoute previousState = route.clone();
+    org.opentcs.data.model.StaticRoute previousState = route.clone();
     // Remove the block.
     objectPool.removeObject(ref);
     objectPool.emitObjectEvent(route.clone(),
@@ -2739,7 +2773,7 @@ public class Model {
       for (Block curBlock : blocks) {
         // If the current block contains the resource, add all of the block's
         // members to the result.
-        if (curBlock.containsMember(resource.getReference())) {
+        if (curBlock.getMembers().contains(resource.getReference())) {
           for (TCSResourceReference<?> curResRef : curBlock.getMembers()) {
             TCSResource<?> member = (TCSResource<?>) objectPool.getObject(curResRef);
             result.add(member);
@@ -2757,11 +2791,11 @@ public class Model {
    */
   public String getInfo() {
     StringBuilder result = new StringBuilder();
-    Set<Point> points = new TreeSet<>(Comparators.objectsById());
-    Set<Path> paths = new TreeSet<>(Comparators.objectsById());
-    Set<LocationType> locationTypes = new TreeSet<>(Comparators.objectsById());
-    Set<Location> locations = new TreeSet<>(Comparators.objectsById());
-    Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsById());
+    Set<Point> points = new TreeSet<>(Comparators.objectsByName());
+    Set<Path> paths = new TreeSet<>(Comparators.objectsByName());
+    Set<LocationType> locationTypes = new TreeSet<>(Comparators.objectsByName());
+    Set<Location> locations = new TreeSet<>(Comparators.objectsByName());
+    Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
     Set<TCSObject<?>> objects = objectPool.getObjects((Pattern) null);
     for (TCSObject<?> curObject : objects) {
       if (curObject instanceof Point) {
@@ -2785,7 +2819,6 @@ public class Model {
     result.append("Points:\n");
     for (Point curPoint : points) {
       result.append(" Point:\n");
-      result.append("  ID: " + curPoint.getId() + "\n");
       result.append("  Name: " + curPoint.getName() + "\n");
       result.append("  Type: " + curPoint.getType() + "\n");
       result.append("  X: " + curPoint.getPosition().getX() + "\n");
@@ -2795,18 +2828,14 @@ public class Model {
     result.append("Paths:\n");
     for (Path curPath : paths) {
       result.append(" Path:\n");
-      result.append("  ID: " + curPath.getId() + "\n");
       result.append("  Name: " + curPath.getName() + "\n");
-      result.append("  Source: " + curPath.getSourcePoint().getId()
-          + " (" + curPath.getSourcePoint().getName() + ")\n");
-      result.append("  Destination: " + curPath.getDestinationPoint().getId()
-          + " (" + curPath.getDestinationPoint().getName() + ")\n");
+      result.append("  Source: " + curPath.getSourcePoint().getName() + "\n");
+      result.append("  Destination: " + curPath.getDestinationPoint().getName() + "\n");
       result.append("  Length: " + curPath.getLength() + "\n");
     }
     result.append("LocationTypes:\n");
     for (LocationType curType : locationTypes) {
       result.append(" LocationType:\n");
-      result.append("  ID: " + curType.getId() + "\n");
       result.append("  Name: " + curType.getName() + "\n");
       result.append("  Operations: "
           + curType.getAllowedOperations().toString() + "\n");
@@ -2814,22 +2843,17 @@ public class Model {
     result.append("Locations:\n");
     for (Location curLocation : locations) {
       result.append(" Location:\n");
-      result.append("  ID: " + curLocation.getId() + "\n");
       result.append("  Name: " + curLocation.getName() + "\n");
-      result.append("  Type: " + curLocation.getType().getId()
-          + " (" + curLocation.getType().getName() + ")\n");
+      result.append("  Type: " + curLocation.getType().getName() + "\n");
       for (Location.Link curLink : curLocation.getAttachedLinks()) {
         result.append("  Link:\n");
-        result.append("   Point: " + curLink.getPoint().getId()
-            + " (" + curLink.getPoint().getName() + ")\n");
-        result.append("   Allowed operations:" + curLink.getAllowedOperations()
-            + "\n");
+        result.append("   Point: " + curLink.getPoint().getName() + "\n");
+        result.append("   Allowed operations:" + curLink.getAllowedOperations() + "\n");
       }
     }
     result.append("Vehicles:\n");
     for (Vehicle curVehicle : vehicles) {
       result.append(" Vehicle:\n");
-      result.append("  ID: " + curVehicle.getId() + "\n");
       result.append("  Name: " + curVehicle.getName() + "\n");
       result.append("  Length: " + curVehicle.getLength());
     }

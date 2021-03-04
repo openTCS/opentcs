@@ -32,12 +32,16 @@ public class ConfigDocGenerator {
    */
   private static final Logger LOG = LoggerFactory.getLogger(ConfigDocGenerator.class);
 
+  private ConfigDocGenerator() {
+  }
+
   /**
    * Generates a file documenting an application's configuration entries.
    *
    * @param args The first argument is expected to be the name of the file to write the
-   * documentation to. The second argument is expected to be fully qualified name of class.
-   * @throws Exception
+   * documentation to. The second argument is expected to be the fully qualified name of the
+   * configuration interface.
+   * @throws Exception In case there was a problem processing the input.
    */
   public static void main(String[] args)
       throws Exception {
@@ -47,7 +51,7 @@ public class ConfigDocGenerator {
 
     for (int i = 1; i < args.length; i++) {
       Class<?> clazz = ConfigDocGenerator.class.getClassLoader().loadClass(args[1]);
-      
+
       checkArgument(clazz.isAnnotationPresent(ConfigurationPrefix.class),
                     "Missing prefix annotation in {}.",
                     clazz.getName());
@@ -60,8 +64,10 @@ public class ConfigDocGenerator {
 
         ConfigurationEntry annotation = method.getAnnotation(ConfigurationEntry.class);
         configurationEntries.add(new Entry(method.getName(),
-                                                        annotation.type(),
-                                                        annotation.description()));
+                                           annotation.type(),
+                                           annotation.description(),
+                                           annotation.orderKey())
+        );
       }
 
       checkArgument(!configurationEntries.isEmpty(),
@@ -132,27 +138,37 @@ public class ConfigDocGenerator {
     /**
      * The name of this configuration entry.
      */
-    private String name;
+    private final String name;
     /**
      * A description for the data type of this configuration entry.
      */
-    private String type;
+    private final String type;
     /**
      * A description for this configuration entry.
      */
-    private String[] description;
+    private final String[] description;
+    /**
+     * A key for sorting entries.
+     */
+    private final String orderKey;
 
     public Entry(String name,
-                              String type,
-                              String[] description) {
+                 String type,
+                 String[] description,
+                 String orderKey) {
       this.name = name;
       this.type = type;
       this.description = description;
+      this.orderKey = orderKey;
     }
 
     @Override
     public int compareTo(Entry entry) {
-      return this.name.compareTo(entry.name);
+      int result = this.orderKey.compareTo(entry.orderKey);
+      if (result == 0) {
+        result = this.name.compareTo(entry.name);
+      }
+      return result;
     }
   }
 }

@@ -3,6 +3,9 @@ apply from: "${rootDir}/gradle/license-headers.gradle"
 dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
+  
+  compile group: "org.jgrapht", name:"jgrapht-core", version: "1.0.1"
+  compileOnly group: "org.jgrapht", name:"jgrapht-core", version: "1.0.1", classifier: "sources"
 }
 
 task release {

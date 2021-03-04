@@ -45,7 +45,6 @@ import org.opentcs.data.model.Location.Link;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -438,7 +437,6 @@ public class OpenTCSModelManager
     fModelName = kernel.getLoadedModelName();
     ((StringProperty) systemModel.getProperty(ModelComponent.NAME)).setText(fModelName);
 
-    // Die im Kernel gespeicherten Layouts
     Set<VisualLayout> allVisualLayouts = kernel.getTCSObjects(VisualLayout.class);
     Set<Vehicle> allVehicles = kernel.getTCSObjects(Vehicle.class);
     Set<Point> allPoints = kernel.getTCSObjects(Point.class);
@@ -446,7 +444,9 @@ public class OpenTCSModelManager
     Set<Location> allLocations = kernel.getTCSObjects(Location.class);
     Set<Path> allPaths = kernel.getTCSObjects(Path.class);
     Set<Block> allBlocks = kernel.getTCSObjects(Block.class);
-    Set<StaticRoute> allStaticRoutes = kernel.getTCSObjects(StaticRoute.class);
+    @SuppressWarnings("deprecation")
+    Set<org.opentcs.data.model.StaticRoute> allStaticRoutes
+        = kernel.getTCSObjects(org.opentcs.data.model.StaticRoute.class);
     Set<Group> allGroups = kernel.getTCSObjects(Group.class);
 
     Set<ProcessAdapter> createdAdapters = new HashSet<>();
@@ -595,13 +595,14 @@ public class OpenTCSModelManager
     }
   }
 
-  private void restoreModelStaticRoutes(Set<StaticRoute> allStaticRoutes,
+  @SuppressWarnings("deprecation")
+  private void restoreModelStaticRoutes(Set<org.opentcs.data.model.StaticRoute> allStaticRoutes,
                                         SystemModel systemModel,
                                         Set<ProcessAdapter> createdAdapters,
                                         Kernel kernel) {
     // --- Static Routes ---
     Iterator<Color> routeColorCycler = Iterators.cycle(Colors.defaultColors());
-    for (StaticRoute staticRoute : allStaticRoutes) {
+    for (org.opentcs.data.model.StaticRoute staticRoute : allStaticRoutes) {
       StaticRouteModel staticRouteModel = crsObjFactory.createStaticRouteModel();
       StaticRouteAdapter adapter = procAdapterFactory.createStaticRouteAdapter(
           staticRouteModel, systemModel.getEventDispatcher());

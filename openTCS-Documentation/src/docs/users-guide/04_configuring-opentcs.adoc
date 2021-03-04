@@ -43,6 +43,10 @@ The default router can be configured using the following configuration entries:
 
 include::{configdoc}/DefaultRouterConfigurationEntries.adoc[]
 
+The shortest path algorithm can be configured using the following configuration entries:
+
+include::{configdoc}/ShortestPathConfigurationEntries.adoc[]
+
 ==== RMI kernel interface configuration entries
 
 The kernel's RMI interface can be configured using the following configuration entries:

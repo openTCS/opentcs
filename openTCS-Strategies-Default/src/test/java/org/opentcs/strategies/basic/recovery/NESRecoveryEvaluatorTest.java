@@ -58,21 +58,16 @@ public class NESRecoveryEvaluatorTest {
    */
   @Test
   public void testRecoveredWhenFullEnergyAndAllOrdersFinished() {
-    Vehicle vehicle = new Vehicle(1, "Test vehicle");
-    vehicle.setEnergyLevel(100);
+    Vehicle vehicle = new Vehicle("Test vehicle").withEnergyLevel(100);
     when(kernel.getTCSObjects(Vehicle.class)).thenReturn(Collections.singleton(vehicle));
 
-    LocationType locType = new LocationType(2, "Test location type");
-    Location location = new Location(3, "Test location", locType.getReference());
-    DriveOrder.Destination destination
-        = new DriveOrder.Destination(location.getReference(),
-                                     DriveOrder.Destination.OP_NOP);
+    LocationType locType = new LocationType("Test location type");
+    Location location = new Location("Test location", locType.getReference());
+    DriveOrder.Destination destination = new DriveOrder.Destination(location.getReference());
     TransportOrder order
-        = new TransportOrder(2,
-                             "Test order",
-                             Collections.singletonList(destination),
-                             System.currentTimeMillis());
-    order.setState(TransportOrder.State.FINISHED);
+        = new TransportOrder("Test order",
+                             Collections.singletonList(new DriveOrder(destination)))
+            .withState(TransportOrder.State.FINISHED);
     when(kernel.getTCSObjects(TransportOrder.class))
         .thenReturn(Collections.singleton(order));
 
@@ -84,8 +79,7 @@ public class NESRecoveryEvaluatorTest {
    */
   @Test
   public void testRecoveredWhenFullEnergyAndNoOrders() {
-    Vehicle vehicle = new Vehicle(1, "Test vehicle");
-    vehicle.setEnergyLevel(100);
+    Vehicle vehicle = new Vehicle("Test vehicle").withEnergyLevel(100);
     when(kernel.getTCSObjects(Vehicle.class)).thenReturn(Collections.singleton(vehicle));
 
     assertTrue(evaluator.evaluateRecovery().isRecovered());
@@ -96,8 +90,7 @@ public class NESRecoveryEvaluatorTest {
    */
   @Test
   public void testNotRecoveredWhenNoEnergy() {
-    Vehicle vehicle = new Vehicle(1, "Test vehicle");
-    vehicle.setEnergyLevel(0);
+    Vehicle vehicle = new Vehicle("Test vehicle").withEnergyLevel(0);
     when(kernel.getTCSObjects(Vehicle.class)).thenReturn(Collections.singleton(vehicle));
 
     assertFalse(evaluator.evaluateRecovery().isRecovered());
@@ -119,21 +112,16 @@ public class NESRecoveryEvaluatorTest {
    */
   @Test
   public void testNotRecoveredWhenUnfinishedOrders() {
-    Vehicle vehicle = new Vehicle(1, "Test vehicle");
-    vehicle.setEnergyLevel(100);
+    Vehicle vehicle = new Vehicle("Test vehicle").withEnergyLevel(100);
     when(kernel.getTCSObjects(Vehicle.class)).thenReturn(Collections.singleton(vehicle));
 
-    LocationType locType = new LocationType(2, "Test location type");
-    Location location = new Location(3, "Test location", locType.getReference());
-    DriveOrder.Destination destination
-        = new DriveOrder.Destination(location.getReference(),
-                                     DriveOrder.Destination.OP_NOP);
+    LocationType locType = new LocationType("Test location type");
+    Location location = new Location("Test location", locType.getReference());
+    DriveOrder.Destination destination = new DriveOrder.Destination(location.getReference());
     TransportOrder order
-        = new TransportOrder(2,
-                             "Test order",
-                             Collections.singletonList(destination),
-                             System.currentTimeMillis());
-    order.setState(TransportOrder.State.DISPATCHABLE);
+        = new TransportOrder("Test order",
+                             Collections.singletonList(new DriveOrder(destination)))
+            .withState(TransportOrder.State.DISPATCHABLE);
     when(kernel.getTCSObjects(TransportOrder.class))
         .thenReturn(Collections.singleton(order));
 

@@ -49,6 +49,19 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This changelog lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.5 (2017-08-10)
+
+* Switched to a plain JGraphT-based implementation of Dijkstra's algorithm for routing.
+* Deprecated static routes.
+  All routes are supposed to be computed by the router implementation.
+  (Both the kernel and the plant overview will still be able to load models containing static routes.
+  The button for creating new static routes in the plant overview has been removed, however.)
+* Introduced caching for configuration entries read via binding interfaces.
+* Prepared immutability for plant model and transport order objects within the kernel.
+* Deprecated dummy references to objects as well as `TCSObject`'s superfluous ID attribute.
+* Made JHotDraw and Docking Frames libraries available as Maven artifacts so they do not have to be kept in the sources distribution.
+* Updated Mockito to 2.8.47.
+
 === Version 4.4 (2017-07-17)
 
 * Fixed a performance issue with building routing tables in the default router caused by excessive calling of methods on a configuration binding interface.

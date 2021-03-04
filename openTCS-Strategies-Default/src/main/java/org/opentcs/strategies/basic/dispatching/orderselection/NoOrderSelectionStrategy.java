@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.dispatching.orderselection;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -61,6 +62,7 @@ public class NoOrderSelectionStrategy
   @Nullable
   @Override
   public VehicleOrderSelection selectOrder(@Nonnull Vehicle vehicle) {
+    Objects.requireNonNull(vehicle, "vehicle");
     if (vehicle.isEnergyLevelDegraded() && vehicle.hasState(Vehicle.State.CHARGING)) {
       LOG.debug("{}: Energy level degraded, vehicle charging - leaving it alone.",
                 vehicle.getName());

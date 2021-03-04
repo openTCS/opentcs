@@ -8,33 +8,39 @@
 package org.opentcs.data.model;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import org.opentcs.data.TCSObjectReference;
+import static org.opentcs.util.Assertions.checkInRange;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * A Path is a connection between two Points.
+ * Describes a connection between two {@link Point}s which a {@link Vehicle} may traverse.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Path
     extends TCSResource<Path>
-    implements Serializable, Cloneable {
+    implements Serializable,
+               Cloneable {
 
   /**
    * A reference to the point which this point originates in.
    */
-  private TCSObjectReference<Point> sourcePoint;
+  private final TCSObjectReference<Point> sourcePoint;
   /**
    * A reference to the point which this point ends in.
    */
-  private TCSObjectReference<Point> destinationPoint;
+  private final TCSObjectReference<Point> destinationPoint;
   /**
    * The length of this path (in mm).
    */
   private long length = 1;
   /**
-   * An explicit (unitless) weight that can be used to influence routing. The
-   * higher the value, the more travelling this path costs.
+   * An explicit (unitless) weight that can be used to influence routing.
+   * The higher the value, the more travelling this path costs.
    */
   private long routingCost = 1;
   /**
@@ -48,8 +54,7 @@ public class Path
    */
   private int maxReverseVelocity;
   /**
-   * A flag for marking this path as locked (i.e. to prevent vehicles from
-   * using it).
+   * A flag for marking this path as locked (i.e. to prevent vehicles from using it).
    */
   private boolean locked;
 
@@ -58,17 +63,96 @@ public class Path
    *
    * @param objectID The new path's object ID.
    * @param name The new path's name.
-   * @param srcPoint A reference to this path's starting point.
-   * @param destPoint A reference to this path's destination point.
+   * @param sourcePoint A reference to this path's starting point.
+   * @param destinationPoint A reference to this path's destination point.
+   * @deprecated Will be removed.
    */
-  public Path(int objectID, String name, TCSObjectReference<Point> srcPoint,
-              TCSObjectReference<Point> destPoint) {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public Path(int objectID,
+              String name,
+              TCSObjectReference<Point> sourcePoint,
+              TCSObjectReference<Point> destinationPoint) {
     super(objectID, name);
-    sourcePoint = Objects.requireNonNull(srcPoint, "srcPoint is null");
-    destinationPoint = Objects.requireNonNull(destPoint, "destPoint is null");
+    this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
+    this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
+    this.length = 1;
+    this.routingCost = 1;
+    this.maxVelocity = 1000;
+    this.maxReverseVelocity = 1000;
   }
 
-  // Methods not declared in any interface start here
+  /**
+   * Creates a new Path.
+   *
+   * @param name The new path's name.
+   * @param sourcePoint A reference to this path's starting point.
+   * @param destinationPoint A reference to this path's destination point.
+   */
+  public Path(String name,
+              TCSObjectReference<Point> sourcePoint,
+              TCSObjectReference<Point> destinationPoint) {
+    super(name);
+    this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
+    this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
+    this.length = 1;
+    this.routingCost = 1;
+    this.maxVelocity = 1000;
+    this.maxReverseVelocity = 1000;
+  }
+
+  @SuppressWarnings("deprecation")
+  private Path(int objectID,
+               String name,
+               Map<String, String> properties,
+               TCSObjectReference<Point> sourcePoint,
+               TCSObjectReference<Point> destinationPoint,
+               long length,
+               long routingCost,
+               int maxVelocity,
+               int maxReverseVelocity,
+               boolean locked) {
+    super(objectID, name, properties);
+    this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
+    this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
+    this.length = checkInRange(length, 1, Long.MAX_VALUE, "length");
+    this.routingCost = checkInRange(routingCost, 1, Long.MAX_VALUE, "routingCost");
+    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE, "maxVelocity");
+    this.maxReverseVelocity = checkInRange(maxReverseVelocity,
+                                           0,
+                                           Integer.MAX_VALUE,
+                                           "maxReverseVelocity");
+    this.locked = locked;
+  }
+
+  @Override
+  public Path withProperty(String key, String value) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    propertiesWith(key, value),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
+  }
+
+  @Override
+  public Path withProperties(Map<String, String> properties) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    properties,
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
+  }
+
   /**
    * Return the length of this path (in mm).
    *
@@ -83,12 +167,34 @@ public class Path
    *
    * @param newLength The new length of this path (in mm). Must be a positive
    * value.
+   * @deprecated Set via constructor instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setLength(long newLength) {
     if (newLength <= 0) {
       throw new IllegalArgumentException("newLength is not a positive value");
     }
     length = newLength;
+  }
+
+  /**
+   * Creates a copy of this object, with the given length.
+   *
+   * @param length The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withLength(long length) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
   }
 
   /**
@@ -107,12 +213,34 @@ public class Path
    * this path costs.
    *
    * @param newCost The new routing cost (unitless). Must be a positive value.
+   * @deprecated Set via constructor instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setRoutingCost(long newCost) {
     if (newCost <= 0) {
       throw new IllegalArgumentException("newCost <= 0: " + newCost);
     }
     routingCost = newCost;
+  }
+
+  /**
+   * Creates a copy of this object, with the given routing cost.
+   *
+   * @param routingCost The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withRoutingCost(long routingCost) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
   }
 
   /**
@@ -149,12 +277,34 @@ public class Path
    * @param newVelocity The new maximum allowed velocity for this path
    * (in mm/s). May not be a negative value.
    * @throws IllegalArgumentException If <code>newVelocity</code> is negative.
+   * @deprecated Set via constructor instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setMaxVelocity(int newVelocity) {
     if (newVelocity < 0) {
       throw new IllegalArgumentException("newVelocity is negative");
     }
     maxVelocity = newVelocity;
+  }
+
+  /**
+   * Creates a copy of this object, with the given maximum velocity.
+   *
+   * @param maxVelocity  The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withMaxVelocity(int maxVelocity) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
   }
 
   /**
@@ -173,12 +323,34 @@ public class Path
    * @param newVelocity The new maximum allowed reverse velocity for this path
    * (in mm/s). May not be a negative value.
    * @throws IllegalArgumentException If <code>newVelocity</code> is negative.
+   * @deprecated Set via constructor instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setMaxReverseVelocity(int newVelocity) {
     if (newVelocity < 0) {
       throw new IllegalArgumentException("newVelocity is negative");
     }
     maxReverseVelocity = newVelocity;
+  }
+
+  /**
+   * Creates a copy of this object, with the given maximum reverse velocity.
+   *
+   * @param maxReverseVelocity  The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withMaxReverseVelocity(int maxReverseVelocity) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
   }
 
   /**
@@ -197,9 +369,31 @@ public class Path
    *
    * @param newLocked If <code>true</code>, this path will be locked when the
    * method call returns; if <code>false</code>, this path will be unlocked.
+   * @deprecated Set via constructor instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public void setLocked(boolean newLocked) {
     locked = newLocked;
+  }
+
+  /**
+   * Creates a copy of this object, with the given locked flag.
+   *
+   * @param locked  The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withLocked(boolean locked) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
   }
 
   /**
@@ -241,16 +435,27 @@ public class Path
       return isNavigableReverse();
     }
     else {
-      throw new IllegalArgumentException(
-          navPoint + " is not an end point of " + this);
+      throw new IllegalArgumentException(navPoint + " is not an end point of " + this);
     }
   }
 
   @Override
   public Path clone() {
-    Path clone = (Path) super.clone();
-    clone.sourcePoint = sourcePoint.clone();
-    clone.destinationPoint = destinationPoint.clone();
-    return clone;
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
   }
+
+  @SuppressWarnings("deprecation")
+  private int getIdWithoutDeprecationWarning() {
+    return getId();
+  }
+
 }

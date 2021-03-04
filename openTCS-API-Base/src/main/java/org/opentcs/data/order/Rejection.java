@@ -14,8 +14,8 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 
 /**
- * Describes the rejection of a transport order by a vehicle, and the reason
- * given for the vehicle rejecting the order.
+ * Describes the rejection of a transport order by a vehicle, and the reason given for the vehicle
+ * rejecting the order.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

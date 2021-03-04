@@ -55,22 +55,23 @@ public class OrderSerializationTest {
   }
 
   private TransportOrder createTransportOrder() {
-    List<DriveOrder.Destination> destinations = new ArrayList<>();
+    List<DriveOrder> driveOrders = new ArrayList<>();
     @SuppressWarnings("unchecked")
-    Location location1 = new Location(1, "Location1", mock(TCSObjectReference.class));
+    Location location1 = new Location("Location1", mock(TCSObjectReference.class));
     @SuppressWarnings("unchecked")
-    Location location2 = new Location(2, "Location2", mock(TCSObjectReference.class));
-    destinations.add(new DriveOrder.Destination(location1.getReference(), "someOperation1"));
-    destinations.add(new DriveOrder.Destination(location2.getReference(), "someOperation2"));
-    TransportOrder transportOrder = new TransportOrder(1, "TransportOrder", destinations, 0);
-    transportOrder.setProperty("someKey", "someValue");
+    Location location2 = new Location("Location2", mock(TCSObjectReference.class));
+    driveOrders.add(new DriveOrder(new DriveOrder.Destination(location1.getReference())
+        .withOperation("someOperation1")));
+    driveOrders.add(new DriveOrder(new DriveOrder.Destination(location2.getReference())
+        .withOperation("someOperation2")));
+    TransportOrder transportOrder = new TransportOrder("TransportOrder", driveOrders)
+        .withProperty("someKey", "someValue");
     return transportOrder;
   }
 
   private OrderSequence createOrderSequence() {
-    OrderSequence orderSequence = new OrderSequence(1, "OrderSequence");
-    orderSequence.addOrder(createTransportOrder().getReference());
-    return orderSequence;
+    return new OrderSequence("OrderSequence")
+        .withOrder(createTransportOrder().getReference());
   }
 
   private byte[] serializeTCSObject(TCSObject<?> tcsObject)

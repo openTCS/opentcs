@@ -119,4 +119,42 @@ public class Assertions {
     }
     return value;
   }
+
+  /**
+   * Ensures that {@code value} is not smaller than {@code minimum} and not greater than
+   * {@code maximum}.
+   *
+   * @param value The value to be checked.
+   * @param minimum The minimum value.
+   * @param maximum The maximum value.
+   * @return The given value.
+   * @throws IllegalArgumentException If value is not within the given range.
+   */
+  public static long checkInRange(long value, long minimum, long maximum)
+      throws IllegalArgumentException {
+    return checkInRange(value, minimum, maximum, "value");
+  }
+
+  /**
+   * Ensures that {@code value} is not smaller than {@code minimum} and not greater than
+   * {@code maximum}.
+   *
+   * @param value The value to be checked.
+   * @param minimum The minimum value.
+   * @param maximum The maximum value.
+   * @param valueName An optional name for the value to be used for the exception message.
+   * @return The given value.
+   * @throws IllegalArgumentException If value is not within the given range.
+   */
+  public static long checkInRange(long value, long minimum, long maximum, String valueName)
+      throws IllegalArgumentException {
+    if (value < minimum || value > maximum) {
+      throw new IllegalArgumentException(String.format("%s is not in [%d..%d]: %d",
+                                                       String.valueOf(valueName),
+                                                       minimum,
+                                                       maximum,
+                                                       value));
+    }
+    return value;
+  }
 }

@@ -14,12 +14,18 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.components.kernel.Router;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a static route in the plant model.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Static routes are an undesirable exception to routes computed by a {@link Router}
+ * implementation and will not be supported in the future.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public class StaticRouteCreationTO
     extends CreationTO
     implements Serializable {

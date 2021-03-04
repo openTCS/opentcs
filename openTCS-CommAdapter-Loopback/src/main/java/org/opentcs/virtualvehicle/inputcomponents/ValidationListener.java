@@ -14,11 +14,12 @@ import java.util.EventListener;
  *
  * @author Tobias Marquardt (Fraunhofer IML)
  */
-interface ValidationListener
+public interface ValidationListener
     extends EventListener {
 
   /**
    * Should be called when the state of validation changed.
+   *
    * @param e The ValidationEvent containing validation information.
    */
   void validityChanged(ValidationEvent e);

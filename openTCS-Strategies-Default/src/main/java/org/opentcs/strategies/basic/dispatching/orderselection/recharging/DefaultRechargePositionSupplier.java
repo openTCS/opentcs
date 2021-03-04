@@ -71,6 +71,9 @@ public class DefaultRechargePositionSupplier
 
   @Override
   public void initialize() {
+    if (initialized) {
+      return;
+    }
     accessPoints.clear();
     Set<Block> allBlocks = kernel.getTCSObjects(Block.class);
     // Get all locations from the kernel, and for each of their access points,
@@ -90,6 +93,9 @@ public class DefaultRechargePositionSupplier
 
   @Override
   public void terminate() {
+    if (!initialized) {
+      return;
+    }
     accessPoints.clear();
     initialized = false;
   }
@@ -130,8 +136,8 @@ public class DefaultRechargePositionSupplier
 
     LinkedList<DriveOrder.Destination> result = new LinkedList<>();
     if (bestLocation != null) {
-      result.add(new DriveOrder.Destination(bestLocation.getReference(),
-                                            vehicle.getRechargeOperation()));
+      result.add(new DriveOrder.Destination(bestLocation.getReference())
+          .withOperation(vehicle.getRechargeOperation()));
     }
     return result;
   }
@@ -219,13 +225,12 @@ public class DefaultRechargePositionSupplier
 
     // Check for every block if the given point is part of it.
     for (Block curBlock : blocks) {
-      if (curBlock.containsMember(point.getReference())) {
+      if (curBlock.getMembers().contains(point.getReference())) {
         // Check for every member of the block if it's a point. If it is, add it
         // to the resulting set.
         for (TCSObjectReference<?> memberRef : curBlock.getMembers()) {
           if (Point.class.equals(memberRef.getReferentClass())) {
-            result.add(kernel.getTCSObject(Point.class,
-                                           (TCSObjectReference<Point>) memberRef));
+            result.add(kernel.getTCSObject(Point.class, (TCSObjectReference<Point>) memberRef));
           }
         }
       }

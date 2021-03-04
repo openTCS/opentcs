@@ -578,6 +578,13 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/ShortestPathConfigurationEntries.adoc",
+              "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
               "org.opentcs.kernel.RmiKernelInterfaceConfiguration"]
     }

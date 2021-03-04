@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.*;
-import org.mockito.Matchers;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
@@ -580,7 +580,7 @@ public class ModelValidatorTest {
   private <T extends ModelComponent> T createComponentWithName(Class<T> clazz, String name) {
     T comp = mock(clazz);
     when(comp.getName()).thenReturn(name);
-    when(comp.getProperty(Matchers.anyString())).thenAnswer((InvocationOnMock invocation) -> {
+    when(comp.getProperty(anyString())).thenAnswer((InvocationOnMock invocation) -> {
       String propName = invocation.getArguments()[0].toString();
       objectPropertiesMap.putIfAbsent(comp, new HashMap<>());
       return objectPropertiesMap.get(comp).get(propName);

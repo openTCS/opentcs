@@ -175,13 +175,12 @@ public abstract class AbstractParkingPositionSupplier
 
     // Check for every block if the given point is part of it.
     for (Block curBlock : blocks) {
-      if (curBlock.containsMember(point.getReference())) {
+      if (curBlock.getMembers().contains(point.getReference())) {
         // Check for every member of the block if it's a point. If it is, add it
         // to the resulting set.
         for (TCSObjectReference<?> memberRef : curBlock.getMembers()) {
           if (Point.class.equals(memberRef.getReferentClass())) {
-            result.add(kernel.getTCSObject(Point.class,
-                                           (TCSObjectReference<Point>) memberRef));
+            result.add(kernel.getTCSObject(Point.class, (TCSObjectReference<Point>) memberRef));
           }
         }
       }

@@ -52,6 +52,8 @@ public class VehicleModel
   public static final String ORIENTATION_ANGLE = "OrientationAngle";
   public static final String ENERGY_LEVEL = "EnergyLevel";
   public static final String ENERGY_STATE = "EnergyState";
+  public static final String CURRENT_TRANSPORT_ORDER_NAME = "currentTransportOrderName";
+  public static final String CURRENT_SEQUENCE_NAME = "currentOrderSequenceName";
 
   /**
    * The point the vehicle currently remains on.
@@ -345,8 +347,8 @@ public class VehicleModel
     pEnergyLevel.setModellingEditable(false);
     setProperty(ENERGY_LEVEL, pEnergyLevel);
     // Bewertung: Gut, ausreichend, kritisch
-    SelectionProperty<EnergyState> pEnergyState = 
-        new SelectionProperty<>(this, Arrays.asList(EnergyState.values()), EnergyState.CRITICAL);
+    SelectionProperty<EnergyState> pEnergyState
+        = new SelectionProperty<>(this, Arrays.asList(EnergyState.values()), EnergyState.CRITICAL);
     pEnergyState.setDescription(bundle.getString("vehicle.energyState.text"));
     pEnergyState.setHelptext(bundle.getString("vehicle.energyState.helptext"));
     pEnergyState.setModellingEditable(false);
@@ -358,17 +360,17 @@ public class VehicleModel
     pLoaded.setModellingEditable(false);
     setProperty(LOADED, pLoaded);
     // State
-    SelectionProperty<Vehicle.State> pState = 
-        new SelectionProperty<>(this, Arrays.asList(Vehicle.State.values()), Vehicle.State.UNKNOWN);
+    SelectionProperty<Vehicle.State> pState
+        = new SelectionProperty<>(this, Arrays.asList(Vehicle.State.values()), Vehicle.State.UNKNOWN);
     pState.setDescription(bundle.getString("vehicle.state.text"));
     pState.setHelptext(bundle.getString("vehicle.state.helptext"));
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
     // Process state
-    SelectionProperty<Vehicle.ProcState> pProcState = 
-        new SelectionProperty<>(this, Arrays.asList(Vehicle.ProcState.values()), Vehicle.ProcState.UNAVAILABLE);
+    SelectionProperty<Vehicle.ProcState> pProcState
+        = new SelectionProperty<>(this, Arrays.asList(Vehicle.ProcState.values()), Vehicle.ProcState.UNAVAILABLE);
     pProcState.setDescription(bundle.getString("vehicle.procState.text"));
-    pProcState.setHelptext("vehicle.procState.helptext");
+    pProcState.setHelptext(bundle.getString("vehicle.procState.helptext"));
     pProcState.setModellingEditable(false);
     setProperty(PROC_STATE, pProcState);
     // Position: Current Point
@@ -400,6 +402,19 @@ public class VehicleModel
     pMiscellaneous.setDescription(bundle.getString("vehicle.miscellaneous.text"));
     pMiscellaneous.setHelptext(bundle.getString("vehicle.miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
+    //The name of the current transport order
+    StringProperty curTransportOrderName = new StringProperty(this);
+    curTransportOrderName.setDescription(bundle.getString("vehicle.currentTransportOrder.text"));
+    curTransportOrderName.setHelptext(bundle.getString("vehicle.currentTransportOrder.helptext"));
+    curTransportOrderName.setModellingEditable(false);
+    setProperty(CURRENT_TRANSPORT_ORDER_NAME, curTransportOrderName);
+    //Current order sequence name
+    StringProperty curOrderSequenceName = new StringProperty(this);
+    curOrderSequenceName.setDescription(bundle.getString("vehicle.currentOrderSequence.text"));
+    curOrderSequenceName.setHelptext(bundle.getString("vehicle.currentOrderSequence.helptext"));
+    curOrderSequenceName.setModellingEditable(false);
+    setProperty(CURRENT_SEQUENCE_NAME, curOrderSequenceName);
+
   }
 
   public enum EnergyState {

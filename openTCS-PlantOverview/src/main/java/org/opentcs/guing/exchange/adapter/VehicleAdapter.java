@@ -26,7 +26,6 @@ import org.opentcs.data.ObjectPropConstants;
 import static org.opentcs.data.ObjectPropConstants.VEHICLE_INITIAL_POSITION;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
@@ -109,7 +108,8 @@ public class VehicleAdapter
       updateModelNextPoint(vehicleModel, vehicle);
       updateModelPrecisePosition(vehicle, vehicleModel);
       updateModelOrientationAngle(vehicle, vehicleModel);
-
+      updateCurrentTransportName(vehicle, vehicleModel);
+      updateCurrentOrderSequenceName(vehicle, vehicleModel);
       vehicleModel.setVehicle(vehicle);
 
       updateMiscModelProperties(vehicle);
@@ -279,6 +279,30 @@ public class VehicleAdapter
     pLength.setValueAndUnit(length, LengthProperty.Unit.MM);
   }
 
+  private void updateCurrentTransportName(Vehicle vehicle,
+                                          VehicleModel vehicleModel) {
+    StringProperty ordName = (StringProperty) vehicleModel.getProperty(VehicleModel.CURRENT_TRANSPORT_ORDER_NAME);
+    if (vehicle.getTransportOrder() == null) {
+      ordName.setText("null");
+    }
+    else {
+      ordName.setText(vehicle.getTransportOrder().getName());
+    }
+
+  }
+
+  private void updateCurrentOrderSequenceName(Vehicle vehicle,
+                                              VehicleModel vehicleModel) {
+    StringProperty seqName = (StringProperty) vehicleModel.getProperty(VehicleModel.CURRENT_SEQUENCE_NAME);
+    if (vehicle.getOrderSequence() == null) {
+      seqName.setText("null");
+    }
+    else {
+      seqName.setText(vehicle.getOrderSequence().getName());
+    }
+
+  }
+
   private int getLength() {
     LengthProperty pLength = (LengthProperty) getModel().getProperty(VehicleModel.LENGTH);
     return ((Double) pLength.getValueByUnit(LengthProperty.Unit.MM)).intValue();
@@ -329,7 +353,7 @@ public class VehicleAdapter
       }
     }
 
-    TCSObjectReference<Location> ref = driveOrder.getDestination().getLocation();
+    TCSObjectReference<?> ref = driveOrder.getDestination().getDestination();
     adapter = getEventDispatcher().findProcessAdapter(ref);
     if (adapter != null) {
       result.add((FigureComponent) adapter.getModel());

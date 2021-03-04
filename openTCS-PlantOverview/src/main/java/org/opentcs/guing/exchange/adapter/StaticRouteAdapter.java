@@ -20,12 +20,10 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import org.opentcs.access.to.model.StaticRouteCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.StaticRoute;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.guing.components.properties.type.ColorProperty;
@@ -43,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public class StaticRouteAdapter
     extends AbstractProcessAdapter {
 
@@ -72,7 +71,8 @@ public class StaticRouteAdapter
   public void updateModelProperties(Kernel kernel,
                                     TCSObject<?> tcsObject,
                                     @Nullable ModelLayoutElement layoutElement) {
-    StaticRoute route = requireNonNull((StaticRoute) tcsObject, "tcsObject");
+    org.opentcs.data.model.StaticRoute route
+        = requireNonNull((org.opentcs.data.model.StaticRoute) tcsObject, "tcsObject");
 
     try {
       StringProperty name
@@ -98,7 +98,7 @@ public class StaticRouteAdapter
   public void storeToPlantModel(PlantModelCreationTO plantModel) {
     try {
       plantModel.getStaticRoutes().add(
-          new StaticRouteCreationTO(getModel().getName())
+          new org.opentcs.access.to.model.StaticRouteCreationTO(getModel().getName())
               .setHopNames(getHopNames())
               .setProperties(getKernelProperties()));
 

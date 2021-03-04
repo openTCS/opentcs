@@ -32,7 +32,7 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.strategies.basic.routing.RoutingTable.INFINITE_COSTS;
+import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,17 +45,9 @@ public class DefaultRouter
     implements Router {
 
   /**
-   * The key of a vehicle property defining the group of vehicles that sharing the same routing
-   * table.
-   * <p>
-   * The value is expected to be an integer, the default value is {@link #DEFAULT_ROUTING_GROUP}.
-   * </p>
-   */
-  public static final String PROPKEY_ROUTING_GROUP = "tcs:routingGroup";
-  /**
    * The default value of a vehicle's routing group.
    */
-  public static final int DEFAULT_ROUTING_GROUP = 0;
+  private static final int DEFAULT_ROUTING_GROUP = 0;
   /**
    * This class's Logger.
    */
@@ -71,15 +63,15 @@ public class DefaultRouter
   /**
    * A builder for constructing our routing tables.
    */
-  private final RoutingTableBuilder tableBuilder;
+  private final PointRouterFactory pointRouterFactory;
   /**
    * The routes selected for each vehicle.
    */
   private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new ConcurrentHashMap<>();
   /**
-   * The routing nets by vehicle routing group.
+   * The point routers by vehicle routing group.
    */
-  private final Map<Integer, RoutingTable> netsByVehicle = new ConcurrentHashMap<>();
+  private final Map<Integer, PointRouter> pointRoutersByVehicleGroup = new ConcurrentHashMap<>();
   /**
    * Prevents reading from the routing tables and planned routes while updating them.
    */
@@ -93,15 +85,15 @@ public class DefaultRouter
    * Creates a new instance.
    *
    * @param kernel The kernel providing the model data.
-   * @param tableBuilder A builder for constructing routing tables.
+   * @param pointRouterFactory A factory for point routers.
    * @param configuration This class's configuration.
    */
   @Inject
   public DefaultRouter(LocalKernel kernel,
-                       RoutingTableBuilder tableBuilder,
+                       PointRouterFactory pointRouterFactory,
                        DefaultRouterConfiguration configuration) {
     this.kernel = requireNonNull(kernel, "kernel");
-    this.tableBuilder = requireNonNull(tableBuilder, "tableBuilder");
+    this.pointRouterFactory = requireNonNull(pointRouterFactory, "pointRouterFactory");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -128,7 +120,7 @@ public class DefaultRouter
     try {
       rwLock.writeLock().lock();
       routesByVehicle.clear();
-      netsByVehicle.clear();
+      pointRoutersByVehicleGroup.clear();
       initialized = false;
     }
     finally {
@@ -141,15 +133,15 @@ public class DefaultRouter
   public void updateRoutingTables() {
     try {
       rwLock.writeLock().lock();
-      netsByVehicle.clear();
+      pointRoutersByVehicleGroup.clear();
       for (Vehicle curVehicle : kernel.getTCSObjects(Vehicle.class)) {
         int currentGroup = getRoutingGroupOfVehicle(curVehicle);
-        if (!netsByVehicle.containsKey(currentGroup)) {
-          RoutingTable routingNet = tableBuilder.computeTable(curVehicle);
-          netsByVehicle.put(currentGroup, routingNet);
+        if (!pointRoutersByVehicleGroup.containsKey(currentGroup)) {
+          pointRoutersByVehicleGroup.put(currentGroup,
+                                         pointRouterFactory.createPointRouter(curVehicle));
         }
       }
-      LOG.debug("Number of nets computed: {}", netsByVehicle.size());
+      LOG.debug("Number of point routers created: {}", pointRoutersByVehicleGroup.size());
     }
     finally {
       rwLock.writeLock().unlock();
@@ -166,7 +158,7 @@ public class DefaultRouter
       List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
       DriveOrder[] driveOrders
           = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      for (Map.Entry<Integer, RoutingTable> curEntry : netsByVehicle.entrySet()) {
+      for (Map.Entry<Integer, PointRouter> curEntry : pointRoutersByVehicleGroup.entrySet()) {
         // Get all points at the first location at which a vehicle of the current
         // type can execute the desired operation and check if an acceptable route
         // originating in one of them exists.
@@ -196,8 +188,8 @@ public class DefaultRouter
       rwLock.readLock().lock();
       List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
       DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
-      OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, net);
+      PointRouter pointRouter = pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle));
+      OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
       OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
       computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
       return (resultStruct.bestCosts == Long.MAX_VALUE)
@@ -219,12 +211,12 @@ public class DefaultRouter
 
     try {
       rwLock.readLock().lock();
-      RoutingTable net = netsByVehicle.get(getRoutingGroupOfVehicle(vehicle));
-      long costs = net.getCosts(sourcePoint, destinationPoint);
+      PointRouter pointRouter = pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle));
+      long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
       if (costs == INFINITE_COSTS) {
         return Optional.empty();
       }
-      List<Route.Step> steps = net.getRouteSteps(sourcePoint, destinationPoint);
+      List<Route.Step> steps = pointRouter.getRouteSteps(sourcePoint, destinationPoint);
       if (steps.isEmpty()) {
         // If the list of steps is empty, we're already at the destination point
         // Create a single step without a path.
@@ -247,7 +239,7 @@ public class DefaultRouter
 
     try {
       rwLock.readLock().lock();
-      return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
+      return pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle))
           .getCosts(sourcePoint, destinationPoint);
     }
     finally {
@@ -265,7 +257,7 @@ public class DefaultRouter
 
     try {
       rwLock.readLock().lock();
-      return netsByVehicle.get(getRoutingGroupOfVehicle(vehicle))
+      return pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle))
           .getCosts(srcPointRef, dstPointRef);
     }
     finally {
@@ -354,7 +346,7 @@ public class DefaultRouter
   public String getInfo() {
     try {
       rwLock.readLock().lock();
-      return "Computed nets/routing tables: " + netsByVehicle.size();
+      return "Computed point routers: " + pointRoutersByVehicleGroup.size();
     }
     finally {
       rwLock.readLock().unlock();
@@ -369,7 +361,7 @@ public class DefaultRouter
    * @param driveOrders The list of drive orders, in the order they are to be
    * processed.
    * @param nextHopIndex The index of the next drive order in the list.
-   * @param net The routing net to use.
+   * @param pointRouter The point router to use.
    * @return <code>true</code> if, and only if, at least one route exists which
    * would allow a vehicle of the given type to process the whole list of drive
    * orders.
@@ -377,17 +369,17 @@ public class DefaultRouter
   private boolean isRoutable(Point startPoint,
                              DriveOrder[] driveOrders,
                              int nextHopIndex,
-                             RoutingTable net) {
+                             PointRouter pointRouter) {
     assert startPoint != null;
     assert driveOrders != null;
-    assert net != null;
+    assert pointRouter != null;
 
     if (nextHopIndex < driveOrders.length) {
       for (Point curPoint : getDestinationPoints(driveOrders[nextHopIndex])) {
         // Check if there is a route from the starting point to the current
         // point and if the rest of the orders are routable from there, too.
-        if (net.getCosts(startPoint, curPoint) != INFINITE_COSTS
-            && isRoutable(curPoint, driveOrders, nextHopIndex + 1, net)) {
+        if (pointRouter.getCosts(startPoint, curPoint) != INFINITE_COSTS
+            && isRoutable(curPoint, driveOrders, nextHopIndex + 1, pointRouter)) {
           // If it was possible to reach the end of the order list from here,
           // propagate the result back to the caller.
           return true;
@@ -432,13 +424,12 @@ public class DefaultRouter
       }
       boolean routable = false;
       for (Point curDestPoint : destPoints) {
-        final long hopCosts = params.net.getCosts(startPoint, curDestPoint);
+        final long hopCosts = params.pointRouter.getCosts(startPoint, curDestPoint);
         if (hopCosts == INFINITE_COSTS) {
           continue;
         }
         // Get the list of steps for the route of the current drive order.
-        List<Route.Step> steps
-            = params.net.getRouteSteps(startPoint, curDestPoint);
+        List<Route.Step> steps = params.pointRouter.getRouteSteps(startPoint, curDestPoint);
         if (steps.isEmpty()) {
           // If the list of steps returned is empty, we're already at the
           // destination point of the drive order - create a single step
@@ -454,8 +445,7 @@ public class DefaultRouter
         Route hopRoute = new Route(steps, hopCosts);
         // Copy the current drive order, add the computed route to it and
         // place it in the result struct.
-        DriveOrder hopOrder = params.driveOrders[hopIndex].clone();
-        hopOrder.setRoute(hopRoute);
+        DriveOrder hopOrder = params.driveOrders[hopIndex].withRoute(hopRoute);
         result.currentRoute[hopIndex] = hopOrder;
         // Calculate the costs for the route so far, too.
         result.currentCosts = currentRouteCosts + hopRoute.getCosts();
@@ -490,16 +480,14 @@ public class DefaultRouter
     assert driveOrder != null;
 
     final DriveOrder.Destination dest = driveOrder.getDestination();
-    final TCSObjectReference<Location> destLocRef = dest.getLocation();
-    final String operation = dest.getOperation();
-    // If the location reference is a dummy and the operation is "just move" or
+    // If the destination references a point and the operation is "just move" or
     // "park the vehicle", this is an order to send the vehicle to an explicitly
     // selected point - return an appropriate set with only that point.
-    if (destLocRef.isDummy()
-        && (Destination.OP_MOVE.equals(operation)
-            || Destination.OP_PARK.equals(operation))) {
+    if (dest.getDestination().getReferentClass() == Point.class
+        && (Destination.OP_MOVE.equals(dest.getOperation())
+            || Destination.OP_PARK.equals(dest.getOperation()))) {
       // Route the vehicle to an user selected point if halting is allowed there.
-      Point destPoint = kernel.getTCSObject(Point.class, destLocRef.getName());
+      Point destPoint = kernel.getTCSObject(Point.class, dest.getDestination().getName());
       requireNonNull(destPoint, "destPoint");
       final Set<Point> result = new HashSet<>();
       if (destPoint.isHaltingPosition()) {
@@ -511,9 +499,8 @@ public class DefaultRouter
     // to the destination location.
     else {
       final Set<Point> result = new HashSet<>();
-      final Location destLoc = kernel.getTCSObject(Location.class, destLocRef);
-      final LocationType destLocType = kernel.getTCSObject(LocationType.class,
-                                                           destLoc.getType());
+      final Location destLoc = kernel.getTCSObject(Location.class, dest.getDestination().getName());
+      final LocationType destLocType = kernel.getTCSObject(LocationType.class, destLoc.getType());
       for (Location.Link curLink : destLoc.getAttachedLinks()) {
         // A link is acceptable if any of the following conditions are true:
         // - The destination operation is OP_NOP, which is allowed everywhere.
@@ -521,10 +508,10 @@ public class DefaultRouter
         // - The link's set of allowed operations is empty and the destination
         //   operation is explicitly allowed with the location's type.
         // Furthermore, the point to be routed at must allow halting.
-        if (Destination.OP_NOP.equals(operation)
-            || curLink.hasAllowedOperation(operation)
+        if (Destination.OP_NOP.equals(dest.getOperation())
+            || curLink.hasAllowedOperation(dest.getOperation())
             || (curLink.getAllowedOperations().isEmpty()
-                && destLocType.isAllowedOperation(operation))) {
+                && destLocType.isAllowedOperation(dest.getOperation()))) {
           Point destPoint = kernel.getTCSObject(Point.class, curLink.getPoint());
           if (destPoint.isHaltingPosition()) {
             result.add(destPoint);
@@ -582,21 +569,21 @@ public class DefaultRouter
      */
     private final DriveOrder[] driveOrders;
     /**
-     * The routing net for the vehicle type.
+     * The point router for the vehicle type.
      */
-    private final RoutingTable net;
+    private final PointRouter pointRouter;
 
     /**
      * Creates a new OrderRouteParameterStruct.
      *
      * @param driveOrders A list of drive orders to be processed as checkpoints
      * of the route to be computed.
-     * @param net The routing net for the vehicle type.
+     * @param pointRouter The point router for the vehicle type.
      */
     public OrderRouteParameterStruct(DriveOrder[] driveOrders,
-                                     RoutingTable net) {
+                                     PointRouter pointRouter) {
       this.driveOrders = requireNonNull(driveOrders, "driveOrders");
-      this.net = requireNonNull(net, "net");
+      this.pointRouter = requireNonNull(pointRouter, "pointRouter");
     }
   }
 

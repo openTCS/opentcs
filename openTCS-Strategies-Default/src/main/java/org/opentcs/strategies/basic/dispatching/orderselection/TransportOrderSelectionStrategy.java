@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -33,6 +34,7 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.CompositeTransportOrderSelectionVeto;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
@@ -72,6 +74,10 @@ public class TransportOrderSelectionStrategy
    */
   private final Comparator<TransportOrder> orderComparator;
   /**
+   * A collection of predicates for filtering transport orders.
+   */
+  private final CompositeTransportOrderSelectionVeto transportOrderSelectionVeto;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -82,12 +88,15 @@ public class TransportOrderSelectionStrategy
       Router router,
       ProcessabilityChecker processabilityChecker,
       OrderReservationPool orderReservationPool,
-      @OrderComparator Comparator<TransportOrder> orderComparator) {
+      @OrderComparator Comparator<TransportOrder> orderComparator,
+      CompositeTransportOrderSelectionVeto transportOrderSelectionVeto) {
     this.router = requireNonNull(router, "router");
     this.kernel = requireNonNull(kernel, "kernel");
     this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.orderComparator = requireNonNull(orderComparator, "orderComparator");
+    this.transportOrderSelectionVeto = requireNonNull(transportOrderSelectionVeto,
+                                                      "transportOrderSelectionVeto");
   }
 
   @Override
@@ -139,9 +148,10 @@ public class TransportOrderSelectionStrategy
       boolean canProcess;
       // Get a route for the vehicle.
       driveOrders = router.getRoute(vehicle, vehiclePosition, curOrder);
+      LOG.info("driveOrders {}", driveOrders);
       canProcess = driveOrders.isPresent();
       if (!canProcess) {
-        LOG.debug("{}: No route for order {}", vehicle.getName(), curOrder);
+        LOG.info("{}: No route for order {}", vehicle.getName(), curOrder);
         kernel.addTransportOrderRejection(curOrder.getReference(),
                                           new Rejection(vehicle.getReference(), "Unroutable"));
       }
@@ -187,7 +197,9 @@ public class TransportOrderSelectionStrategy
   private SortedSet<TransportOrder> findOrdersFor(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
-    Set<TransportOrder> orders = kernel.getTCSObjects(TransportOrder.class);
+    Set<TransportOrder> orders = kernel.getTCSObjects(TransportOrder.class).stream()
+        .filter(transportOrderSelectionVeto.negate())
+        .collect(Collectors.toSet());
 
     SortedSet<TransportOrder> result = findNextOrderInSameSequence(orders, vehicle);
     if (result == null || !result.isEmpty()) {

@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -73,21 +72,14 @@ public class XMLFileModelPersister
   public XMLFileModelPersister(@ApplicationHome File directory,
                                Provider<XMLModelReader> readerProvider,
                                Provider<XMLModelWriter> writerProvider) {
-    LOG.debug("method entry");
-    this.readerProvider = Objects.requireNonNull(readerProvider);
-    this.writerProvider = Objects.requireNonNull(writerProvider);
-    Objects.requireNonNull(directory, "directory is null");
-    dataDirectory = new File(directory, "data");
-    if (!dataDirectory.isDirectory() && !dataDirectory.mkdirs()) {
-      throw new IllegalArgumentException(dataDirectory.getPath()
-          + " is not an existing directory and could not be created, either.");
-    }
+    this.readerProvider = requireNonNull(readerProvider, "readerProvider");
+    this.writerProvider = requireNonNull(writerProvider, "writerProvider");
+    this.dataDirectory = new File(requireNonNull(directory, "directory"), "data");
   }
 
   @Override
   public Optional<String> getPersistentModelName()
       throws IllegalStateException {
-    LOG.debug("method entry");
     if (!hasSavedModel()) {
       return Optional.empty();
     }
@@ -104,9 +96,8 @@ public class XMLFileModelPersister
 
     File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     // Check if writing the model is possible.
-    checkState(dataDirectory.exists(), "%s does not exist", dataDirectory.getPath());
-    checkState(dataDirectory.isDirectory(),
-               "%s exists, but is not a directory",
+    checkState(dataDirectory.isDirectory() || dataDirectory.mkdirs(),
+               "%s is not an existing directory and could not be created, either.",
                dataDirectory.getPath());
     checkState(!modelFile.exists() || modelFile.isFile(),
                "%s exists, but is not a regular file",
@@ -210,8 +201,7 @@ public class XMLFileModelPersister
   @Override
   public void removeModel()
       throws IllegalStateException {
-    LOG.debug("method entry");
-    LOG.debug("Removing model.");
+    LOG.debug("Removing model...");
     File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     // If the model file does not exist, don't do anything
     if (!modelFileExists()) {
@@ -236,7 +226,6 @@ public class XMLFileModelPersister
    */
   private String readXMLModelName(File modelFile)
       throws IllegalStateException {
-    LOG.debug("method entry");
     try (InputStream inStream = new FileInputStream(modelFile)) {
       XMLModelReader reader = readerProvider.get();
       return reader.readModelName(inStream);
@@ -255,7 +244,6 @@ public class XMLFileModelPersister
    */
   private void readXMLModel(File modelFile, Model model)
       throws IOException {
-    LOG.debug("method entry");
     try (InputStream inStream = new FileInputStream(modelFile)) {
       XMLModelReader reader = readerProvider.get();
       reader.readXMLModel(inStream, model);

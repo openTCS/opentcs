@@ -25,16 +25,25 @@ public interface DefaultDispatcherConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to automatically create parking orders idle vehicles.")
+      description = "Whether to automatically create parking orders idle vehicles.",
+      orderKey = "0_idle_0")
   boolean parkIdleVehicles();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to automatically create recharge orders for idle vehicles.")
+      description = "Whether to automatically create recharge orders for idle vehicles.",
+      orderKey = "0_idle_1")
   boolean rechargeIdleVehicles();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether orders to the current position with no operation should be assigned.")
+      description = "Whether orders to the current position with no operation should be assigned.",
+      orderKey = "1_misc")
   boolean assignRedundantOrders();
+  
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether unroutable incoming transport orders should be marked as UNROUTABLE.",
+      orderKey = "1_misc")
+  boolean dismissUnroutableTransportOrders();
 }

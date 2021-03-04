@@ -118,7 +118,7 @@ public class OrderStatusMessage
     orderMessage.setOrderState(OrderState.fromTransportOrderState(order.getState()));
     for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
       Destination dest = new Destination();
-      dest.setLocationName(curDriveOrder.getDestination().getLocation().getName());
+      dest.setLocationName(curDriveOrder.getDestination().getDestination().getName());
       dest.setOperation(curDriveOrder.getDestination().getOperation());
       dest.setState(mapDriveOrderState(curDriveOrder.getState()));
       for (Map.Entry<String, String> mapEntry
@@ -139,6 +139,7 @@ public class OrderStatusMessage
     return orderMessage;
   }
 
+  @SuppressWarnings("deprecation")
   private static Destination.State mapDriveOrderState(DriveOrder.State driveOrderState) {
     switch (driveOrderState) {
       case PRISTINE:

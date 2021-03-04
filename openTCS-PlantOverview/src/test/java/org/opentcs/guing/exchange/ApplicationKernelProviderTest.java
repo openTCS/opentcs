@@ -10,7 +10,7 @@ package org.opentcs.guing.exchange;
 
 import javax.inject.Provider;
 import org.junit.*;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;

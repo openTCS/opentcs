@@ -360,6 +360,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleMaxVelocity(TCSObjectReference<Vehicle> ref,
                                     int velocity)
       throws ObjectUnknownException {
@@ -369,6 +370,7 @@ class KernelStateOperating
   }
 
   @Override
+  @Deprecated
   public void setVehicleMaxReverseVelocity(TCSObjectReference<Vehicle> ref,
                                            int velocity)
       throws ObjectUnknownException {
@@ -554,12 +556,21 @@ class KernelStateOperating
   }
 
   @Override
-  public void setTransportOrderFutureDriveOrders(
-      TCSObjectReference<TransportOrder> orderRef,
-      List<DriveOrder> newOrders)
+  @Deprecated
+  public void setTransportOrderFutureDriveOrders(TCSObjectReference<TransportOrder> orderRef,
+                                                 List<DriveOrder> newOrders)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      orderPool.setTransportOrderFutureDriveOrders(orderRef, newOrders);
+      orderPool.setTransportOrderDriveOrders(orderRef, newOrders);
+    }
+  }
+
+  @Override
+  public void setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
+                                           List<DriveOrder> newOrders)
+      throws ObjectUnknownException {
+    synchronized (getGlobalSyncObject()) {
+      orderPool.setTransportOrderDriveOrders(orderRef, newOrders);
     }
   }
 

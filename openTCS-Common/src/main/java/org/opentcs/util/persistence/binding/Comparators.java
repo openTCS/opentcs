@@ -51,6 +51,9 @@ public final class Comparators {
   private static final Comparator<PropertyTO> PROPERTIES_BY_NAME
       = (PropertyTO o1, PropertyTO o2) -> o1.getName().compareTo(o2.getName());
 
+  private Comparators() {
+  }
+
   /**
    * Returns a comparator for ordering <code>PlantModelElementTO</code>s ascendingly by their names.
    *

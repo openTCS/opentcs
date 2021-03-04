@@ -14,8 +14,8 @@ dependencies {
   compile project(':openTCS-CommAdapter-Loopback')
   compile project(':openTCS-Strategies-Default')
   
-  compile group: "org.cfg4j", name:"cfg4j-core", version: "4.4.0"
-  compileOnly group: "org.cfg4j", name:"cfg4j-core", version: "4.4.0", classifier: 'sources'
+  compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
+  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
   
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
