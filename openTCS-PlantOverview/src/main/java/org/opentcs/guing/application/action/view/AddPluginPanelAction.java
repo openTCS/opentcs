@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.view;
 
 import java.awt.event.ActionEvent;
@@ -28,6 +27,12 @@ public class AddPluginPanelAction
   private final PluggablePanelFactory factory;
   private final OpenTCSView view;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param view The openTCS view
+   * @param factory The pluggable panel factory
+   */
   public AddPluginPanelAction(OpenTCSView view, PluggablePanelFactory factory) {
     this.view = Objects.requireNonNull(view, "view is null");
     this.factory = Objects.requireNonNull(factory, "panelID is null");

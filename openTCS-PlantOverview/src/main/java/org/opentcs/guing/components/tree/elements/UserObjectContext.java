@@ -23,31 +23,34 @@ public interface UserObjectContext {
 
   /**
    * Returns a popup menu with actions for this context.
-   * 
+   *
    * @param selectedUserObjects The user objects that are currently selected
    * in the tree view.
    * @return A popup menu.
    */
   JPopupMenu getPopupMenu(@Nullable Set<UserObject> selectedUserObjects);
-  
+
   /**
    * Called after a specific item was removed from the tree (via the <code>
    * DeleteAction</code>.
-   * 
+   *
    * @param userObject The UserObject affected.
    * @return <code>true</code>, if it was successfully removed.
    */
   boolean removed(UserObject userObject);
-  
+
   /**
    * Returns the type of this context.
-   * 
+   *
    * @return One of CONTEXT_TYPE.
    */
   ContextType getType();
 
   public enum ContextType {
 
-    COMPONENT, BLOCK, GROUP, NULL;
+    COMPONENT,
+    BLOCK,
+    GROUP,
+    NULL;
   }
 }

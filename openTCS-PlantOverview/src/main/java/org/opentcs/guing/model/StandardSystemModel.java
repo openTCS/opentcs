@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
 import org.jhotdraw.draw.DefaultDrawing;
@@ -48,6 +47,7 @@ import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Standardimplementierung des Datenmodells des gesamten modellierten Systems.
@@ -362,7 +362,7 @@ class StandardSystemModel
     for (Block block : blocks) {
       mapLayoutElement(block.getReference(), elements);
     }
-    
+
     for (Vehicle vehicle : vehicles) {
       mapLayoutElement(vehicle.getReference(), elements);
     }
@@ -401,10 +401,8 @@ class StandardSystemModel
         }
       }
     }
-    else {
-      if (Objects.equals(name, root.getName())) {
-        return root;
-      }
+    else if (Objects.equals(name, root.getName())) {
+      return root;
     }
     return null;
   }

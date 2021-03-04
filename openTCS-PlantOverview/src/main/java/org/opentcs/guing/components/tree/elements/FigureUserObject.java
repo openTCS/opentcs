@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import java.util.HashSet;
@@ -46,7 +45,10 @@ public class FigureUserObject
   /**
    * Creates a new instance.
    *
-   * @param modelComponent
+   * @param modelComponent The corresponding data object
+   * @param view The openTCS view
+   * @param editor The drawing editor
+   * @param modelManager The model manager
    */
   public FigureUserObject(ModelComponent modelComponent,
                           OpenTCSView view,
@@ -70,7 +72,7 @@ public class FigureUserObject
   public ImageIcon getIcon() {
     return IconToolkit.instance().createImageIcon("tree/figure.18x18.png");
   }
-  
+
   @Override // UserObject
   public void rightClicked(JComponent component, int x, int y) {
     userObjectItems = getSelectedUserObjects(((JTree) component));

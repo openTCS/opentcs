@@ -69,7 +69,6 @@ import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.draw.AbstractFigure;
 import org.jhotdraw.draw.AttributeKey;
@@ -137,7 +136,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.CourseObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,10 +234,6 @@ public abstract class OpenTCSDrawingView
    */
   private final ModelManager modelManager;
   /**
-   * A factory for creating figure objects.
-   */
-  private final CourseObjectFactory crsObjFactory;
-  /**
    * A helper for creating transport orders with the kernel.
    */
   private final TransportOrderUtil orderUtil;
@@ -326,12 +320,7 @@ public abstract class OpenTCSDrawingView
   /**
    * Handles events for static routes.
    */
-  private final StaticRouteChangeHandler routeChangeHandler
-      = new StaticRouteChangeHandler();
-  /**
-   * The application's event bus.
-   */
-  private final MBassador<Object> eventBus;
+  private final StaticRouteChangeHandler routeChangeHandler = new StaticRouteChangeHandler();
 
   /**
    * Creates new instance.
@@ -339,22 +328,16 @@ public abstract class OpenTCSDrawingView
    * @param appState Stores the application's current state.
    * @param opentcsView The view to be used.
    * @param modelManager Provides the current system model.
-   * @param crsObjFactory A factory for figure objects.
    * @param orderUtil A helper for creating transport orders with the kernel.
-   * @param eventBus The application's event bus.
    */
   public OpenTCSDrawingView(ApplicationState appState,
                             OpenTCSView opentcsView,
                             ModelManager modelManager,
-                            CourseObjectFactory crsObjFactory,
-                            TransportOrderUtil orderUtil,
-                            MBassador<Object> eventBus) {
+                            TransportOrderUtil orderUtil) {
     this.appState = requireNonNull(appState, "appState");
     this.fOpenTCSView = requireNonNull(opentcsView, "opentcsView");
     this.modelManager = requireNonNull(modelManager, "modelManager");
-    this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
-    this.eventBus = requireNonNull(eventBus, "eventBus");
 
     // Set a dummy tool tip text to turn tooltips on
     setToolTipText(" ");
@@ -459,15 +442,6 @@ public abstract class OpenTCSDrawingView
         }
       }, null);
     }
-  }
-
-  /**
-   * Returns the OpenTCSView.
-   *
-   * @return The OpenTCSView.
-   */
-  public OpenTCSView getTCSView() {
-    return fOpenTCSView;
   }
 
   public boolean isBlocksVisible() {

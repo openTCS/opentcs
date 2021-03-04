@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
@@ -30,14 +29,19 @@ import org.opentcs.guing.util.IconToolkit;
  * @see Block
  */
 public class BlockUserObject
-    extends AbstractUserObject implements ContextObject{
-  
+    extends AbstractUserObject
+    implements ContextObject {
+
   private final UserObjectContext context;
 
   /**
    * Creates a new instance.
    *
-   * @param dataObject The corresponding model component.
+   * @param dataObject The corresponding model component
+   * @param context The user object context
+   * @param view The openTCS view
+   * @param editor The drawing editor
+   * @param modelManager The model manager
    */
   @Inject
   public BlockUserObject(@Assisted BlockModel dataObject,

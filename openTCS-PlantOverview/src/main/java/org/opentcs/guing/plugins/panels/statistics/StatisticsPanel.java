@@ -11,6 +11,7 @@ package org.opentcs.guing.plugins.panels.statistics;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opentcs.components.plantoverview.PluggablePanel;
@@ -31,6 +32,11 @@ public class StatisticsPanel
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(StatisticsPanel.class);
+  /**
+   * This class's resources bundle.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
   /**
    * A file chooser for selecting the input file.
    */
@@ -59,7 +65,7 @@ public class StatisticsPanel
     initComponents();
 
     inputFileChooser.setMultiSelectionEnabled(false);
-    inputFileChooser.setFileFilter(new FileNameExtensionFilter("Text files",
+    inputFileChooser.setFileFilter(new FileNameExtensionFilter(BUNDLE.getString("textFiles"),
                                                                "txt"));
   }
 

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
@@ -25,14 +24,16 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Ein Fahrzeug-Objekt in der Baumansicht. <p> <b>Entwurfsmuster:</b> Befehl.
+ * Ein Fahrzeug-Objekt in der Baumansicht.
+ * <p>
+ * <b>Entwurfsmuster:</b> Befehl.
  * VehicleUserObject ist ein konkreter Befehl.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class VehicleUserObject
     extends AbstractUserObject {
-  
+
   /**
    * Stores the application's current state.
    */

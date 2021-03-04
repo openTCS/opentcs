@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -23,8 +22,6 @@ import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
-import org.opentcs.data.ObjectPropConstants;
-import static org.opentcs.data.ObjectPropConstants.VEHICLE_INITIAL_POSITION;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
@@ -42,7 +39,6 @@ import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
-import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
@@ -57,10 +53,15 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_CRITICAL;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_GOOD;
-import static org.opentcs.guing.model.elements.VehicleModel.INITIAL_POSITION;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
+import org.opentcs.access.SharedKernelProvider;
+import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
 
 /**
  * An adapter for vehicles.
@@ -75,22 +76,38 @@ public class VehicleAdapter
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(VehicleAdapter.class);
+  /**
+   * Handles vehicle processable categories updates.
+   */
+  private final VehicleProcessableCategoriesAdapter vehicleProcessableCategoriesAdapter;
 
   /**
    * Creates a new instance.
    *
+   * @param kernelProvider A kernel provider.
+   * @param applicationState The plant overviews mode.
    * @param model The corresponding model component.
    * @param eventDispatcher The event dispatcher.
    */
   @Inject
-  public VehicleAdapter(@Assisted VehicleModel model,
+  public VehicleAdapter(SharedKernelProvider kernelProvider,
+                        ApplicationState applicationState,
+                        @Assisted VehicleModel model,
                         @Assisted EventDispatcher eventDispatcher) {
     super(model, eventDispatcher);
+    this.vehicleProcessableCategoriesAdapter
+        = new VehicleProcessableCategoriesAdapter(kernelProvider, applicationState, model);
   }
 
   @Override
   public VehicleModel getModel() {
     return (VehicleModel) super.getModel();
+  }
+
+  @Override
+  public void register() {
+    super.register();
+    getModel().addAttributesChangeListener(vehicleProcessableCategoriesAdapter);
   }
 
   @Override // OpenTCSProcessAdapter
@@ -104,6 +121,8 @@ public class VehicleAdapter
       VehicleModel vehicleModel = getModel();
       updateModelName(vehicleModel, vehicle);
       updateModelLength(vehicle, vehicleModel);
+      updateModelMaxVelocity(vehicle, vehicleModel);
+      updateModelMaxReverseVelocity(vehicle, vehicleModel);
       updateModelEnergy(vehicle, vehicleModel);
       updateModelEnergyState(vehicleModel, vehicle);
       updateModelLoadedState(vehicleModel, vehicle);
@@ -114,6 +133,7 @@ public class VehicleAdapter
       updateModelOrientationAngle(vehicle, vehicleModel);
       updateCurrentTransportName(vehicle, vehicleModel);
       updateCurrentOrderSequenceName(vehicle, vehicleModel);
+      updateProcessableCategories(vehicle, vehicleModel);
       vehicleModel.setVehicle(vehicle);
 
       updateMiscModelProperties(vehicle);
@@ -133,6 +153,8 @@ public class VehicleAdapter
             .setLength(getLength())
             .setEnergyLevelCritical(getEnergyLevelCritical())
             .setEnergyLevelGood(getEnergyLevelGood())
+            .setMaxVelocity(getMaximumVelocity())
+            .setMaxReverseVelocity(getMaximumReverseVelocity())
             .setProperties(getKernelProperties())
     );
     for (VisualLayoutCreationTO layout : plantModel.getVisualLayouts()) {
@@ -283,6 +305,17 @@ public class VehicleAdapter
     pName.setText(vehicle.getName());
   }
 
+  private void updateModelMaxVelocity(Vehicle vehicle, VehicleModel vehicleModel) {
+    SpeedProperty maxVelProperty = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_VELOCITY);
+    maxVelProperty.setValueAndUnit(vehicle.getMaxVelocity(), Unit.MM_S);
+
+  }
+
+  private void updateModelMaxReverseVelocity(Vehicle vehicle, VehicleModel vehicleModel) {
+    SpeedProperty maxRevVelProperty = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
+    maxRevVelProperty.setValueAndUnit(vehicle.getMaxReverseVelocity(), Unit.MM_S);
+  }
+
   private void updateModelLength(Vehicle vehicle, VehicleModel vehicleModel) {
     int length = vehicle.getLength();
     LengthProperty pLength = (LengthProperty) vehicleModel.getProperty(VehicleModel.LENGTH);
@@ -313,9 +346,25 @@ public class VehicleAdapter
 
   }
 
+  private void updateProcessableCategories(Vehicle vehicle, VehicleModel vehicleModel) {
+    OrderCategoriesProperty categories
+        = (OrderCategoriesProperty) vehicleModel.getProperty(VehicleModel.PROCESSABLE_CATEGORIES);
+    categories.setItems(vehicle.getProcessableCategories());
+  }
+
   private int getLength() {
     LengthProperty pLength = (LengthProperty) getModel().getProperty(VehicleModel.LENGTH);
     return ((Double) pLength.getValueByUnit(LengthProperty.Unit.MM)).intValue();
+  }
+
+  private int getMaximumReverseVelocity() {
+    SpeedProperty pMaxRevVel = (SpeedProperty) getModel().getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
+    return ((Double) pMaxRevVel.getValueByUnit(SpeedProperty.Unit.MM_S)).intValue();
+  }
+
+  private int getMaximumVelocity() {
+    SpeedProperty pMaxVel = (SpeedProperty) getModel().getProperty(VehicleModel.MAXIMUM_VELOCITY);
+    return ((Double) pMaxVel.getValueByUnit(SpeedProperty.Unit.MM_S)).intValue();
   }
 
   private int getEnergyLevelCritical() {
@@ -387,28 +436,12 @@ public class VehicleAdapter
     Map<String, String> misc = tcsObject.getProperties();
 
     for (Map.Entry<String, String> curEntry : misc.entrySet()) {
-      if (!curEntry.getValue().contains("Unknown")
-          && !curEntry.getKey().equals(ObjectPropConstants.VEHICLE_INITIAL_POSITION)) {
+      if (!curEntry.getValue().contains("Unknown")) {
         items.add(new KeyValueProperty(getModel(), curEntry.getKey(), curEntry.getValue()));
       }
     }
 
     KeyValueSetProperty miscellaneous = (KeyValueSetProperty) getModel().getProperty(ModelComponent.MISCELLANEOUS);
     miscellaneous.setItems(items);
-
-    String initialPointName = misc.get(ObjectPropConstants.VEHICLE_INITIAL_POSITION);
-
-    if (initialPointName != null) {
-      CoursePointProperty property = (CoursePointProperty) getModel().getProperty(VehicleModel.INITIAL_POSITION);
-      property.setPointName(initialPointName);
-    }
-  }
-
-  @Override
-  protected Map<String, String> getKernelProperties() {
-    Map<String, String> result = super.getKernelProperties();
-    result.put(VEHICLE_INITIAL_POSITION,
-               ((CoursePointProperty) getModel().getProperty(INITIAL_POSITION)).getPointName());
-    return result;
   }
 }

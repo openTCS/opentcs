@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Color;
@@ -62,7 +61,8 @@ public class StandardPropertyCellRenderer
   public Component getTableCellRendererComponent(
       JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected,
+                                                                hasFocus, row, column);
     label.setText(value.toString());
 
     if (value instanceof Property) {
@@ -87,7 +87,7 @@ public class StandardPropertyCellRenderer
         }
         label.setForeground(editable ? Color.blue : Color.darkGray);
         break;
-        
+
       default:
     }
 

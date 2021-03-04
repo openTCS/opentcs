@@ -55,7 +55,6 @@ public class StringListCellRenderer<E>
                                                                          index,
                                                                          isSelected,
                                                                          cellHasFocus);
-    label.setOpaque(true);
     label.setText(representer.apply(value));
     return label;
   }

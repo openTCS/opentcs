@@ -13,7 +13,7 @@ package org.opentcs.guing.model;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ComponentSelectionListener {
-  
+
   /**
    * Informs this listener that the given component has been selected.
    *

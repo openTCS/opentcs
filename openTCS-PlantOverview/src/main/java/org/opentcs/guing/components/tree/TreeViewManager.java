@@ -22,7 +22,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.swing.tree.TreeNode;
 import net.engio.mbassy.listener.Handler;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.components.tree.elements.UserObjectUtil;
 import org.opentcs.guing.event.ModelNameChangeEvent;
@@ -61,7 +60,7 @@ public abstract class TreeViewManager {
    * @param mouseListener The MouseListener for the TreeView.
    */
   @Inject
-  public TreeViewManager(TreeView treeView, 
+  public TreeViewManager(TreeView treeView,
                          UserObjectUtil userObjectUtil,
                          MouseListener mouseListener) {
     this.fTreeView = requireNonNull(treeView, "treeView is null");
@@ -240,7 +239,6 @@ public abstract class TreeViewManager {
       fTreeView.selectItem(component);
       Set<ModelComponent> comps = new HashSet<>(1);
       comps.add(component);
-      OpenTCSView.instance().editingOptions(comps);
     }
   }
 
@@ -262,6 +260,5 @@ public abstract class TreeViewManager {
     }
 
     fTreeView.selectItems(visibleComponents);
-    OpenTCSView.instance().editingOptions(components);
   }
 }

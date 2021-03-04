@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application;
 
 import org.opentcs.guing.model.FiguresFolder;
@@ -54,7 +53,7 @@ public interface GuiManager {
    * Called when a block was selected in the tree view.
    * Should select all figures in the drawing view belonging to the block.
    *
-   * @param blockFiguresFolder 
+   * @param blockFiguresFolder
    */
   void blockSelected(FiguresFolder blockFiguresFolder);
 
@@ -72,10 +71,10 @@ public interface GuiManager {
    * @return
    */
   boolean saveModel();
-  
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   boolean saveModelAs();
 

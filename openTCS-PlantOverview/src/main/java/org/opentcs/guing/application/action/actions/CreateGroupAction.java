@@ -6,8 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
-
 package org.opentcs.guing.application.action.actions;
 
 import java.awt.event.ActionEvent;
@@ -20,11 +18,12 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * An action to create a group.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
-public class CreateGroupAction extends AbstractAction {
-  
+public class CreateGroupAction
+    extends AbstractAction {
+
   /**
    * This action class's ID.
    */
@@ -51,5 +50,5 @@ public class CreateGroupAction extends AbstractAction {
     panel.setLocationRelativeTo(null);
     panel.setVisible(true);
   }
-  
+
 }

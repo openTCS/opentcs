@@ -312,14 +312,14 @@ public class ModelComponentConverter {
     element.setProperties(courseProperties);
   }
 
-  private Set<CourseObjectProperty> convertProperties(
-      Map<String, Property> modelProperties) {
+  private Set<CourseObjectProperty> convertProperties(Map<String, Property> modelProperties) {
     Set<CourseObjectProperty> courseProperties
         = new TreeSet<>(Comparators.courseObjectPropertiesByName());
     for (String key : modelProperties.keySet()) {
-      CourseObjectProperty property
-          = propertyConverter.convert(key, modelProperties.get(key));
-      courseProperties.add(property);
+      if (modelProperties.get(key).isPersistent()) {
+        CourseObjectProperty property = propertyConverter.convert(key, modelProperties.get(key));
+        courseProperties.add(property);
+      }
     }
 
     return courseProperties;

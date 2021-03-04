@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Color;
@@ -69,9 +68,12 @@ public class ColorPropertyCellEditor
   @Override
   public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    
+
     Frame parent = JOptionPane.getFrameForComponent(fTable);
-    Color newColor = JColorChooser.showDialog(parent, bundle.getString("ColorPropertyCellEditor.ColorPropertyWindowTitle"), fColorProperty.getColor());
+    Color newColor = JColorChooser.showDialog(parent,
+                                              bundle.getString("ColorPropertyCellEditor."
+                                                  + "ColorPropertyWindowTitle"),
+                                              fColorProperty.getColor());
 
     if (newColor != null) {
       Color oldColor = fColorProperty.getColor();

@@ -7,6 +7,8 @@
  */
 package org.opentcs.access.rmi;
 
+import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import java.lang.reflect.Proxy;
 import java.rmi.registry.Registry;
 import static java.util.Objects.requireNonNull;
@@ -49,6 +51,10 @@ import org.opentcs.util.eventsystem.TCSEvent;
 public class KernelProxyBuilder {
 
   /**
+   * Provides socket factories used for RMI.
+   */
+  private SocketFactoryProvider socketFactoryProvider = new NullSocketFactoryProvider();
+  /**
    * The registry host.
    */
   private String host = "localhost";
@@ -83,6 +89,16 @@ public class KernelProxyBuilder {
    * Creates a new instance.
    */
   public KernelProxyBuilder() {
+  }
+
+  public SocketFactoryProvider getSocketFactoryProvider() {
+    return socketFactoryProvider;
+  }
+
+  public KernelProxyBuilder setSocketFactoryProvider(
+      @Nonnull SocketFactoryProvider socketFactoryProvider) {
+    this.socketFactoryProvider = socketFactoryProvider;
+    return this;
   }
 
   /**
@@ -252,7 +268,8 @@ public class KernelProxyBuilder {
       throws KernelUnavailableException, CredentialsException {
     // Create an invocation handler that does the actual work.
     ProxyInvocationHandler handler
-        = new ProxyInvocationHandler(host,
+        = new ProxyInvocationHandler(socketFactoryProvider,
+                                     host,
                                      port,
                                      userName,
                                      password,

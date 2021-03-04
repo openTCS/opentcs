@@ -216,7 +216,8 @@ public class TransportOrdersContainerPanel
                                         content,
                                         true,
                                         StandardContentDialog.CLOSE);
-        dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.transportOrder"));
+        dialog.setTitle(ResourceBundleUtil.getBundle()
+            .getString("TransportOrdersContainerPanel.transportOrder"));
         dialog.setVisible(true);
       }
     }
@@ -237,7 +238,8 @@ public class TransportOrdersContainerPanel
       StandardContentDialog dialog
           = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
                                       content);
-      dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.newTransportOrder"));
+      dialog.setTitle(ResourceBundleUtil.getBundle()
+          .getString("TransportOrdersContainerPanel.newTransportOrder"));
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
@@ -245,7 +247,8 @@ public class TransportOrdersContainerPanel
                                        content.getActions(),
                                        content.getPropertiesList(),
                                        content.getSelectedDeadline(),
-                                       content.getSelectedVehicle());
+                                       content.getSelectedVehicle(),
+                                       content.getSelectedCategory());
       }
     }
     catch (KernelRuntimeException exc) {
@@ -433,27 +436,40 @@ public class TransportOrdersContainerPanel
     Vector<FilterButton> buttons = new Vector<>();
     IconToolkit iconkit = IconToolkit.instance();
     // Mögliche States einer Transport Order:
-    // RAW: A transport order's initial state. A transport order remains in this state until its parameters have been set up completely.
-    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterRaw.16x16.gif"), fTableModel, "RAW");
+    // RAW: A transport order's initial state. A transport order remains in this state until its 
+    // parameters have been set up completely.
+    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterRaw.16x16.gif"),
+                              fTableModel, "RAW");
     button.setToolTipText(bundle.getString("TransportOrdersContainerPanel.bar.filterRAW"));
     buttons.add(button);
-    // ACTIVE: Set (by a user/client) when a transport order's parameters have been set up completely and the kernel should dispatch it when possible.
-    // UNROUTABLE: Failure state that marks a transport order as unroutable, i.e. it is impossible to find a route that would allow a vehicle to process the transport order completely.
-    // DISPATCHABLE: Marks a transport order as ready to be dispatched to a vehicle (i.e. all its dependencies have been finished).
-    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterActivated.16x16.gif"), fTableModel, "DISPATCHABLE");
+    // ACTIVE: Set (by a user/client) when a transport order's parameters have been set up 
+    // completely and the kernel should dispatch it when possible.
+    // UNROUTABLE: Failure state that marks a transport order as unroutable, i.e. it is impossible
+    // to find a route that would allow a vehicle to process the transport order completely.
+    // DISPATCHABLE: Marks a transport order as ready to be dispatched to a vehicle (i.e. all its 
+    // dependencies have been finished).
+    button
+        = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterActivated.16x16.gif"),
+                           fTableModel, "DISPATCHABLE");
     button.setToolTipText(bundle.getString("TransportOrdersContainerPanel.bar.filterDISPATCHABLE"));
     buttons.add(button);
     // BEING_PROCESSED: Marks a transport order as being processed by a vehicle.
-    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterProcessing.16x16.gif"), fTableModel, "BEING_PROCESSED");
+    button
+        = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterProcessing.16x16.gif"),
+                           fTableModel, "BEING_PROCESSED");
     button.setToolTipText(bundle.getString("TransportOrdersContainerPanel.bar.filterPROCESSED"));
     buttons.add(button);
     // FINISHED: Marks a transport order as successfully completed.
-    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFinished.16x16.gif"), fTableModel, "FINISHED");
+    button
+        = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFinished.16x16.gif"),
+                           fTableModel, "FINISHED");
     button.setToolTipText(bundle.getString("TransportOrdersContainerPanel.bar.filterFINISHED"));
     buttons.add(button);
-    // WITHDRAWN: Indicates the transport order is withdrawn from a processing vehicle but not yet in its final state (which will be FAILED), as the vehicle has not yet finished/cleaned up.
+    // WITHDRAWN: Indicates the transport order is withdrawn from a processing vehicle but not yet 
+    // in its final state (which will be FAILED), as the vehicle has not yet finished/cleaned up.
     // FAILED: General failure state that marks a transport order as failed.
-    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFailed.16x16.gif"), fTableModel, "FAILED");
+    button = new FilterButton(iconkit.getImageIconByFullPath(fIconPath + "filterFailed.16x16.gif"),
+                              fTableModel, "FAILED");
     button.setToolTipText(bundle.getString("TransportOrdersContainerPanel.bar.filterFAILED"));
     buttons.add(button);
 

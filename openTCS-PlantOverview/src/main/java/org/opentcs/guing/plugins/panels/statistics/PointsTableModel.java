@@ -24,8 +24,8 @@ class PointsTableModel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle BUNDLE =
-      ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
   /**
    * The column names.
    */

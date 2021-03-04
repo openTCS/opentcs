@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
@@ -31,6 +30,9 @@ public class LocationTypeUserObject
    * Creates a new instance of StationUserObject
    *
    * @param modelComponent
+   * @param view The openTCS view
+   * @param editor The drawing editor
+   * @param modelManager The model manager
    */
   @Inject
   public LocationTypeUserObject(@Assisted LocationTypeModel modelComponent,

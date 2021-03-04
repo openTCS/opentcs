@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.type;
 
 import java.io.Serializable;
@@ -135,4 +134,11 @@ public interface ModelAttribute
    * verändern kann, ansonsten false.
    */
   boolean isOperatingEditable();
+  
+  /**
+   * @return true, if this attribute should be considered when persisting the model to a file or not.
+   */
+  default boolean isPersistent() {
+    return true;
+  }
 }

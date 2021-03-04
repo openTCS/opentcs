@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.exchange;
 
 import org.opentcs.access.Kernel;
@@ -37,7 +36,7 @@ public interface KernelProxyManager {
    * successfully.
    */
   boolean connect(ConnectionParamSet connParamSet);
-  
+
   /**
    * Tells the proxy manager the connection to the kernel was lost.
    */

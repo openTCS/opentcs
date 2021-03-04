@@ -58,14 +58,14 @@ public class FileModeMenu
 
     modellingModeItem.addActionListener(
         new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            view.switchPlantOverviewState(OperationMode.MODELLING);
-            if (!appState.hasOperationMode(OperationMode.MODELLING)) {
-              operatingModeItem.setSelected(true);
-            }
-          }
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        view.switchPlantOverviewState(OperationMode.MODELLING);
+        if (!appState.hasOperationMode(OperationMode.MODELLING)) {
+          operatingModeItem.setSelected(true);
         }
+      }
+    }
     );
 
     operatingModeItem
@@ -80,14 +80,14 @@ public class FileModeMenu
 
     operatingModeItem.addActionListener(
         new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            view.switchPlantOverviewState(OperationMode.OPERATING);
-            if (!appState.hasOperationMode(OperationMode.OPERATING)) {
-              modellingModeItem.setSelected(true);
-            }
-          }
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        view.switchPlantOverviewState(OperationMode.OPERATING);
+        if (!appState.hasOperationMode(OperationMode.OPERATING)) {
+          modellingModeItem.setSelected(true);
         }
+      }
+    }
     );
   }
 

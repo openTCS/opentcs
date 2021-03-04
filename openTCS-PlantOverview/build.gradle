@@ -29,6 +29,14 @@ compileJava {
   options.compilerArgs << "-Xlint:-rawtypes"
 }
 
+distributions {
+  main {
+    contents {
+      from "${sourceSets.main.resources.srcDirs[0]}/org/opentcs/plantoverview/distribution"
+    }
+  }
+}
+
 // For now, we're using hand-crafted start scripts, so disable the application
 // plugin's start script generation.
 startScripts.enabled = false

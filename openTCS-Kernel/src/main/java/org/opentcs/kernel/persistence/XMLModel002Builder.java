@@ -271,6 +271,8 @@ public class XMLModel002Builder
       vehicle.setLength((long) curVehicle.getLength())
           .setEnergyLevelCritical((long) curVehicle.getEnergyLevelCritical())
           .setEnergyLevelGood((long) curVehicle.getEnergyLevelGood())
+          .setMaxVelocity(curVehicle.getMaxVelocity())
+          .setMaxReverseVelocity(curVehicle.getMaxReverseVelocity())
           .setProperties(getProperties(curVehicle));
       result.add(vehicle);
     }
@@ -575,12 +577,12 @@ public class XMLModel002Builder
     for (PointTO pointTO : pointTOs) {
       model.createPoint(
           new PointCreationTO(pointTO.getName())
-              .setPosition(new Triple(pointTO.getxPosition(),
-                                      pointTO.getyPosition(),
-                                      pointTO.getzPosition()))
-              .setVehicleOrientationAngle(pointTO.getVehicleOrientationAngle().doubleValue())
-              .setType(Point.Type.valueOf(pointTO.getType()))
-              .setProperties(getProperties(pointTO.getProperties())));
+          .setPosition(new Triple(pointTO.getxPosition(),
+                                  pointTO.getyPosition(),
+                                  pointTO.getzPosition()))
+          .setVehicleOrientationAngle(pointTO.getVehicleOrientationAngle().doubleValue())
+          .setType(Point.Type.valueOf(pointTO.getType()))
+          .setProperties(getProperties(pointTO.getProperties())));
     }
   }
 
@@ -596,10 +598,12 @@ public class XMLModel002Builder
     for (VehicleTO vehicleTO : vehicleTOs) {
       model.createVehicle(
           new VehicleCreationTO(vehicleTO.getName())
-              .setLength(vehicleTO.getLength().intValue())
-              .setEnergyLevelCritical(vehicleTO.getEnergyLevelCritical().intValue())
-              .setEnergyLevelGood(vehicleTO.getEnergyLevelGood().intValue())
-              .setProperties(getProperties(vehicleTO.getProperties()))
+          .setLength(vehicleTO.getLength().intValue())
+          .setEnergyLevelCritical(vehicleTO.getEnergyLevelCritical().intValue())
+          .setEnergyLevelGood(vehicleTO.getEnergyLevelGood().intValue())
+          .setMaxReverseVelocity(vehicleTO.getMaxReverseVelocity())
+          .setMaxVelocity(vehicleTO.getMaxVelocity())
+          .setProperties(getProperties(vehicleTO.getProperties()))
       );
     }
   }
@@ -618,12 +622,12 @@ public class XMLModel002Builder
           new PathCreationTO(pathTO.getName(),
                              pathTO.getSourcePoint(),
                              pathTO.getDestinationPoint())
-              .setLength(pathTO.getLength())
-              .setRoutingCost(pathTO.getRoutingCost())
-              .setLocked(pathTO.isLocked())
-              .setMaxVelocity(pathTO.getMaxVelocity().intValue())
-              .setMaxReverseVelocity(pathTO.getMaxReverseVelocity().intValue())
-              .setProperties(getProperties(pathTO.getProperties())));
+          .setLength(pathTO.getLength())
+          .setRoutingCost(pathTO.getRoutingCost())
+          .setLocked(pathTO.isLocked())
+          .setMaxVelocity(pathTO.getMaxVelocity().intValue())
+          .setMaxReverseVelocity(pathTO.getMaxReverseVelocity().intValue())
+          .setProperties(getProperties(pathTO.getProperties())));
     }
 //
 //    // Loop through all paths. Add the path to its source point as an outgoing path and to its 
@@ -646,8 +650,8 @@ public class XMLModel002Builder
     for (LocationTypeTO locationTypeTO : locationTypeTOs) {
       model.createLocationType(
           new LocationTypeCreationTO(locationTypeTO.getName())
-              .setAllowedOperations(getAllowedOperations(locationTypeTO.getAllowedOperations()))
-              .setProperties(getProperties(locationTypeTO.getProperties())));
+          .setAllowedOperations(getAllowedOperations(locationTypeTO.getAllowedOperations()))
+          .setProperties(getProperties(locationTypeTO.getProperties())));
     }
   }
 
@@ -671,11 +675,11 @@ public class XMLModel002Builder
     for (LocationTO locationTO : locationTOs) {
       model.createLocation(
           new LocationCreationTO(locationTO.getName(), locationTO.getType())
-              .setPosition(new Triple(locationTO.getxPosition(),
-                                      locationTO.getyPosition(),
-                                      locationTO.getzPosition()))
-              .setLinks(getLinks(locationTO))
-              .setProperties(getProperties(locationTO.getProperties()))
+          .setPosition(new Triple(locationTO.getxPosition(),
+                                  locationTO.getyPosition(),
+                                  locationTO.getzPosition()))
+          .setLinks(getLinks(locationTO))
+          .setProperties(getProperties(locationTO.getProperties()))
       );
     }
 
@@ -703,8 +707,8 @@ public class XMLModel002Builder
     for (BlockTO blockTO : blockTOs) {
       model.createBlock(
           new BlockCreationTO(blockTO.getName())
-              .setMemberNames(getMemberNames(blockTO.getMembers()))
-              .setProperties(getProperties(blockTO.getProperties())));
+          .setMemberNames(getMemberNames(blockTO.getMembers()))
+          .setProperties(getProperties(blockTO.getProperties())));
     }
   }
 
@@ -728,8 +732,8 @@ public class XMLModel002Builder
     for (GroupTO groupTO : groupTOs) {
       model.createGroup(
           new GroupCreationTO(groupTO.getName())
-              .setMemberNames(getMemberNames(groupTO.getMembers()))
-              .setProperties(getProperties(groupTO.getProperties())));
+          .setMemberNames(getMemberNames(groupTO.getMembers()))
+          .setProperties(getProperties(groupTO.getProperties())));
     }
   }
 
@@ -746,8 +750,8 @@ public class XMLModel002Builder
     for (StaticRouteTO staticRouteTO : staticRouteTOs) {
       model.createStaticRoute(
           new org.opentcs.access.to.model.StaticRouteCreationTO(staticRouteTO.getName())
-              .setHopNames(getHopNames(staticRouteTO.getHops()))
-              .setProperties(getProperties(staticRouteTO.getProperties())));
+          .setHopNames(getHopNames(staticRouteTO.getHops()))
+          .setProperties(getProperties(staticRouteTO.getProperties())));
     }
   }
 
@@ -771,11 +775,11 @@ public class XMLModel002Builder
     for (VisualLayoutTO visualLayoutTO : visuLayoutTOs) {
       model.createVisualLayout(
           new VisualLayoutCreationTO(visualLayoutTO.getName())
-              .setScaleX(visualLayoutTO.getScaleX())
-              .setScaleY(visualLayoutTO.getScaleY())
-              .setShapeElements(getShapeElements(visualLayoutTO.getShapeLayoutElements()))
-              .setModelElements(getModelElements(visualLayoutTO.getModelLayoutElements()))
-              .setProperties(getProperties(visualLayoutTO.getProperties()))
+          .setScaleX(visualLayoutTO.getScaleX())
+          .setScaleY(visualLayoutTO.getScaleY())
+          .setShapeElements(getShapeElements(visualLayoutTO.getShapeLayoutElements()))
+          .setModelElements(getModelElements(visualLayoutTO.getModelLayoutElements()))
+          .setProperties(getProperties(visualLayoutTO.getProperties()))
       );
     }
   }

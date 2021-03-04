@@ -9,6 +9,7 @@ package org.opentcs.customizations.plantoverview;
 
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.plantoverview.LocationTheme;
+import org.opentcs.components.plantoverview.OrderCategorySuggestions;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.components.plantoverview.PropertySuggestions;
 import org.opentcs.components.plantoverview.VehicleTheme;
@@ -57,11 +58,21 @@ public abstract class PlantOverviewInjectionModule
   }
 
   /**
-   * returns a multibinder that can be used to register classes that provide suggested properties.
+   * Returns a multibinder that can be used to register classes that provide suggested properties.
    *
    * @return The multibinder.
    */
   protected Multibinder<PropertySuggestions> propertySuggestionsBinder() {
     return Multibinder.newSetBinder(binder(), PropertySuggestions.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register classes that provide suggested order 
+   * categories.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<OrderCategorySuggestions> orderCategorySuggestionsBinder() {
+    return Multibinder.newSetBinder(binder(), OrderCategorySuggestions.class);
   }
 }

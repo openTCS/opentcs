@@ -18,6 +18,7 @@ import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.transport.CreateTransportOrderPanel;
+import org.opentcs.guing.transport.OrderCategorySuggestionsPool;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -45,6 +46,10 @@ public class CreateTransportOrderAction
    * Provides panels for entering new transport orders.
    */
   private final Provider<CreateTransportOrderPanel> orderPanelProvider;
+  /**
+   * The pool of suggested transport order categories.
+   */
+  private final OrderCategorySuggestionsPool categorySuggestionsPool;
 
   /**
    * Creates a new instance.
@@ -52,16 +57,19 @@ public class CreateTransportOrderAction
    * @param orderUtil A helper for creating transport orders with the kernel.
    * @param dialogParent The parent component for dialogs shown by this action.
    * @param orderPanelProvider Provides panels for entering new transport orders.
+   * @param categorySuggestionsPool The pool of suggested transport order categories.
    */
   @Inject
   public CreateTransportOrderAction(TransportOrderUtil orderUtil,
                                     @ApplicationFrame Component dialogParent,
-                                    Provider<CreateTransportOrderPanel> orderPanelProvider) {
+                                    Provider<CreateTransportOrderPanel> orderPanelProvider,
+                                    OrderCategorySuggestionsPool categorySuggestionsPool) {
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.orderPanelProvider = requireNonNull(orderPanelProvider,
                                              "orderPanelProvider");
-
+    this.categorySuggestionsPool = requireNonNull(categorySuggestionsPool,
+                                                  "categorySuggestionsPool");
     ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
@@ -82,6 +90,9 @@ public class CreateTransportOrderAction
     orderUtil.createTransportOrder(contentPanel.getDestinationModels(),
                                    contentPanel.getActions(),
                                    contentPanel.getSelectedDeadline(),
-                                   contentPanel.getSelectedVehicle());
+                                   contentPanel.getSelectedVehicle(),
+                                   contentPanel.getSelectedCategory());
+
+    categorySuggestionsPool.addCategorySuggestion(contentPanel.getSelectedCategory());
   }
 }

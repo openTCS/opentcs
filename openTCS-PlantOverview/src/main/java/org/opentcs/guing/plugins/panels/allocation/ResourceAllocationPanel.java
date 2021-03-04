@@ -83,7 +83,7 @@ public class ResourceAllocationPanel
     kernelClient.getKernel().addEventListener(this);
 
     // Trigger an update to the table model.
-    handleVehicleStateChange(new QuerySchedulerAllocations(new HashMap<>()));
+    handleVehicleStateChange(kernelClient.getKernel().query(QuerySchedulerAllocations.class));
 
     initialized = true;
   }

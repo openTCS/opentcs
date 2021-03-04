@@ -82,7 +82,7 @@ public class UndoRedoManager
   private final RedoAction redoAction;
 
   /**
-   * Creates new UndoRedoManager
+   * Creates a new UndoRedoManager.
    */
   @Inject
   public UndoRedoManager() {

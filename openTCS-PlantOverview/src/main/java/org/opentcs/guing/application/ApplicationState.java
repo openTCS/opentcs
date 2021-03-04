@@ -39,7 +39,7 @@ public class ApplicationState {
   public OperationMode getOperationMode() {
     return operationMode;
   }
-  
+
   /**
    * Checks whether the application is currently in the given mode of operation.
    *

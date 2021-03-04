@@ -8,10 +8,9 @@
  */
 @XmlSchema(xmlns = {@javax.xml.bind.annotation.XmlNs(
       prefix = "xsi", namespaceURI = "http://www.w3.org/2001/XMLSchema-instance"),
-                                              @javax.xml.bind.annotation.XmlNs(
-                                                  prefix = "xs",
-                                                  namespaceURI = "http://www.w3.org/2001/XMLSchema")})
+                    @javax.xml.bind.annotation.XmlNs(
+                        prefix = "xs",
+                        namespaceURI = "http://www.w3.org/2001/XMLSchema")})
 package org.opentcs.guing.persistence;
 
 import javax.xml.bind.annotation.XmlSchema;
-

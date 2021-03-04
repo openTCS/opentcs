@@ -51,6 +51,18 @@ import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
 public class ViewActionMap
     extends ActionMap {
 
+  /**
+   * Creates a new instance.
+   *
+   * @param view The openTCS view
+   * @param undoRedoManager The undo redo manager
+   * @param actionFactory The action factory
+   * @param createTransportOrderAction The action to create transport orders
+   * @param findVehicleAction The action to find vehicles
+   * @param pauseAllVehiclesAction The action to pause all vehicles
+   * @param createGroupAction The action to create a group
+   * @param aboutAction The action to show the about window
+   */
   @Inject
   public ViewActionMap(OpenTCSView view,
                        UndoRedoManager undoRedoManager,

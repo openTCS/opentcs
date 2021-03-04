@@ -42,6 +42,15 @@ public class EditorColorChooserAction
 
   protected AttributeKey<Color> key;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param editor The drawing editor
+   * @param key The attribute key
+   * @param name The name
+   * @param icon The icon
+   * @param fixedAttributes The fixed attributes
+   */
   public EditorColorChooserAction(DrawingEditor editor,
                                   AttributeKey<Color> key,
                                   String name,

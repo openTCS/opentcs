@@ -34,6 +34,8 @@ public class SelectSameAction
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The drawing editor
    */
   public SelectSameAction(DrawingEditor editor) {
     super(editor);

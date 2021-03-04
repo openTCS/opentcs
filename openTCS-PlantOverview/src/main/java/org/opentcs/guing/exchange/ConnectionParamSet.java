@@ -62,7 +62,7 @@ public class ConnectionParamSet {
    * Creates a new instance with the host and port parsed from the given string, which must follow a
    * pattern of "host:port".
    *
-   * @param hostAndPort 
+   * @param hostAndPort
    */
   public ConnectionParamSet(String hostAndPort) {
     requireNonNull(hostAndPort, "hostAndPort");

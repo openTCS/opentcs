@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.TravelCosts;
+import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.queries.Query;
 import org.opentcs.access.queries.QueryAvailableScriptFiles;
 import org.opentcs.access.queries.QueryRecoveryStatus;
@@ -427,6 +428,15 @@ class KernelStateOperating
     }
   }
 
+  @Override
+  public void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
+                                              Set<String> processableCategories)
+      throws UnsupportedKernelOpException {
+    synchronized (getGlobalSyncObject()) {
+      getModel().setVehicleProcessableCategories(ref, processableCategories);
+    }
+  }
+  
   @Override
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)

@@ -26,7 +26,7 @@ interface OrderGenerationTrigger {
 
   /**
    * Triggers order generation.
-   * 
+   *
    * @throws KernelRuntimeException In case the kernel threw an exception when
    * creating the transport orders.
    */

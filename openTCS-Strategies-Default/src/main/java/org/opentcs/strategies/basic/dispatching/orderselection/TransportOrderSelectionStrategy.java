@@ -147,10 +147,10 @@ public class TransportOrderSelectionStrategy
       boolean canProcess;
       // Get a route for the vehicle.
       driveOrders = router.getRoute(vehicle, vehiclePosition, curOrder);
-      LOG.info("driveOrders {}", driveOrders);
+      LOG.debug("driveOrders {}", driveOrders);
       canProcess = driveOrders.isPresent();
       if (!canProcess) {
-        LOG.info("{}: No route for order {}", vehicle.getName(), curOrder);
+        LOG.debug("{}: No route for order {}", vehicle.getName(), curOrder);
         kernel.addTransportOrderRejection(curOrder.getReference(),
                                           new Rejection(vehicle.getReference(), "Unroutable"));
       }

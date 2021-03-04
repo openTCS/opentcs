@@ -18,7 +18,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,6 +44,12 @@ class TransportOrderTableModel
     extends AbstractTableModel {
 
   /**
+   * This classe's bundle.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+
+  /**
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(TransportOrderTableModel.class);
@@ -50,14 +57,14 @@ class TransportOrderTableModel
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    "Name",
-    "Deadline",
-    "Vehicle",};
+    "#",
+    BUNDLE.getString("deadline"),
+    BUNDLE.getString("vehicle")};
   /**
    * The column classes.
    */
   private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
-    String.class,
+    Integer.class,
     TransportOrderData.Deadline.class,
     TCSObjectReference.class,};
   /**
@@ -74,7 +81,6 @@ class TransportOrderTableModel
    * Creates a new instance.
    */
   public TransportOrderTableModel() {
-    // Do nada.
   }
 
   /**
@@ -129,26 +135,19 @@ class TransportOrderTableModel
 
     switch (columnIndex) {
       case 0:
-        return data.getName();
+        return rowIndex + 1;
       case 1:
         return data.getDeadline();
       case 2:
         return data.getIntendedVehicle();
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
   @Override
   public String getColumnName(int columnIndex) {
-    try {
-      return COLUMN_NAMES[columnIndex];
-    }
-    catch (ArrayIndexOutOfBoundsException exc) {
-      LOG.warn("Invalid columnIndex", exc);
-      return "FEHLER";
-    }
+    return COLUMN_NAMES[columnIndex];
   }
 
   @Override
@@ -166,8 +165,7 @@ class TransportOrderTableModel
       case 2:
         return true;
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
@@ -176,9 +174,6 @@ class TransportOrderTableModel
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     TransportOrderData data = transportOrderDataList.get(rowIndex);
     switch (columnIndex) {
-      case 0:
-        data.setName(aValue.toString());
-        break;
       case 1:
         data.setDeadline((TransportOrderData.Deadline) aValue);
         break;
@@ -186,8 +181,7 @@ class TransportOrderTableModel
         data.setIntendedVehicle((TCSObjectReference<Vehicle>) aValue);
         break;
       default:
-        throw new IllegalArgumentException("Unhandled columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
@@ -235,9 +229,8 @@ class TransportOrderTableModel
    */
   public void toFile(File file)
       throws IOException {
-    if (file == null) {
-      throw new NullPointerException("file is null");
-    }
+    requireNonNull(file, "file");
+
     createXMLStructure();
     try (OutputStream outStream = new FileOutputStream(file)) {
       outStream.write(toXml().getBytes());
@@ -253,9 +246,8 @@ class TransportOrderTableModel
    */
   @SuppressWarnings("unchecked")
   public static List<TransportOrderXMLStructure> fromXml(String xmlData) {
-    if (xmlData == null) {
-      throw new NullPointerException("xmlData is null");
-    }
+    requireNonNull(xmlData, "xmlData");
+
     StringReader stringReader = new StringReader(xmlData);
     try {
       JAXBContext jc = JAXBContext.newInstance(TransportOrderTableModel.class);
@@ -278,7 +270,8 @@ class TransportOrderTableModel
    */
   public static List<TransportOrderXMLStructure> fromFile(File sourceFile)
       throws IOException {
-    Objects.requireNonNull(sourceFile, "sourceFile is null");
+    requireNonNull(sourceFile, "sourceFile");
+
     final String path = sourceFile.getAbsolutePath();
     if (!sourceFile.isFile() || !sourceFile.canRead()) {
       throw new IOException(path + ": file not a regular file or unreadable");

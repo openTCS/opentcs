@@ -39,6 +39,8 @@ public class SendToBackAction
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The drawing editor
    */
   public SendToBackAction(DrawingEditor editor) {
     super(editor);
@@ -60,13 +62,15 @@ public class SendToBackAction
       }
 
       @Override
-      public void redo() throws CannotRedoException {
+      public void redo()
+          throws CannotRedoException {
         super.redo();
         SendToBackAction.sendToBack(view, figures);
       }
 
       @Override
-      public void undo() throws CannotUndoException {
+      public void undo()
+          throws CannotUndoException {
         super.undo();
         BringToFrontAction.bringToFront(view, figures);
       }

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
@@ -30,7 +29,10 @@ public class LinkUserObject
   /**
    * Creates a new instance of LinkUserObject
    *
-   * @param modelComponent
+   * @param modelComponent The corresponding data object
+   * @param view The openTCS view
+   * @param editor The drawing editor
+   * @param modelManager The model manager
    */
   @Inject
   public LinkUserObject(@Assisted LinkModel modelComponent,

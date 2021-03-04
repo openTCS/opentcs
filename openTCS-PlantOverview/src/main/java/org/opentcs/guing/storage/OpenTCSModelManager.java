@@ -67,6 +67,8 @@ import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
@@ -213,7 +215,7 @@ public class OpenTCSModelManager
     this.modelReaderFileChooser.setAcceptAllFileFilterUsed(false);
     modelReaders.stream().forEach(o -> {
       FileFilter filter = o.getDialogFileFilter();
-      if (o instanceof ModelJAXBReader) {
+      if (o instanceof UnifiedModelReader) {
         this.modelReaderFileChooser.setFileFilter(filter);
       }
       else {
@@ -225,7 +227,7 @@ public class OpenTCSModelManager
     this.modelPersistorFileChooser.setAcceptAllFileFilterUsed(false);
     modelPersistors.stream().forEach(o -> {
       FileFilter filter = o.getDialogFileFilter();
-      if (o instanceof ModelJAXBPersistor) {
+      if (o instanceof UnifiedModelPersistor) {
         this.modelPersistorFileChooser.setFileFilter(filter);
       }
       else {
@@ -291,7 +293,8 @@ public class OpenTCSModelManager
     }
     catch (IllegalStateException | CredentialsException e) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
+                                ResourceBundleUtil.getBundle()
+                                    .getString("modelManager.persistence.notSaved"));
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -330,7 +333,8 @@ public class OpenTCSModelManager
     }
     catch (IOException e) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle().getString("modelManager.persistence.notSaved"));
+                                ResourceBundleUtil.getBundle()
+                                    .getString("modelManager.persistence.notSaved"));
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -508,11 +512,13 @@ public class OpenTCSModelManager
                                     null);
     }
 
-    restoreModelPoints(allPoints, systemModel, origin, scaleX, scaleY, createdAdapters, restoredFigures, kernel);
+    restoreModelPoints(allPoints, systemModel, origin, scaleX,
+                       scaleY, createdAdapters, restoredFigures, kernel);
     restoreModelPaths(allPaths, systemModel, origin, createdAdapters, restoredFigures, kernel);
     restoreModelVehicles(allVehicles, systemModel, createdAdapters, kernel);
     restoreModelLocationTypes(allLocationTypes, systemModel, createdAdapters, kernel);
-    restoreModelLocations(allLocations, systemModel, origin, scaleX, scaleY, createdAdapters, restoredFigures, kernel);
+    restoreModelLocations(allLocations, systemModel, origin, scaleX,
+                          scaleY, createdAdapters, restoredFigures, kernel);
     restoreModelBlocks(allBlocks, systemModel, createdAdapters, kernel);
     restoreModelStaticRoutes(allStaticRoutes, systemModel, createdAdapters, kernel);
     restoreModelGroups(allGroups, systemModel, createdAdapters, kernel);
@@ -717,7 +723,8 @@ public class OpenTCSModelManager
       Point2D.Double figurePosition;
       double figurePositionX = 0;
       double figurePositionY = 0;
-      StringProperty stringProperty = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_POS_X);
+      StringProperty stringProperty
+          = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_POS_X);
       String locPosX = stringProperty.getText();
       stringProperty = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_POS_Y);
       String locPosY = stringProperty.getText();
@@ -731,9 +738,11 @@ public class OpenTCSModelManager
       }
 
       // Label
-      stringProperty = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
+      stringProperty
+          = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
       String labelOffsetX = stringProperty.getText();
-      stringProperty = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
+      stringProperty
+          = (StringProperty) locationModel.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
       String labelOffsetY = stringProperty.getText();
       // TODO: labelOrientationAngle auswerten
 //      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
@@ -765,8 +774,8 @@ public class OpenTCSModelManager
       locationModel.setFigure(llf);
       locationModel.addAttributesChangeListener(llf);
 
-      String locationTypeName
-          = (String) ((LocationTypeProperty) locationModel.getProperty(LocationModel.TYPE)).getValue();
+      String locationTypeName = (String) ((LocationTypeProperty) locationModel
+                                          .getProperty(LocationModel.TYPE)).getValue();
       locationModel.setLocationType(getLocationTypeComponent(locationTypeName));
 
       for (LinkModel linkModel : getAttachedLinks(locationModel)) {
@@ -862,7 +871,8 @@ public class OpenTCSModelManager
         }
       }
       // Figur auf diese Position verschieben
-      Point2D.Double figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
+      Point2D.Double figurePosition = new Point2D.Double(figurePositionX / scaleX,
+                                                         -figurePositionY / scaleY);  // Vorzeichen!
       locationFigure.setBounds(figurePosition, figurePosition);
 
       labelPosition = locationFigure.getStartPoint();
@@ -877,24 +887,30 @@ public class OpenTCSModelManager
       restoredFigures.add(llf);
       // Den Stationstyp zuweisen
       // Der Typ der Station
-      LocationTypeModel type = (LocationTypeModel) getModelComponent(systemModel, location.getType());
+      LocationTypeModel type = (LocationTypeModel) getModelComponent(systemModel,
+                                                                     location.getType());
       locationModel.setLocationType(type);
       locationModel.updateTypeProperty(systemModel.getLocationTypeModels());
       locationModel.propertiesChanged(new NullAttributesChangeListener());
       // XXX Why clearing the objects properties? pseifert @ 25.04.14
       //kernel().clearTCSObjectProperties(location.getReference());
-      KeyValueSetProperty misc = (KeyValueSetProperty) locationModel.getProperty(ModelComponent.MISCELLANEOUS);
+      KeyValueSetProperty misc
+          = (KeyValueSetProperty) locationModel.getProperty(ModelComponent.MISCELLANEOUS);
 
       if (misc != null) {
         for (String key : location.getProperties().keySet()) {
           misc.addItem(new KeyValueProperty(locationModel, key, location.getProperties().get(key)));
         }
         // Datei f�r Default-Symbol
-        SymbolProperty symbol = (SymbolProperty) locationModel.getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
+        SymbolProperty symbol
+            = (SymbolProperty) locationModel
+                .getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
 
         if (symbol.getLocationRepresentation() != null) {
           LocationRepresentation symbolName = symbol.getLocationRepresentation();
-          KeyValueProperty pr = new KeyValueProperty(locationModel, ObjectPropConstants.LOC_DEFAULT_REPRESENTATION, symbolName.name());
+          KeyValueProperty pr = new KeyValueProperty(locationModel,
+                                                     ObjectPropConstants.LOC_DEFAULT_REPRESENTATION,
+                                                     symbolName.name());
           misc.addItem(pr);
 
           Iterator<KeyValueProperty> e = misc.getItems().iterator();
@@ -919,7 +935,8 @@ public class OpenTCSModelManager
         // Das zur Figure geh�rige Datenmodell in der GUI
         LinkModel linkModel = linkConnection.getModel();
         // Speziell f�r diesen Link erlaubte Operation
-        StringSetProperty pOperations = (StringSetProperty) linkModel.getProperty(LinkModel.ALLOWED_OPERATIONS);
+        StringSetProperty pOperations
+            = (StringSetProperty) linkModel.getProperty(LinkModel.ALLOWED_OPERATIONS);
         pOperations.setItems(new ArrayList<>(link.getAllowedOperations()));
 
         LinkAdapter linkAdapter = addProcessAdapter(systemModel, linkModel);
@@ -1002,8 +1019,8 @@ public class OpenTCSModelManager
                                     null);
 
       // Neue Farbe suchen für Vehicles
-        ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
-            .setColor(routeColorCycler.next());
+      ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
+          .setColor(routeColorCycler.next());
       // Das zugeh�rige Model Layout Element suchen
       ModelLayoutElement element = systemModel.getLayoutMap().get(vehicle.getReference());
 
@@ -1016,6 +1033,12 @@ public class OpenTCSModelManager
         ((ColorProperty) vehicleModel.getProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR))
             .setColor(color);
       }
+      SpeedProperty maxVelP
+          = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_VELOCITY);
+      maxVelP.setValueAndUnit(vehicle.getMaxVelocity(), Unit.MM_S);
+      SpeedProperty maxRevVelP
+          = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
+      maxRevVelP.setValueAndUnit(vehicle.getMaxReverseVelocity(), Unit.MM_S);
 
       systemModel.getMainFolder(SystemModel.FolderKey.VEHICLES).add(vehicleModel);
       // Die VehicleFigures werden erst in OpenTCSDrawingView.setVehicles() erzeugt
@@ -1071,8 +1094,10 @@ public class OpenTCSModelManager
       // Das zugeh�rige Modell
       PathModel pathModel = pathFigure.getModel();
       // Anfangs- und Endpunkte
-      PointModel startPointModel = (PointModel) getModelComponent(systemModel, path.getSourcePoint());
-      PointModel endPointModel = (PointModel) getModelComponent(systemModel, path.getDestinationPoint());
+      PointModel startPointModel = (PointModel) getModelComponent(systemModel,
+                                                                  path.getSourcePoint());
+      PointModel endPointModel = (PointModel) getModelComponent(systemModel,
+                                                                path.getDestinationPoint());
       pathFigure.connect(startPointModel.getFigure(), endPointModel.getFigure());
       // Adapter zur Verkn�pfung des Kernel-Objekts mit der Figur
       PathAdapter adapter = procAdapterFactory.createPathAdapter(
@@ -1180,7 +1205,8 @@ public class OpenTCSModelManager
       Point2D.Double figurePosition;
       double figurePositionX = 0;
       double figurePositionY = 0;
-      StringProperty stringProperty = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_POS_X);
+      StringProperty stringProperty
+          = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_POS_X);
       String pointPosX = stringProperty.getText();
       stringProperty = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_POS_Y);
       String pointPosY = stringProperty.getText();
@@ -1194,9 +1220,11 @@ public class OpenTCSModelManager
       }
 
       // Label
-      stringProperty = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
+      stringProperty
+          = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
       String labelOffsetX = stringProperty.getText();
-      stringProperty = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
+      stringProperty
+          = (StringProperty) pointModel.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y);
       String labelOffsetY = stringProperty.getText();
       // TODO: labelOrientationAngle auswerten
 //      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);

@@ -29,7 +29,6 @@ import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
@@ -37,6 +36,7 @@ import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
@@ -254,6 +254,11 @@ public class UnifiedModelComponentConverter {
     LengthProperty lp = (LengthProperty) vehicleModel.getProperty(VehicleModel.LENGTH);
     vehicle.setLength((long) lp.getValueByUnit(LengthProperty.Unit.MM));
 
+    SpeedProperty maximumVelocityProperty = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_VELOCITY);
+    vehicle.setMaxVelocity(((Double) maximumVelocityProperty.getValueByUnit(Unit.MM_S)).intValue());
+    SpeedProperty maximumReverseVelocityProperty = (SpeedProperty) vehicleModel.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
+    vehicle.setMaxReverseVelocity(((Double) maximumReverseVelocityProperty.getValueByUnit(Unit.MM_S)).intValue());
+
     PercentProperty pp = (PercentProperty) vehicleModel.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
     vehicle.setEnergyLevelGood((long) pp.getValueByUnit(PercentProperty.Unit.PERCENT));
 
@@ -267,14 +272,6 @@ public class UnifiedModelComponentConverter {
       property.setName(kvp.getKey());
       property.setValue(kvp.getValue());
       vehicle.getProperties().add(property);
-    }
-
-    CoursePointProperty cpp
-        = (CoursePointProperty) vehicleModel.getProperty(VehicleModel.INITIAL_POSITION);
-    if (!Strings.isNullOrEmpty(cpp.getPointName())) {
-      vehicle.getProperties().add(new PropertyTO()
-          .setName(ObjectPropConstants.VEHICLE_INITIAL_POSITION)
-          .setValue(cpp.getPointName()));
     }
 
     return vehicle;
@@ -746,6 +743,12 @@ public class UnifiedModelComponentConverter {
     LengthProperty lp = (LengthProperty) model.getProperty(VehicleModel.LENGTH);
     lp.setValueAndUnit(vehicleTO.getLength(), LengthProperty.Unit.MM);
 
+    SpeedProperty maximumVelocity = (SpeedProperty) model.getProperty(VehicleModel.MAXIMUM_VELOCITY);
+    maximumVelocity.setValueAndUnit(((double) vehicleTO.getMaxVelocity()), Unit.MM_S);
+
+    SpeedProperty maximumReverseVelocity = (SpeedProperty) model.getProperty(VehicleModel.MAXIMUM_REVERSE_VELOCITY);
+    maximumReverseVelocity.setValueAndUnit(((double) vehicleTO.getMaxReverseVelocity()), Unit.MM_S);
+
     PercentProperty pp = (PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
     pp.setValueAndUnit(vehicleTO.getEnergyLevelCritical(), PercentProperty.Unit.PERCENT);
 
@@ -754,14 +757,6 @@ public class UnifiedModelComponentConverter {
 
     KeyValueSetProperty kvsp = (KeyValueSetProperty) model.getProperty(VehicleModel.MISCELLANEOUS);
     for (PropertyTO property : vehicleTO.getProperties()) {
-      if (Objects.equals(property.getName(), ObjectPropConstants.VEHICLE_INITIAL_POSITION)) {
-        CoursePointProperty cpp
-            = (CoursePointProperty) model.getProperty(VehicleModel.INITIAL_POSITION);
-        cpp.setPointName(property.getValue());
-        // Don't add this to the vehicle's properties
-        continue;
-      }
-
       kvsp.addItem(new KeyValueProperty(model, property.getName(), property.getValue()));
     }
 

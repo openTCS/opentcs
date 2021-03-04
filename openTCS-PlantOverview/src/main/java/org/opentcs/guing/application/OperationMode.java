@@ -28,7 +28,7 @@ public enum OperationMode {
    * Used when operating a plant/system.
    */
   OPERATING;
-  
+
   /**
    * Returns the equivalent operation mode to the given kernel state.
    *
@@ -46,7 +46,7 @@ public enum OperationMode {
       return UNDEFINED;
     }
   }
-  
+
   public static Kernel.State equivalent(OperationMode mode) {
     if (Objects.equals(mode, MODELLING)) {
       return Kernel.State.MODELLING;

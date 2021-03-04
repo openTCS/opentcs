@@ -54,7 +54,8 @@ public class KernelStateChangeEvent
         return State.OPERATING;
       case SHUTDOWN:
         return State.SHUTDOWN;
-      default: return null;
+      default:
+        return null;
     }
   }
 

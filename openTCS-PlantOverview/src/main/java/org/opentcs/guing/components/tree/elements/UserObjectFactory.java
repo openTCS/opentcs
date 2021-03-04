@@ -25,36 +25,35 @@ import org.opentcs.guing.model.elements.VehicleModel;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface UserObjectFactory {
-  
+
   BlockUserObject createBlockUserObject(BlockModel model, UserObjectContext context);
-  
+
 //  FigureUserObject createFigureUserObject(AbstractFigureComponent model);
-  
   GroupUserObject createGroupUserObject(GroupModel model);
-  
+
   LayoutUserObject createLayoutUserObject(LayoutModel model);
-  
+
   LinkUserObject createLinkUserObject(LinkModel model);
-  
+
   LocationTypeUserObject createLocationTypeUserObject(LocationTypeModel model);
-  
+
   LocationUserObject createLocationUserObject(LocationModel model, UserObjectContext context);
-  
+
   PathUserObject createPathUserObject(PathModel model, UserObjectContext context);
-  
+
   PointUserObject createPointUserObject(PointModel model, UserObjectContext context);
-  
+
   SimpleFolderUserObject createSimpleFolderUserObject(CompositeModelComponent model);
-  
+
   StaticRouteUserObject createStaticRouteUserObject(StaticRouteModel model);
-  
+
   VehicleUserObject createVehicleUserObject(VehicleModel model);
-  
+
   ComponentContext createComponentContext();
-  
+
   BlockContext createBlockContext();
-  
+
   GroupContext createGroupContext();
-  
+
   NullContext createNullContext();
 }

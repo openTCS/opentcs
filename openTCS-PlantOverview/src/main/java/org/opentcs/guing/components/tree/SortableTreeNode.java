@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree;
 
 import java.util.Collections;
@@ -66,7 +65,7 @@ public class SortableTreeNode
   public void sort(Comparator<Object> comparator) {
     Collections.sort(children, comparator);
   }
-  
+
   @Override
   public TreeNode getChildAt(int index) {
     try {

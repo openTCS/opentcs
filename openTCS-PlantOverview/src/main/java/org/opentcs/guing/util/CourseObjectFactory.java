@@ -94,11 +94,11 @@ public class CourseObjectFactory {
   public LinkConnection createLinkConnection() {
     return figureFactory.createLinkConnection(new LinkModel());
   }
-  
+
   public VehicleFigure createVehicleFigure(VehicleModel model) {
     return figureFactory.createVehicleFigure(model);
   }
-  
+
   public OffsetFigure createOffsetFigure() {
     return figureFactory.createOffsetFigure();
   }

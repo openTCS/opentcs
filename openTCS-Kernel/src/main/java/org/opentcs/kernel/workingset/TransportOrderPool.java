@@ -146,13 +146,15 @@ public class TransportOrderPool {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    * @throws IllegalArgumentException If the order is supposed to be part of an order sequence, but
-   * the sequence is already complete or the intended vehicles of the two differ.
+   * the sequence is already complete, the categories of the two differ or the intended vehicles of 
+   * the two differ.
    */
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
     TransportOrder newOrder = new TransportOrder(to.getName(), toDriveOrders(to.getDestinations()))
         .withCreationTime(timestampGenerator.getNextTimestamp())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
+        .withCategory(to.getCategory())
         .withDeadline(to.getDeadline().toInstant().toEpochMilli())
         .withDispensable(to.isDispensable())
         .withWrappingSequence(getWrappingSequence(to))
@@ -692,6 +694,7 @@ public class TransportOrderPool {
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     OrderSequence newSequence = new OrderSequence(to.getName())
+        .withCategory(to.getCategory())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withFailureFatal(to.isFailureFatal())
         .withProperties(to.getProperties());
@@ -1062,6 +1065,12 @@ public class TransportOrderPool {
       throw new ObjectUnknownException(to.getWrappingSequence());
     }
     checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
+    checkArgument(Objects.equals(to.getCategory(), sequence.getCategory()),
+                  "Order sequence %s has different category than order %s: %s != %s",
+                  sequence,
+                  to.getName(),
+                  sequence.getCategory(),
+                  to.getCategory());
     checkArgument(Objects.equals(to.getIntendedVehicleName(), getIntendedVehicleName(sequence)),
                   "Order sequence %s has different intended vehicle than order %s: %s != %s",
                   sequence,

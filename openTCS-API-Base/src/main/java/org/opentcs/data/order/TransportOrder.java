@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a set of movements and operations that are to be executed by a {@link Vehicle}.
+ * Represents a sequence of movements and operations that are to be executed by a {@link Vehicle}.
  * <p>
  * A TransportOrder basically encapsulates a list of {@link DriveOrder} instances.
  * </p>
@@ -49,6 +49,11 @@ public class TransportOrder
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(TransportOrder.class);
+  /**
+   * The category of this transport order.
+   */
+  @Nonnull
+  private String category = OrderConstants.CATEGORY_NONE;
   /**
    * A set of TransportOrders that must have been finished before this one may
    * be processed.
@@ -189,6 +194,7 @@ public class TransportOrder
   private TransportOrder(int objectID,
                          String name,
                          Map<String, String> properties,
+                         String category,
                          List<DriveOrder> driveOrders,
                          int currentDriveOrderIndex,
                          long creationTime,
@@ -202,6 +208,7 @@ public class TransportOrder
                          State state,
                          long finishedTime) {
     super(objectID, name, properties);
+    this.category = requireNonNull(category, "category");
     requireNonNull(driveOrders, "driveOrders");
     this.driveOrders = new LinkedList<>();
     for (DriveOrder driveOrder : driveOrders) {
@@ -225,7 +232,7 @@ public class TransportOrder
   public TransportOrder withProperty(String key, String value) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
-                              propertiesWith(key, value),
+                              propertiesWith(key, value), category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -245,6 +252,42 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               properties,
+                              category,
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  /**
+   * Retruns this transport order's category.
+   *
+   * @return This transport order's category.
+   */
+  @Nonnull
+  public String getCategory() {
+    return category;
+  }
+
+  /**
+   * Creates a copy of this obejct, with the given category.
+   *
+   * @param category The category to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withCategory(@Nonnull String category) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -311,6 +354,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -344,6 +388,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -392,6 +437,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -429,6 +475,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -479,6 +526,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -530,6 +578,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -596,6 +645,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -643,6 +693,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -749,6 +800,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -837,6 +889,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -886,6 +939,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -937,6 +991,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -982,6 +1037,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1001,6 +1057,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,

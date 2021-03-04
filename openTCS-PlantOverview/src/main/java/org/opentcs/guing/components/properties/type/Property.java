@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.type;
 
 /**
@@ -23,7 +22,8 @@ package org.opentcs.guing.components.properties.type;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface Property
-    extends ModelAttribute, Cloneable {
+    extends ModelAttribute,
+            Cloneable {
 
   /**
    * Übernimmt die Werte von dem übergebenen Attribut. Die Eigenschaften

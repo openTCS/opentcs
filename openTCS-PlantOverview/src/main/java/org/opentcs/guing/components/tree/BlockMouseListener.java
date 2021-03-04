@@ -49,6 +49,13 @@ public class BlockMouseListener
   private final DrawingEditor drawingEditor;
   private List<ModelComponent> fAffectedModels;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param appState The application state
+   * @param drawingEditor The drawing editor
+   * @param treeView The tree view
+   */
   @Inject
   public BlockMouseListener(ApplicationState appState,
                             DrawingEditor drawingEditor,

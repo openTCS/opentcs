@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application;
 
 import java.awt.Color;
@@ -75,7 +74,7 @@ public class StatusPanel
     gridBagConstraints.weightx = 0.8;
     add(textFieldStatus, gridBagConstraints);
   }
-  
+
   /**
    * Clears the status textfield, removing any logged messages.
    */
@@ -122,7 +121,7 @@ public class StatusPanel
     Objects.requireNonNull(text, "text is null");
     textFieldPosition.setText(text);
   }
-  
+
   private void showOptionPane(String text) {
     JOptionPane.showMessageDialog(this.getParent(), text, "", JOptionPane.ERROR_MESSAGE);
   }

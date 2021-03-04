@@ -81,6 +81,9 @@ public final class Origin {
    * Zoom ï¿½ndern.
    */
   public void setScale(double scaleX, double scaleY) {
+    if (fScaleX == scaleX && fScaleY == scaleY) {
+      return;
+    }
     fScaleX = scaleX;
     fScaleY = scaleY;
     notifyScaleChanged();

@@ -20,11 +20,16 @@ import javax.xml.bind.annotation.XmlType;
  * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "id", "length", "energyLevelCritical", "energyLevelGood",
-                      "properties"})
+@XmlType(
+      propOrder = {"name", "id", "length", "energyLevelCritical", "energyLevelGood", "maxVelocity", "maxReverseVelocity",
+                   "properties"})
 public class VehicleTO
     extends PlantModelElementTO {
 
+  //max velocity in mm/s.
+  private int maxVelocity;
+  //max rev velocity in mm/s.
+  private int maxReverseVelocity;
   private String type = "";
   private Long length = 0L;
   private Long energyLevelCritical = 0L;
@@ -74,6 +79,28 @@ public class VehicleTO
   public VehicleTO setEnergyLevelGood(@Nonnull Long energyLevelGood) {
     requireNonNull(energyLevelGood, "energyLevelGood");
     this.energyLevelGood = energyLevelGood;
+    return this;
+  }
+
+  @XmlAttribute
+  @XmlSchemaType(name = "unsignedInt")
+  public int getMaxVelocity() {
+    return maxVelocity;
+  }
+
+  public VehicleTO setMaxVelocity(@Nonnull int maxVelocity) {
+    this.maxVelocity = maxVelocity;
+    return this;
+  }
+
+  @XmlAttribute
+  @XmlSchemaType(name = "unsignedInt")
+  public int getMaxReverseVelocity() {
+    return maxReverseVelocity;
+  }
+
+  public VehicleTO setMaxReverseVelocity(@Nonnull int maxReverseVelocity) {
+    this.maxReverseVelocity = maxReverseVelocity;
     return this;
   }
 }

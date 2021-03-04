@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Component;
@@ -77,9 +76,9 @@ public class QuantityCellEditor
 
     if (blankIndex == -1) {
       userMessageHelper.showMessageDialog(
-                                    ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorMsg"),
-                                    ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorTitle"),
-                                    UserMessageHelper.Type.ERROR);
+          ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorMsg"),
+          ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorTitle"),
+          UserMessageHelper.Type.ERROR);
       return;
     }
 
@@ -89,9 +88,9 @@ public class QuantityCellEditor
     if (property().getModel() instanceof LayoutModel) {
       if (valueString.equals("0.0") || valueString.equals("0")) {
         userMessageHelper.showMessageDialog(
-                                      ResourceBundleUtil.getBundle().getString("VisualLayout.scaleInvalid.msg"),
-                                      ResourceBundleUtil.getBundle().getString("VisualLayout.scaleInvalid.title"),
-                                      UserMessageHelper.Type.ERROR);
+            ResourceBundleUtil.getBundle().getString("VisualLayout.scaleInvalid.msg"),
+            ResourceBundleUtil.getBundle().getString("VisualLayout.scaleInvalid.title"),
+            UserMessageHelper.Type.ERROR);
         return;
       }
     }
@@ -101,7 +100,7 @@ public class QuantityCellEditor
       if (!property().getValidRange().isValueValid(newValue)) {
         return;
       }
-      
+
       double oldValue = (double) property().getValue();
       String oldUnit = property().getUnit().toString();
       property().setValueAndUnit(newValue, unitString);

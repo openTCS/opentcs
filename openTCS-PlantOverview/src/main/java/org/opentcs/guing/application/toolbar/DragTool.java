@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.toolbar;
 
 import java.awt.event.MouseEvent;
@@ -14,7 +13,7 @@ import org.jhotdraw.draw.tool.AbstractTool;
 
 /**
  * The tool to drag the drawing.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class DragTool

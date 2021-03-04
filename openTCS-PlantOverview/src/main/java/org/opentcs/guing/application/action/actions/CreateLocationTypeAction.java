@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.actions;
 
 import java.awt.event.ActionEvent;

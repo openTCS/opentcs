@@ -9,11 +9,8 @@ package org.opentcs.kernel;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
-import org.opentcs.virtualvehicle.EnergyStorage;
-import org.opentcs.virtualvehicle.EnergyStorageFactory;
 import org.opentcs.virtualvehicle.LoopbackAdapterComponentsFactory;
 import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterFactory;
-import org.opentcs.virtualvehicle.StaticEnergyStorage;
 import org.opentcs.virtualvehicle.VirtualVehicleConfiguration;
 
 /**
@@ -34,9 +31,6 @@ public class LoopbackCommAdapterModule
 
   private void configureLoopbackAdapterDependencies() {
     install(new FactoryModuleBuilder().build(LoopbackAdapterComponentsFactory.class));
-    install(new FactoryModuleBuilder()
-        .implement(EnergyStorage.class, StaticEnergyStorage.class)
-        .build(EnergyStorageFactory.class));
 
     bind(VirtualVehicleConfiguration.class)
         .toInstance(getConfigBindingProvider().get(VirtualVehicleConfiguration.PREFIX,

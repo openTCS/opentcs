@@ -10,6 +10,7 @@ package org.opentcs.guing.storage;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Constants related to reading and writing the plant overview's own model file format.
@@ -27,7 +28,7 @@ public interface ModelJAXBConstants {
    * The file filter this persistor supports.
    */
   FileFilter DIALOG_FILE_FILTER
-      = new FileNameExtensionFilter(String.format("Plant Overview model files (*.%s)",
-                                                  FILE_ENDING_OPENTCS),
+      = new FileNameExtensionFilter(ResourceBundleUtil.getBundle()
+          .getFormatted("PlantOverview.modelFile.name", FILE_ENDING_OPENTCS),
                                     FILE_ENDING_OPENTCS);
 }

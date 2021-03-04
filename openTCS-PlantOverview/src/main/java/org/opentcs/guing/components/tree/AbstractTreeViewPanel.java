@@ -86,9 +86,9 @@ public abstract class AbstractTreeViewPanel
   protected final List<Figure> bufferedFigures = new ArrayList<>();
 
   /**
-   * Creates new form StandardTreeView
+   * Creates a new instance.
    *
-   * @param undoRedoManager
+   * @param undoRedoManager The undo redo manager
    */
   @Inject
   public AbstractTreeViewPanel(UndoRedoManager undoRedoManager) {

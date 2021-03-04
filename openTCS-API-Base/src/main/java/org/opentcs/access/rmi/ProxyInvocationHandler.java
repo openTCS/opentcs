@@ -7,6 +7,7 @@
  */
 package org.opentcs.access.rmi;
 
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -81,6 +82,10 @@ class ProxyInvocationHandler
    */
   private final EventHub<TCSEvent> eventHub = new SynchronousEventHub<>();
   /**
+   * Provides socket factories used for RMI.
+   */
+  private final SocketFactoryProvider socketFactoryProvider;
+  /**
    * The remote kernel.
    */
   private volatile RemoteKernel remoteKernel;
@@ -100,6 +105,7 @@ class ProxyInvocationHandler
   /**
    * Creates a new instance.
    *
+   * @param socketFactoryProvider Provides socket factories used for RMI.
    * @param hostName The host on which the RMI registry listing the remote kernel is running.
    * @param port The port on which the RMI registry is listening.
    * @param userName The user name to use when logging in with the remote kernel.
@@ -117,6 +123,7 @@ class ProxyInvocationHandler
   @Deprecated
   @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   ProxyInvocationHandler(
+      @Nonnull SocketFactoryProvider socketFactoryProvider,
       @Nonnull String hostName,
       int port,
       @Nonnull String userName,
@@ -125,6 +132,7 @@ class ProxyInvocationHandler
       long eventPollInterval,
       long eventPollTimeout)
       throws CredentialsException {
+    this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
     this.hostName = requireNonNull(hostName, "hostName");
     this.port = checkInRange(port, 0, 65535, "port");
     this.userName = requireNonNull(userName, "userName");
@@ -137,6 +145,7 @@ class ProxyInvocationHandler
   /**
    * Creates a new instance.
    *
+   * @param socketFactoryProvider Provides socket factories used for RMI.
    * @param hostName The host on which the RMI registry listing the remote kernel is running.
    * @param port The port on which the RMI registry is listening.
    * @param userName The user name to use when logging in with the remote kernel.
@@ -150,6 +159,7 @@ class ProxyInvocationHandler
    */
   @SuppressWarnings("deprecation")
   ProxyInvocationHandler(
+      @Nonnull SocketFactoryProvider socketFactoryProvider,
       @Nonnull String hostName,
       int port,
       @Nonnull String userName,
@@ -157,7 +167,8 @@ class ProxyInvocationHandler
       long eventPollInterval,
       long eventPollTimeout)
       throws CredentialsException {
-    this(hostName,
+    this(socketFactoryProvider,
+         hostName,
          port,
          userName,
          password,
@@ -245,7 +256,9 @@ class ProxyInvocationHandler
     }
     try {
       // Look up the remote kernel with the RMI registry.
-      Registry registry = LocateRegistry.getRegistry(hostName, port);
+      Registry registry = LocateRegistry.getRegistry(hostName,
+                                                     port,
+                                                     socketFactoryProvider.getClientSocketFactory());
       RemoteKernel kernel = (RemoteKernel) registry.lookup(RemoteKernel.REGISTRATION_NAME);
       // Login, save the client ID and set the event filter.
       clientID = kernel.login(userName, password);

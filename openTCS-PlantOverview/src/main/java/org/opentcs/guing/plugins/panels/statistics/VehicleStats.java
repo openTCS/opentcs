@@ -137,7 +137,7 @@ class VehicleStats
     }
     lastChargingStart = 0;
   }
-  
+
   /**
    * Indicates the vehicle started waiting at the given time.
    *
@@ -147,7 +147,7 @@ class VehicleStats
     assert timestamp > 0;
     lastWaitingStart = timestamp;
   }
-  
+
   /**
    * Indicates the vehicle stopped waiting at the given time.
    *

@@ -99,10 +99,12 @@ public class TransportOrderView
     //Dispensable
     boolean dispensable = getTransportOrder().isDispensable();
     dispensableTextField.setText(Boolean.toString(dispensable));
-    
+
     if (processingVehicle != null) {
       vehicleTextField.setText(processingVehicle.getName());
     }
+
+    categoryTextField.setText(getTransportOrder().getCategory());
 
     // --- Fahraufträge ---
     // Tabelle Transportauftrag Properties
@@ -110,7 +112,7 @@ public class TransportOrderView
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("TransportOrderView.key"),
       ResourceBundleUtil.getBundle().getString("TransportOrderView.value")});
-    for(Entry<String, String> entry : getTransportOrder().getProperties().entrySet()) {
+    for (Entry<String, String> entry : getTransportOrder().getProperties().entrySet()) {
       tableModel.addRow(new String[] {entry.getKey(), entry.getValue()});
     }
     propertiesTable.setModel(tableModel);
@@ -155,7 +157,7 @@ public class TransportOrderView
       ResourceBundleUtil.getBundle().getString("TransportOrderView.key"),
       ResourceBundleUtil.getBundle().getString("TransportOrderView.value")});
     driveOrderPropertiesTable.setModel(tableModel);
-    
+
     // Route
     tableModel = new UneditableTableModel();
     tableModel.setColumnIdentifiers(new String[] {
@@ -165,9 +167,11 @@ public class TransportOrderView
 
     // --- Abhängigkeiten ---
     tableModel = new UneditableTableModel();
-    tableModel.setColumnIdentifiers(new String[] {ResourceBundleUtil.getBundle().getString("TransportOrderView.to")});
+    tableModel.setColumnIdentifiers(new String[] {
+      ResourceBundleUtil.getBundle().getString("TransportOrderView.to")});
 
-    Iterator<TCSObjectReference<TransportOrder>> iDependencies = getTransportOrder().getDependencies().iterator();
+    Iterator<TCSObjectReference<TransportOrder>> iDependencies
+        = getTransportOrder().getDependencies().iterator();
     TCSObjectReference<TransportOrder> refTransportOrder;
 
     while (iDependencies.hasNext()) {
@@ -223,7 +227,7 @@ public class TransportOrderView
     for (Entry<String, String> entry : o.getDestination().getProperties().entrySet()) {
       m2.addRow(new String[] {entry.getKey(), entry.getValue()});
     }
-    
+
     Route route = o.getRoute();
 
     if (route == null) {
@@ -273,6 +277,8 @@ public class TransportOrderView
     vehicleTextField = new javax.swing.JTextField();
     dispensableLabel = new javax.swing.JLabel();
     dispensableTextField = new javax.swing.JTextField();
+    categoryLabel = new javax.swing.JLabel();
+    categoryTextField = new javax.swing.JTextField();
     propertiesPanel = new javax.swing.JPanel();
     propertiesScrollPane = new javax.swing.JScrollPane();
     propertiesTable = new javax.swing.JTable();
@@ -328,8 +334,8 @@ public class TransportOrderView
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     generalPanel.add(createdLabel, gridBagConstraints);
 
-    createdTextField.setColumns(10);
     createdTextField.setEditable(false);
+    createdTextField.setColumns(10);
     createdTextField.setFont(createdTextField.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -348,8 +354,8 @@ public class TransportOrderView
     gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
     generalPanel.add(finishedLabel, gridBagConstraints);
 
-    finishedTextField.setColumns(10);
     finishedTextField.setEditable(false);
+    finishedTextField.setColumns(10);
     finishedTextField.setFont(finishedTextField.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 3;
@@ -418,6 +424,26 @@ public class TransportOrderView
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
     generalPanel.add(dispensableTextField, gridBagConstraints);
+
+    categoryLabel.setFont(categoryLabel.getFont());
+    categoryLabel.setText(bundle.getString("TransportOrderView.category")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
+    generalPanel.add(categoryLabel, gridBagConstraints);
+
+    categoryTextField.setEditable(false);
+    categoryTextField.setColumns(10);
+    categoryTextField.setFont(categoryTextField.getFont());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 3;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.5;
+    generalPanel.add(categoryTextField, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -580,6 +606,8 @@ public class TransportOrderView
     add(driveOrdersPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JLabel categoryLabel;
+  private javax.swing.JTextField categoryTextField;
   private javax.swing.JLabel costsLabel;
   private javax.swing.JTextField costsTextField;
   private javax.swing.JLabel createdLabel;

@@ -17,10 +17,10 @@ import org.opentcs.access.Kernel;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface KernelStateHandler {
-  
+
   /**
    * Informs the handler that the kernel is now in the given state.
-   * 
+   *
    * @param state The new state.
    */
   void enterKernelState(Kernel.State state);

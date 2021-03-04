@@ -128,14 +128,14 @@ public class ModelJAXBReader
         else {
           //Gather log information and log/store it in the errors
           Location loc = listener.getLocation(courseElement);
-          Object[] args = new Object[] {loc.getLineNumber(),
-                                        loc.getColumnNumber(),
-                                        model.getClass().getSimpleName(),
-                                        model.getName()};
           String validationErrors = validator.getErrors().stream()
               .collect(Collectors.joining("\n  "));
-          String message = MessageFormatter.arrayFormat(
-              "[Row {},Column {}] Invalid {}: \n  " + validationErrors, args).getMessage();
+          String message = ResourceBundleUtil.getBundle()
+              .getFormatted("ModelJAXBReader.error.header",
+                            loc.getLineNumber(),
+                            loc.getColumnNumber(),
+                            model.getClass().getSimpleName(),
+                            validationErrors);
           LOG.warn(message);
           errors.add(message);
           validator.resetErrors();

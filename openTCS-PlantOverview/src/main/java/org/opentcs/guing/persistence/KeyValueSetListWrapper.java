@@ -21,7 +21,8 @@ import org.opentcs.guing.persistence.CourseObjectProperty.KeyValueCourseProperty
  * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 @XmlRootElement(name = "keyValueSetEntries")
-public class KeyValueSetListWrapper extends ArrayList<KeyValueCourseProperty> {
+public class KeyValueSetListWrapper
+    extends ArrayList<KeyValueCourseProperty> {
 
   @XmlElement(name = "keyValueProperty")
   public List<KeyValueCourseProperty> getEntries() {

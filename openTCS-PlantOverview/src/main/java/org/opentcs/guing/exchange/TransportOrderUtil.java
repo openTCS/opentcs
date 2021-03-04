@@ -70,15 +70,17 @@ public class TransportOrderUtil {
    * @param destModels The locations or points to visit.
    * @param actions The actions to execute.
    * @param deadline The deadline.
-   * @param vModel The vehicle that shall execute this order. Pass
-   * <code>null</code> to let the kernel determine one.
+   * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the 
+   * kernel determine one.
+   * @param category The category.
    */
   @SuppressWarnings("unchecked")
   public void createTransportOrder(List<AbstractFigureComponent> destModels,
                                    List<String> actions,
                                    long deadline,
-                                   VehicleModel vModel) {
-    createTransportOrder(destModels, actions, new ArrayList<>(), deadline, vModel);
+                                   VehicleModel vModel,
+                                   String category) {
+    createTransportOrder(destModels, actions, new ArrayList<>(), deadline, vModel, category);
   }
 
   /**
@@ -88,15 +90,17 @@ public class TransportOrderUtil {
    * @param actions The actions to execute.
    * @param propertiesList The properties for each destination.
    * @param deadline The deadline.
-   * @param vModel The vehicle that shall execute this order. Pass
-   * <code>null</code> to let the kernel determine one.
+   * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the 
+   * kernel determine one.
+   * @param category The category.
    */
   @SuppressWarnings("unchecked")
   public void createTransportOrder(List<AbstractFigureComponent> destModels,
                                    List<String> actions,
                                    List<Map<String, String>> propertiesList,
                                    long deadline,
-                                   VehicleModel vModel) {
+                                   VehicleModel vModel,
+                                   String category) {
     requireNonNull(destModels, "locations");
     requireNonNull(actions, "actions");
     requireNonNull(propertiesList, "propertiesList");
@@ -127,13 +131,14 @@ public class TransportOrderUtil {
         }
         destinations.add(destination);
       }
-
+      
       TransportOrder tOrder = client.getKernel()
           .createTransportOrder(new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
                                                              destinations)
               .setDeadline(ZonedDateTime.ofInstant(Instant.ofEpochMilli(deadline),
                                                    ZoneId.systemDefault()))
-              .setIntendedVehicleName(vModel == null ? null : vModel.getName()));
+              .setIntendedVehicleName(vModel == null ? null : vModel.getName())
+              .setCategory(category));
 
       client.getKernel().activateTransportOrder(tOrder.getReference());
     }
@@ -158,6 +163,7 @@ public class TransportOrderUtil {
               .setIntendedVehicleName(pattern.getIntendedVehicle() == null
                   ? null
                   : pattern.getIntendedVehicle().getName())
+              .setCategory(pattern.getCategory())
               .setProperties(pattern.getProperties()));
 
       client.getKernel().activateTransportOrder(tOrder.getReference());

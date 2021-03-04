@@ -9,13 +9,13 @@
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentcs.guing.util.ResourceBundleUtil;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A table model for drive orders.
@@ -26,15 +26,11 @@ class DriveOrderTableModel
     extends AbstractTableModel {
 
   /**
-   * This class's Logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(DriveOrderTableModel.class);
-  /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    "Location",
-    "Operation"
+    ResourceBundleUtil.getBundle().getString("location.description"),
+    ResourceBundleUtil.getBundle().getString("operation.description")
   };
   /**
    * The column classes.
@@ -49,36 +45,27 @@ class DriveOrderTableModel
   private final List<DriveOrderStructure> driveOrderDataList = new ArrayList<>();
 
   /**
-   * Creates a new DriveOrderTableModel.
+   * Creates a new instance.
    *
-   * @param list A list with the current <code>DriveOrderStructure</code>s
+   * @param driveOrders The actual list of drive orders.
    */
-  public DriveOrderTableModel(List<DriveOrderStructure> list) {
-    super();
-    Objects.requireNonNull(list);
-    for (DriveOrderStructure curDOS : list) {
+  public DriveOrderTableModel(List<DriveOrderStructure> driveOrders) {
+    requireNonNull(driveOrders, "driveOrders");
+
+    for (DriveOrderStructure curDOS : driveOrders) {
       driveOrderDataList.add(curDOS);
     }
-    fireTableDataChanged();
+  }
+  
+  /**
+   * Creates a new instance.
+   */
+  public DriveOrderTableModel() {
   }
 
   @Override
   public int getRowCount() {
     return driveOrderDataList.size();
-  }
-
-  /**
-   * Removes the DriveOrderStructure at the given index.
-   * Does nothing if <code>row</code> is not in scope.
-   *
-   * @param row Index which DriveOrderStructure shall be removed
-   */
-  public void removeData(int row) {
-    if (row < 0 || row >= driveOrderDataList.size()) {
-      return;
-    }
-    driveOrderDataList.remove(row);
-    fireTableDataChanged();
   }
 
   @Override
@@ -108,20 +95,13 @@ class DriveOrderTableModel
       case 1:
         return data.getDriveOrderVehicleOperation();
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
   @Override
   public String getColumnName(int columnIndex) {
-    try {
-      return COLUMN_NAMES[columnIndex];
-    }
-    catch (ArrayIndexOutOfBoundsException exc) {
-      LOG.warn("Invalid columnIndex", exc);
-      return "FEHLER";
-    }
+    return COLUMN_NAMES[columnIndex];
   }
 
   @Override
@@ -137,8 +117,7 @@ class DriveOrderTableModel
       case 1:
         return true;
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
@@ -160,18 +139,17 @@ class DriveOrderTableModel
         data.setDriveOrderVehicleOperation((String) aValue);
         break;
       default:
-        throw new IllegalArgumentException("Unhandled columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Unhandled columnIndex: " + columnIndex);
     }
   }
 
   /**
-   * Returns the list containing all <code>DriveOrderStructure</code>s.
+   * Returns this model's complete content.
    *
-   * @return the list containing all <code>DriveOrderStructure</code>s.
+   * @return This model's complete content. The result list is unmodifiable.
    */
-  public List<DriveOrderStructure> getList() {
-    return driveOrderDataList;
+  public List<DriveOrderStructure> getContent() {
+    return Collections.unmodifiableList(driveOrderDataList);
   }
 
   /**
@@ -188,12 +166,28 @@ class DriveOrderTableModel
   }
 
   /**
-   * Adds a new DriveOrderStructure.
+   * Adds drive order data to the end of the model/list.
    *
-   * @param dos The new drive order structure
+   * @param driveOrder The new drive order data
    */
-  public void addData(DriveOrderStructure dos) {
-    Objects.requireNonNull(dos);
-    driveOrderDataList.add(dos);
+  public void addData(DriveOrderStructure driveOrder) {
+    requireNonNull(driveOrder, "driveOrder");
+
+    driveOrderDataList.add(driveOrder);
+    fireTableDataChanged();
+  }
+
+  /**
+   * Removes the DriveOrderStructure at the given index.
+   * Does nothing if <code>row</code> is not in scope.
+   *
+   * @param row Index which DriveOrderStructure shall be removed
+   */
+  public void removeData(int row) {
+    if (row < 0 || row >= driveOrderDataList.size()) {
+      return;
+    }
+    driveOrderDataList.remove(row);
+    fireTableDataChanged();
   }
 }

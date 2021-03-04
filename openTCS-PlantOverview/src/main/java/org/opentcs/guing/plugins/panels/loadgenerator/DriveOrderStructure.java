@@ -15,7 +15,7 @@ import org.opentcs.data.model.Location;
  * This class provides the data structure for storing
  * and holding the elements typically drive order consists of:
  * location and available operation type at this location.
- * 
+ *
  * @author Iryna Felko (Fraunhofer IML)
  */
 public class DriveOrderStructure {
@@ -57,6 +57,7 @@ public class DriveOrderStructure {
 
   /**
    * Returns a reference to the location.
+   *
    * @return The reference to the location.
    */
   public TCSObjectReference<Location> getDriveOrderLocation() {
@@ -65,7 +66,7 @@ public class DriveOrderStructure {
 
   /**
    * Sets the location of this order.
-   * 
+   *
    * @param loc The new location
    */
   public void setDriveOrderLocation(TCSObjectReference<Location> loc) {
@@ -74,7 +75,7 @@ public class DriveOrderStructure {
 
   /**
    * Sets the vehicle operation of this order.
-   * 
+   *
    * @param op The new operation
    */
   public void setDriveOrderVehicleOperation(String op) {
@@ -83,6 +84,7 @@ public class DriveOrderStructure {
 
   /**
    * Returns this drive order's operation type.
+   *
    * @return The drive order's operation type.
    */
   public String getDriveOrderVehicleOperation() {

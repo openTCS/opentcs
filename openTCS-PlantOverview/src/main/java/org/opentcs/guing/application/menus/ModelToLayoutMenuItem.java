@@ -142,7 +142,7 @@ public class ModelToLayoutMenuItem
     else {
       spy = (StringProperty) model.getProperty(ElementPropKeys.LOC_POS_Y);
     }
-    spy.setText(String.valueOf(modelProperty.getValue()));
+    spy.setText(String.valueOf(((Number) modelProperty.getValue()).intValue()));
     spy.markChanged();
     cua.snapShotAfterModification();
     undoRedoManager.addEdit(cua);
@@ -168,7 +168,7 @@ public class ModelToLayoutMenuItem
     else {
       spx = (StringProperty) model.getProperty(ElementPropKeys.LOC_POS_X);
     }
-    spx.setText(String.valueOf(modelProperty.getValue()));
+    spx.setText(String.valueOf(((Number) modelProperty.getValue()).intValue()));
     spx.markChanged();
     cua.snapShotAfterModification();
     undoRedoManager.addEdit(cua);

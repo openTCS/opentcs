@@ -9,12 +9,16 @@ package org.opentcs.data.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
@@ -97,6 +101,11 @@ public class Vehicle
    * A reference to the order sequence this vehicle is currently processing.
    */
   private TCSObjectReference<OrderSequence> orderSequence;
+  /**
+   * The set of transport order categories this vehicle can process.
+   */
+  private Set<String> processableCategories
+      = new HashSet<>(Arrays.asList(OrderConstants.CATEGORY_NONE));
   /**
    * The index of the last route step travelled for the current drive order of the current transport
    * order.
@@ -194,6 +203,7 @@ public class Vehicle
                   ProcState procState,
                   TCSObjectReference<TransportOrder> transportOrder,
                   TCSObjectReference<OrderSequence> orderSequence,
+                  Set<String> processableCategories,
                   int routeProgressIndex,
                   VehicleCommAdapter.State adapterState,
                   State state,
@@ -216,6 +226,7 @@ public class Vehicle
     this.procState = requireNonNull(procState, "procState");
     this.transportOrder = transportOrder;
     this.orderSequence = orderSequence;
+    this.processableCategories = requireNonNull(processableCategories, "processableCategories");
     this.routeProgressIndex = routeProgressIndex;
     this.adapterState = requireNonNull(adapterState, "adapterState");
     this.state = requireNonNull(state, "state");
@@ -246,6 +257,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -271,6 +283,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -327,6 +340,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -418,6 +432,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -478,6 +493,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -533,6 +549,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -585,6 +602,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -639,6 +657,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -693,6 +712,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -755,6 +775,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -818,6 +839,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -877,6 +899,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -933,6 +956,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -989,6 +1013,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1045,6 +1070,47 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
+                       routeProgressIndex,
+                       adapterState,
+                       state,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices);
+  }
+
+  /**
+   * Returns the set of categories this vehicle can process.
+   *
+   * @return The set of categories this vehicle can process.
+   */
+  public Set<String> getProcessableCategories() {
+    return processableCategories;
+  }
+
+  /**
+   * Creates a copy of this object, with the given set of processable categories.
+   *
+   * @param processableCategories The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withProcessableCategories(Set<String> processableCategories) {
+    return new Vehicle(getIdWithoutDeprecationWarning(),
+                       getName(),
+                       getProperties(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1099,6 +1165,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1152,6 +1219,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1205,6 +1273,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1261,6 +1330,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1322,6 +1392,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,
@@ -1368,6 +1439,7 @@ public class Vehicle
                        procState,
                        transportOrder,
                        orderSequence,
+                       processableCategories,
                        routeProgressIndex,
                        adapterState,
                        state,

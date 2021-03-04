@@ -21,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -38,6 +37,7 @@ import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.components.tree.TreeViewManager;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Ein Fahrzeug im {@link AllVehiclesPanel}.

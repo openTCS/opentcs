@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.jhotdraw.app.Application;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * The plant overview application's entry point.
@@ -58,14 +59,17 @@ public class PlantOverviewStarter {
   }
 
   public void startPlantOverview() {
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     opentcsView.init();
     opentcsView.switchPlantOverviewState(initialMode());
     progressIndicator.initialize();
-    progressIndicator.setProgress(0, "Start openTCS visualization");
+    progressIndicator.setProgress(0, bundle.getString(
+                                  "PlantOverviewStarter.progress.startPlantOverview"));
     // XXX We currently do this to iteratively eliminate (circular) references
     // to the OpenTCSView instance. This should eventually go away.
     OpenTCSView.setInstance(opentcsView);
-    progressIndicator.setProgress(5, "Launch openTCS visualization application");
+    progressIndicator.setProgress(5, bundle.getString(
+                                  "PlantOverviewStarter.progress.showPlantOverview"));
     opentcsView.setApplication(application);
     // Start the view.
     application.show(opentcsView);

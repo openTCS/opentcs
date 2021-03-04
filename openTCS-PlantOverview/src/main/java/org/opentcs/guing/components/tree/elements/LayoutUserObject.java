@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
@@ -29,7 +28,10 @@ public class LayoutUserObject
   /**
    * Creates a new instance.
    *
-   * @param model The corresponding data object.
+   * @param model The corresponding data object
+   * @param view The openTCS view
+   * @param editor The drawing editor
+   * @param modelManager The model manager
    */
   @Inject
   public LayoutUserObject(@Assisted LayoutModel model,

@@ -85,7 +85,7 @@ public interface TreeView {
    * @return <code>true</code> if it has some.
    */
   boolean hasBufferedObjects();
-  
+
   /**
    * Returns the dragged user object.
    *

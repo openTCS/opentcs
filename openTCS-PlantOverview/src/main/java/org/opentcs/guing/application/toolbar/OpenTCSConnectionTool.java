@@ -18,7 +18,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * A tool to connect two figures with a path for instance.
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class OpenTCSConnectionTool
@@ -62,13 +62,15 @@ public class OpenTCSConnectionTool
         }
 
         @Override
-        public void undo() throws CannotUndoException {
+        public void undo()
+            throws CannotUndoException {
           super.undo();
           addedDrawing.remove(addedFigure);
         }
 
         @Override
-        public void redo() throws CannotRedoException {
+        public void redo()
+            throws CannotRedoException {
           super.redo();
           addedDrawing.add(addedFigure);
         }

@@ -16,12 +16,12 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.rmi.KernelProxy;
 import org.opentcs.access.rmi.KernelProxyBuilder;
 import org.opentcs.access.rmi.KernelUnavailableException;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The default implementation of {@link KernelProxyManager}, providing a single
- * kernel proxy.
+ * The default implementation of {@link KernelProxyManager}, providing a single kernel proxy.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -37,6 +37,10 @@ class DefaultKernelProxyManager
    * Builds kernel proxies.
    */
   private final KernelProxyBuilder kernelProxyBuilder;
+  /**
+   * Provides socket factories used to create RMI registries.
+   */
+  private final SocketFactoryProvider socketFactoryProvider;
   /**
    * A reference to the kernel connected to.
    * <code>null</code> if no connection is currently established.
@@ -57,14 +61,19 @@ class DefaultKernelProxyManager
    * Creates a new instance of KernelProxy.
    */
   @Inject
-  DefaultKernelProxyManager(KernelProxyBuilder kernelProxyBuilder) {
+  DefaultKernelProxyManager(KernelProxyBuilder kernelProxyBuilder,
+                            SocketFactoryProvider socketFactoryProvider) {
     this.kernelProxyBuilder = requireNonNull(kernelProxyBuilder, "kernelProxyBuilder");
+    this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
   }
 
   @Override
   public boolean connect(String host, int port) {
     try {
-      kernelProxy = kernelProxyBuilder.setHost(host).setPort(port).build();
+      kernelProxy = kernelProxyBuilder.setSocketFactoryProvider(socketFactoryProvider)
+          .setHost(host)
+          .setPort(port)
+          .build();
       this.host = host;
       this.port = port;
     }

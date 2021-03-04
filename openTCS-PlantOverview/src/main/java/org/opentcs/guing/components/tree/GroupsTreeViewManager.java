@@ -22,6 +22,13 @@ import org.opentcs.guing.model.ModelComponent;
 public class GroupsTreeViewManager
     extends TreeViewManager {
 
+  /**
+   * Creates a new instance.
+   *
+   * @param treeView The tree view
+   * @param userObjectUtil The user object util
+   * @param mouseListener The mouse listener
+   */
   @Inject
   public GroupsTreeViewManager(TreeView treeView,
                                UserObjectUtil userObjectUtil,
@@ -32,8 +39,8 @@ public class GroupsTreeViewManager
   @Override
   public void addItem(Object parent, ModelComponent item) {
     if (item.isTreeViewVisible()) {
-      UserObjectContext context = 
-          userObjectUtil.createContext(UserObjectContext.ContextType.GROUP);
+      UserObjectContext context
+          = userObjectUtil.createContext(UserObjectContext.ContextType.GROUP);
       getTreeView().addItem(parent, userObjectUtil.createUserObject(item, context));
     }
   }

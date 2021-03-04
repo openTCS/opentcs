@@ -66,9 +66,9 @@ public class EditDriveOrderPanel
   public EditDriveOrderPanel(List<LocationModel> locations,
                              AbstractFigureComponent location, String action) {
     checkArgument(location instanceof PointModel || location instanceof LocationModel,
-                  String.format("Selected location has to be of type PointModel or "
-                      + "LocationModel and not %s.",
-                                location.getClass()));
+                  ResourceBundleUtil.getBundle()
+                      .getFormatted("EditDriveOrderPanel.wrongLocationMessage",
+                                    location.getClass().getName()));
     initComponents();
     fLocations = sortLocations(locations);
     fSelectedLocation = location;

@@ -372,6 +372,11 @@ public interface RemoteKernel
       throws CredentialsException, ObjectUnknownException, RemoteException;
 
   @CallPermissions({UserPermission.MODIFY_MODEL})
+  void setVehicleProcessableCategories(ClientID clientID, TCSObjectReference<Vehicle> ref,
+                                             Set<String> processableCategories)
+      throws CredentialsException, ObjectUnknownException, RemoteException;
+
+  @CallPermissions({UserPermission.MODIFY_MODEL})
   void removeVehicle(ClientID clientID, TCSObjectReference<Vehicle> ref)
       throws CredentialsException, ObjectUnknownException, RemoteException;
 

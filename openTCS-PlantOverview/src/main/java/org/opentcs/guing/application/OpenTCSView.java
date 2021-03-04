@@ -31,17 +31,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -52,7 +49,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -85,7 +81,6 @@ import org.opentcs.guing.application.action.ToolBarManager;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.application.action.file.CloseFileAction;
-import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.application.toolbar.PaletteToolBarBorder;
 import org.opentcs.guing.components.dialogs.VehiclesPanel;
 import org.opentcs.guing.components.dockable.DockableHandlerFactory;
@@ -100,7 +95,6 @@ import org.opentcs.guing.components.drawing.course.OriginChangeListener;
 import org.opentcs.guing.components.drawing.figures.BitmapFigure;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
-import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.components.drawing.figures.TCSFigure;
@@ -169,6 +163,7 @@ import org.opentcs.guing.util.UserMessageHelper;
 import org.opentcs.util.UniqueStringGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Visualizes the driving course and other kernel objects as well as messages
@@ -191,7 +186,8 @@ public class OpenTCSView
   /**
    * Copyright information.
    */
-  public static final String COPYRIGHT = "Copyright (c) 2012 - 2017 by Fraunhofer IML";
+  public static final String COPYRIGHT
+      = ResourceBundleUtil.getBundle().getString("openTCS.copyright");
   /**
    * Property key for the kernel's current mode of operation.
    */
@@ -329,10 +325,6 @@ public class OpenTCSView
    */
   private final Provider<ViewActionMap> actionMapProvider;
   /**
-   * A provider for the menu bar.
-   */
-  private final Provider<ApplicationMenuBar> menuBarProvider;
-  /**
    * A provider for the tool bar manager.
    */
   private final Provider<ToolBarManager> toolBarManagerProvider;
@@ -364,10 +356,6 @@ public class OpenTCSView
    * A factory for handlers related to dockables.
    */
   private final DockableHandlerFactory dockableHandlerFactory;
-  /**
-   * The application frame's menu bar.
-   */
-  private ApplicationMenuBar fMenuBar;
   /**
    * Provides the application's tool bars.
    */
@@ -411,7 +399,6 @@ public class OpenTCSView
    * @param vehiclesPanel A panel showing all the vehicles in the system model.
    * @param userObjectUtil A factory for UserObject instances.
    * @param actionMapProvider A provider for ActionMaps.
-   * @param menuBarProvider A provider for the menu bar.
    * @param toolBarManagerProvider A provider for the tool bar manager.
    * @param propertiesPanelFactory A factory for properties-related panels.
    * @param toContainerPanelProvider A provider for panels showing the transport orders.
@@ -446,7 +433,6 @@ public class OpenTCSView
                      VehiclesPanel vehiclesPanel,
                      UserObjectUtil userObjectUtil,
                      Provider<ViewActionMap> actionMapProvider,
-                     Provider<ApplicationMenuBar> menuBarProvider,
                      Provider<ToolBarManager> toolBarManagerProvider,
                      PropertiesPanelFactory propertiesPanelFactory,
                      Provider<TransportOrdersContainerPanel> toContainerPanelProvider,
@@ -482,7 +468,6 @@ public class OpenTCSView
     this.vehiclesPanel = requireNonNull(vehiclesPanel, "vehiclesPanel");
     this.userObjectUtil = requireNonNull(userObjectUtil, "userObjectUtil");
     this.actionMapProvider = requireNonNull(actionMapProvider, "actionMapProvider");
-    this.menuBarProvider = requireNonNull(menuBarProvider, "menuBarProvider");
     this.toolBarManagerProvider = requireNonNull(toolBarManagerProvider, "toolBarManagerProvider");
     this.propertiesPanelFactory = requireNonNull(propertiesPanelFactory, "propertiesPanelFactory");
     this.toContainerPanelProvider = requireNonNull(toContainerPanelProvider,
@@ -499,14 +484,15 @@ public class OpenTCSView
 
   @Override // AbstractView
   public void init() {
-    progressIndicator.setProgress(10, "openTCS view initialized");
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    progressIndicator.setProgress(10, bundle.getString("OpenTCSView.progress.initialized"));
 
     fDrawingEditor.setDrawingEditorListener(new DrawingEditorEventHandler(fModelManager));
 
     // Hide the block folder in the generic components tree.
     fComponentsTreeManager.setComponentFilter(new BlockFolderFilter());
 
-    progressIndicator.setProgress(15, "Initialize system model");
+    progressIndicator.setProgress(15, bundle.getString("OpenTCSView.progress.loadModel"));
     setSystemModel(fModelManager.getModel());
 
     // Properties view (lower left corner)
@@ -520,7 +506,6 @@ public class OpenTCSView
     fComponentsTreeManager.addMouseMotionListener(listener);
 
     setActionMap(actionMapProvider.get());
-    this.fMenuBar = menuBarProvider.get();
     this.toolBarManager = toolBarManagerProvider.get();
     initializeFrame();
     createEmptyModel();
@@ -608,8 +593,7 @@ public class OpenTCSView
     DrawingViewScrollPane newScrollPane
         = drawingViewFactory.createDrawingView(fModelManager.getModel(),
                                                toolBarManager.getSelectionToolButton(),
-                                               toolBarManager.getDragToolButton(),
-                                               this);
+                                               toolBarManager.getDragToolButton());
 
     int drawingViewIndex = viewManager.getNextDrawingViewIndex();
 
@@ -703,7 +687,8 @@ public class OpenTCSView
     DefaultSingleCDockable newDockable
         = dockingManager.createDockable("orderSequences" + biggestIndex,
                                         bundle.getString(
-                                            "OpenTCSView.tab.transportOrderSequences") + " " + biggestIndex,
+                                            "OpenTCSView.tab.transportOrderSequences")
+                                        + " " + biggestIndex,
                                         panel, true);
     viewManager.putOrderSequenceView(newDockable, panel);
 
@@ -846,50 +831,6 @@ public class OpenTCSView
     setHasUnsavedChanges(true);
   }
 
-  public JMenuBar getMenuBar() {
-    return fMenuBar;
-  }
-
-  /**
-   * Informs locations the theme has changed and they have to repaint:
-   * <ul>
-   * <li>If an update is triggered by a {@link LocationTypeModel} (e.g. a LocationType's symbol has
-   * changed), all Locations associated to this LocationType are updated.</li>
-   * <li>If an update is triggered by a {@link LocationModel} (e.g. a Location's symbol has
-   * changed), only that Location is updated.</li>
-   * <li>If the {@code triggeringComponent} is {@code null}, all Locations are updated.</li>
-   * </ul>
-   *
-   * @param triggerComponent The {@link ModelComponent} triggering the update.
-   */
-  public void updateLocationThemes(@Nullable ModelComponent triggerComponent) {
-    if (triggerComponent instanceof LocationTypeModel) {
-      updateFilteredLocationThemes(figure -> figure.getPresentationFigure().getModel()
-          .getLocationType().equals((LocationTypeModel) triggerComponent));
-    }
-    else if (triggerComponent instanceof LocationModel) {
-      updateFilteredLocationThemes(figure -> figure.getPresentationFigure().getModel()
-          .equals((LocationModel) triggerComponent));
-    }
-    else {
-      // Update all location themes
-      updateFilteredLocationThemes(figure -> true);
-    }
-  }
-
-  private void updateFilteredLocationThemes(Predicate<LabeledLocationFigure> locationFilter) {
-    fDrawingEditor.getDrawingViews().stream()
-        .flatMap(drawView -> drawView.getDrawing().getChildren().stream())
-        .filter(figure -> figure instanceof LabeledLocationFigure)
-        .map(figure -> (LabeledLocationFigure) figure)
-        .filter(locationFilter)
-        .forEach(figure -> {
-          figure.propertiesChanged(
-              new AttributesChangeEvent(attributesEventHandler,
-                                        figure.getPresentationFigure().getModel()));
-        });
-  }
-
   /**
    * Logs a message to the status text area.
    *
@@ -1012,6 +953,7 @@ public class OpenTCSView
       String loadMsg = bundle.getFormatted("kernelPeristence.modelLoaded", modelName);
       statusPanel.setLogMessage(Level.INFO, loadMsg);
     }
+    progressIndicator.setProgress(70, bundle.getString("loadCurrentKernelModel.displayModel"));
     SystemModel restoredModel = fModelManager.getModel();
 
     eventBus.publish(new SystemModelTransitionEvent(this,
@@ -1019,6 +961,7 @@ public class OpenTCSView
 
     // Step 3: Let components set themselves up for the new model.
     setSystemModel(restoredModel);
+    progressIndicator.setProgress(80, bundle.getString("loadCurrentKernelModel.showDirectoryTree"));
     // Sort the tree
     fComponentsTreeManager.sortItems();
 
@@ -1417,9 +1360,6 @@ public class OpenTCSView
     if (figure != null) {
       drawingView.toggleSelection(figure);
     }
-    else {
-      editingOptions(Collections.singleton(modelComponent));
-    }
   }
 
   @Override// GuiManager
@@ -1701,35 +1641,6 @@ public class OpenTCSView
     addModelComponent(fModelManager.getModel().getFolder(model), model);
 
     return model;
-  }
-
-  /**
-   * Checks if the selected tree object can be edited.
-   *
-   * @param dataObjects The data objects that need editing.
-   */
-  public void editingOptions(Set<ModelComponent> dataObjects) {
-    if (dataObjects == null || dataObjects.isEmpty()) {
-      if (appState.hasOperationMode(OperationMode.MODELLING)
-          && (getActiveDrawingView().hasBufferedFigures()
-              || fComponentsTreeManager.hasBufferedObjects())) {
-//        fActionManager.changeEditMenuEnablePaste();
-      }
-      else {
-//        fActionManager.changeEditMenu(false);
-      }
-    }
-    else {
-//      fActionManager.changeEditMenu(false);
-      for (ModelComponent dataObject : dataObjects) {
-        if (dataObject instanceof PointModel
-            || dataObject instanceof LocationModel
-            || dataObject instanceof LocationTypeModel
-            || dataObject instanceof VehicleModel) {
-//          fActionManager.changeEditMenu(true);
-        }
-      }
-    }
   }
 
   private OpenTCSDrawingView getActiveDrawingView() {
@@ -2246,10 +2157,9 @@ public class OpenTCSView
       }
 
       if (model instanceof LayoutModel) {
-        // Ma�stabs�nderung behandeln
+        // Handle scale changes.
         LengthProperty pScaleX = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
         LengthProperty pScaleY = (LengthProperty) model.getProperty(LayoutModel.SCALE_Y);
-        updateLocationThemes(null);
 
         if (pScaleX.hasChanged() || pScaleY.hasChanged()) {
           double scaleX = (double) pScaleX.getValue();
@@ -2257,7 +2167,6 @@ public class OpenTCSView
 
           if (scaleX != 0.0 && scaleY != 0.0) {
             fModelManager.getModel().getDrawingMethod().getOrigin().setScale(scaleX, scaleY);
-//          fModelManager.restoreModel();  // ???
           }
         }
       }
@@ -2279,7 +2188,6 @@ public class OpenTCSView
           locModel.updateTypeProperty(fModelManager.getModel().getLocationTypeModels());
         }
       }
-//  resetSelectionTool(); ???
     }
 
     private boolean blockContainsPoint(BlockModel block, ModelComponent pointModel) {

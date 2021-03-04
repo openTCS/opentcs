@@ -31,6 +31,11 @@ public class ComponentContext
 
   private final OpenTCSView openTCSView;
 
+  /**
+   * Creates a new instance.
+   * 
+   * @param openTCSView The openTCS view
+   */
   @Inject
   public ComponentContext(OpenTCSView openTCSView) {
     this.openTCSView = Objects.requireNonNull(openTCSView, "openTCSView");

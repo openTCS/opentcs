@@ -162,8 +162,7 @@ public abstract class BasicVehicleCommAdapter
    */
   @Override
   public synchronized void enable() {
-    if (enabled) {
-      LOG.debug("{}: Already enabled, doing nothing.", getName());
+    if (isEnabled()) {
       return;
     }
     connectVehicle();
@@ -183,8 +182,7 @@ public abstract class BasicVehicleCommAdapter
    */
   @Override
   public synchronized void disable() {
-    if (!enabled) {
-      LOG.debug("{}: Not enabled, doing nothing.", getName());
+    if (!isEnabled()) {
       return;
     }
     disconnectVehicle();

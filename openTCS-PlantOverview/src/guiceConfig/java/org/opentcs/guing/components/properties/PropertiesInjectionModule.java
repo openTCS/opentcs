@@ -18,6 +18,7 @@ import org.opentcs.guing.components.properties.panel.CoursePointPropertyEditorPa
 import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValueSetPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.LinkActionsEditorPanel;
+import org.opentcs.guing.components.properties.panel.OrderCategoriesPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.PropertiesPanelFactory;
 import org.opentcs.guing.components.properties.panel.StringSetPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.SymbolPropertyEditorPanel;
@@ -27,6 +28,7 @@ import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
+import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 
@@ -68,6 +70,9 @@ public class PropertiesInjectionModule
     dialogContentMapBinder
         .addBinding(SymbolProperty.class)
         .to(SymbolPropertyEditorPanel.class);
+    dialogContentMapBinder
+        .addBinding(OrderCategoriesProperty.class)
+        .to(OrderCategoriesPropertyEditorPanel.class);
 
     bind(SelectionPropertiesComponent.class)
         .in(Singleton.class);

@@ -15,10 +15,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.components.properties.type.SymbolProperty;
 
 /**
  * Ein Dialog, in den eine Komponente vom Typ DialogContent zum Ändern von
@@ -188,14 +186,6 @@ public class StandardDetailsDialog
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;
-
-    // If we cancle we don't have to update any themes.
-    if (retStatus != RET_CANCEL) {
-      if (fParentComponent instanceof OpenTCSView
-          && fContent.getProperty() instanceof SymbolProperty) {
-        ((OpenTCSView) fParentComponent).updateLocationThemes(fContent.getProperty().getModel());
-      }
-    }
 
     setVisible(false);
   }

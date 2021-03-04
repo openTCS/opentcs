@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.transport;
 
 import java.awt.event.ActionEvent;
@@ -34,7 +33,7 @@ public class FilterButton
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param icon The image that the button should display
    * @param tableModel The table model to be filtered
    * @param filter The actual filter
@@ -51,7 +50,7 @@ public class FilterButton
         changed();
       }
     });
-    
+
     setSelected(true);
   }
 

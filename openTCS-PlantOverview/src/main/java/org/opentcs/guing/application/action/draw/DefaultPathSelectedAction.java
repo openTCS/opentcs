@@ -44,10 +44,10 @@ public class DefaultPathSelectedAction
   /**
    * Constructor for an action of a button in the toolbar.
    *
-   * @param editor
-   * @param tool
-   * @param popupButton
-   * @param group
+   * @param editor The drawing editor
+   * @param tool The tool
+   * @param popupButton The popup button
+   * @param group The button group
    */
   public DefaultPathSelectedAction(
       DrawingEditor editor,
@@ -67,11 +67,11 @@ public class DefaultPathSelectedAction
   /**
    * Constructor for a button inside a drop down menu of another button.
    *
-   * @param editor
-   * @param tool
-   * @param pathType
-   * @param popupButton
-   * @param group
+   * @param editor The drawing editor
+   * @param tool The tool
+   * @param pathType The path tzpe
+   * @param popupButton The popup button
+   * @param group The button group
    */
   public DefaultPathSelectedAction(
       DrawingEditor editor,
@@ -88,7 +88,7 @@ public class DefaultPathSelectedAction
     this.popupButton = popupButton;
     Objects.requireNonNull(group);
     this.group = group;
-    
+
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     putValue(AbstractAction.NAME, bundle.getString("path.type." + pathType.name() + ".text"));
     putValue(AbstractAction.SHORT_DESCRIPTION, bundle.getString("path.type." + pathType.name() + ".toolTipText"));

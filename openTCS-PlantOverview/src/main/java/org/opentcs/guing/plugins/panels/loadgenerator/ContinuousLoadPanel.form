@@ -567,11 +567,8 @@
                   <SubComponents>
                     <Component class="javax.swing.JTable" name="doTable">
                       <Properties>
-                        <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                          <Table columnCount="2" rowCount="0">
-                            <Column editable="false" title="Location" type="java.lang.Object"/>
-                            <Column editable="false" title="Operation" type="java.lang.Object"/>
-                          </Table>
+                        <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="new DriveOrderTableModel()" type="code"/>
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                           <ResourceString bundle="org/opentcs/remote/genericclient/Bundle.properties" key="Drive_orders_in_selected_transport_order" replaceFormat="bundle.getString(&quot;{key}&quot;)"/>

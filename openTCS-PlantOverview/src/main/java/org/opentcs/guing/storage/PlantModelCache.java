@@ -22,11 +22,11 @@ import org.opentcs.data.model.visualization.VisualLayout;
 
 /**
  * Caches some elements a plant model contains of.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PlantModelCache {
-  
+
   /**
    * The plant model's visual layouts.
    */

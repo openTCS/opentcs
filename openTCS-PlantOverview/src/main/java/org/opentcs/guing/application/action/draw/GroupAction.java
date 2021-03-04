@@ -1,15 +1,15 @@
 /**
  * (c): IML, JHotDraw.
- * 
+ *
  * Changed by IML to allow access to ResourceBundle.
  *
- * 
+ *
  * @(#)GroupAction.java
  *
  * Copyright (c) 1996-2010 by the original authors of JHotDraw and all its
  * contributors. All rights reserved.
  *
- * You may not use, copy or modify this file, except in compliance with the 
+ * You may not use, copy or modify this file, except in compliance with the
  * license agreement you entered into with the copyright holders. For details
  * see accompanying license terms.
  */
@@ -47,15 +47,30 @@ public class GroupAction
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The drawing editor
    */
   public GroupAction(DrawingEditor editor) {
     this(editor, new GroupFigure(), true);
   }
 
+  /**
+   * Creates a new instance.
+   *
+   * @param editor The drawing editor
+   * @param prototype The prototype figure
+   */
   public GroupAction(DrawingEditor editor, CompositeFigure prototype) {
     this(editor, prototype, true);
   }
 
+  /**
+   * Creates a new instance.
+   *
+   * @param editor The drawing editor
+   * @param prototype The prototype figure
+   * @param isGroupingAction Whether this action groups figures
+   */
   public GroupAction(DrawingEditor editor, CompositeFigure prototype, boolean isGroupingAction) {
     super(editor);
     this.prototype = prototype;
@@ -84,7 +99,7 @@ public class GroupAction
         && getView().getSelectionCount() == 1
         && prototype != null
         && getView().getSelectedFigures().iterator().next().getClass().equals(
-        prototype.getClass());
+            prototype.getClass());
   }
 
   @Override
@@ -102,13 +117,15 @@ public class GroupAction
           }
 
           @Override
-          public void redo() throws CannotRedoException {
+          public void redo()
+              throws CannotRedoException {
             super.redo();
             groupFigures(view, group, ungroupedFigures);
           }
 
           @Override
-          public void undo() throws CannotUndoException {
+          public void undo()
+              throws CannotUndoException {
             ungroupFigures(view, group);
             super.undo();
           }
@@ -135,13 +152,15 @@ public class GroupAction
           }
 
           @Override
-          public void redo() throws CannotRedoException {
+          public void redo()
+              throws CannotRedoException {
             super.redo();
             ungroupFigures(view, group);
           }
 
           @Override
-          public void undo() throws CannotUndoException {
+          public void undo()
+              throws CannotUndoException {
             groupFigures(view, group, ungroupedFigures);
             super.undo();
           }

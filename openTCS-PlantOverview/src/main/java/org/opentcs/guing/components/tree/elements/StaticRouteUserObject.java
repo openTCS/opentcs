@@ -56,6 +56,7 @@ public class StaticRouteUserObject
    *
    * @param modelComponent The corresponding model component.
    * @param appState Stores the application's current state.
+   * @param view The openTCS view.
    * @param editor The application's drawing editor.
    * @param modelManager Provides the currently loaded system model.
    * @param dialogsFactory A factory for dialogs-related components.

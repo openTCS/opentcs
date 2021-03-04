@@ -43,6 +43,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * LabeledPointFigure: PointFigure mit zugehörigem Label, das mit der Figur
@@ -110,8 +111,11 @@ public class LabeledPointFigure
   @Override
   public String getToolTipText(Point2D.Double p) {
     PointFigure pf = getPresentationFigure();
-    StringBuilder sb = new StringBuilder("<html>Point ");
-    sb.append("<b>").append(pf.getModel().getName()).append("</b>");
+    String pointDesc
+        = ResourceBundleUtil.getBundle().getString("point.description");
+    StringBuilder sb = new StringBuilder("<html>");
+    sb.append(pointDesc).append(" ").append("<b>")
+        .append(pf.getModel().getName()).append("</b>");
     // Show miscellaneous properties in tooltip
     KeyValueSetProperty property = (KeyValueSetProperty) pf.getModel().getProperty(ModelComponent.MISCELLANEOUS);
     Iterator<KeyValueProperty> items = property.getItems().iterator();

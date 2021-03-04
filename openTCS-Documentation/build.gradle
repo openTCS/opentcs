@@ -76,8 +76,16 @@ task renderDocs {
 }
 
 installDist.dependsOn renderDocs
-distTar.dependsOn renderDocs
-distZip.dependsOn renderDocs
+
+distTar {
+  dependsOn renderDocs
+  baseName = baseName.toLowerCase()
+}
+
+distZip {
+  dependsOn renderDocs
+  baseName = baseName.toLowerCase()
+}
 
 task release {
   dependsOn build

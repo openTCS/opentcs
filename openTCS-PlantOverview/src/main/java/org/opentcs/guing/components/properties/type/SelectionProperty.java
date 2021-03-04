@@ -75,7 +75,8 @@ public class SelectionProperty<E extends Enum<E>>
   @Override
   public void setValue(Object value) {
     if (fPossibleValues.contains(value)
-        || value.equals(ResourceBundleUtil.getBundle().getString("PropertiesCollection.differentValues.text"))) {
+        || value.equals(ResourceBundleUtil.getBundle()
+            .getString("PropertiesCollection.differentValues.text"))) {
       fValue = value;
     }
   }

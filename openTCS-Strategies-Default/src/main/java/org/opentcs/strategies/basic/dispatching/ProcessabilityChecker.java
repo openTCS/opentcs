@@ -73,6 +73,17 @@ public class ProcessabilityChecker {
   public boolean checkProcessability(Vehicle vehicle, TransportOrder order) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(order, "order");
+    
+    // Check for matching categories
+    if (!vehicle.getProcessableCategories().contains(order.getCategory())) {
+      LOG.debug("Vehicle {} not able to process order {} with category '{}'. Processable "
+          + "categories: {}",
+                vehicle.getName(),
+                order.getName(),
+                order.getCategory(),
+                vehicle.getProcessableCategories());
+      return false;
+    }
 
     ExplainedBoolean result = vehicleControllerPool.getVehicleController(vehicle.getName())
         .canProcess(getOperations(order));

@@ -16,12 +16,10 @@ import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.image.VolatileImage;
 import javax.inject.Inject;
-import net.engio.mbassy.bus.MBassador;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.model.ModelManager;
-import org.opentcs.guing.util.CourseObjectFactory;
 
 /**
  * Draws the drawing using a VolatileImage.
@@ -43,18 +41,14 @@ public class OpenTCSDrawingViewVolatile
    * @param appState Stores the application's current state.
    * @param opentcsView The view to be used.
    * @param modelManager Provides the current system model.
-   * @param crsObjFactory A factory for figure objects.
    * @param orderUtil A helper for creating transport orders with the kernel.
-   * @param eventBus The application's event bus.
    */
   @Inject
   public OpenTCSDrawingViewVolatile(ApplicationState appState,
                                     OpenTCSView opentcsView,
                                     ModelManager modelManager,
-                                    CourseObjectFactory crsObjFactory,
-                                    TransportOrderUtil orderUtil,
-                                    MBassador<Object> eventBus) {
-    super(appState, opentcsView, modelManager, crsObjFactory, orderUtil, eventBus);
+                                    TransportOrderUtil orderUtil) {
+    super(appState, opentcsView, modelManager, orderUtil);
   }
 
   @Override
@@ -136,7 +130,7 @@ public class OpenTCSDrawingViewVolatile
           // image was restored, but buffer lost; redraw everything
           dirtyArea.setBounds(bufferedArea);
           break;
-          
+
         default:
       }
 

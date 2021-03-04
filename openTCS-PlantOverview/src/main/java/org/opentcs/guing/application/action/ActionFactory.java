@@ -8,7 +8,15 @@
  */
 package org.opentcs.guing.application.action;
 
-import org.opentcs.guing.application.action.course.VehicleAction;
+import org.opentcs.guing.application.action.course.DispatchVehicleAction;
+import org.opentcs.guing.application.action.course.FollowVehicleAction;
+import org.opentcs.guing.application.action.course.ReleaseVehicleAction;
+import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
+import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
+import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
+import org.opentcs.guing.application.action.course.WithdrawAction;
+import org.opentcs.guing.application.action.course.WithdrawAndDisableAction;
+import org.opentcs.guing.application.action.course.WithdrawImmediatelyAction;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -18,5 +26,21 @@ import org.opentcs.guing.model.elements.VehicleModel;
  */
 public interface ActionFactory {
 
-  VehicleAction createVehicleAction(String actionId, VehicleModel model);
+  ScrollToVehicleAction createScrollToVehicleAction(VehicleModel vehicleModel);
+
+  FollowVehicleAction createFollowVehicleAction(VehicleModel vehicleModel);
+
+  SendVehicleToPointAction createSendVehicleToPointAction(VehicleModel vehicleModel);
+
+  SendVehicleToLocationAction createSendVehicleToLocationAction(VehicleModel vehicleModel);
+
+  WithdrawAction createWithdrawAction(VehicleModel vehicleModel);
+
+  WithdrawAndDisableAction createWithdrawAndDisableAction(VehicleModel vehicleModel);
+
+  WithdrawImmediatelyAction createWithdrawImmediatelyAction(VehicleModel vehicleModel);
+
+  ReleaseVehicleAction createReleaseVehicleAction(VehicleModel vehicleModel);
+
+  DispatchVehicleAction createDispatchVehicleAction(VehicleModel vehicleModel);
 }

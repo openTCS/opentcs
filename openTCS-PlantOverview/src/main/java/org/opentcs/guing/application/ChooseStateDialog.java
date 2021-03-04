@@ -121,7 +121,6 @@ class ChooseStateDialog
     doClose(OperationMode.OPERATING);
   }//GEN-LAST:event_jButton2ActionPerformed
 
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton jButton2;
   private javax.swing.JButton modellingButton;

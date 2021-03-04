@@ -162,8 +162,9 @@ public class VehicleCreationTO
     return maxReverseVelocity;
   }
 
-  public void setMaxReverseVelocity(int maxReverseVelocity) {
+  public VehicleCreationTO setMaxReverseVelocity(int maxReverseVelocity) {
     this.maxReverseVelocity = checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
+    return this;
   }
 
   /**

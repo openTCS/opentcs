@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model;
 
 import java.util.ArrayList;
@@ -86,7 +85,8 @@ public abstract class CompositeModelComponent
   }
 
   @Override
-  public CompositeModelComponent clone() throws CloneNotSupportedException {
+  public CompositeModelComponent clone()
+      throws CloneNotSupportedException {
     CompositeModelComponent clone = (CompositeModelComponent) super.clone();
     clone.fChildComponents = new ArrayList<>(fChildComponents);
     return clone;

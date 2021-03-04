@@ -20,10 +20,15 @@ import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
+import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SslSocketFactoryProvider;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.kernel.CentralEventHub;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
+import static org.opentcs.kernel.RmiKernelInterfaceConfiguration.ConnectionEncryption.NONE;
 import org.opentcs.kernel.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.persistence.ModelPersister;
@@ -193,8 +198,27 @@ public class DefaultKernelInjectionModule
   }
 
   private void configureStandardRemoteKernelDependencies() {
+    RmiKernelInterfaceConfiguration configuration
+        = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
+                                         RmiKernelInterfaceConfiguration.class);
     bind(RmiKernelInterfaceConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
-                                                   RmiKernelInterfaceConfiguration.class));
+        .toInstance(configuration);
+
+    switch (configuration.connectionEncryption()) {
+      case NONE:
+        bind(SocketFactoryProvider.class).to(NullSocketFactoryProvider.class);
+        break;
+      case SSL_UNTRUSTED:
+        bind(SocketFactoryProvider.class).to(AnonSslSocketFactoryProvider.class);
+        break;
+      case SSL:
+        bind(SocketFactoryProvider.class).to(SslSocketFactoryProvider.class);
+        break;
+      default:
+        LOG.warn("No implementation for '{}' encryption, falling back to '{}'.",
+                 configuration.connectionEncryption().name(),
+                 NONE.name());
+        bind(SocketFactoryProvider.class).to(NullSocketFactoryProvider.class);
+    }
   }
 }

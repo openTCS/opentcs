@@ -19,18 +19,43 @@ In some less common cases, you may have multiple vehicle drivers registered with
 To automatically select a specific driver in such cases, set a property with the key `tcs:preferredAdapterClass` on the vehicles, with its value being the name of the Java class implementing the driver's adapter factory.
 (If you do not know this class name, ask the developer who provided the vehicle driver to you for it.)
 
-=== Initializing a virtual vehicle's position automatically on startup
+=== Configuring a virtual vehicle's characteristics
 
-Even during the development or simulation phase of a project, repeatedly setting a virtual vehicle's initial position manually via the loopback driver's user interface can be tiresome and possibly error-prone.
-To automatically set a vehicle's initial position when the loopback driver is enabled, you can store the initial position in the respective plant model by doing the following:
+The loopback driver supports some (limited) configuration of the virtual vehicle's characteristics via properties set in the plant model.
+You can set the properties the following way:
 
-. Start the plant overview client in modelling mode.
+. Start the plant overview client in modelling mode and create or load a plant model.
 . In the plant overview client's tree view of the plant model, select a vehicle.
-. In the table showing the vehicle's properties, click into the value field labelled btn:[Initial position].
-In the dialog shown, select the initial position for this vehicle from the model's list of points.
+. In the table showing the vehicle's properties, click into the value field labelled btn:[Miscellaneous].
+  In the dialog shown, add a property key and value according to the list below.
 . Save the model and persist it in the kernel as described in <<Saving the plant model>>.
 
-Whenever you attach the loopback driver to the modified vehicle after doing this, it will automatically report the vehicle's position to be the one that you selected.
+The loopback driver interprets properties with the following keys:
+
+* `loopback:initialPosition`:
+  Set the property value to the name of a point in the plant model.
+  When started, the loopback adapter will set the virtual vehicle's current position to this.
+  (Default value: not set)
+* `loopback:acceleration`:
+  Set the property value to a positive integer representing an acceleration in mm/s^2^.
+  The loopback adapter will simulate vehicle movement with the given acceleration.
+  (Default value: 500)
+* `loopback:deceleration`:
+  Set the property value to a negative integer representing an acceleration in mm/s^2^.
+  The loopback adapter will simulate vehicle movement with the given deceleration.
+  (Default value: -500)
+* `loopback:loadOperation`:
+  Set the property value to a string representing the virtual vehicle's load operation.
+  When the virtual vehicle executes this operation, the loopback adapter will set the its load handling device's state to _full_.
+  (Default value: not set)
+* `loopback:unloadOperation`:
+  Set the property value to a string representing the virtual vehicle's unload operation.
+  When the virtual vehicle executes this operation, the loopback adapter will set its load handling device's state to _empty_.
+  (Default value: not set)
+* `loopback:operatingTime`:
+  Set the property value to a positive integer representing the virtual vehicle's operating time in milliseconds.
+  When the virtual vehicle executes an operation, the loopback adapter will simulate an operating time accordingly.
+  (Default value: 5000)
 
 === Running kernel and plant overview on separate systems
 

@@ -14,6 +14,8 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.vehicleselection.AssignedVehicleSelectionStrategy;
 import org.opentcs.strategies.basic.dispatching.vehicleselection.AvailableVehicleSelectionStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Selects vehicles for transport orders.
@@ -23,6 +25,10 @@ import org.opentcs.strategies.basic.dispatching.vehicleselection.AvailableVehicl
 public class VehicleSelector
     implements Lifecycle {
 
+  /**
+   * This class' logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleSelector.class);
   /**
    * Checks whether a specific vehicle is assigned to/intended for a given transport order.
    */
@@ -96,20 +102,24 @@ public class VehicleSelector
 
     VehicleOrderSelection result;
 
+    LOG.debug("{}: Checking if someone has a veto on this transport order...", order.getName());
     if (transportOrderSelectionVeto.test(order)) {
       return new VehicleOrderSelection(order, null, null);
     }
 
+    LOG.debug("{}: Checking for a vehicle assigned vehicle...", order.getName());
     result = assignedVehicleStrategy.selectVehicle(order);
     if (result != null) {
       return result;
     }
 
+    LOG.debug("{}: Checking for the closest vehicle available...", order.getName());
     result = availableVehicleStrategy.selectVehicle(order);
     if (result != null) {
       return result;
     }
 
+    LOG.debug("{}: No vehicle found - transport order should stay dispatchable.", order.getName());
     return new VehicleOrderSelection(order, null, null);
   }
 }

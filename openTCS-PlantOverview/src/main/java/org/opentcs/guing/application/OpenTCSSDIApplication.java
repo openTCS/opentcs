@@ -12,11 +12,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.JFrame;
 import net.engio.mbassy.listener.Handler;
 import org.jhotdraw.app.SDIApplication;
 import org.jhotdraw.app.View;
 import org.opentcs.guing.application.action.file.CloseFileAction;
+import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
@@ -35,6 +37,10 @@ public class OpenTCSSDIApplication
    */
   private final JFrame contentFrame;
   /**
+   * A provider for the menu bar.
+   */
+  private final Provider<ApplicationMenuBar> menuBarProvider;
+  /**
    * Provides the current system model.
    */
   private final ModelManager modelManager;
@@ -42,24 +48,34 @@ public class OpenTCSSDIApplication
    * The application's configuration.
    */
   private final PlantOverviewApplicationConfiguration appConfig;
+  /**
+   * Provides the application's current state.
+   */
+  private final ApplicationState appState;
 
   /**
    * Creates a new instance.
    *
    * @param frame The frame in which the OpenTCSView is to be shown.
+   * @param menuBarProvider Provides the main application menu bar.
    * @param modelManager Provides the current system model.
    * @param appConfig The application's configuration.
+   * @param appState Provides the application's current state.
    */
   @Inject
   public OpenTCSSDIApplication(@ApplicationFrame JFrame frame,
+                               Provider<ApplicationMenuBar> menuBarProvider,
                                ModelManager modelManager,
-                               PlantOverviewApplicationConfiguration appConfig) {
+                               PlantOverviewApplicationConfiguration appConfig,
+                               ApplicationState appState) {
     this.contentFrame = requireNonNull(frame, "frame");
+    this.menuBarProvider = requireNonNull(menuBarProvider, "menuBarProvider");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.appConfig = requireNonNull(appConfig, "appConfig");
+    this.appState = requireNonNull(appState, "appState");
   }
 
-  @Override // SDIApplication
+  @Override
   public void show(final View view) {
     requireNonNull(view, "view");
 
@@ -70,21 +86,14 @@ public class OpenTCSSDIApplication
 
     final OpenTCSView opentcsView = (OpenTCSView) view;
 
-    if (contentFrame != null) {
-      setupContentFrame(opentcsView);
-    }
-    // Bei Änderungen am Modell wird in der View HAS_UNSAVED_CHANGES_PROPERTY gesetzt.
-    // Beim Laden eines neuen Modells wird in der View MODELNAME_PROPERTY gesetzt.
-    // Beim Umschalten der Kernel-Betriebsart wird in der View OPERATIONMODE_PROPERTY gesetzt.
-    // Damit wird die Titelzeile aktualisiert
+    setupContentFrame(opentcsView);
+
     opentcsView.addPropertyChangeListener(new TitleUpdater(opentcsView));
     updateViewTitle(view, contentFrame);
 
     // The frame should be shown only after the view has been initialized.
     opentcsView.start();
-    if (contentFrame != null) {
-      contentFrame.setVisible(true);
-    }
+    contentFrame.setVisible(true);
   }
 
   @Override
@@ -123,14 +132,12 @@ public class OpenTCSSDIApplication
   }
 
   private void setupContentFrame(OpenTCSView opentcsView) {
-    // Das OpenTCSView-Panel in den Frame zeichnen
-    // Menu erzeugen...
-    // ... und im Frame anzeigen
-    contentFrame.setJMenuBar(opentcsView.getMenuBar());
-    // Ein Icon für den Frame
+    ApplicationMenuBar menuBar = menuBarProvider.get();
+    menuBar.setOperationMode(appState.getOperationMode());
+    contentFrame.setJMenuBar(menuBar);
+
     contentFrame.setIconImages(Icons.getOpenTCSIcons());
-    // Größe des Frames
-    contentFrame.setSize(1024, 768); // Default size
+    contentFrame.setSize(1024, 768);
 
     // Restore the window's dimensions from the configuration.
     contentFrame.setExtendedState(appConfig.frameMaximized() ? Frame.MAXIMIZED_BOTH : Frame.NORMAL);
@@ -142,9 +149,7 @@ public class OpenTCSSDIApplication
                              appConfig.frameBoundsHeight());
     }
 
-    // Action "Frame schließen" abfangen
     contentFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    // Fenster-Dimensionen beim Schließen in openTCS Configuration speichern
     contentFrame.addWindowListener(new WindowStatusUpdater(opentcsView));
   }
 
@@ -179,7 +184,6 @@ public class OpenTCSSDIApplication
 
     @Override
     public void windowClosing(WindowEvent e) {
-      // Called when the window is being closed.
       // Check if changes to the model still need to be saved.
       getAction(opentcsView, CloseFileAction.ID).actionPerformed(
           new ActionEvent(contentFrame,

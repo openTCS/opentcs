@@ -43,7 +43,8 @@ public class LocationTypeProperty
   @Override
   public void setValue(Object value) {
     if (fPossibleValues.contains(value)
-        || value.equals(ResourceBundleUtil.getBundle().getString("PropertiesCollection.differentValues.text"))) {
+        || value.equals(ResourceBundleUtil.getBundle()
+            .getString("PropertiesCollection.differentValues.text"))) {
       super.setValue(value);
     }
   }

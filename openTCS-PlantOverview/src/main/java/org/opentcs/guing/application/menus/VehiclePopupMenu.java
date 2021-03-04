@@ -11,12 +11,21 @@ package org.opentcs.guing.application.menus;
 import com.google.inject.assistedinject.Assisted;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.application.action.ActionFactory;
-import org.opentcs.guing.application.action.course.VehicleAction;
+import org.opentcs.guing.application.action.course.DispatchVehicleAction;
+import org.opentcs.guing.application.action.course.FollowVehicleAction;
+import org.opentcs.guing.application.action.course.ReleaseVehicleAction;
+import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
+import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
+import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
+import org.opentcs.guing.application.action.course.WithdrawAction;
+import org.opentcs.guing.application.action.course.WithdrawAndDisableAction;
+import org.opentcs.guing.application.action.course.WithdrawImmediatelyAction;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -44,52 +53,71 @@ public class VehiclePopupMenu
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(model, "model");
 
-    JMenuItem mi = new JMenuItem(ResourceBundleUtil.getBundle().getString("VehicleAction.vehicle") + model.getName());
+    final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+
+    JMenuItem mi = new JMenuItem(bundle.getString("VehicleAction.vehicle") + model.getName());
     // Disabled, Foreground, Background, ...
     mi.setEnabled(false);
     add(mi);
 
     addSeparator();
 
-    add(actionFactory.createVehicleAction(VehicleAction.SCROLL_TO, model));
+    Action action;
 
+    action = actionFactory.createScrollToVehicleAction(model);
+    bundle.configureAction(action, ScrollToVehicleAction.ID);
+    add(action);
+
+    action = actionFactory.createFollowVehicleAction(model);
+    bundle.configureAction(action, FollowVehicleAction.ID);
     JCheckBoxMenuItem followCheckBox = new JCheckBoxMenuItem();
-    followCheckBox.setAction(actionFactory.createVehicleAction(VehicleAction.FOLLOW, model));
+    followCheckBox.setAction(action);
     followCheckBox.setSelected(model.isViewFollows());
     add(followCheckBox);
 
     addSeparator();
 
-    VehicleAction vehicleAction;
-    vehicleAction = actionFactory.createVehicleAction(VehicleAction.SEND_TO_POINT, model);
-    vehicleAction.setEnabled(!modelManager.getModel().getPointModels().isEmpty());
-    add(vehicleAction);
-    vehicleAction = actionFactory.createVehicleAction(VehicleAction.SEND_TO_LOCATION, model);
-    vehicleAction.setEnabled(!modelManager.getModel().getLocationModels().isEmpty());
-    add(vehicleAction);
+    action = actionFactory.createSendVehicleToPointAction(model);
+    bundle.configureAction(action, SendVehicleToPointAction.ID);
+    action.setEnabled(!modelManager.getModel().getPointModels().isEmpty());
+    add(action);
+
+    action = actionFactory.createSendVehicleToLocationAction(model);
+    bundle.configureAction(action, SendVehicleToLocationAction.ID);
+    action.setEnabled(!modelManager.getModel().getLocationModels().isEmpty());
+    add(action);
 
     addSeparator();
 
-    JMenu withdrawSubMenu = new JMenu(ResourceBundleUtil.getBundle().getString(
-        "course.vehicle.withdrawTransportOrderSubMenu.text"));
+    JMenu withdrawSubMenu
+        = new JMenu(bundle.getString("course.vehicle.withdrawTransportOrderSubMenu.text"));
 
-    vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER, model);
-    vehicleAction.setEnabled(model.isAvailableForOrder());
-    withdrawSubMenu.add(vehicleAction);
-    vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_DISABLE_VEHICLE, model);
-    vehicleAction.setEnabled(model.isAvailableForOrder());
-    withdrawSubMenu.add(vehicleAction);
-    vehicleAction = actionFactory.createVehicleAction(VehicleAction.WITHDRAW_TRANSPORT_ORDER_IMMEDIATELY, model);
-    vehicleAction.setEnabled(model.isAvailableForOrder());
-    withdrawSubMenu.add(vehicleAction);
-    
+    action = actionFactory.createWithdrawAction(model);
+    bundle.configureAction(action, WithdrawAction.ID);
+    action.setEnabled(model.isAvailableForOrder());
+    withdrawSubMenu.add(action);
+
+    action = actionFactory.createWithdrawAndDisableAction(model);
+    bundle.configureAction(action, WithdrawAndDisableAction.ID);
+    action.setEnabled(model.isAvailableForOrder());
+    withdrawSubMenu.add(action);
+
+    action = actionFactory.createWithdrawImmediatelyAction(model);
+    bundle.configureAction(action, WithdrawImmediatelyAction.ID);
+    action.setEnabled(model.isAvailableForOrder());
+    withdrawSubMenu.add(action);
+
     withdrawSubMenu.addSeparator();
-    
-    withdrawSubMenu.add(actionFactory.createVehicleAction(VehicleAction.RELEASE_VEHICLE, model));
+
+    action = actionFactory.createReleaseVehicleAction(model);
+    bundle.configureAction(action, ReleaseVehicleAction.ID);
+    withdrawSubMenu.add(action);
 
     add(withdrawSubMenu);
 
-    add(actionFactory.createVehicleAction(VehicleAction.DISPATCH_VEHICLE, model));
+    action = actionFactory.createDispatchVehicleAction(model);
+    bundle.configureAction(action, DispatchVehicleAction.ID);
+    add(action);
 
   }
 

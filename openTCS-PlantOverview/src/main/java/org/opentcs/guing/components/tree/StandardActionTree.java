@@ -6,12 +6,12 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree;
 
 import org.opentcs.guing.components.EditableComponent;
 
 /**
+ * A JTree which delegates actions to it's parent.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
@@ -21,6 +21,11 @@ public class StandardActionTree
 
   private final EditableComponent parent;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param parent The parent editable component
+   */
   public StandardActionTree(EditableComponent parent) {
     this.parent = parent;
   }

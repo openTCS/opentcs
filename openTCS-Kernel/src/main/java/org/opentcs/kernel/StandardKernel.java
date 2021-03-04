@@ -742,6 +742,13 @@ final class StandardKernel
   }
 
   @Override
+  public void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
+                                              Set<String> processableCategories)
+      throws ObjectUnknownException {
+    kernelState.setVehicleProcessableCategories(ref, processableCategories);
+  }
+
+  @Override
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {

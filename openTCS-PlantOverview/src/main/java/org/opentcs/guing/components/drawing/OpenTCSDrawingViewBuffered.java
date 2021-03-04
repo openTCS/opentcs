@@ -18,13 +18,11 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import javax.inject.Inject;
-import net.engio.mbassy.bus.MBassador;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import static org.opentcs.guing.components.drawing.OpenTCSDrawingView.setViewRenderingHints;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.model.ModelManager;
-import org.opentcs.guing.util.CourseObjectFactory;
 
 /**
  * Draws the drawing using a BufferedImage.
@@ -46,18 +44,14 @@ public class OpenTCSDrawingViewBuffered
    * @param appState Stores the application's current state.
    * @param opentcsView The view to be used.
    * @param modelManager Provides the current system model.
-   * @param crsObjFactory A factory for figure objects.
    * @param orderUtil A helper for creating transport orders with the kernel.
-   * @param eventBus The application's event bus.
    */
   @Inject
   public OpenTCSDrawingViewBuffered(ApplicationState appState,
                                     OpenTCSView opentcsView,
                                     ModelManager modelManager,
-                                    CourseObjectFactory crsObjFactory,
-                                    TransportOrderUtil orderUtil,
-                                    MBassador<Object> eventBus) {
-    super(appState, opentcsView, modelManager, crsObjFactory, orderUtil, eventBus);
+                                    TransportOrderUtil orderUtil) {
+    super(appState, opentcsView, modelManager, orderUtil);
   }
 
   @Override

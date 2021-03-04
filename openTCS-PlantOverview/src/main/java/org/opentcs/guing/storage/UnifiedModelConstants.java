@@ -10,6 +10,7 @@ package org.opentcs.guing.storage;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Constants related to reading and writing the kernel's model file format.
@@ -26,6 +27,7 @@ public interface UnifiedModelConstants {
    * The file filter this persistor supports.
    */
   FileFilter DIALOG_FILE_FILTER
-      = new FileNameExtensionFilter(String.format("Kernel model files (*.%s)", FILE_ENDING_XML),
+      = new FileNameExtensionFilter(ResourceBundleUtil.getBundle()
+          .getFormatted("PlantOverview.kernelFile.name", FILE_ENDING_XML),
                                     FILE_ENDING_XML);
 }

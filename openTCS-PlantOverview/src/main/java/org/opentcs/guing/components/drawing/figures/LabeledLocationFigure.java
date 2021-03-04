@@ -18,6 +18,7 @@ import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.swing.Action;
 import org.jhotdraw.xml.DOMInput;
@@ -33,6 +34,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * LabeledLocationFigure: LocationFigure mit zugehörigem Label, das mit der
@@ -69,8 +71,11 @@ public class LabeledLocationFigure
   @Override
   public String getToolTipText(Point2D.Double p) {
     LocationFigure lf = getPresentationFigure();
-    StringBuilder sb = new StringBuilder("<html>Location ");
-    sb.append("<b>").append(lf.getModel().getName()).append("</b>");
+    String locationDesc
+        = ResourceBundleUtil.getBundle().getString("location.description");
+    StringBuilder sb = new StringBuilder("<html>");
+    sb.append(locationDesc).append(" ").append("<b>")
+        .append(lf.getModel().getName()).append("</b>");
     // Show miscellaneous properties in tooltip
     KeyValueSetProperty property = (KeyValueSetProperty) lf.getModel().getProperty(ModelComponent.MISCELLANEOUS);
     Iterator<KeyValueProperty> items = property.getItems().iterator();
@@ -82,7 +87,7 @@ public class LabeledLocationFigure
       sb.append("<br>").append(key).append(": ").append(value);
     }
 
-    sb.append("</html");
+    sb.append("</html>");
 
     return sb.toString();
   }

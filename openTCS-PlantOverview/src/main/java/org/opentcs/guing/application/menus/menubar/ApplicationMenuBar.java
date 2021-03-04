@@ -24,7 +24,6 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ApplicationMenuBar
     extends JMenuBar {
 
-  private static final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
   private final FileMenu menuFile;
   private final EditMenu menuEdit;
   private final ActionsMenu menuActions;
@@ -52,26 +51,24 @@ public class ApplicationMenuBar
     requireNonNull(menuView, "menuView");
     requireNonNull(menuHelp, "menuHelp");
 
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+
     this.menuFile = menuFile;
     labels.configureMenu(menuFile, "file");
     add(menuFile);
 
-    // --- Menu Edit ---
     this.menuEdit = menuEdit;
     labels.configureMenu(menuEdit, "edit");
     add(menuEdit);
 
-    // --- Menu Actions ---
     this.menuActions = menuActions;
     labels.configureMenu(menuActions, "actions");
     add(menuActions);
 
-    // --- Menu View ---
     this.menuView = menuView;
     labels.configureMenu(menuView, "view");
     add(menuView);
 
-    // --- Menu Help ---
     this.menuHelp = menuHelp;
     labels.configureMenu(menuHelp, "help");
     add(menuHelp);

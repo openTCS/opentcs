@@ -70,7 +70,11 @@ public interface ObjectPropConstants {
    * <p>
    * Type: String (any name of a {@link Point} existing in the same model.
    * </p>
+   * 
+   * @deprecated Use vehicle driver-specific properties to specify the vehicle's initial position.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   String VEHICLE_INITIAL_POSITION = "tcs:initialVehiclePosition";
   /**
    * A property key for {@link VisualLayout} instances used to provide a hint for which

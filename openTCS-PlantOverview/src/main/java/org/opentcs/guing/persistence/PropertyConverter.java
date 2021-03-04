@@ -60,7 +60,6 @@ import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_CRITICAL;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_LEVEL_GOOD;
 import static org.opentcs.guing.model.elements.VehicleModel.ENERGY_STATE;
-import static org.opentcs.guing.model.elements.VehicleModel.INITIAL_POSITION;
 import static org.opentcs.guing.model.elements.VehicleModel.LOADED;
 import static org.opentcs.guing.model.elements.VehicleModel.NEXT_POINT;
 import static org.opentcs.guing.model.elements.VehicleModel.ORIENTATION_ANGLE;
@@ -180,7 +179,7 @@ public class PropertyConverter {
             revertLengthProperty(model, VehicleModel.LENGTH, property);
             break;
           case ElementPropKeys.VEHICLE_ROUTE_COLOR:
-            revertRouteColorProperty(model,ElementPropKeys.VEHICLE_ROUTE_COLOR, property);
+            revertRouteColorProperty(model, ElementPropKeys.VEHICLE_ROUTE_COLOR, property);
             break;
           case ENERGY_LEVEL_CRITICAL:
             revertPercentProperty(model, ENERGY_LEVEL_CRITICAL, property);
@@ -215,9 +214,6 @@ public class PropertyConverter {
           case ORIENTATION_ANGLE:
             revertAngleProperty(model, ORIENTATION_ANGLE, property);
             break;
-          case INITIAL_POSITION:
-            revertCoursePointProperty(model, INITIAL_POSITION, property);
-            break;
           case ROUTING_COST:
             revertIntegerProerty(model, ROUTING_COST, property);
             break;
@@ -232,6 +228,12 @@ public class PropertyConverter {
             break;
           case MAX_REVERSE_VELOCITY:
             revertSpeedProperty(model, MAX_REVERSE_VELOCITY, property);
+            break;
+          case VehicleModel.MAXIMUM_VELOCITY:
+            revertSpeedProperty(model, VehicleModel.MAXIMUM_VELOCITY, property);
+            break;
+          case VehicleModel.MAXIMUM_REVERSE_VELOCITY:
+            revertSpeedProperty(model, VehicleModel.MAXIMUM_REVERSE_VELOCITY, property);
             break;
           case ElementPropKeys.PATH_CONN_TYPE:
             revertSelectionProperty(model, ElementPropKeys.PATH_CONN_TYPE, property);
@@ -497,10 +499,10 @@ public class PropertyConverter {
     ((ColorProperty) model.getProperty(BLOCK_COLOR)).setColor(color);
   }
 
-  private void revertRouteColorProperty(ModelComponent model,String key,
+  private void revertRouteColorProperty(ModelComponent model, String key,
                                         CourseObjectProperty property) {
     ColorProperty colorProp = (ColorProperty) model.getProperty(key);
-    colorProp.setColor(new Color((int)property.getValue()));
+    colorProp.setColor(new Color((int) property.getValue()));
 
   }
 

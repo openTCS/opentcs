@@ -113,7 +113,8 @@ public class LayoutToModelMenuItem
     return drawingEditor.getActiveView();
   }
 
-  private void updateModelY(ModelComponent model) throws IllegalArgumentException {
+  private void updateModelY(ModelComponent model)
+      throws IllegalArgumentException {
     CoordinateProperty modelProperty;
     CoordinateUndoActivity cua;
     if (model instanceof PointModel) {
@@ -141,7 +142,8 @@ public class LayoutToModelMenuItem
     undoRedoManager.addEdit(cua);
   }
 
-  private void updateModelX(ModelComponent model) throws IllegalArgumentException {
+  private void updateModelX(ModelComponent model)
+      throws IllegalArgumentException {
     CoordinateProperty modelProperty;
     if (model instanceof PointModel) {
       modelProperty = (CoordinateProperty) model.getProperty(PointModel.MODEL_X_POSITION);

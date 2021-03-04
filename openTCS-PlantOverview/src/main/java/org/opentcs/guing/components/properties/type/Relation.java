@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.type;
 
 import java.io.Serializable;
@@ -95,7 +94,7 @@ public class Relation<U>
       return Operation.MULTIPLICATION;
     }
   }
-  
+
   public static enum Operation {
     DIVISION,
     MULTIPLICATION

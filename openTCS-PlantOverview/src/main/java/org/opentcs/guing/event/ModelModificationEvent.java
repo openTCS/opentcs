@@ -21,7 +21,7 @@ public class ModelModificationEvent
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param source The source of the event.
    */
   public ModelModificationEvent(Object source) {

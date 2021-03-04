@@ -7,11 +7,14 @@
  */
 package org.opentcs.virtualvehicle;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.Orientation;
@@ -40,6 +43,10 @@ public class LoopbackCommunicationAdapter
     implements SimVehicleCommAdapter {
 
   /**
+   * The name of the load handling device set by this adapter.
+   */
+  public static final String LHD_NAME = "default";
+  /**
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(LoopbackCommunicationAdapter.class);
@@ -56,10 +63,6 @@ public class LoopbackCommunicationAdapter
    */
   private final LoopbackAdapterComponentsFactory componentsFactory;
   /**
-   * The energy storage of this vehicle.
-   */
-  private EnergyStorage energyStorage;
-  /**
    * The task simulating the virtual vehicle's behaviour.
    */
   private CyclicTask vehicleSimulationTask;
@@ -70,7 +73,7 @@ public class LoopbackCommunicationAdapter
   /**
    * The vehicle to this comm adapter instance.
    */
-  private Vehicle vehicle;
+  private final Vehicle vehicle;
   /**
    * Whether the loopback adapter is initialized or not.
    */
@@ -82,13 +85,11 @@ public class LoopbackCommunicationAdapter
    * @param componentsFactory The factory providing additional components for this adapter.
    * @param configuration This class's configuration.
    * @param vehicle The vehicle this adapter is associated with.
-   * @param energyStorage The energy storage of this vehicle.
    */
   @Inject
   public LoopbackCommunicationAdapter(LoopbackAdapterComponentsFactory componentsFactory,
                                       VirtualVehicleConfiguration configuration,
-                                      @Assisted Vehicle vehicle,
-                                      @Assisted EnergyStorage energyStorage) {
+                                      @Assisted Vehicle vehicle) {
     super(new LoopbackVehicleModel(vehicle),
           configuration.commandQueueCapacity(),
           1,
@@ -96,24 +97,27 @@ public class LoopbackCommunicationAdapter
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
-    this.energyStorage = requireNonNull(energyStorage, "energyStorage");
   }
 
   @Override
   public void initialize() {
     if (isInitialized()) {
-      LOG.debug("Already initialized.");
       return;
     }
     super.initialize();
 
-    String initialPos = vehicle.getProperties().get(ObjectPropConstants.VEHICLE_INITIAL_POSITION);
+    String initialPos
+        = vehicle.getProperties().get(LoopbackAdapterConstants.PROPKEY_INITIAL_POSITION);
+    if (initialPos == null) {
+      @SuppressWarnings("deprecation")
+      String deprecatedInitialPos
+          = vehicle.getProperties().get(ObjectPropConstants.VEHICLE_INITIAL_POSITION);
+      initialPos = deprecatedInitialPos;
+    }
     if (initialPos != null) {
       initVehiclePosition(initialPos);
     }
-
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
-
     initialized = true;
   }
 
@@ -125,7 +129,6 @@ public class LoopbackCommunicationAdapter
   @Override
   public void terminate() {
     if (!isInitialized()) {
-      LOG.debug("Not initialized.");
       return;
     }
     super.terminate();
@@ -134,24 +137,26 @@ public class LoopbackCommunicationAdapter
 
   @Override
   public synchronized void enable() {
-    if (!isEnabled()) {
-      getProcessModel().getVelocityController().addVelocityListener(getProcessModel());
-      // Create task for vehicle simulation.
-      vehicleSimulationTask = new VehicleSimulationTask();
-      Thread simThread = new Thread(vehicleSimulationTask, getName() + "-simulationTask");
-      simThread.start();
+    if (isEnabled()) {
+      return;
     }
+    getProcessModel().getVelocityController().addVelocityListener(getProcessModel());
+    // Create task for vehicle simulation.
+    vehicleSimulationTask = new VehicleSimulationTask();
+    Thread simThread = new Thread(vehicleSimulationTask, getName() + "-simulationTask");
+    simThread.start();
     super.enable();
   }
 
   @Override
   public synchronized void disable() {
-    if (isEnabled()) {
-      // Disable vehicle simulation.
-      vehicleSimulationTask.terminate();
-      vehicleSimulationTask = null;
-      getProcessModel().getVelocityController().removeVelocityListener(getProcessModel());
+    if (!isEnabled()) {
+      return;
     }
+    // Disable vehicle simulation.
+    vehicleSimulationTask.terminate();
+    vehicleSimulationTask = null;
+    getProcessModel().getVelocityController().removeVelocityListener(getProcessModel());
     super.disable();
   }
 
@@ -167,7 +172,7 @@ public class LoopbackCommunicationAdapter
 
   @Override
   public synchronized void sendCommand(MovementCommand cmd) {
-    assert cmd != null;
+    requireNonNull(cmd, "cmd");
 
     // Reset the execution flag for single-step mode.
     singleStepExecutionAllowed = false;
@@ -193,66 +198,10 @@ public class LoopbackCommunicationAdapter
   @Override
   public synchronized ExplainedBoolean canProcess(List<String> operations) {
     requireNonNull(operations, "operations");
+
     final boolean canProcess = isEnabled();
     final String reason = canProcess ? "" : "adapter not enabled";
     return new ExplainedBoolean(canProcess, reason);
-  }
-
-  /**
-   * Sets the energy storage for this vehicle.
-   *
-   * @param energyStorage The energy storage for the vehicle to simulate
-   */
-  public void setEnergyStorage(EnergyStorage energyStorage) {
-    this.energyStorage = energyStorage;
-  }
-
-  /**
-   * Get the energy storage of this vehicle.
-   *
-   * @return The energy storage of this vehicle.
-   */
-  public EnergyStorage getEnergyStorage() {
-    return energyStorage;
-  }
-
-  /**
-   * Get the current absolute energy value of the simulated {@link EnergyStorage}.
-   *
-   * @return the current energy in Ws
-   */
-  public double getEnergy() {
-    return energyStorage.getEnergy();
-  }
-
-  /**
-   * Get the current energy level of the simulated {@link EnergyStorage}.
-   *
-   * @return the current energy level in %
-   */
-  public int getEnergyLevel() {
-    return energyStorage.getEnergyLevel();
-  }
-
-  /**
-   * Set the energy of vehicle.
-   *
-   * @param energy Energy level in percentage.
-   */
-  public void setEnergyLevel(int energy) {
-    // Set new energy level in VehicleModel
-    getProcessModel().setVehicleEnergyLevel(energy);
-    // Set new energy in energyStorage
-    energyStorage.setEnergyLevel(energy);
-  }
-
-  /**
-   * Get the energy capacity of the simulated {@link EnergyStorage}.
-   *
-   * @return the energy capacity
-   */
-  public double getEnergyCapacity() {
-    return energyStorage.getCapacity();
   }
 
   @Override
@@ -275,8 +224,7 @@ public class LoopbackCommunicationAdapter
   }
 
   /**
-   * Triggers the <code>VehicleCommunicatorTask</code> for execution in single
-   * step mode.
+   * Triggers a step in single step mode.
    */
   protected synchronized void trigger() {
     singleStepExecutionAllowed = true;
@@ -293,11 +241,6 @@ public class LoopbackCommunicationAdapter
      * <em>advanceTime</em> has passed for real.
      */
     private int simAdvanceTime;
-    /**
-     * Energy level of the energy storage, the last time it was
-     * changed by task.
-     */
-    private int lastEnergyLevel = energyStorage.getEnergyLevel();
 
     /**
      * Creates a new VehicleSimluationTask.
@@ -306,95 +249,49 @@ public class LoopbackCommunicationAdapter
       super(0);
     }
 
-    /**
-     * Discharge the vehicle's {@code energyStorage} by the given amount over
-     * {@code simAdvanceTime}.
-     * Views and the {@code BasicCommunicationAdapter} are updated if needed.
-     *
-     * @param power power in W
-     */
-    private void dischargeEnergy(double power) {
-      energyStorage.discharge(power, simAdvanceTime);
-      int currentEnergyLevel = energyStorage.getEnergyLevel();
-      // Update energy level only if changed
-      if (currentEnergyLevel != lastEnergyLevel) {
-        getProcessModel().setVehicleEnergyLevel(currentEnergyLevel);
-        lastEnergyLevel = currentEnergyLevel;
-      }
-    }
-
-    /**
-     * Charge the vehicle's {@code energyStorage} by the given amount over
-     * {@code simAdvanceTime}.
-     * Views and the {@code BasicCommunicationAdapter} are updated if needed.
-     *
-     * @param power power in W
-     */
-    private void chargeEnergy(double power) {
-      energyStorage.charge(power, simAdvanceTime);
-      int currentEnergyLevel = energyStorage.getEnergyLevel();
-      // Update energy level only if changed
-      if (currentEnergyLevel != lastEnergyLevel) {
-        getProcessModel().setVehicleEnergyLevel(currentEnergyLevel);
-        lastEnergyLevel = currentEnergyLevel;
-      }
-    }
-
     @Override
     protected void runActualTask() {
-      try {
-        // Don't do anything if no energy left
-        if (energyStorage.getEnergy() <= 0.0) {
-          Thread.sleep(ADVANCE_TIME);
-          getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
-          return;
-        }
-        final MovementCommand curCommand;
-        synchronized (LoopbackCommunicationAdapter.this) {
-          curCommand = getSentQueue().peek();
-        }
-        simAdvanceTime = (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
-        if (curCommand == null) {
-          Thread.sleep(ADVANCE_TIME);
-          dischargeEnergy(getProcessModel().getIdlePower());
-          getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
-        }
-        else {
-          // If we were told to move somewhere, simulate the journey.
-          LOG.debug("Processing MovementCommand");
-          final Step curStep = curCommand.getStep();
-          // Simulate the movement.
-          simulateMovement(curStep);
-          // Simulate processing of an operation.
-          if (!curCommand.isWithoutOperation()) {
-            simulateOperation(curCommand.getOperation());
-          }
-          LOG.debug("Processed MovementCommand");
-          if (!isTerminated()) {
-            // Set the vehicle's state back to IDLE, but only if there aren't 
-            // any more movements to be processed.
-            if (getSentQueue().size() <= 1 && getCommandQueue().isEmpty()) {
-              getProcessModel().setVehicleState(Vehicle.State.IDLE);
-            }
-            // Update GUI.
-            synchronized (LoopbackCommunicationAdapter.this) {
-              MovementCommand sentCmd = getSentQueue().poll();
-              // If the command queue was cleared in the meantime, the kernel
-              // might be surprised to hear we executed a command we shouldn't
-              // have, so we only peek() at the beginning of this method and
-              // poll() here. If sentCmd is null, the queue was probably cleared
-              // and we shouldn't report anything back.
-              if (sentCmd != null && sentCmd.equals(curCommand)) {
-                // Let the vehicle manager know we've finished this command.
-                getProcessModel().commandExecuted(curCommand);
-                LoopbackCommunicationAdapter.this.notify();
-              }
-            }
-          }
-        }
+      final MovementCommand curCommand;
+      synchronized (LoopbackCommunicationAdapter.this) {
+        curCommand = getSentQueue().peek();
       }
-      catch (InterruptedException iexc) {
-        throw new IllegalStateException("Unexpectedly interrupted", iexc);
+      simAdvanceTime = (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
+      if (curCommand == null) {
+        Uninterruptibles.sleepUninterruptibly(ADVANCE_TIME, TimeUnit.MILLISECONDS);
+        getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
+      }
+      else {
+        // If we were told to move somewhere, simulate the journey.
+        LOG.debug("Processing MovementCommand...");
+        final Step curStep = curCommand.getStep();
+        // Simulate the movement.
+        simulateMovement(curStep);
+        // Simulate processing of an operation.
+        if (!curCommand.isWithoutOperation()) {
+          simulateOperation(curCommand.getOperation());
+        }
+        LOG.debug("Processed MovementCommand.");
+        if (!isTerminated()) {
+          // Set the vehicle's state back to IDLE, but only if there aren't 
+          // any more movements to be processed.
+          if (getSentQueue().size() <= 1 && getCommandQueue().isEmpty()) {
+            getProcessModel().setVehicleState(Vehicle.State.IDLE);
+          }
+          // Update GUI.
+          synchronized (LoopbackCommunicationAdapter.this) {
+            MovementCommand sentCmd = getSentQueue().poll();
+            // If the command queue was cleared in the meantime, the kernel
+            // might be surprised to hear we executed a command we shouldn't
+            // have, so we only peek() at the beginning of this method and
+            // poll() here. If sentCmd is null, the queue was probably cleared
+            // and we shouldn't report anything back.
+            if (sentCmd != null && sentCmd.equals(curCommand)) {
+              // Let the vehicle manager know we've finished this command.
+              getProcessModel().commandExecuted(curCommand);
+              LoopbackCommunicationAdapter.this.notify();
+            }
+          }
+        }
       }
     }
 
@@ -407,28 +304,24 @@ public class LoopbackCommunicationAdapter
      * @param step A step
      * @throws InterruptedException If an exception occured while sumulating
      */
-    private void simulateMovement(Step step)
-        throws InterruptedException {
-      long pathLength;
-      int maxVelocity;
-      String pointName;
-      Orientation orientation;
+    private void simulateMovement(Step step) {
       if (step.getPath() == null) {
         return;
       }
-      else {
-        orientation = step.getVehicleOrientation();
-        pathLength = step.getPath().getLength();
-        switch (orientation) {
-          case BACKWARD:
-            maxVelocity = step.getPath().getMaxReverseVelocity();
-            break;
-          default:
-            maxVelocity = step.getPath().getMaxVelocity();
-            break;
-        }
-        pointName = step.getDestinationPoint().getName();
+
+      Orientation orientation = step.getVehicleOrientation();
+      long pathLength = step.getPath().getLength();
+      int maxVelocity;
+      switch (orientation) {
+        case BACKWARD:
+          maxVelocity = step.getPath().getMaxReverseVelocity();
+          break;
+        default:
+          maxVelocity = step.getPath().getMaxVelocity();
+          break;
       }
+      String pointName = step.getDestinationPoint().getName();
+
       getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
       getProcessModel().getVelocityController().addWayEntry(new WayEntry(pathLength,
                                                                          maxVelocity,
@@ -437,11 +330,10 @@ public class LoopbackCommunicationAdapter
       // Advance the velocity controller by small steps until the
       // controller has processed all way entries.
       while (getProcessModel().getVelocityController().hasWayEntries() && !isTerminated()) {
-        final WayEntry wayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
-        Thread.sleep(ADVANCE_TIME);
-        dischargeEnergy(getProcessModel().getMovementPower());
+        WayEntry wayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
+        Uninterruptibles.sleepUninterruptibly(ADVANCE_TIME, TimeUnit.MILLISECONDS);
         getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
-        final WayEntry nextWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
+        WayEntry nextWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
         if (wayEntry != nextWayEntry) {
           // Let the vehicle manager know that the vehicle has reached
           // the way entry's destination point.
@@ -451,53 +343,34 @@ public class LoopbackCommunicationAdapter
     }
 
     /**
-     * Simulates a operation.
+     * Simulates an operation.
      *
      * @param operation A operation
      * @throws InterruptedException If an exception occured while simulating
      */
-    private void simulateOperation(String operation)
-        throws InterruptedException {
-      assert operation != null;
-      if (!isTerminated()) {
-        LOG.debug("Operating...");
-        boolean charging = operation.equals(getRechargeOperation());
-        // Get additional specifications for this operation
-        final OperationSpec opSpec = getProcessModel().getOperationSpecs().get(operation);
-        final int operatingTime;
-        if (opSpec != null) {
-          operatingTime = opSpec.getOperatingTime();
-        }
-        else {
-          operatingTime = getProcessModel().getDefaultOperatingTime();
-        }
-        // Calculate amount of power that needs to be charged per second to
-        // get an energy level of 100% at the end of a charging-operation.
-        double chargingPower = 0.0; // Power to charge per second 
-        if (charging) {
-          getProcessModel().setVehicleState(Vehicle.State.CHARGING);
-          double toCharge = energyStorage.getCapacity() - energyStorage.getEnergy();
-          chargingPower = toCharge / (operatingTime / 1000.0);
-        }
-        else {
-          getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
-        }
-        for (int timePassed = 0; timePassed < operatingTime && !isTerminated();
-             timePassed += simAdvanceTime) {
-          Thread.sleep(ADVANCE_TIME);
-          if (charging) {
-            chargeEnergy(chargingPower);
-          }
-          else {
-            dischargeEnergy(getProcessModel().getOperationPower());
-          }
-          getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
-        }
-        if (opSpec != null && opSpec.changesLoadCondition()) {
-          // Update load handling devices as defined by this operation
-          List<LoadHandlingDevice> devices = opSpec.getLoadCondition();
-          getProcessModel().setVehicleLoadHandlingDevices(devices);
-        }
+    private void simulateOperation(String operation) {
+      requireNonNull(operation, "operation");
+
+      if (isTerminated()) {
+        return;
+      }
+
+      LOG.debug("Operating...");
+      final int operatingTime = getProcessModel().getOperatingTime();
+      getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
+      for (int timePassed = 0; timePassed < operatingTime && !isTerminated();
+           timePassed += simAdvanceTime) {
+        Uninterruptibles.sleepUninterruptibly(ADVANCE_TIME, TimeUnit.MILLISECONDS);
+        getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
+      }
+      if (operation.equals(getProcessModel().getLoadOperation())) {
+        // Update load handling devices as defined by this operation
+        getProcessModel().setVehicleLoadHandlingDevices(
+            Arrays.asList(new LoadHandlingDevice(LHD_NAME, true)));
+      }
+      else if (operation.equals(getProcessModel().getUnloadOperation())) {
+        getProcessModel().setVehicleLoadHandlingDevices(
+            Arrays.asList(new LoadHandlingDevice(LHD_NAME, false)));
       }
     }
   }

@@ -17,7 +17,7 @@ import org.opentcs.data.notification.UserNotification;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface MessageDisplay {
-  
+
   /**
    * Displays the given message.
    *

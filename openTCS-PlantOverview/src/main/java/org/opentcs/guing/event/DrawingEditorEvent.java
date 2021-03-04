@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.event;
 
 import java.util.EventObject;
@@ -34,7 +33,7 @@ public class DrawingEditorEvent
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param editor The event source.
    * @param figures The affected figures.
    */
@@ -45,7 +44,7 @@ public class DrawingEditorEvent
 
   /**
    * Creates a new instance for a single figure.
-   * 
+   *
    * @param editor The event source.
    * @param figure The affected figure.
    */
@@ -57,7 +56,7 @@ public class DrawingEditorEvent
 
   /**
    * Checks whether this event references at least one figure.
-   * 
+   *
    * @return <code>true</code> if, and only if, this event references at least
    * one figure.
    */
@@ -67,7 +66,7 @@ public class DrawingEditorEvent
 
   /**
    * Returns the originating DrawingEditor.
-   * 
+   *
    * @return The originating DrawingEditor.
    */
   public DrawingEditor getDrawingEditor() {
@@ -76,7 +75,7 @@ public class DrawingEditorEvent
 
   /**
    * Returns the affected Figure objects.
-   * 
+   *
    * @return The affected Figure objects.
    */
   public List<Figure> getFigures() {
@@ -85,6 +84,7 @@ public class DrawingEditorEvent
 
   /**
    * Returns the first affected figure.
+   *
    * @return The first affected figure.
    */
   public Figure getFigure() {

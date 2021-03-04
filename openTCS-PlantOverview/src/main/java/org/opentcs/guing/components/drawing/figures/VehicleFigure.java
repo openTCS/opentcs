@@ -24,7 +24,6 @@ import static java.awt.image.ImageObserver.ALLBITS;
 import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.util.Collection;
 import java.util.LinkedList;
-import static java.util.Objects.requireNonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -56,6 +55,8 @@ import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
+import static java.util.Objects.requireNonNull;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * The graphical representation of a vehicle.
@@ -182,14 +183,22 @@ public class VehicleFigure
   @Override
   public String getToolTipText(Point2D.Double p) {
     VehicleModel model = getModel();
-    StringBuilder sb = new StringBuilder("<html>Vehicle ");
-    sb.append("<b>").append(model.getName()).append("</b>");
-    sb.append("<br>Position: ").append(model.getPoint() != null ? model.getPoint().getName() : "?");
-    sb.append("<br>Next Position: ").append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
+    String vehicleDesc = ResourceBundleUtil.getBundle().getString("vehicle.description");
+    String positionDesc = ResourceBundleUtil.getBundle().getString("vehicle.point.text");
+    String nextPositionDesc = ResourceBundleUtil.getBundle().getString("vehicle.nextPoint.text");
+    String stateDesc = ResourceBundleUtil.getBundle().getString("vehicle.state.text");
+    String procStateDesc = ResourceBundleUtil.getBundle().getString("vehicle.procState.text");
+    String energyDesc = ResourceBundleUtil.getBundle().getString("vehicle.energyLevel.text");
+    StringBuilder sb = new StringBuilder("<html>");
+    sb.append(vehicleDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
+    sb.append("<br>").append(positionDesc).append(": ")
+        .append(model.getPoint() != null ? model.getPoint().getName() : "?");
+    sb.append("<br>").append(nextPositionDesc).append(": ")
+        .append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
     AbstractProperty sp = (AbstractProperty) model.getProperty(VehicleModel.STATE);
-    sb.append("<br>State: ").append(sp.getValue().toString());
+    sb.append("<br>").append(stateDesc).append(": ").append(sp.getValue().toString());
     sp = (AbstractProperty) model.getProperty(VehicleModel.PROC_STATE);
-    sb.append("<br>Proc State: ").append(sp.getValue().toString());
+    sb.append("<br>").append(procStateDesc).append(": ").append(sp.getValue().toString());
     AbstractProperty pEnergyState = (AbstractProperty) model.getProperty(VehicleModel.ENERGY_STATE);
     VehicleModel.EnergyState state = (VehicleModel.EnergyState) pEnergyState.getValue();
 
@@ -211,7 +220,9 @@ public class VehicleFigure
         sColor = "black";
     }
 
-    sb.append("<br>Energy: <font color=").append(sColor).append(">").append(((PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL)).getValue()).append("%</font>");
+    sb.append("<br>").append(energyDesc).append(": <font color=").append(sColor).append(">")
+        .append(((PercentProperty) model.getProperty(VehicleModel.ENERGY_LEVEL)).getValue())
+        .append("%</font>");
     sb.append("</html>");
 
     return sb.toString();

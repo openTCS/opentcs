@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 /**
@@ -21,9 +22,12 @@ import javax.swing.table.TableCellRenderer;
  * @param <E> The type of the table cell values that the representer can represent.
  */
 public class StringTableCellRenderer<E>
-    extends JLabel
     implements TableCellRenderer {
 
+  /**
+   * The default renderer we delegate to.
+   */
+  private final DefaultTableCellRenderer delegate = new DefaultTableCellRenderer();
   /**
    * Returns a String representation of E.
    */
@@ -38,15 +42,20 @@ public class StringTableCellRenderer<E>
    */
   public StringTableCellRenderer(Function<E, String> representer) {
     this.representer = requireNonNull(representer, "representer");
-    setOpaque(true);
   }
 
   @Override
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                  boolean hasFocus, int row, int column) {
+    JLabel label = (JLabel) delegate.getTableCellRendererComponent(table,
+                                                                   value,
+                                                                   isSelected,
+                                                                   hasFocus,
+                                                                   row,
+                                                                   column);
     @SuppressWarnings("unchecked")
     E val = (E) value;
-    setText(representer.apply(val));
-    return this;
+    label.setText(representer.apply(val));
+    return label;
   }
 }

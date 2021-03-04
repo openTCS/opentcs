@@ -186,9 +186,10 @@ public class UnifiedModelReader
       addModelComponentToSystemModel(modelComponent, systemModel);
     }
     else {
-      String deserializationError = String.format("Component %s not valid: %s",
-                                                  modelComponent.getName(),
-                                                  validator.getErrors());
+      String deserializationError = ResourceBundleUtil.getBundle()
+          .getFormatted("UnifiedModelReader.deserialization.error",
+                        modelComponent.getName(),
+                        validator.getErrors());
       validator.resetErrors();
       LOG.warn("Deserialization error: {}", deserializationError);
       deserializationErrors.add(deserializationError);

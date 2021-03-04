@@ -36,7 +36,7 @@ public interface SharedKernelProvider {
    * preexisting client.
    *
    * @return the new client
-   * @throws RuntimeException in case of connection falure with Kernel.
+   * @throws KernelUnavailableException in case of connection falure with Kernel.
    */
   @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
   default SharedKernelClient register()

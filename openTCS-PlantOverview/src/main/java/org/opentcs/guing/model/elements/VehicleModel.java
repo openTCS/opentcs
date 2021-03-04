@@ -20,11 +20,12 @@ import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
-import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
+import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
 import org.opentcs.guing.model.AbstractFigureComponent;
@@ -49,12 +50,14 @@ public class VehicleModel
   public static final String POINT = "Point";
   public static final String NEXT_POINT = "NextPoint";
   public static final String PRECISE_POSITION = "PrecisePosition";
-  public static final String INITIAL_POSITION = "InitialPosition";
   public static final String ORIENTATION_ANGLE = "OrientationAngle";
   public static final String ENERGY_LEVEL = "EnergyLevel";
   public static final String ENERGY_STATE = "EnergyState";
   public static final String CURRENT_TRANSPORT_ORDER_NAME = "currentTransportOrderName";
   public static final String CURRENT_SEQUENCE_NAME = "currentOrderSequenceName";
+  public static final String MAXIMUM_VELOCITY = "MaximumVelocity";
+  public static final String MAXIMUM_REVERSE_VELOCITY = "MaximumReverseVelocity";
+  public static final String PROCESSABLE_CATEGORIES = "ProcessableCategories";
 
   /**
    * The point the vehicle currently remains on.
@@ -310,7 +313,7 @@ public class VehicleModel
     pName.setHelptext(bundle.getString("vehicle.name.helptext"));
     setProperty(NAME, pName);
 
-    LengthProperty pLength = new LengthProperty(this);
+    LengthProperty pLength = new LengthProperty(this, 1000, LengthProperty.Unit.MM);
     pLength.setDescription(bundle.getString("vehicle.length.text"));
     pLength.setHelptext(bundle.getString("vehicle.length.helptext"));
     setProperty(LENGTH, pLength);
@@ -320,21 +323,31 @@ public class VehicleModel
     pColor.setHelptext(bundle.getString("vehicle.routeColor.helptext"));
     setProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR, pColor);
 
-    PercentProperty pEnergyLevelCritical = new PercentProperty(this, true);
+    PercentProperty pEnergyLevelCritical = new PercentProperty(this,
+                                                               30,
+                                                               PercentProperty.Unit.PERCENT,
+                                                               true);
     pEnergyLevelCritical.setDescription(bundle.getString("vehicle.energyLevelCritical.text"));
     pEnergyLevelCritical.setHelptext(bundle.getString("vehicle.energyLevelCritical.helptext"));
     setProperty(ENERGY_LEVEL_CRITICAL, pEnergyLevelCritical);
 
-    PercentProperty pEnergyLevelGood = new PercentProperty(this, true);
+    PercentProperty pEnergyLevelGood = new PercentProperty(this,
+                                                           90,
+                                                           PercentProperty.Unit.PERCENT,
+                                                           true);
     pEnergyLevelGood.setDescription(bundle.getString("vehicle.energyLevelGood.text"));
     pEnergyLevelGood.setHelptext(bundle.getString("vehicle.energyLevelGood.helptext"));
     setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
 
-    CoursePointProperty pInitialPosition = new CoursePointProperty(this);
-    pInitialPosition.setDescription(bundle.getString("vehicle.initialPosition.text"));
-    pInitialPosition.setHelptext(bundle.getString("vehicle.initialPosition.helptext"));
-    setProperty(INITIAL_POSITION, pInitialPosition);
+    SpeedProperty pMaximumVelocity = new SpeedProperty(this, 1000, SpeedProperty.Unit.MM_S);
+    pMaximumVelocity.setDescription(bundle.getString("vehicle.maximumVelocity.text"));
+    pMaximumVelocity.setHelptext(bundle.getString("vehicle.maximumVelocity.helptext"));
+    setProperty(MAXIMUM_VELOCITY, pMaximumVelocity);
 
+    SpeedProperty pMaximumReverseVelocity = new SpeedProperty(this, 1000, SpeedProperty.Unit.MM_S);
+    pMaximumReverseVelocity.setDescription(bundle.getString("vehicle.maximumReverseVelocity.text"));
+    pMaximumReverseVelocity.setHelptext(bundle.getString("vehicle.maximumReverseVelocity.helptext"));
+    setProperty(MAXIMUM_REVERSE_VELOCITY, pMaximumReverseVelocity);
     PercentProperty pEnergyLevel = new PercentProperty(this, true);
     pEnergyLevel.setDescription(bundle.getString("vehicle.energyLevel.text"));
     pEnergyLevel.setHelptext(bundle.getString("vehicle.energyLevel.helptext"));
@@ -409,6 +422,12 @@ public class VehicleModel
     curOrderSequenceName.setModellingEditable(false);
     setProperty(CURRENT_SEQUENCE_NAME, curOrderSequenceName);
 
+    OrderCategoriesProperty pProcessableCategories = new OrderCategoriesProperty(this);
+    pProcessableCategories.setDescription(bundle.getString("vehicle.processableCategories.text"));
+    pProcessableCategories.setHelptext(bundle.getString("vehicle.processableCategories.helptext"));
+    pProcessableCategories.setModellingEditable(false);
+    pProcessableCategories.setOperatingEditable(true);
+    setProperty(PROCESSABLE_CATEGORIES, pProcessableCategories);
   }
 
   public enum EnergyState {

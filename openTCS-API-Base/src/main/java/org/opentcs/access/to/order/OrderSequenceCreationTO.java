@@ -9,9 +9,11 @@ package org.opentcs.access.to.order;
 
 import java.io.Serializable;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.to.*;
+import org.opentcs.data.order.OrderConstants;
 
 /**
  * A transfer object describing a transport order.
@@ -22,6 +24,10 @@ public class OrderSequenceCreationTO
     extends CreationTO
     implements Serializable {
 
+  /**
+   * The category of the order sequence.
+   */
+  private String category = OrderConstants.CATEGORY_NONE;
   /**
    * The (optional) name of the vehicle that is supposed to execute the transport order.
    */
@@ -57,6 +63,27 @@ public class OrderSequenceCreationTO
   @Override
   public OrderSequenceCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
     return (OrderSequenceCreationTO) super.setProperty(key, value);
+  }
+
+  /**
+   * Returns the (optional) category of the order sequence.
+   *
+   * @return The (optional) category of the order sequence.
+   */
+  @Nonnull
+  public String getCategory() {
+    return category;
+  }
+
+  /**
+   * Sets the (optional) category of the order sequence.
+   *
+   * @param category The category.
+   * @return The category.
+   */
+  public OrderSequenceCreationTO setCategory(@Nonnull String category) {
+    this.category = requireNonNull(category, "category");
+    return this;
   }
 
   /**

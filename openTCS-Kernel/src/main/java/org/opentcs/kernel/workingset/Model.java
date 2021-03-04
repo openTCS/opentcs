@@ -1940,6 +1940,21 @@ public class Model {
     return vehicle;
   }
 
+  public Vehicle setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
+                                                 Set<String> processableCategories)
+      throws ObjectUnknownException {
+    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
+    if (vehicle == null) {
+      throw new ObjectUnknownException(ref);
+    }
+    Vehicle previousState = vehicle.clone();
+    vehicle = objectPool.replaceObject(vehicle.withProcessableCategories(processableCategories));
+    objectPool.emitObjectEvent(vehicle.clone(),
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+
   /**
    * Sets a vehicle's position.
    *

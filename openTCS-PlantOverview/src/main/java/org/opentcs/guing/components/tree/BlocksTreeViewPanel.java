@@ -5,7 +5,7 @@
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
-*/
+ */
 package org.opentcs.guing.components.tree;
 
 import java.util.HashSet;
@@ -19,13 +19,19 @@ import org.opentcs.guing.model.ModelComponent;
  *
  * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
-public class BlocksTreeViewPanel extends AbstractTreeViewPanel {
+public class BlocksTreeViewPanel
+    extends AbstractTreeViewPanel {
 
+  /**
+   * Creates a new instance.
+   *
+   * @param undoRedoManager The undo redo manager
+   */
   @Inject
   public BlocksTreeViewPanel(UndoRedoManager undoRedoManager) {
     super(undoRedoManager);
   }
-  
+
   @Override // EditableComponent
   public void cutSelectedItems() {
     bufferSelectedItems(true);

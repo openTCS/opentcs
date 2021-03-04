@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.view;
 
 import java.awt.event.ActionEvent;
@@ -24,6 +23,11 @@ public class AddTransportOrderSequenceView
   public final static String ID = "view.addOSView";
   private final OpenTCSView view;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param view The openTCS view
+   */
   public AddTransportOrderSequenceView(OpenTCSView view) {
     this.view = view;
   }

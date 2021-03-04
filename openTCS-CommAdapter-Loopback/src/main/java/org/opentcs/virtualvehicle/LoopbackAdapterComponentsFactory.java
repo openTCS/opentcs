@@ -20,11 +20,9 @@ public interface LoopbackAdapterComponentsFactory {
    * Creates a new LoopbackCommunicationAdapter for the given vehicle.
    *
    * @param vehicle The vehicle.
-   * @param energyStorage The energy storage.
    * @return A new LoopbackCommunicationAdapter for the given vehicle.
    */
-  LoopbackCommunicationAdapter createLoopbackCommAdapter(Vehicle vehicle,
-                                                         EnergyStorage energyStorage);
+  LoopbackCommunicationAdapter createLoopbackCommAdapter(Vehicle vehicle);
 
   /**
    * Creates a new panel for the given comm adapter.

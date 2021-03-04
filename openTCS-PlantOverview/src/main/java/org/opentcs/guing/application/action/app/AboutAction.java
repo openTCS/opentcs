@@ -68,21 +68,24 @@ public class AboutAction
 
   @Override
   public void actionPerformed(ActionEvent evt) {
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JOptionPane.showMessageDialog(
         dialogParent,
         "<html><p><b>" + OpenTCSView.NAME + "</b><br> "
-        + "openTCS baseline version: " + Environment.getBaselineVersion() + "<br>"
-        + "openTCS customization: " + Environment.getCustomizationName() + " " + Environment.getCustomizationVersion() + "<br>"
+        + bundle.getFormatted("openTCS.about.baseVersion", Environment.getBaselineVersion()) + "<br>"
+        + bundle.getFormatted("openTCS.about.customization",
+                              Environment.getCustomizationName(),
+                              Environment.getCustomizationVersion()) + "<br>"
         + OpenTCSView.COPYRIGHT + "<br>"
-        + "Running on<br>"
+        + bundle.getString("openTCS.about.runningOn") + "<br>"
         + "Java: " + System.getProperty("java.version") + ", " + System.getProperty("java.vendor") + "<br>"
         + "JVM: " + System.getProperty("java.vm.version") + ", " + System.getProperty("java.vm.vendor") + "<br>"
         + "OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + "<br>"
         + "<b>Kernel</b><br>"
         + kernelProvider.getKernelDescription()
-        + "<br>Mode: " + appState.getOperationMode()
+        + "<br>" + bundle.getFormatted("openTCS.about.mode", appState.getOperationMode())
         + "</p></html>",
-        "About",
+        bundle.getString("openTCS.about.title"),
         JOptionPane.PLAIN_MESSAGE,
         new ImageIcon(getClass().getResource("/org/opentcs/guing/res/symbols/openTCS/openTCS.300x132.gif")));
   }

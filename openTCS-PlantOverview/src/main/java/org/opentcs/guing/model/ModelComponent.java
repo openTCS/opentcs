@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model;
 
 import java.util.List;
@@ -213,5 +212,6 @@ public interface ModelComponent
    * @return A clone of this ModelComponent.
    * @throws java.lang.CloneNotSupportedException
    */
-  ModelComponent clone() throws CloneNotSupportedException;
+  ModelComponent clone()
+      throws CloneNotSupportedException;
 }

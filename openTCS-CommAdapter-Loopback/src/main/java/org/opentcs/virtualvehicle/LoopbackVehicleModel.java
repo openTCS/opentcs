@@ -7,10 +7,8 @@
  */
 package org.opentcs.virtualvehicle;
 
-import java.util.HashMap;
-import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
@@ -29,30 +27,21 @@ public class LoopbackVehicleModel
    */
   private boolean singleStepModeEnabled;
   /**
-   * Additional specifications for operations.
+   * Indicates which operation is a loading operation.
    */
-  private final Map<String, OperationSpec> operationSpecs = new HashMap<>();
+  private final String loadOperation;
   /**
-   * The time needed for executing operations without explicit operation times.
+   * Indicates which operation is an unloading operation.
    */
-  private int defaultOperatingTime = 5000;
+  private final String unloadOperation;
+  /**
+   * The time needed for executing operations.
+   */
+  private int operatingTime;
   /**
    * The velocity controller for calculating the simulated vehicle's velocity and current position.
    */
-  private final VelocityController velocityController
-      = new VelocityController(-500, 500, -1000, 1000);
-  /**
-   * Amount of energy that is consumed during Movement per second. [W]
-   */
-  private double movementPower;
-  /**
-   * Amount of energy that is consumed during Operation per second. [W]
-   */
-  private double operationPower;
-  /**
-   * Amount of energy that is consumed during idle state per second. [W]
-   */
-  private double idlePower;
+  private final VelocityController velocityController;
   /**
    * Keeps a log of recent velocity values.
    */
@@ -60,6 +49,23 @@ public class LoopbackVehicleModel
 
   public LoopbackVehicleModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
+    this.velocityController = new VelocityController(parseDeceleration(attachedVehicle),
+                                                     parseAcceleration(attachedVehicle),
+                                                     attachedVehicle.getMaxReverseVelocity(),
+                                                     attachedVehicle.getMaxVelocity());
+    this.operatingTime = parseOperatingTime(attachedVehicle);
+    this.loadOperation
+        = attachedVehicle.getProperty(LoopbackAdapterConstants.PROPKEY_LOAD_OPERATION);
+    this.unloadOperation
+        = attachedVehicle.getProperty(LoopbackAdapterConstants.PROPKEY_UNLOAD_OPERATION);
+  }
+
+  public String getLoadOperation() {
+    return this.loadOperation;
+  }
+
+  public String getUnloadOperation() {
+    return this.unloadOperation;
   }
 
   /**
@@ -88,39 +94,12 @@ public class LoopbackVehicleModel
   }
 
   /**
-   * Returns the additional operation specifications.
-   *
-   * @return operation specification
-   */
-  @Nonnull
-  public synchronized Map<String, OperationSpec> getOperationSpecs() {
-    return operationSpecs;
-  }
-
-  /**
-   * Sets the operation specifications.
-   *
-   * @param operationSpecs The new operation specifications.
-   */
-  public synchronized void setOperationSpecs(@Nonnull Map<String, OperationSpec> operationSpecs) {
-    requireNonNull(operationSpecs, "operationSpecs");
-    
-    Map<String, OperationSpec> oldValue = new HashMap<>(this.operationSpecs);
-    this.operationSpecs.clear();
-    this.operationSpecs.putAll(operationSpecs);
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.OPERATION_SPECS.name(),
-                                                  oldValue,
-                                                  operationSpecs);
-  }
-
-  /**
    * Returns the default operating time.
    *
    * @return The default operating time
    */
-  public synchronized int getDefaultOperatingTime() {
-    return defaultOperatingTime;
+  public synchronized int getOperatingTime() {
+    return operatingTime;
   }
 
   /**
@@ -128,11 +107,11 @@ public class LoopbackVehicleModel
    *
    * @param defaultOperatingTime The new default operating time
    */
-  public synchronized void setDefaultOperatingTime(int defaultOperatingTime) {
-    int oldValue = this.defaultOperatingTime;
-    this.defaultOperatingTime = defaultOperatingTime;
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.DEFAULT_OPERATING_TIME.name(),
+  public synchronized void setOperatingTime(int defaultOperatingTime) {
+    int oldValue = this.operatingTime;
+    this.operatingTime = defaultOperatingTime;
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.OPERATING_TIME.name(),
                                                   oldValue,
                                                   defaultOperatingTime);
   }
@@ -142,7 +121,7 @@ public class LoopbackVehicleModel
    *
    * @return The maximum deceleration
    */
-  public synchronized int getMaxDeceleration() {
+  public synchronized int getMaxDecceleration() {
     return velocityController.getMaxDeceleration();
   }
 
@@ -154,8 +133,8 @@ public class LoopbackVehicleModel
   public synchronized void setMaxDeceleration(int maxDeceleration) {
     int oldValue = velocityController.getMaxDeceleration();
     velocityController.setMaxDeceleration(maxDeceleration);
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.MAX_DECELERATION.name(),
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.DECELERATION.name(),
                                                   oldValue,
                                                   maxDeceleration);
   }
@@ -177,8 +156,8 @@ public class LoopbackVehicleModel
   public synchronized void setMaxAcceleration(int maxAcceleration) {
     int oldValue = velocityController.getMaxAcceleration();
     velocityController.setMaxAcceleration(maxAcceleration);
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.MAX_ACCELERATION.name(),
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.ACCELERATION.name(),
                                                   oldValue,
                                                   maxAcceleration);
   }
@@ -200,7 +179,7 @@ public class LoopbackVehicleModel
   public synchronized void setMaxRevVelocity(int maxRevVelocity) {
     int oldValue = velocityController.getMaxRevVelocity();
     velocityController.setMaxRevVelocity(maxRevVelocity);
-    
+
     getPropertyChangeSupport().firePropertyChange(Attribute.MAX_REVERSE_VELOCITY.name(),
                                                   oldValue,
                                                   maxRevVelocity);
@@ -223,7 +202,7 @@ public class LoopbackVehicleModel
   public synchronized void setMaxFwdVelocity(int maxFwdVelocity) {
     int oldValue = velocityController.getMaxFwdVelocity();
     velocityController.setMaxFwdVelocity(maxFwdVelocity);
-    
+
     getPropertyChangeSupport().firePropertyChange(Attribute.MAX_FORWARD_VELOCITY.name(),
                                                   oldValue,
                                                   maxFwdVelocity);
@@ -246,7 +225,7 @@ public class LoopbackVehicleModel
   public synchronized void setVehiclePaused(boolean pause) {
     boolean oldValue = velocityController.isVehiclePaused();
     velocityController.setVehiclePaused(pause);
-    
+
     getPropertyChangeSupport().firePropertyChange(Attribute.VEHICLE_PAUSED.name(),
                                                   oldValue,
                                                   pause);
@@ -260,75 +239,6 @@ public class LoopbackVehicleModel
   @Nonnull
   public VelocityController getVelocityController() {
     return velocityController;
-  }
-
-  /**
-   * Set the energy that is consumed during movement per second.
-   *
-   * @param power power in W
-   */
-  public void setMovementPower(double power) {
-    double oldValue = movementPower;
-    movementPower = power;
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.MOVEMENT_POWER.name(),
-                                                  oldValue,
-                                                  power);
-  }
-
-  /**
-   * Get the energy that is consumed during movement per second.
-   *
-   * @return power in W
-   */
-  public double getMovementPower() {
-    return movementPower;
-  }
-
-  /**
-   * Set the energy that is consumed during operation per second.
-   *
-   * @param power power in W
-   */
-  public void setOperationPower(double power) {
-    double oldValue = operationPower;
-    operationPower = power;
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.OPERATION_POWER.name(),
-                                                  oldValue,
-                                                  power);
-  }
-
-  /**
-   * Get the energy that is consumed during operation per second.
-   *
-   * @return power in W
-   */
-  public double getOperationPower() {
-    return operationPower;
-  }
-
-  /**
-   * Set the energy that is consumed during idle state per second.
-   *
-   * @param power power in W
-   */
-  public void setIdlePower(double power) {
-    double oldValue = idlePower;
-    idlePower = power;
-    
-    getPropertyChangeSupport().firePropertyChange(Attribute.IDLE_POWER.name(),
-                                                  oldValue,
-                                                  power);
-  }
-
-  /**
-   * Get the energy that is consumed during idle state per second.
-   *
-   * @return power in W
-   */
-  public double getIdlePower() {
-    return idlePower;
   }
 
   /**
@@ -351,6 +261,36 @@ public class LoopbackVehicleModel
                                                   velocityHistory);
   }
 
+  private int parseOperatingTime(Vehicle vehicle) {
+    String opTime = vehicle.getProperty(LoopbackAdapterConstants.PROPKEY_OPERATING_TIME);
+    // Ensure it's a positive value.
+    return Math.max(Parsers.tryParseString(opTime, 5000), 1);
+  }
+
+  /**
+   * Gets the maximum acceleration. If the user did not specify any, 1000(m/s²) is returned.
+   *
+   * @param vehicle the vehicle
+   * @return the maximum acceleration.
+   */
+  private int parseAcceleration(Vehicle vehicle) {
+    String acceleration = vehicle.getProperty(LoopbackAdapterConstants.PROPKEY_ACCELERATION);
+    // Ensure it's a positive value.
+    return Math.max(Parsers.tryParseString(acceleration, 500), 1);
+  }
+
+  /**
+   * Gets the maximum decceleration. If the user did not specify any, 1000(m/s²) is returned.
+   *
+   * @param vehicle the vehicle
+   * @return the maximum decceleration.
+   */
+  private int parseDeceleration(Vehicle vehicle) {
+    String deceleration = vehicle.getProperty(LoopbackAdapterConstants.PROPKEY_DECELERATION);
+    // Ensure it's a negative value.
+    return Math.min(Parsers.tryParseString(deceleration, -500), -1);
+  }
+
   /**
    * Notification arguments to indicate some change.
    */
@@ -360,21 +300,17 @@ public class LoopbackVehicleModel
      */
     SINGLE_STEP_MODE,
     /**
-     * Indicates a change of the virtual vehicle's operation specs.
-     */
-    OPERATION_SPECS,
-    /**
      * Indicates a change of the virtual vehicle's default operating time.
      */
-    DEFAULT_OPERATING_TIME,
+    OPERATING_TIME,
     /**
      * Indicates a change of the virtual vehicle's maximum acceleration.
      */
-    MAX_ACCELERATION,
+    ACCELERATION,
     /**
      * Indicates a change of the virtual vehicle's maximum deceleration.
      */
-    MAX_DECELERATION,
+    DECELERATION,
     /**
      * Indicates a change of the virtual vehicle's maximum forward velocity.
      */
@@ -388,20 +324,8 @@ public class LoopbackVehicleModel
      */
     VEHICLE_PAUSED,
     /**
-     * Indicates a change of the virtual vehicle's movement power setting.
-     */
-    MOVEMENT_POWER,
-    /**
-     * Indicates a change of the virtual vehicle's operation power setting.
-     */
-    OPERATION_POWER,
-    /**
-     * Indicates a change of the virtual vehicle's idle power setting.
-     */
-    IDLE_POWER,
-    /**
      * Indicates a change of the virtual vehicle's velocity history.
      */
-    VELOCITY_HISTORY;
+    VELOCITY_HISTORY,
   }
 }

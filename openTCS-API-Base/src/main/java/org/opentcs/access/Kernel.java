@@ -775,6 +775,17 @@ public interface Kernel
       throws ObjectUnknownException, CredentialsException;
 
   /**
+   * Sets the categories of transport orders a vehicle can process.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param processableCategories A set of transport order categories.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
+                                       Set<String> processableCategories)
+      throws ObjectUnknownException;
+
+  /**
    * Creates a new location type.
    * A new location type is created with a generated unique ID and name and all
    * other attributes set to default values. A copy of the newly created
@@ -1522,7 +1533,7 @@ public interface Kernel
   @ScheduledApiChange(when = "5.0", details = "Method will be removed.")
   List<TransportOrder> createTransportOrdersFromScript(String fileName)
       throws ObjectUnknownException, CredentialsException, IOException;
-  
+
   /**
    * Notifies the router that the topology has changed in a significant way and needs to be
    * re-evaluated.

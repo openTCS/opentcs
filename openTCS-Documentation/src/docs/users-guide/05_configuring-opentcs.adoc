@@ -3,8 +3,7 @@
 
 === Kernel configuration
 
-The kernel application reads its configuration data from two files -- `config/opentcs-kernel-defaults.properties` and `config/opentcs-kernel.properties`.
-(Both files must exist.)
+The kernel application reads its configuration data from two files -- `config/opentcs-kernel-defaults-baseline.properties` and `config/opentcs-kernel.properties`.
 It is good practice to leave the first one untouched and set overriding values and project-specific configuration data in the second one.
 
 ==== Kernel application configuration entries
@@ -67,8 +66,7 @@ include::{configdoc}/VirtualVehicleConfigurationEntries.adoc[]
 
 === Plant Overview configuration
 
-The plant overview application reads its configuration data from two files -- `config/opentcs-plantoverview-defaults.properties` and `config/opentcs-plantoverview.properties`.
-(Both files must exist.)
+The plant overview application reads its configuration data from two files -- `config/opentcs-plantoverview-defaults-baseline.properties` and `config/opentcs-plantoverview.properties`.
 It is good practice to leave the first one untouched and set overriding values and project-specific configuration data in the second one.
 
 ==== Plant Overview application configuration entries

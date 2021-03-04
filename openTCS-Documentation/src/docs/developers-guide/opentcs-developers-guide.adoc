@@ -1,5 +1,5 @@
 = openTCS: Developer's Guide
-The openTCS developers <info@opentcs.org>
+The openTCS developers
 openTCS {project-version}
 :last-update-label!:
 ifdef::backend-pdf[:imagesdir: {imagesoutdir}]

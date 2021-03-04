@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.transport;
 
 import javax.swing.JTable;
@@ -40,7 +39,7 @@ public class OrdersTable
   public boolean isCellEditable(int row, int column) {
     return false;
   }
-  
+
   @Override
   public TableCellEditor getCellEditor(int row, int column) {
     TableModel tableModel = getModel();
@@ -55,7 +54,7 @@ public class OrdersTable
     TableModel tableModel = getModel();
     Object value = tableModel.getValueAt(row, column);
     TableCellRenderer renderer = getDefaultRenderer(value.getClass());
-  
+
     return renderer;
   }
 }

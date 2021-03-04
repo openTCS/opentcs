@@ -24,6 +24,7 @@ import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.InputValidationListener;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Eine Benutzerschnittstelle zum Auswählen einer Station oder eines
@@ -51,7 +52,7 @@ public class PointPanel
   public PointPanel(List<PointModel> items) {
     initComponents();
     fItems = items;
-    setDialogTitle("Meldepunkt auswählen");
+    setDialogTitle(ResourceBundleUtil.getBundle().getString("PointPanel.title"));
 
     Collections.sort(fItems, getComparator());
     List<String> names = new ArrayList<>();

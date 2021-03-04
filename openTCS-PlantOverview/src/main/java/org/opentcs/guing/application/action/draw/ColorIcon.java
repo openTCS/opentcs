@@ -38,6 +38,8 @@ public class ColorIcon
 
   /**
    * Creates a new instance.
+   *
+   * @param rgb The combined RGB components
    */
   public ColorIcon(int rgb) {
     this(new Color(rgb));

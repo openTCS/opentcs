@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties;
 
 import java.awt.BorderLayout;
@@ -58,7 +57,7 @@ public abstract class AbstractTableContent
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param tableProvider Provides attribute tables.
    */
   public AbstractTableContent(Provider<AttributesTable> tableProvider) {

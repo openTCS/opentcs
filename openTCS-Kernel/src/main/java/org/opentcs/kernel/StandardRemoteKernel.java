@@ -35,6 +35,7 @@ import org.opentcs.access.UnsupportedKernelOpException;
 import org.opentcs.access.rmi.CallPermissions;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.RemoteKernel;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.data.user.UserPermission;
@@ -107,8 +108,11 @@ class StandardRemoteKernel
    */
   private final Map<ClientID, ClientEntry> knownClients = new HashMap<>();
   /**
-   * A task that periodically cleans up the list of known clients and event
-   * buffers.
+   * Provides socket factories used for RMI.
+   */
+  private final SocketFactoryProvider socketFactoryProvider;
+  /**
+   * A task that periodically cleans up the list of known clients and event buffers.
    */
   private ClientCleanerTask cleanerTask;
   /**
@@ -127,20 +131,21 @@ class StandardRemoteKernel
   /**
    * Creates and registers a new RMI object for a locally running kernel.
    *
-   * @param homeDirectory The kernel's home directory (for saving user account
-   * data). Will be created if it doesn't exist, yet.
+   * @param homeDirectory The kernel's home directory (for saving user account data). Will be
+   * created if it doesn't exist, yet.
    * @param kernel The local kernel.
-   * @param sweepInterval The interval for cleaning out inactive clients (in ms).
-   * Must be at least 1000.
-   * @param registryAddress The RMI registry's host and port.
+   * @param configuration This class' configuration.
+   * @param socketFactoryProvider Provides socket factories used for RMI.
    */
   @Inject
   StandardRemoteKernel(@ApplicationHome File homeDirectory,
                        LocalKernel kernel,
-                       RmiKernelInterfaceConfiguration configuration) {
+                       RmiKernelInterfaceConfiguration configuration,
+                       SocketFactoryProvider socketFactoryProvider) {
     requireNonNull(homeDirectory, "homeDirectory");
     this.localKernel = requireNonNull(kernel, "kernel");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
     dataDir = new File(homeDirectory, "data");
     if (!dataDir.isDirectory() && !dataDir.mkdirs()) {
       throw new IllegalArgumentException(dataDir.getPath()
@@ -192,12 +197,13 @@ class StandardRemoteKernel
     cleanerThread.start();
     // Ensure a registry is running.
     LOG.debug("Checking for RMI registry on host '{}'...", configuration.registryHost());
+    RMIRegistries rmiRegistries = new RMIRegistries(socketFactoryProvider);
     Optional<Registry> registry;
     if (Objects.equals(configuration.registryHost(), "localhost")) {
-      registry = RMIRegistries.lookupOrInstallRegistry(configuration.registryPort());
+      registry = rmiRegistries.lookupOrInstallRegistry(configuration.registryPort());
     }
     else {
-      registry = RMIRegistries.lookupRegistry(configuration.registryHost(),
+      registry = rmiRegistries.lookupRegistry(configuration.registryHost(),
                                               configuration.registryPort());
     }
     checkState(registry.isPresent(), "RMI registry unavailable");
@@ -208,9 +214,13 @@ class StandardRemoteKernel
                                                     new Class<?>[] {RemoteKernel.class},
                                                     this);
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(proxy, configuration.remoteKernelPort());
+      UnicastRemoteObject.exportObject(proxy,
+                                       configuration.remoteKernelPort(),
+                                       socketFactoryProvider.getClientSocketFactory(),
+                                       socketFactoryProvider.getServerSocketFactory());
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RemoteKernel.REGISTRATION_NAME, proxy);
+      LOG.debug("Bound instance {} with registry {}.", rmiRegistry.list(), rmiRegistry);
     }
     catch (RemoteException exc) {
       LOG.error("Could not export or bind with RMI registry", exc);

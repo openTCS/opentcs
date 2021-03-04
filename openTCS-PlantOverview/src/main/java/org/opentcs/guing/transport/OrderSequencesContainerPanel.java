@@ -218,7 +218,8 @@ public class OrderSequencesContainerPanel
       DialogContent content = transportViewFactory.createOrderSequenceView(os);
       StandardContentDialog dialog
           = new StandardContentDialog(dialogParent, content, true, StandardContentDialog.CLOSE);
-      dialog.setTitle(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.orderSequence"));
+      dialog.setTitle(ResourceBundleUtil.getBundle()
+          .getString("OrderSequencesContainerPanel.orderSequence"));
       dialog.setVisible(true);
     }
     catch (KernelRuntimeException e) {
@@ -231,7 +232,8 @@ public class OrderSequencesContainerPanel
     fTable.setRowSelectionInterval(row, row);
 
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = menu.add(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.popup.showDetails"));
+    JMenuItem item = menu.add(ResourceBundleUtil.getBundle()
+        .getString("TransportOrdersContainerPanel.popup.showDetails"));
     item.addActionListener(new ActionListener() {
 
       @Override
@@ -322,7 +324,8 @@ public class OrderSequencesContainerPanel
                            fTableModel,
                            Boolean.FALSE);
     buttons.add(b1);
-    b1.setToolTipText(ResourceBundleUtil.getBundle().getString("OrderSequencesContainerPanel.filterOrderSequences"));
+    b1.setToolTipText(ResourceBundleUtil.getBundle()
+        .getString("OrderSequencesContainerPanel.filterOrderSequences"));
 
     return buttons;
   }
@@ -356,7 +359,8 @@ public class OrderSequencesContainerPanel
       row.addElement(intendedVehicle.getName());
     }
     else {
-      row.addElement(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.table.determineAutomatic"));
+      row.addElement(ResourceBundleUtil.getBundle()
+          .getString("TransportOrdersContainerPanel.table.determineAutomatic"));
     }
 
     // Spalte 3: Ausfï¿½hrendes Fahrzeug
@@ -366,7 +370,8 @@ public class OrderSequencesContainerPanel
       row.addElement(processingVehicle.getName());
     }
     else {
-      row.addElement(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.table.determineAutomatic"));
+      row.addElement(ResourceBundleUtil.getBundle()
+          .getString("TransportOrdersContainerPanel.table.determineAutomatic"));
     }
 
     // Spalte 4: Index

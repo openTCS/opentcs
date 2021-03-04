@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
@@ -15,7 +14,7 @@ import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class LoadModelAction
@@ -27,7 +26,7 @@ public class LoadModelAction
   /**
    * Creates a new instance.
    *
-   * @param view
+   * @param view The gui manager
    */
   public LoadModelAction(GuiManager view) {
     this.view = view;

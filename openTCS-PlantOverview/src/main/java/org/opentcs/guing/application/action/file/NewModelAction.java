@@ -25,6 +25,8 @@ public class NewModelAction
 
   /**
    * Creates a new instance.
+   *
+   * @param view The gui manager
    */
   public NewModelAction(GuiManager view) {
     this.view = view;

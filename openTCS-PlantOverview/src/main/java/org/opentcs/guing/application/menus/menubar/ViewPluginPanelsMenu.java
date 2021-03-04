@@ -80,7 +80,7 @@ public class ViewPluginPanelsMenu
       return factory1.getPanelDescription().compareTo(factory2.getPanelDescription());
     });
     factories.addAll(panelRegistry.getFactories());
-    
+
     for (final PluggablePanelFactory factory : factories) {
       if (factory.providesPanel(kernelState)) {
         String title = factory.getPanelDescription();

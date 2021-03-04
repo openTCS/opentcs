@@ -23,7 +23,7 @@ public class Comparators {
 
   private static final Comparator<? super CourseObjectProperty> PROPERTIES_BY_NAME
       = (o1, o2) -> o1.getKey().compareTo(o2.getKey());
-  
+
   private Comparators() {
   }
 

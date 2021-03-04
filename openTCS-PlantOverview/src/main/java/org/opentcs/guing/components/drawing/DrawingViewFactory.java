@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JToggleButton;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
@@ -59,17 +58,14 @@ public class DrawingViewFactory {
    * @param systemModel The system model.
    * @param selectionToolButton The selection tool button in the tool bar.
    * @param dragToolButton The drag tool button in the tool bar.
-   * @param view The global view.
    * @return A new drawing view, wrapped in a scroll pane.
    */
   public DrawingViewScrollPane createDrawingView(SystemModel systemModel,
                                                  JToggleButton selectionToolButton,
-                                                 JToggleButton dragToolButton,
-                                                 OpenTCSView view) {
+                                                 JToggleButton dragToolButton) {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(selectionToolButton, "selectionToolButton");
     requireNonNull(dragToolButton, "dragToolButton");
-    requireNonNull(view, "view");
 
     OpenTCSDrawingView drawingView = drawingViewProvider.get();
     drawingEditor.add(drawingView);

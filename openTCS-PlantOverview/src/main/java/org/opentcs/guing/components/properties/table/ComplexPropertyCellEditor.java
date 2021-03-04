@@ -65,8 +65,9 @@ public class ComplexPropertyCellEditor
    * @param dialogParent A parent for dialogs created by this instance.
    */
   @Inject
-  public ComplexPropertyCellEditor(Map<Class<? extends AbstractComplexProperty>, Provider<DetailsDialogContent>> contentMap,
-                                   @Assisted JPanel dialogParent) {
+  public ComplexPropertyCellEditor(
+      Map<Class<? extends AbstractComplexProperty>, Provider<DetailsDialogContent>> contentMap,
+      @Assisted JPanel dialogParent) {
     this.contentMap = requireNonNull(contentMap, "contentMap");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
 

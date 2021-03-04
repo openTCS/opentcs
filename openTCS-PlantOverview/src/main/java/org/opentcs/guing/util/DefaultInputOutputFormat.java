@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.util;
 
 import java.awt.datatransfer.DataFlavor;
@@ -131,42 +130,42 @@ public class DefaultInputOutputFormat
         // search the duplicated figures for a LinkConnection
         String srcPointName = domi.getAttribute("sourceName", "");
         String destLocationName = domi.getAttribute("destName", "");
-      
+
         if (!srcPointName.isEmpty() && !destLocationName.isEmpty()) {
           Figure srcPointFigure = null;
           Figure destPointFigure = null;
           InputStream in2 = (InputStream) t.getTransferData(new DataFlavor(mimeType, description));
           NanoXMLDOMInput domi2 = new NanoXMLDOMInput(factory, in2);
           domi2.openElement("Drawing-Clip");
-        
+
           for (int j = 0, m = domi2.getElementCount(); j < m; j++) {
             // search the duplicated figures for the point and location, that
             // belong to the link
             Figure searchFigure = figures.get(j);
             domi2.openElement(j);
-          
+
             if (domi2.getAttribute("name", "").equals(srcPointName)) {
               srcPointFigure = searchFigure;
             }
-            
+
             String x = domi2.getAttribute("name", "");
-            
+
             if (x.equals(destLocationName)) {
               destPointFigure = searchFigure;
             }
-            
+
             domi2.closeElement();
           }
-          
+
           domi2.closeElement();
-          
+
           if (srcPointFigure != null && destPointFigure != null) {
             LinkConnection link = (LinkConnection) baseFigure;
             link.connect((LabeledPointFigure) srcPointFigure, (LabeledLocationFigure) destPointFigure);
           }
         }
       }
-      
+
       domi.closeElement();
     }
 

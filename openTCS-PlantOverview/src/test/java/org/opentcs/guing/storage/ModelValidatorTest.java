@@ -14,6 +14,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
+import org.opentcs.data.model.Triple;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
@@ -22,18 +24,23 @@ import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
+import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
+import org.opentcs.guing.components.properties.type.TripleProperty;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
+import static org.opentcs.guing.model.elements.AbstractConnection.END_COMPONENT;
+import static org.opentcs.guing.model.elements.AbstractConnection.START_COMPONENT;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
  *
@@ -57,6 +64,10 @@ public class ModelValidatorTest {
   private static final String LOCATION_TYPE_NAME = "Ladestation";
 
   private static final String LOCATION_NAME = "Location-001";
+
+  private static final String LINK_NAME = POINT_NAME + " --- " + LOCATION_NAME;
+
+  private static final String VEHICLE_NAME = "Vehicle-001";
 
   /**
    * The system model for this test.
@@ -91,7 +102,9 @@ public class ModelValidatorTest {
       return result;
     });
     when(model.getLocationTypeModels()).thenAnswer((InvocationOnMock invocation) -> {
-      return components.values().stream().filter(o -> o instanceof LocationTypeModel).collect(Collectors.toList());
+      return components.values().stream()
+          .filter(o -> o instanceof LocationTypeModel)
+          .collect(Collectors.toList());
     });
   }
 
@@ -191,7 +204,7 @@ public class ModelValidatorTest {
     PointModel point = createPointModel(POINT_NAME);
     addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "abc");
     Assert.assertTrue("Validator said invalid for corrupt orientation angle.",
-                       validator.isValidWith(model, point));
+                      validator.isValidWith(model, point));
   }
 
   @Test
@@ -410,6 +423,14 @@ public class ModelValidatorTest {
   }
 
   @Test
+  public void testPathMissingStartPoint() {
+    PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    removeProperty(path, PathModel.START_COMPONENT);
+    Assert.assertFalse("Validator said valid for missing start point.",
+                       validator.isValidWith(model, path));
+  }
+
+  @Test
   public void testPathMissingLocked() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     removeProperty(path, PathModel.LOCKED);
@@ -420,6 +441,7 @@ public class ModelValidatorTest {
   @Test
   public void testPathInvalidStartPoint() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
     components.remove(POINT_NAME);
     Assert.assertFalse("Validator said valid for invalid start point.",
                        validator.isValidWith(model, path));
@@ -428,6 +450,7 @@ public class ModelValidatorTest {
   @Test
   public void testPathInvalidEndPoint() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     components.remove(POINT_NAME_2);
     Assert.assertFalse("Validator said valid for invalid end point.",
                        validator.isValidWith(model, path));
@@ -568,6 +591,198 @@ public class ModelValidatorTest {
                       validator.isValidWith(model, location));
   }
 
+  @Test
+  public void testLinkMissingStartPoint() {
+    LinkModel link = createLink(LINK_NAME);
+    removeProperty(link, START_COMPONENT);
+    Assert.assertFalse("Validator said valid for missing start point.",
+                       validator.isValidWith(model, link));
+  }
+
+  @Test
+  public void testLinkMissingEndPoint() {
+    LinkModel link = createLink(LINK_NAME);
+    removeProperty(link, END_COMPONENT);
+    Assert.assertFalse("Validator said valid for missing end point.",
+                       validator.isValidWith(model, link));
+  }
+
+  @Test
+  public void testLinkInvalidEndPoint() {
+    LinkModel link = createLink(LINK_NAME);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    Assert.assertFalse("Validator said valid for missing end point.",
+                       validator.isValidWith(model, link));
+  }
+
+  @Test
+  public void testLinkInvalidStartPoint() {
+    LinkModel link = createLink(LINK_NAME);
+    when(model.getModelComponent(LOCATION_NAME)).thenReturn(components.get(LOCATION_NAME));
+    Assert.assertFalse("Validator said valid for missing start point.",
+                       validator.isValidWith(model, link));
+  }
+
+  @Test
+  public void testLinkValid() {
+    LinkModel link = createLink(LINK_NAME);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    when(model.getModelComponent(LOCATION_NAME)).thenReturn(components.get(LOCATION_NAME));
+    Assert.assertTrue("Validator said invalid for valid link model.",
+                      validator.isValidWith(model, link));
+  }
+
+  @Test
+  public void testVehicleMissingLength() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.LENGTH);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingEnergyLevelCritical() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.ENERGY_LEVEL_CRITICAL);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingEnergyLevelGood() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.ENERGY_LEVEL_GOOD);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingEnergyLevel() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.ENERGY_LEVEL);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingEnergyState() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.ENERGY_STATE);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingLoaded() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.LOADED);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingState() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.STATE);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingProcState() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.PROC_STATE);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingPoint() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.POINT);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingNextPoint() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.NEXT_POINT);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingPrecisePosition() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.PRECISE_POSITION);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleMissingOrientationAngle() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    removeProperty(vehicle, VehicleModel.ORIENTATION_ANGLE);
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleInvalidEnergyState() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    addProperty(vehicle, SelectionProperty.class, VehicleModel.ENERGY_STATE,
+                "WrongEntry");
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleInvalidProcState() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    addProperty(vehicle, SelectionProperty.class, VehicleModel.PROC_STATE, "WrongEntry");
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleInvalidInitialAndCurrentPosition() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleInvalidNextPosition() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    Assert.assertFalse("Validator said valid for invalid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleValidWithNullPoints() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    addProperty(vehicle, StringProperty.class, VehicleModel.POINT, "null");
+    addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, "null");
+    Assert.assertTrue("Validator said invalid for valid vehicle model.",
+                       validator.isValidWith(model, vehicle));
+  }
+
+  @Test
+  public void testVehicleValid() {
+    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
+    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
+    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
+    Assert.assertTrue("Validator said invalid for valid vehicle model.",
+                      validator.isValidWith(model, vehicle));
+  }
+
   /**
    * Creates a mock for a given class with the given name and registers Mockito Stubs on it
    * to return from the properties map defined at the beginning.
@@ -673,9 +888,10 @@ public class ModelValidatorTest {
   }
 
   /**
+   * Creates a link model with all properties set.
    *
-   * @param name
-   * @return
+   * @param name The name of the link
+   * @return The link model
    */
   private LinkModel createLink(String name) {
     LinkModel link = createComponentWithName(LinkModel.class, name);
@@ -688,6 +904,33 @@ public class ModelValidatorTest {
   }
 
   /**
+   * Creates a vehicle model with all properties set.
+   *
+   * @param name The name of the vehicle
+   * @return The vehicle model
+   */
+  private VehicleModel createVehicle(String name) {
+    VehicleModel vehicle = createComponentWithName(VehicleModel.class, name);
+    addProperty(vehicle, LengthProperty.class, VehicleModel.LENGTH, 1.0);
+    addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_CRITICAL, 30);
+    addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_GOOD, 80);
+    addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL, 60);
+    addProperty(vehicle, SelectionProperty.class, VehicleModel.ENERGY_STATE,
+                VehicleModel.EnergyState.GOOD);
+    addProperty(vehicle, SelectionProperty.class, VehicleModel.PROC_STATE, Vehicle.ProcState.IDLE);
+    addProperty(vehicle, SelectionProperty.class, VehicleModel.STATE, Vehicle.State.IDLE);
+    addProperty(vehicle, BooleanProperty.class, VehicleModel.LOADED, Boolean.FALSE);
+    addProperty(vehicle, StringProperty.class, VehicleModel.POINT, POINT_NAME);
+    addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, POINT_NAME_2);
+    addProperty(vehicle, TripleProperty.class, VehicleModel.PRECISE_POSITION, new Triple(0, 0, 0));
+    addProperty(vehicle, AngleProperty.class, VehicleModel.ORIENTATION_ANGLE, 0.0);
+
+    components.put(POINT_NAME, createPointModel(POINT_NAME));
+    components.put(POINT_NAME_2, createPointModel(POINT_NAME_2));
+    return vehicle;
+  }
+
+  /**
    * Adds a property to the given model component.
    *
    * @param <T> the type of the property
@@ -697,9 +940,9 @@ public class ModelValidatorTest {
    * @param propValue the property value
    */
   private <T extends AbstractProperty> void addProperty(ModelComponent component,
-                                                         Class<T> clazz,
-                                                         String propName,
-                                                         Object propValue) {
+                                                        Class<T> clazz,
+                                                        String propName,
+                                                        Object propValue) {
     objectPropertiesMap.putIfAbsent(component, new HashMap<>());
     T property = mock(clazz);
     when(property.getValue()).thenReturn(propValue);

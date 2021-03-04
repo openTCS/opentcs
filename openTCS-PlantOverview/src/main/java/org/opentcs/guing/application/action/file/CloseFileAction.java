@@ -18,6 +18,7 @@ package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
 import java.net.URI;
+import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -62,15 +63,15 @@ public class CloseFileAction
    * 0: Save file 1: Dont't save file 2: Canceled
    */
   private int fileSaved;
-  private final View view;
+  private final OpenTCSView view;
 
   /**
    * Creates a new instance.
    *
-   * @param view
+   * @param view The openTCS view
    */
-  public CloseFileAction(View view) {
-    this.view = view;
+  public CloseFileAction(OpenTCSView view) {
+    this.view = requireNonNull(view, "view");
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     labels.configureAction(this, ID);
   }
@@ -108,7 +109,7 @@ public class CloseFileAction
 
       switch (option) {
         case JOptionPane.YES_OPTION: // Save
-          if (((OpenTCSView) view).saveModel()) {
+          if (view.saveModel()) {
             fileSaved = JOptionPane.YES_OPTION;
             doIt(evt.getActionCommand(), view);
           }

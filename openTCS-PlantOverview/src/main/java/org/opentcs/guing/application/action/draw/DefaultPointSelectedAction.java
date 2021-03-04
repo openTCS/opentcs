@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.draw;
 
 import java.awt.event.ActionEvent;
@@ -55,10 +54,10 @@ public class DefaultPointSelectedAction
   /**
    * Constructor for an action of a button in the toolbar.
    *
-   * @param editor
-   * @param tool
-   * @param popupButton
-   * @param group
+   * @param editor The drawing editor
+   * @param tool The tool
+   * @param popupButton The popup button
+   * @param group The button group
    */
   public DefaultPointSelectedAction(DrawingEditor editor,
                                     Tool tool,
@@ -73,11 +72,11 @@ public class DefaultPointSelectedAction
   /**
    * Constructor for a button inside a drop down menu of another button.
    *
-   * @param editor
-   * @param tool
-   * @param pointType
-   * @param popupButton
-   * @param group
+   * @param editor The drawing editor
+   * @param tool The tool
+   * @param pointType The point type
+   * @param popupButton The popup button
+   * @param group The button group
    */
   public DefaultPointSelectedAction(DrawingEditor editor,
                                     Tool tool,

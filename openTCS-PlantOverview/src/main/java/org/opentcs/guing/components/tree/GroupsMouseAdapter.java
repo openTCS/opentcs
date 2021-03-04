@@ -43,6 +43,12 @@ public class GroupsMouseAdapter
 
   private final ViewManager viewManager;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param treeView The tree view
+   * @param viewManager The view manager
+   */
   @Inject
   public GroupsMouseAdapter(TreeView treeView, ViewManager viewManager) {
     super(treeView);

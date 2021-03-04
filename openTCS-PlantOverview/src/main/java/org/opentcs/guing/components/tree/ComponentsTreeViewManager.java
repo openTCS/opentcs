@@ -23,10 +23,17 @@ import org.opentcs.guing.model.ModelComponent;
 public class ComponentsTreeViewManager
     extends TreeViewManager {
 
+  /**
+   * Creates a new instance.
+   *
+   * @param treeView The tree view
+   * @param userObjectUtil The user object util
+   * @param mouseListener The mouse listener
+   */
   @Inject
-  public ComponentsTreeViewManager(TreeView treeView, 
-                               UserObjectUtil userObjectUtil,
-                               MouseListener mouseListener) {
+  public ComponentsTreeViewManager(TreeView treeView,
+                                   UserObjectUtil userObjectUtil,
+                                   MouseListener mouseListener) {
     super(treeView, userObjectUtil, mouseListener);
     treeView.getTree().getSelectionModel().setSelectionMode(
         TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
@@ -35,8 +42,8 @@ public class ComponentsTreeViewManager
   @Override
   public void addItem(Object parent, ModelComponent item) {
     if (item.isTreeViewVisible()) {
-      UserObjectContext context = 
-          userObjectUtil.createContext(UserObjectContext.ContextType.COMPONENT);
+      UserObjectContext context
+          = userObjectUtil.createContext(UserObjectContext.ContextType.COMPONENT);
       getTreeView().addItem(parent, userObjectUtil.createUserObject(item, context));
     }
   }

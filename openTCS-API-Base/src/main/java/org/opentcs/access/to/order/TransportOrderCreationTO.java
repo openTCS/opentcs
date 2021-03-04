@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.to.*;
+import org.opentcs.data.order.OrderConstants;
 
 /**
  * A transfer object describing a transport order.
@@ -48,6 +49,11 @@ public class TransportOrderCreationTO
    */
   @Nullable
   private String intendedVehicleName;
+  /**
+   * The category of the transport order.
+   */
+  @Nonnull
+  private String category = OrderConstants.CATEGORY_NONE;
   /**
    * The point of time at which execution of the transport order is supposed to be finished.
    */
@@ -176,6 +182,28 @@ public class TransportOrderCreationTO
     return this;
   }
 
+  /**
+   * Returns the (optional) category of the transport order.
+   * 
+   * @return The (optional) category of the transport order.
+   */
+  @Nonnull
+  public String getCategory() {
+    return category;
+  }
+
+  /**
+   * Sets the (optional) category of the transport order.
+   * 
+   * @param category The category.
+   * @return This instance.
+   */
+  @Nonnull
+  public TransportOrderCreationTO setCategory(@Nonnull String category) {
+    this.category = requireNonNull(category, "category");
+    return this;
+  }
+  
   /**
    * Returns the point of time at which execution of the transport order is supposed to be finished.
    *

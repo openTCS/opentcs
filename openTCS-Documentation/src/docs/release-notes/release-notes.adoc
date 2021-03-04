@@ -1,5 +1,5 @@
 = openTCS: Release Notes
-The openTCS developers <info@opentcs.org>
+The openTCS developers
 openTCS {project-version}
 :last-update-label!:
 
@@ -38,16 +38,30 @@ To get started with openTCS, please refer to the user's guide, the developer's g
 
 Please note that, while we are happy to be able to release openTCS to the public as free software and would like to see it used and improved continuously, the development team cannot provide unlimited free support for it.
 
-If you have technical/support questions, please post them in the forum on the project's homepage, where the community and the developers involved will respond as time permits.
-For customers, Fraunhofer IML also provides support via e-mail or telephone - please contact us via info@opentcs.org.
+If you have technical/support questions, please post them on the project's mailing list, where the community and the developers involved will respond as time permits.
+You can subscribe to the mailing list on the project homepage at http://sourceforge.net/projects/opentcs/.
 
 Legal notice:
 This announcement of possible supporting services is not intended to create any binding or legal obligations or an obligation on entering any contract.
 It does not impose any duty on Fraunhofer IML to disclose any information nor to enter into any individual agreement or obligation.
 
-== Changelog
+== Change log
 
-This changelog lists the most relevant changes for past releases in reverse chronological order.
+This change log lists the most relevant changes for past releases in reverse chronological order.
+
+=== Version 4.8 (2017-11-28)
+
+* Bugs fixed:
+** Properly copy model coordinates to layout coordinates in the plant overview without invalidating the model.
+** Adjust erroneous behaviour in the load generator plugin panel and properly update its GUI elements depending on its state.
+* New features:
+** Add a category property to transport orders and order sequences and a set of processable categories to vehicles, allowing a finer-grained selection of processable orders.
+** Prepare proper encryption for RMI connections.
+* Other changes:
+** Use the unified (i.e. the kernel's) XML file format to load and save plant models in the plant overview by default.
+   (The plant overview's previous default file format is still supported for both loading and saving.
+   Support for the old format will eventually be removed in a future version, though, so users are advised to switch to the new format.)
+** Remove some unmaintained features from the loopback adapter and its GUI.
 
 === Version 4.7 (2017-10-11)
 

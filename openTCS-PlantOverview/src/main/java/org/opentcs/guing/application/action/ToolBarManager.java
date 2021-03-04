@@ -165,9 +165,10 @@ public class ToolBarManager {
   /**
    * Creates a new instance.
    *
-   * @param actionMap The action map to be used.
-   * @param crsObjFactory A factory for course objects.
-   * @param editor The drawing editor.
+   * @param actionMap The action map to be used
+   * @param crsObjFactory A factory for course objects
+   * @param editor The drawing editor
+   * @param selectionToolFactory The selection tool factory
    */
   @Inject
   public ToolBarManager(ViewActionMap actionMap,

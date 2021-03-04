@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
@@ -27,14 +26,19 @@ import org.opentcs.guing.util.IconToolkit;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationUserObject
-    extends FigureUserObject implements ContextObject {
-  
+    extends FigureUserObject
+    implements ContextObject {
+
   private final UserObjectContext context;
 
   /**
    * Creates a new instance.
    *
-   * @param model The corresponding model object.
+   * @param model The corresponding model object
+   * @param context The user object context
+   * @param view The openTCS view
+   * @param editor The drawing editor
+   * @param modelManager The model manager
    */
   @Inject
   public LocationUserObject(@Assisted LocationModel model,
@@ -62,7 +66,7 @@ public class LocationUserObject
   public ImageIcon getIcon() {
     return IconToolkit.instance().createImageIcon("tree/location.18x18.png");
   }
-  
+
   @Override
   public boolean removed() {
     return context.removed(this);

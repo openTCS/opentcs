@@ -55,6 +55,6 @@ To customize the appearance of locations and vehicles, new theme implementations
 . Create a new class which implements `LocationTheme` or `VehicleTheme`.
 . Place the JAR file of your theme, containing all required resources, in the subdirectory `lib/openTCS-extensions/` of the openTCS plant overview application's installation directory _before_ the application is started.
 (The openTCS start scripts include all JAR files in that directory in the application's classpath.)
-. Set the `locationThemeClass` or `vehicleThemeClass` in the Plant Overview application's configuration file (`config/opentcs-plantoverview.properties`).
+. Set the `locationThemeClass` or `vehicleThemeClass` in the Plant Overview application's configuration file.
 
 Vehicles or locations in plant models are then rendered using your custom theme.

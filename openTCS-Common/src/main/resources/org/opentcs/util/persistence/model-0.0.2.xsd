@@ -259,6 +259,11 @@
                    type="xsd:unsignedInt"/>
     <xsd:attribute name="energyLevelGood"
                    type="xsd:unsignedInt"/>
+    <xsd:attribute name="maxVelocity"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="maxReverseVelocity"
+                   type="xsd:unsignedInt"/>
+    
   </xsd:complexType>
 
   <!-- Data type for location type elements -->

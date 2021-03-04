@@ -108,7 +108,6 @@ These instructions explain how the newly created model that was persisted in the
 . Enable the driver by ticking the checkbox btn:[Enable loopback adapter] in the btn:[Loopback options] tab or the checkbox in the btn:[Enabled?] column of the vehicle list.
 . In the loopback options tab or in the vehicles list, select a point from the plant model to have the loopback adapter report this point to the kernel as the (virtual) vehicle's current position.
 (In a real-world application, a vehicle driver communicating with a real vehicle would automatically report the vehicle's current position to the kernel as soon as it is known.)
-. In the vehicle driver's loopback options tab, set the vehicle's state to `IDLE` to let the kernel know that the vehicle is now in a state that allows it to receive and process orders.
 . Switch to the plant overview client.
 An icon representing the vehicle should now be shown at the point on which you placed it using the loopback driver.
 . Right-click on the vehicle and select menu:Context menu[Dispatch Vehicle] to allow the kernel to dispatch the vehicle.

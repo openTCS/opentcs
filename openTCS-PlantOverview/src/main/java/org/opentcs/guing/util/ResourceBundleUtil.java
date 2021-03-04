@@ -104,8 +104,8 @@ public class ResourceBundleUtil
   // Nicht "org.jhotdraw.draw.Labels" verwenden!
   private static final Set<String> ACCELERATOR_KEYS = new HashSet<>(
       Arrays.asList(new String[] {
-        "shift", "control", "ctrl", "meta", "alt", "altGraph"
-      }));
+    "shift", "control", "ctrl", "meta", "alt", "altGraph"
+  }));
   /**
    * The global map of property name modifiers. The key of this map is the name
    * of the property name modifier, the value of this map is a fallback chain.
@@ -196,7 +196,8 @@ public class ResourceBundleUtil
    * @param key
    * @throws java.util.MissingResourceException
    */
-  private String getStringRecursive(String key) throws MissingResourceException {
+  private String getStringRecursive(String key)
+      throws MissingResourceException {
     String value = resource.getString(key);
 
     // Substitute placeholders in the value
@@ -351,7 +352,8 @@ public class ResourceBundleUtil
       URL url = baseClass.getResource(rsrcName);
 
       if (IS_VERBOSE && url == null) {
-        LOG.warn("[" + baseName + "]. getIconProperty \"" + key + ".icon\" resource:" + rsrcName + " not found.",
+        LOG.warn("[" + baseName + "]. getIconProperty \"" + key + ".icon\" resource:"
+            + rsrcName + " not found.",
                  new Exception("Exception just for tracing"));
       }
 
@@ -381,7 +383,8 @@ public class ResourceBundleUtil
       URL url = baseClass.getResource(rsrcName);
 
       if (IS_VERBOSE && url == null) {
-        LOG.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" resource:" + rsrcName + " not found.",
+        LOG.warn("[" + baseName + "].getLargeIconProperty \"" + key + ".largeIcon\" resource:"
+            + rsrcName + " not found.",
                  new Exception("Exception just for tracing"));
       }
 
@@ -675,7 +678,7 @@ public class ResourceBundleUtil
    * Get the appropriate ResourceBundle subclass.
    *
    * @param baseName
-   * @return 
+   * @return
    * @see java.util.ResourceBundle
    */
   public static ResourceBundleUtil getBundle(String baseName)
@@ -688,7 +691,7 @@ public class ResourceBundleUtil
    *
    * @param baseName
    * @param locale
-   * @return 
+   * @return
    * @see java.util.ResourceBundle
    */
   public static ResourceBundleUtil getBundle(String baseName, Locale locale)
@@ -715,6 +718,7 @@ public class ResourceBundleUtil
 
   /**
    * Removes a property name modifier.
+   *
    * @param name
    */
   public static void removePropertyNameModifier(String name) {
@@ -724,7 +728,8 @@ public class ResourceBundleUtil
   /**
    * Read object from ObjectInputStream and re-establish ResourceBundle.
    */
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream in)
+      throws IOException, ClassNotFoundException {
     // our "pseudo-constructor"
     in.defaultReadObject();
     // re-establish the "resource" variable

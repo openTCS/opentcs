@@ -47,6 +47,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -498,8 +499,9 @@ public class PathConnection
 
   @Override
   public String getToolTipText(Point2D.Double p) {
-    StringBuilder sb = new StringBuilder("<html>Path ");
-    sb.append("<b>").append(getModel().getName()).append("</b>");
+    String pathDesc = ResourceBundleUtil.getBundle().getString("path.description");
+    StringBuilder sb = new StringBuilder("<html>");
+    sb.append(pathDesc).append(" ").append("<b>").append(getModel().getName()).append("</b>");
     sb.append("</html>");
 
     return sb.toString();

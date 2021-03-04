@@ -56,8 +56,7 @@ public interface ProcessAdapter
    * Reads the current properties from the model and adopts these for the
    * kernel object.
    *
-   * @param kernel The kernel to synchronize the local model data to.
-   * @param plantModelCache A cache for elements a plant model contains of.
+   * @param plantModel The transfer object describing a plant model
    */
   void storeToPlantModel(org.opentcs.access.to.model.PlantModelCreationTO plantModel);
 }

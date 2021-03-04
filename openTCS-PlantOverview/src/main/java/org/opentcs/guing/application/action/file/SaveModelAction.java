@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
@@ -27,7 +26,7 @@ public class SaveModelAction
   /**
    * Creates a new instance.
    *
-   * @param view
+   * @param view The gui manager
    */
   public SaveModelAction(GuiManager view) {
     this.view = view;

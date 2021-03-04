@@ -25,6 +25,8 @@ public class AddDrawingViewAction
 
   /**
    * Creates a new instance.
+   *
+   * @param view The openTCS view
    */
   public AddDrawingViewAction(OpenTCSView view) {
     this.view = view;

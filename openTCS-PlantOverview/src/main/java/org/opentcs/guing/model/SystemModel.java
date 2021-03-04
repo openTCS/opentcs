@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.model;
 
 import java.util.List;
@@ -49,16 +48,16 @@ public interface SystemModel
   /**
    * Fügt dem Systemmodell eine Hauptkomponente hinzu.
    *
-   * @param key
-   * @param component
+   * @param key The folder key
+   * @param component The model component to be added to the folder
    */
   void addMainFolder(FolderKey key, ModelComponent component);
 
   /**
    * Liefert die zum Schlüssel passende Hauptkomponente.
    *
-   * @param key
-   * @return
+   * @param key The folder key
+   * @return The model component that represents the main folder
    */
   ModelComponent getMainFolder(FolderKey key);
 
@@ -66,8 +65,8 @@ public interface SystemModel
    * Liefert das Elternobjekt zu einem ModelComponent-Objekt. Die Zuordnung wird
    * über das Class-Objekt von item vorgenommen.
    *
-   * @param item
-   * @return
+   * @param item The model component where a parent folder should be found from
+   * @return The parent folder of the item
    */
   ModelComponent getFolder(ModelComponent item);
 
@@ -79,18 +78,18 @@ public interface SystemModel
    * @return alle Objekte einer Klasse
    */
   <T> List<T> getAll(FolderKey foldername, Class<T> classType);
-  
+
   /**
    * Liefert alle Objekte in allen Ordnern.
-   * 
+   *
    * @return Liste aller Objekte
    */
   List<ModelComponent> getAll();
 
   /**
-   * Liefert die Zuordnungstabelle.
+   * Returns the vent dispatcher.
    *
-   * @return
+   * @return The event dispatcher
    */
   EventDispatcher getEventDispatcher();
 
@@ -105,10 +104,10 @@ public interface SystemModel
    * Liefert die Zeichenmethode. Hier sind beispielsweise möglich "symbolisch"
    * und auf "Koordinaten basierend".
    *
-   * @return
+   * @return The drawing method
    */
   DrawingMethod getDrawingMethod();
-  
+
   /**
    * Returns the component with the given name, if it exists.
    *
@@ -120,7 +119,7 @@ public interface SystemModel
   /**
    * Liefert eine Liste aller Fahrzeuge.
    *
-   * @return
+   * @return The list of vehicle models
    */
   List<VehicleModel> getVehicleModels();
 
@@ -135,22 +134,24 @@ public interface SystemModel
   VehicleModel getVehicleModel(String name);
 
   /**
+   * Returns the list of layout models
    *
-   * @return
+   * @return The list of layout models
    */
   List<LayoutModel> getLayoutModels();
 
   /**
+   * Searches a layout model with a specific name.
    *
-   * @param name
-   * @return
+   * @param name The name of the layout model
+   * @return The layout model or <code>null</code> if no layout model with the name could be found
    */
   LayoutModel getLayoutModel(String name);
 
   /**
    * Liefert eine Liste aller Knoten.
    *
-   * @return
+   * @return The list of points
    */
   List<PointModel> getPointModels();
 
@@ -241,7 +242,7 @@ public interface SystemModel
    * @return eine Liste aller Blockbereiche
    */
   List<BlockModel> getBlockModels();
-  
+
   List<GroupModel> getGroupModels();
 
   /**
@@ -263,12 +264,12 @@ public interface SystemModel
   /**
    * Adds a reference to a ModelLayoutElement to every object in the pool.
    *
-   * @param layout
-   * @param points
-   * @param paths
-   * @param locations
-   * @param blocks
-   * @param vehicles
+   * @param layout The visual layout
+   * @param points The points
+   * @param paths The paths
+   * @param locations The locations
+   * @param blocks The blocks
+   * @param vehicles The vehicles
    */
   void createLayoutMap(VisualLayout layout,
                        Set<Point> points,

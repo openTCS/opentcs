@@ -44,6 +44,9 @@ public class DefaultAttributeAction
 
   /**
    * Creates a new instance.
+   * 
+   * @param editor The drawing editor
+   * @param key The attribute kez
    */
   public DefaultAttributeAction(
       DrawingEditor editor,

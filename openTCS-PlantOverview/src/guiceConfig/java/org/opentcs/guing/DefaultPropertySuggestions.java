@@ -9,6 +9,7 @@ package org.opentcs.guing;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.plantoverview.PropertySuggestions;
@@ -33,6 +34,13 @@ public class DefaultPropertySuggestions
     keySuggestions.add(Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION);
     keySuggestions.add(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION);
     keySuggestions.add(Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION);
+    keySuggestions.add(LoopbackAdapterConstants.PROPKEY_INITIAL_POSITION);
+    keySuggestions.add(LoopbackAdapterConstants.PROPKEY_OPERATING_TIME);
+    keySuggestions.add(LoopbackAdapterConstants.PROPKEY_LOAD_OPERATION);
+    keySuggestions.add(LoopbackAdapterConstants.PROPKEY_UNLOAD_OPERATION);
+    keySuggestions.add(LoopbackAdapterConstants.PROPKEY_ACCELERATION);
+    keySuggestions.add(LoopbackAdapterConstants.PROPKEY_DECELERATION);
+
   }
 
   @Override

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.transport;
 
 import java.util.ArrayList;
@@ -44,23 +43,23 @@ public class LocationActionPanel
 
   /**
    * Creates new instance.
-   * 
+   *
    * @param locations The location models.
    */
   public LocationActionPanel(List<LocationModel> locations) {
     initComponents();
     fLocations = locations;
     setDialogTitle(ResourceBundleUtil.getBundle().getString("LocationActionPanel.title"));
-  
+
     Collections.sort(fLocations, getComparator());
-    
+
     List<String> names = new ArrayList<>();
     for (LocationModel model : fLocations) {
       names.add(model.getName());
     }
 
     locationsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(names)));
-    
+
     updateActions();
   }
 
@@ -78,7 +77,7 @@ public class LocationActionPanel
         String s2 = item2.getName();
         s1 = s1.toLowerCase();
         s2 = s2.toLowerCase();
-  
+
         return s1.compareTo(s2);
       }
     };
@@ -92,7 +91,7 @@ public class LocationActionPanel
    */
   public LocationModel getSelectedLocation() {
     int index = locationsComboBox.getSelectedIndex();
-  
+
     if (index == -1) {
       return null;
     }
@@ -102,7 +101,7 @@ public class LocationActionPanel
 
   public String getSelectedAction() {
     int index = actionsComboBox.getSelectedIndex();
-  
+
     if (index == -1) {
       return null;
     }
@@ -125,7 +124,7 @@ public class LocationActionPanel
     fActions.addAll(actions);
     actionsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(fActions)));
   }
-  
+
   @Override
   public void update() {
   }

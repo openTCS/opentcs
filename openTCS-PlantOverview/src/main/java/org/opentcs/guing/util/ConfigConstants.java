@@ -6,16 +6,15 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.util;
 
 /**
  * Defines some reserved/commonly used config keys and values.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public interface ConfigConstants {
-  
+
   /**
    * A configuration key for the client value of the location theme.
    */

@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.event;
 
 import java.util.EventObject;
@@ -23,7 +22,7 @@ public class BlockChangeEvent
 
   /**
    * Creates a new instance of BlockElementChangeEvent.
-   * 
+   *
    * @param block The <code>BlockModel</code> that has changed.
    */
   public BlockChangeEvent(BlockModel block) {

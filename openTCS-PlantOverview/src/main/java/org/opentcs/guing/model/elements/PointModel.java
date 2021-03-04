@@ -78,7 +78,9 @@ public class PointModel
     pPhi.setHelptext(bundle.getString("point.phi.helptext"));
     setProperty(VEHICLE_ORIENTATION_ANGLE, pPhi);
 
-    SelectionProperty<PointType> pType = new SelectionProperty<>(this, Arrays.asList(PointType.values()), PointType.values()[0]);
+    SelectionProperty<PointType> pType = new SelectionProperty<>(this,
+                                                                 Arrays.asList(PointType.values()),
+                                                                 PointType.values()[0]);
     pType.setDescription(bundle.getString("point.type.text"));
     pType.setHelptext(bundle.getString("point.type.helptext"));
     pType.setCollectiveEditable(true);
@@ -116,8 +118,10 @@ public class PointModel
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y, pPointLabelOffsetY);
 
     StringProperty pPointLabelOrientationAngle = new StringProperty(this);
-    pPointLabelOrientationAngle.setDescription(bundle.getString("element.pointLabelOrientationAngle.text"));
-    pPointLabelOrientationAngle.setHelptext(bundle.getString("element.pointLabelOrientationAngle.helptext"));
+    pPointLabelOrientationAngle.setDescription(
+        bundle.getString("element.pointLabelOrientationAngle.text"));
+    pPointLabelOrientationAngle.setHelptext(
+        bundle.getString("element.pointLabelOrientationAngle.helptext"));
     pPointLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, pPointLabelOrientationAngle);
   }

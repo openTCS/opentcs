@@ -10,6 +10,7 @@
 package org.opentcs.guing.model.elements;
 
 import org.opentcs.guing.model.AbstractFigureComponent;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * A graphical component with illustrating effect, but without any impact
@@ -29,6 +30,6 @@ public class OtherGraphicalElement
 
   @Override
   public String getDescription() {
-    return "Graphical object";
+    return ResourceBundleUtil.getBundle().getString("otherGraphicalElement.description");
   }
 }

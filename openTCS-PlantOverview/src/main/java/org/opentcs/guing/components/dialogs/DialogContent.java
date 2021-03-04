@@ -12,6 +12,7 @@ package org.opentcs.guing.components.dialogs;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Basisimplementierung für Dialog- und Registerkarteninhalte.
@@ -222,16 +223,30 @@ public abstract class DialogContent
    *
    * @param field eine Bezeichnung des Feldes, das geparst wird (wird nur im
    * Fehlerfall verwendet)
-   * @param example ein richtiges Beispiel, wie ein einzugebender Wert
+   * @param example ein richtiges Beispiel, wie ein einzug
+   * = ResourceBundleUtil.getBundle().getString("DialogContent.parseError.example");
+   * // String title = ResourceBundleUtil.getBundle().getString("DialogContent.title");
+   * // "Eingabefehler";
+   * // String message = "Fehler beim Parsen des Feldes '" + field + "'.\n"
+   * // + "Korrektes Eingabebeispiel: " + example;
+   * JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+   * }
+   *
+   * /**
+   * Zeigt an, ob das Parsen eines Wertes fehlgeschlagen ist.
+   *
+   * @returnebender Wert
    * auszusehen hat (wird nur im Fehlerfall verwendet)
    */
   protected void showErrorMessage(String field, String example) {
-    // TODO: Text aus ResouceBundle!
-    String title = "Eingabefehler";
-    String message = "Fehler beim Parsen des Feldes '" + field + "'.\n"
-        + "Korrektes Eingabebeispiel: " + example;
-    int messageType = JOptionPane.ERROR_MESSAGE;
-    JOptionPane.showMessageDialog(this, message, title, messageType);
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    String title = bundle.getString("DialogContent.parseError.title");
+    String parseErrorMessage
+        = bundle.getFormatted("DialogContent.parseError.message", field);
+    String validExample
+        = bundle.getFormatted("DialogContent.parseError.example", example);
+    String message = parseErrorMessage + "\n" + validExample;
+    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
   }
 
   /**

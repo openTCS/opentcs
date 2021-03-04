@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.type;
 
 import java.util.Iterator;
@@ -30,13 +29,13 @@ public class StringSetProperty
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param model The model component this property belongs to.
    */
   public StringSetProperty(ModelComponent model) {
     super(model);
   }
-  
+
   @Override
   public Object getComparableValue() {
     StringBuilder sb = new StringBuilder();

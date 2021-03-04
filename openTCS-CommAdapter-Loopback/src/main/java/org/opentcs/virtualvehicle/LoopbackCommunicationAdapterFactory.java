@@ -12,8 +12,6 @@ import java.util.ResourceBundle;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A factory for loopback communication adapters (virtual vehicles).
@@ -24,46 +22,9 @@ public class LoopbackCommunicationAdapterFactory
     implements VehicleCommAdapterFactory {
 
   /**
-   * A property key for {@link Vehicle} instances used to provide the amount of energy (in W) the
-   * vehicle consumes during movement to the loopback driver.
-   * <p>
-   * Type: Double
-   * </p>
-   */
-  public static final String PROP_MOVEMENT_ENERGY = "tcs:virtualVehicleMovementEnergy";
-  /**
-   * A property key for {@link Vehicle} instances used to provide the amount of energy (in W) the
-   * vehicle consumes during operations to the loopback driver.
-   * <p>
-   * Type: Double
-   * </p>
-   */
-  public static final String PROP_OPERATION_ENERGY = "tcs:virtualVehicleOperationEnergy";
-  /**
-   * A property key for {@link Vehicle} instances used to provide the amount of energy (in W) the
-   * vehicle consumes when idle to the loopback driver.
-   * <p>
-   * Type: Double
-   * </p>
-   */
-  public static final String PROP_IDLE_ENERGY = "tcs:virtualVehicleIdleEnergy";
-  /**
-   * This class's Logger.
-   */
-  private static final Logger LOG
-      = LoggerFactory.getLogger(LoopbackCommunicationAdapterFactory.class);
-  /**
-   * The default energy storage capacity.
-   */
-  private static final double DEFAULT_CAPACITY = 1000.0;
-  /**
    * The adapter components factory.
    */
   private final LoopbackAdapterComponentsFactory adapterFactory;
-  /**
-   * The energy storage factory.
-   */
-  private final EnergyStorageFactory energyStorageFactory;
   /**
    * Indicates whether this component is initialized or not.
    */
@@ -73,17 +34,17 @@ public class LoopbackCommunicationAdapterFactory
    * Creates a new factory.
    *
    * @param componentsFactory The adapter components factory.
-   * @param energyStorageFactory The energy storage factory.
    */
   @Inject
-  public LoopbackCommunicationAdapterFactory(LoopbackAdapterComponentsFactory componentsFactory,
-                                             EnergyStorageFactory energyStorageFactory) {
+  public LoopbackCommunicationAdapterFactory(LoopbackAdapterComponentsFactory componentsFactory) {
     this.adapterFactory = requireNonNull(componentsFactory, "componentsFactory");
-    this.energyStorageFactory = requireNonNull(energyStorageFactory, "energyStorageFactory");
   }
 
   @Override
   public void initialize() {
+    if (isInitialized()) {
+      return;
+    }
     initialized = true;
   }
 
@@ -94,6 +55,9 @@ public class LoopbackCommunicationAdapterFactory
 
   @Override
   public void terminate() {
+    if (!isInitialized()) {
+      return;
+    }
     initialized = false;
   }
 
@@ -112,49 +76,6 @@ public class LoopbackCommunicationAdapterFactory
   @Override
   public LoopbackCommunicationAdapter getAdapterFor(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
-
-    LoopbackCommunicationAdapter adapter
-        = adapterFactory.createLoopbackCommAdapter(vehicle,
-                                                   energyStorageFactory.createInstance(DEFAULT_CAPACITY));
-
-    // Get energy usage of moving vehicle
-    String movementEnergyProp = vehicle.getProperty(PROP_MOVEMENT_ENERGY);
-    if (movementEnergyProp != null) {
-      try {
-        adapter.getProcessModel().setMovementPower(Double.parseDouble(movementEnergyProp));
-      }
-      catch (NumberFormatException e) {
-        LOG.debug("Invalid movement energy usage value for vehicle {}. Using default.",
-                  vehicle.getName(),
-                  e);
-      }
-    }
-
-    // Get energy usage of operating vehicle
-    String operationEnergyProp = vehicle.getProperties().get(PROP_OPERATION_ENERGY);
-    if (operationEnergyProp != null) {
-      try {
-        adapter.getProcessModel().setOperationPower(Double.parseDouble(operationEnergyProp));
-      }
-      catch (NumberFormatException e) {
-        LOG.debug("Invalid operation energy usage value for vehicle {}. Using default.",
-                  vehicle.getName(),
-                  e);
-      }
-    }
-
-    // Get energy usage of idle vehicle 
-    String idleEnergyProp = vehicle.getProperties().get(PROP_IDLE_ENERGY);
-    if (idleEnergyProp != null) {
-      try {
-        adapter.getProcessModel().setIdlePower(Double.parseDouble(idleEnergyProp));
-      }
-      catch (NumberFormatException e) {
-        LOG.debug("Invalid idle energy usage value for vehicle {}. Using default.",
-                  vehicle.getName(),
-                  e);
-      }
-    }
-    return adapter;
+    return adapterFactory.createLoopbackCommAdapter(vehicle);
   }
 }

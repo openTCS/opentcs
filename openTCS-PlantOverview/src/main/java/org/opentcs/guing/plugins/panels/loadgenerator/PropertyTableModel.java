@@ -9,13 +9,13 @@
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Table model for transport order proerties.
@@ -26,15 +26,17 @@ class PropertyTableModel
     extends AbstractTableModel {
 
   /**
-   * This class's Logger.
+   * This classe's bundle.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(PropertyTableModel.class);
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    "Key",
-    "Value"
+    BUNDLE.getString("key"),
+    BUNDLE.getString("value")
   };
   /**
    * The column classes.
@@ -49,17 +51,22 @@ class PropertyTableModel
   private List<PropEntry> data = new ArrayList<>();
 
   /**
-   * Creates a new PropertyTableModel.
+   * Creates a new instance.
    *
-   * @param data Map containing the current properties
+   * @param data The properties.
    */
   public PropertyTableModel(Map<String, String> data) {
-    super();
     requireNonNull(data, "data");
 
     for (Entry<String, String> entry : data.entrySet()) {
       this.data.add(new PropEntry(entry.getKey(), entry.getValue()));
     }
+  }
+  
+  /**
+   * Creates a new instance.
+   */
+  public PropertyTableModel() {
   }
 
   @Override
@@ -85,20 +92,13 @@ class PropertyTableModel
       case 1:
         return entry.getValue();
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
   @Override
   public String getColumnName(int columnIndex) {
-    try {
-      return COLUMN_NAMES[columnIndex];
-    }
-    catch (ArrayIndexOutOfBoundsException exc) {
-      LOG.warn("Invalid columnIndex", exc);
-      return "FEHLER";
-    }
+    return COLUMN_NAMES[columnIndex];
   }
 
   @Override
@@ -114,8 +114,7 @@ class PropertyTableModel
       case 1:
         return true;
       default:
-        throw new IllegalArgumentException("Invalid columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Invalid columnIndex: " + columnIndex);
     }
   }
 
@@ -138,18 +137,43 @@ class PropertyTableModel
         entry.setValue((String) aValue);
         break;
       default:
-        throw new IllegalArgumentException("Unhandled columnIndex: "
-            + columnIndex);
+        throw new IllegalArgumentException("Unhandled columnIndex: " + columnIndex);
     }
   }
 
   /**
-   * Returns the properties as a list.
+   * Returns this model's complete content.
    *
-   * @return The list holding the properties
+   * @return This model's complete content. The result list is unmodifiable.
    */
   public List<PropEntry> getList() {
-    return data;
+    return Collections.unmodifiableList(data);
+  }
+
+  /**
+   * Adds an entry to the end of the model/list.
+   *
+   * @param propEntry The new entry.
+   */
+  public void addData(PropEntry propEntry) {
+    requireNonNull(propEntry, "propEntry");
+
+    data.add(propEntry);
+    fireTableDataChanged();
+  }
+
+  /**
+   * Removes the entry at the given index.
+   * Does nothing if <code>row</code> does not exist.
+   *
+   * @param row Index of entry to be removed.
+   */
+  public void removeData(int row) {
+    if (row < 0 || row >= data.size()) {
+      return;
+    }
+    data.remove(row);
+    fireTableDataChanged();
   }
 
   /**
@@ -160,17 +184,16 @@ class PropertyTableModel
     /**
      * The key.
      */
-    private String key;
+    private String key = "";
     /**
      * The value.
      */
-    private String value;
+    private String value = "";
 
     /**
-     * Creates an empty PropEntry.
+     * Creates a new instance.
      */
     public PropEntry() {
-      // Do nada.
     }
 
     /**
@@ -180,8 +203,8 @@ class PropertyTableModel
      * @param value The value
      */
     public PropEntry(String key, String value) {
-      this.key = key;
-      this.value = value;
+      this.key = requireNonNull(key, "key");
+      this.value = requireNonNull(value, "value");
     }
 
     /**
@@ -199,7 +222,7 @@ class PropertyTableModel
      * @param key The new key
      */
     public void setKey(String key) {
-      this.key = key;
+      this.key = requireNonNull(key, "key");
     }
 
     /**
@@ -217,7 +240,7 @@ class PropertyTableModel
      * @param value The new value
      */
     public void setValue(String value) {
-      this.value = value;
+      this.value = requireNonNull(value, "value");
     }
   }
 }

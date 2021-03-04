@@ -45,6 +45,11 @@ public class TreeMouseAdapter
    */
   protected final TreeView treeView;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param treeView The tree view
+   */
   @Inject
   public TreeMouseAdapter(TreeView treeView) {
     this.treeView = Objects.requireNonNull(treeView);
@@ -94,45 +99,45 @@ public class TreeMouseAdapter
 
   /**
    * Evaluates a right click the user made on an user object.
-   * 
+   *
    * @param e The MouseEvent.
    * @param userObject The user object that was right clicked.
    * @param oldSelection The user objects that were selected.
    */
-  protected void evaluateRightClick(MouseEvent e, 
-                                    UserObject userObject, 
+  protected void evaluateRightClick(MouseEvent e,
+                                    UserObject userObject,
                                     Set<UserObject> oldSelection) {
-      if (userObject instanceof BlockUserObject
-              || userObject instanceof PointUserObject
-              || userObject instanceof LocationUserObject
-              || userObject instanceof PathUserObject) {
-          oldSelection.add(userObject);
-          Set<ModelComponent> dataObjects = new HashSet<>();
-          
-          for (UserObject userObj : oldSelection) {
-              dataObjects.add(userObj.getModelComponent());
-          }
-          
-          treeView.selectItems(dataObjects);
+    if (userObject instanceof BlockUserObject
+        || userObject instanceof PointUserObject
+        || userObject instanceof LocationUserObject
+        || userObject instanceof PathUserObject) {
+      oldSelection.add(userObject);
+      Set<ModelComponent> dataObjects = new HashSet<>();
+
+      for (UserObject userObj : oldSelection) {
+        dataObjects.add(userObj.getModelComponent());
       }
-      userObject.rightClicked(treeView.getTree(), e.getX(), e.getY());
+
+      treeView.selectItems(dataObjects);
+    }
+    userObject.rightClicked(treeView.getTree(), e.getX(), e.getY());
   }
 
   /**
    * Returns the UserObject in the currently selected path.
-   * 
+   *
    * @return An UserObject.
    */
   private UserObject getUserObject() {
-    DefaultMutableTreeNode treeNode = 
-        (DefaultMutableTreeNode) treeView.getTree().getLastSelectedPathComponent();
+    DefaultMutableTreeNode treeNode
+        = (DefaultMutableTreeNode) treeView.getTree().getLastSelectedPathComponent();
 
     return treeNode != null ? (UserObject) treeNode.getUserObject() : null;
   }
 
   /**
    * Shows a popup menu with options for the JTree.
-   * 
+   *
    * @param x x coordinate.
    * @param y y coordinate.
    */

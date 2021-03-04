@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Component;
@@ -70,11 +69,11 @@ public class IntegerPropertyCellEditor
 
     JFormattedTextField textField = (JFormattedTextField) getComponent();
     setValue(value);
-    
+
     if (property().getValue() instanceof Integer) {
       textField.setValue(new Integer((int) property().getValue()));
     }
-    
+
     return fComponent;
   }
 
@@ -86,7 +85,8 @@ public class IntegerPropertyCellEditor
       textField.commitEdit();
     }
     catch (ParseException ex) {
-      LoggerFactory.getLogger(IntegerPropertyCellEditor.class).error("ParseException: {0}", textField.getText());
+      LoggerFactory.getLogger(IntegerPropertyCellEditor.class).error("ParseException: {0}",
+                                                                     textField.getText());
     }
 
     try {
@@ -97,7 +97,7 @@ public class IntegerPropertyCellEditor
       if (newValue != oldValue) {
         markProperty();
       }
-    
+
       return property();
     }
     catch (NumberFormatException e) {

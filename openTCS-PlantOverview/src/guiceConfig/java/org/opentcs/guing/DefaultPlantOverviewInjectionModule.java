@@ -21,6 +21,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
+import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
+import org.opentcs.access.rmi.factories.AnonSslSocketFactoryProvider;
+import org.opentcs.access.rmi.factories.SslSocketFactoryProvider;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ApplicationHome;
@@ -32,6 +36,7 @@ import org.opentcs.guing.model.ModelInjectionModule;
 import org.opentcs.guing.storage.DefaultStorageInjectionModule;
 import org.opentcs.guing.transport.TransportInjectionModule;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
+import static org.opentcs.guing.util.PlantOverviewApplicationConfiguration.ConnectionEncryption.NONE;
 import org.opentcs.guing.util.UtilInjectionModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,8 +107,25 @@ public class DefaultPlantOverviewInjectionModule
         .toInstance(configuration);
     configurePlantOverview(configuration);
     configureThemes(configuration);
+
+    switch (configuration.connectionEncryption()) {
+      case NONE:
+        bind(SocketFactoryProvider.class).to(NullSocketFactoryProvider.class);
+        break;
+      case SSL_UNTRUSTED:
+        bind(SocketFactoryProvider.class).to(AnonSslSocketFactoryProvider.class);
+        break;
+      case SSL:
+        bind(SocketFactoryProvider.class).to(SslSocketFactoryProvider.class);
+        break;
+      default:
+        LOG.warn("No implementation for '{}' encryption, falling back to '{}'.",
+                 configuration.connectionEncryption().name(),
+                 NONE.name());
+        bind(SocketFactoryProvider.class).to(NullSocketFactoryProvider.class);
+    }
   }
-  
+
   private void configureThemes(PlantOverviewApplicationConfiguration configuration) {
     bind(LocationTheme.class)
         .to(configuration.locationThemeClass())

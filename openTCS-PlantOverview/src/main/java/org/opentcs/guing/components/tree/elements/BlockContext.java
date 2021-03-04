@@ -21,6 +21,9 @@ import org.opentcs.guing.model.elements.BlockModel;
 public class BlockContext
     implements UserObjectContext {
 
+  /**
+   * Creates a new instance.
+   */
   @Inject
   public BlockContext() {
   }

@@ -55,6 +55,12 @@ public class OrderSequence
                Cloneable {
 
   /**
+   * The category of this order sequence.
+   * An order sequence and all transport orders it contains share the same category.
+   */
+  @Nonnull
+  private String category = OrderConstants.CATEGORY_NONE;
+  /**
    * Transport orders belonging to this sequence that still need to be processed.
    */
   private final List<TCSObjectReference<TransportOrder>> orders;
@@ -126,6 +132,7 @@ public class OrderSequence
   private OrderSequence(int objectID,
                         String name,
                         Map<String, String> properties,
+                        String category,
                         TCSObjectReference<Vehicle> intendedVehicle,
                         List<TCSObjectReference<TransportOrder>> orders,
                         int finishedIndex,
@@ -134,6 +141,7 @@ public class OrderSequence
                         boolean finished,
                         TCSObjectReference<Vehicle> processingVehicle) {
     super(objectID, name, properties);
+    this.category = requireNonNull(category, "category");
     this.intendedVehicle = intendedVehicle;
     this.orders = new ArrayList<>(requireNonNull(orders, "orders"));
     this.finishedIndex = finishedIndex;
@@ -148,6 +156,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              propertiesWith(key, value),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -162,6 +171,37 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              properties,
+                             category,
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
+  }
+
+  /**
+   * Returns this order sequence's category.
+   *
+   * @return This order sequence's category.
+   */
+  @Nonnull
+  public String getCategory() {
+    return category;
+  }
+
+  /**
+   * Creates a copy of this object, with the given category.
+   *
+   * @param category The category to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withCategory(String category) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -223,6 +263,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              ordersWithAppended(order),
                              finishedIndex,
@@ -288,6 +329,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -329,6 +371,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -372,6 +415,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -415,6 +459,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -458,6 +503,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -501,6 +547,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -528,6 +575,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             category,
                              intendedVehicle,
                              orders,
                              finishedIndex,

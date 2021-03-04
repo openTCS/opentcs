@@ -20,6 +20,14 @@ dependencies {
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 
+distributions {
+  main {
+    contents {
+      from "${sourceSets.main.resources.srcDirs[0]}/org/opentcs/kernel/distribution"
+    }
+  }
+}
+
 // For now, we're using hand-crafted start scripts, so disable the application
 // plugin's start script generation.
 startScripts.enabled = false

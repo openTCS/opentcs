@@ -292,7 +292,7 @@ public abstract class CourseObjectProperty {
       super(key, value);
     }
   }
-  
+
   @XmlRootElement(name = "locationTypeProperty")
   public static class LocationTypeCourseProperty
       extends CourseObjectProperty {

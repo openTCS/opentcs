@@ -6,12 +6,12 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.transport;
 
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * A table model in which each cell is uneditable.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */

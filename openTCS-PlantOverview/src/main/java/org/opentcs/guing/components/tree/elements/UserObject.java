@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.tree.elements;
 
 import javax.swing.ImageIcon;
@@ -87,18 +86,18 @@ public interface UserObject {
    * wird.
    */
   void doubleClicked();
-  
+
   /**
    * Returns the parent component that contains this user object.
    * (Typically a <code>SimpleFolder</code>
-   * 
+   *
    * @return The parent <code>ModelComponent</code>.
    */
   ModelComponent getParent();
-  
+
   /**
    * Sets the parent component.
-   * 
+   *
    * @param parent The parent.
    */
   void setParent(ModelComponent parent);

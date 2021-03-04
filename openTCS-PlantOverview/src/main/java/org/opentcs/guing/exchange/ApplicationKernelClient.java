@@ -13,6 +13,8 @@ import org.opentcs.access.SharedKernelClient;
 import static org.opentcs.util.Assertions.checkState;
 
 /**
+ * Implementation of the {@link SharedKernelClient} interface to give access to a shared kernel
+ * object.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

@@ -18,11 +18,11 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Deletes the region at (or after) the caret position.
- * This action acts on the last EditableComponent} / {@code JTextComponent} 
+ * This action acts on the last EditableComponent} / {@code JTextComponent}
  * which had the focus when the {@code ActionEvent} was generated.
  * This action is called when the user selects the "Delete" item in
  * the Edit menu. The menu item is automatically created by the application.
- * 
+ *
  * @author Werner Randelshofer
  */
 public class DeleteAction

@@ -73,7 +73,7 @@ public class ResourceAllocationPanelTest {
 
     panel.processEvent(new TCSObjectEvent(vehicle, vehicle, TCSObjectEvent.Type.OBJECT_MODIFIED));
 
-    verify(kernel, never()).query(any());
+    verify(kernel, times(1)).query(any());
   }
 
   @Test
@@ -83,7 +83,7 @@ public class ResourceAllocationPanelTest {
 
     panel.processEvent(new TCSObjectEvent(vehicle, vehicle, TCSObjectEvent.Type.OBJECT_MODIFIED));
 
-    verify(kernel, never()).query(any());
+    verify(kernel, times(1)).query(any());
   }
 
   @Test
@@ -96,7 +96,7 @@ public class ResourceAllocationPanelTest {
 
     panel.processEvent(new TCSObjectEvent(vehicle, vehicle2, TCSObjectEvent.Type.OBJECT_MODIFIED));
 
-    verify(kernel, times(1)).query(any());
+    verify(kernel, times(2)).query(any());
     verify((AllocationTreeModel) panel.allocationTable.getModel(), times(0))
         .updateAllocations(any());
   }
@@ -112,7 +112,7 @@ public class ResourceAllocationPanelTest {
 
     panel.processEvent(new TCSObjectEvent(vehicle, vehicle2, TCSObjectEvent.Type.OBJECT_MODIFIED));
 
-    verify(kernel, times(1)).query(any());
+    verify(kernel, times(2)).query(any());
     verify((AllocationTreeModel) panel.allocationTable.getModel(), times(1))
         .updateAllocations(any());
   }
@@ -126,7 +126,7 @@ public class ResourceAllocationPanelTest {
 
     panel.processEvent(new TCSObjectEvent(vehicle, null, TCSObjectEvent.Type.OBJECT_CREATED));
 
-    verify(kernel, times(1)).query(any());
+    verify(kernel, times(2)).query(any());
     verify((AllocationTreeModel) panel.allocationTable.getModel(), times(1))
         .updateAllocations(any());
   }
@@ -140,7 +140,7 @@ public class ResourceAllocationPanelTest {
 
     panel.processEvent(new TCSObjectEvent(null, vehicle, TCSObjectEvent.Type.OBJECT_REMOVED));
 
-    verify(kernel, times(1)).query(any());
+    verify(kernel, times(2)).query(any());
     verify((AllocationTreeModel) panel.allocationTable.getModel(), times(1))
         .updateAllocations(any());
   }

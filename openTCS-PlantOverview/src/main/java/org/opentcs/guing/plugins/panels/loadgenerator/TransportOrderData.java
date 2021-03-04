@@ -32,7 +32,7 @@ public class TransportOrderData {
   /**
    * This transport order's name.
    */
-  private String name;
+  private String name = "";
   /**
    * The new transport order's deadline.
    */

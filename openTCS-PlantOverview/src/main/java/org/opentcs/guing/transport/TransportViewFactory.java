@@ -6,7 +6,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.transport;
 
 import org.opentcs.data.order.OrderSequence;
@@ -17,7 +16,7 @@ import org.opentcs.data.order.OrderSequence;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface TransportViewFactory {
-  
+
   /**
    * Creates a new view for an order sequence.
    *

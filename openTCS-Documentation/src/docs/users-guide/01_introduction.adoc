@@ -3,8 +3,10 @@
 
 === Purpose of the software
 
-openTCS is a control system software for (fleets of) automatic vehicles.
-It was primarily developed for the coordination of automated guided vehicles (AGV), but it is generally conceivable to use it with other automatic vehicles like mobile robots or quadrocopters, as openTCS controls the vehicles independent of their specific characteristics like track guidance system or load handling device.
+openTCS is a control system/fleet management software for automatic vehicles.
+It was primarily developed for the coordination of automated guided vehicles (AGV) performing transportation tasks e.g. in a production plant.
+However, it can be used with other automatic vehicles like mobile robots or quadrocopters, too.
+openTCS controls the vehicles independent of their specific characteristics like track guidance system or load handling device.
 This is achieved by integrating vehicles into the system via pluggable drivers, similar to device drivers in operating systems.
 
 === System requirements
@@ -17,7 +19,7 @@ If you intend to extend and customize openTCS, please also see the Developer's G
 
 === Questions and problem reports
 
-If you have questions about this manual, the openTCS project or about using or extending openTCS, please contact the development team by using the discussion forums at http://sourceforge.net/projects/opentcs/ or by sending an e-mail to info@opentcs.org.
+If you have questions about this manual, the openTCS project or about using or extending openTCS, please contact the development team by using the mailing list at http://sourceforge.net/projects/opentcs/.
 
 If you encounter technical problems using openTCS, please remember to include enough data in your problem report to help the developers help you, e.g.:
 

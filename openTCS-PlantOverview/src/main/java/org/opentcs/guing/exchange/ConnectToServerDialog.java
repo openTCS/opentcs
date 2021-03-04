@@ -73,7 +73,7 @@ public class ConnectToServerDialog
 
     initComponents();
     initConnectionBookmarks();
-    
+
     if (appConfig.connectionBookmarks().isEmpty()) {
       host = "localhost";
       port = Registry.REGISTRY_PORT;
@@ -120,7 +120,7 @@ public class ConnectToServerDialog
    * erfolgreich war.
    */
   private void handleError() {
-    String message = "No connection to kernel";
+    String message = ResourceBundleUtil.getBundle().getString("ConnectToServerDialog.message");
     JOptionPane.showMessageDialog(this, message, message, JOptionPane.ERROR_MESSAGE);
   }
 
@@ -154,7 +154,7 @@ public class ConnectToServerDialog
     panelButtons = new javax.swing.JPanel();
     okButton = new javax.swing.JButton();
     cancelButton = new CancelButton();
-    cbComboBox = new javax.swing.JComboBox<ConnectionParamSet>();
+    cbComboBox = new javax.swing.JComboBox<>();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
@@ -180,7 +180,7 @@ public class ConnectToServerDialog
     getContentPane().add(textFieldServer, gridBagConstraints);
 
     labelPort.setFont(labelPort.getFont());
-    labelPort.setText("RMI Port:");
+    labelPort.setText(bundle.getString("ConnectToServerDialog.port.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -201,7 +201,7 @@ public class ConnectToServerDialog
     panelButtons.setLayout(new java.awt.GridBagLayout());
 
     okButton.setFont(okButton.getFont().deriveFont(okButton.getFont().getStyle() | java.awt.Font.BOLD));
-    okButton.setText("OK");
+    okButton.setText(bundle.getString("ConnectToServerDialog.okButton.text")); // NOI18N
     okButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         okButtonActionPerformed(evt);
@@ -215,7 +215,7 @@ public class ConnectToServerDialog
     panelButtons.add(okButton, gridBagConstraints);
 
     cancelButton.setFont(cancelButton.getFont());
-    cancelButton.setText("Cancel");
+    cancelButton.setText(bundle.getString("ConnectToServerDialog.cancelButton.text")); // NOI18N
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         cancelButtonActionPerformed(evt);
@@ -266,8 +266,10 @@ public class ConnectToServerDialog
     }
     catch (NumberFormatException e) {
       JOptionPane.showMessageDialog(this,
-                                    ResourceBundleUtil.getBundle().getString("ConnectToServerDialog.invalidPort.message"),
-                                    ResourceBundleUtil.getBundle().getString("ConnectToServerDialog.invalidPort"),
+                                    ResourceBundleUtil.getBundle().getString(
+                                        "ConnectToServerDialog.invalidPort.message"),
+                                    ResourceBundleUtil.getBundle().getString(
+                                        "ConnectToServerDialog.invalidPort"),
                                     JOptionPane.ERROR_MESSAGE);
       return;
     }

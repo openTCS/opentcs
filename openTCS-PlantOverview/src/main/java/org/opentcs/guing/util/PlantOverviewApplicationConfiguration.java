@@ -75,8 +75,18 @@ public interface PlantOverviewApplicationConfiguration {
   @ConfigurationEntry(
       type = "List of <hostname:port>",
       description = "The configured connection bookmarks.",
-      orderKey = "2_bookmarks")
+      orderKey = "2_connection_0")
   List<ConnectionParamSet> connectionBookmarks();
+
+  @ConfigurationEntry(
+      type = "String",
+      description = {"The type of encryption used for RMI.",
+                     "'NONE': No encryption.",
+                     "'SSL_UNTRUSTED': SSL is used, but there is no way to verify the remote "
+                     + "peer's identity. (Default)",
+                     "'SSL': SSL is used. (Generation of a keystore-truststore-pair is required.)"},
+      orderKey = "2_connection_1")
+  ConnectionEncryption connectionEncryption();
 
   @ConfigurationEntry(
       type = "Class name",
@@ -110,5 +120,11 @@ public interface PlantOverviewApplicationConfiguration {
     MODELLING,
     OPERATING,
     ASK
+  }
+
+  enum ConnectionEncryption {
+    NONE,
+    SSL_UNTRUSTED,
+    SSL;
   }
 }

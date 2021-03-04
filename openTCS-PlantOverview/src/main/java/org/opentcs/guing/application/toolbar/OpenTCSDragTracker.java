@@ -48,7 +48,7 @@ public class OpenTCSDragTracker
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param appState Stores the application's current state.
    */
   @Inject

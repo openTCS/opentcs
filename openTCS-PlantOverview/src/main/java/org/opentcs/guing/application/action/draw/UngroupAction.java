@@ -32,6 +32,8 @@ public class UngroupAction
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The drawing editor
    */
   public UngroupAction(DrawingEditor editor) {
     super(editor, new GroupFigure(), false);

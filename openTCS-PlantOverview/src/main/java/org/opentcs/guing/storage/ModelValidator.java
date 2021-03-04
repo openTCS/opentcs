@@ -4,17 +4,18 @@
 package org.opentcs.guing.storage;
 
 import com.google.common.base.Strings;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
@@ -37,9 +38,9 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
  * Validator for a {@link SystemModel} and its {@link ModelComponent}s.
@@ -48,6 +49,11 @@ import org.slf4j.helpers.MessageFormatter;
  * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class ModelValidator {
+
+  /**
+   * This class' resource bundle.
+   */
+  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 
   /**
    * The collection of errors which happened after the last reset.
@@ -62,6 +68,7 @@ public class ModelValidator {
   /**
    * Creates a new instance.
    */
+  @Inject
   public ModelValidator() {
   }
 
@@ -90,25 +97,26 @@ public class ModelValidator {
    */
   public boolean isValidWith(SystemModel model, ModelComponent component) {
     if (model == null) {
-      errorOccurred(model, "The system model is null.");
+      errorOccurred(model, "ModelValidator.error.nullModel");
       return false;
     }
     if (component == null) {
-      errorOccurred(component, "The model component to validate is null.");
+      errorOccurred(component, "ModelValidator.error.nullComponent");
       return false;
     }
     //Validate the name of the component
     if (Strings.isNullOrEmpty(component.getName())) {
-      errorOccurred(component, "Invalid name \"{}\".", component.getName());
+      errorOccurred(component, "ModelValidator.error.invalidComponentName", component.getName());
       return false;
     }
     if (nameExists(model, component)) {
-      errorOccurred(component, "Component name \"{}\" used multiple times.", component.getName());
+      errorOccurred(component, "ModelValidator.error.componentNameExists", component.getName());
       return false;
     }
     //Validate the miscellaneous property of the component
     //TODO: Seems to be optional in some models?!
-    KeyValueSetProperty miscellaneous = (KeyValueSetProperty) component.getProperty(ModelComponent.MISCELLANEOUS);
+    KeyValueSetProperty miscellaneous
+        = (KeyValueSetProperty) component.getProperty(ModelComponent.MISCELLANEOUS);
     /*if (miscellaneous == null) {
      errorOccurred(component, "Miscellaneous key-value-set does not exist.");
      return false;
@@ -154,13 +162,12 @@ public class ModelValidator {
    * Handles all occurred errors while validating the system model.
    *
    * @param component the component where the error occurred
-   * @param format the format string
-   * @param args a list of arguments
+   * @param bundleKey the bundle key with the error description
+   * @param args a list of arguments for the error description
    */
-  private void errorOccurred(ModelComponent component, String format, Object... args) {
+  private void errorOccurred(ModelComponent component, String bundleKey, Object... args) {
     String componentName = component == null ? "null" : component.getName();
-    String pattern = componentName + ": " + format;
-    String message = MessageFormatter.arrayFormat(pattern, args).getMessage();
+    String message = componentName + ": " + bundle.getFormatted(bundleKey, args);
     LOG.info(message);
     errors.add(message);
   }
@@ -177,7 +184,7 @@ public class ModelValidator {
     //Validate the x-scale in the model view
     LengthProperty scaleXProperty = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_X);
     if (scaleXProperty == null || scaleXProperty.getValue() == null) {
-      errorOccurred(layoutModel, "ScaleX property does not exist.");
+      errorOccurred(layoutModel, "ModelValidator.error.layout.scaleXMissing");
       return false; //Return because the next if would be a NPE
     }
     double scaleX = 0;
@@ -185,18 +192,20 @@ public class ModelValidator {
       scaleX = Double.parseDouble(scaleXProperty.getValue().toString());
     }
     catch (NumberFormatException e) {
-      errorOccurred(layoutModel, "ScaleX property is not a valid double: {}.", scaleXProperty.getValue());
+      errorOccurred(layoutModel, "ModelValidator.error.layout.scaleXInvalid",
+                    scaleXProperty.getValue());
       valid = false;
     }
     if (scaleX < 0) {
-      errorOccurred(layoutModel, "ScaleX property {} is < 0.", scaleXProperty.getValue());
+      errorOccurred(layoutModel, "ModelValidator.error.layout.scaleXNegative",
+                    scaleXProperty.getValue());
       valid = false;
     }
 
     //validate the y-scale in the model view
     LengthProperty scaleYProperty = (LengthProperty) layoutModel.getProperty(LayoutModel.SCALE_Y);
     if (scaleYProperty == null || scaleYProperty.getValue() == null) {
-      errorOccurred(layoutModel, "ScaleY property does not exist.");
+      errorOccurred(layoutModel, "ModelValidator.error.layout.scaleYMissing");
       return false; //Return because the next if would be a NPE
     }
     double scaleY = 0;
@@ -204,11 +213,13 @@ public class ModelValidator {
       scaleY = Double.parseDouble(scaleYProperty.getValue().toString());
     }
     catch (NumberFormatException e) {
-      errorOccurred(layoutModel, "ScaleY property is not a valid double: {}.", scaleYProperty.getValue());
+      errorOccurred(layoutModel, "ModelValidator.error.layout.scaleYInvalid",
+                    scaleYProperty.getValue());
       valid = false;
     }
     if (scaleY < 0) {
-      errorOccurred(layoutModel, "ScaleY property {} is < 0.", scaleYProperty.getValue());
+      errorOccurred(layoutModel, "ModelValidator.error.layout.scaleYNegative",
+                    scaleYProperty.getValue());
       valid = false;
     }
 
@@ -225,9 +236,10 @@ public class ModelValidator {
   private boolean validatePoint(SystemModel model, PointModel point) {
     boolean valid = true;
     //Validate the vehicle orientation angle
-    AngleProperty orientationProperty = (AngleProperty) point.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
+    AngleProperty orientationProperty
+        = (AngleProperty) point.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
     if (orientationProperty == null || orientationProperty.getValue() == null) {
-      errorOccurred(point, "Vehicle orientation angle does not exist or null.");
+      errorOccurred(point, "ModelValidator.error.point.nullVehicleOrientation");
       return false; //Return because the next if would be a NPE
     }
 
@@ -240,17 +252,19 @@ public class ModelValidator {
     else {
       Double angle = (Double) orientationProperty.getValue();
       if (angle < 0) {
-        LOG.warn("{}: Orientation angle property is {} but has to be > 0. Transforming to positive angle.",
+        LOG.warn("{}: Orientation angle property is {} but has to be > 0."
+            + " Transforming to positive angle.",
                  point.getName(),
                  orientationProperty.getValue());
         orientationProperty.setValueAndUnit(360 + angle % 360, AngleProperty.Unit.DEG);
       }
     }
+    point.setProperty(PointModel.VEHICLE_ORIENTATION_ANGLE, orientationProperty);
 
     //Validate the point type
     AbstractProperty typeProperty = (AbstractProperty) point.getProperty(PointModel.TYPE);
     if (typeProperty == null || typeProperty.getComparableValue() == null) {
-      errorOccurred(point, "Point type property does not exist.");
+      errorOccurred(point, "ModelValidator.error.point.nullType");
       return false; //Return because the next if would be a NPE
     }
 
@@ -261,37 +275,42 @@ public class ModelValidator {
       }
     }
     if (!found) {
-      errorOccurred(point, "Invalid type of point \"{}\".", typeProperty.getComparableValue());
+      errorOccurred(point, "ModelValidator.error.point.invalidType",
+                    typeProperty.getComparableValue());
       valid = false;
     }
 
     //Validate the x position in the model view
-    CoordinateProperty xCoordProperty = (CoordinateProperty) point.getProperty(PointModel.MODEL_X_POSITION);
+    CoordinateProperty xCoordProperty
+        = (CoordinateProperty) point.getProperty(PointModel.MODEL_X_POSITION);
     if (xCoordProperty == null || xCoordProperty.getValue().toString().equals("")) {
-      errorOccurred(point, "The x value of the model position does not exist.");
+      errorOccurred(point, "ModelValidator.error.point.missingModelX");
       valid = false;
     }
 
     //Validate the y position in the model view
-    CoordinateProperty yCoordProperty = (CoordinateProperty) point.getProperty(PointModel.MODEL_Y_POSITION);
+    CoordinateProperty yCoordProperty
+        = (CoordinateProperty) point.getProperty(PointModel.MODEL_Y_POSITION);
     if (yCoordProperty == null
         || yCoordProperty.getValue() == null
         || yCoordProperty.getValue().toString().equals("")) {
-      errorOccurred(point, "The y value of the model position does not exist.");
+      errorOccurred(point, "ModelValidator.error.point.missingModelY");
       valid = false;
     }
 
     //Validate the x position in the course model
     StringProperty xPosProperty = (StringProperty) point.getProperty(ElementPropKeys.POINT_POS_X);
-    if (xPosProperty == null || xPosProperty.getText() == null || xPosProperty.getText().equals("")) {
-      errorOccurred(point, "The x value of the point position does not exist.");
+    if (xPosProperty == null
+        || xPosProperty.getText() == null
+        || xPosProperty.getText().equals("")) {
+      errorOccurred(point, "ModelValidator.error.point.missingPositionX");
       valid = false;
     }
 
     //Validate the y position in the course model
     StringProperty yPosProperty = (StringProperty) point.getProperty(ElementPropKeys.POINT_POS_Y);
-    if (yPosProperty == null || yPosProperty.getText() == null || yPosProperty.getText().equals("")) {
-      errorOccurred(point, "The y value of the point position does not exist.");
+    if (yPosProperty == null || isNullOrEmpty(yPosProperty.getText())) {
+      errorOccurred(point, "ModelValidator.error.point.missingPositionY");
       valid = false;
     }
 
@@ -310,28 +329,29 @@ public class ModelValidator {
     //Validate the length of the path
     LengthProperty lengthProperty = (LengthProperty) path.getProperty(PathModel.LENGTH);
     if (lengthProperty == null || lengthProperty.getValue() == null) {
-      errorOccurred(path, "Path length does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.nullLength");
       return false; //Return because the next if would be a NPE
     }
 
     //Validate the routing costs
     IntegerProperty costProperty = (IntegerProperty) path.getProperty(PathModel.ROUTING_COST);
     if (costProperty == null || costProperty.getValue() == null) {
-      errorOccurred(path, "Path routing cost does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.nullRoutingCost");
       return false; //Return because the next if would be a NPE
     }
 
     //Validate the max velocity
     SpeedProperty maxVelocityProperty = (SpeedProperty) path.getProperty(PathModel.MAX_VELOCITY);
     if (maxVelocityProperty == null || maxVelocityProperty.getValue() == null) {
-      errorOccurred(path, "Path max velocity does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.nullMaxVelocity");
       return false; //Return because the next if would be a NPE
     }
 
     //Validate the max reverse velocity
-    SpeedProperty maxRevVelocityProperty = (SpeedProperty) path.getProperty(PathModel.MAX_REVERSE_VELOCITY);
+    SpeedProperty maxRevVelocityProperty
+        = (SpeedProperty) path.getProperty(PathModel.MAX_REVERSE_VELOCITY);
     if (maxRevVelocityProperty == null || maxRevVelocityProperty.getValue() == null) {
-      errorOccurred(path, "Path max velocity does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.nullMaxReverseVelocity");
       return false; //Return because the next if would be a NPE
     }
 
@@ -339,64 +359,65 @@ public class ModelValidator {
     AbstractProperty typeProperty
         = (AbstractProperty) path.getProperty(ElementPropKeys.PATH_CONN_TYPE);
     if (typeProperty == null) {
-      errorOccurred(path, "Path connection type does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.nullConnectionType");
       return false; //Return because the next if would be a NPE
     }
 
     //Validate the control points of the path
-    StringProperty controlPointsProperty = (StringProperty) path.getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
+    StringProperty controlPointsProperty
+        = (StringProperty) path.getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
     if (controlPointsProperty == null) {
-      errorOccurred(path, "Path control points do not exist.");
+      errorOccurred(path, "ModelValidator.error.path.nullControlPoints");
       return false; //Return because the next if would be a NPE
     }
 
     if ((typeProperty.getValue().equals(PathModel.LinerType.BEZIER)
          || typeProperty.getValue().equals(PathModel.LinerType.BEZIER_3))
-        && (controlPointsProperty.getText() == null || controlPointsProperty.getText().equals(""))) {
-      errorOccurred(path, "Invalid path control points for bezier curve \"{}\".", controlPointsProperty.getText());
+        && (isNullOrEmpty(controlPointsProperty.getText()))) {
+      errorOccurred(path, "ModelValidator.error.path.invalidControlPoints",
+                    controlPointsProperty.getText());
       valid = false;
     }
 
     //Validate the start component of this path
     StringProperty startProperty = (StringProperty) path.getProperty(PathModel.START_COMPONENT);
     if (startProperty == null) {
-      errorOccurred(path, "Start component does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.missingStartProperty");
       return false; //Return because the next if would be a NPE
     }
 
-    if (startProperty.getText() == null
-        || startProperty.getText().equals("")) {
-      errorOccurred(path, "Invalid start component name \"{}\".", startProperty.getText());
+    if (isNullOrEmpty(startProperty.getText())) {
+      errorOccurred(path, "ModelValidator.error.path.invalidStart", startProperty.getText());
       valid = false;
     }
 
     if (!nameExists(model, startProperty.getText())) {
-      errorOccurred(model, "Start component \"{}\" does not exist.", startProperty.getText());
+      errorOccurred(model, "ModelValidator.error.path.notExistingStart", startProperty.getText());
       valid = false;
     }
 
     //Validate the end component of this path
     StringProperty endProperty = (StringProperty) path.getProperty(PathModel.END_COMPONENT);
     if (endProperty == null) {
-      errorOccurred(path, "End component does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.missingEndProperty");
       return false; //Return because the next if would be a NPE
     }
 
     if (endProperty.getText() == null
         || endProperty.getText().equals("")) {
-      errorOccurred(path, "Invalid end component name \"{}\".", endProperty.getText());
+      errorOccurred(path, "ModelValidator.error.path.invalidEnd", endProperty.getText());
       valid = false;
     }
 
     if (!nameExists(model, endProperty.getText())) {
-      errorOccurred(model, "End component \"{}\" does not exist.", endProperty.getText());
+      errorOccurred(model, "ModelValidator.error.path.notExistingEnd", endProperty.getText());
       valid = false;
     }
 
     //Validate the existence of the locked property
     BooleanProperty lockedProperty = (BooleanProperty) path.getProperty(PathModel.LOCKED);
     if (lockedProperty == null) {
-      errorOccurred(path, "Locked property does not exist.");
+      errorOccurred(path, "ModelValidator.error.path.missingLockedProperty");
       valid = false; //Return because the next if would be a NPE
     }
 
@@ -411,6 +432,7 @@ public class ModelValidator {
                path.getName(),
                lengthProperty.getValue());
       lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
+      path.setProperty(PathModel.LENGTH, lengthProperty);
     }
 
     //Validate the costs
@@ -419,6 +441,7 @@ public class ModelValidator {
                path.getName(),
                costProperty.getValue());
       costProperty.setValue(1);
+      path.setProperty(PathModel.ROUTING_COST, costProperty);
     }
 
     //Validate the maximum velocity
@@ -427,6 +450,7 @@ public class ModelValidator {
                path.getName(),
                maxVelocityProperty.getValue());
       maxVelocityProperty.setValueAndUnit(0, SpeedProperty.Unit.MM_S);
+      path.setProperty(PathModel.MAX_VELOCITY, maxVelocityProperty);
     }
 
     //Validate the maximum reverse velocity
@@ -435,6 +459,7 @@ public class ModelValidator {
                path.getName(),
                maxRevVelocityProperty.getValue());
       maxRevVelocityProperty.setValueAndUnit(0, SpeedProperty.Unit.MM_S);
+      path.setProperty(PathModel.MAX_VELOCITY, maxRevVelocityProperty);
     }
 
     //Validate the connection type of this path
@@ -446,7 +471,8 @@ public class ModelValidator {
     }
     //Record error if property value is not present in the enum
     if (!found) {
-      errorOccurred(path, "Invalid type of path '{}'.", typeProperty.getComparableValue());
+      errorOccurred(path, "ModelValidator.error.path.invalidType",
+                    typeProperty.getComparableValue());
       valid = false;
     }
 
@@ -468,7 +494,7 @@ public class ModelValidator {
         = (StringSetProperty) locationType.getProperty(LocationTypeModel.ALLOWED_OPERATIONS);
 
     if (allowedOperationsProperty == null) {
-      errorOccurred(locationType, "Allowed operations does not exist.");
+      errorOccurred(locationType, "ModelValidator.error.locationType.missingAllowedOperations");
       valid = false; //Return because the next if would be a NPE
     }
 
@@ -486,66 +512,71 @@ public class ModelValidator {
     boolean valid = true;
 
     //Validate the x position in the model view
-    CoordinateProperty xCoordProperty = (CoordinateProperty) location.getProperty(LocationModel.MODEL_X_POSITION);
+    CoordinateProperty xCoordProperty
+        = (CoordinateProperty) location.getProperty(LocationModel.MODEL_X_POSITION);
     if (xCoordProperty == null) {
-      errorOccurred(location, "The x value of the model position does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingModelX");
       return false;
     }
     try {
       Double.parseDouble(xCoordProperty.getValue().toString());
     }
     catch (NumberFormatException e) {
-      errorOccurred(location, "The x value of the model position is not an integer.");
+      errorOccurred(location, "ModelValidator.error.location.invalidModelX",
+                    xCoordProperty.getValue());
       valid = false;
     }
 
     //Validate the y position in the model view
-    CoordinateProperty yCoordProperty = (CoordinateProperty) location.getProperty(LocationModel.MODEL_Y_POSITION);
+    CoordinateProperty yCoordProperty
+        = (CoordinateProperty) location.getProperty(LocationModel.MODEL_Y_POSITION);
     if (yCoordProperty == null) {
-      errorOccurred(location, "The y value of the model position does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingModelY");
       return false;
     }
     try {
       Double.parseDouble(yCoordProperty.getValue().toString());
     }
     catch (NumberFormatException e) {
-      errorOccurred(location, "The y value of the model position is not an integer.");
+      errorOccurred(location, "ModelValidator.error.location.invalidModelY");
       valid = false;
     }
 
     //Validate the x position in the course model
     StringProperty xPosProperty = (StringProperty) location.getProperty(ElementPropKeys.LOC_POS_X);
     if (xPosProperty == null || xPosProperty.getText() == null) {
-      errorOccurred(location, "The x value of the location position does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingPositionX");
       return false;
     }
     try {
-      Integer.parseInt(xPosProperty.getText().toString());
+      Integer.parseInt(xPosProperty.getText());
     }
     catch (NumberFormatException e) {
-      errorOccurred(location, "The x value of the location position is not an integer.");
+      errorOccurred(location, "ModelValidator.error.location.invalidPositionX",
+                    xPosProperty.getText());
       valid = false;
     }
 
     //Validate the y position in the course model
     StringProperty yPosProperty = (StringProperty) location.getProperty(ElementPropKeys.LOC_POS_Y);
     if (yPosProperty == null || yPosProperty.getText() == null) {
-      errorOccurred(location, "The y value of the location position does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingPositionY");
       return false;
     }
     try {
-      Integer.parseInt(yPosProperty.getText().toString());
+      Integer.parseInt(yPosProperty.getText());
     }
     catch (NumberFormatException e) {
-      errorOccurred(location, "The y value of the location position is not an integer.");
+      errorOccurred(location, "ModelValidator.error.location.invalidPositionY");
       valid = false;
     }
 
     //Validate the location type
     boolean found = false;
-    LocationTypeProperty locTypeProperty = (LocationTypeProperty) location.getProperty(LocationModel.TYPE);
+    LocationTypeProperty locTypeProperty
+        = (LocationTypeProperty) location.getProperty(LocationModel.TYPE);
     if (locTypeProperty == null) {
-      errorOccurred(location, "The location type does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingType");
       return false; //Return because the next if would be a NPE
     }
     for (LocationTypeModel type : model.getLocationTypeModels()) {
@@ -557,7 +588,8 @@ public class ModelValidator {
 
     //Record error if location type is not present in the system model
     if (!found) {
-      errorOccurred(location, "Invalid type of location \"{}\" - not found.", locTypeProperty.getValue());
+      errorOccurred(location, "ModelValidator.error.location.invalidType",
+                    locTypeProperty.getValue());
       valid = false;
     }
 
@@ -565,7 +597,7 @@ public class ModelValidator {
     StringProperty labelOffsetXProperty
         = (StringProperty) location.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
     if (labelOffsetXProperty == null) {
-      errorOccurred(location, "The x value of the location label offset does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingLabelOffsetX");
       return false;
     }
 
@@ -573,7 +605,7 @@ public class ModelValidator {
     StringProperty labelOffsetYProperty
         = (StringProperty) location.getProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y);
     if (labelOffsetYProperty == null) {
-      errorOccurred(location, "The y value of the location label offset does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingLabelOffsetY");
       return false;
     }
 
@@ -581,7 +613,7 @@ public class ModelValidator {
     StringProperty labelOrientationAngleProperty
         = (StringProperty) location.getProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
     if (labelOrientationAngleProperty == null) {
-      errorOccurred(location, "The orientation angle for the label does not exist.");
+      errorOccurred(location, "ModelValidator.error.location.missingLabelOrientation");
       valid = false;
     }
 
@@ -601,24 +633,23 @@ public class ModelValidator {
     //Validate the start component of the link
     StringProperty startProperty = (StringProperty) link.getProperty(LinkModel.START_COMPONENT);
     if (startProperty == null) {
-      errorOccurred(link, "Start component does not exist.");
+      errorOccurred(link, "ModelValidator.error.link.missingStartProperty");
       return false; //Return because the next if would be a NPE
     }
-    if (startProperty.getText() == null
-        || startProperty.getText().equals("")) {
-      errorOccurred(link, "Invalid start component name \"{}\".", startProperty.getText());
+    if (isNullOrEmpty(startProperty.getText())) {
+      errorOccurred(link, "ModelValidator.error.link.invalidStartProperty",
+                    startProperty.getText());
       valid = false;
     }
 
     //Validate the end component of the link
     StringProperty endProperty = (StringProperty) link.getProperty(LinkModel.END_COMPONENT);
     if (endProperty == null) {
-      errorOccurred(link, "End component does not exist.");
+      errorOccurred(link, "ModelValidator.error.link.missingEndProperty");
       return false; //Return because the next if would be a NPE
     }
-    if (endProperty.getText() == null
-        || endProperty.getText().equals("")) {
-      errorOccurred(link, "Invalid end component name \"{}\".", endProperty.getText());
+    if (isNullOrEmpty(endProperty.getText())) {
+      errorOccurred(link, "ModelValidator.error.link.invalidEndProperty", endProperty.getText());
       valid = false;
     }
     if (!valid) {
@@ -626,12 +657,14 @@ public class ModelValidator {
     }
     //Validate whether the start component exists
     if (!nameExists(model, startProperty.getText())) {
-      errorOccurred(link, "Start component \"{}\" does not exist.", startProperty.getModel().getName());
+      errorOccurred(link, "ModelValidator.error.link.notExistingStart",
+                    startProperty.getText());
       valid = false;
     }
     //Validate whether the point exists
     if (!nameExists(model, endProperty.getText())) {
-      errorOccurred(link, "End component \"{}\" does not exist.", endProperty.getModel().getName());
+      errorOccurred(link, "ModelValidator.error.link.notExistingEnd",
+                    endProperty.getText());
       valid = false;
     }
     return valid;
@@ -683,18 +716,18 @@ public class ModelValidator {
     //Validate that all elements of the group exists
     StringSetProperty elementsProperty = (StringSetProperty) group.getProperty(GroupModel.ELEMENTS);
     if (elementsProperty == null) {
-      errorOccurred(group, "Elements property for the group does not exist.");
+      errorOccurred(group, "ModelValidator.error.group.nullElementsProperty");
       return false; //Return because the next if would be a NPE
     }
     Set<String> elements = new HashSet<>();
     for (String element : elementsProperty.getItems()) {
       if (elements.contains(element)) {
-        errorOccurred(group, "Group element \"{}\" is listed multiple times.", element);
+        errorOccurred(group, "ModelValidator.error.group.duplicateElement", element);
         valid = false;
       }
       elements.add(element);
       if (!nameExists(model, element)) {
-        errorOccurred(group, "Group element \"{}\" does not exist.", element);
+        errorOccurred(group, "ModelValidator.error.group.notExistingElement", element);
         valid = false;
       }
     }
@@ -713,20 +746,21 @@ public class ModelValidator {
     boolean valid = true;
 
     //Validate that all elements of the static route exists
-    StringSetProperty elementsProperty = (StringSetProperty) staticRoute.getProperty(StaticRouteModel.ELEMENTS);
+    StringSetProperty elementsProperty
+        = (StringSetProperty) staticRoute.getProperty(StaticRouteModel.ELEMENTS);
     if (elementsProperty == null) {
-      errorOccurred(staticRoute, "Elements property for the static route does not exist.");
+      errorOccurred(staticRoute, "ModelValidator.error.staticRoute.nullElementsProperty");
       return false; //Return because the next if would be a NPE
     }
     Set<String> elements = new HashSet<>();
     for (String element : elementsProperty.getItems()) {
       if (elements.contains(element)) {
-        errorOccurred(staticRoute, "Static route element \"{}\" is listed multiple times.", element);
+        errorOccurred(staticRoute, "ModelValidator.error.staticRoute.duplicateElement", element);
         valid = false;
       }
       elements.add(element);
       if (!nameExists(model, element)) {
-        errorOccurred(staticRoute, "Static route element \"{}\" does not exist.", element);
+        errorOccurred(staticRoute, "ModelValidator.error.staticRoute.notExistingElement", element);
         valid = false;
       }
     }
@@ -747,85 +781,81 @@ public class ModelValidator {
     //Validate that all properties needed exist
     LengthProperty lengthProperty = (LengthProperty) vehicle.getProperty(VehicleModel.LENGTH);
     if (lengthProperty == null) {
-      errorOccurred(vehicle, "Length property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingLengthProperty");
       valid = false;
     }
 
     PercentProperty energyCriticalProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
     if (energyCriticalProperty == null) {
-      errorOccurred(vehicle, "Energy level critical property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingEnergyCritical");
       valid = false;
     }
 
     PercentProperty energyGoodProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
     if (energyGoodProperty == null) {
-      errorOccurred(vehicle, "Energy level good property does not exist.");
-      valid = false;
-    }
-
-    CoursePointProperty initialPositionProperty
-        = (CoursePointProperty) vehicle.getProperty(VehicleModel.INITIAL_POSITION);
-    if (initialPositionProperty == null) {
-      errorOccurred(vehicle, "Initial position property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingEnergyGood");
       valid = false;
     }
 
     PercentProperty energyLevelProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL);
     if (energyLevelProperty == null) {
-      errorOccurred(vehicle, "Energy level property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingEnergyLevel");
       valid = false;
     }
 
     AbstractProperty energyStateProperty
         = (AbstractProperty) vehicle.getProperty(VehicleModel.ENERGY_STATE);
     if (energyStateProperty == null) {
-      errorOccurred(vehicle, "Energy state property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingEnergyState");
       valid = false;
     }
 
     BooleanProperty loadedProperty = (BooleanProperty) vehicle.getProperty(VehicleModel.LOADED);
     if (loadedProperty == null) {
-      errorOccurred(vehicle, "Loaded property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingLoaded");
       valid = false;
     }
 
     AbstractProperty stateProperty = (AbstractProperty) vehicle.getProperty(VehicleModel.STATE);
     if (stateProperty == null) {
-      errorOccurred(vehicle, "State property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingState");
       valid = false;
     }
 
     AbstractProperty procStateproperty
         = (AbstractProperty) vehicle.getProperty(VehicleModel.PROC_STATE);
     if (procStateproperty == null) {
-      errorOccurred(vehicle, "Processing state property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingProcState");
       valid = false;
     }
 
     StringProperty currentPointProperty = (StringProperty) vehicle.getProperty(VehicleModel.POINT);
     if (currentPointProperty == null) {
-      errorOccurred(vehicle, "Current point property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingCurrentPoint");
       valid = false;
     }
 
-    StringProperty nextPointProperty = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
+    StringProperty nextPointProperty
+        = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
     if (nextPointProperty == null) {
-      errorOccurred(vehicle, "Next point property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingNextPoint");
       valid = false;
     }
 
-    TripleProperty precisePositionProperty = (TripleProperty) vehicle.getProperty(VehicleModel.PRECISE_POSITION);
+    TripleProperty precisePositionProperty
+        = (TripleProperty) vehicle.getProperty(VehicleModel.PRECISE_POSITION);
     if (precisePositionProperty == null) {
-      errorOccurred(vehicle, "Precise position property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingPrecisePosition");
       valid = false;
     }
 
-    AngleProperty orientationProperty = (AngleProperty) vehicle.getProperty(VehicleModel.ORIENTATION_ANGLE);
+    AngleProperty orientationProperty
+        = (AngleProperty) vehicle.getProperty(VehicleModel.ORIENTATION_ANGLE);
     if (orientationProperty == null) {
-      errorOccurred(vehicle, "Orientation angle property does not exist.");
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.missingOrientation");
       valid = false;
     }
 
@@ -840,6 +870,7 @@ public class ModelValidator {
                vehicle.getName(),
                lengthProperty.getValue());
       lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
+      vehicle.setProperty(VehicleModel.LENGTH, lengthProperty);
     }
 
     //Validate the critical energy level
@@ -849,6 +880,7 @@ public class ModelValidator {
                vehicle.getName(),
                energyCriticalProperty.getValue());
       energyCriticalProperty.setValueAndUnit(0, PercentProperty.Unit.PERCENT);
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_CRITICAL, energyCriticalProperty);
     }
 
     //Validate the good energy level
@@ -857,6 +889,7 @@ public class ModelValidator {
                vehicle.getName(),
                energyGoodProperty.getValue());
       energyGoodProperty.setValueAndUnit(100, PercentProperty.Unit.PERCENT);
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_GOOD, energyGoodProperty);
     }
 
     //Validate that the good energy level is greater equals than the critical energy level
@@ -869,12 +902,14 @@ public class ModelValidator {
       energyGoodProperty
           .setValueAndUnit(energyCriticalProperty.getValueByUnit(PercentProperty.Unit.PERCENT),
                            PercentProperty.Unit.PERCENT);
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_GOOD, energyGoodProperty);
     }
 
     //Validate the current energy level
     if (((int) energyLevelProperty.getValue()) < 0 || ((int) energyLevelProperty.getValue()) > 100) {
       LOG.warn("{}: Energy level is {} but has to be in range of [0..100]. Setting it to 50.");
       energyLevelProperty.setValueAndUnit(50, PercentProperty.Unit.PERCENT);
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL, energyLevelProperty);
     }
 
     //Validate that the energy state is a valid/known value
@@ -886,7 +921,8 @@ public class ModelValidator {
       }
     }
     if (!found) {
-      errorOccurred(model, "Unknown energy state {}.", energyStateProperty.getValue());
+      errorOccurred(model, "ModelValidator.error.vehicle.invalidEnergyState",
+                    energyStateProperty.getValue());
       valid = false;
     }
 
@@ -899,7 +935,8 @@ public class ModelValidator {
       }
     }
     if (!found) {
-      errorOccurred(model, "Unknown processing state {}.", procStateproperty.getValue());
+      errorOccurred(model, "ModelValidator.error.vehicle.invalidProcState",
+                    procStateproperty.getValue());
       valid = false;
     }
 
@@ -907,6 +944,21 @@ public class ModelValidator {
     if (((Double) orientationProperty.getValue()) < 0) {
       LOG.warn("{}: Orientation angle is {} but has to be >= 0. Setting it to 0.");
       orientationProperty.setValueAndUnit(0, AngleProperty.Unit.DEG);
+      vehicle.setProperty(VehicleModel.ORIENTATION_ANGLE, orientationProperty);
+    }
+    //Validate whether the current point exists
+    String currentPoint = currentPointProperty.getText();
+    if (!isNullOrEmptyPoint(currentPoint) && !nameExists(model, currentPoint)) {
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.notExistingCurrentPoint",
+                    currentPointProperty.getText());
+      valid = false;
+    }
+    //Validate whether the next point exists
+    String nextPoint = nextPointProperty.getText();
+    if (!isNullOrEmptyPoint(nextPoint) && !nameExists(model, nextPoint)) {
+      errorOccurred(vehicle, "ModelValidator.error.vehicle.notExistingNextPoint",
+                    nextPointProperty.getText());
+      valid = false;
     }
     return valid;
   }
@@ -958,5 +1010,16 @@ public class ModelValidator {
       return false;
     }
     return model.getModelComponent(name) != null;
+  }
+
+  /**
+   * Returns true if the given name is null or empty or equals the string "null", because that's
+   * a valid content in a model file for no point.
+   *
+   * @param name The point name
+   * @return True if the given name is null or empty or equals the string "null"
+   */
+  private boolean isNullOrEmptyPoint(String name) {
+    return isNullOrEmpty(name) || name.equals("null");
   }
 }

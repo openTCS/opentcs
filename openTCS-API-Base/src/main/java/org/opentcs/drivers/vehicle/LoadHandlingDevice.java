@@ -9,6 +9,7 @@ package org.opentcs.drivers.vehicle;
 
 import java.io.Serializable;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Describes a single load handling device on a vehicle.
@@ -36,18 +37,17 @@ public class LoadHandlingDevice
    * capacity or not.
    */
   public LoadHandlingDevice(String label, boolean full) {
-    this.label = Objects.requireNonNull(label, "label is null");
+    this.label = requireNonNull(label, "label");
     this.full = full;
   }
 
   /**
    * Creates a new LoadHandlingDevice as a copy of the given one.
    *
-   * @param original The instance to be copied.F
+   * @param original The instance to be copied.
    */
   public LoadHandlingDevice(LoadHandlingDevice original) {
-    this.label = original.label;
-    this.full = original.full;
+    this(original.label, original.full);
   }
 
   /**

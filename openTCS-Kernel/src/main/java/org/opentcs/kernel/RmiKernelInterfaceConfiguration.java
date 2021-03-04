@@ -35,16 +35,32 @@ public interface RmiKernelInterfaceConfiguration {
       description = "The TCP port of the RMI.",
       orderKey = "0_address_1")
   int registryPort();
-  
+
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote kernel.",
       orderKey = "0_address_2")
   int remoteKernelPort();
+  
+  @ConfigurationEntry(
+      type = "String",
+      description = {"The type of encryption used for RMI.",
+                     "'NONE': No encryption.",
+                     "'SSL_UNTRUSTED': SSL is used, but there is no way to verify the remote peer's "
+                         + "identity. (Default)",
+                     "'SSL': SSL is used. (Generation of a keystore-truststore-pair is required.)"},
+      orderKey = "0_address_3")
+  ConnectionEncryption connectionEncryption();
 
   @ConfigurationEntry(
       type = "Long",
       description = "The interval for cleaning out inactive clients (in ms).",
       orderKey = "1_sweeping")
   long clientSweepInterval();
+
+  enum ConnectionEncryption {
+    NONE,
+    SSL_UNTRUSTED,
+    SSL;
+  }
 }

@@ -115,7 +115,7 @@ public class ViewManager {
   public Map<DefaultSingleCDockable, OrderSequencesContainerPanel> getOrderSequenceMap() {
     return orderSequenceViews;
   }
-  
+
   @Handler
   public void handleModeChange(OperationModeChangeEvent evt) {
     switch (evt.getNewMode()) {
@@ -126,7 +126,7 @@ public class ViewManager {
         setPlantOverviewStateOperating();
         break;
       default:
-        // XXX Unhandled mode. Do anything?
+      // XXX Unhandled mode. Do anything?
     }
   }
 
@@ -260,7 +260,7 @@ public class ViewManager {
                                    OrderSequencesContainerPanel panel) {
     orderSequenceViews.put(dockable, panel);
   }
-  
+
   /**
    * Forgets the given dockable.
    *

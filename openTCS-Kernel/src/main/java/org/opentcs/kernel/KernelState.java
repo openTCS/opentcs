@@ -485,6 +485,12 @@ abstract class KernelState
     throw new UnsupportedKernelOpException(unsupportedMsg());
   }
 
+  public void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
+                                              Set<String> pocessableCategories)
+      throws UnsupportedKernelOpException {
+    throw new UnsupportedKernelOpException(unsupportedMsg());
+  }
+
   public void setVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                  TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {

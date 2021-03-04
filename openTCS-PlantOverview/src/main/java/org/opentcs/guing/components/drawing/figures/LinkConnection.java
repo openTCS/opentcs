@@ -25,6 +25,7 @@ import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Eine gestrichelte Linie, die einen Meldepunkt mit einer Übergabestation oder
@@ -87,8 +88,10 @@ public class LinkConnection
 
   @Override // AbstractFigure
   public String getToolTipText(Point2D.Double p) {
-    StringBuilder sb = new StringBuilder("<html>Link ");
-    sb.append("<b>").append(getModel().getName()).append("</b>");
+    String linkDesc
+        = ResourceBundleUtil.getBundle().getString("link.description");
+    StringBuilder sb = new StringBuilder("<html>");
+    sb.append(linkDesc).append(" ").append("<b>").append(getModel().getName()).append("</b>");
     sb.append("</html>");
 
     return sb.toString();

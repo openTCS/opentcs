@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A class to save <code>DriveOrderStructure</code>s.
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 @XmlType(propOrder = {"driveOrderLocation", "driveOrderVehicleOperation"})
@@ -57,6 +58,7 @@ public class DriveOrderXMLStructure {
 
   /**
    * Returns a reference to the location.
+   *
    * @return The reference to the location.
    */
   @XmlAttribute(name = "driveOrderLocation", required = true)
@@ -66,6 +68,7 @@ public class DriveOrderXMLStructure {
 
   /**
    * Sets the drive order location.
+   *
    * @param loc The new location.
    */
   public void setDriveOrderLocation(String loc) {
@@ -74,6 +77,7 @@ public class DriveOrderXMLStructure {
 
   /**
    * Sets the drive order vehicle operation.
+   *
    * @param op The new operation
    */
   public void setDriveOrderVehicleOperation(String op) {
@@ -82,6 +86,7 @@ public class DriveOrderXMLStructure {
 
   /**
    * Returns this drive order's operation type.
+   *
    * @return The drive order's operation type.
    */
   @XmlAttribute(name = "driveOrderVehicleOperation", required = true)

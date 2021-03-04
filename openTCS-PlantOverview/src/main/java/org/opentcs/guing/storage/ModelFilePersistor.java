@@ -25,10 +25,15 @@ public interface ModelFilePersistor {
    * Persist a system model.
    *
    * @param systemModel The system model to be serialized.
+   * @param modelName The model name
+   * @param file The file to serialize into
+   * @param ignoreError Whether errors should be ignored
+   * @return <code>true</code> if, and only if, the model was successfully serialized
+   * @throws java.io.IOException If an exception occurs
    */
   public boolean serialize(SystemModel systemModel, String modelName, File file, boolean ignoreError)
-      throws IOException; 
-  
+      throws IOException;
+
   /**
    * Returns the filter that declares which files are supported with this persistor.
    *
