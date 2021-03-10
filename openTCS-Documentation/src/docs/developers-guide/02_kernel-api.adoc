@@ -160,3 +160,34 @@ include::{kernel-testSrc}/org/opentcs/documentation/WithdrawTransportOrderTest.j
 ----
 include::{kernel-testSrc}/org/opentcs/documentation/WithdrawTransportOrderTest.java[tags=documentation_withdrawTransportOrderByVehicle]
 ----
+
+=== Using the event bus
+
+Each of the main openTCS applications -- Kernel, Kernel Control Center and Plant Overview -- provides an event bus that can be used to receive or emit event objects application-wide.
+To acquire the respective application's event bus instance, request it to be provided via dependency injection.
+Any of the following three variants of constructor parameters are equivalent:
+
+[source, java]
+----
+public MyClass(@ApplicationEventBus EventHandler eventHandler) {
+  ...
+}
+----
+
+[source, java]
+----
+public MyClass(@ApplicationEventBus EventSource eventSource) {
+  ...
+}
+----
+
+[source, java]
+----
+public MyClass(@ApplicationEventBus EventBus eventBus) {
+  ...
+}
+----
+
+Having acquired the `EventHandler`, `EventSource` or `EventBus` instance that way, you can use it to emit event objects to it and/or subscribe to receive event objects.
+
+Note that, within the Kernel application, event objects should be emitted via the kernel executor to avoid concurrency issues -- see <<section-kernel-executor>>.

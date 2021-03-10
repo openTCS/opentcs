@@ -18,6 +18,7 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.model.elements.VehicleModel;
+import static org.opentcs.guing.util.I18nPlantOverview.VEHICLEPOPUP_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,22 +31,24 @@ public class IntegrationLevelChangeAction
     extends AbstractAction {
 
   /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(IntegrationLevelChangeAction.class);
-  /**
    * Resource path to the correct lables.
    */
   public static final String IGNORE_ID = "course.vehicle.integrationLevelIgnore";
   public static final String NOTICE_ID = "course.vehicle.integrationLevelNotice";
   public static final String RESPECT_ID = "course.vehicle.integrationLevelRespect";
   public static final String UTILIZE_ID = "course.vehicle.integrationLevelUtilize";
-
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(IntegrationLevelChangeAction.class);
+  /**
+   * This instance's resource bundle.
+   */
+  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(VEHICLEPOPUP_PATH);
   /**
    * The vehicles to change the level of.
    */
   private final Collection<VehicleModel> vehicles;
-
   /**
    * Sets the level to to change the vehicles to.
    */
@@ -70,20 +73,22 @@ public class IntegrationLevelChangeAction
     this.level = requireNonNull(level, "level");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
 
+    String actionName;
     switch (level) {
       case TO_BE_NOTICED:
-        ResourceBundleUtil.getBundle().configureAction(this, NOTICE_ID);
+        actionName = bundle.getString("integrationLevelChangeAction.notice.name");
         break;
       case TO_BE_RESPECTED:
-        ResourceBundleUtil.getBundle().configureAction(this, RESPECT_ID);
+        actionName = bundle.getString("integrationLevelChangeAction.respect.name");
         break;
       case TO_BE_UTILIZED:
-        ResourceBundleUtil.getBundle().configureAction(this, UTILIZE_ID);
+        actionName = bundle.getString("integrationLevelChangeAction.utilize.name");
         break;
       default:
-        ResourceBundleUtil.getBundle().configureAction(this, IGNORE_ID);
+        actionName = bundle.getString("integrationLevelChangeAction.ignore.name");
         break;
     }
+    putValue(NAME, actionName);
   }
 
   @Override

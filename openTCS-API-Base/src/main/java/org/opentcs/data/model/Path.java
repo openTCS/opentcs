@@ -238,7 +238,9 @@ public class Path
    * more travelling this path costs.
    *
    * @return The routing cost of this path (unitless).
+   * @deprecated Use property-based routing costs, instead.
    */
+  @Deprecated
   public long getRoutingCost() {
     return routingCost;
   }
@@ -262,7 +264,9 @@ public class Path
    *
    * @param routingCost The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use property-based routing costs, instead.
    */
+  @Deprecated
   public Path withRoutingCost(long routingCost) {
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),

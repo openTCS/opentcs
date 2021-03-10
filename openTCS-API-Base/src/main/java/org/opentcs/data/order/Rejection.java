@@ -12,13 +12,17 @@ import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes the rejection of a transport order by a vehicle, and the reason given for the vehicle
  * rejecting the order.
  *
+ * @deprecated Rejections are replaced by object history entries.
  * @author Stefan Walter (Fraunhofer IML)
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0", details = "Will be removed.")
 public class Rejection
     implements Serializable {
 

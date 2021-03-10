@@ -7,7 +7,6 @@ package org.opentcs.guing.application.action.edit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.net.URL;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -24,6 +23,8 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import static org.opentcs.guing.event.SystemModelTransitionEvent.Stage.UNLOADING;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
@@ -43,6 +44,8 @@ public class UndoRedoManager
 
   public static final String UNDO_ACTION_ID = "edit.undo";
   public static final String REDO_ACTION_ID = "edit.redo";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
   /**
    * Sending this UndoableEdit event to the UndoRedoManager
@@ -206,7 +209,8 @@ public class UndoRedoManager
     }
     else {
       undoAction.setEnabled(false);
-      label = ResourceBundleUtil.getBundle().getString(UNDO_ACTION_ID + ".text");
+      label = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH)
+          .getString("undoRedoManager.undoAction.name");
     }
 
     undoAction.putValue(Action.NAME, label);
@@ -218,7 +222,8 @@ public class UndoRedoManager
     }
     else {
       redoAction.setEnabled(false);
-      label = ResourceBundleUtil.getBundle().getString(REDO_ACTION_ID + ".text");
+      label = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH)
+          .getString("undoRedoManager.redoAction.name");
     }
 
     redoAction.putValue(Action.NAME, label);
@@ -317,13 +322,13 @@ public class UndoRedoManager
       extends AbstractAction {
 
     public UndoAction() {
-      ResourceBundleUtil.getBundle().configureAction(this, UNDO_ACTION_ID);
-
+      putValue(NAME, BUNDLE.getString("undoRedoManager.undoAction.name"));
+      putValue(SHORT_DESCRIPTION, BUNDLE.getString("undoRedoManager.undoAction.shortDescription"));
       putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl Z"));
 
-      URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-undo.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
-      putValue(LARGE_ICON_KEY, new ImageIcon(url));
+      ImageIcon icon = ImageDirectory.getImageIcon("/menu/edit-undo.png");
+      putValue(SMALL_ICON, icon);
+      putValue(LARGE_ICON_KEY, icon);
 
       setEnabled(false);
     }
@@ -346,13 +351,13 @@ public class UndoRedoManager
       extends AbstractAction {
 
     public RedoAction() {
-      ResourceBundleUtil.getBundle().configureAction(this, REDO_ACTION_ID);
-
+      putValue(NAME, BUNDLE.getString("undoRedoManager.redoAction.name"));
+      putValue(SHORT_DESCRIPTION, BUNDLE.getString("undoRedoManager.redoAction.shortDescription"));
       putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl Y"));
 
-      URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-redo.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
-      putValue(LARGE_ICON_KEY, new ImageIcon(url));
+      ImageIcon icon = ImageDirectory.getImageIcon("/menu/edit-redo.png");
+      putValue(SMALL_ICON, icon);
+      putValue(LARGE_ICON_KEY, icon);
 
       setEnabled(false);
     }

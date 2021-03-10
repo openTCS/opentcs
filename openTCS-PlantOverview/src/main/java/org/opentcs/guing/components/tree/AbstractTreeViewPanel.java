@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
@@ -42,8 +43,15 @@ import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
+import static org.opentcs.guing.model.SystemModel.FolderKey.LINKS;
+import static org.opentcs.guing.model.SystemModel.FolderKey.LOCATIONS;
+import static org.opentcs.guing.model.SystemModel.FolderKey.LOCATION_TYPES;
+import static org.opentcs.guing.model.SystemModel.FolderKey.OTHER_GRAPHICAL_ELEMENTS;
+import static org.opentcs.guing.model.SystemModel.FolderKey.PATHS;
+import static org.opentcs.guing.model.SystemModel.FolderKey.POINTS;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -230,15 +238,6 @@ public abstract class AbstractTreeViewPanel
 
       // Select point and path "directly", not the entries in a block area.
       if (dataObject != null && dataObject.equals(userObject.getModelComponent())) {
-        // pseifert @ 20.05.14: Is this still neccessary?
-//        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
-//        if (parentNode != null) {
-//          UserObject parentUserObject = (UserObject) parentNode.getUserObject();
-//
-//          if (parentUserObject != null && parentUserObject instanceof BlockUserObject) {
-//            continue;
-//          }
-//        }
         searchNode = node;
         break;
       }
@@ -280,8 +279,7 @@ public abstract class AbstractTreeViewPanel
       setRoot(item);
     }
     else {
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-      String treeViewName;
+      SimpleFolder folder;
       boolean sorting = true;  // Die Kindelemente des Knotens sollen sortiert werden
 
       if (item instanceof LayoutUserObject) {
@@ -292,27 +290,31 @@ public abstract class AbstractTreeViewPanel
       DefaultMutableTreeNode parentItem = findFirst(parent);
 
       if (parent instanceof LayoutModel) {
-        treeViewName = ((SimpleFolder) ((SimpleFolderUserObject) item).getModelComponent()).getTreeViewName();
 
-        if (treeViewName.equals(bundle.getString("tree.points.text"))) {
+        folder = ((SimpleFolder) ((SimpleFolderUserObject) item).getModelComponent());
+
+        if (Objects.equals(folder,
+                           modelManager.getModel().getMainFolder(POINTS))) {
           fTreeModel.insertNodeInto(treeItem, parentItem, 0);
         }
-        else if (treeViewName.equals(bundle.getString("tree.paths.text"))) {
+        else if (Objects.equals(folder,
+                                modelManager.getModel().getMainFolder(PATHS))) {
           insertElementAt(treeItem, parentItem, 1);
         }
-        else if (treeViewName.equals(bundle.getString("tree.locations.text"))) {
+        else if (Objects.equals(folder,
+                                modelManager.getModel().getMainFolder(LOCATIONS))) {
           insertElementAt(treeItem, parentItem, 2);
         }
-        else if (treeViewName.equals(bundle.getString("tree.locationTypes.text"))) {
+        else if (Objects.equals(folder,
+                                modelManager.getModel().getMainFolder(LOCATION_TYPES))) {
           insertElementAt(treeItem, parentItem, 3);
         }
-        else if (treeViewName.equals(bundle.getString("tree.links.text"))) {
+        else if (Objects.equals(folder,
+                                modelManager.getModel().getMainFolder(LINKS))) {
           insertElementAt(treeItem, parentItem, 4);
         }
-        else if (treeViewName.equals(bundle.getString("tree.blocks.text"))) {
-          insertElementAt(treeItem, parentItem, 5);
-        }
-        else if (treeViewName.equals(bundle.getString("tree.otherGraphicals.text"))) {
+        else if (Objects.equals(folder,
+                                modelManager.getModel().getMainFolder(OTHER_GRAPHICAL_ELEMENTS))) {
           insertElementAt(treeItem, parentItem, 7);
         }
       }
@@ -557,7 +559,7 @@ public abstract class AbstractTreeViewPanel
 
     @Override
     public String getPresentationName() {
-      return ResourceBundleUtil.getBundle().getString("edit.delete.text");
+      return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH).getString("abstractTreeViewPanel.deleteEdit.presentationName");
     }
 
     @Override
@@ -594,7 +596,7 @@ public abstract class AbstractTreeViewPanel
 
     @Override
     public String getPresentationName() {
-      return ResourceBundleUtil.getBundle().getString("edit.paste.text");
+      return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH).getString("abstractTreeViewPanel.pasteEdit.presentationName");
     }
 
     @Override

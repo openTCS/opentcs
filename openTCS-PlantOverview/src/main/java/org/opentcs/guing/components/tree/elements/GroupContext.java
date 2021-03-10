@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -42,9 +43,9 @@ public class GroupContext
   @Override
   public JPopupMenu getPopupMenu(final Set<UserObject> selectedUserObjects) {
     JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
-    JMenuItem item = new JMenuItem(labels.getString("tree.removeFromGroup"));
+    JMenuItem item = new JMenuItem(labels.getString("groupsMouseAdapter.popupMenuItem_removeFromGroup.text"));
     item.addActionListener(new ActionListener() {
 
       @Override

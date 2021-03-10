@@ -11,6 +11,7 @@ package org.opentcs.guing.application.action.view;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.opentcs.guing.application.OpenTCSView;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -22,6 +23,9 @@ public class AddDrawingViewAction
     extends AbstractAction {
 
   public final static String ID = "view.addDrawingView";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
+
   private final OpenTCSView view;
 
   /**
@@ -31,8 +35,8 @@ public class AddDrawingViewAction
    */
   public AddDrawingViewAction(OpenTCSView view) {
     this.view = view;
-    
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
+
+    putValue(NAME, BUNDLE.getString("addDrawingViewAction.name"));
   }
 
   @Override

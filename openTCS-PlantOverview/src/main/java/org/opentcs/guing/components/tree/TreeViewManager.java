@@ -195,7 +195,7 @@ public abstract class TreeViewManager
     this.componentFilter = requireNonNull(componentFilter, "componentFilter");
   }
 
-  public boolean accepts(ModelComponent component) {
+  private boolean accepts(ModelComponent component) {
     return componentFilter.test(component);
   }
 

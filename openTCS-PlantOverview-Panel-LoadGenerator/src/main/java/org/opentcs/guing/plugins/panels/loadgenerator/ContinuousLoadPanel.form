@@ -12,7 +12,7 @@
           <StringArray count="0"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Allowed_operations" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.comboBox_operationTypes.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -25,7 +25,7 @@
           <StringArray count="0"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Available_locations" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.comboBox_locations.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -34,18 +34,6 @@
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="locationsComboBox.setRenderer(new LocationComboBoxRenderer());"/>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;TCSObjectReference&lt;Location&gt;&gt;"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="propertyComboBox">
-      <Properties>
-        <Property name="editable" type="boolean" value="true"/>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new javax.swing.DefaultComboBoxModel&lt;String&gt;(new String[] { &quot;keyX&quot; })" type="code"/>
-        </Property>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="propertyComboBox.setSelectedIndex(-1);"/>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JFileChooser" name="fileChooser">
@@ -58,7 +46,7 @@
   </Properties>
   <AccessibilityProperties>
     <Property name="AccessibleContext.accessibleName" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Continuous_load" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.accessibleName" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
     </Property>
   </AccessibilityProperties>
   <AuxValues>
@@ -82,7 +70,7 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Trigger for generating orders">
-              <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="GeneratorTriggerTitle" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_generateTrigger.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -101,7 +89,7 @@
               <ComponentRef name="triggerButtonGroup"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="IfThereAreNoMoreThan" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.radioButton_triggerByOrderThreshold.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -125,7 +113,7 @@
         <Component class="javax.swing.JLabel" name="thresholdOrdersLbl">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="ThresholdOrders" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.label_unitOrdersToBeProcessed.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -147,7 +135,7 @@
               <ComponentRef name="triggerButtonGroup"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="AfterATimeoutOf" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.radioButton_triggerAfterTimeout.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -171,7 +159,7 @@
         <Component class="javax.swing.JLabel" name="timerSecondsLbl">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Seconds" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.label_unitSeconds.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -187,7 +175,7 @@
             </Property>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="singleTriggerRadioButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.radioButton_triggerOnce.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -203,7 +191,7 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Order profile">
-              <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="OrderProfileTitle" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_orderProfile.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -232,7 +220,7 @@
                 </Property>
                 <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="CreateOrdersRandomly" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.radioButton_createOrdersRandomly.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -259,7 +247,7 @@
             <Component class="javax.swing.JLabel" name="randomOrderCountLbl">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="OrdersAtATime" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.label_unitOrdersAtATime.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -290,7 +278,7 @@
             <Component class="javax.swing.JLabel" name="randomOrderSizeLbl">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="DriveOrdersPerTransportOrder" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.label_unitDriveOrdersPerOrder.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -316,7 +304,7 @@
                   <ComponentRef name="orderSpecButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="CreateOrdersByDefinition" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.radioButton_createOrdersAccordingDefinition.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -344,7 +332,7 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Order generation">
-              <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="OrderGenerationTitle" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_orderGeneration.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -360,7 +348,7 @@
         <Component class="javax.swing.JCheckBox" name="orderGenChkBox">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="EnableOrderGeneration" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.checkBox_enableOrderGeneration.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -386,7 +374,7 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Transport order modelling">
-              <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Transport_orders_modelling" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_transportOrderModelling.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -408,7 +396,7 @@
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                 <TitledBorder title="Transport orders">
-                  <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Transport_orders" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_transportOrders.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </TitledBorder>
               </Border>
             </Property>
@@ -476,10 +464,10 @@
                 <Component class="javax.swing.JButton" name="addToTOTableButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Add_new_order" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_addTransportOrder.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Add_empty_transport_order" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_addTransportOrder.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -495,10 +483,10 @@
                 <Component class="javax.swing.JButton" name="deleteFromTOTableButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Delete_selected" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_deleteSelectedOrder.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Remove_selected_transport_order" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_deleteSelectedOrder.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -535,7 +523,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Drive orders">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Drive_orders" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_driveOrders.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -545,7 +533,7 @@
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Drive orders">
                     <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="DriveOrders" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.tab_driveOrders.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </JTabbedPaneConstraints>
                 </Constraint>
@@ -571,7 +559,7 @@
                           <Connection code="new DriveOrderTableModel()" type="code"/>
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                          <ResourceString bundle="org/opentcs/remote/genericclient/Bundle.properties" key="Drive_orders_in_selected_transport_order" replaceFormat="bundle.getString(&quot;{key}&quot;)"/>
+                          <ResourceString bundle="org/opentcs/remote/genericclient/Bundle.properties" key="continuousLoadPanel.table_driveOrders.tooltipText" replaceFormat="bundle.getString(&quot;{key}&quot;)"/>
                         </Property>
                         <Property name="selectionModel" type="javax.swing.ListSelectionModel" editor="org.netbeans.modules.form.editors2.JTableSelectionModelEditor">
                           <JTableSelectionModel selectionMode="0"/>
@@ -583,10 +571,10 @@
                 <Component class="javax.swing.JButton" name="deleteFromDOTableButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Delete_selected" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_deleteSelectedDriveOrder.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/remote/genericclient/Bundle.properties" key="Remove_selected_drive_order" replaceFormat="bundle.getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="org/opentcs/remote/genericclient/Bundle.properties" key="continuousLoadPanel.button_deleteSelectedDriveOrder.tooltipText" replaceFormat="bundle.getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -602,7 +590,7 @@
                 <Component class="javax.swing.JButton" name="addDOButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="addDO" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_addDriveOrder.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -622,7 +610,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Properties">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Properties" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.panel_properties.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -632,7 +620,7 @@
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Properties">
                     <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="Properties" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.tab_properties.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </JTabbedPaneConstraints>
                 </Constraint>
@@ -659,7 +647,7 @@
                 <Component class="javax.swing.JButton" name="addPropertyButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="addProperty" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_addProperty.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -675,7 +663,7 @@
                 <Component class="javax.swing.JButton" name="removePropertyButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="removeProperty" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_removeProperty.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -704,7 +692,7 @@
             <Component class="javax.swing.JButton" name="openButton">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="open" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_open.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
@@ -715,7 +703,7 @@
             <Component class="javax.swing.JButton" name="saveButton">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/guing/plugins/panels/loadgenerator/Bundle.properties" key="save" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle.properties" key="continuousLoadPanel.button_save.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>

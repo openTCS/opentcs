@@ -28,10 +28,10 @@ import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -69,7 +69,8 @@ public class TransportOrderView
     this.historyEntryFormatter = requireNonNull(historyEntryFormatter, "historyEntryFormatter");
 
     initComponents();
-    setDialogTitle(ResourceBundleUtil.getBundle().getString("TransportOrderView.detailedView"));
+    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH)
+        .getString("transportOrderView.title"));
   }
 
   @Override
@@ -117,11 +118,6 @@ public class TransportOrderView
 
     dependenciesTable.setModel(createDependenciesTableModel());
 
-    rejectionsTable.setModel(createRejectionsTableModel());
-    rejectionsTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-    rejectionsTable.getColumnModel().getColumn(1).setPreferredWidth(300);
-    rejectionsTable.getColumnModel().getColumn(1).setCellRenderer(new ToolTipCellRenderer());
-
     historyTable.setModel(createHistoryTableModel());
     historyTable.getColumnModel().getColumn(0).setPreferredWidth(100);
     historyTable.getColumnModel().getColumn(1).setPreferredWidth(300);
@@ -132,8 +128,8 @@ public class TransportOrderView
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.key"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.value")});
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_properties.column_propertiesKey.headerText"),
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_properties.column_propertiesValue.headerText")});
     for (Entry<String, String> entry : fTransportOrder.getProperties().entrySet()) {
       tableModel.addRow(new String[] {entry.getKey(), entry.getValue()});
     }
@@ -145,7 +141,7 @@ public class TransportOrderView
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.target"),
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_driveOrderProperties.column_target.headerText"),
       "Operation",
       "Status"});
 
@@ -164,8 +160,8 @@ public class TransportOrderView
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.key"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.value")
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesKey.headerText"),
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesValue.headerText")
     });
 
     return tableModel;
@@ -175,8 +171,8 @@ public class TransportOrderView
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.route"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.destination")});
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_route.column_route.headerText"),
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_routeTable.column_destination.headerText")});
 
     return tableModel;
   }
@@ -185,7 +181,7 @@ public class TransportOrderView
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.to")});
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_dependencies.column_dependentTransportOrder.headerText")});
 
     for (TCSObjectReference<TransportOrder> refTransportOrder
              : fTransportOrder.getDependencies()) {
@@ -197,31 +193,12 @@ public class TransportOrderView
     return tableModel;
   }
 
-  private TableModel createRejectionsTableModel() {
-    DefaultTableModel tableModel = new UneditableTableModel();
-
-    tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.vehicle"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.reason")
-    });
-
-    for (Rejection rejection : fTransportOrder.getRejections()) {
-      tableModel.addRow(new String[] {
-        rejection.getVehicle().getName(),
-        rejection.getReason(),
-        TIMESTAMP_FORMAT.format(new Date(rejection.getTimestamp()))
-      });
-    }
-
-    return tableModel;
-  }
-
   private TableModel createHistoryTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(new String[] {
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.historyTimestamp"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.historyEvent")
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_history.column_timestamp.headerText"),
+      ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH).getString("transportOrderView.table_history.column_event.headerText")
     });
 
     for (ObjectHistory.Entry entry : fTransportOrder.getHistory().getEntries()) {
@@ -301,9 +278,6 @@ public class TransportOrderView
     propertiesPanel = new javax.swing.JPanel();
     propertiesScrollPane = new javax.swing.JScrollPane();
     propertiesTable = new javax.swing.JTable();
-    rejectionsPanel = new javax.swing.JPanel();
-    rejectionsScrollPane = new javax.swing.JScrollPane();
-    rejectionsTable = new javax.swing.JTable();
     historyPanel = new javax.swing.JPanel();
     historyScrollPane = new javax.swing.JScrollPane();
     historyTable = new javax.swing.JTable();
@@ -313,6 +287,7 @@ public class TransportOrderView
     driveOrdersPropertiesPanel = new javax.swing.JPanel();
     driveOrdersPropertiesScrollPane = new javax.swing.JScrollPane();
     driveOrderPropertiesTable = new javax.swing.JTable();
+    routePanel = new javax.swing.JPanel();
     routeScrollPane = new javax.swing.JScrollPane();
     routeTable = new javax.swing.JTable();
     costsLabel = new javax.swing.JLabel();
@@ -320,8 +295,8 @@ public class TransportOrderView
 
     setLayout(new java.awt.GridBagLayout());
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    generalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.generalPanel.title"))); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/dialogs/transportOrderDetail"); // NOI18N
+    generalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_general.border.title"))); // NOI18N
     generalPanel.setLayout(new java.awt.GridBagLayout());
 
     nameLabel.setFont(nameLabel.getFont());
@@ -345,7 +320,7 @@ public class TransportOrderView
     generalPanel.add(nameTextField, gridBagConstraints);
 
     createdLabel.setFont(createdLabel.getFont());
-    createdLabel.setText(bundle.getString("TransportOrderView.created")); // NOI18N
+    createdLabel.setText(bundle.getString("transportOrderView.label_created.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -365,7 +340,7 @@ public class TransportOrderView
     generalPanel.add(createdTextField, gridBagConstraints);
 
     finishedLabel.setFont(finishedLabel.getFont());
-    finishedLabel.setText(bundle.getString("TransportOrderView.finished")); // NOI18N
+    finishedLabel.setText(bundle.getString("transportOrderView.label_finished.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 1;
@@ -385,7 +360,7 @@ public class TransportOrderView
     generalPanel.add(finishedTextField, gridBagConstraints);
 
     deadlineLabel.setFont(deadlineLabel.getFont());
-    deadlineLabel.setText(bundle.getString("TransportOrderView.deadline")); // NOI18N
+    deadlineLabel.setText(bundle.getString("transportOrderView.label_deadline.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -405,7 +380,7 @@ public class TransportOrderView
     generalPanel.add(deadlineTextField, gridBagConstraints);
 
     vehicleLabel.setFont(vehicleLabel.getFont());
-    vehicleLabel.setText(bundle.getString("TransportOrderView.vehicle")); // NOI18N
+    vehicleLabel.setText(bundle.getString("transportOrderView.label_vehicle.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 2;
@@ -425,7 +400,7 @@ public class TransportOrderView
     generalPanel.add(vehicleTextField, gridBagConstraints);
 
     dispensableLabel.setFont(dispensableLabel.getFont());
-    dispensableLabel.setText(bundle.getString("TransportOrderView.dispensable")); // NOI18N
+    dispensableLabel.setText(bundle.getString("transportOrderView.label_dispensable.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -445,7 +420,7 @@ public class TransportOrderView
     generalPanel.add(dispensableTextField, gridBagConstraints);
 
     categoryLabel.setFont(categoryLabel.getFont());
-    categoryLabel.setText(bundle.getString("TransportOrderView.category")); // NOI18N
+    categoryLabel.setText(bundle.getString("transportOrderView.label_category.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 3;
@@ -472,7 +447,7 @@ public class TransportOrderView
     gridBagConstraints.weightx = 0.1;
     add(generalPanel, gridBagConstraints);
 
-    dependenciesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.dependenciesPanel.title"))); // NOI18N
+    dependenciesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_dependencies.border.title"))); // NOI18N
     dependenciesPanel.setLayout(new java.awt.BorderLayout());
 
     dependenciesScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
@@ -498,7 +473,7 @@ public class TransportOrderView
     gridBagConstraints.weighty = 0.5;
     add(dependenciesPanel, gridBagConstraints);
 
-    propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.propertiesPanel.title"))); // NOI18N
+    propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_properties.border.title"))); // NOI18N
     propertiesPanel.setLayout(new java.awt.BorderLayout());
 
     propertiesScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
@@ -516,34 +491,7 @@ public class TransportOrderView
     gridBagConstraints.weighty = 0.5;
     add(propertiesPanel, gridBagConstraints);
 
-    rejectionsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.rejectionsPanel.title"))); // NOI18N
-    rejectionsPanel.setLayout(new java.awt.BorderLayout());
-
-    rejectionsScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
-
-    rejectionsTable.setFont(rejectionsTable.getFont());
-    rejectionsTable.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {
-
-      },
-      new String [] {
-
-      }
-    ));
-    rejectionsScrollPane.setViewportView(rejectionsTable);
-
-    rejectionsPanel.add(rejectionsScrollPane, java.awt.BorderLayout.CENTER);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.5;
-    gridBagConstraints.weighty = 0.5;
-    add(rejectionsPanel, gridBagConstraints);
-
-    historyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.historyPanel.title"))); // NOI18N
+    historyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_history.border.title"))); // NOI18N
     historyPanel.setLayout(new java.awt.BorderLayout());
 
     historyScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
@@ -569,7 +517,7 @@ public class TransportOrderView
     gridBagConstraints.weighty = 0.5;
     add(historyPanel, gridBagConstraints);
 
-    driveOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.driveOrdersPanel.title"))); // NOI18N
+    driveOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_driveOrders.border.title"))); // NOI18N
     driveOrdersPanel.setLayout(new java.awt.GridBagLayout());
 
     driveOrdersScrollPane.setPreferredSize(new java.awt.Dimension(300, 100));
@@ -585,7 +533,7 @@ public class TransportOrderView
     gridBagConstraints.weighty = 1.0;
     driveOrdersPanel.add(driveOrdersScrollPane, gridBagConstraints);
 
-    driveOrdersPropertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.propertiesPanel.title"))); // NOI18N
+    driveOrdersPropertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_driveOrderProperties.border.title"))); // NOI18N
     driveOrdersPropertiesPanel.setPreferredSize(new java.awt.Dimension(162, 140));
     driveOrdersPropertiesPanel.setLayout(new java.awt.BorderLayout());
 
@@ -606,9 +554,13 @@ public class TransportOrderView
     gridBagConstraints.weighty = 1.0;
     driveOrdersPanel.add(driveOrdersPropertiesPanel, gridBagConstraints);
 
-    routeScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.tos"))); // NOI18N
-    routeScrollPane.setPreferredSize(new java.awt.Dimension(300, 100));
+    routePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("transportOrderView.panel_route.border.title"))); // NOI18N
+    routePanel.setPreferredSize(new java.awt.Dimension(300, 140));
+    routePanel.setLayout(new java.awt.BorderLayout());
+
     routeScrollPane.setViewportView(routeTable);
+
+    routePanel.add(routeScrollPane, java.awt.BorderLayout.CENTER);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -618,10 +570,10 @@ public class TransportOrderView
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    driveOrdersPanel.add(routeScrollPane, gridBagConstraints);
+    driveOrdersPanel.add(routePanel, gridBagConstraints);
 
     costsLabel.setFont(costsLabel.getFont());
-    costsLabel.setText(bundle.getString("TransportOrderView.costs")); // NOI18N
+    costsLabel.setText(bundle.getString("transportOrderView.label_costs.title")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
@@ -681,9 +633,7 @@ public class TransportOrderView
   private javax.swing.JPanel propertiesPanel;
   private javax.swing.JScrollPane propertiesScrollPane;
   private javax.swing.JTable propertiesTable;
-  private javax.swing.JPanel rejectionsPanel;
-  private javax.swing.JScrollPane rejectionsScrollPane;
-  private javax.swing.JTable rejectionsTable;
+  private javax.swing.JPanel routePanel;
   private javax.swing.JScrollPane routeScrollPane;
   private javax.swing.JTable routeTable;
   private javax.swing.JLabel vehicleLabel;

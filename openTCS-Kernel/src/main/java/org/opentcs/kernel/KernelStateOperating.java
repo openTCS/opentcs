@@ -29,6 +29,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.ActiveInOperatingMode;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -42,7 +43,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -143,7 +143,7 @@ class KernelStateOperating
    */
   @Inject
   @SuppressWarnings("deprecation")
-  KernelStateOperating(@GlobalKernelSync Object globalSyncObject,
+  KernelStateOperating(@GlobalSyncObject Object globalSyncObject,
                        TCSObjectPool objectPool,
                        Model model,
                        TransportOrderPool orderPool,
@@ -680,7 +680,7 @@ class KernelStateOperating
   @Deprecated
   public void addTransportOrderRejection(
       TCSObjectReference<TransportOrder> orderRef,
-      Rejection newRejection)
+      org.opentcs.data.order.Rejection newRejection)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       orderPool.addTransportOrderRejection(orderRef, newRejection);

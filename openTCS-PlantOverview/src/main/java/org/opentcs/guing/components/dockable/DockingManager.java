@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.opentcs.guing.components.tree.TreeView;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -294,7 +295,7 @@ public class DockingManager {
     control.putProperty(CControl.KEY_GOTO_MAXIMIZED, null);
     control.putProperty(CControl.KEY_MAXIMIZE_CHANGE, null);
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil bundleTreeView = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
     CGrid grid = new CGrid(control);
     courseTabPane = new CStack(COURSE_TAB_PANE_ID);
     tabPanes.put(COURSE_TAB_PANE_ID, courseTabPane);
@@ -307,28 +308,33 @@ public class DockingManager {
     tabPanes.put(TREE_TAB_PANE_ID, treeTabPane);
     DefaultSingleCDockable treeViewDock
         = createDockable(COMPONENTS_ID,
-                         bundle.getString("dockable.treeView"),
+                         bundleTreeView.getString("dockingManager.panel_components.title"),
                          (JComponent) fTreeView,
                          false);
     DefaultSingleCDockable treeBlocks
         = createDockable(BLOCKS_ID,
-                         bundle.getString("tree.blocks.text"),
+                         bundleTreeView.getString("dockingManager.panel_blocks.title"),
                          (JComponent) fBlocksView,
                          false);
     DefaultSingleCDockable treeGroups
         = createDockable(GROUPS_ID,
-                         bundle.getString("tree.groups.text"),
+                         bundleTreeView.getString("dockingManager.panel_groups.title"),
                          (JComponent) fGroupsView,
                          false);
+
     grid.add(0, 0, 250, 400, treeTabPane);
-    grid.add(0, 400, 250, 400, createDockable(PROPERTIES_ID,
-                                              bundle.getString("dockable.properties"),
-                                              fPropertiesComponent,
-                                              false));
-    grid.add(0, 800, 250, 200, createDockable(STATUS_ID,
-                                              bundle.getString("dockable.status"),
-                                              statusScrollPane,
-                                              false));
+    grid.add(0, 400, 250, 400,
+             createDockable(PROPERTIES_ID,
+                            ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH)
+                                .getString("dockingManager.panel_properties.title"),
+                            fPropertiesComponent,
+                            false));
+    grid.add(0, 800, 250, 200,
+             createDockable(STATUS_ID,
+                            ResourceBundleUtil.getBundle(I18nPlantOverview.STATUS_PATH)
+                                .getString("dockingManager.panel_status.title"),
+                            statusScrollPane,
+                            false));
     grid.add(250, 0, 150, 500, vehiclesDockable);
     grid.add(400, 0, 1000, 500, courseTabPane);
 

@@ -49,6 +49,29 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.15 (2019-05-02)
+
+* New features:
+** Add history entries for transport orders being deferred or resumed as well as assigned to or reserved for vehicles in the dispatching process.
+   This makes it easier to find out e.g. why a transport order wasn't assigned to a vehicle, yet.
+   It also implicitly deprecates transport orders' rejection entries, as history entries provide the same functionality, but for more use cases.
+** Expect applications' locales to be set via BCP 47 language tags, making the configuration more flexible and independent from the source code.
+** Extend the default router to be able to extract explicitly given routing costs from path properties, too.
+* Bugs fixed:
+** In case no load or unload operation is defined for a virtual vehicle, use a default value to avoid exceptions.
+** Do not (wrongly) set a vehicle's processing state to `IDLE` whenever its integration level is set to `TO_BE_UTILIZED`.
+** Avoid potential deadlocks related to using the Plant Overview's resource allocation panel.
+* Other changes:
+** Disable the Kernel application's integrated control center GUI by default.
+   It can still be re-enabled via the Kernel configuration, but it has been deprecated for several openTCS releases now and will be removed with the openTCS 5.
+** Move all language files for the applications' internationalization to a common hierarchy, remove unused/left-over entries and apply a proper naming pattern to the remaining ones to improve maintainability.
+   (The language files for the Kernel application's integrated control center GUI are excluded from this, as that GUI will be removed with openTCS 5.)
+** Remove support for the Plant Overview application's old model file format (file name extension `.opentcs`).
+   The old format has been deprecated since openTCS 4.8 in favour of a unified file format (file name extension `.xml`) shared by Kernel and Plant Overview.
+   Users who still have model files in the old format may want to save them in the current format before updating.
+** Remove the menu item to trigger the kernel's dispatching process from the Plant Overview's main menu.
+   The dispatcher is triggered automatically (and, for special cases in integration projects, periodically), so manual triggering does not need to be involved.
+
 === Version 4.14 (2019-03-22)
 
 * Bugs fixed:
@@ -56,7 +79,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    Prevent a vehicle from being re-parked to positions that have the same priority as the vehicle's current parking position.
 ** Fix a bug where charging vehicles don't execute transport orders after they have reached the "sufficiently recharged" state.
 * Other changes:
-** The Kernel application does no longer persist `Color`s and `ViewBookmark`s of the visual layout. 
+** The Kernel application does no longer persist `Color` and `ViewBookmark` elements of the visual layout.
    (For some time now, these elements could no longer be created with the PlantOverview application and were ignored when a model was loaded, anyway.)
 
 === Version 4.13.1 (2019-02-25)

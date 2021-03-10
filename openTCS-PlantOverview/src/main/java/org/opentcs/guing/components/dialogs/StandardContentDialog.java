@@ -26,7 +26,8 @@ import javax.swing.border.EmptyBorder;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StandardContentDialog
-    extends javax.swing.JDialog implements InputValidationListener {
+    extends javax.swing.JDialog
+    implements InputValidationListener {
 
   /**
    * A return status code - returned if Cancel button has been pressed
@@ -111,8 +112,6 @@ public class StandardContentDialog
    *
    * @param options welche Schaltknöpfe angezeigt werden sollen
    */
-  
-
   /**
    * Liefert den Return-Status.
    *
@@ -147,6 +146,7 @@ public class StandardContentDialog
   public void requestClose() {
     doClose(RET_CANCEL);
   }
+
   protected final void initButtons(int options) {
     switch (options) {
       case OK_CANCEL:
@@ -175,7 +175,6 @@ public class StandardContentDialog
     }
   }
 
-
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -201,8 +200,8 @@ public class StandardContentDialog
     buttonPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
 
     okButton.setFont(okButton.getFont().deriveFont(okButton.getFont().getStyle() | java.awt.Font.BOLD));
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    okButton.setText(bundle.getString("dialog.buttonOk.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/system"); // NOI18N
+    okButton.setText(bundle.getString("standardContentDialog.button_ok.text")); // NOI18N
     okButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         okButtonActionPerformed(evt);
@@ -211,7 +210,7 @@ public class StandardContentDialog
     buttonPanel.add(okButton);
 
     cancelButton.setFont(cancelButton.getFont());
-    cancelButton.setText(bundle.getString("dialog.buttonCancel.text")); // NOI18N
+    cancelButton.setText(bundle.getString("standardContentDialog.button_cancel.text")); // NOI18N
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         cancelButtonActionPerformed(evt);
@@ -220,7 +219,7 @@ public class StandardContentDialog
     buttonPanel.add(cancelButton);
 
     applyButton.setFont(applyButton.getFont());
-    applyButton.setText(bundle.getString("dialog.buttonApply.text")); // NOI18N
+    applyButton.setText(bundle.getString("standardContentDialog.button_apply.text")); // NOI18N
     applyButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         applyButtonActionPerformed(evt);
@@ -229,7 +228,7 @@ public class StandardContentDialog
     buttonPanel.add(applyButton);
 
     closeButton.setFont(closeButton.getFont());
-    closeButton.setText(bundle.getString("dialog.buttonClose.text")); // NOI18N
+    closeButton.setText(bundle.getString("standardContentDialog.button_close.text")); // NOI18N
     closeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         closeButtonActionPerformed(evt);
@@ -248,47 +247,47 @@ public class StandardContentDialog
    *
    * @param evt das Ereignis
    */
-    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
-      doClose(RET_CANCEL);
-    }//GEN-LAST:event_closeButtonActionPerformed
+  private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
+    doClose(RET_CANCEL);
+  }//GEN-LAST:event_closeButtonActionPerformed
 
   /**
    * Button "Übernehmen" gedrückt.
    *
    * @param evt das Ereignis
    */
-    private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
-      fContent.update();
-    }//GEN-LAST:event_applyButtonActionPerformed
+  private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
+    fContent.update();
+  }//GEN-LAST:event_applyButtonActionPerformed
 
   /**
    * Button "Ok" gedrückt.
    *
    * @param evt das Ereignis
    */
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-      fContent.update();
+  private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+    fContent.update();
 
-      if (!fContent.updateFailed()) {
-        doClose(RET_OK);
-      }
-    }//GEN-LAST:event_okButtonActionPerformed
+    if (!fContent.updateFailed()) {
+      doClose(RET_OK);
+    }
+  }//GEN-LAST:event_okButtonActionPerformed
 
   /**
    * Button "Abbrechen" gedrückt.
    *
    * @param evt das Ereignis
    */
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-      doClose(RET_CANCEL);
-    }//GEN-LAST:event_cancelButtonActionPerformed
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    doClose(RET_CANCEL);
+  }//GEN-LAST:event_cancelButtonActionPerformed
 
   /**
    * Closes the dialog
    */
-    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-      doClose(RET_CANCEL);
-    }//GEN-LAST:event_closeDialog
+  private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
+    doClose(RET_CANCEL);
+  }//GEN-LAST:event_closeDialog
 
   /**
    * Schließt den Dialog.

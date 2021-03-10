@@ -112,7 +112,7 @@ public class AssignReservedOrdersPhase
                                        order))
         .filter(optCandidate -> optCandidate.isPresent())
         .map(optCandidate -> optCandidate.get())
-        .filter(assignmentCandidateSelectionFilter)
+        .filter(candidate -> assignmentCandidateSelectionFilter.apply(candidate).isEmpty())
         .findFirst()
         .ifPresent(
             candidate -> transportOrderUtil.assignTransportOrder(vehicle,

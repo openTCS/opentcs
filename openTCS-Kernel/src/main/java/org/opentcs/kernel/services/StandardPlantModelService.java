@@ -22,12 +22,12 @@ import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.util.event.EventHandler;
@@ -86,7 +86,7 @@ public class StandardPlantModelService
   @Inject
   public StandardPlantModelService(LocalKernel kernel,
                                    TCSObjectService objectService,
-                                   @GlobalKernelSync Object globalSyncObject,
+                                   @GlobalSyncObject Object globalSyncObject,
                                    Model model,
                                    ModelPersister modelPersister,
                                    @ApplicationEventBus EventHandler eventHandler,

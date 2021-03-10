@@ -31,7 +31,6 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Applies attribute values on the selected figures of the current {@link DrawingView} of a
@@ -110,11 +109,6 @@ public class AttributeAction
 
         if (name == null) {
           name = (String) getValue(AbstractAction.NAME);
-        }
-
-        if (name == null) {
-          ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-          name = labels.getString("attribute.text");
         }
 
         return name;

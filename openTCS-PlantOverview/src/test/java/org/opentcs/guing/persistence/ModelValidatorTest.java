@@ -393,7 +393,7 @@ public class ModelValidatorTest {
   @Test
   public void testPathInvalidTwoControlPoints() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
-    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.BEZIER);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.Type.BEZIER);
     Assert.assertFalse("Validator said valid for invalid end point.",
                        validator.isValidWith(model, path));
   }
@@ -401,7 +401,7 @@ public class ModelValidatorTest {
   @Test
   public void testPathInvalidThreeControlPoints() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
-    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.BEZIER_3);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.Type.BEZIER_3);
     Assert.assertFalse("Validator said valid for invalid end point.",
                        validator.isValidWith(model, path));
   }
@@ -665,14 +665,6 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testVehicleMissingEnergyState() {
-    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
-    removeProperty(vehicle, VehicleModel.ENERGY_STATE);
-    Assert.assertFalse("Validator said valid for invalid vehicle model.",
-                       validator.isValidWith(model, vehicle));
-  }
-
-  @Test
   public void testVehicleMissingLoaded() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     removeProperty(vehicle, VehicleModel.LOADED);
@@ -724,17 +716,6 @@ public class ModelValidatorTest {
   public void testVehicleMissingOrientationAngle() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     removeProperty(vehicle, VehicleModel.ORIENTATION_ANGLE);
-    Assert.assertFalse("Validator said valid for invalid vehicle model.",
-                       validator.isValidWith(model, vehicle));
-  }
-
-  @Test
-  public void testVehicleInvalidEnergyState() {
-    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
-    addProperty(vehicle, SelectionProperty.class, VehicleModel.ENERGY_STATE,
-                "WrongEntry");
-    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
-    when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
     Assert.assertFalse("Validator said valid for invalid vehicle model.",
                        validator.isValidWith(model, vehicle));
   }
@@ -825,7 +806,7 @@ public class ModelValidatorTest {
   private PointModel createPointModel(String name) {
     PointModel point = createComponentWithName(PointModel.class, name);
     addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, "5");
-    addProperty(point, SelectionProperty.class, PointModel.TYPE, PointModel.PointType.HALT);
+    addProperty(point, SelectionProperty.class, PointModel.TYPE, PointModel.Type.HALT);
     addProperty(point, CoordinateProperty.class, PointModel.MODEL_X_POSITION, "0");
     addProperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "0");
     addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "0");
@@ -845,7 +826,7 @@ public class ModelValidatorTest {
     addProperty(path, IntegerProperty.class, PathModel.ROUTING_COST, 0);
     addProperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, 0d);
     addProperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, 0d);
-    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.LinerType.DIRECT);
+    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.Type.DIRECT);
     addProperty(path, StringProperty.class, ElementPropKeys.PATH_CONTROL_POINTS, "");
     addProperty(path, StringProperty.class, PathModel.START_COMPONENT, pointName1);
     addProperty(path, StringProperty.class, PathModel.END_COMPONENT, pointName2);
@@ -915,8 +896,6 @@ public class ModelValidatorTest {
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_CRITICAL, 30);
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_GOOD, 80);
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL, 60);
-    addProperty(vehicle, SelectionProperty.class, VehicleModel.ENERGY_STATE,
-                VehicleModel.EnergyState.GOOD);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.PROC_STATE, Vehicle.ProcState.IDLE);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.STATE, Vehicle.State.IDLE);
     addProperty(vehicle, SelectionProperty.class,

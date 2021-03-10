@@ -160,7 +160,7 @@ public class PathConnection
    *
    * @param type the type of the curve
    */
-  private void initControlPoints(PathModel.LinerType type) {
+  private void initControlPoints(PathModel.Type type) {
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
     Point2D.Double ep;
     int size = path.size();
@@ -183,7 +183,7 @@ public class PathConnection
 
     if (sp.x != ep.x || sp.y != ep.y) {
       path.clear();
-      if (type == PathModel.LinerType.BEZIER_3) { //BEZIER curve with 3 control points);
+      if (type == PathModel.Type.BEZIER_3) { //BEZIER curve with 3 control points);
         //Add the scaled vector between start and endpoint to the startpoint
         cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) * 1 / 6, sp.y + (ep.y - sp.y) * 1 / 6); //point at 1/6
         cp2 = new Point2D.Double(sp.x + (ep.x - sp.x) * 2 / 6, sp.y + (ep.y - sp.y) * 2 / 6); //point at 2/6
@@ -434,11 +434,11 @@ public class PathConnection
    *
    * @return The type of this path
    */
-  public PathModel.LinerType getLinerType() {
-    return (PathModel.LinerType) getModel().getPropertyPathConnType().getValue();
+  public PathModel.Type getLinerType() {
+    return (PathModel.Type) getModel().getPropertyPathConnType().getValue();
   }
 
-  public void setLinerByType(PathModel.LinerType type) {
+  public void setLinerByType(PathModel.Type type) {
     switch (type) {
       case DIRECT:
         resetPath();
@@ -570,7 +570,7 @@ public class PathConnection
   @Override
   public void propertiesChanged(AttributesChangeEvent e) {
     if (!e.getInitiator().equals(this)) {
-      setLinerByType((PathModel.LinerType) getModel().getPropertyPathConnType().getValue());
+      setLinerByType((PathModel.Type) getModel().getPropertyPathConnType().getValue());
       calculateLength();
       lineout();
     }
@@ -684,16 +684,16 @@ public class PathConnection
 
     AbstractProperty pConnType = (AbstractProperty) clone.getModel().getPropertyPathConnType();
     if (getLiner() instanceof TupelBezierLiner) {
-      pConnType.setValue(PathModel.LinerType.BEZIER);
+      pConnType.setValue(PathModel.Type.BEZIER);
     }
     else if (getLiner() instanceof TripleBezierLiner) {
-      pConnType.setValue(PathModel.LinerType.BEZIER_3);
+      pConnType.setValue(PathModel.Type.BEZIER_3);
     }
     else if (getLiner() instanceof ElbowLiner) {
-      pConnType.setValue(PathModel.LinerType.ELBOW);
+      pConnType.setValue(PathModel.Type.ELBOW);
     }
     else if (getLiner() instanceof SlantedLiner) {
-      pConnType.setValue(PathModel.LinerType.SLANTED);
+      pConnType.setValue(PathModel.Type.SLANTED);
     }
 
     return clone;

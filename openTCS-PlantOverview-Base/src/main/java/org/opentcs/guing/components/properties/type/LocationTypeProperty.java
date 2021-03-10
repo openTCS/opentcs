@@ -10,8 +10,6 @@ package org.opentcs.guing.components.properties.type;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.ResourceBundle;
-import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -24,10 +22,6 @@ public class LocationTypeProperty
     implements Selectable<String> {
 
   private List<String> fPossibleValues;
-  /**
-   * This class's resource bundle.
-   */
-  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
 
   public LocationTypeProperty(ModelComponent model) {
     this(model, new ArrayList<>(), "");
@@ -47,7 +41,7 @@ public class LocationTypeProperty
   @Override
   public void setValue(Object value) {
     if (fPossibleValues.contains(value)
-        || value.equals(bundle.getString("PropertiesCollection.differentValues.text"))) {
+        || value instanceof AcceptableInvalidValue) {
       super.setValue(value);
     }
   }

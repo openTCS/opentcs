@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.model.TCSResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,10 @@ class AllocatorTask
    */
   private final ScheduledExecutorService kernelExecutor;
   /**
+   * A global object to be used for synchronization within the kernel.
+   */
+  private final Object globalSyncObject;
+  /**
    * Describes the actual task.
    */
   private final AllocatorCommand command;
@@ -62,12 +67,14 @@ class AllocatorTask
                        @Nonnull Queue<AllocatorCommand.Allocate> deferredAllocations,
                        @Nonnull Scheduler.Module allocationAdvisor,
                        @Nonnull ScheduledExecutorService kernelExecutor,
+                       @Nonnull @GlobalSyncObject Object globalSyncObject,
                        @Nonnull AllocatorCommand command) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.deferredAllocations = requireNonNull(deferredAllocations, "deferredAllocations");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
+    this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.command = requireNonNull(command, "command");
   }
 
@@ -135,7 +142,7 @@ class AllocatorTask
     Scheduler.Client client = command.getClient();
     Set<TCSResource<?>> resources = command.getResources();
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       LOG.debug("{}: Checking resource if all resources are available:", client.getId());
       if (!reservationPool.resourcesAvailableForUser(resources, client)) {
         LOG.debug("{}: Resources unavailable: {}", client.getId(), resources);
@@ -171,7 +178,7 @@ class AllocatorTask
    * @param command Describes the allocated resources.
    */
   private void undoAllocate(Client client, Set<TCSResource<?>> resources) {
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       reservationPool.free(client, resources);
     }
   }
@@ -186,6 +193,7 @@ class AllocatorTask
                                               deferredAllocations,
                                               allocationAdvisor,
                                               kernelExecutor,
+                                              globalSyncObject,
                                               allocate));
     }
     deferredAllocations.clear();

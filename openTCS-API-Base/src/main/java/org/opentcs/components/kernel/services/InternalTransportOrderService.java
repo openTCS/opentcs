@@ -13,8 +13,8 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the transport order service must provide which are not accessible to remote
@@ -40,8 +40,12 @@ public interface InternalTransportOrderService
    * @param ref A reference to the transport order to be modified.
    * @param rejection The rejection to be added.
    * @throws ObjectUnknownException If the referenced transport order does not exist.
+   * @deprecated Rejections are replaced by object history entries.
    */
-  void registerTransportOrderRejection(TCSObjectReference<TransportOrder> ref, Rejection rejection)
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of the object history.")
+  void registerTransportOrderRejection(TCSObjectReference<TransportOrder> ref, 
+                                       org.opentcs.data.order.Rejection rejection)
       throws ObjectUnknownException;
 
   /**

@@ -16,7 +16,8 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 
 /**
- *
+ * Describes which communication adapter a vehicle is currently associated with and which adapters
+ * are available.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */

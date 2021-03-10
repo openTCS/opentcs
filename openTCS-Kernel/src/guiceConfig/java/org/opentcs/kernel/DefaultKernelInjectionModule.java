@@ -32,6 +32,7 @@ import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ApplicationHome;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
@@ -84,7 +85,7 @@ public class DefaultKernelInjectionModule
 
     // A single global synchronization object for the kernel.
     bind(Object.class)
-        .annotatedWith(GlobalKernelSync.class)
+        .annotatedWith(GlobalSyncObject.class)
         .to(Object.class)
         .in(Singleton.class);
 

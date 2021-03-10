@@ -43,6 +43,22 @@ public interface Router
    * </p>
    */
   String PROPKEY_ROUTING_GROUP = "tcs:routingGroup";
+  /**
+   * The key (prefix) of a path property defining the routing cost when its travelled in forward
+   * direction.
+   * <p>
+   * The value is expected to be a (long) integer.
+   * </p>
+   */
+  String PROPKEY_ROUTING_COST_FORWARD = "tcs:routingCostForward";
+  /**
+   * The key (prefix) of a path property defining the routing cost when its travelled in reverse
+   * direction.
+   * <p>
+   * The value is expected to be a (long) integer.
+   * </p>
+   */
+  String PROPKEY_ROUTING_COST_REVERSE = "tcs:routingCostReverse";
 
   /**
    * Notifies the router of changes in the topology.

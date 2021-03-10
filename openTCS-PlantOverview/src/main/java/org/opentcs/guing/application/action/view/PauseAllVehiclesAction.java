@@ -9,7 +9,6 @@
 package org.opentcs.guing.application.action.view;
 
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
@@ -25,6 +24,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
@@ -43,6 +43,8 @@ public class PauseAllVehiclesAction
    * This action's ID.
    */
   public final static String ID = "openTCS.pauseAllVehicles";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**
    * This class's logger.
    */
@@ -71,13 +73,14 @@ public class PauseAllVehiclesAction
                                 SharedKernelServicePortalProvider portalProvider) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
-    
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
 
-    URL urlSmall = getClass().getResource(ImageDirectory.DIR + "/toolbar/pause-vehicles.16.png");
-    URL urlLarge = getClass().getResource(ImageDirectory.DIR + "/toolbar/pause-vehicles.22.png");
-    putValue(SMALL_ICON, new ImageIcon(urlSmall));
-    putValue(LARGE_ICON_KEY, new ImageIcon(urlLarge));
+    putValue(NAME, BUNDLE.getString("pauseAllVehiclesAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("pauseAllVehiclesAction.shortDescription"));
+
+    ImageIcon iconSmall = ImageDirectory.getImageIcon("/toolbar/pause-vehicles.16.png");
+    ImageIcon iconLarge = ImageDirectory.getImageIcon("/toolbar/pause-vehicles.22.png");
+    putValue(SMALL_ICON, iconSmall);
+    putValue(LARGE_ICON_KEY, iconLarge);
   }
 
   @Override

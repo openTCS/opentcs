@@ -7,15 +7,17 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection;
 
-import java.util.function.Predicate;
+import java.util.Collection;
+import java.util.function.Function;
 import org.opentcs.data.model.Vehicle;
 
 /**
- * A predicate for selecting {@link Vehicle}s for parking.
- * Returns {@code true} if the given {@link Vehicle} should be selected.
+ * A filter for selecting {@link Vehicle}s for parking.
+ * Returns a collection of reasons for filtering the vehicle.
+ * If the returned collection is empty, no reason to filter it was encountered.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ParkVehicleSelectionFilter
-    extends Predicate<Vehicle> {
+    extends Function<Vehicle, Collection<String>> {
 }

@@ -31,6 +31,7 @@ import org.opentcs.guing.components.tree.elements.PointUserObject;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.GroupModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -92,12 +93,12 @@ public class GroupsMouseAdapter
   private void showPopupMenuGroup(ModelComponent folder, int x, int y) {
     final GroupModel groupFolder = (GroupModel) folder;
     JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
     final OpenTCSView openTCSView = OpenTCSView.instance();
 
     final JCheckBoxMenuItem cbItemAll = new JCheckBoxMenuItem(
-        labels.getString("tree.group.showInAll"), groupFolder.isGroupVisible());
+        labels.getString("groupsMouseAdapter.popupMenuItem_showInAll.text"), groupFolder.isGroupVisible());
     cbItemAll.addActionListener((ActionEvent e)
         -> setGroupVisibilityInAllDrawingViews(groupFolder, cbItemAll.isSelected())
     );
@@ -105,7 +106,7 @@ public class GroupsMouseAdapter
 
     for (final String title : viewManager.getDrawingViewNames()) {
       final JCheckBoxMenuItem cbItem = new JCheckBoxMenuItem(
-          labels.getFormatted("tree.group.show", title),
+          labels.getFormatted("groupsMouseAdapter.popupMenuItem_show.text", title),
           groupFolder.isGroupInDrawingViewVisible(title));
       cbItem.addActionListener((ActionEvent e)
           -> setGroupVisibilityInDrawingView(title, groupFolder, cbItem.isSelected()));
@@ -114,11 +115,11 @@ public class GroupsMouseAdapter
 
     menu.addSeparator();
 
-    JMenuItem item = new JMenuItem(labels.getString("tree.group.add"));
+    JMenuItem item = new JMenuItem(labels.getString("groupsMouseAdapter.popupMenuItem_addToGroup.text"));
     item.addActionListener((ActionEvent e) -> openTCSView.addSelectedItemsToGroup(groupFolder));
     menu.add(item);
 
-    item = new JMenuItem(labels.getString("tree.group.delete"));
+    item = new JMenuItem(labels.getString("groupsMouseAdapter.popupMenuItem_deleteGroup.text"));
     item.addActionListener((ActionEvent e) -> openTCSView.deleteGroup(groupFolder));
 
     menu.add(item);

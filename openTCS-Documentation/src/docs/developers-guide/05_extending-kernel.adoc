@@ -168,6 +168,7 @@ include::{kernel-testSrc}/org/opentcs/documentation/ReceiveCommAdapterMessageTes
 
 Unlike information published via events, data stored as properties in `Vehicle` or `TransportOrder` objects can be retrieved at any time.
 
+[#section-kernel-executor]
 === Executing code in kernel context
 
 Within the kernel, concurrent modifications of the data model -- e.g. contents of the plant model or transport order properties -- need to be synchronized carefully.

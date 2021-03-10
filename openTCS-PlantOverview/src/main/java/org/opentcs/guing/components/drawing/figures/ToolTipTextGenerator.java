@@ -10,10 +10,9 @@ package org.opentcs.guing.components.drawing.figures;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.model.ModelComponent;
@@ -34,10 +33,6 @@ import org.opentcs.guing.persistence.ModelManager;
 public class ToolTipTextGenerator {
 
   /**
-   * This class's resource bundle.
-   */
-  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
-  /**
    * The model manager.
    */
   private final ModelManager modelManager;
@@ -48,7 +43,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(PointModel model) {
-    String pointDesc = bundle.getString("point.description");
+    String pointDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(pointDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
 
@@ -61,7 +56,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(LocationModel model) {
-    String locationDesc = bundle.getString("location.description");
+    String locationDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(locationDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
 
@@ -74,7 +69,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(PathModel model) {
-    String pathDesc = bundle.getString("path.description");
+    String pathDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(pathDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
 
@@ -86,13 +81,13 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(VehicleModel model) {
-    String vehicleDesc = bundle.getString("vehicle.description");
-    String positionDesc = bundle.getString("vehicle.point.text");
-    String nextPositionDesc = bundle.getString("vehicle.nextPoint.text");
-    String stateDesc = bundle.getString("vehicle.state.text");
-    String procStateDesc = bundle.getString("vehicle.procState.text");
-    String integrationLevelDesc = bundle.getString("vehicle.integrationLevel.text");
-    String energyDesc = bundle.getString("vehicle.energyLevel.text");
+    String vehicleDesc = model.getDescription();
+    String positionDesc = model.getPropertyPoint().getDescription();
+    String nextPositionDesc = model.getPropertyNextPoint().getDescription();
+    String stateDesc = model.getPropertyState().getDescription();
+    String procStateDesc = model.getPropertyProcState().getDescription();
+    String integrationLevelDesc = model.getPropertyIntegrationLevel().getDescription();
+    String energyDesc = model.getPropertyEnergyLevel().getDescription();
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(vehicleDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
     sb.append("<br>").append(positionDesc).append(": ")
@@ -103,23 +98,19 @@ public class ToolTipTextGenerator {
     sb.append("<br>").append(procStateDesc).append(": ").append(model.getPropertyProcState().getValue());
     sb.append("<br>").append(integrationLevelDesc).append(": ").append(model.getPropertyIntegrationLevel().getValue());
 
-    VehicleModel.EnergyState state = (VehicleModel.EnergyState) model.getPropertyEnergyState().getValue();
+    Vehicle vehicle = model.getVehicle();
     String sColor;
-    switch (state) {
-      case CRITICAL:
-        sColor = "red";
-        break;
-
-      case DEGRADED:
-        sColor = "orange";
-        break;
-
-      case GOOD:
-        sColor = "green";
-        break;
-
-      default:
-        sColor = "black";
+    if (vehicle.isEnergyLevelCritical()) {
+      sColor = "red";
+    }
+    else if (vehicle.isEnergyLevelDegraded()) {
+      sColor = "orange";
+    }
+    else if (vehicle.isEnergyLevelGood()) {
+      sColor = "green";
+    }
+    else {
+      sColor = "black";
     }
 
     sb.append("<br>").append(energyDesc).append(": <font color=").append(sColor).append(">")
@@ -131,7 +122,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(LinkModel model) {
-    String linkDesc = bundle.getString("link.description");
+    String linkDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(linkDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
     sb.append("</html>");
@@ -183,8 +174,9 @@ public class ToolTipTextGenerator {
 
     blocks.sort((b1, b2) -> b1.getName().compareTo(b2.getName()));
 
-    String desc = bundle.getString("modelComponent.blocks.description");
+    String desc = blocks.get(0).getDescription();
     StringBuilder sb = new StringBuilder("<br>").append(desc);
+    sb.append(": ");
     for (BlockModel block : blocks) {
       sb.append(block.getName()).append(", ");
     }

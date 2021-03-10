@@ -84,7 +84,7 @@ public class BlockAdapter
   }
 
   private Block.Type getKernelBlockType(BlockModel model) {
-    return convertBlockType((BlockModel.BlockType) model.getPropertyType().getValue());
+    return convertBlockType((BlockModel.Type) model.getPropertyType().getValue());
   }
 
   private Set<String> getMemberNames(BlockModel blockModel) {
@@ -97,21 +97,21 @@ public class BlockAdapter
   }
 
   private void updateModelType(BlockModel model, Block block) {
-    BlockModel.BlockType value;
+    BlockModel.Type value;
 
     switch (block.getType()) {
       case SAME_DIRECTION_ONLY:
-        value = BlockModel.BlockType.SAME_DIRECTION_ONLY;
+        value = BlockModel.Type.SAME_DIRECTION_ONLY;
         break;
       case SINGLE_VEHICLE_ONLY:
       default:
-        value = BlockModel.BlockType.SINGLE_VEHICLE_ONLY;
+        value = BlockModel.Type.SINGLE_VEHICLE_ONLY;
     }
 
     model.getPropertyType().setValue(value);
   }
 
-  private Block.Type convertBlockType(BlockModel.BlockType type) {
+  private Block.Type convertBlockType(BlockModel.Type type) {
     requireNonNull(type, "type");
     switch (type) {
       case SINGLE_VEHICLE_ONLY:

@@ -9,11 +9,11 @@
 package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.application.GuiManager;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -25,6 +25,9 @@ public class NewModelAction
     extends AbstractAction {
 
   public final static String ID = "file.newModel";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
+
   private final GuiManager view;
 
   /**
@@ -35,14 +38,14 @@ public class NewModelAction
   public NewModelAction(GuiManager view) {
     this.view = view;
 
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-
+    putValue(NAME, BUNDLE.getString("newModelAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("newModelAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl N"));
     putValue(MNEMONIC_KEY, Integer.valueOf('N'));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/document-new.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/menu/document-new.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override

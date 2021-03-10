@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +46,7 @@ class TransportOrderTableModel
   /**
    * This classe's bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
 
   /**
    * This class's Logger.
@@ -57,8 +57,8 @@ class TransportOrderTableModel
    */
   private static final String[] COLUMN_NAMES = new String[] {
     "#",
-    BUNDLE.getString("deadline"),
-    BUNDLE.getString("vehicle")};
+    BUNDLE.getString("transportOrderTableModel.column_deadline.headerText"),
+    BUNDLE.getString("transportOrderTableModel.column_vehicle.headerText")};
   /**
    * The column classes.
    */

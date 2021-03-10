@@ -9,8 +9,11 @@ package org.opentcs.virtualvehicle;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +29,7 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.util.CyclicTask;
@@ -52,6 +56,16 @@ public class LoopbackCommunicationAdapter
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(LoopbackCommunicationAdapter.class);
+  /**
+   * An error code indicating that there's a conflict between a load operation and the vehicle's
+   * current load state.
+   */
+  private static final String LOAD_OPERATION_CONFLICT = "cannotLoadWhenLoaded";
+  /**
+   * An error code indicating that there's a conflict between an unload operation and the vehicle's
+   * current load state.
+   */
+  private static final String UNLOAD_OPERATION_CONFLICT = "cannotUnloadWhenNotLoaded";
   /**
    * The time by which to advance the velocity controller per step (in ms).
    */
@@ -80,6 +94,10 @@ public class LoopbackCommunicationAdapter
    * The vehicle to this comm adapter instance.
    */
   private final Vehicle vehicle;
+  /**
+   * The vehicle's load state.
+   */
+  private LoadState loadState = LoadState.EMPTY;
   /**
    * Whether the loopback adapter is initialized or not.
    */
@@ -142,6 +160,25 @@ public class LoopbackCommunicationAdapter
     }
     super.terminate();
     initialized = false;
+  }
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    super.propertyChange(evt);
+
+    if (!((evt.getSource()) instanceof LoopbackVehicleModel)) {
+      return;
+    }
+    if (Objects.equals(evt.getPropertyName(),
+                       VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name())) {
+      if (!getProcessModel().getVehicleLoadHandlingDevices().isEmpty()
+          && getProcessModel().getVehicleLoadHandlingDevices().get(0).isFull()) {
+        loadState = LoadState.FULL;
+      }
+      else {
+        loadState = LoadState.EMPTY;
+      }
+    }
   }
 
   @Override
@@ -211,8 +248,39 @@ public class LoopbackCommunicationAdapter
   public synchronized ExplainedBoolean canProcess(List<String> operations) {
     requireNonNull(operations, "operations");
 
-    final boolean canProcess = isEnabled();
-    final String reason = canProcess ? "" : "adapter not enabled";
+    LOG.debug("{}: Checking processability of {}...", getName(), operations);
+    boolean canProcess = true;
+    String reason = "";
+
+    // Do NOT require the vehicle to be IDLE or CHARGING here!
+    // That would mean a vehicle moving to a parking position or recharging location would always
+    // have to finish that order first, which would render a transport order's dispensable flag
+    // useless.
+    boolean loaded = loadState == LoadState.FULL;
+    Iterator<String> opIter = operations.iterator();
+    while (canProcess && opIter.hasNext()) {
+      final String nextOp = opIter.next();
+      // If we're loaded, we cannot load another piece, but could unload.
+      if (loaded) {
+        if (nextOp.startsWith(getProcessModel().getLoadOperation())) {
+          canProcess = false;
+          reason = LOAD_OPERATION_CONFLICT;
+        }
+        else if (nextOp.startsWith(getProcessModel().getUnloadOperation())) {
+          loaded = false;
+        }
+      } // If we're not loaded, we could load, but not unload.
+      else if (nextOp.startsWith(getProcessModel().getLoadOperation())) {
+        loaded = true;
+      }
+      else if (nextOp.startsWith(getProcessModel().getUnloadOperation())) {
+        canProcess = false;
+        reason = UNLOAD_OPERATION_CONFLICT;
+      }
+    }
+    if (!canProcess) {
+      LOG.debug("{}: Cannot process {}, reason: '{}'", getName(), operations, reason);
+    }
     return new ExplainedBoolean(canProcess, reason);
   }
 
@@ -399,5 +467,13 @@ public class LoopbackCommunicationAdapter
             Arrays.asList(new LoadHandlingDevice(LHD_NAME, false)));
       }
     }
+  }
+
+  /**
+   * The vehicle's possible load states.
+   */
+  private enum LoadState {
+    EMPTY,
+    FULL;
   }
 }

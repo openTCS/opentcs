@@ -48,6 +48,7 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -451,38 +452,38 @@ class StandardSystemModel
    * können.
    */
   private void createMainFolders() {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
     createMainFolder(this, FolderKey.VEHICLES,
-                     new SimpleFolder(bundle.getString("tree.vehicles.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_vehicles.name")));
 
     LayoutModel layoutModel = crsObjFactory.createLayoutModel();
     layoutModel.setName("VLayout-1");
     createMainFolder(this, FolderKey.LAYOUT, layoutModel);
 
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.POINTS,
-                     new SimpleFolder(bundle.getString("tree.points.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_points.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.PATHS,
-                     new SimpleFolder(bundle.getString("tree.paths.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_paths.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.LOCATIONS,
-                     new SimpleFolder(bundle.getString("tree.locations.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_locations.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.LOCATION_TYPES,
-                     new SimpleFolder(bundle.getString("tree.locationTypes.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_locationTypes.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.LINKS,
-                     new SimpleFolder(bundle.getString("tree.links.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_links.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.BLOCKS,
-                     new SimpleFolder(bundle.getString("tree.blocks.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_blocks.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.GROUPS,
-                     new SimpleFolder(bundle.getString("tree.groups.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_groups.name")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.OTHER_GRAPHICAL_ELEMENTS,
-                     new SimpleFolder(bundle.getString("tree.otherGraphicals.text")));
+                     new SimpleFolder(bundle.getString("standardSystemModel.folder_otherGraphicalElements.name")));
   }
 
   private void createProperties() {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("systemModel.name.text"));
-    pName.setHelptext(bundle.getString("systemModel.name.helptext"));
+    pName.setDescription(bundle.getString("standardSystemModel.property_name.description"));
+    pName.setHelptext(bundle.getString("standardSystemModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);

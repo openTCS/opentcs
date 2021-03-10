@@ -16,6 +16,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import org.opentcs.guing.components.properties.type.ColorProperty;
+import static org.opentcs.guing.util.I18nPlantOverview.PROPERTIES_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -67,12 +68,11 @@ public class ColorPropertyCellEditor
 
   @Override
   public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(PROPERTIES_PATH);
 
     Frame parent = JOptionPane.getFrameForComponent(fTable);
     Color newColor = JColorChooser.showDialog(parent,
-                                              bundle.getString("ColorPropertyCellEditor."
-                                                  + "ColorPropertyWindowTitle"),
+                                              bundle.getString("colorPropertyCellEditor.dialog_colorSelection.title"),
                                               fColorProperty.getColor());
 
     if (newColor != null) {

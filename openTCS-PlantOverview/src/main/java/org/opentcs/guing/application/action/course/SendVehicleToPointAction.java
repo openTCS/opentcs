@@ -21,6 +21,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.PointPanel;
+import static org.opentcs.guing.util.I18nPlantOverview.VEHICLEPOPUP_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -34,6 +35,8 @@ public class SendVehicleToPointAction
    * Sends a vehicle directly to a point.
    */
   public static final String ID = "course.vehicle.sendToPoint";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(VEHICLEPOPUP_PATH);
   /**
    * The vehicle.
    */
@@ -68,8 +71,8 @@ public class SendVehicleToPointAction
     this.applicationFrame = requireNonNull(applicationFrame, "applicationFrame");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
-    
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
+
+    putValue(NAME, BUNDLE.getString("sendVehicleToPointAction.name"));
   }
 
   @Override

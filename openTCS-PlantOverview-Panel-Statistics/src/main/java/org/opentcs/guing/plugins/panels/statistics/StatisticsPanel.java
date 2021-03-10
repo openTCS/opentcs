@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opentcs.components.plantoverview.PluggablePanel;
+import static org.opentcs.guing.plugins.panels.statistics.I18nPlantOverviewPanelStatistics.BUNDLE_PATH;
 import org.opentcs.util.statistics.StatisticsLogParser;
 import org.opentcs.util.statistics.StatisticsRecord;
 import org.slf4j.Logger;
@@ -34,8 +35,7 @@ public class StatisticsPanel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * A file chooser for selecting the input file.
    */
@@ -64,7 +64,7 @@ public class StatisticsPanel
     initComponents();
 
     inputFileChooser.setMultiSelectionEnabled(false);
-    inputFileChooser.setFileFilter(new FileNameExtensionFilter(BUNDLE.getString("textFiles"),
+    inputFileChooser.setFileFilter(new FileNameExtensionFilter(BUNDLE.getString("statisticsPanel.fileChooser_inputFile.fileFilter.description"),
                                                                "txt"));
   }
 
@@ -199,8 +199,8 @@ public class StatisticsPanel
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle"); // NOI18N
-    analysisInputFileLbl.setText(bundle.getString("Input_file")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/statisticsPanel/Bundle"); // NOI18N
+    analysisInputFileLbl.setText(bundle.getString("statisticsPanel.label_inputFile.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
@@ -216,7 +216,7 @@ public class StatisticsPanel
     gridBagConstraints.weightx = 1.0;
     jPanel1.add(analysisInputFileTxt, gridBagConstraints);
 
-    parsedRecordsLbl.setText(bundle.getString("Parsed_records")); // NOI18N
+    parsedRecordsLbl.setText(bundle.getString("statisticsPanel.label_parsedRecords.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -232,7 +232,7 @@ public class StatisticsPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     jPanel1.add(parsedRecordsTxt, gridBagConstraints);
 
-    startInputParsingBtn.setText(bundle.getString("Read_input_file")); // NOI18N
+    startInputParsingBtn.setText(bundle.getString("statisticsPanel.button_readInputFile.text")); // NOI18N
     startInputParsingBtn.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         startInputParsingBtnActionPerformed(evt);
@@ -245,7 +245,7 @@ public class StatisticsPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 0, 3);
     jPanel1.add(startInputParsingBtn, gridBagConstraints);
 
-    totalRuntimeLbl.setText(bundle.getString("Total_runtime")); // NOI18N
+    totalRuntimeLbl.setText(bundle.getString("statisticsPanel.label_totalRuntime.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -263,10 +263,10 @@ public class StatisticsPanel
 
     add(jPanel1, java.awt.BorderLayout.NORTH);
 
-    analysisDataPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Analysis_data"))); // NOI18N
+    analysisDataPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("statisticsPanel.panel_analysisData.border.title"))); // NOI18N
     analysisDataPanel.setLayout(new javax.swing.BoxLayout(analysisDataPanel, javax.swing.BoxLayout.Y_AXIS));
 
-    analysisVehiclesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Vehicles"))); // NOI18N
+    analysisVehiclesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("statisticsPanel.panel_analysisVehicles.border.title"))); // NOI18N
     analysisVehiclesPanel.setLayout(new java.awt.BorderLayout());
 
     jScrollPane1.setPreferredSize(new java.awt.Dimension(550, 200));
@@ -278,7 +278,7 @@ public class StatisticsPanel
 
     analysisDataPanel.add(analysisVehiclesPanel);
 
-    analysisCoursePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Course"))); // NOI18N
+    analysisCoursePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("statisticsPanel.panel_analysisCourse.border.title"))); // NOI18N
     analysisCoursePanel.setLayout(new java.awt.BorderLayout());
 
     jScrollPane2.setPreferredSize(new java.awt.Dimension(550, 200));
@@ -290,7 +290,7 @@ public class StatisticsPanel
 
     analysisDataPanel.add(analysisCoursePanel);
 
-    analysisOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Orders"))); // NOI18N
+    analysisOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("statisticsPanel.panel_analysisOrders.border.title"))); // NOI18N
     analysisOrdersPanel.setLayout(new java.awt.BorderLayout());
 
     jScrollPane3.setPreferredSize(new java.awt.Dimension(550, 200));
@@ -300,7 +300,7 @@ public class StatisticsPanel
 
     analysisOrdersPanel.add(jScrollPane3, java.awt.BorderLayout.CENTER);
 
-    ordersSuccRateLbl.setText(bundle.getString("Successfully_finished")); // NOI18N
+    ordersSuccRateLbl.setText(bundle.getString("statisticsPanel.label_ordersSuccessRate.text")); // NOI18N
     jPanel2.add(ordersSuccRateLbl);
 
     ordersSuccRateTxt.setEditable(false);
@@ -308,7 +308,7 @@ public class StatisticsPanel
     ordersSuccRateTxt.setText("0");
     jPanel2.add(ordersSuccRateTxt);
 
-    ordersDeadlineRateLbl.setText(bundle.getString("Crossed_deadline")); // NOI18N
+    ordersDeadlineRateLbl.setText(bundle.getString("statisticsPanel.label_ordersDeadlineCrossedRate.text")); // NOI18N
     jPanel2.add(ordersDeadlineRateLbl);
 
     ordersDeadlineRateTxt.setEditable(false);
@@ -322,7 +322,7 @@ public class StatisticsPanel
 
     add(analysisDataPanel, java.awt.BorderLayout.CENTER);
 
-    getAccessibleContext().setAccessibleName(bundle.getString("Statistics_panel_title")); // NOI18N
+    getAccessibleContext().setAccessibleName(bundle.getString("statisticsPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
 
   private void startInputParsingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startInputParsingBtnActionPerformed

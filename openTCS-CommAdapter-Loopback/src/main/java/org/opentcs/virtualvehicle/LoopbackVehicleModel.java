@@ -54,10 +54,8 @@ public class LoopbackVehicleModel
                                                      attachedVehicle.getMaxReverseVelocity(),
                                                      attachedVehicle.getMaxVelocity());
     this.operatingTime = parseOperatingTime(attachedVehicle);
-    this.loadOperation
-        = attachedVehicle.getProperty(LoopbackAdapterConstants.PROPKEY_LOAD_OPERATION);
-    this.unloadOperation
-        = attachedVehicle.getProperty(LoopbackAdapterConstants.PROPKEY_UNLOAD_OPERATION);
+    this.loadOperation = extractLoadOperation(attachedVehicle);
+    this.unloadOperation = extractUnloadOperation(attachedVehicle);
   }
 
   public String getLoadOperation() {
@@ -289,6 +287,22 @@ public class LoopbackVehicleModel
     String deceleration = vehicle.getProperty(LoopbackAdapterConstants.PROPKEY_DECELERATION);
     // Ensure it's a negative value.
     return Math.min(Parsers.tryParseString(deceleration, -500), -1);
+  }
+
+  private static String extractLoadOperation(Vehicle attachedVehicle) {
+    String result = attachedVehicle.getProperty(LoopbackAdapterConstants.PROPKEY_LOAD_OPERATION);
+    if (result == null) {
+      result = LoopbackAdapterConstants.PROPVAL_LOAD_OPERATION_DEFAULT;
+    }
+    return result;
+  }
+
+  private static String extractUnloadOperation(Vehicle attachedVehicle) {
+    String result = attachedVehicle.getProperty(LoopbackAdapterConstants.PROPKEY_UNLOAD_OPERATION);
+    if (result == null) {
+      result = LoopbackAdapterConstants.PROPVAL_UNLOAD_OPERATION_DEFAULT;
+    }
+    return result;
   }
 
   /**

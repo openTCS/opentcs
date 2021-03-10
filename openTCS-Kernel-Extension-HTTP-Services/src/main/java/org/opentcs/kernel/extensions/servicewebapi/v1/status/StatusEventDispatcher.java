@@ -26,6 +26,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleStat
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides descriptions of recent events.
@@ -36,6 +38,10 @@ public class StatusEventDispatcher
     implements Lifecycle,
                EventHandler {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(StatusEventDispatcher.class);
   /**
    * The interface configuration.
    */
@@ -143,7 +149,7 @@ public class StatusEventDispatcher
           events.wait(timeout);
         }
         catch (InterruptedException exc) {
-          // XXX Do something.
+          LOG.warn("Unexpectedly interrupted", exc);
         }
       }
       messages = events.subMap(minSequenceNo, maxSequenceNo).values();

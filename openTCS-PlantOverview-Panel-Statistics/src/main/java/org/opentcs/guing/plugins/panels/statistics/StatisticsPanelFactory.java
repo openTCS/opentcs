@@ -14,6 +14,7 @@ import javax.inject.Provider;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
+import static org.opentcs.guing.plugins.panels.statistics.I18nPlantOverviewPanelStatistics.BUNDLE_PATH;
 
 /**
  * Creates statistics panels.
@@ -26,8 +27,7 @@ public class StatisticsPanelFactory
   /**
    * This class's bundle.
    */
-  private final ResourceBundle bundle
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * A provider for the actual panels.
    */
@@ -45,7 +45,7 @@ public class StatisticsPanelFactory
 
   @Override
   public String getPanelDescription() {
-    return bundle.getString("Statistics_panel_title");
+    return bundle.getString("statisticsPanelFactory.panelDescription");
   }
 
   @Override

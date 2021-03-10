@@ -19,9 +19,10 @@ import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.view.AddBitmapAction;
 import org.opentcs.guing.application.action.view.AddDrawingViewAction;
-import org.opentcs.guing.application.action.view.AddTransportOrderSequenceView;
-import org.opentcs.guing.application.action.view.AddTransportOrderView;
+import org.opentcs.guing.application.action.view.AddTransportOrderSequenceViewAction;
+import org.opentcs.guing.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -76,10 +77,10 @@ public class ViewMenu
     requireNonNull(view, "view");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
     
-    this.setText( labels.getString("view.text"));
-    this.setToolTipText(labels.getString("view.toolTipText"));
+    this.setText( labels.getString("viewMenu.text"));
+    this.setToolTipText(labels.getString("viewMenu.tooltipText"));
     this.setMnemonic('V');
 
     // Menu item View -> Add Background Image
@@ -93,11 +94,11 @@ public class ViewMenu
     add(menuAddDrawingView);
 
     // Menu item View -> Add transport order view
-    menuTransportOrderView = new JMenuItem(actionMap.get(AddTransportOrderView.ID));
+    menuTransportOrderView = new JMenuItem(actionMap.get(AddTransportOrderViewAction.ID));
     add(menuTransportOrderView);
 
     // Menu item View -> Add transport order sequence view
-    menuOrderSequenceView = new JMenuItem(actionMap.get(AddTransportOrderSequenceView.ID));
+    menuOrderSequenceView = new JMenuItem(actionMap.get(AddTransportOrderSequenceViewAction.ID));
     add(menuOrderSequenceView);
 
     addSeparator();
@@ -124,7 +125,7 @@ public class ViewMenu
 
     // Menu item View -> Restore docking layout
     menuItemRestoreDockingLayout = new JMenuItem(actionMap.get(RestoreDockingLayoutAction.ID));
-    menuItemRestoreDockingLayout.setText(labels.getString("view.restoreDockingLayout.text"));
+    menuItemRestoreDockingLayout.setText(labels.getString("viewMenu.menuItem_restoreWindowArrangement.text"));
     add(menuItemRestoreDockingLayout);
   }
 

@@ -13,16 +13,16 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import java.awt.Dimension;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.TreeSet;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.opentcs.data.ObjectPropConstants;
@@ -31,6 +31,7 @@ import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.Property;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -40,22 +41,22 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class KeyValueSetPropertyEditorPanel
-    extends javax.swing.JPanel
+    extends JPanel
     implements DetailsDialogContent {
 
   /**
    * A resource bundle.
    */
-  private final ResourceBundleUtil resBundle = ResourceBundleUtil.getBundle();
-  /**
-   * Das zu bearbeitende Attribut.
-   */
-  private KeyValueSetProperty fProperty;
-
+  private final ResourceBundleUtil resBundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
   /**
    * A provider that provides new instances of KeyValuePropertyEditorPanels
    */
   private final Provider<KeyValuePropertyEditorPanel> editorProvider;
+  /**
+   * Das zu bearbeitende Attribut.
+   */
+  private KeyValueSetProperty fProperty;
 
   /**
    * Creates a new instance.
@@ -64,38 +65,20 @@ public class KeyValueSetPropertyEditorPanel
    */
   @Inject
   public KeyValueSetPropertyEditorPanel(Provider<KeyValuePropertyEditorPanel> editorProvider) {
-    this.editorProvider = Objects.requireNonNull(editorProvider, "editorProvider");
+    this.editorProvider = requireNonNull(editorProvider, "editorProvider");
+
     initComponents();
-    itemsTable.setModel(new javax.swing.table.DefaultTableModel(
-        new Object[][] {},
-        new String[] {
-          resBundle.getString("KeyValueSetPropertyEditorPanel.key.text"),
-          resBundle.getString("KeyValueSetPropertyEditorPanel.value.text")}) {
-      private final Class[] types = new Class[] {
-        java.lang.String.class, java.lang.String.class
-      };
 
-      @Override
-      public Class<?> getColumnClass(int columnIndex) {
-        return types[columnIndex];
-      }
+    itemsTable.setModel(new ItemsTableModel());
 
-      @Override
-      public boolean isCellEditable(int i, int i1) {
-        return false;
-      }
-    });
     setPreferredSize(new Dimension(350, 200));
 
-    itemsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-      @Override
-      public void valueChanged(ListSelectionEvent evt) {
-        if (evt.getValueIsAdjusting()) {
-          return;
-        }
-
-        handleSelectionChanged();
+    itemsTable.getSelectionModel().addListSelectionListener((ListSelectionEvent evt) -> {
+      if (evt.getValueIsAdjusting()) {
+        return;
       }
+
+      handleSelectionChanged();
     });
   }
 
@@ -103,20 +86,12 @@ public class KeyValueSetPropertyEditorPanel
   public void setProperty(Property property) {
     fProperty = (KeyValueSetProperty) property;
 
-    DefaultTableModel model = (DefaultTableModel) itemsTable.getModel();
+    ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
 
-    for (int i = model.getRowCount() - 1; i >= 0; i--) {
-      model.removeRow(i);
-    }
+    model.setRowCount(0);
 
-    Iterator<KeyValueProperty> e = fProperty.getItems().iterator();
-
-    while (e.hasNext()) {
-      KeyValueProperty p = e.next();
-      String[] row = new String[2];
-      row[0] = p.getKey();
-      row[1] = p.getValue();
-      model.addRow(row);
+    for (KeyValueProperty p : fProperty.getItems()) {
+      model.addRow(new String[] {p.getKey(), p.getValue()});
     }
 
     sortItems();
@@ -140,7 +115,7 @@ public class KeyValueSetPropertyEditorPanel
 
   @Override
   public String getTitle() {
-    return ResourceBundleUtil.getBundle().getString("KeyValueSetPropertyEditorPanel.title");
+    return resBundle.getString("keyValueSetPropertyEditorPanel.title");
   }
 
   @Override
@@ -191,13 +166,9 @@ public class KeyValueSetPropertyEditorPanel
       items.put((String) itemsTable.getValueAt(i, 0), (String) itemsTable.getValueAt(i, 1));
     }
 
-    TreeSet<String> sorted = new TreeSet<>(items.keySet());
-
     int index = 0;
-    Iterator<String> i = sorted.iterator();
 
-    while (i.hasNext()) {
-      String key = i.next();
+    for (String key : new TreeSet<>(items.keySet())) {
       String value = items.get(key);
 
       itemsTable.setValueAt(key, index, 0);
@@ -220,12 +191,12 @@ public class KeyValueSetPropertyEditorPanel
       if (itemsTable.getValueAt(i, 0).equals(key)) {
         JOptionPane.showMessageDialog(
             this,
-            resBundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + key);
+            resBundle.getString("keyValueSetPropertyEditorPanel.optionPane_keyAlreadyExists.message") + ": " + key);
         return;
       }
     }
 
-    DefaultTableModel model = (DefaultTableModel) itemsTable.getModel();
+    ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
     model.addRow(new Object[] {key, value});
   }
 
@@ -249,7 +220,7 @@ public class KeyValueSetPropertyEditorPanel
               && Objects.equals(itemsTable.getValueAt(newKeyRow, 0), newKey)) {
             JOptionPane.showMessageDialog(
                 this,
-                resBundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + newKey);
+                resBundle.getString("keyValueSetPropertyEditorPanel.optionPane_keyAlreadyExists.message") + ": " + newKey);
             return;
           }
         }
@@ -385,8 +356,8 @@ public class KeyValueSetPropertyEditorPanel
     controlPanel.setLayout(new java.awt.GridBagLayout());
 
     addButton.setFont(addButton.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    addButton.setText(bundle.getString("KeyValueSetPropertyEditorPanel.addButton")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/propertyEditing"); // NOI18N
+    addButton.setText(bundle.getString("keyValueSetPropertyEditorPanel.button_add.text")); // NOI18N
     addButton.setOpaque(false);
     addButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -399,7 +370,7 @@ public class KeyValueSetPropertyEditorPanel
     controlPanel.add(addButton, gridBagConstraints);
 
     editButton.setFont(editButton.getFont());
-    editButton.setText(bundle.getString("KeyValueSetPropertyEditorPanel.editButton")); // NOI18N
+    editButton.setText(bundle.getString("keyValueSetPropertyEditorPanel.button_edit.text")); // NOI18N
     editButton.setOpaque(false);
     editButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -414,7 +385,7 @@ public class KeyValueSetPropertyEditorPanel
     controlPanel.add(editButton, gridBagConstraints);
 
     removeButton.setFont(removeButton.getFont());
-    removeButton.setText(bundle.getString("KeyValueSetPropertyEditorPanel.removeButton")); // NOI18N
+    removeButton.setText(bundle.getString("keyValueSetPropertyEditorPanel.button_remove.text")); // NOI18N
     removeButton.setOpaque(false);
     removeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -439,14 +410,13 @@ public class KeyValueSetPropertyEditorPanel
    * @param evt das auslösende Ereignis
    */
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-      int i = itemsTable.getSelectedRow();
+      int selectedRowIndex = itemsTable.getSelectedRow();
 
-      if (i == -1) {
+      if (selectedRowIndex == -1) {
         return;
       }
 
-      DefaultTableModel model = (DefaultTableModel) itemsTable.getModel();
-      model.removeRow(i);
+      ((ItemsTableModel) itemsTable.getModel()).removeRow(selectedRowIndex);
 
       updateView();
     }//GEN-LAST:event_removeButtonActionPerformed
@@ -468,6 +438,8 @@ public class KeyValueSetPropertyEditorPanel
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       add();
     }//GEN-LAST:event_addButtonActionPerformed
+
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JPanel controlPanel;
@@ -476,4 +448,34 @@ public class KeyValueSetPropertyEditorPanel
   private javax.swing.JTable itemsTable;
   private javax.swing.JButton removeButton;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
+
+  private class ItemsTableModel
+      extends DefaultTableModel {
+
+    private final Class<?>[] types = new Class<?>[] {
+      String.class, String.class
+    };
+
+    public ItemsTableModel() {
+      super(
+          new Object[][] {},
+          new String[] {
+            resBundle.getString("keyValueSetPropertyEditorPanel.table_properties.column_key.headerText"),
+            resBundle.getString("keyValueSetPropertyEditorPanel.table_properties.column_value.headerText")
+          }
+      );
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+      return types[columnIndex];
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+      return false;
+    }
+  }
+
 }

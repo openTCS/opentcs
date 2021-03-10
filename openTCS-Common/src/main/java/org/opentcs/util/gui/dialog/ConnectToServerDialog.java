@@ -15,6 +15,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.opentcs.util.I18nCommon;
 import org.opentcs.util.gui.Icons;
 
 /**
@@ -30,7 +31,7 @@ public class ConnectToServerDialog
    * This class's resource bundle.
    */
   private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/util/Bundle");
+      = ResourceBundle.getBundle(I18nCommon.BUNDLE_PATH);
   /**
    * A return status code - returned if Cancel button has been pressed.
    */
@@ -155,12 +156,12 @@ public class ConnectToServerDialog
     cbComboBox = new javax.swing.JComboBox<>();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/util/Bundle"); // NOI18N
-    setTitle(bundle.getString("ConnectToServerDialog.title")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/common/Bundle"); // NOI18N
+    setTitle(bundle.getString("connectToServerDialog.title")); // NOI18N
     getContentPane().setLayout(new java.awt.GridBagLayout());
 
     labelDescription.setFont(labelDescription.getFont());
-    labelDescription.setText(bundle.getString("ConnectToServerDialog.description.text")); // NOI18N
+    labelDescription.setText(bundle.getString("connectToServerDialog.label_description.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -181,7 +182,7 @@ public class ConnectToServerDialog
     getContentPane().add(textFieldDescription, gridBagConstraints);
 
     labelServer.setFont(labelServer.getFont());
-    labelServer.setText(bundle.getString("ConnectToServerDialog.host.text")); // NOI18N
+    labelServer.setText(bundle.getString("connectToServerDialog.label_host.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -202,7 +203,7 @@ public class ConnectToServerDialog
     getContentPane().add(textFieldServer, gridBagConstraints);
 
     labelPort.setFont(labelPort.getFont());
-    labelPort.setText(bundle.getString("ConnectToServerDialog.port.text")); // NOI18N
+    labelPort.setText(bundle.getString("connectToServerDialog.label_port.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -225,7 +226,7 @@ public class ConnectToServerDialog
     panelButtons.setLayout(new java.awt.GridBagLayout());
 
     okButton.setFont(okButton.getFont().deriveFont(okButton.getFont().getStyle() | java.awt.Font.BOLD));
-    okButton.setText(bundle.getString("ConnectToServerDialog.okButton.text")); // NOI18N
+    okButton.setText(bundle.getString("connectToServerDialog.button_ok.text")); // NOI18N
     okButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         okButtonActionPerformed(evt);
@@ -239,7 +240,7 @@ public class ConnectToServerDialog
     panelButtons.add(okButton, gridBagConstraints);
 
     cancelButton.setFont(cancelButton.getFont());
-    cancelButton.setText(bundle.getString("ConnectToServerDialog.cancelButton.text")); // NOI18N
+    cancelButton.setText(bundle.getString("connectToServerDialog.button_cancle.text")); // NOI18N
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         cancelButtonActionPerformed(evt);
@@ -284,8 +285,8 @@ public class ConnectToServerDialog
     description = textFieldDescription.getText();
     if (description.isEmpty()) {
       JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("ConnectToServerDialog.invalidDescription.message"),
-                                    BUNDLE.getString("ConnectToServerDialog.invalidDescription"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidDescription.message"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidDescription.title"),
                                     JOptionPane.ERROR_MESSAGE
       );
       return;
@@ -294,8 +295,8 @@ public class ConnectToServerDialog
     host = textFieldServer.getText();
     if (host.isEmpty()) {
       JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("ConnectToServerDialog.invalidHost.message"),
-                                    BUNDLE.getString("ConnectToServerDialog.invalidHost"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidHost.message"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidHost.title"),
                                     JOptionPane.ERROR_MESSAGE
       );
       return;
@@ -309,8 +310,8 @@ public class ConnectToServerDialog
     }
     catch (NumberFormatException e) {
       JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("ConnectToServerDialog.invalidPort.message"),
-                                    BUNDLE.getString("ConnectToServerDialog.invalidPort"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidPort.message"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidPort.title"),
                                     JOptionPane.ERROR_MESSAGE
       );
       return;

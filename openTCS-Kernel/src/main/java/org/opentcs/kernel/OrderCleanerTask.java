@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -62,7 +63,7 @@ class OrderCleanerTask
    * @param configuration This class's configuration.
    */
   @Inject
-  public OrderCleanerTask(@GlobalKernelSync Object globalSyncObject,
+  public OrderCleanerTask(@GlobalSyncObject Object globalSyncObject,
                           TransportOrderPool orderPool,
                           Set<TransportOrderCleanupApproval> orderCleanupApprovals,
                           Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals,

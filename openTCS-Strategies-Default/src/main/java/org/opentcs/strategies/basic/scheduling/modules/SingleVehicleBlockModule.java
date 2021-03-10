@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
@@ -46,15 +47,21 @@ public class SingleVehicleBlockModule
    */
   private final InternalPlantModelService plantModelService;
   /**
+   * A global object to be used for synchronization within the kernel.
+   */
+  private final Object globalSyncObject;
+  /**
    * Whether this module is initialized.
    */
   private boolean initialized;
 
   @Inject
   public SingleVehicleBlockModule(@Nonnull ReservationPool reservationPool,
-                                  @Nonnull InternalPlantModelService plantModelService) {
+                                  @Nonnull InternalPlantModelService plantModelService,
+                                  @Nonnull @GlobalSyncObject Object globalSyncObject) {
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
+    this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
   }
 
   @Override
@@ -101,7 +108,7 @@ public class SingleVehicleBlockModule
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       Set<Block> blocks = filterBlocksContainingResources(resources,
                                                           Block.Type.SINGLE_VEHICLE_ONLY);
 

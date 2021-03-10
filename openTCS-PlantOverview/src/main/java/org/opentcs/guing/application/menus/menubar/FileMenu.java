@@ -22,6 +22,7 @@ import org.opentcs.guing.application.action.file.SaveModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAsAction;
 import org.opentcs.guing.application.action.synchronize.LoadModelFromKernelAction;
 import org.opentcs.guing.application.action.synchronize.PersistInKernelAction;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -95,10 +96,10 @@ public class FileMenu
     this.menuImport = requireNonNull(menuImport, "menuImport");
     this.menuExport = requireNonNull(menuExport, "menuExport");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
     
-    this.setText( labels.getString("file.text"));
-    this.setToolTipText(labels.getString("file.toolTipText"));
+    this.setText( labels.getString("fileMenu.text"));
+    this.setToolTipText(labels.getString("fileMenu.tooltipText"));
     this.setMnemonic('F');
 
     // Menu item File -> New Model (nur in Mode Modelling)

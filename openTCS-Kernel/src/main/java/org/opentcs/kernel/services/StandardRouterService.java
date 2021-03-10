@@ -14,10 +14,10 @@ import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.RouterService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.KernelApplicationConfiguration;
 import org.opentcs.kernel.workingset.Model;
 
@@ -65,7 +65,7 @@ public class StandardRouterService
    * @param configuration The kernel application's configuration.
    */
   @Inject
-  public StandardRouterService(@GlobalKernelSync Object globalSyncObject,
+  public StandardRouterService(@GlobalSyncObject Object globalSyncObject,
                                LocalKernel kernel,
                                Router router,
                                Dispatcher dispatcher,

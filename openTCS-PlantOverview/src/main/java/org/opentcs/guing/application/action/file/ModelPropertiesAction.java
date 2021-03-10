@@ -11,13 +11,14 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -31,8 +32,9 @@ public class ModelPropertiesAction
   /**
    * This action's ID.
    */
-  public final static String ID = "file.modelProperties";
-
+  public static final String ID = "file.modelProperties";
+  
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * The parent component for dialogs shown by this action.
    */
@@ -47,25 +49,26 @@ public class ModelPropertiesAction
                                ModelManager modelManager) {
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.modelManager = requireNonNull(modelManager, "modelManager");
-
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
+    putValue(NAME, BUNDLE.getString("modelPropertiesAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("modelPropertiesAction.shortDescription"));
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    ResourceBundle bundle = ResourceBundle.getBundle(getClass().getName());
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.MODELPROPERTIES_PATH);
 
     JOptionPane.showMessageDialog(
         dialogParent,
         "<html><p><b>" + modelManager.getModel().getName() + "</b><br>"
-        + bundle.getString("numberOfPoints.label") + numberOfPoints() + "<br>"
-        + bundle.getString("numberOfPaths.label") + numberOfPaths() + "<br>"
-        + bundle.getString("numberOfLocations.label") + numberOfLocations() + "<br>"
-        + bundle.getString("numberOfLocationTypes.label") + numberOfLocationTypes() + "<br>"
-        + bundle.getString("numberOfBlocks.label") + numberOfBlocks() + "<br>"
-        + bundle.getString("numberOfVehicles.label") + numberOfVehicles() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfPoints") + numberOfPoints() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfPaths") + numberOfPaths() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfLocations") + numberOfLocations() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfLocationTypes") + numberOfLocationTypes() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfBlocks") + numberOfBlocks() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfVehicles") + numberOfVehicles() + "<br>"
         + "<br>"
-        + bundle.getString("lastModified.label") + lastModified()
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.lastModified") + lastModified()
         + "</p></html>"
     );
 

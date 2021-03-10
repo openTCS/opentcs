@@ -50,7 +50,7 @@
               </FontInfo>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/res/labels.properties" key="KeyValueSetPropertyEditorPanel.addButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/propertyEditing.properties" key="keyValueSetPropertyEditorPanel.button_add.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="opaque" type="boolean" value="false"/>
           </Properties>
@@ -71,7 +71,7 @@
               </FontInfo>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/res/labels.properties" key="KeyValueSetPropertyEditorPanel.editButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/propertyEditing.properties" key="keyValueSetPropertyEditorPanel.button_edit.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="opaque" type="boolean" value="false"/>
           </Properties>
@@ -92,7 +92,7 @@
               </FontInfo>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/res/labels.properties" key="KeyValueSetPropertyEditorPanel.removeButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/propertyEditing.properties" key="keyValueSetPropertyEditorPanel.button_remove.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="opaque" type="boolean" value="false"/>
           </Properties>

@@ -18,3 +18,5 @@ include::05_extending-kernel.adoc[]
 include::06_extending-control-center.adoc[]
 
 include::07_extending-plantoverview.adoc[]
+
+include::08_translating.adoc[]

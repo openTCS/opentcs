@@ -37,6 +37,26 @@ public class GridConstrainer
 
   private final static int MIN_GRID_SPACING = 4;
   /**
+   * The spacing factor for a medium grid cell.
+   */
+  private static final int MEDIUM_GRID_SPACING = 5;
+  /**
+   * The color for minor grid cells.
+   */
+  private static final Color MINOR_COLOR = new Color(0xd4d4d4);
+  /**
+   * The color for major grid cells.
+   */
+  private static final Color MAJOR_COLOR = new Color(0xc0c0c0);
+  /**
+   * The color for medium grid cells.
+   */
+  private static final Color MEDIUM_COLOR = new Color(0xd0d0d0);
+  /**
+   * The color for x- and y-axis.
+   */
+  private static final Color AXIS_COLOR = new Color(0xC040C0);
+  /**
    * The width of a minor grid cell. The value 0 turns the constrainer off for
    * the horizontal axis.
    */
@@ -57,29 +77,9 @@ public class GridConstrainer
    */
   private boolean isVisible;
   /**
-   * The color for minor grid cells.
-   */
-  private static Color minorColor = new Color(0xd4d4d4);
-  /**
-   * The color for major grid cells.
-   */
-  private static Color majorColor = new Color(0xc0c0c0);
-  /**
-   * The color for medium grid cells.
-   */
-  private static Color mediumColor = new Color(0xd0d0d0);
-  /**
-   * The color for x- and y-axis.
-   */
-  private static Color axisColor = new Color(0xC040C0);
-  /**
    * The spacing factor for a major grid cell.
    */
   private int majorGridSpacing = 10;
-  /**
-   * The spacing factor for a medium grid cell.
-   */
-  private final int mediumGridSpacing = 5;
 
   /**
    * Creates a new instance with a grid of 1x1.
@@ -253,7 +253,7 @@ public class GridConstrainer
       case SOUTH_EAST:
         p.y = p0.y + height;
         break;
-        
+
       default:
     }
 
@@ -269,7 +269,7 @@ public class GridConstrainer
       case SOUTH_EAST:
         p.x = p0.x + width;
         break;
-        
+
       default:
     }
 
@@ -340,7 +340,7 @@ public class GridConstrainer
         p0.y -= r.height;
         p0.x -= r.width;
         break;
-        
+
       default:
     }
 
@@ -373,7 +373,7 @@ public class GridConstrainer
           r.y += height;
         }
         break;
-        
+
       default:
     }
 
@@ -393,7 +393,7 @@ public class GridConstrainer
           r.x += width;
         }
         break;
-        
+
       default:
     }
 
@@ -453,23 +453,23 @@ public class GridConstrainer
           t.transform(point, viewPoint);
 
           if (i == 0) {
-            g.setColor(axisColor);
+            g.setColor(AXIS_COLOR);
           }
           else if (i % majorGridSpacing == 0) {
-            g.setColor(majorColor);
+            g.setColor(MAJOR_COLOR);
           }
-          else if (i % mediumGridSpacing == 0) {
-            g.setColor(mediumColor);
+          else if (i % MEDIUM_GRID_SPACING == 0) {
+            g.setColor(MEDIUM_COLOR);
           }
           else {
-            g.setColor(minorColor);
+            g.setColor(MINOR_COLOR);
           }
 
           g.drawLine((int) viewPoint.x, viewBounds.y, (int) viewPoint.x, viewBounds.y + viewBounds.height);
         }
       }
       else if (width * majorGridSpacing * view.getScaleFactor() > 2) {
-        g.setColor(majorColor);
+        g.setColor(MAJOR_COLOR);
 
         for (int i = (int) (origin.x / width), m = (int) ((origin.x + bounds.width) / width) + 1;
              i <= m; i++) {
@@ -490,23 +490,23 @@ public class GridConstrainer
           t.transform(point, viewPoint);
 
           if (i == 0) {
-            g.setColor(axisColor);
+            g.setColor(AXIS_COLOR);
           }
           else if (i % majorGridSpacing == 0) {
-            g.setColor(majorColor);
+            g.setColor(MAJOR_COLOR);
           }
-          else if (i % mediumGridSpacing == 0) {
-            g.setColor(mediumColor);
+          else if (i % MEDIUM_GRID_SPACING == 0) {
+            g.setColor(MEDIUM_COLOR);
           }
           else {
-            g.setColor(minorColor);
+            g.setColor(MINOR_COLOR);
           }
 
           g.drawLine(viewBounds.x, (int) viewPoint.y, viewBounds.x + viewBounds.width, (int) viewPoint.y);
         }
       }
       else if (height * majorGridSpacing * view.getScaleFactor() > 2) {
-        g.setColor(majorColor);
+        g.setColor(MAJOR_COLOR);
 
         for (int i = (int) (origin.y / height), m = (int) ((origin.y + bounds.height) / height) + 1;
              i <= m; i++) {

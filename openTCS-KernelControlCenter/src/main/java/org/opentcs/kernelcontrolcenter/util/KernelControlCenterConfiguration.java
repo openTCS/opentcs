@@ -27,10 +27,10 @@ public interface KernelControlCenterConfiguration {
 
   @ConfigurationEntry(
       type = "String",
-      description = {"The kernel control center application's locale.",
-                     "Valid values: 'English', 'German'"},
+      description = {"The kernel control center application's locale, as a BCP 47 language tag.",
+                     "Examples: 'en', 'de', 'zh'"},
       orderKey = "0_init_0")
-  String language();
+  String locale();
 
   @ConfigurationEntry(
       type = "List of <description>\\|<hostname>\\|<port>",

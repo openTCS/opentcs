@@ -24,6 +24,10 @@ public interface PointRouter {
    * A constant for marking the costs for a route as infinite.
    */
   long INFINITE_COSTS = Long.MAX_VALUE;
+  /**
+   * A constant for high routing costs (to be used for instance as a fallback value).
+   */
+  long HIGH_COSTS = INFINITE_COSTS - 1;
 
   /**
    * Returns a list of route steps to travel from a given source point to a given destination point.

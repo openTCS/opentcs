@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
-import org.opentcs.guing.components.properties.type.BooleanProperty;
+import org.opentcs.guing.components.properties.type.MultipleDifferentValues;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
@@ -96,16 +96,12 @@ public class PropertiesCollection
         AbstractProperty clone = (AbstractProperty) property.clone();
 
         if (differentValues) {
-          clone.setIsCollectionAndHasDifferentValues(true);
-
-          if (!(clone instanceof BooleanProperty)) {
-            clone.setValue(bundle.getString("PropertiesCollection.differentValues.text"));
-          }
+          clone.setValue(new MultipleDifferentValues());
 
           clone.unmarkChanged();
 
           clone.setDescription(property.getDescription());
-          clone.setHelptext(bundle.getString("PropertiesCollection.differentValues.helptext"));
+          clone.setHelptext(property.getHelptext());
           clone.setModellingEditable(property.isModellingEditable());
           clone.setOperatingEditable(property.isOperatingEditable());
           setProperty(name, clone);
@@ -157,6 +153,6 @@ public class PropertiesCollection
 
   @Override // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("collection.description");
+    return bundle.getString("propertiesCollection.description");
   }
 }

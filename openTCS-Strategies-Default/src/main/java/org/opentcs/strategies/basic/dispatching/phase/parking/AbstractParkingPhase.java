@@ -145,7 +145,7 @@ public abstract class AbstractParkingPhase
             .withIntendedVehicleName(vehicle.getName())
     );
     Optional<AssignmentCandidate> candidate = computeCandidate(vehicle, vehiclePosition, parkOrder)
-        .filter(assignmentCandidateSelectionFilter);
+        .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());
     // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
     if (candidate.isPresent()) {
       transportOrderUtil.assignTransportOrder(candidate.get().getVehicle(),

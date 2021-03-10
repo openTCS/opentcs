@@ -132,10 +132,10 @@ public class PointFigure
   protected void drawFill(Graphics2D g) {
     Rectangle rect = fDisplayBox;
 
-    if (getModel().getPropertyType().getValue() == PointModel.PointType.PARK) {
+    if (getModel().getPropertyType().getValue() == PointModel.Type.PARK) {
       g.setColor(C_PARK);
     }
-    else if (getModel().getPropertyType().getValue() == PointModel.PointType.REPORT) {
+    else if (getModel().getPropertyType().getValue() == PointModel.Type.REPORT) {
       g.setColor(C_REPORT);
     }
     else {
@@ -146,7 +146,7 @@ public class PointFigure
       g.fillOval(rect.x, rect.y, rect.width, rect.height);
     }
 
-    if (getModel().getPropertyType().getValue() == PointModel.PointType.PARK) {
+    if (getModel().getPropertyType().getValue() == PointModel.Type.PARK) {
       g.setColor(Color.white);
       Font oldFont = g.getFont();
       Font newFont = new Font(Font.DIALOG, Font.BOLD, 7);

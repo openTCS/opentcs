@@ -18,8 +18,6 @@ import org.opentcs.access.KernelServicePortal;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.util.JOptionPaneUtil;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,12 +101,7 @@ public class ModelKernelPersistor {
     if (!valid) {
       //Use a hash set to avoid duplicate errors
       Set<String> errors = new HashSet<>(validator.getErrors());
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-      JOptionPaneUtil.showDialogWithTextArea(
-          statusPanel,
-          bundle.getString("ValidationWarning.title"),
-          bundle.getString("ValidationWarning.descriptionSavingKernel"),
-          errors);
+      validator.showSavingValidationWarning(statusPanel, errors);
     }
     return valid;
   }

@@ -8,7 +8,6 @@
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
@@ -68,8 +67,8 @@ public class PrioritizedReparkPhase
 
     LOG.debug("Looking for parking vehicles to send to higher prioritized parking positions...");
 
-    Set<Vehicle> vehicles = getOrderService().fetchObjects(Vehicle.class, vehicleSelectionFilter);
-    vehicles.stream()
+    getOrderService().fetchObjects(Vehicle.class).stream()
+        .filter(vehicle -> vehicleSelectionFilter.apply(vehicle).isEmpty())
         .sorted((vehicle1, vehicle2) -> {
           // Sort the vehicles based on the priority of the parking position they occupy
           Point point1 = getOrderService().fetchObject(Point.class, vehicle1.getCurrentPosition());

@@ -486,15 +486,6 @@ task schemagenXml {
              "org.opentcs.kernel.extensions.xmlhost.status.binding.OrderStatusMessage",
              "org.opentcs.kernel.extensions.xmlhost.status.binding.VehicleStatusMessage" ]
     }
-    javaexec {
-      classpath configurations.schemagen
-      main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/opentcs-plantoverview-persistence.xsd",
-             "org.opentcs.guing.persistence.legacy.CourseModel",
-             "org.opentcs.guing.persistence.legacy.CourseElement",
-             "org.opentcs.guing.persistence.legacy.CourseObjectProperty",
-             "org.opentcs.guing.persistence.legacy.KeyValueSetListWrapper" ]
-    }
   }
 }
 

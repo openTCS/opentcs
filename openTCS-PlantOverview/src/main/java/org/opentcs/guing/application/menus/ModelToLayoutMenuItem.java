@@ -36,6 +36,7 @@ import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
 
@@ -88,7 +89,7 @@ public class ModelToLayoutMenuItem
                                @ApplicationEventBus EventHandler eventHandler,
                                PropertiesComponentsFactory componentsFactory,
                                @Assisted boolean copyAll) {
-    super(ResourceBundleUtil.getBundle().getString("propertiesTable.toLayout"));
+    super(ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH).getString("modelToLayoutMenuItem.text"));
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.eventBus = requireNonNull(eventHandler, "eventHandler");
@@ -132,16 +133,15 @@ public class ModelToLayoutMenuItem
 
   private void updateLayoutY(ModelComponent model) {
     CoordinateProperty modelProperty;
-    CoordinateUndoActivity cua;
     if (model instanceof PointModel) {
       modelProperty = (CoordinateProperty) model.getProperty(PointModel.MODEL_Y_POSITION);
     }
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);
     }
-    cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
+    CoordinateUndoActivity cua
+        = componentsFactory.createModelToLayoutCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
-    cua.setSaveTransform(true);
     modelProperty.setChangeState(ModelAttribute.ChangeState.DETAIL_CHANGED);
     StringProperty spy;
     if (model instanceof PointModel) {
@@ -164,9 +164,9 @@ public class ModelToLayoutMenuItem
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_X_POSITION);
     }
-    CoordinateUndoActivity cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
+    CoordinateUndoActivity cua
+        = componentsFactory.createModelToLayoutCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
-    cua.setSaveTransform(true);
     modelProperty.setChangeState(ModelAttribute.ChangeState.DETAIL_CHANGED);
     // Copy the model coordinates to the layout coordinates...
     StringProperty spx;

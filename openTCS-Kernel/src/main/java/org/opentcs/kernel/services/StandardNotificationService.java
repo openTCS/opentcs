@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.NotificationService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 
 /**
@@ -40,7 +40,7 @@ public class StandardNotificationService
    * @param notificationBuffer The notification buffer to be used.
    */
   @Inject
-  public StandardNotificationService(@GlobalKernelSync Object globalSyncObject,
+  public StandardNotificationService(@GlobalSyncObject Object globalSyncObject,
                                      NotificationBuffer notificationBuffer) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.notificationBuffer = requireNonNull(notificationBuffer, "notificationBuffer");

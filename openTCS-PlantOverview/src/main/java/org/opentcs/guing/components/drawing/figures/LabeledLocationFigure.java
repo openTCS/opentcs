@@ -198,6 +198,18 @@ public class LabeledLocationFigure
         lpy.setText(String.format("%d", newY));
         lpy.markChanged();
       }
+
+      // Offset of the labels of the location will be updated here.
+      StringProperty propOffsetX = model.getPropertyLabelOffsetX();
+      if (Strings.isNullOrEmpty(propOffsetX.getText())) {
+        propOffsetX.setText(String.format("%d", TCSLabelFigure.DEFAULT_LABEL_OFFSET_X));
+      }
+
+      StringProperty propOffsetY = model.getPropertyLabelOffsetY();
+      if (Strings.isNullOrEmpty(propOffsetY.getText())) {
+        propOffsetY.setText(String.format("%d", TCSLabelFigure.DEFAULT_LABEL_OFFSET_Y));
+      }
+
     }
     // Immer den Typ aktualisieren
     model.getPropertyType().markChanged();

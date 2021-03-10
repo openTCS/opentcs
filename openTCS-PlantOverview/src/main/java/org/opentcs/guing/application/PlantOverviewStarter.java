@@ -16,7 +16,6 @@ import org.opentcs.guing.exchange.AttributeAdapterRegistry;
 import org.opentcs.guing.exchange.KernelEventFetcher;
 import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * The plant overview application's entry point.
@@ -54,7 +53,7 @@ public class PlantOverviewStarter {
    * Dispatches openTCS event from kernel objects to corresponding model components.
    */
   private final OpenTCSEventDispatcher eventDispatcher;
-  
+
   private final AttributeAdapterRegistry attributeAdapterRegistry;
 
   /**
@@ -90,8 +89,6 @@ public class PlantOverviewStarter {
   }
 
   public void startPlantOverview() {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-
     eventLogger.initialize();
     kernelEventFetcher.initialize();
     eventDispatcher.initialize();
@@ -100,13 +97,11 @@ public class PlantOverviewStarter {
     opentcsView.init();
     opentcsView.switchPlantOverviewState(initialMode());
     progressIndicator.initialize();
-    progressIndicator.setProgress(0, bundle.getString(
-                                  "PlantOverviewStarter.progress.startPlantOverview"));
+    progressIndicator.setProgress(StartupProgressStatus.START_PLANT_OVERVIEW);
     // XXX We currently do this to iteratively eliminate (circular) references
     // to the OpenTCSView instance. This should eventually go away.
     OpenTCSView.setInstance(opentcsView);
-    progressIndicator.setProgress(5, bundle.getString(
-                                  "PlantOverviewStarter.progress.showPlantOverview"));
+    progressIndicator.setProgress(StartupProgressStatus.SHOW_PLANT_OVERVIEW);
     opentcsView.setApplication(application);
     // Start the view.
     application.show(opentcsView);

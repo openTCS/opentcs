@@ -8,8 +8,10 @@
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
 import static java.util.Objects.requireNonNull;
+import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
@@ -18,10 +20,15 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
 /**
  * Filters transport orders that are dispatchable and available to <em>any</em> vehicle.
  *
+ * <p>
+ * Note: This filter is not a {@link TransportOrderSelectionFilter} by intention, since it is not
+ * intended to be used in contexts where {@link ObjectHistory} entries are created.
+ * </p>
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class IsFreelyDispatchableToAnyVehicle
-    implements TransportOrderSelectionFilter {
+    implements Predicate<TransportOrder> {
 
   /**
    * The order service.

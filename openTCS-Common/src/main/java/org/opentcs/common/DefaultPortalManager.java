@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.util.I18nCommon;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.gui.dialog.ConnectToServerDialog;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
@@ -40,7 +41,7 @@ public class DefaultPortalManager
    * This class's resource bundle.
    */
   private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/util/Bundle");
+      = ResourceBundle.getBundle(I18nCommon.BUNDLE_PATH);
   /**
    * The handler to send events to.
    */
@@ -170,8 +171,8 @@ public class DefaultPortalManager
       LOG.warn("Failed to connect to remote portal", e);
       eventHandler.onEvent(ConnectionState.DISCONNECTED);
       JOptionPane.showMessageDialog(null,
-                                    BUNDLE.getString("DefaultPortalManager.NoConnectionDialog.text"),
-                                    BUNDLE.getString("DefaultPortalManager.NoConnectionDialog.text"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_noConnection.message"),
+                                    BUNDLE.getString("connectToServerDialog.optionPane_noConnection.message"),
                                     JOptionPane.ERROR_MESSAGE);
 
       // Retry connection attempt

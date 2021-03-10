@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 
 /**
  * Table model for transport order proerties.
@@ -27,15 +28,14 @@ class PropertyTableModel
   /**
    * This classe's bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
 
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    BUNDLE.getString("key"),
-    BUNDLE.getString("value")
+    BUNDLE.getString("propertyTableModel.column_key.headerText"),
+    BUNDLE.getString("propertyTableModel.column_value.headerText")
   };
   /**
    * The column classes.

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A plain implementation of {@link EventBus}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

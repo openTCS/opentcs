@@ -8,7 +8,6 @@
 package org.opentcs.virtualvehicle;
 
 import static java.util.Objects.requireNonNull;
-import java.util.ResourceBundle;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
@@ -65,8 +64,7 @@ public class LoopbackCommunicationAdapterFactory
   @Override
   @Deprecated
   public String getAdapterDescription() {
-    return ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle")
-        .getString("AdapterFactoryDescription");
+    return getDescription().getDescription();
   }
 
   @Override

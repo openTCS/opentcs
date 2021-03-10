@@ -49,7 +49,7 @@
               <Font name="Arial" size="11" style="0"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/virtualvehicle/inputcomponents/Bundle.properties" key="okButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="inputDialog.button_ok.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="name" type="java.lang.String" value="inputDialogOkButton" noResource="true"/>
           </Properties>
@@ -63,7 +63,7 @@
               <Font name="Arial" size="11" style="0"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/virtualvehicle/inputcomponents/Bundle.properties" key="cancelButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="inputDialog.button_cancel.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="name" type="java.lang.String" value="inputDialogCancelButton" noResource="true"/>
           </Properties>
@@ -77,7 +77,7 @@
               <Font name="Arial" size="11" style="0"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/virtualvehicle/inputcomponents/Bundle.properties" key="resetButton" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="inputDialog.button_reset.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="name" type="java.lang.String" value="inputDialogResetButton" noResource="true"/>
           </Properties>

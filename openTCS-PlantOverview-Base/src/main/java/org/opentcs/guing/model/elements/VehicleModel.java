@@ -55,7 +55,6 @@ public class VehicleModel
   public static final String PRECISE_POSITION = "PrecisePosition";
   public static final String ORIENTATION_ANGLE = "OrientationAngle";
   public static final String ENERGY_LEVEL = "EnergyLevel";
-  public static final String ENERGY_STATE = "EnergyState";
   public static final String CURRENT_TRANSPORT_ORDER_NAME = "currentTransportOrderName";
   public static final String CURRENT_SEQUENCE_NAME = "currentOrderSequenceName";
   public static final String MAXIMUM_VELOCITY = "MaximumVelocity";
@@ -304,7 +303,7 @@ public class VehicleModel
 
   @Override // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("vehicle.description");
+    return bundle.getString("vehicleModel.description");
   }
 
   public LengthProperty getPropertyLength() {
@@ -341,11 +340,6 @@ public class VehicleModel
 
   public PercentProperty getPropertyEnergyLevel() {
     return (PercentProperty) getProperty(ENERGY_LEVEL);
-  }
-
-  @SuppressWarnings("unchecked")
-  public SelectionProperty<EnergyState> getPropertyEnergyState() {
-    return (SelectionProperty<EnergyState>) getProperty(ENERGY_STATE);
   }
 
   @SuppressWarnings("unchecked")
@@ -401,92 +395,116 @@ public class VehicleModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("vehicle.name.text"));
-    pName.setHelptext(bundle.getString("vehicle.name.helptext"));
+    pName.setDescription(bundle.getString("vehicleModel.property_name.description"));
+    pName.setHelptext(bundle.getString("vehicleModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     LengthProperty pLength = new LengthProperty(this, 1000, LengthProperty.Unit.MM);
-    pLength.setDescription(bundle.getString("vehicle.length.text"));
-    pLength.setHelptext(bundle.getString("vehicle.length.helptext"));
+    pLength.setDescription(bundle.getString("vehicleModel.property_length.description"));
+    pLength.setHelptext(bundle.getString("vehicleModel.property_length.helptext"));
     setProperty(LENGTH, pLength);
 
     ColorProperty pColor = new ColorProperty(this, Color.red);
-    pColor.setDescription(bundle.getString("vehicle.routeColor.text"));
-    pColor.setHelptext(bundle.getString("vehicle.routeColor.helptext"));
+    pColor.setDescription(bundle.getString("vehicleModel.property_routeColor.description"));
+    pColor.setHelptext(bundle.getString("vehicleModel.property_routeColor.helptext"));
     setProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR, pColor);
 
     PercentProperty pEnergyLevelCritical = new PercentProperty(this,
                                                                30,
                                                                PercentProperty.Unit.PERCENT,
                                                                true);
-    pEnergyLevelCritical.setDescription(bundle.getString("vehicle.energyLevelCritical.text"));
-    pEnergyLevelCritical.setHelptext(bundle.getString("vehicle.energyLevelCritical.helptext"));
+    pEnergyLevelCritical.setDescription(
+        bundle.getString("vehicleModel.property_energyLevelCritical.description")
+    );
+    pEnergyLevelCritical.setHelptext(
+        bundle.getString("vehicleModel.property_energyLevelCritical.helptext")
+    );
     setProperty(ENERGY_LEVEL_CRITICAL, pEnergyLevelCritical);
 
     PercentProperty pEnergyLevelGood = new PercentProperty(this,
                                                            90,
                                                            PercentProperty.Unit.PERCENT,
                                                            true);
-    pEnergyLevelGood.setDescription(bundle.getString("vehicle.energyLevelGood.text"));
-    pEnergyLevelGood.setHelptext(bundle.getString("vehicle.energyLevelGood.helptext"));
+    pEnergyLevelGood.setDescription(
+        bundle.getString("vehicleModel.property_energyLevelGood.description")
+    );
+    pEnergyLevelGood.setHelptext(
+        bundle.getString("vehicleModel.property_energyLevelGood.helptext")
+    );
     setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
 
     PercentProperty pEnergyLevelFullyRecharged = new PercentProperty(this,
                                                                      30,
                                                                      PercentProperty.Unit.PERCENT,
                                                                      true);
-    pEnergyLevelFullyRecharged.setDescription(bundle.getString("vehicle.energyLevelFullyRecharged.text"));
-    pEnergyLevelFullyRecharged.setHelptext(bundle.getString("vehicle.energyLevelFullyRecharged.helptext"));
+    pEnergyLevelFullyRecharged.setDescription(
+        bundle.getString("vehicleModel.property_energyLevelFullyRecharged.description")
+    );
+    pEnergyLevelFullyRecharged.setHelptext(
+        bundle.getString("vehicleModel.property_energyLevelFullyRecharged.helptext")
+    );
     setProperty(ENERGY_LEVEL_FULLY_RECHARGED, pEnergyLevelFullyRecharged);
 
-    PercentProperty pEnergyLevelSufficientlyRecharged = new PercentProperty(this,
-                                                                            90,
-                                                                            PercentProperty.Unit.PERCENT,
-                                                                            true);
-    pEnergyLevelSufficientlyRecharged.setDescription(bundle.getString("vehicle.energyLevelSufficientlyRecharged.text"));
-    pEnergyLevelSufficientlyRecharged.setHelptext(bundle.getString("vehicle.energyLevelSufficientlyRecharged.helptext"));
+    PercentProperty pEnergyLevelSufficientlyRecharged
+        = new PercentProperty(this,
+                              90,
+                              PercentProperty.Unit.PERCENT,
+                              true);
+    pEnergyLevelSufficientlyRecharged.setDescription(
+        bundle.getString("vehicleModel.property_energyLevelSufficientlyRecharged.description")
+    );
+    pEnergyLevelSufficientlyRecharged.setHelptext(
+        bundle.getString("vehicleModel.property_energyLevelSufficientlyRecharged.helptext")
+    );
     setProperty(ENERGY_LEVEL_SUFFICIENTLY_RECHARGED, pEnergyLevelSufficientlyRecharged);
 
     SpeedProperty pMaximumVelocity = new SpeedProperty(this, 1000, SpeedProperty.Unit.MM_S);
-    pMaximumVelocity.setDescription(bundle.getString("vehicle.maximumVelocity.text"));
-    pMaximumVelocity.setHelptext(bundle.getString("vehicle.maximumVelocity.helptext"));
+    pMaximumVelocity.setDescription(
+        bundle.getString("vehicleModel.property_maximumVelocity.description")
+    );
+    pMaximumVelocity.setHelptext(
+        bundle.getString("vehicleModel.property_maximumVelocity.helptext")
+    );
     setProperty(MAXIMUM_VELOCITY, pMaximumVelocity);
 
     SpeedProperty pMaximumReverseVelocity = new SpeedProperty(this, 1000, SpeedProperty.Unit.MM_S);
-    pMaximumReverseVelocity.setDescription(bundle.getString("vehicle.maximumReverseVelocity.text"));
-    pMaximumReverseVelocity.setHelptext(bundle.getString("vehicle.maximumReverseVelocity.helptext"));
+    pMaximumReverseVelocity.setDescription(
+        bundle.getString("vehicleModel.property_maximumReverseVelocity.description")
+    );
+    pMaximumReverseVelocity.setHelptext(
+        bundle.getString("vehicleModel.property_maximumReverseVelocity.helptext")
+    );
     setProperty(MAXIMUM_REVERSE_VELOCITY, pMaximumReverseVelocity);
 
     PercentProperty pEnergyLevel = new PercentProperty(this, true);
-    pEnergyLevel.setDescription(bundle.getString("vehicle.energyLevel.text"));
-    pEnergyLevel.setHelptext(bundle.getString("vehicle.energyLevel.helptext"));
+    pEnergyLevel.setDescription(bundle.getString("vehicleModel.property_energyLevel.description"));
+    pEnergyLevel.setHelptext(bundle.getString("vehicleModel.property_energyLevel.helptext"));
     pEnergyLevel.setModellingEditable(false);
     setProperty(ENERGY_LEVEL, pEnergyLevel);
 
-    SelectionProperty<EnergyState> pEnergyState
-        = new SelectionProperty<>(this, Arrays.asList(EnergyState.values()), EnergyState.CRITICAL);
-    pEnergyState.setDescription(bundle.getString("vehicle.energyState.text"));
-    pEnergyState.setHelptext(bundle.getString("vehicle.energyState.helptext"));
-    pEnergyState.setModellingEditable(false);
-    setProperty(ENERGY_STATE, pEnergyState);
-
     BooleanProperty pLoaded = new BooleanProperty(this);
-    pLoaded.setDescription(bundle.getString("vehicle.loaded.text"));
-    pLoaded.setHelptext(bundle.getString("vehicle.loaded.helptext"));
+    pLoaded.setDescription(bundle.getString("vehicleModel.property_loaded.description"));
+    pLoaded.setHelptext(bundle.getString("vehicleModel.property_loaded.helptext"));
     pLoaded.setModellingEditable(false);
     setProperty(LOADED, pLoaded);
 
     SelectionProperty<Vehicle.State> pState
-        = new SelectionProperty<>(this, Arrays.asList(Vehicle.State.values()), Vehicle.State.UNKNOWN);
-    pState.setDescription(bundle.getString("vehicle.state.text"));
-    pState.setHelptext(bundle.getString("vehicle.state.helptext"));
+        = new SelectionProperty<>(this,
+                                  Arrays.asList(Vehicle.State.values()),
+                                  Vehicle.State.UNKNOWN);
+    pState.setDescription(bundle.getString("vehicleModel.property_state.description"));
+    pState.setHelptext(bundle.getString("vehicleModel.property_state.helptext"));
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
 
     SelectionProperty<Vehicle.ProcState> pProcState
-        = new SelectionProperty<>(this, Arrays.asList(Vehicle.ProcState.values()), Vehicle.ProcState.UNAVAILABLE);
-    pProcState.setDescription(bundle.getString("vehicle.procState.text"));
-    pProcState.setHelptext(bundle.getString("vehicle.procState.helptext"));
+        = new SelectionProperty<>(this,
+                                  Arrays.asList(Vehicle.ProcState.values()),
+                                  Vehicle.ProcState.UNAVAILABLE);
+    pProcState.setDescription(
+        bundle.getString("vehicleModel.property_processingState.description")
+    );
+    pProcState.setHelptext(bundle.getString("vehicleModel.property_processingState.helptext"));
     pProcState.setModellingEditable(false);
     setProperty(PROC_STATE, pProcState);
 
@@ -494,64 +512,83 @@ public class VehicleModel
         = new SelectionProperty<>(this,
                                   Arrays.asList(Vehicle.IntegrationLevel.values()),
                                   Vehicle.IntegrationLevel.TO_BE_RESPECTED);
-    pIntegrationLevel.setDescription(bundle.getString("vehicle.integrationLevel.text"));
-    pIntegrationLevel.setHelptext(bundle.getString("vehicle.integrationLevel.helptext"));
+    pIntegrationLevel.setDescription(
+        bundle.getString("vehicleModel.property_integrationLevel.description")
+    );
+    pIntegrationLevel.setHelptext(
+        bundle.getString("vehicleModel.property_integrationLevel.helptext")
+    );
     pIntegrationLevel.setModellingEditable(false);
     setProperty(INTEGRATION_LEVEL, pIntegrationLevel);
 
     StringProperty pPoint = new StringProperty(this);
-    pPoint.setDescription(bundle.getString("vehicle.point.text"));
-    pPoint.setHelptext(bundle.getString("vehicle.point.helptext"));
+    pPoint.setDescription(bundle.getString("vehicleModel.property_currentPoint.description"));
+    pPoint.setHelptext(bundle.getString("vehicleModel.property_currentPoint.helptext"));
     pPoint.setModellingEditable(false);
     setProperty(POINT, pPoint);
 
     StringProperty pNextPoint = new StringProperty(this);
-    pNextPoint.setDescription(bundle.getString("vehicle.nextPoint.text"));
-    pNextPoint.setHelptext(bundle.getString("vehicle.nextPoint.helptext"));
+    pNextPoint.setDescription(bundle.getString("vehicleModel.property_nextPoint.description"));
+    pNextPoint.setHelptext(bundle.getString("vehicleModel.property_nextPoint.helptext"));
     pNextPoint.setModellingEditable(false);
     setProperty(NEXT_POINT, pNextPoint);
 
     TripleProperty pPrecisePosition = new TripleProperty(this);
-    pPrecisePosition.setDescription(bundle.getString("vehicle.precisePosition.text"));
-    pPrecisePosition.setHelptext(bundle.getString("vehicle.precisePosition.helptext"));
+    pPrecisePosition.setDescription(
+        bundle.getString("vehicleModel.property_precisePosition.description")
+    );
+    pPrecisePosition.setHelptext(
+        bundle.getString("vehicleModel.property_precisePosition.helptext")
+    );
     pPrecisePosition.setModellingEditable(false);
     setProperty(PRECISE_POSITION, pPrecisePosition);
 
     AngleProperty pOrientationAngle = new AngleProperty(this);
-    pOrientationAngle.setDescription(bundle.getString("vehicle.orientationAngle.text"));
-    pOrientationAngle.setHelptext(bundle.getString("vehicle.orientationAngle.helptext"));
+    pOrientationAngle.setDescription(
+        bundle.getString("vehicleModel.property_orientationAngle.description")
+    );
+    pOrientationAngle.setHelptext(
+        bundle.getString("vehicleModel.property_orientationAngle.helptext")
+    );
     pOrientationAngle.setModellingEditable(false);
     setProperty(ORIENTATION_ANGLE, pOrientationAngle);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("vehicle.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("vehicle.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(
+        bundle.getString("vehicleModel.property_miscellaneous.description")
+    );
+    pMiscellaneous.setHelptext(bundle.getString("vehicleModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
 
     StringProperty curTransportOrderName = new StringProperty(this);
-    curTransportOrderName.setDescription(bundle.getString("vehicle.currentTransportOrder.text"));
-    curTransportOrderName.setHelptext(bundle.getString("vehicle.currentTransportOrder.helptext"));
+    curTransportOrderName.setDescription(
+        bundle.getString("vehicleModel.property_currentTransportOrder.description")
+    );
+    curTransportOrderName.setHelptext(
+        bundle.getString("vehicleModel.property_currentTransportOrder.helptext")
+    );
     curTransportOrderName.setModellingEditable(false);
     setProperty(CURRENT_TRANSPORT_ORDER_NAME, curTransportOrderName);
 
     StringProperty curOrderSequenceName = new StringProperty(this);
-    curOrderSequenceName.setDescription(bundle.getString("vehicle.currentOrderSequence.text"));
-    curOrderSequenceName.setHelptext(bundle.getString("vehicle.currentOrderSequence.helptext"));
+    curOrderSequenceName.setDescription(
+        bundle.getString("vehicleModel.property_currentOrderSequence.description")
+    );
+    curOrderSequenceName.setHelptext(
+        bundle.getString("vehicleModel.property_currentOrderSequence.helptext")
+    );
     curOrderSequenceName.setModellingEditable(false);
     setProperty(CURRENT_SEQUENCE_NAME, curOrderSequenceName);
 
     OrderCategoriesProperty pProcessableCategories = new OrderCategoriesProperty(this);
-    pProcessableCategories.setDescription(bundle.getString("vehicle.processableCategories.text"));
-    pProcessableCategories.setHelptext(bundle.getString("vehicle.processableCategories.helptext"));
+    pProcessableCategories.setDescription(
+        bundle.getString("vehicleModel.property_processableCategories.description")
+    );
+    pProcessableCategories.setHelptext(
+        bundle.getString("vehicleModel.property_processableCategories.helptext")
+    );
     pProcessableCategories.setModellingEditable(false);
     pProcessableCategories.setOperatingEditable(true);
     setProperty(PROCESSABLE_CATEGORIES, pProcessableCategories);
-  }
-
-  public enum EnergyState {
-
-    CRITICAL,
-    DEGRADED,
-    GOOD
   }
 }

@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import java.text.DateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -21,6 +22,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.notification.UserNotification;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 
 /**
  * A table model for holding {@link org.opentcs.drivers.vehicle.VehicleNotification} instances in
@@ -36,10 +38,10 @@ final class LogTableModel
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    ResourceBundle.getBundle("org/opentcs/kernelcontrolcenter/Bundle")
-    .getString("LogTableModel.TimeStamp"),
-    ResourceBundle.getBundle("org/opentcs/kernelcontrolcenter/Bundle")
-    .getString("LogTableModel.Message")
+    ResourceBundle.getBundle(BUNDLE_PATH)
+    .getString("logTableModel.column_timeStamp.headerText"),
+    ResourceBundle.getBundle(BUNDLE_PATH)
+    .getString("logTableModel.column_message.headerText")
   };
   /**
    * The column classes.

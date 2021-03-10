@@ -8,6 +8,7 @@
 package org.opentcs.guing.model.elements;
 
 import java.util.Arrays;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
@@ -15,6 +16,7 @@ import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.properties.type.PointTypeProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.AbstractConnectableModelComponent;
@@ -55,7 +57,7 @@ public class PointModel
 
   @Override // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("point.description");
+    return bundle.getString("pointModel.description");
   }
 
   public CoordinateProperty getPropertyModelPositionX() {
@@ -71,8 +73,8 @@ public class PointModel
   }
 
   @SuppressWarnings("unchecked")
-  public SelectionProperty<PointType> getPropertyType() {
-    return (SelectionProperty<PointType>) getProperty(TYPE);
+  public SelectionProperty<Type> getPropertyType() {
+    return (SelectionProperty<Type>) getProperty(TYPE);
   }
 
   public KeyValueSetProperty getPropertyMiscellaneous() {
@@ -101,73 +103,73 @@ public class PointModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("point.name.text"));
-    pName.setHelptext(bundle.getString("point.name.helptext"));
+    pName.setDescription(bundle.getString("pointModel.property_name.description"));
+    pName.setHelptext(bundle.getString("pointModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     CoordinateProperty pPosX = new CoordinateProperty(this,
                                                       DEFAULT_XY_POSITION,
                                                       LengthProperty.Unit.MM);
-    pPosX.setDescription(bundle.getString("point.x.text"));
-    pPosX.setHelptext(bundle.getString("point.x.helptext"));
+    pPosX.setDescription(bundle.getString("pointModel.property_modelPositionX.description"));
+    pPosX.setHelptext(bundle.getString("pointModel.property_modelPositionX.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
 
     CoordinateProperty pPosY = new CoordinateProperty(this,
                                                       DEFAULT_XY_POSITION,
                                                       LengthProperty.Unit.MM);
-    pPosY.setDescription(bundle.getString("point.y.text"));
-    pPosY.setHelptext(bundle.getString("point.y.helptext"));
+    pPosY.setDescription(bundle.getString("pointModel.property_modelPositionY.description"));
+    pPosY.setHelptext(bundle.getString("pointModel.property_modelPositionY.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
 
     AngleProperty pPhi = new AngleProperty(this);
-    pPhi.setDescription(bundle.getString("point.phi.text"));
-    pPhi.setHelptext(bundle.getString("point.phi.helptext"));
+    pPhi.setDescription(bundle.getString("pointModel.property_angle.description"));
+    pPhi.setHelptext(bundle.getString("pointModel.property_angle.helptext"));
     setProperty(VEHICLE_ORIENTATION_ANGLE, pPhi);
 
-    SelectionProperty<PointType> pType = new SelectionProperty<>(this,
-                                                                 Arrays.asList(PointType.values()),
-                                                                 PointType.values()[0]);
-    pType.setDescription(bundle.getString("point.type.text"));
-    pType.setHelptext(bundle.getString("point.type.helptext"));
+    PointTypeProperty pType = new PointTypeProperty(this,
+                                                    Arrays.asList(Type.values()),
+                                                    Type.values()[0]);
+    pType.setDescription(bundle.getString("pointModel.property_type.description"));
+    pType.setHelptext(bundle.getString("pointModel.property_type.helptext"));
     pType.setCollectiveEditable(true);
     setProperty(TYPE, pType);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("point.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("point.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("pointModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("pointModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
 
     StringProperty pPointPosX = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
-    pPointPosX.setDescription(bundle.getString("element.pointPosX.text"));
-    pPointPosX.setHelptext(bundle.getString("element.pointPosX.helptext"));
+    pPointPosX.setDescription(bundle.getString("pointModel.property_positionX.description"));
+    pPointPosX.setHelptext(bundle.getString("pointModel.property_positionX.helptext"));
     // The position can only be changed in the drawing.
     pPointPosX.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_POS_X, pPointPosX);
 
     StringProperty pPointPosY = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
-    pPointPosY.setDescription(bundle.getString("element.pointPosY.text"));
-    pPointPosY.setHelptext(bundle.getString("element.pointPosY.helptext"));
+    pPointPosY.setDescription(bundle.getString("pointModel.property_positionY.description"));
+    pPointPosY.setHelptext(bundle.getString("pointModel.property_positionY.helptext"));
     // The position can only be changed in the drawing.
     pPointPosY.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_POS_Y, pPointPosY);
 
     StringProperty pPointLabelOffsetX = new StringProperty(this);
-    pPointLabelOffsetX.setDescription(bundle.getString("element.pointLabelOffsetX.text"));
-    pPointLabelOffsetX.setHelptext(bundle.getString("element.pointLabelOffsetX.helptext"));
+    pPointLabelOffsetX.setDescription(bundle.getString("pointModel.property_labelOffsetX.description"));
+    pPointLabelOffsetX.setHelptext(bundle.getString("pointModel.property_labelOffsetX.helptext"));
     pPointLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_X, pPointLabelOffsetX);
 
     StringProperty pPointLabelOffsetY = new StringProperty(this);
-    pPointLabelOffsetY.setDescription(bundle.getString("element.pointLabelOffsetY.text"));
-    pPointLabelOffsetY.setHelptext(bundle.getString("element.pointLabelOffsetY.helptext"));
+    pPointLabelOffsetY.setDescription(bundle.getString("pointModel.property_labelOffsetY.description"));
+    pPointLabelOffsetY.setHelptext(bundle.getString("pointModel.property_labelOffsetY.helptext"));
     pPointLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y, pPointLabelOffsetY);
 
     StringProperty pPointLabelOrientationAngle = new StringProperty(this);
     pPointLabelOrientationAngle.setDescription(
-        bundle.getString("element.pointLabelOrientationAngle.text"));
+        bundle.getString("pointModel.property_labelOrientationAngle.description"));
     pPointLabelOrientationAngle.setHelptext(
-        bundle.getString("element.pointLabelOrientationAngle.helptext"));
+        bundle.getString("pointModel.property_labelOrientationAngle.helptext"));
     pPointLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, pPointLabelOrientationAngle);
   }
@@ -175,24 +177,38 @@ public class PointModel
   /**
    * The supported point types.
    */
-  public enum PointType {
+  public enum Type {
 
     /**
      * A halting position.
      */
-    HALT,
+    HALT(ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.halt.description"),
+         ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.halt.helptext")),
     /**
      * A reporting position.
      */
-    REPORT,
+    REPORT(ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.report.description"),
+           ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.report.helptext")),
     /**
      * A parking position.
      */
-    PARK;
+    PARK(ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.park.description"),
+         ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.park.helptext"));
 
-    @Override
-    public String toString() {
-      return ResourceBundle.getBundle(BUNDLE_PATH).getString("point.type." + name() + ".text");
+    private final String description;
+    private final String helptext;
+
+    private Type(String description, String helptext) {
+      this.description = requireNonNull(description, "description");
+      this.helptext = requireNonNull(helptext, "helptext");
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public String getHelptext() {
+      return helptext;
     }
   }
 }

@@ -20,7 +20,6 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import org.jhotdraw.util.Images;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * ColorIcon.
@@ -35,21 +34,6 @@ public class ColorIcon
   private int width;
   private int height;
   private String name;
-
-  /**
-   * Creates a new instance.
-   *
-   * @param rgb The combined RGB components
-   */
-  public ColorIcon(int rgb) {
-    this(new Color(rgb));
-  }
-
-  public ColorIcon(Color color) {
-    this(color, (color == null)
-         ? ResourceBundleUtil.getBundle().getToolTipTextProperty("attribute.color.noColor")
-         : color.getRed() + "," + color.getGreen() + "," + color.getBlue(), 14, 14);
-  }
 
   public ColorIcon(int rgb, String name) {
     this(new Color(rgb), name, 14, 14);

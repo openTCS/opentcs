@@ -147,7 +147,7 @@ public class GroupModel
 
   @Override  // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("group.description");
+    return bundle.getString("groupModel.description");
   }
 
   public StringSetProperty getPropertyElements() {
@@ -160,19 +160,19 @@ public class GroupModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("group.name.text"));
-    pName.setHelptext(bundle.getString("group.name.helptext"));
+    pName.setDescription(bundle.getString("groupModel.property_name.description"));
+    pName.setHelptext(bundle.getString("groupModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     StringSetProperty pElements = new StringSetProperty(this);
-    pElements.setDescription(bundle.getString("group.elements.text"));
+    pElements.setDescription(bundle.getString("groupModel.property_elements.description"));
     pElements.setModellingEditable(false);
     pElements.setOperatingEditable(false);
     setProperty(ELEMENTS, pElements);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("group.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("group.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("groupModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("groupModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 }

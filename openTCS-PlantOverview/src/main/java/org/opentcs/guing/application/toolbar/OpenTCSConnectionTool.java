@@ -15,6 +15,7 @@ import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.ConnectionTool;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -39,7 +40,8 @@ public class OpenTCSConnectionTool
   public OpenTCSConnectionTool(ConnectionFigure prototype) {
     super(prototype);
 
-    presentationName = ResourceBundleUtil.getBundle().getString("edit.createConnectionFigure.text");
+    presentationName = ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH)
+        .getString("openTcsConnectionTool.undo.presentationName");
   }
 
   @Override // ConnectionTool

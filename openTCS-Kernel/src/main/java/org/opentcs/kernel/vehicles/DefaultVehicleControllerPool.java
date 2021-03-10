@@ -125,13 +125,6 @@ public final class DefaultVehicleControllerPool
 
       // Set the system's simulation time factor.
       simCommAdapter.setSimTimeFactor(simulationTimeFactor);
-
-      // XXX This is currently done in DriverGUI
-//        // If an initial position is stored in the vehicle object's properties, set it.
-//        String initialPos = vehicle.getProperties().get(ObjectPropConstants.VEHICLE_INITIAL_POSITION);
-//        if (initialPos != null) {
-//          simCommAdapter.initVehiclePosition(initialPos);
-//        }
     }
   }
 

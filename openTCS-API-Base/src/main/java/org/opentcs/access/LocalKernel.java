@@ -27,7 +27,6 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -408,7 +407,7 @@ public interface LocalKernel
    */
   @Deprecated
   void addTransportOrderRejection(TCSObjectReference<TransportOrder> ref,
-                                  Rejection newRejection)
+                                  org.opentcs.data.order.Rejection newRejection)
       throws ObjectUnknownException;
 
   /**

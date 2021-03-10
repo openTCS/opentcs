@@ -24,10 +24,6 @@ public abstract class AbstractProperty
    * The value of this property.
    */
   protected Object fValue;
-  /**
-   *
-   */
-  private boolean isCollectionAndHasDifferentValues;
 
   /**
    * Creates a new instance of AbstractProperty
@@ -54,26 +50,6 @@ public abstract class AbstractProperty
    */
   public Object getValue() {
     return fValue;
-  }
-
-  /**
-   * Sets whether this property is part of <code>PropertiesCollection</code>
-   * and the selected values are different.
-   *
-   * @param newValue True if the selected objects differ in this property.
-   */
-  public void setIsCollectionAndHasDifferentValues(boolean newValue) {
-    isCollectionAndHasDifferentValues = newValue;
-  }
-
-  /**
-   * Returns whether this property is part of <code>PropertiesCollection</code>
-   * and the selected values are different.
-   *
-   * @return True or false.
-   */
-  public boolean isCollectionAndHasDifferentValues() {
-    return isCollectionAndHasDifferentValues;
   }
 
   @Override

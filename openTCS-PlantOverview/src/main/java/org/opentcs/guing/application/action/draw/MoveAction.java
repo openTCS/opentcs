@@ -17,15 +17,14 @@ package org.opentcs.guing.application.action.draw;
 
 import java.awt.event.ActionEvent;
 import java.awt.geom.AffineTransform;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import static javax.swing.Action.SMALL_ICON;
-import javax.swing.ImageIcon;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.TransformEdit;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -37,6 +36,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public abstract class MoveAction
     extends AbstractSelectedAction {
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**
    * The X offset by which to move.
    */
@@ -107,10 +107,9 @@ public abstract class MoveAction
      */
     public East(DrawingEditor editor) {
       super(editor, 1, 0);
-      ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-      labels.configureAction(this, ID, false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-forward.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, BUNDLE.getString("moveAction.east.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/draw-arrow-forward.png"));
     }
   }
 
@@ -132,10 +131,9 @@ public abstract class MoveAction
      */
     public West(DrawingEditor editor) {
       super(editor, -1, 0);
-      ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-      labels.configureAction(this, ID, false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-back.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, BUNDLE.getString("moveAction.west.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/draw-arrow-back.png"));
     }
   }
 
@@ -157,10 +155,9 @@ public abstract class MoveAction
      */
     public North(DrawingEditor editor) {
       super(editor, 0, -1);
-      ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-      labels.configureAction(this, ID, false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-up.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, BUNDLE.getString("moveAction.north.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/draw-arrow-up.png"));
     }
   }
 
@@ -182,10 +179,9 @@ public abstract class MoveAction
      */
     public South(DrawingEditor editor) {
       super(editor, 0, 1);
-      ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-      labels.configureAction(this, ID, false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-down.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, BUNDLE.getString("moveAction.south.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/draw-arrow-down.png"));
     }
   }
 }

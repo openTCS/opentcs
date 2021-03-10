@@ -39,6 +39,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.event.EventSource;
@@ -62,8 +63,7 @@ public class ContinuousLoadPanel
   /**
    * This classe's bundle.
    */
-  private final ResourceBundle bundle
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * Provides access to a portal.
    */
@@ -256,8 +256,8 @@ public class ContinuousLoadPanel
       for (TransportOrderData curData : tableModel.getList()) {
         if (curData.getDriveOrders().isEmpty()) {
           JOptionPane.showMessageDialog(this,
-                                        bundle.getString("error.driveOrderEmpty.text"),
-                                        bundle.getString("error.driveOrderEmpty.title"),
+                                        bundle.getString("continuousLoadPanel.optionPane_driveOrderEmpty.message"),
+                                        bundle.getString("continuousLoadPanel.optionPane_driveOrderEmpty.title"),
                                         JOptionPane.ERROR_MESSAGE);
           return null;
         }
@@ -266,8 +266,8 @@ public class ContinuousLoadPanel
             if (curDOS.getDriveOrderLocation() == null
                 || curDOS.getDriveOrderVehicleOperation() == null) {
               JOptionPane.showMessageDialog(this,
-                                            bundle.getString("error.driveOrderIncorrect.text"),
-                                            bundle.getString("error.driveOrderIncorrect.title"),
+                                            bundle.getString("continuousLoadPanel.optionPane_driveOrderIncorrect.message"),
+                                            bundle.getString("continuousLoadPanel.optionPane_driveOrderIncorrect.title"),
                                             JOptionPane.ERROR_MESSAGE);
               return null;
             }
@@ -370,8 +370,6 @@ public class ContinuousLoadPanel
 
     // Properties
     propertyTable.setModel(new PropertyTableModel(transportOrder.getProperties()));
-    propertyTable.getColumn(bundle.getString("key"))
-        .setCellEditor(new DefaultCellEditor(propertyComboBox));
   }
 
   // CHECKSTYLE:OFF
@@ -391,8 +389,6 @@ public class ContinuousLoadPanel
     operationTypesComboBox = new javax.swing.JComboBox<>();
     locationsComboBox = new javax.swing.JComboBox<>();
     locationsComboBox.setRenderer(new LocationComboBoxRenderer());
-    propertyComboBox = new javax.swing.JComboBox<>();
-    propertyComboBox.setSelectedIndex(-1);
     fileChooser = new javax.swing.JFileChooser();
     triggerPanel = new javax.swing.JPanel();
     thresholdTriggerRadioButton = new javax.swing.JRadioButton();
@@ -441,27 +437,24 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     openButton = new javax.swing.JButton();
     saveButton = new javax.swing.JButton();
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle"); // NOI18N
-    operationTypesComboBox.setToolTipText(bundle.getString("Allowed_operations")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/loadGeneratorPanel/Bundle"); // NOI18N
+    operationTypesComboBox.setToolTipText(bundle.getString("continuousLoadPanel.comboBox_operationTypes.tooltipText")); // NOI18N
 
-    locationsComboBox.setToolTipText(bundle.getString("Available_locations")); // NOI18N
+    locationsComboBox.setToolTipText(bundle.getString("continuousLoadPanel.comboBox_locations.tooltipText")); // NOI18N
     locationsComboBox.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         locationsComboBoxItemStateChanged(evt);
       }
     });
 
-    propertyComboBox.setEditable(true);
-    propertyComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "keyX" }));
-
     setPreferredSize(new java.awt.Dimension(520, 700));
     setLayout(new java.awt.GridBagLayout());
 
-    triggerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("GeneratorTriggerTitle"))); // NOI18N
+    triggerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_generateTrigger.border.title"))); // NOI18N
     triggerPanel.setLayout(new java.awt.GridBagLayout());
 
     triggerButtonGroup.add(thresholdTriggerRadioButton);
-    thresholdTriggerRadioButton.setText(bundle.getString("IfThereAreNoMoreThan")); // NOI18N
+    thresholdTriggerRadioButton.setText(bundle.getString("continuousLoadPanel.radioButton_triggerByOrderThreshold.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -476,7 +469,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     triggerPanel.add(thresholdSpinner, gridBagConstraints);
 
-    thresholdOrdersLbl.setText(bundle.getString("ThresholdOrders")); // NOI18N
+    thresholdOrdersLbl.setText(bundle.getString("continuousLoadPanel.label_unitOrdersToBeProcessed.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 1;
@@ -491,7 +484,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     triggerPanel.add(fillingLbl, gridBagConstraints);
 
     triggerButtonGroup.add(timerTriggerRadioButton);
-    timerTriggerRadioButton.setText(bundle.getString("AfterATimeoutOf")); // NOI18N
+    timerTriggerRadioButton.setText(bundle.getString("continuousLoadPanel.radioButton_triggerAfterTimeout.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -506,7 +499,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     triggerPanel.add(timerSpinner, gridBagConstraints);
 
-    timerSecondsLbl.setText(bundle.getString("Seconds")); // NOI18N
+    timerSecondsLbl.setText(bundle.getString("continuousLoadPanel.label_unitSeconds.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 2;
@@ -516,7 +509,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     triggerButtonGroup.add(singleTriggerRadioButton);
     singleTriggerRadioButton.setSelected(true);
-    singleTriggerRadioButton.setText(bundle.getString("singleTriggerRadioButton")); // NOI18N
+    singleTriggerRadioButton.setText(bundle.getString("continuousLoadPanel.radioButton_triggerOnce.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -531,14 +524,14 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weightx = 1.0;
     add(triggerPanel, gridBagConstraints);
 
-    orderProfilePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OrderProfileTitle"))); // NOI18N
+    orderProfilePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_orderProfile.border.title"))); // NOI18N
     orderProfilePanel.setLayout(new java.awt.GridBagLayout());
 
     randomOrderSpecPanel.setLayout(new java.awt.GridBagLayout());
 
     orderSpecButtonGroup.add(randomOrderSpecButton);
     randomOrderSpecButton.setSelected(true);
-    randomOrderSpecButton.setText(bundle.getString("CreateOrdersRandomly")); // NOI18N
+    randomOrderSpecButton.setText(bundle.getString("continuousLoadPanel.radioButton_createOrdersRandomly.text")); // NOI18N
     randomOrderSpecButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         randomOrderSpecButtonActionPerformed(evt);
@@ -554,7 +547,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     randomOrderSpecPanel.add(randomOrderCountSpinner, gridBagConstraints);
 
-    randomOrderCountLbl.setText(bundle.getString("OrdersAtATime")); // NOI18N
+    randomOrderCountLbl.setText(bundle.getString("continuousLoadPanel.label_unitOrdersAtATime.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     randomOrderSpecPanel.add(randomOrderCountLbl, gridBagConstraints);
@@ -572,7 +565,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     randomOrderSpecPanel.add(randomOrderSizeSpinner, gridBagConstraints);
 
-    randomOrderSizeLbl.setText(bundle.getString("DriveOrdersPerTransportOrder")); // NOI18N
+    randomOrderSizeLbl.setText(bundle.getString("continuousLoadPanel.label_unitDriveOrdersPerOrder.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 4;
     gridBagConstraints.gridy = 0;
@@ -587,7 +580,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     explicitOrderSpecPanel.setLayout(new java.awt.GridBagLayout());
 
     orderSpecButtonGroup.add(explicitOrderSpecButton);
-    explicitOrderSpecButton.setText(bundle.getString("CreateOrdersByDefinition")); // NOI18N
+    explicitOrderSpecButton.setText(bundle.getString("continuousLoadPanel.radioButton_createOrdersAccordingDefinition.text")); // NOI18N
     explicitOrderSpecButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         explicitOrderSpecButtonActionPerformed(evt);
@@ -615,10 +608,10 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     add(orderProfilePanel, gridBagConstraints);
 
-    orderGenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OrderGenerationTitle"))); // NOI18N
+    orderGenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_orderGeneration.border.title"))); // NOI18N
     orderGenPanel.setLayout(new java.awt.GridBagLayout());
 
-    orderGenChkBox.setText(bundle.getString("EnableOrderGeneration")); // NOI18N
+    orderGenChkBox.setText(bundle.getString("continuousLoadPanel.checkBox_enableOrderGeneration.text")); // NOI18N
     orderGenChkBox.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         orderGenChkBoxItemStateChanged(evt);
@@ -640,12 +633,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     add(orderGenPanel, gridBagConstraints);
 
-    transportOrderGenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Transport_orders_modelling"))); // NOI18N
+    transportOrderGenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_transportOrderModelling.border.title"))); // NOI18N
     transportOrderGenPanel.setEnabled(false);
     transportOrderGenPanel.setPreferredSize(new java.awt.Dimension(1057, 800));
     transportOrderGenPanel.setLayout(new java.awt.GridBagLayout());
 
-    transportOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Transport_orders"))); // NOI18N
+    transportOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_transportOrders.border.title"))); // NOI18N
     transportOrdersPanel.setEnabled(false);
     transportOrdersPanel.setPreferredSize(new java.awt.Dimension(568, 452));
     transportOrdersPanel.setLayout(new java.awt.GridBagLayout());
@@ -665,8 +658,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     transportOrdersActionPanel.setLayout(new java.awt.GridBagLayout());
 
-    addToTOTableButton.setText(bundle.getString("Add_new_order")); // NOI18N
-    addToTOTableButton.setToolTipText(bundle.getString("Add_empty_transport_order")); // NOI18N
+    addToTOTableButton.setText(bundle.getString("continuousLoadPanel.button_addTransportOrder.text")); // NOI18N
+    addToTOTableButton.setToolTipText(bundle.getString("continuousLoadPanel.button_addTransportOrder.tooltipText")); // NOI18N
     addToTOTableButton.setEnabled(false);
     addToTOTableButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -680,8 +673,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weightx = 1.0;
     transportOrdersActionPanel.add(addToTOTableButton, gridBagConstraints);
 
-    deleteFromTOTableButton.setText(bundle.getString("Delete_selected")); // NOI18N
-    deleteFromTOTableButton.setToolTipText(bundle.getString("Remove_selected_transport_order")); // NOI18N
+    deleteFromTOTableButton.setText(bundle.getString("continuousLoadPanel.button_deleteSelectedOrder.text")); // NOI18N
+    deleteFromTOTableButton.setToolTipText(bundle.getString("continuousLoadPanel.button_deleteSelectedOrder.tooltipText")); // NOI18N
     deleteFromTOTableButton.setEnabled(false);
     deleteFromTOTableButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -713,12 +706,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     jTabbedPane1.setEnabled(false);
 
-    driveOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Drive_orders"))); // NOI18N
+    driveOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_driveOrders.border.title"))); // NOI18N
     driveOrdersPanel.setEnabled(false);
     driveOrdersPanel.setLayout(new java.awt.GridBagLayout());
 
     doTable.setModel(new DriveOrderTableModel());
-    doTable.setToolTipText(bundle.getString("Drive_orders_in_selected_transport_order")); // NOI18N
+    doTable.setToolTipText(bundle.getString("continuousLoadPanel.table_driveOrders.tooltipText")); // NOI18N
     doTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
     driveOrdersScrollPane.setViewportView(doTable);
 
@@ -731,8 +724,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weighty = 1.0;
     driveOrdersPanel.add(driveOrdersScrollPane, gridBagConstraints);
 
-    deleteFromDOTableButton.setText(bundle.getString("Delete_selected")); // NOI18N
-    deleteFromDOTableButton.setToolTipText(bundle.getString("Remove_selected_drive_order")); // NOI18N
+    deleteFromDOTableButton.setText(bundle.getString("continuousLoadPanel.button_deleteSelectedDriveOrder.text")); // NOI18N
+    deleteFromDOTableButton.setToolTipText(bundle.getString("continuousLoadPanel.button_deleteSelectedDriveOrder.tooltipText")); // NOI18N
     deleteFromDOTableButton.setEnabled(false);
     deleteFromDOTableButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -746,7 +739,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weightx = 1.0;
     driveOrdersPanel.add(deleteFromDOTableButton, gridBagConstraints);
 
-    addDOButton.setText(bundle.getString("addDO")); // NOI18N
+    addDOButton.setText(bundle.getString("continuousLoadPanel.button_addDriveOrder.text")); // NOI18N
     addDOButton.setEnabled(false);
     addDOButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -760,9 +753,9 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weightx = 1.0;
     driveOrdersPanel.add(addDOButton, gridBagConstraints);
 
-    jTabbedPane1.addTab(bundle.getString("DriveOrders"), driveOrdersPanel); // NOI18N
+    jTabbedPane1.addTab(bundle.getString("continuousLoadPanel.tab_driveOrders.title"), driveOrdersPanel); // NOI18N
 
-    propertyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Properties"))); // NOI18N
+    propertyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("continuousLoadPanel.panel_properties.border.title"))); // NOI18N
     propertyPanel.setEnabled(false);
     propertyPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -777,7 +770,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weighty = 1.0;
     propertyPanel.add(jScrollPane1, gridBagConstraints);
 
-    addPropertyButton.setText(bundle.getString("addProperty")); // NOI18N
+    addPropertyButton.setText(bundle.getString("continuousLoadPanel.button_addProperty.text")); // NOI18N
     addPropertyButton.setEnabled(false);
     addPropertyButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -791,7 +784,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weightx = 1.0;
     propertyPanel.add(addPropertyButton, gridBagConstraints);
 
-    removePropertyButton.setText(bundle.getString("removeProperty")); // NOI18N
+    removePropertyButton.setText(bundle.getString("continuousLoadPanel.button_removeProperty.text")); // NOI18N
     removePropertyButton.setEnabled(false);
     removePropertyButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -805,7 +798,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weightx = 1.0;
     propertyPanel.add(removePropertyButton, gridBagConstraints);
 
-    jTabbedPane1.addTab(bundle.getString("Properties"), propertyPanel); // NOI18N
+    jTabbedPane1.addTab(bundle.getString("continuousLoadPanel.tab_properties.title"), propertyPanel); // NOI18N
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -817,7 +810,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     transportOrderGenPanel.add(jTabbedPane1, gridBagConstraints);
     jTabbedPane1.getAccessibleContext().setAccessibleName("Drive orders");
 
-    openButton.setText(bundle.getString("open")); // NOI18N
+    openButton.setText(bundle.getString("continuousLoadPanel.button_open.text")); // NOI18N
     openButton.setEnabled(false);
     openButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -826,7 +819,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     });
     openSavePanel.add(openButton);
 
-    saveButton.setText(bundle.getString("save")); // NOI18N
+    saveButton.setText(bundle.getString("continuousLoadPanel.button_save.text")); // NOI18N
     saveButton.setEnabled(false);
     saveButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -849,7 +842,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     gridBagConstraints.weighty = 1.0;
     add(transportOrderGenPanel, gridBagConstraints);
 
-    getAccessibleContext().setAccessibleName(bundle.getString("Continuous_load")); // NOI18N
+    getAccessibleContext().setAccessibleName(bundle.getString("continuousLoadPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
 
   private void randomOrderSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_randomOrderSpecButtonActionPerformed
@@ -1001,9 +994,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     if (targetFile.exists()) {
       dialogResult = JOptionPane.showConfirmDialog(
           this,
-          bundle.getString("A_file_with_the_chosen_name_already_exists")
-          + bundle.getString("do_you_want_to_overwrite_it?"),
-          bundle.getString("File_exists"),
+          bundle.getString("continuousLoadPanel.optionPane_overwriteFileConfirmation.message"),
+          bundle.getString("continuousLoadPanel.optionPane_overwriteFileConfirmation.title"),
           JOptionPane.YES_NO_OPTION,
           JOptionPane.WARNING_MESSAGE);
       if (dialogResult != JOptionPane.YES_OPTION) {
@@ -1030,8 +1022,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     File targetFile = fileChooser.getSelectedFile();
     if (!targetFile.exists()) {
       JOptionPane.showMessageDialog(this,
-                                    bundle.getString("The_chosen_input_file_does_not_exist."),
-                                    bundle.getString("File_does_not_exist"),
+                                    bundle.getString("continuousLoadPanel.optionPane_fileDoesNotExist.message"),
+                                    bundle.getString("continuousLoadPanel.optionPane_fileDoesNotExist.title"),
                                     JOptionPane.ERROR_MESSAGE);
       return;
     }
@@ -1134,7 +1126,6 @@ toTable.getSelectionModel().addListSelectionListener(listener);
   private javax.swing.JPanel orderGenPanel;
   private javax.swing.JPanel orderProfilePanel;
   private javax.swing.ButtonGroup orderSpecButtonGroup;
-  private javax.swing.JComboBox<String> propertyComboBox;
   private javax.swing.JPanel propertyPanel;
   private javax.swing.JTable propertyTable;
   private javax.swing.JLabel randomOrderCountLbl;

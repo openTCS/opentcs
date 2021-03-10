@@ -21,6 +21,7 @@ import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.MergedPropertySuggestions;
 import org.opentcs.guing.components.properties.type.Property;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.gui.BoundsPopupMenuListener;
 
@@ -81,7 +82,7 @@ public class KeyValuePropertyEditorPanel
 
   @Override
   public String getTitle() {
-    return ResourceBundleUtil.getBundle().getString("KeyValuePropertyEditorPanel.title");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH).getString("keyValuePropertyEditorPanel.title");
   }
 
   @Override
@@ -107,15 +108,15 @@ public class KeyValuePropertyEditorPanel
     setLayout(new java.awt.GridBagLayout());
 
     keyLabel.setFont(keyLabel.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    keyLabel.setText(bundle.getString("KeyValuePropertyEditorPanel.key.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/propertyEditing"); // NOI18N
+    keyLabel.setText(bundle.getString("keyValuePropertyEditorPanel.label_key.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     add(keyLabel, gridBagConstraints);
 
     valueLabel.setFont(valueLabel.getFont());
-    valueLabel.setText(bundle.getString("KeyValuePropertyEditorPanel.value.text")); // NOI18N
+    valueLabel.setText(bundle.getString("keyValuePropertyEditorPanel.label_value.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;

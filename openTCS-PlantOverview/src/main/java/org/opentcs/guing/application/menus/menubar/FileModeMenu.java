@@ -19,6 +19,7 @@ import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.synchronize.SwitchToModellingAction;
 import org.opentcs.guing.application.action.synchronize.SwitchToOperatingAction;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -29,7 +30,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class FileModeMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+  private static final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
   private final JCheckBoxMenuItem modellingModeItem;
   private final JCheckBoxMenuItem operatingModeItem;
 
@@ -44,7 +45,7 @@ public class FileModeMenu
   public FileModeMenu(final ApplicationState appState,
                       final OpenTCSView view,
                       final ViewActionMap actionMap) {
-    super(labels.getString("file.mode.setMode"));
+    super(labels.getString("fileModeMenu.text"));
     requireNonNull(view, "view");
     requireNonNull(actionMap, "actionMap");
 

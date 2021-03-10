@@ -24,15 +24,6 @@ public final class ColorProperty
   private Color fColor;
 
   /**
-   * Creates a new instance of ColorProperty
-   *
-   * @param model
-   */
-  public ColorProperty(ModelComponent model) {
-    this(model, Color.white);
-  }
-
-  /**
    * Konstruktor mit Übergabe einer Farbe.
    *
    * @param model

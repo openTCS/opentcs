@@ -151,9 +151,8 @@ public class OpenTCSDrawingEditor
   public void addVehicle(VehicleModel vehicleModel) {
     NamedVehicleFigure vehicleFigure = crsObjectFactory.createNamedVehicleFigure(vehicleModel);
 
-    SwingUtilities.invokeLater(() -> {
-      getDrawing().add(vehicleFigure);
-    });
+    SwingUtilities.invokeLater(() -> getDrawing().add(vehicleFigure));
+
     vehicleModel.addAttributesChangeListener(vehicleFigure);
     modelManager.getModel().registerFigure(vehicleModel, vehicleFigure);
 
@@ -275,7 +274,8 @@ public class OpenTCSDrawingEditor
     setDrawing(systemModel.getDrawing());
     for (DrawingView drawView : getDrawingViews()) {
       ((OpenTCSDrawingView) drawView).setBlocks(
-          systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
+          systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS)
+      );
     }
   }
 
@@ -428,8 +428,7 @@ public class OpenTCSDrawingEditor
    */
   public void showVehicles(boolean show) {
     for (VehicleModel vehModel : modelManager.getModel().getVehicleModels()) {
-      VehicleFigure figure = (VehicleFigure) modelManager.getModel().getFigure(vehModel);
-      figure.setVisible(show);
+      ((VehicleFigure) modelManager.getModel().getFigure(vehModel)).setVisible(show);
     }
   }
 
@@ -451,13 +450,5 @@ public class OpenTCSDrawingEditor
     public void figureRemoved(CompositeFigureEvent e) {
       OpenTCSDrawingEditor.this.figureRemoved(e.getChildFigure());
     }
-  }
-
-  public enum OffsetIdenticator {
-
-    TOP,
-    BOTTOM,
-    LEFT,
-    RIGHT;
   }
 }

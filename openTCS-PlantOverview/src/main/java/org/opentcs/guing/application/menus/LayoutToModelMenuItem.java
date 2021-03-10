@@ -33,6 +33,7 @@ import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
 
@@ -85,7 +86,8 @@ public class LayoutToModelMenuItem
                                @ApplicationEventBus EventHandler eventHandler,
                                PropertiesComponentsFactory componentsFactory,
                                @Assisted boolean copyAll) {
-    super(ResourceBundleUtil.getBundle().getString("propertiesTable.fromLayout"));
+    super(ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH)
+        .getString("layoutToModelMenuItem.text"));
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
@@ -125,14 +127,14 @@ public class LayoutToModelMenuItem
   private void updateModelY(ModelComponent model)
       throws IllegalArgumentException {
     CoordinateProperty modelProperty;
-    CoordinateUndoActivity cua;
     if (model instanceof PointModel) {
       modelProperty = (CoordinateProperty) model.getProperty(PointModel.MODEL_Y_POSITION);
     }
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);
     }
-    cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
+    CoordinateUndoActivity cua
+        = componentsFactory.createLayoutToModelCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
     StringProperty spy;
     if (model instanceof PointModel) {
@@ -146,7 +148,6 @@ public class LayoutToModelMenuItem
       modelProperty.setValueAndUnit(Double.parseDouble(spy.getText()), modelProperty.getUnit());
       modelProperty.markChanged();
     }
-    cua.setSaveTransform(false);
     cua.snapShotAfterModification();
     undoRedoManager.addEdit(cua);
   }
@@ -160,7 +161,8 @@ public class LayoutToModelMenuItem
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_X_POSITION);
     }
-    CoordinateUndoActivity cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
+    CoordinateUndoActivity cua
+        = componentsFactory.createLayoutToModelCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
     StringProperty spx;
     if (model instanceof PointModel) {
@@ -173,7 +175,6 @@ public class LayoutToModelMenuItem
       modelProperty.setValueAndUnit(Double.parseDouble(spx.getText()), modelProperty.getUnit());
       modelProperty.markChanged();
     }
-    cua.setSaveTransform(false);
     cua.snapShotAfterModification();
     undoRedoManager.addEdit(cua);
   }

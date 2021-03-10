@@ -12,6 +12,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for <code>InputPanels</code> that use text fields for input.
@@ -24,6 +26,10 @@ import javax.swing.text.Document;
 public abstract class TextInputPanel
     extends InputPanel {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(TextInputPanel.class);
   /**
    * Create a new instance of <code>TextInputPanel</code>.
    * @param title The title of this panel.
@@ -168,7 +174,7 @@ public abstract class TextInputPanel
         text = doc.getText(0, doc.getLength());
       }
       catch (BadLocationException e) {
-        //TODO 
+        LOG.warn("Exception retrieving document text", e);
         return;
       }
       setInputValid(text.matches(format), doc);

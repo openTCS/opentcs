@@ -22,7 +22,6 @@ import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.ImageDirectory;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * This action manages the behaviour when the user selects the point button.
@@ -36,7 +35,7 @@ public class DefaultPointSelectedAction
   /**
    * The SelectionProperty contains all point types in the model.
    */
-  private final PointModel.PointType pointType;
+  private final PointModel.Type pointType;
 
   private final Tool tool;
   /**
@@ -87,7 +86,7 @@ public class DefaultPointSelectedAction
    */
   public DefaultPointSelectedAction(DrawingEditor editor,
                                     Tool tool,
-                                    PointModel.PointType pointType,
+                                    PointModel.Type pointType,
                                     JPopupButton popupButton,
                                     ButtonGroup group) {
     super(editor);
@@ -98,9 +97,8 @@ public class DefaultPointSelectedAction
 
     this.largeIcon = getLargeImageIconByType(pointType);
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    putValue(AbstractAction.NAME, bundle.getString("point.type." + pointType.name() + ".text"));
-    putValue(AbstractAction.SHORT_DESCRIPTION, bundle.getString("point.type." + pointType.name() + ".toolTipText"));
+    putValue(AbstractAction.NAME, pointType.getDescription());
+    putValue(AbstractAction.SHORT_DESCRIPTION, pointType.getHelptext());
     putValue(AbstractAction.SMALL_ICON, getImageIconByType(pointType));
   }
 
@@ -112,7 +110,8 @@ public class DefaultPointSelectedAction
       PointFigure pointFigure = lpf.getPresentationFigure();
       pointFigure.getModel().getPropertyType().setValue(pointType);
 
-      ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "point.type." + pointType.name());
+      popupButton.setText(null);
+      popupButton.setToolTipText(pointType.getHelptext());
       popupButton.setIcon(largeIcon);
     }
 
@@ -125,7 +124,7 @@ public class DefaultPointSelectedAction
     setEnabled(getView() != null && getView().isEnabled());
   }
 
-  private ImageIcon getImageIconByType(PointModel.PointType pointType) {
+  private ImageIcon getImageIconByType(PointModel.Type pointType) {
     switch (pointType) {
       case HALT:
         return ImageDirectory.getImageIcon("/toolbar/point-halt.22.png");
@@ -138,7 +137,7 @@ public class DefaultPointSelectedAction
     }
   }
 
-  private ImageIcon getLargeImageIconByType(PointModel.PointType pointType) {
+  private ImageIcon getLargeImageIconByType(PointModel.Type pointType) {
     switch (pointType) {
       case HALT:
         return ImageDirectory.getImageIcon("/toolbar/point-halt-arrow.22.png");

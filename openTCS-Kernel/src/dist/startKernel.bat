@@ -20,10 +20,10 @@ set OPENTCS_CP=%OPENTCS_LIBDIR%\*;
 set OPENTCS_CP=%OPENTCS_CP%;%OPENTCS_LIBDIR%\openTCS-extensions\*;
 
 rem XXX Be a bit more clever to find out the name of the JVM runtime.
-set JAVA=javaw
+set JAVA=java
 
 rem Start kernel
-start /b %JAVA% -enableassertions ^
+%JAVA% -enableassertions ^
     -Dopentcs.base="%OPENTCS_BASE%" ^
     -Dopentcs.home="%OPENTCS_HOME%" ^
     -Djava.util.logging.config.file="%OPENTCS_CONFIGDIR%\logging.config" ^

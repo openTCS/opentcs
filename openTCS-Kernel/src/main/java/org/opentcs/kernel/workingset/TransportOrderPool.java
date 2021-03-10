@@ -31,7 +31,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
@@ -617,10 +616,11 @@ public class TransportOrderPool {
    * @return The modified transport order.
    * @throws ObjectUnknownException If any of the referenced transport orders
    * does not exist.
+   * @deprecated Rejections are replaced by object history entries.
    */
-  @SuppressWarnings("deprecation")
+  @Deprecated
   public TransportOrder addTransportOrderRejection(TCSObjectReference<TransportOrder> orderRef,
-                                                   Rejection newRejection)
+                                                   org.opentcs.data.order.Rejection newRejection)
       throws ObjectUnknownException {
     LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);

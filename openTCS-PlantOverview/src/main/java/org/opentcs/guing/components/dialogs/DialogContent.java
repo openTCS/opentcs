@@ -10,9 +10,7 @@
 package org.opentcs.guing.components.dialogs;
 
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Basisimplementierung für Dialog- und Registerkarteninhalte.
@@ -31,9 +29,9 @@ public abstract class DialogContent
    */
   protected String fTabTitle;
   /**
-   * Zeigt an, ob das Parsen eines Textes fehlgeschlagen ist.
+   * Zeigt an, ob das Übernehmen der Werte aus den Bedienelementen fehlgeschlagen ist.
    */
-  protected boolean fParsingFailed;
+  protected boolean updateFailed;
   /**
    * Zeigt an, ob der Dialog, der diese Komponente enthält, modal sein soll oder
    * nicht. Der Standardwert ist
@@ -132,134 +130,6 @@ public abstract class DialogContent
   }
 
   /**
-   * Extrahiert aus einem Text mit einer Einheit einen numerischen Wert. Diese
-   * Funktion sollte nur aus der Methode update() aufgerufen werden.
-   *
-   * @param text der Text, der den numerischen Wert enthält
-   * @param unit die Einheit hinter dem Wert
-   * @param field eine Bezeichnung des Feldes, das geparst wird (wird nur im
-   * Fehlerfall verwendet)
-   * @param example ein richtiges Beispiel, wie ein einzugebender Wert
-   * auszusehen hat (wird nur im Fehlerfall verwendet)
-   * @return den geparsten Wert
-   */
-  protected double parseDouble(String text, String unit, String field, String example) {
-    int index;
-
-    if (!unit.isEmpty()) {
-      index = text.indexOf(unit);
-
-      if (index == -1) {
-        showErrorMessage(field, example);
-        fParsingFailed = true;
-
-        return -1;
-      }
-    }
-    else {
-      index = text.length();
-    }
-
-    return parseDouble(text.substring(0, index), field, example);
-  }
-
-  /**
-   * Extrahiert aus einem Text einen numerischen Wert. Diese Funktion sollte nur
-   * aus der Methode update() aufgerufen werden.
-   *
-   * @param text der Text, der den numerischen Wert enthält
-   * @param field eine Bezeichnung des Feldes, das geparst wird (wird nur im
-   * Fehlerfall verwendet)
-   * @param example ein richtiges Beispiel, wie ein einzugebender Wert
-   * auszusehen hat (wird nur im Fehlerfall verwendet)
-   * @return den geparsten Wert
-   */
-  protected double parseDouble(String text, String field, String example) {
-    try {
-      fParsingFailed = false;
-      return Double.parseDouble(text);
-    }
-    catch (NumberFormatException e) {
-      showErrorMessage(field, example);
-      fParsingFailed = true;
-    }
-
-    return -1;
-  }
-
-  /**
-   * Extrahiert aus einem Text mit einer Einheit einen numerischen Wert. Diese
-   * Funktion sollte nur aus der Methode update() aufgerufen werden.
-   *
-   * @param text der Text, der den numerischen Wert enthält
-   * @param unit die Einheit hinter dem Wert
-   * @param field eine Bezeichnung des Feldes, das geparst wird (wird nur im
-   * Fehlerfall verwendet)
-   * @param example ein richtiges Beispiel, wie ein einzugebender Wert
-   * auszusehen hat (wird nur im Fehlerfall verwendet)
-   * @return den geparsten Wert
-   */
-  protected int parseInt(String text, String unit, String field, String example) {
-    return (int) parseDouble(text, unit, field, example);
-  }
-
-  /**
-   * Extrahiert aus einem Text einen numerischen Wert. Diese Funktion sollte nur
-   * aus der Methode update() aufgerufen werden.
-   *
-   * @param text der Text, der den numerischen Wert enthält
-   * @param field eine Bezeichnung des Feldes, das geparst wird (wird nur im
-   * Fehlerfall verwendet)
-   * @param example ein richtiges Beispiel, wie ein einzugebender Wert
-   * auszusehen hat (wird nur im Fehlerfall verwendet)
-   * @return den geparsten Wert
-   */
-  protected int parseInt(String text, String field, String example) {
-    return (int) parseDouble(text, field, example);
-  }
-
-  /**
-   * Zeigt ein Fenster mit der Meldung, dass das Parsen fehlgeschlagen ist.
-   *
-   * @param field eine Bezeichnung des Feldes, das geparst wird (wird nur im
-   * Fehlerfall verwendet)
-   * @param example ein richtiges Beispiel, wie ein einzug
-   * = ResourceBundleUtil.getBundle().getString("DialogContent.parseError.example");
-   * // String title = ResourceBundleUtil.getBundle().getString("DialogContent.title");
-   * // "Eingabefehler";
-   * // String message = "Fehler beim Parsen des Feldes '" + field + "'.\n"
-   * // + "Korrektes Eingabebeispiel: " + example;
-   * JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-   * }
-   *
-   * /**
-   * Zeigt an, ob das Parsen eines Wertes fehlgeschlagen ist.
-   *
-   * @returnebender Wert
-   * auszusehen hat (wird nur im Fehlerfall verwendet)
-   */
-  protected void showErrorMessage(String field, String example) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    String title = bundle.getString("DialogContent.parseError.title");
-    String parseErrorMessage
-        = bundle.getFormatted("DialogContent.parseError.message", field);
-    String validExample
-        = bundle.getFormatted("DialogContent.parseError.example", example);
-    String message = parseErrorMessage + "\n" + validExample;
-    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-  }
-
-  /**
-   * Zeigt an, ob das Parsen eines Wertes fehlgeschlagen ist.
-   *
-   * @return
-   * <code> true </code>, wenn beim Parsen ein Fehler aufgetreten ist
-   */
-  public boolean parsingFailed() {
-    return fParsingFailed;
-  }
-
-  /**
    * Zeigt an, ob das Übernehmen der Werte aus den Bedienelementen
    * fehlgeschlagen ist.
    *
@@ -267,7 +137,7 @@ public abstract class DialogContent
    * <code> true </code>, wenn ein Fehler aufgetreten ist
    */
   public boolean updateFailed() {
-    return parsingFailed();
+    return updateFailed;
   }
 
   /**

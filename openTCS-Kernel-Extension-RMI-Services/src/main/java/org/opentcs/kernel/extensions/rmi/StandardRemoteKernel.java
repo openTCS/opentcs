@@ -31,7 +31,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
-import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -92,10 +91,6 @@ public class StandardRemoteKernel
    */
   private final Kernel localKernel;
   /**
-   * The notification service.
-   */
-  private final NotificationService notificationService;
-  /**
    * The user manager.
    */
   private final UserManager userManager;
@@ -132,13 +127,11 @@ public class StandardRemoteKernel
    */
   @Inject
   StandardRemoteKernel(LocalKernel kernel,
-                       NotificationService notificationService,
                        UserManager userManager,
                        RmiKernelInterfaceConfiguration configuration,
                        SocketFactoryProvider socketFactoryProvider,
                        RegistryProvider registryProvider) {
     this.localKernel = requireNonNull(kernel, "kernel");
-    this.notificationService = requireNonNull(notificationService, "notificationService");
     this.userManager = requireNonNull(userManager, "userManager");
     this.configuration = requireNonNull(configuration, "configuration");
     this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");

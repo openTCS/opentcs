@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
@@ -72,6 +73,10 @@ public class DefaultScheduler
    */
   private final ScheduledExecutorService kernelExecutor;
   /**
+   * A global object to be used for synchronization within the kernel.
+   */
+  private final Object globalSyncObject;
+  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
@@ -81,17 +86,21 @@ public class DefaultScheduler
    *
    * @param plantModelService The plant model service.
    * @param allocationAdvisor Takes care of modules.
+   * @param reservationPool The reservation pool to be used.
    * @param kernelExecutor Executes scheduling tasks.
+   * @param globalSyncObject The kernel threads' global synchronization object.
    */
   @Inject
   public DefaultScheduler(InternalPlantModelService plantModelService,
                           AllocationAdvisor allocationAdvisor,
                           ReservationPool reservationPool,
-                          @KernelExecutor ScheduledExecutorService kernelExecutor) {
+                          @KernelExecutor ScheduledExecutorService kernelExecutor,
+                          @GlobalSyncObject Object globalSyncObject) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
+    this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
   }
 
   @Override
@@ -126,7 +135,7 @@ public class DefaultScheduler
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       claimsByClient.put(client, resources);
 
       allocationAdvisor.claim(client, resources);
@@ -146,7 +155,7 @@ public class DefaultScheduler
     }
     // XXX Verify that the index is only incremented, never decremented?
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       List<Set<TCSResource<?>>> claims = claimsByClient.get(client);
       List<Set<TCSResource<?>>> remainingClaims = claims.subList(index, claims.size());
       allocationAdvisor.setAllocationState(client,
@@ -159,7 +168,7 @@ public class DefaultScheduler
   public void unclaim(Client client) {
     requireNonNull(client, "client");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       claimsByClient.remove(client);
 
       allocationAdvisor.setAllocationState(client,
@@ -179,6 +188,7 @@ public class DefaultScheduler
                                             deferredAllocations,
                                             allocationAdvisor,
                                             kernelExecutor,
+                                            globalSyncObject,
                                             new Allocate(client, resources)));
   }
 
@@ -188,7 +198,7 @@ public class DefaultScheduler
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       // Check if all resources are available.
       final Set<TCSResource<?>> availableResources = new HashSet<>();
       for (TCSResource<?> curResource : resources) {
@@ -217,7 +227,7 @@ public class DefaultScheduler
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       LOG.debug("{}: Releasing resources: {}", client.getId(), resources);
       reservationPool.free(client, resources);
 
@@ -230,6 +240,7 @@ public class DefaultScheduler
                                               deferredAllocations,
                                               allocationAdvisor,
                                               kernelExecutor,
+                                              globalSyncObject,
                                               new AllocationsReleased(client,
                                                                       completelyFreeResources)));
     }
@@ -238,6 +249,7 @@ public class DefaultScheduler
                                             deferredAllocations,
                                             allocationAdvisor,
                                             kernelExecutor,
+                                            globalSyncObject,
                                             new RetryAllocates(client)));
   }
 
@@ -245,7 +257,7 @@ public class DefaultScheduler
   public void freeAll(Client client) {
     requireNonNull(client, "client");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       LOG.debug("{}: Releasing all resources", client.getId());
       reservationPool.freeAll(client);
     }
@@ -254,12 +266,13 @@ public class DefaultScheduler
                                             deferredAllocations,
                                             allocationAdvisor,
                                             kernelExecutor,
+                                            globalSyncObject,
                                             new RetryAllocates(client)));
   }
 
   @Override
   public Map<String, Set<TCSResource<?>>> getAllocations() {
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       return reservationPool.getAllocations();
     }
   }
@@ -277,6 +290,7 @@ public class DefaultScheduler
                                             deferredAllocations,
                                             allocationAdvisor,
                                             kernelExecutor,
+                                            globalSyncObject,
                                             new CheckAllocationsPrepared(client, resources)));
   }
 }

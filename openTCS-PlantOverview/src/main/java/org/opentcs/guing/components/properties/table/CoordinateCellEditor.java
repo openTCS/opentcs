@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import com.google.inject.assistedinject.Assisted;
@@ -46,12 +45,12 @@ public class CoordinateCellEditor
   private CoordinateUndoActivity coordinateUndoActivity;
 
   /**
-   * Creates a new instance of CoordinateCellEditor
+   * Creates a new instance.
    *
    * @param textField
    */
   @Inject
-  public CoordinateCellEditor(@Assisted JTextField textField, 
+  public CoordinateCellEditor(@Assisted JTextField textField,
                               @Assisted UserMessageHelper umh,
                               PropertiesComponentsFactory componentsFactory) {
     super(textField, umh);
@@ -95,7 +94,8 @@ public class CoordinateCellEditor
       JTable table, Object value, boolean isSelected, int row, int column) {
 
     CoordinateProperty coordinateProperty = (CoordinateProperty) value;
-    coordinateUndoActivity = componentsFactory.createCoordinateUndoActivity(coordinateProperty);
+    coordinateUndoActivity
+        = componentsFactory.createLayoutToModelCoordinateUndoActivity(coordinateProperty);
     coordinateUndoActivity.snapShotBeforeModification();
 
     return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -114,9 +114,5 @@ public class CoordinateCellEditor
     coordinateUndoActivity.snapShotAfterModification();
 
     return result;
-  }
-
-  public CoordinateUndoActivity getCoordinateUndoActivity() {
-    return coordinateUndoActivity;
   }
 }

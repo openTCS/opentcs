@@ -30,10 +30,10 @@ public interface PlantOverviewApplicationConfiguration {
 
   @ConfigurationEntry(
       type = "String",
-      description = {"The plant overview application's locale.",
-                     "Valid values: 'English', 'German'"},
+      description = {"The plant overview application's locale, as a BCP 47 language tag.",
+                     "Examples: 'en', 'de', 'zh'"},
       orderKey = "0_init_0")
-  String language();
+  String locale();
 
   @ConfigurationEntry(
       type = "String",
@@ -89,8 +89,10 @@ public interface PlantOverviewApplicationConfiguration {
 
   @ConfigurationEntry(
       type = "Class name",
-      description = {"The name of the class to be used for the location theme.",
-                     "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"},
+      description = {
+        "The name of the class to be used for the location theme.",
+        "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"
+      },
       orderKey = "3_themes_0"
   )
   Class<? extends LocationTheme> locationThemeClass();

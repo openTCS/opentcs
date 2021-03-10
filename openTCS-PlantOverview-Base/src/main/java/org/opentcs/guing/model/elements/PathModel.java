@@ -16,6 +16,7 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.properties.type.LinerTypeProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
@@ -62,7 +63,7 @@ public class PathModel
 
   @Override
   public String getDescription() {
-    return bundle.getString("path.description");
+    return bundle.getString("pathModel.description");
   }
 
   public LengthProperty getPropertyLength() {
@@ -86,8 +87,8 @@ public class PathModel
   }
 
   @SuppressWarnings("unchecked")
-  public SelectionProperty<LinerType> getPropertyPathConnType() {
-    return (SelectionProperty<LinerType>) getProperty(ElementPropKeys.PATH_CONN_TYPE);
+  public SelectionProperty<Type> getPropertyPathConnType() {
+    return (SelectionProperty<Type>) getProperty(ElementPropKeys.PATH_CONN_TYPE);
   }
 
   public StringProperty getPropertyPathControlPoints() {
@@ -100,98 +101,116 @@ public class PathModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("path.name.text"));
-    pName.setHelptext(bundle.getString("path.name.helptext"));
+    pName.setDescription(bundle.getString("pathModel.property_name.description"));
+    pName.setHelptext(bundle.getString("pathModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     LengthProperty pLength = new LengthProperty(this);
-    pLength.setDescription(bundle.getString("path.length.text"));
-    pLength.setHelptext(bundle.getString("path.length.helptext"));
+    pLength.setDescription(bundle.getString("pathModel.property_length.description"));
+    pLength.setHelptext(bundle.getString("pathModel.property_length.helptext"));
     setProperty(LENGTH, pLength);
 
     IntegerProperty pCost = new IntegerProperty(this, 1);
-    pCost.setDescription(bundle.getString("path.routingCost.text"));
-    pCost.setHelptext(bundle.getString("path.routingCost.helptext"));
-    pCost.setCollectiveEditable(true);
+    pCost.setDescription(bundle.getString("pathModel.property_routingCost.descritpion"));
+    pCost.setHelptext(bundle.getString("pathModel.property_routingCost.helptext"));
     setProperty(ROUTING_COST, pCost);
 
     SpeedProperty pMaxVelocity = new SpeedProperty(this, 1.0, SpeedProperty.Unit.M_S);
-    pMaxVelocity.setDescription(bundle.getString("path.maxVelocity.text"));
-    pMaxVelocity.setHelptext(bundle.getString("path.maxVelocity.helptext"));
-    pMaxVelocity.setCollectiveEditable(true);
+    pMaxVelocity.setDescription(bundle.getString("pathModel.property_maximumVelocity.description"));
+    pMaxVelocity.setHelptext(bundle.getString("pathModel.property_maximumVelocity.helptext"));
     setProperty(MAX_VELOCITY, pMaxVelocity);
 
     SpeedProperty pMaxReverseVelocity = new SpeedProperty(this, 0.0, SpeedProperty.Unit.M_S);
-    pMaxReverseVelocity.setDescription(bundle.getString("path.maxReverseVelocity.text"));
-    pMaxReverseVelocity.setHelptext(bundle.getString("path.maxReverseVelocity.helptext"));
-    pMaxReverseVelocity.setCollectiveEditable(true);
+    pMaxReverseVelocity.setDescription(bundle.getString("pathModel.property_maximumReverseVelocity.description"));
+    pMaxReverseVelocity.setHelptext(bundle.getString("pathModel.property_maximumReverseVelocity.helptext"));
     setProperty(MAX_REVERSE_VELOCITY, pMaxReverseVelocity);
 
-    SelectionProperty<LinerType> pPathConnType = new SelectionProperty<>(this, Arrays.asList(LinerType.values()), LinerType.values()[0]);
-    pPathConnType.setDescription(bundle.getString("element.pathConnType.text"));
-    pPathConnType.setHelptext(bundle.getString("element.pathConnType.helptext"));
+    LinerTypeProperty pPathConnType = new LinerTypeProperty(this, Arrays.asList(Type.values()), Type.values()[0]);
+    pPathConnType.setDescription(bundle.getString("pathModel.property_pathConnectionType.description"));
+    pPathConnType.setHelptext(bundle.getString("pathModel.property_pathConnectionType.helptext"));
     pPathConnType.setCollectiveEditable(true);
     setProperty(ElementPropKeys.PATH_CONN_TYPE, pPathConnType);
 
     StringProperty pPathControlPoints = new StringProperty(this);
-    pPathControlPoints.setDescription(bundle.getString("element.pathControlPoints.text"));
-    pPathControlPoints.setHelptext(bundle.getString("element.pathControlPoints.helptext"));
+    pPathControlPoints.setDescription(bundle.getString("pathModel.property_pathControlPoints.description"));
+    pPathControlPoints.setHelptext(bundle.getString("pathModel.property_pathControlPoints.helptext"));
     // Control points may only be moved in the drawing.
     pPathControlPoints.setModellingEditable(false);
     setProperty(ElementPropKeys.PATH_CONTROL_POINTS, pPathControlPoints);
 
     StringProperty startComponent = new StringProperty(this);
-    startComponent.setDescription(bundle.getString("element.startComponent.text"));
+    startComponent.setDescription(bundle.getString("pathModel.property_startComponent.description"));
     startComponent.setModellingEditable(false);
     startComponent.setOperatingEditable(false);
     setProperty(START_COMPONENT, startComponent);
     StringProperty endComponent = new StringProperty(this);
-    endComponent.setDescription(bundle.getString("element.endComponent.text"));
+    endComponent.setDescription(bundle.getString("pathModel.property_endComponent.description"));
     endComponent.setModellingEditable(false);
     endComponent.setOperatingEditable(false);
     setProperty(END_COMPONENT, endComponent);
 
     BooleanProperty pLocked = new BooleanProperty(this);
-    pLocked.setDescription(bundle.getString("path.locked.text"));
-    pLocked.setHelptext(bundle.getString("path.locked.helptext"));
+    pLocked.setDescription(bundle.getString("pathModel.property_locked.description"));
+    pLocked.setHelptext(bundle.getString("pathModel.property_locked.helptext"));
     pLocked.setCollectiveEditable(true);
     pLocked.setOperatingEditable(true);
     setProperty(LOCKED, pLocked);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("path.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("path.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("pathModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("pathModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 
   /**
    * The supported liner types for connections.
    */
-  public enum LinerType {
+  public enum Type {
 
     /**
      * A direct connection.
      */
-    DIRECT,
+    DIRECT(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.direct.description"),
+           ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.direct.helptext")),
     /**
      * An elbow connection.
      */
-    ELBOW,
+    ELBOW(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.elbow.description"),
+          ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.elbow.helptext")),
     /**
      * A slanted connection.
      */
-    SLANTED,
+    SLANTED(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.slanted.description"),
+            ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.slanted.helptext")),
     /**
      * A bezier curve with 2 control points.
      */
-    BEZIER,
+    BEZIER(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.bezier.description"),
+           ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.bezier.helptext")),
     /**
      * A bezier curve with 3 control points.
      */
-    BEZIER_3;
+    BEZIER_3(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.bezier3.description"),
+             ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.bezier3.helptext"));
+
+    private final String description;
+    private final String helptext;
+
+    private Type(String description, String helptext) {
+      this.description = requireNonNull(description, "description");
+      this.helptext = requireNonNull(helptext, "helptext");
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public String getHelptext() {
+      return helptext;
+    }
 
     /**
-     * Returns the <code>LinerType</code> constant matching the name in the
+     * Returns the <code>Type</code> constant matching the name in the
      * given input. This method permits extraneous whitespace around the name
      * and is case insensitive, which makes it a bit more liberal than the
      * default <code>valueOf</code> that all enums provide.
@@ -201,22 +220,17 @@ public class PathModel
      * @throws IllegalArgumentException If this enum has no constant with the
      * given name.
      */
-    public static LinerType valueOfNormalized(String input)
+    public static Type valueOfNormalized(String input)
         throws IllegalArgumentException {
       String normalizedInput = requireNonNull(input, "input is null").trim();
 
-      for (LinerType curType : values()) {
+      for (Type curType : values()) {
         if (normalizedInput.equalsIgnoreCase(curType.name())) {
           return curType;
         }
       }
 
       throw new IllegalArgumentException("No match for '" + input + "'");
-    }
-
-    @Override
-    public String toString() {
-      return ResourceBundle.getBundle(BUNDLE_PATH).getString("path.type." + name() + ".text");
     }
   }
 }

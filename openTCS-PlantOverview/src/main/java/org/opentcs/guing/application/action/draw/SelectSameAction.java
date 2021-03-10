@@ -15,14 +15,13 @@
  */
 package org.opentcs.guing.application.action.draw;
 
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import static javax.swing.Action.SMALL_ICON;
-import javax.swing.ImageIcon;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
+import static org.opentcs.guing.util.I18nPlantOverview.MODELVIEW_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -36,6 +35,8 @@ public class SelectSameAction
 
   public final static String ID = "edit.selectSame";
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MODELVIEW_PATH);
+
   /**
    * Creates a new instance.
    *
@@ -43,12 +44,10 @@ public class SelectSameAction
    */
   public SelectSameAction(DrawingEditor editor) {
     super(editor);
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureAction(this, ID, false);
-    
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/kcharselect.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    
+
+    putValue(NAME, BUNDLE.getString("selectSameAction.name"));
+    putValue(SMALL_ICON, ImageDirectory.getImageIcon("/menu/kcharselect.png"));
+
     updateEnabledState();
   }
 

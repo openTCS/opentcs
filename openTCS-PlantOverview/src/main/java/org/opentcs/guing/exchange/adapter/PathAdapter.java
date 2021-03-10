@@ -46,6 +46,7 @@ public class PathAdapter
   private static final Logger LOG = LoggerFactory.getLogger(PathAdapter.class);
 
   @Override
+  @SuppressWarnings("deprecation")
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,
                                     SystemModel systemModel,
@@ -72,18 +73,22 @@ public class PathAdapter
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
                                                 SystemModel systemModel,
                                                 PlantModelCreationTO plantModel) {
     PathModel pathModel = (PathModel) modelComponent;
-    ModelComponent srcPoint = pathModel.getStartComponent();
-    ModelComponent dstPoint = pathModel.getEndComponent();
 
-    LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.", pathModel.getName(), srcPoint, dstPoint);
+    LOG.debug("Path {}: srcPoint is {}, dstPoint is {}.",
+              pathModel.getName(),
+              getSourcePoint(pathModel),
+              getDestinationPoint(pathModel));
 
     PlantModelCreationTO result = plantModel
         .withPath(
-            new PathCreationTO(pathModel.getName(), srcPoint.getName(), dstPoint.getName())
+            new PathCreationTO(pathModel.getName(),
+                               getSourcePoint(pathModel),
+                               getDestinationPoint(pathModel))
                 .withLength(getLength(pathModel))
                 .withMaxVelocity(getMaxVelocity(pathModel))
                 .withMaxReverseVelocity(getMaxReverseVelocity(pathModel))
@@ -105,7 +110,7 @@ public class PathAdapter
     String sConnectionType = properties.get(ElementPropKeys.PATH_CONN_TYPE);
     if (sConnectionType != null) {
       model.getPropertyPathConnType()
-          .setValue(PathModel.LinerType.valueOfNormalized(sConnectionType));
+          .setValue(PathModel.Type.valueOfNormalized(sConnectionType));
     }
 
     // PATH_CONTROL_POINTS: Only when PATH_CONN_TYPE BEZIER
@@ -136,6 +141,14 @@ public class PathAdapter
     return (int) model.getPropertyRoutingCost().getValue();
   }
 
+  private String getSourcePoint(PathModel model) {
+    return model.getPropertyStartComponent().getText();
+  }
+
+  private String getDestinationPoint(PathModel model) {
+    return model.getPropertyEndComponent().getText();
+  }
+
   private long getLength(PathModel model) {
     LengthProperty pLength = model.getPropertyLength();
 
@@ -158,21 +171,24 @@ public class PathAdapter
                                                  SystemModel systemModel) {
     PathModel pathModel = (PathModel) model;
     // Connection type
-    PathModel.LinerType type = (PathModel.LinerType) pathModel.getPropertyPathConnType().getValue();
+    PathModel.Type type = (PathModel.Type) pathModel.getPropertyPathConnType().getValue();
 
     // BEZIER control points
     String sControlPoints = "";
-    if (type.equals(PathModel.LinerType.BEZIER) || type.equals(PathModel.LinerType.BEZIER_3)) {
+    if (type.equals(PathModel.Type.BEZIER) || type.equals(PathModel.Type.BEZIER_3)) {
       sControlPoints = buildBezierControlPoints(pathModel, systemModel);
     }
 
     pathModel.getPropertyPathControlPoints().setText(sControlPoints);
 
-    return layout.withModelElement(
-        new ModelLayoutElementCreationTO(pathModel.getName())
-            .withProperty(ElementPropKeys.PATH_CONN_TYPE, type.name())
-            .withProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints)
-    );
+    ModelLayoutElementCreationTO modelLayoutElement
+        = new ModelLayoutElementCreationTO(pathModel.getName())
+            .withProperty(ElementPropKeys.PATH_CONN_TYPE, type.name());
+    if (!sControlPoints.isEmpty()) {
+      modelLayoutElement = modelLayoutElement
+          .withProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints);
+    }
+    return layout.withModelElement(modelLayoutElement);
   }
 
   private String buildBezierControlPoints(PathModel model, SystemModel systemModel) {

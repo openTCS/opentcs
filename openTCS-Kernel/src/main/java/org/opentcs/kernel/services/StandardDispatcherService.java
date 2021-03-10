@@ -11,14 +11,12 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is the standard implementation of the {@link DispatcherService} interface.
@@ -28,10 +26,6 @@ import org.slf4j.LoggerFactory;
 public class StandardDispatcherService
     implements DispatcherService {
 
-  /**
-   * This class' logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(StandardDispatcherService.class);
   /**
    * A global object to be used for synchronization within the kernel.
    */
@@ -53,7 +47,7 @@ public class StandardDispatcherService
    * @param dispatcher The dispatcher.
    */
   @Inject
-  public StandardDispatcherService(@GlobalKernelSync Object globalSyncObject,
+  public StandardDispatcherService(@GlobalSyncObject Object globalSyncObject,
                                    TCSObjectPool globalObjectPool,
                                    Dispatcher dispatcher) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");

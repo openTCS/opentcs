@@ -9,15 +9,17 @@
 package org.opentcs.guing.application.action.actions;
 
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.NAME;
+import static javax.swing.Action.SHORT_DESCRIPTION;
 import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import org.opentcs.guing.components.dialogs.CreateGroupPanel;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -33,6 +35,8 @@ public class CreateGroupAction
    * This action class's ID.
    */
   public static final String ID = "openTCS.createGroup";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**
    * Provides panels for creating groups.
    */
@@ -46,11 +50,13 @@ public class CreateGroupAction
   @Inject
   public CreateGroupAction(Provider<CreateGroupPanel> panelProvider) {
     this.panelProvider = requireNonNull(panelProvider, "panelProvider");
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/groups.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+
+    putValue(NAME, BUNDLE.getString("createGroupAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("createGroupAction.shortDescription"));
+
+    ImageIcon icon = ImageDirectory.getImageIcon("/toolbar/groups.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override

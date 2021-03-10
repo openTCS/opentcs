@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 
 /**
  * A table model for drive orders.
@@ -27,14 +28,13 @@ class DriveOrderTableModel
   /**
    * This classe's bundle.
    */
-  private final ResourceBundle bundle
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The column names.
    */
   private final String[] columnNames = new String[] {
-    bundle.getString("location.description"),
-    bundle.getString("operation.description")
+    bundle.getString("driveOrderTableModel.column_location.headerText"),
+    bundle.getString("driveOrderTableModel.column_operation.headerText")
   };
   /**
    * The column classes.

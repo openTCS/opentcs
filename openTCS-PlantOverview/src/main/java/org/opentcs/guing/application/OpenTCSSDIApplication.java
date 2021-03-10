@@ -24,6 +24,7 @@ import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
@@ -39,9 +40,9 @@ public class OpenTCSSDIApplication
     implements EventHandler {
 
   private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/guing/res/labels");
+      = ResourceBundle.getBundle(I18nPlantOverview.SYSTEM_PATH);
   /**
-   * The JFrame in which the OpenTCSView is shown. May be null.
+   * The JFrame in which the OpenTCSView is shown.
    */
   private final JFrame contentFrame;
   /**
@@ -125,8 +126,7 @@ public class OpenTCSSDIApplication
 
   @Override
   protected void updateViewTitle(View view, JFrame frame) {
-    OpenTCSView opentcsView = (OpenTCSView) view;
-    opentcsView.updateModelName();
+    ((OpenTCSView) view).updateModelName();
   }
 
   @Override
@@ -147,7 +147,7 @@ public class OpenTCSSDIApplication
       frame.setTitle(OpenTCSView.NAME + " - "
           + view.getPlantOverviewState() + " - \""
           + modelName + "\" - "
-          + BUNDLE.getString("Application.ConnectedToKernel.text") + portalManager.getDescription()
+          + BUNDLE.getString("openTcsSdiApplication.frameTitle_connectedTo.text") + portalManager.getDescription()
           + " (" + portalManager.getHost() + ":" + portalManager.getPort()+")");
     }
   }

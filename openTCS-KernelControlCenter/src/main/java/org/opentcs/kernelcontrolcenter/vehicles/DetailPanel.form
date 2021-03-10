@@ -11,7 +11,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="clearMenuItem">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.ClearLogMessageText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.popupMenu_messageDetails.menuItem_clear.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -32,7 +32,7 @@
         <Menu class="javax.swing.JMenu" name="filterMenu">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.FilterMessages" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.popupMenu_messagesTable.subMenu_filter.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value=" message filtering"/>
           </Properties>
@@ -40,7 +40,7 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="everythingCheckBoxMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.FilterMessagesShowAll" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.popupMenu_messagesTable.subMenu_filter.menuItem_showAll.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -50,7 +50,7 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="warningsCheckBoxMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.FilterMessagesShowErrorsAndWarnings" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.popupMenu_messagesTable.subMenu_filter.menuItem_showErrorsAndWarnings.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -60,7 +60,7 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="errorsCheckBoxMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.FilterMessagesShowErrors" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.popupMenu_messagesTable.subMenu_filter.menuItem_showErrors.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -84,7 +84,7 @@
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.NoVehicleAttached" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.label_noVehicleAttached.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -137,7 +137,7 @@
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="General status">
                 <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.GeneralStatus" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.tab_generalStatus.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </JTabbedPaneConstraints>
             </Constraint>
@@ -168,7 +168,7 @@
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                             <TitledBorder title="Adapter status">
-                              <ResourceString PropertyName="titleX" bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.AdapterStatus" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.panel_adapterStatus.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                             </TitledBorder>
                           </Border>
                         </Property>
@@ -179,7 +179,7 @@
                         <Component class="javax.swing.JCheckBox" name="chkBoxEnable">
                           <Properties>
                             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                              <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.EnableAdapter" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                              <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.checkBox_enableAdapter.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                             </Property>
                             <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
@@ -199,7 +199,7 @@
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                             <TitledBorder title="Vehicle status">
-                              <ResourceString PropertyName="titleX" bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.VehicleStatus" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.panel_vehicleStatus.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                             </TitledBorder>
                           </Border>
                         </Property>
@@ -210,7 +210,7 @@
                         <Component class="javax.swing.JLabel" name="curPosLbl">
                           <Properties>
                             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                              <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.CurrentPosition" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                              <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.label_currentPosition.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                             </Property>
                           </Properties>
                           <Constraints>
@@ -235,7 +235,7 @@
                         <Component class="javax.swing.JLabel" name="curStateLbl">
                           <Properties>
                             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                              <ResourceString bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.CurrentState" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                              <ResourceString bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.label_currentState.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                             </Property>
                           </Properties>
                           <Constraints>
@@ -306,7 +306,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Messages">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/kernelcontrolcenter/Bundle.properties" key="DetailPanel.Messages" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/kernelcontrolcenter/Bundle.properties" key="detailPanel.panel_messages.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>

@@ -12,7 +12,7 @@
   </Properties>
   <AccessibilityProperties>
     <Property name="AccessibleContext.accessibleName" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="LoopbackOptions" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.accessibleName" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
     </Property>
   </AccessibilityProperties>
   <AuxValues>
@@ -64,7 +64,7 @@
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                         <TitledBorder title="Vehicle properties">
-                          <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Vehicle_properties" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                          <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_vehicleProperties.border.title" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                         </TitledBorder>
                       </Border>
                     </Property>
@@ -76,7 +76,7 @@
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                          <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="maxFwdVelocityLabel" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                          <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_maximumForwardVelocity.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                         </Property>
                       </Properties>
                       <Constraints>
@@ -118,7 +118,7 @@
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                          <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="maxRevVelocityLabel" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                          <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_maximumReverseVelocity.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                         </Property>
                       </Properties>
                       <Constraints>
@@ -160,7 +160,7 @@
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                          <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="maxAccelerationLabel" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                          <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_maximumAcceleration.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                         </Property>
                       </Properties>
                       <Constraints>
@@ -221,7 +221,7 @@
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                          <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="maxDecelerationLabel" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                          <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_maximumDeceleration.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                         </Property>
                       </Properties>
                       <Constraints>
@@ -243,7 +243,7 @@
                     <Component class="javax.swing.JLabel" name="defaultOpTimeLbl">
                       <Properties>
                         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                          <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="defaultOperatingTime" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                          <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_operatingTime.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                         </Property>
                       </Properties>
                       <Constraints>
@@ -340,7 +340,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Adapter status">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Adapter_status" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_adapterStatus.border.title" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -352,7 +352,7 @@
                 <Component class="javax.swing.JCheckBox" name="chkBoxEnable">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Enable_communication_adapter" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.checkBox_enableAdapter.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="name" type="java.lang.String" value="chkBoxEnable" noResource="true"/>
                   </Properties>
@@ -372,7 +372,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Current position/state">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="CurrentPositionSettings" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_vehicleStatus.border.title" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -435,9 +435,7 @@
                 </Component>
                 <Component class="javax.swing.JLabel" name="orientationAngleLbl">
                   <Properties>
-                    <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="AngleUnit" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
-                    </Property>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&amp;#186;"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -447,9 +445,7 @@
                 </Component>
                 <Component class="javax.swing.JLabel" name="precisePosUnitLabel">
                   <Properties>
-                    <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="precisePosUnit" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
-                    </Property>
+                    <Property name="text" type="java.lang.String" value="mm"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -464,7 +460,7 @@
                       <Color blue="ff" green="ff" red="ff" type="rgb"/>
                     </Property>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="OrientationAngleNotSet" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.textField_orientationAngle.angleNotSetPlaceholder" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
@@ -486,7 +482,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="11"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="energyLevelLabel" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_energyLevel.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -499,7 +495,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="4"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="orientationLabel" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_orientationAngle.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -534,7 +530,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="11"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="positionLabel" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_position.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -547,7 +543,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="11"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="pauseVehicle" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_pauseVehicle.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -560,7 +556,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="11"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="stateLabel" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_state.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -595,7 +591,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="11"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="precisePosLabel" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_precisePosition.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -635,7 +631,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Vehicle property">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="PropertySetterPanelTitel" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_vehicleProperty.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -646,7 +642,7 @@
                 <Component class="javax.swing.JLabel" name="keyLabel">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="keyPanelText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.label_propertyKey.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -676,7 +672,7 @@
                 <Component class="javax.swing.JButton" name="propSetButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="setPropertyButtonText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.button_setProperty.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -694,7 +690,7 @@
                       <ComponentRef name="propertyEditorGroup"/>
                     </Property>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="removePropertyRadioButtonText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.radioButton_removeProperty.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -713,7 +709,7 @@
                     </Property>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="setPropertyRadioButtonText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.radioButton_setProperty.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -755,7 +751,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Event dispatching">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Event_dispatching" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_eventDispatching.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -766,7 +762,7 @@
                 <Component class="javax.swing.JCheckBox" name="includeAppendixCheckBox">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Include_appendix" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.checkBox_includeAppendix.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -793,7 +789,7 @@
                 <Component class="javax.swing.JButton" name="dispatchEventButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Dispatch_event" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.button_dispatchEvent.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -808,7 +804,7 @@
                 <Component class="javax.swing.JButton" name="dispatchCommandFailedButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="dispatchCommandFailed.button.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.button_failCurrentCommand.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -827,7 +823,7 @@
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Command processing">
-                      <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Command_processing" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_commandProcessing.border.title" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
                 </Property>
@@ -841,7 +837,7 @@
                       <ComponentRef name="modeButtonGroup"/>
                     </Property>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="SingleStepMode" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.checkBox_commandProcessingManual.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -869,7 +865,7 @@
                     </Property>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="FlowModus" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.checkBox_commandProcessingAutomatic.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -893,7 +889,7 @@
                 <Component class="javax.swing.JButton" name="triggerButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/virtualvehicle/Bundle.properties" key="Next_step" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.button_nextStep.text" replaceFormat="BUNDLE.getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="enabled" type="boolean" value="false"/>
                     <Property name="name" type="java.lang.String" value="triggerButton" noResource="true"/>
@@ -916,7 +912,7 @@
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                 <TitledBorder title="Load handling device">
-                  <ResourceString PropertyName="titleX" bundle="org/opentcs/virtualvehicle/Bundle.properties" key="LoadHandlingDevices" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/commadapter/loopback/Bundle.properties" key="loopbackCommAdapterPanel.panel_loadHandlingDevice.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </TitledBorder>
               </Border>
             </Property>

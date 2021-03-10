@@ -16,6 +16,7 @@ import static javax.swing.Action.MNEMONIC_KEY;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -30,6 +31,8 @@ public class SwitchToModellingAction
    * The id of this action. (Often used to map a key combination in the ressources.)
    */
   public static final String ID = "file.mode.switchToModelling";
+  
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
   /**
    * The view.
@@ -39,8 +42,9 @@ public class SwitchToModellingAction
   @Inject
   public SwitchToModellingAction(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
-    ResourceBundleUtil.getBundle().configureAction(this, ID, false);
     
+    putValue(NAME, BUNDLE.getString("switchToModellingAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("switchToModellingAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt M"));
     putValue(MNEMONIC_KEY, Integer.valueOf('M'));
   }

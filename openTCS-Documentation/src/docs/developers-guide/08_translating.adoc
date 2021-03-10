@@ -1,0 +1,99 @@
+
+== Translating the user interfaces
+
+Each openTCS application with a user interface is prepared for internationalization based on Java's `ResourceBundle` mechanism.
+As a result, the applications can be configured to display texts in different languages, provided there is a translation in the form of resource bundle property files.
+(How this configuration works is described in the User's Guide.)
+The openTCS distribution itself comes with language files for the default language (English) and German.
+Additional translations can be integrated primarily by adding JAR files containing property files to the class path.
+
+The following sections explain how to create and integrate a new translation.
+
+NOTE: Parts of the texts in the distribution may change between openTCS releases.
+While this might not happen often, it still means that, when you update to a new version of openTCS, you may want to check whether your translations are still correct.
+If there were textual changes in the openTCS distribution, you may need to update your language files.
+
+=== Extracting default language files
+
+To create a new translation pack for an application, you first need to know what texts to translate.
+The best way to do this is to look at the existing language files in the openTCS distribution.
+These are contained in the applications' JAR files (`opentcs-*.jar`), and are by convention kept in a common directory `/i18n/org/opentcs` inside these JAR files.
+
+To start your translation work, extract all of the application's language files into a single directory first.
+Since JAR files are really only ZIP files, this can be done using any ZIP utility you like.
+As an example, to use `unzip` in a shell on a Linux system, issue the following command from the application's `lib/` directory:
+
+----
+unzip "opentcs-*.jar" "i18n/org/opentcs/*.properties"
+----
+
+Alternatively, to use link:https://7-zip.org/[7-Zip] in a shell on a Windows system, issue the following command from the application's `lib/` directory:
+
+----
+7z x -r "opentcs-*.jar" "i18n\org\opentcs\*.properties"
+----
+
+You will find the extracted language files in the `i18n/` directory, then.
+For the Plant Overview application, an excerpt of that directory's contents would look similar to this:
+
+....
+i18n/
+  org/
+    opentcs/
+      plantoverview/
+        mainMenu.properties
+        mainMenu_de.properties
+        toolbar.properties
+        toolbar_de.properties
+        ...
+....
+
+Files whose names end with `_de.properties` are German translations.
+You will not need these and can delete them.
+
+=== Creating a translation
+
+Copy the whole `i18n/` directory with the English language files to a new, separate directory, e.g. `translation/`.
+Working with a copy ensures that you still have the English version at hand to look up the original texts when translating.
+
+Then rename all property files in the new directory so their names contain the appropriate language tag for your translation.
+If you are e.g. translating to Norwegian, rename `mainMenu.properties` to `mainMenu_no.properties` and the other files accordingly.
+It is important that the base name of the file remains the same and only the language tag is added to it.
+
+The next step is doing the actual translation work -- open each property file in a text editor and translate the properties' values in it.
+
+After translating all the files, create a JAR file containing the `i18n/` directory with your language files.
+You can do this for instance by simply creating a ZIP file and changing its name to end with `.jar`.
+
+The result could be a file named e.g. `language-pack-norwegian.jar`, whose contents should look similar to this:
+
+....
+i18n/
+  org/
+    opentcs/
+      plantoverview/
+        mainMenu_no.properties
+        toolbar_no.properties
+        ...
+....
+
+=== Integrating a translation
+
+Finally, you merely need to add the JAR file you created to the translated application's class path.
+After configuring the application to the respective language and restarting it, you should see your translations in the user interface.
+
+=== Updating a translation
+
+As development of openTCS proceeds, parts of the applications' language files may change.
+This means that your translations may also need to be updated when you move from one version of openTCS to a more recent one.
+
+To find out what changes were made and may need to be applied to your translations, you could do the following:
+
+. Extract the language files for the old version of the application, e.g. into a directory `translation_old/`.
+. Extract the language files for the new version of the application, e.g. into a directory `translation_new/`.
+. Create a link:https://en.wikipedia.org/wiki/Diff[diff] between the two language file versions.
+  For example, on a Linux system you could run `diff -urN translation_old/ translation_new/ > language_changes.diff` to write a diff to the file `language_changes.diff`.
+. Read the diff to see which new language files and/or entries were added, removed or changed.
+
+Based on the information from the diff, you can apply appropriate changes to your own language files.
+Then you merely need to create new JAR files for your translations and add them to the applications' class paths.

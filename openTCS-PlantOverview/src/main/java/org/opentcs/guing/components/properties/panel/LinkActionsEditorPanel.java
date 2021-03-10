@@ -7,7 +7,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.panel;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import javax.swing.JDialog;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -31,12 +31,17 @@ public class LinkActionsEditorPanel
   /**
    * The bundle to be used.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
 
   /**
    * Creates a new instance.
    */
   public LinkActionsEditorPanel() {
+  }
+
+  @Override
+  public String getTitle() {
+    return bundle.getString("linkActionsEditorPanel.title");
   }
 
   @Override
@@ -50,8 +55,8 @@ public class LinkActionsEditorPanel
     int index = getItemsList().getSelectedIndex();
     JDialog parent = (JDialog) getTopLevelAncestor();
     SelectionPanel content = new SelectionPanel(
-        bundle.getString("LinkActionsEditorPanel.editAction"),
-        bundle.getString("LinkActionsEditorPanel.action"),
+        bundle.getString("linkActionsEditorPanel.dialog_actionSelectionEdit.title"),
+        bundle.getString("linkActionsEditorPanel.dialog_actionSelection.label_action.text"),
         getPossibleItems(),
         value);
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
@@ -68,8 +73,8 @@ public class LinkActionsEditorPanel
   protected void add() {
     JDialog parent = (JDialog) getTopLevelAncestor();
     SelectionPanel content = new SelectionPanel(
-        bundle.getString("LinkActionsEditorPanel.addAction"),
-        bundle.getString("LinkActionsEditorPanel.action"),
+        bundle.getString("linkActionsEditorPanel.dialog_actionSelectionAdd.title"),
+        bundle.getString("linkActionsEditorPanel.dialog_actionSelection.label_action.text"),
         getPossibleItems());
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);

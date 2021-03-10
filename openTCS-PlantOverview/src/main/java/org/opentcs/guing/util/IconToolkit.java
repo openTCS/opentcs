@@ -24,12 +24,11 @@ public class IconToolkit {
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(IconToolkit.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IconToolkit.class);
   /**
    * The default path for icons.
    */
-  private static final String fDefaultPath = "/org/opentcs/guing/res/symbols/";
+  private static final String DEFAULT_PATH = "/org/opentcs/guing/res/symbols/";
   /**
    * The single instance of this class.
    */
@@ -67,7 +66,7 @@ public class IconToolkit {
       return new ImageIcon(url);
     }
     else {
-      log.warn("Icon not found: " + fullPath);
+      LOG.warn("Icon not found: {}", fullPath);
       return null;
     }
   }
@@ -79,6 +78,6 @@ public class IconToolkit {
    * @return The icon, or <code>null</code>, if the file does not exist.
    */
   public ImageIcon createImageIcon(String relativePath) {
-    return getImageIconByFullPath(fDefaultPath + relativePath);
+    return getImageIconByFullPath(DEFAULT_PATH + relativePath);
   }
 }

@@ -15,6 +15,7 @@ import static javax.swing.Action.ACCELERATOR_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.application.OpenTCSView;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -27,6 +28,8 @@ public class PersistInKernelAction
 
   public static final String ID = "synchronize.saveModelInKernel";
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
+
   private final OpenTCSView openTCSView;
 
   /**
@@ -36,8 +39,9 @@ public class PersistInKernelAction
    */
   public PersistInKernelAction(OpenTCSView openTCSView) {
     this.openTCSView = Objects.requireNonNull(openTCSView);
-    ResourceBundleUtil.getBundle().configureAction(this, ID, false);
-    
+
+    putValue(NAME, BUNDLE.getString("persistInKernelAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("persistInKernelAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt P"));
     putValue(MNEMONIC_KEY, Integer.valueOf('P'));
 

@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.ResourceBundle;
-import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.model.ModelComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +32,6 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(AbstractQuantity.class);
-  /**
-   * This class's resource bundle.
-   */
-  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The unit's enum class;
    */
@@ -312,8 +306,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   public void setValueAndUnit(double value, U unit)
       throws IllegalArgumentException {
     if (!isPossibleUnit(unit)) {
-      throw new IllegalArgumentException(
-          bundle.getString("AbstractQuantity.errorWrongUnit"));
+      throw new IllegalArgumentException(String.format("'%s' is not a valid unit.", unit));
     }
     if (!Double.isNaN(value)) {
       if (fValue instanceof Double) {

@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
+import org.opentcs.guing.components.properties.type.BlockTypeProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
@@ -66,7 +68,7 @@ public class BlockModel
 
   @Override  // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("block.description");
+    return bundle.getString("blockModel.description");
   }
 
   @Override  // AbstractModelComponent
@@ -179,8 +181,8 @@ public class BlockModel
   }
 
   @SuppressWarnings("unchecked")
-  public SelectionProperty<BlockType> getPropertyType() {
-    return (SelectionProperty<BlockType>) getProperty(TYPE);
+  public SelectionProperty<Type> getPropertyType() {
+    return (SelectionProperty<Type>) getProperty(TYPE);
   }
 
   public StringSetProperty getPropertyElements() {
@@ -193,53 +195,58 @@ public class BlockModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("block.name.text"));
-    pName.setHelptext(bundle.getString("block.name.helptext"));
+    pName.setDescription(bundle.getString("blockModel.property_name.description"));
+    pName.setHelptext(bundle.getString("blockModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     ColorProperty pColor = new ColorProperty(this, Color.red);
-    pColor.setDescription(bundle.getString("element.blockColor.text"));
-    pColor.setHelptext(bundle.getString("element.blockColor.helptext"));
+    pColor.setDescription(bundle.getString("blockModel.property_color.description"));
+    pColor.setHelptext(bundle.getString("blockModel.property_color.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
 
-    SelectionProperty<BlockType> pType = new SelectionProperty<>(this,
-                                                                 Arrays.asList(BlockType.values()),
-                                                                 BlockType.values()[0]);
-    pType.setDescription(bundle.getString("block.type.text"));
-    pType.setHelptext(bundle.getString("block.type.helptext"));
+    BlockTypeProperty pType = new BlockTypeProperty(this,
+                                                    Arrays.asList(Type.values()),
+                                                    Type.values()[0]);
+    pType.setDescription(bundle.getString("blockModel.property_type.description"));
+    pType.setHelptext(bundle.getString("blockModel.property_type.helptext"));
     pType.setCollectiveEditable(true);
     setProperty(TYPE, pType);
 
     StringSetProperty pElements = new StringSetProperty(this);
-    pElements.setDescription(bundle.getString("block.elements.text"));
-    pElements.setHelptext(bundle.getString("block.elements.helptext"));
+    pElements.setDescription(bundle.getString("blockModel.property_elements.description"));
+    pElements.setHelptext(bundle.getString("blockModel.property_elements.helptext"));
     pElements.setModellingEditable(false);
     pElements.setOperatingEditable(false);
     setProperty(ELEMENTS, pElements);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("block.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("block.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("blockModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("blockModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 
   /**
    * The supported point types.
    */
-  public enum BlockType {
+  public enum Type {
 
     /**
      * Single vehicle only allowed.
      */
-    SINGLE_VEHICLE_ONLY,
+    SINGLE_VEHICLE_ONLY(ResourceBundle.getBundle(BUNDLE_PATH).getString("blockModel.type.singleVehicleOnly.description")),
     /**
      * Same direction only allowed.
      */
-    SAME_DIRECTION_ONLY;
+    SAME_DIRECTION_ONLY(ResourceBundle.getBundle(BUNDLE_PATH).getString("blockModel.type.sameDirectionOnly.description"));
 
-    @Override
-    public String toString() {
-      return ResourceBundle.getBundle(BUNDLE_PATH).getString("block.type." + name() + ".text");
+    private final String description;
+
+    private Type(String description) {
+      this.description = requireNonNull(description, "description");
+    }
+
+    public String getDescription() {
+      return description;
     }
   }
 }

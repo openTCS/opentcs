@@ -7,7 +7,6 @@ package org.opentcs.guing.application.action.edit;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import static javax.swing.Action.ACCELERATOR_KEY;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
@@ -15,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.components.EditableComponent;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -32,6 +32,8 @@ public class DuplicateAction
 
   public final static String ID = "edit.duplicate";
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
+
   /**
    * Creates a new instance which acts on the currently focused component.
    */
@@ -47,13 +49,14 @@ public class DuplicateAction
    */
   public DuplicateAction(JComponent target) {
     super(target);
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+
+    putValue(NAME, BUNDLE.getString("duplicateAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("duplicateAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl D"));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-copy-3.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/menu/edit-copy-3.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override

@@ -31,8 +31,7 @@ public class StatusPanel
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(StatusPanel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StatusPanel.class);
   /**
    * A text field for status messages.
    */
@@ -93,20 +92,20 @@ public class StatusPanel
     if (level == Level.SEVERE) {
       showOptionPane(text);
       textFieldStatus.setForeground(Color.magenta);
-      log.error(text);
+      LOG.error(text);
     }
     else if (level == Level.WARNING) {
       showOptionPane(text);
       textFieldStatus.setForeground(Color.red);
-      log.warn(text);
+      LOG.warn(text);
     }
     else if (level == Level.INFO) {
       textFieldStatus.setForeground(Color.blue);
-      log.info(text);
+      LOG.info(text);
     }
     else {
       textFieldStatus.setForeground(Color.black);
-      log.info(text);
+      LOG.info(text);
     }
 
     textFieldStatus.setText(text);

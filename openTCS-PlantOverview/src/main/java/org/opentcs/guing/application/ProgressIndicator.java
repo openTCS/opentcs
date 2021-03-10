@@ -9,6 +9,7 @@
 package org.opentcs.guing.application;
 
 /**
+ * Makes progress information available in some way.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -21,12 +22,11 @@ public interface ProgressIndicator {
   void initialize();
 
   /**
-   * Sets/publishes the current progress.
+   * Sets/publishes the current progress status.
    *
-   * @param percent The progress.
-   * @param message A message to be added to the progress.
+   * @param progressStatus The progress status.
    */
-  void setProgress(int percent, String message);
+  void setProgress(ProgressStatus progressStatus);
 
   /**
    * Terminates the progress indicator, indicating that no further progress is

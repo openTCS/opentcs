@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -38,8 +37,6 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.unified.PlantModelElementConverter;
-import org.opentcs.guing.util.JOptionPaneUtil;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,12 +114,7 @@ public class ModelImportAdapter {
 
     // If any errors occurred, show the dialog with all errors listed
     if (!collectedErrorMessages.isEmpty()) {
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-      JOptionPaneUtil
-          .showDialogWithTextArea(statusPanel,
-                                  bundle.getString("ValidationWarning.title"),
-                                  bundle.getString("ValidationWarning.descriptionLoading"),
-                                  collectedErrorMessages.stream().collect(Collectors.toList()));
+      validator.showLoadingValidationWarning(statusPanel, collectedErrorMessages);
     }
 
     return systemModel;
@@ -226,10 +218,9 @@ public class ModelImportAdapter {
       return true;
     }
     else {
-      String deserializationError = ResourceBundleUtil.getBundle()
-          .getFormatted("UnifiedModelReader.deserialization.error",
-                        modelComponent.getName(),
-                        validator.getErrors());
+      String deserializationError = validator.formatDeserializationErrors(modelComponent,
+                                                                          validator.getErrors());
+      validator.formatDeserializationErrors(modelComponent, validator.getErrors());
       validator.resetErrors();
       LOG.warn("Deserialization error: {}", deserializationError);
       collectedErrorMessages.add(deserializationError);

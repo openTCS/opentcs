@@ -29,12 +29,12 @@ public class TCSLabelFigure
   /**
    * The default x label offset for label figures.
    */
-  public static final double DEFAULT_LABEL_OFFSET_X = -10;
+  public static final int DEFAULT_LABEL_OFFSET_X = -10;
 
   /**
    * The default y label offset for label figures.
    */
-  public static final double DEFAULT_LABEL_OFFSET_Y = -20;
+  public static final int DEFAULT_LABEL_OFFSET_Y = -20;
 
   private Point2D.Double fOffset;
   private LabeledFigure fParent;
@@ -79,10 +79,11 @@ public class TCSLabelFigure
   /**
    * Sets the position relative to the {@code Figure}.
    *
-   * @param offset The offset.
+   * @param posX The X-Offset of the label.
+   * @param posY The Y-Offset of the label.
    */
-  public void setOffset(Point2D.Double offset) {
-    fOffset = offset;
+  public void setOffset(int posX, int posY) {
+    fOffset =  new Point2D.Double(posX, posY);
   }
 
   public Double getOffset() {

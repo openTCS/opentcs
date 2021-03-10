@@ -10,7 +10,6 @@ package org.opentcs.guing.application.action.actions;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,6 +23,7 @@ import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.transport.CreateTransportOrderPanel;
 import org.opentcs.guing.transport.OrderCategorySuggestionsPool;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -40,6 +40,8 @@ public class CreateTransportOrderAction
    * This action class's ID.
    */
   public static final String ID = "actions.createTransportOrder";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * A helper for creating transport orders with the kernel.
    */
@@ -76,13 +78,13 @@ public class CreateTransportOrderAction
                                              "orderPanelProvider");
     this.categorySuggestionsPool = requireNonNull(categorySuggestionsPool,
                                                   "categorySuggestionsPool");
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+
+    putValue(NAME, BUNDLE.getString("createTransportOrderAction.name"));
     putValue(MNEMONIC_KEY, Integer.valueOf('T'));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/create-order.22.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/toolbar/create-order.22.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override
@@ -93,7 +95,6 @@ public class CreateTransportOrderAction
   public void createTransportOrder() {
     CreateTransportOrderPanel contentPanel = orderPanelProvider.get();
     StandardContentDialog dialog = new StandardContentDialog(dialogParent, contentPanel);
-    dialog.setTitle(ResourceBundleUtil.getBundle().getString("TransportOrdersContainerPanel.newTransportOrder"));
     dialog.setVisible(true);
 
     if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {

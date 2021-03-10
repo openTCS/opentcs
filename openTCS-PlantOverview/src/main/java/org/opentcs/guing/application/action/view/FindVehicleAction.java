@@ -10,7 +10,6 @@ package org.opentcs.guing.application.action.view;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +28,8 @@ import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.Comparators;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -44,6 +45,8 @@ public class FindVehicleAction
    * This action's ID.
    */
   public final static String ID = "actions.findVehicle";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * Provides the current system model.
    */
@@ -78,13 +81,12 @@ public class FindVehicleAction
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.panelFactory = requireNonNull(panelFactory, "panelFactory");
 
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+    putValue(NAME, BUNDLE.getString("findVehicleAction.name"));
     putValue(MNEMONIC_KEY, Integer.valueOf('F'));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/find-vehicle.22.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/toolbar/find-vehicle.22.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override
@@ -102,7 +104,8 @@ public class FindVehicleAction
     Collections.sort(vehicles, Comparators.modelComponentsByName());
     FindVehiclePanel content = panelFactory.createFindVehiclesPanel(vehicles,
                                                                     drawingEditor.getActiveView());
-    String title = ResourceBundleUtil.getBundle().getString("findVehiclePanel.title");
+    String title = ResourceBundleUtil.getBundle(I18nPlantOverview.FINDVEHICLE_PATH)
+        .getString("findVehicleAction.dialog_findVehicle.title");
     ClosableDialog dialog = new ClosableDialog(dialogParent, true, content, title);
     dialog.setLocationRelativeTo(dialogParent);
     dialog.setVisible(true);

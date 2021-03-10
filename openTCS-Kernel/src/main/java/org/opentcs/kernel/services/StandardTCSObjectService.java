@@ -16,11 +16,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 
 /**
@@ -47,7 +47,7 @@ public class StandardTCSObjectService
    * @param globalObjectPool The object pool to be used.
    */
   @Inject
-  public StandardTCSObjectService(@GlobalKernelSync Object globalSyncObject,
+  public StandardTCSObjectService(@GlobalSyncObject Object globalSyncObject,
                                   TCSObjectPool globalObjectPool) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");

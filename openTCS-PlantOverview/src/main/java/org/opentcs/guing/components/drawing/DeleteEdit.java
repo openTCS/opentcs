@@ -15,6 +15,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import org.jhotdraw.draw.Figure;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -45,7 +46,7 @@ class DeleteEdit
 
   @Override
   public String getPresentationName() {
-    return ResourceBundleUtil.getBundle().getString("edit.delete.text");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH).getString("deleteEdit.presentationName");
   }
 
   @Override

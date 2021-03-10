@@ -62,19 +62,33 @@ public class VehicleProcessModel {
    * User notifications published by the comm adapter.
    */
   private final Queue<UserNotification> notifications = new LinkedList<>();
-
+  /**
+   * The vehicle's precise position.
+   */
   private Triple precisePosition;
-
+  /**
+   * The vehicle's orientation angle.
+   */
   private double orientationAngle = Double.NaN;
-
+  /**
+   * The vehicle's energy level.
+   */
   private int energyLevel = 100;
-
+  /**
+   * The vehicle's load handling devices (state).
+   */
   private List<LoadHandlingDevice> loadHandlingDevices = new LinkedList<>();
-
+  /**
+   * The vehicle's maximum forward velocity.
+   */
   private int maxVelocity;
-
+  /**
+   * The vehicle's maximum reverse velocity.
+   */
   private int maxReverseVelocity;
-
+  /**
+   * The vehicle's current state.
+   */
   private Vehicle.State state = Vehicle.State.UNKNOWN;
 
   @Deprecated
@@ -91,10 +105,20 @@ public class VehicleProcessModel {
     this.vehicleReference = vehicle.getReference();
   }
 
+  /**
+   * Registers a new property change listener with this model.
+   *
+   * @param listener The listener to be registered.
+   */
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     pcs.addPropertyChangeListener(listener);
   }
 
+  /**
+   * Unregisters a property change listener from this model.
+   *
+   * @param listener The listener to be unregistered.
+   */
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     pcs.removePropertyChangeListener(listener);
   }
@@ -111,10 +135,10 @@ public class VehicleProcessModel {
   public Vehicle getVehicle() {
     return vehicle;
   }
-  
+
   /**
    * Returns a reference to the vehicle.
-   * 
+   *
    * @return A reference to the vehicle.
    */
   @Nonnull
@@ -505,7 +529,7 @@ public class VehicleProcessModel {
   }
 
   /**
-   * Notifies observers that the given command has been sent to the associated vehicle
+   * Notifies observers that the given command has been sent to the associated vehicle.
    *
    * @param sentCommand The command that has been sent to the vehicle.
    */
@@ -544,7 +568,7 @@ public class VehicleProcessModel {
   /**
    * A notification object sent to observers to indicate a change of a property.
    */
-  public static abstract class PropertyUpdate {
+  public static class PropertyUpdate {
 
     /**
      * The property's key.

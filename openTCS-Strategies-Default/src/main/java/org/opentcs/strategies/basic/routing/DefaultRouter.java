@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class DefaultRouter
   /**
    * The default value of a vehicle's routing group.
    */
-  private static final int DEFAULT_ROUTING_GROUP = 0;
+  private static final String DEFAULT_ROUTING_GROUP = "";
   /**
    * This class's Logger.
    */
@@ -71,7 +72,7 @@ public class DefaultRouter
   /**
    * The point routers by vehicle routing group.
    */
-  private final Map<Integer, PointRouter> pointRoutersByVehicleGroup = new ConcurrentHashMap<>();
+  private final Map<String, PointRouter> pointRoutersByVehicleGroup = new ConcurrentHashMap<>();
   /**
    * Prevents reading from the routing tables and planned routes while updating them.
    */
@@ -141,7 +142,7 @@ public class DefaultRouter
       rwLock.writeLock().lock();
       pointRoutersByVehicleGroup.clear();
       for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
-        int currentGroup = getRoutingGroupOfVehicle(curVehicle);
+        String currentGroup = getRoutingGroupOfVehicle(curVehicle);
         if (!pointRoutersByVehicleGroup.containsKey(currentGroup)) {
           pointRoutersByVehicleGroup.put(currentGroup,
                                          pointRouterFactory.createPointRouter(curVehicle));
@@ -164,7 +165,7 @@ public class DefaultRouter
       List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
       DriveOrder[] driveOrders
           = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      for (Map.Entry<Integer, PointRouter> curEntry : pointRoutersByVehicleGroup.entrySet()) {
+      for (Map.Entry<String, PointRouter> curEntry : pointRoutersByVehicleGroup.entrySet()) {
         // Get all points at the first location at which a vehicle of the current
         // type can execute the desired operation and check if an acceptable route
         // originating in one of them exists.
@@ -523,13 +524,13 @@ public class DefaultRouter
   /**
    * Returns all vehicles within the given routing group.
    *
-   * @param routingGroup The routint group all vehicles should be in
+   * @param routingGroup The routing group the returned vehicles should belong to.
    * @return The vehicles which have the given routing group
    */
-  private Set<Vehicle> getVehiclesByRoutingGroup(int routingGroup) {
+  private Set<Vehicle> getVehiclesByRoutingGroup(String routingGroup) {
     Set<Vehicle> result = new HashSet<>();
     for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
-      if (getRoutingGroupOfVehicle(curVehicle) == routingGroup) {
+      if (Objects.equals(getRoutingGroupOfVehicle(curVehicle), routingGroup)) {
         result.add(curVehicle);
       }
     }
@@ -543,18 +544,10 @@ public class DefaultRouter
    * @param vehicle The vehicle
    * @return The routing group of the vehicle
    */
-  private int getRoutingGroupOfVehicle(Vehicle vehicle) {
-    int routingGroup = DEFAULT_ROUTING_GROUP;
-    try {
-      routingGroup = Integer.parseInt(vehicle.getProperty(PROPKEY_ROUTING_GROUP));
-    }
-    catch (NumberFormatException e) {
-      LOG.debug("Invalid routing group '{}' for vehicle {}, using default ({}).",
-                vehicle.getProperty(PROPKEY_ROUTING_GROUP),
-                vehicle,
-                DEFAULT_ROUTING_GROUP);
-    }
-    return routingGroup;
+  private String getRoutingGroupOfVehicle(Vehicle vehicle) {
+    String propVal = vehicle.getProperty(PROPKEY_ROUTING_GROUP);
+    
+    return propVal == null ? DEFAULT_ROUTING_GROUP : propVal;
   }
 
   /**

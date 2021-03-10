@@ -35,11 +35,9 @@ import org.opentcs.guing.application.action.actions.CreateGroupAction;
 import org.opentcs.guing.application.action.actions.CreateLocationTypeAction;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
-import org.opentcs.guing.application.action.draw.BringToFrontAction;
 import org.opentcs.guing.application.action.draw.DefaultPathSelectedAction;
 import org.opentcs.guing.application.action.draw.DefaultPointSelectedAction;
 import org.opentcs.guing.application.action.draw.SelectSameAction;
-import org.opentcs.guing.application.action.draw.SendToBackAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
 import org.opentcs.guing.application.action.view.PauseAllVehiclesAction;
 import org.opentcs.guing.application.toolbar.DragTool;
@@ -56,6 +54,7 @@ import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
@@ -93,10 +92,6 @@ public class ToolBarManager
    * A toggle button for the selection tool.
    */
   private final JToggleButton selectionToolButton;
-  /**
-   * The actual selection tool.
-   */
-  private MultipleSelectionTool selectionTool;
   /**
    * A toggle button for the drag tool.
    */
@@ -180,7 +175,7 @@ public class ToolBarManager
     this.selectionToolFactory = requireNonNull(selectionToolFactory,
                                                "selectionToolFactory");
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH);
 
     // --- 1. ToolBar: Creation ---
     // Selection, Drag | Create Point, Location, Path, Link | 
@@ -206,9 +201,8 @@ public class ToolBarManager
     buttonCreateLocation = addToolButton(toolBarCreation,
                                          editor,
                                          creationTool,
-                                         "openTCS.createLocation",
-                                         ImageDirectory.getImageIcon("/toolbar/location.22.png"),
-                                         labels);
+                                         labels.getString("toolBarManager.button_createLocation.tooltipText"),
+                                         ImageDirectory.getImageIcon("/toolbar/location.22.png"));
     creationTool.setToolDoneAfterCreation(false);
 
     // --- Create Path Figure (only in Modelling mode) ---
@@ -223,9 +217,8 @@ public class ToolBarManager
     buttonCreateLink = addToolButton(toolBarCreation,
                                      editor,
                                      connectionTool,
-                                     "openTCS.createLink",
-                                     ImageDirectory.getImageIcon("/toolbar/link.22.png"),
-                                     labels);
+                                     labels.getString("toolBarManager.button_createLink.tooltipText"),
+                                     ImageDirectory.getImageIcon("/toolbar/link.22.png"));
     connectionTool.setToolDoneAfterCreation(false);
 
     JToolBar.Separator sep = new JToolBar.Separator();
@@ -275,25 +268,25 @@ public class ToolBarManager
     buttonPauseAllVehicles.setText(null);
     toolBarCreation.add(buttonPauseAllVehicles);
 
-    toolBarCreation.setName(labels.getString("toolBarCreation.title"));
+    toolBarCreation.setName(labels.getString("toolBarManager.toolbar_drawing.title"));
     toolBarList.add(toolBarCreation);
 
-//    // --- 2. ToolBar: Attributes ---
-//    // TODO: Diesen Toolbar "später" wieder einfügen, sobald es freie Grafikelemente im Modell gibt
-//    // Pick, Apply
-//    // Color: Stroke, Fill, Text
-//    // Stroke: Decoration, Width, Dashes, Type, Placement, Cap, Join
-//    // Font: Font; Bold, Italic, Underline
-//    toolBarAttributes = new JToolBar();
+    // --- 2. ToolBar: Attributes ---
+    // TODO: Diesen Toolbar "später" wieder einfügen, sobald es freie Grafikelemente im Modell gibt
+    // Pick, Apply
+    // Color: Stroke, Fill, Text
+    // Stroke: Decoration, Width, Dashes, Type, Placement, Cap, Join
+    // Font: Font; Bold, Italic, Underline
+//    JToolBar toolBarAttributes = new JToolBar();
 //    ButtonFactory.addAttributesButtonsTo(toolBarAttributes, editor);
-//    toolBarAttributes.setName(labels.getString("toolBarAttributes.title"));
+//    toolBarAttributes.setName(labels.getString("toolBarManager.toolbar_attributes.title"));
 //    toolBarList.add(toolBarAttributes);
     // --- 3. ToolBar: Alignment (nur im Modelling Mode) ---
     // Align: West, East, Horizontal; North, South, Vertical
     // Move: West, East, North, South
     // Bring to front, Send to back
     ButtonFactory.addAlignmentButtonsTo(toolBarAlignment, editor);
-    toolBarAlignment.setName(labels.getString("toolBarAlignment.title"));
+    toolBarAlignment.setName(labels.getString("toolBarManager.toolbar_alignment.title"));
     toolBarList.add(toolBarAlignment);
   }
 
@@ -373,17 +366,8 @@ public class ToolBarManager
     // Drawing Actions
     drawingActions.add(new SelectSameAction(editor));
 
-    // Selection Actions
-    LinkedList<Action> selectionActions = new LinkedList<>();
-    // 2014-04-03 HH: Group/Ungroup disabled to avoid confusion with kernel groups
-//  selectionActions.add(new GroupAction(editor));
-//  selectionActions.add(new UngroupAction(editor));
-//  selectionActions.add(null); // separator
-
-    selectionActions.add(new BringToFrontAction(editor));
-    selectionActions.add(new SendToBackAction(editor));
-
-    selectionTool = selectionToolFactory.createMultipleSelectionTool(drawingActions, selectionActions);
+    MultipleSelectionTool selectionTool
+        = selectionToolFactory.createMultipleSelectionTool(drawingActions, new LinkedList<>());
 
     ButtonGroup buttonGroup;
 
@@ -410,12 +394,11 @@ public class ToolBarManager
       toolBar.putClientProperty("toolHandler", toolHandler);
     }
 
-
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/select-2.png");
-    toggleButton.setIcon( new ImageIcon(url) );
+    toggleButton.setIcon(ImageDirectory.getImageIcon("/toolbar/select-2.png"));
     toggleButton.setText(null);
-    toggleButton.setToolTipText( ResourceBundleUtil.getBundle().getString("openTCS.selectionTool.toolTipText") );
-    
+    toggleButton.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH)
+        .getString("toolBarManager.button_selectionTool.tooltipText"));
+
     toggleButton.setSelected(true);
     toggleButton.addItemListener(new ToolButtonListener(selectionTool, editor));
 //    toggleButton.setFocusable(false);
@@ -446,9 +429,10 @@ public class ToolBarManager
     }
 
     URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/cursor-opened-hand.png");
-    button.setIcon( new ImageIcon(url) );
+    button.setIcon(new ImageIcon(url));
     button.setText(null);
-    button.setToolTipText( ResourceBundleUtil.getBundle().getString("openTCS.dragTool.toolTipText") );
+    button.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH)
+        .getString("toolBarManager.button_dragTool.tooltipText"));
 
     button.setSelected(false);
     button.addItemListener(new ToolButtonListener(dragTool, editor));
@@ -473,7 +457,6 @@ public class ToolBarManager
   private JPopupButton pointToolButton(JToolBar toolBar,
                                        DrawingEditor editor,
                                        Tool tool) {
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     JPopupButton popupButton = new JPopupButton();
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
     popupButton.setAction(new DefaultPointSelectedAction(editor, tool, popupButton, group),
@@ -481,14 +464,15 @@ public class ToolBarManager
     ToolListener toolHandler = (ToolListener) toolBar.getClientProperty("toolHandler");
     tool.addToolListener(toolHandler);
 
-    for (PointModel.PointType type : PointModel.PointType.values()) {
+    for (PointModel.Type type : PointModel.Type.values()) {
       DefaultPointSelectedAction action
           = new DefaultPointSelectedAction(editor, tool, type, popupButton, group);
       popupButton.add(action);
       action.setEnabled(true);
     }
 
-    labels.configureNamelessButton(popupButton, "point.type." + PointModel.PointType.values()[0].name());
+    popupButton.setText(null);
+    popupButton.setToolTipText(PointModel.Type.values()[0].getHelptext());
     popupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/point-halt-arrow.22.png"));
     popupButton.setFocusable(true);
 
@@ -505,20 +489,20 @@ public class ToolBarManager
    * @param toolBar
    * @param editor
    * @param tool
-   * @param labelKey
+   * @param toolTipText
    * @param labels
    * @return
    */
   private JToggleButton addToolButton(JToolBar toolBar,
                                       DrawingEditor editor,
                                       Tool tool,
-                                      String labelKey,
-                                      ImageIcon iconBase,
-                                      ResourceBundleUtil labels) {
+                                      String toolTipText,
+                                      ImageIcon iconBase) {
     JToggleButton toggleButton = new JToggleButton();
 
     toggleButton.setIcon(iconBase);
-    labels.configureToolBarButton(toggleButton, labelKey);
+    toggleButton.setText(null);
+    toggleButton.setToolTipText(toolTipText);
     toggleButton.addItemListener(new ToolButtonListener(tool, editor));
 //    toggleButton.setFocusable(false);
 
@@ -552,15 +536,15 @@ public class ToolBarManager
     ToolListener toolHandler = (ToolListener) toolBar.getClientProperty("toolHandler");
     tool.addToolListener(toolHandler);
 
-    for (PathModel.LinerType type : PathModel.LinerType.values()) {
+    for (PathModel.Type type : PathModel.Type.values()) {
       DefaultPathSelectedAction action
           = new DefaultPathSelectedAction(editor, tool, type, popupButton, group);
       popupButton.add(action);
       action.setEnabled(true);
     }
 
-    ResourceBundleUtil.getBundle().configureNamelessButton(
-        popupButton, "path.type." + PathModel.LinerType.values()[0].name());
+    popupButton.setText(null);
+    popupButton.setToolTipText(PathModel.Type.values()[0].getHelptext());
     popupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/path-direct-arrow.22.png"));
     popupButton.setFocusable(true);
 

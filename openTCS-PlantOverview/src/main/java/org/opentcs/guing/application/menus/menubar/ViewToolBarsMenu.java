@@ -13,8 +13,8 @@ import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
-import org.jhotdraw.app.action.ActionUtil;
 import org.opentcs.guing.application.OperationMode;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -24,19 +24,21 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ViewToolBarsMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+  private static final ResourceBundleUtil labelsMenu = 
+    ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
+  private static final ResourceBundleUtil labelsToolbar = 
+    ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH);
 
   public ViewToolBarsMenu(Collection<Action> viewActions) {
-    super(labels.getString("view.toolBars.text"));
+    super(labelsMenu.getString("viewToolBarsMenu.text"));
     requireNonNull(viewActions, "viewActions");
 
     JCheckBoxMenuItem checkBoxMenuItem;
     for (Action a : viewActions) {
       checkBoxMenuItem = new JCheckBoxMenuItem(a);
-      ActionUtil.configureJCheckBoxMenuItem(checkBoxMenuItem, a);
       add(checkBoxMenuItem);
 
-      if (checkBoxMenuItem.getText().equals(labels.getString("toolBarCreation.title"))) {
+      if (checkBoxMenuItem.getText().equals(labelsToolbar.getString("toolBarManager.toolbar_drawing.title"))) {
         checkBoxMenuItem.setEnabled(false); // "Draw"-Toolbar musn't be disabled.
       }
     }

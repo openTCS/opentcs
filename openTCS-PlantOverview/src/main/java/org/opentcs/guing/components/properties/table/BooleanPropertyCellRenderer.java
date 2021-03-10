@@ -7,13 +7,13 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.table;
 
 import java.awt.Component;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
+import org.opentcs.guing.components.properties.type.MultipleDifferentValues;
 
 /**
  * Ein CellRenderer für Attribute vom Typ {
@@ -55,12 +55,12 @@ public class BooleanPropertyCellRenderer
     if (value instanceof BooleanProperty) {
       BooleanProperty property = (BooleanProperty) value;
 
-      if (property.getValue() instanceof Boolean) {
+      if (property.getValue() instanceof MultipleDifferentValues) {
+        setBackground(AbstractPropertyCellEditor.DIFFERENT_VALUE_COLOR);
+      }
+      else if (property.getValue() instanceof Boolean) {
         setToolTipText(property.getHelptext());
         setSelected((boolean) property.getValue());
-        if (property.isCollectionAndHasDifferentValues()) {
-          setBackground(AbstractPropertyCellEditor.DIFFERENT_VALUE_COLOR);
-        }
       }
       else {
         setEnabled(false);

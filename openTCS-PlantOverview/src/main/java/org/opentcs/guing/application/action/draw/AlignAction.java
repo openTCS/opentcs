@@ -17,15 +17,14 @@ package org.opentcs.guing.application.action.draw;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.net.URL;
 import java.util.Collection;
 import static javax.swing.Action.SMALL_ICON;
-import javax.swing.ImageIcon;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.TransformEdit;
 import org.jhotdraw.undo.CompositeEdit;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -39,7 +38,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public abstract class AlignAction
     extends AbstractSelectedAction {
 
-  protected ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+  protected ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH);
 
   /**
    * Creates a new instance.
@@ -64,7 +63,7 @@ public abstract class AlignAction
 
   @Override
   public void actionPerformed(java.awt.event.ActionEvent e) {
-    CompositeEdit edit = new CompositeEdit(labels.getString("edit.align.text"));
+    CompositeEdit edit = new CompositeEdit(bundle.getString("alignAction.undo.presentationName"));
     fireUndoableEditHappened(edit);
     alignFigures(getView().getSelectedFigures(), getSelectionBounds());
     fireUndoableEditHappened(edit);
@@ -96,9 +95,9 @@ public abstract class AlignAction
 
     public North(DrawingEditor editor) {
       super(editor);
-      labels.configureAction(this, "edit.alignNorth", false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/align-vertical-top-2.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, bundle.getString("alignAction.north.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/align-vertical-top-2.png"));
     }
 
     @Override
@@ -124,9 +123,9 @@ public abstract class AlignAction
 
     public East(DrawingEditor editor) {
       super(editor);
-      labels.configureAction(this, "edit.alignEast", false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/align-horizontal-right-2.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, bundle.getString("alignAction.east.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/align-horizontal-right-2.png"));
     }
 
     @Override
@@ -152,9 +151,9 @@ public abstract class AlignAction
 
     public West(DrawingEditor editor) {
       super(editor);
-      labels.configureAction(this, "edit.alignWest", false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/align-horizontal-left.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, bundle.getString("alignAction.west.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/align-horizontal-left.png"));
     }
 
     @Override
@@ -180,9 +179,9 @@ public abstract class AlignAction
 
     public South(DrawingEditor editor) {
       super(editor);
-      labels.configureAction(this, "edit.alignSouth", false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/align-vertical-bottom-2.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, bundle.getString("alignAction.south.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/align-vertical-bottom-2.png"));
     }
 
     @Override
@@ -208,9 +207,9 @@ public abstract class AlignAction
 
     public Vertical(DrawingEditor editor) {
       super(editor);
-      labels.configureAction(this, "edit.alignVertical", false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/align-vertical-center-2.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, bundle.getString("alignAction.vertical.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/align-vertical-center-2.png"));
     }
 
     @Override
@@ -236,9 +235,9 @@ public abstract class AlignAction
 
     public Horizontal(DrawingEditor editor) {
       super(editor);
-      labels.configureAction(this, "edit.alignHorizontal", false);
-      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/align-horizontal-center-2.png");
-      putValue(SMALL_ICON, new ImageIcon(url));
+
+      putValue(SHORT_DESCRIPTION, bundle.getString("alignAction.horizontal.shortDescription"));
+      putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/align-horizontal-center-2.png"));
     }
 
     @Override

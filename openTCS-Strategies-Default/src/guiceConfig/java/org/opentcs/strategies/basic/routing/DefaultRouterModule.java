@@ -14,7 +14,7 @@ import org.opentcs.strategies.basic.routing.jgrapht.DijkstraPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluator;
 import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorComposite;
 import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorDistance;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorExplicit;
+import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorExplicitProperties;
 import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorHops;
 import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorTravelTime;
 import org.opentcs.strategies.basic.routing.jgrapht.FloydWarshallPointRouterFactory;
@@ -82,22 +82,7 @@ public class DefaultRouterModule
         .toProvider(() -> {
           EdgeEvaluatorComposite result = new EdgeEvaluatorComposite();
           for (ShortestPathConfiguration.EvaluatorType type : spConfiguration.edgeEvaluators()) {
-            switch (type) {
-              case DISTANCE:
-                result.getComponents().add(new EdgeEvaluatorDistance());
-                break;
-              case TRAVELTIME:
-                result.getComponents().add(new EdgeEvaluatorTravelTime());
-                break;
-              case HOPS:
-                result.getComponents().add(new EdgeEvaluatorHops());
-                break;
-              case EXPLICIT:
-                result.getComponents().add(new EdgeEvaluatorExplicit());
-                break;
-              default:
-                throw new IllegalArgumentException("Unhandled evaluator type: " + type);
-            }
+            result.getComponents().add(toEdgeEvaluator(type));
           }
           // Make sure at least one evaluator is used.
           if (result.getComponents().isEmpty()) {
@@ -106,6 +91,24 @@ public class DefaultRouterModule
           }
           return result;
         });
+  }
+
+  @SuppressWarnings("deprecation")
+  private EdgeEvaluator toEdgeEvaluator(ShortestPathConfiguration.EvaluatorType type) {
+    switch (type) {
+      case DISTANCE:
+        return new EdgeEvaluatorDistance();
+      case TRAVELTIME:
+        return new EdgeEvaluatorTravelTime();
+      case HOPS:
+        return new EdgeEvaluatorHops();
+      case EXPLICIT:
+        return new org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorExplicit();
+      case EXPLICIT_PROPERTIES:
+        return new EdgeEvaluatorExplicitProperties();
+      default:
+        throw new IllegalArgumentException("Unhandled evaluator type: " + type);
+    }
   }
 
 }

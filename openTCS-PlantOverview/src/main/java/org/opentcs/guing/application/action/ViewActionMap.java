@@ -18,7 +18,6 @@ import org.opentcs.guing.application.action.actions.CreateLocationTypeAction;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
 import org.opentcs.guing.application.action.app.AboutAction;
-import org.opentcs.guing.application.action.course.DispatchVehicleAction;
 import org.opentcs.guing.application.action.edit.ClearSelectionAction;
 import org.opentcs.guing.application.action.edit.CopyAction;
 import org.opentcs.guing.application.action.edit.CutAction;
@@ -39,8 +38,8 @@ import org.opentcs.guing.application.action.synchronize.SwitchToModellingAction;
 import org.opentcs.guing.application.action.synchronize.SwitchToOperatingAction;
 import org.opentcs.guing.application.action.view.AddBitmapAction;
 import org.opentcs.guing.application.action.view.AddDrawingViewAction;
-import org.opentcs.guing.application.action.view.AddTransportOrderSequenceView;
-import org.opentcs.guing.application.action.view.AddTransportOrderView;
+import org.opentcs.guing.application.action.view.AddTransportOrderSequenceViewAction;
+import org.opentcs.guing.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
 import org.opentcs.guing.application.action.view.PauseAllVehiclesAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
@@ -60,7 +59,6 @@ public class ViewActionMap
    * @param undoRedoManager The undo redo manager
    * @param actionFactory The action factory
    * @param createTransportOrderAction The action to create transport orders
-   * @param dispatchAction The action to trigger a dispatcher run
    * @param findVehicleAction The action to find vehicles
    * @param pauseAllVehiclesAction The action to pause all vehicles
    * @param createGroupAction The action to create a group
@@ -75,7 +73,6 @@ public class ViewActionMap
                        UndoRedoManager undoRedoManager,
                        ActionFactory actionFactory,
                        CreateTransportOrderAction createTransportOrderAction,
-                       DispatchVehicleAction dispatchAction,
                        FindVehicleAction findVehicleAction,
                        PauseAllVehiclesAction pauseAllVehiclesAction,
                        CreateGroupAction createGroupAction,
@@ -88,7 +85,6 @@ public class ViewActionMap
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(createTransportOrderAction, "createTransportOrderAction");
-    requireNonNull(dispatchAction, "dispatchAction");
     requireNonNull(findVehicleAction, "findVehicleAction");
     requireNonNull(pauseAllVehiclesAction, "pauseAllVehiclesAction");
     requireNonNull(createGroupAction, "createGroupAction");
@@ -130,17 +126,16 @@ public class ViewActionMap
     put(CreateVehicleAction.ID, new CreateVehicleAction(view));
     put(CreateBlockAction.ID, new CreateBlockAction(view));
     put(CreateTransportOrderAction.ID, createTransportOrderAction);
-    put(DispatchVehicleAction.ID, dispatchAction);
 
     // --- Menu View ---
     // Menu View -> Add drawing view
     put(AddDrawingViewAction.ID, new AddDrawingViewAction(view));
 
     // Menu View -> Add transport order view
-    put(AddTransportOrderView.ID, new AddTransportOrderView(view));
+    put(AddTransportOrderViewAction.ID, new AddTransportOrderViewAction(view));
 
     // Menu View -> Add transport order sequence view
-    put(AddTransportOrderSequenceView.ID, new AddTransportOrderSequenceView(view));
+    put(AddTransportOrderSequenceViewAction.ID, new AddTransportOrderSequenceViewAction(view));
 
     put(AddBitmapAction.ID, new AddBitmapAction(view));
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));

@@ -9,13 +9,13 @@
 package org.opentcs.guing.application.action.actions;
 
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.model.elements.BlockModel;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -31,6 +31,8 @@ public class CreateBlockAction
    * This action class's ID.
    */
   public static final String ID = "openTCS.createBlock";
+  
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**
    * The GUI manager instance we're working with.
    */
@@ -43,12 +45,14 @@ public class CreateBlockAction
    */
   public CreateBlockAction(GuiManager guiManager) {
     this.guiManager = guiManager;
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-
-    URL urlSmall = getClass().getResource(ImageDirectory.DIR + "/toolbar/blockdevice-3.16.png");
-    URL urlLarge = getClass().getResource(ImageDirectory.DIR + "/toolbar/blockdevice-3.22.png");
-    putValue(SMALL_ICON, new ImageIcon(urlSmall));
-    putValue(LARGE_ICON_KEY, new ImageIcon(urlLarge));
+    
+    putValue(NAME, BUNDLE.getString("createBlockAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("createBlockAction.shortDescription"));
+    
+    ImageIcon iconSmall = ImageDirectory.getImageIcon("/toolbar/blockdevice-3.16.png");
+    ImageIcon iconLarge = ImageDirectory.getImageIcon("/toolbar/blockdevice-3.22.png");
+    putValue(SMALL_ICON, iconSmall);
+    putValue(LARGE_ICON_KEY, iconLarge);
   }
 
   @Override

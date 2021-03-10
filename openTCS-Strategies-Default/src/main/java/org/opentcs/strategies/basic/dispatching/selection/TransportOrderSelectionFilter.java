@@ -7,15 +7,17 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection;
 
-import java.util.function.Predicate;
+import java.util.Collection;
+import java.util.function.Function;
 import org.opentcs.data.order.TransportOrder;
 
 /**
- * A predicate for {@link TransportOrder}s.
- * Returns {@code true} if the given {@link TransportOrder} should be selected.
+ * A filter for {@link TransportOrder}s.
+ * Returns a collection of reasons for filtering the transport order.
+ * If the returned collection is empty, no reason to filter it was encountered.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface TransportOrderSelectionFilter
-    extends Predicate<TransportOrder> {
+    extends Function<TransportOrder, Collection<String>> {
 }

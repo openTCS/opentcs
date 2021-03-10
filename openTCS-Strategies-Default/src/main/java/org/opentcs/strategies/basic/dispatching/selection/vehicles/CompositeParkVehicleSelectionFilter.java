@@ -7,15 +7,17 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
+import java.util.Collection;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFilter;
 
 /**
  * A collection of {@link ParkVehicleSelectionFilter}s.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeParkVehicleSelectionFilter
@@ -25,18 +27,16 @@ public class CompositeParkVehicleSelectionFilter
    * The {@link ParkVehicleSelectionFilter}s.
    */
   private final Set<ParkVehicleSelectionFilter> filters;
-  
+
   @Inject
   public CompositeParkVehicleSelectionFilter(Set<ParkVehicleSelectionFilter> filters) {
     this.filters = requireNonNull(filters, "filters");
   }
 
   @Override
-  public boolean test(Vehicle vehicle) {
-    boolean result = true;
-    for (ParkVehicleSelectionFilter filter : filters) {
-      result &= filter.test(vehicle);
-    }
-    return result;
+  public Collection<String> apply(Vehicle vehicle) {
+    return filters.stream()
+        .flatMap(filter -> filter.apply(vehicle).stream())
+        .collect(Collectors.toList());
   }
 }

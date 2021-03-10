@@ -71,6 +71,7 @@ public class TransportOrder
    * A list of rejections for this transport order.
    */
   @Nonnull
+  @Deprecated
   private List<Rejection> rejections = new LinkedList<>();
   /**
    * The drive orders this transport order consists of.
@@ -779,8 +780,10 @@ public class TransportOrder
    * Returns a list of rejections for this transport order.
    *
    * @return A list of rejections for this transport order.
+   * @deprecated Rejections are replaced by object history entries.
    */
   @Nonnull
+  @Deprecated
   public List<Rejection> getRejections() {
     return Collections.unmodifiableList(rejections);
   }
@@ -803,7 +806,10 @@ public class TransportOrder
    *
    * @param rejection The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Rejections are replaced by object history entries.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of the object history.")
   public TransportOrder withRejection(@Nonnull Rejection rejection) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
@@ -1237,6 +1243,7 @@ public class TransportOrder
     );
   }
 
+  @Deprecated
   private List<Rejection> rejectionsWithAppended(@Nonnull Rejection rejection) {
     List<Rejection> result = new ArrayList<>(rejections.size() + 1);
     result.addAll(rejections);

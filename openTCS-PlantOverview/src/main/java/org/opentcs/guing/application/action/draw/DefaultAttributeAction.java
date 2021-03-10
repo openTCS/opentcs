@@ -1,15 +1,15 @@
 /**
  * (c): IML, JHotDraw.
- * 
+ *
  * Changed by IML to allow access to ResourceBundle.
  *
- * 
+ *
  * @(#)DefaultAttributeAction.java
  *
  * Copyright (c) 1996-2010 by the original authors of JHotDraw and all its
  * contributors. All rights reserved.
  *
- * You may not use, copy or modify this file, except in compliance with the 
+ * You may not use, copy or modify this file, except in compliance with the
  * license agreement you entered into with the copyright holders. For details
  * see accompanying license terms.
  */
@@ -28,11 +28,9 @@ import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.FigureSelectionEvent;
 import org.jhotdraw.undo.CompositeEdit;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * DefaultAttributeAction. <p> XXX - should listen to changes in the default
- * attributes of its DrawingEditor.
+ * DefaultAttributeAction.
  *
  * @author Werner Randelshofer
  */
@@ -44,7 +42,7 @@ public class DefaultAttributeAction
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param editor The drawing editor
    * @param key The attribute kez
    */
@@ -137,8 +135,7 @@ public class DefaultAttributeAction
   @Override
   public void actionPerformed(ActionEvent evt) {
     if (getView() != null && getView().getSelectionCount() > 0) {
-      ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-      CompositeEdit edit = new CompositeEdit(labels.getString("drawAttributeChange"));
+      CompositeEdit edit = new CompositeEdit("");
       fireUndoableEditHappened(edit);
       changeAttribute();
       fireUndoableEditHappened(edit);

@@ -44,7 +44,6 @@ import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -809,7 +808,7 @@ abstract class KernelState
   @Deprecated
   public void addTransportOrderRejection(
       TCSObjectReference<TransportOrder> orderRef,
-      Rejection newRejection)
+      org.opentcs.data.order.Rejection newRejection)
       throws ObjectUnknownException {
     throw new org.opentcs.access.UnsupportedKernelOpException(unsupportedMsg());
   }

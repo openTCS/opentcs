@@ -84,15 +84,34 @@ The default router finds the cheapest route from one position in the driving cou
 It takes into account paths that have been locked, but not positions and/or assumed future behaviour of other vehicles.
 As a result, it does not route around slower or stopped vehicles blocking the way.
 
-The cost function used for evaluating the edges of the graph can be configured -- see <<Default router configuration entries>>.
+==== Cost functions
+
+The cost function used for evaluating the paths in the driving course can be selected via configuration -- see <<Default router configuration entries>>.
+The following cost functions/configuration options are available:
+
+* `DISTANCE`:
+  Routing costs are equal to the paths' lengths.
+* `TRAVELTIME`:
+  Routing costs are computed as the expected time to travel on the paths, i.e. as path length divided by maximum allowed vehicle speed.
+* `EXPLICIT`:
+  Routing costs are read from the paths' _routing cost_ attributes.
+* `EXPLICIT_PROPERTIES`:
+  Routing costs for a vehicle on a path are taken from path properties with keys `tcs:routingCostForward<GROUP>` and `tcs:routingCostReverse<GROUP>`.
+  The `<GROUP>` to be used is the vehicle's routing group (see below).
+  As an example, if a vehicle's routing group is "Example", routing costs for this vehicle would be taken from path properties with keys `tcs:routingCostForwardExample` and `tcs:routingCostReverseExample`.
+  This way, different routing costs can be assigned to a path, e.g. for different types of vehicles. +
+  Note that, for this cost function to work properly, the values of the routing cost properties should be decimal integers.
+
 The default cost function for a path simply evaluates to the path's length, so the cheapest route by default is the shortest one.
+
+==== Routing groups
 
 It is possible to treat vehicles in a plant differently when computing their routes.
 This may be desirable if they have different characteristics and actually have different optimal routes through the driving course.
 For this to work, the paths in the model or the cost function used need to reflect this difference.
 This isn't done by default -- the default router computes routes for all vehicles the same way unless told otherwise.
-To let the router know that it should compute routes for a vehicle separately, set a property with the key `tcs:routingGroup` to an integer value other than zero.
-(Vehicles that have the same integer value set share the same routing table, and zero is the default value for all vehicles.)
+To let the router know that it should compute routes for a vehicle separately, set a property with the key `tcs:routingGroup` to an arbitrary string.
+(Vehicles that have the same value set share the same routing table, and the empty string is the default value for all vehicles.)
 
 === Default scheduler
 

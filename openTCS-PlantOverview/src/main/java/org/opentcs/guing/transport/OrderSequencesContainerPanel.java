@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -43,6 +42,8 @@ import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OrderSequenceEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.TRANSPORTORDER_PATH;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
@@ -163,15 +164,15 @@ public class OrderSequencesContainerPanel
 
   private void initComponents() {
     setLayout(new BorderLayout());
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TO_SEQUENCE_PATH);
 
     String[] columns = {"Name",
-                        bundle.getString("OrderSequencesContainerPanel.intendedVehicle"),
-                        bundle.getString("OrderSequencesContainerPanel.executingVehicle"),
+                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.headerText"),
+                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_executingVehicle.headerText"),
                         "Index",
-                        bundle.getString("OrderSequencesContainerPanel.complete"),
-                        bundle.getString("OrderSequencesContainerPanel.finished"),
-                        bundle.getString("OrderSequencesContainerPanel.failureFatal")};
+                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_complete.headerText"),
+                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_finished.headerText"),
+                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_failureFatal.headerText")};
     fTableModel = new FilterTableModel(new DefaultTableModel(columns, 0));
     fTableModel.setColumnIndexToFilter(5);  // Column "Finished"
     fTable = new OrdersTable(fTableModel);
@@ -208,8 +209,6 @@ public class OrderSequencesContainerPanel
       DialogContent content = transportViewFactory.createOrderSequenceView(os);
       StandardContentDialog dialog
           = new StandardContentDialog(dialogParent, content, true, StandardContentDialog.CLOSE);
-      dialog.setTitle(ResourceBundleUtil.getBundle()
-          .getString("OrderSequencesContainerPanel.orderSequence"));
       dialog.setVisible(true);
     }
     catch (KernelRuntimeException e) {
@@ -222,8 +221,8 @@ public class OrderSequencesContainerPanel
     fTable.setRowSelectionInterval(row, row);
 
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = menu.add(ResourceBundleUtil.getBundle()
-        .getString("TransportOrdersContainerPanel.popup.showDetails"));
+    JMenuItem item = menu.add(ResourceBundleUtil.getBundle(TRANSPORTORDER_PATH)
+        .getString("orderSequencesContainerPanel.table_sequences.popupMenuItem_showDetails.text"));
     item.addActionListener(new ActionListener() {
 
       @Override
@@ -253,12 +252,10 @@ public class OrderSequencesContainerPanel
     }
 
     fOrderSequences = new Vector<>();
-    Iterator<OrderSequence> i = orderSequences.iterator();
 
-    while (i.hasNext()) {
-      OrderSequence t = i.next();
-      fOrderSequences.addElement(t);
-      fTableModel.addRow(toTableRow(t));
+    for (OrderSequence sequence : orderSequences) {
+      fOrderSequences.addElement(sequence);
+      fTableModel.addRow(toTableRow(sequence));
     }
   }
 
@@ -333,8 +330,8 @@ public class OrderSequencesContainerPanel
                            fTableModel,
                            Boolean.FALSE);
     buttons.add(b1);
-    b1.setToolTipText(ResourceBundleUtil.getBundle()
-        .getString("OrderSequencesContainerPanel.filterOrderSequences"));
+    b1.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverview.TO_SEQUENCE_PATH)
+        .getString("orderSequencesContainerPanel.button_filterFinishedOrderSequences.tooltipText"));
 
     return buttons;
   }
@@ -368,8 +365,8 @@ public class OrderSequencesContainerPanel
       row.addElement(intendedVehicle.getName());
     }
     else {
-      row.addElement(ResourceBundleUtil.getBundle()
-          .getString("TransportOrdersContainerPanel.table.determineAutomatic"));
+      row.addElement(ResourceBundleUtil.getBundle(I18nPlantOverview.TRANSPORTORDER_PATH)
+          .getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.determinedAutomatic.text"));
     }
 
     // Spalte 3: Ausfï¿½hrendes Fahrzeug
@@ -379,8 +376,8 @@ public class OrderSequencesContainerPanel
       row.addElement(processingVehicle.getName());
     }
     else {
-      row.addElement(ResourceBundleUtil.getBundle()
-          .getString("TransportOrdersContainerPanel.table.determineAutomatic"));
+      row.addElement(ResourceBundleUtil.getBundle(I18nPlantOverview.TRANSPORTORDER_PATH)
+          .getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.determinedAutomatic.text"));
     }
 
     // Spalte 4: Index

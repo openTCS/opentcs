@@ -9,6 +9,7 @@ package org.opentcs.kernel;
 
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
@@ -35,7 +36,7 @@ final class KernelStateShutdown
    * @param modelPersister The model persister to be used.
    */
   @Inject
-  public KernelStateShutdown(@GlobalKernelSync Object globalSyncObject,
+  public KernelStateShutdown(@GlobalSyncObject Object globalSyncObject,
                              TCSObjectPool objectPool,
                              Model model,
                              NotificationBuffer messageBuffer,

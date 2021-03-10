@@ -10,19 +10,15 @@ package org.opentcs.guing.components.drawing;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -34,14 +30,11 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class DrawingViewPlacardPanel
     extends JPanel {
 
-  private static final String toggleGridActionID = "view.toggleGrid";
-  private static final String toggleRulersActionID = "view.toggleRulers";
-  private static final String toggleLabelsActionID = "view.toggleLabels";
-  private static final String toggleBlocksActionID = "view.toggleBlocks";
   /**
-   * The drawing view.
+   * This instance's resource bundle.
    */
-  private final OpenTCSDrawingView drawingView;
+  private final ResourceBundleUtil labels
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.MODELVIEW_PATH);
   /**
    * A combo box for selecting the zoom level.
    */
@@ -57,7 +50,7 @@ public class DrawingViewPlacardPanel
    * @param drawingView The drawing view.
    */
   public DrawingViewPlacardPanel(OpenTCSDrawingView drawingView) {
-    this.drawingView = requireNonNull(drawingView, "drawingView");
+    requireNonNull(drawingView, "drawingView");
 
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -116,68 +109,62 @@ public class DrawingViewPlacardPanel
       }
     }
 
-    comboBox.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        final double scaleFactor;
+    comboBox.addActionListener((ActionEvent e) -> {
+      final double scaleFactor;
 
-        if (comboBox.getSelectedItem() instanceof ZoomItem) {
-          // A zoom step of the array scaleFactors[]
-          ZoomItem item = (ZoomItem) comboBox.getSelectedItem();
-          scaleFactor = item.getScaleFactor();
-        }
-        else {
-          try {
-            // Text input in the combo box
-            String text = (String) comboBox.getSelectedItem();
-            double factor = Double.parseDouble(text.split(" ")[0]);
-            scaleFactor = factor * 0.01;  // Eingabe in %
-            comboBox.setSelectedItem((int) (factor + 0.5) + " %");
-          }
-          catch (NumberFormatException ex) {
-            comboBox.setSelectedIndex(0);
-            return;
-          }
-        }
-
-        drawingView.setScaleFactor(scaleFactor);
+      if (comboBox.getSelectedItem() instanceof ZoomItem) {
+        // A zoom step of the array scaleFactors[]
+        ZoomItem item = (ZoomItem) comboBox.getSelectedItem();
+        scaleFactor = item.getScaleFactor();
       }
+      else {
+        try {
+          // Text input in the combo box
+          String text = (String) comboBox.getSelectedItem();
+          double factor = Double.parseDouble(text.split(" ")[0]);
+          scaleFactor = factor * 0.01;  // Eingabe in %
+          comboBox.setSelectedItem((int) (factor + 0.5) + " %");
+        }
+        catch (NumberFormatException ex) {
+          comboBox.setSelectedIndex(0);
+          return;
+        }
+      }
+
+      drawingView.setScaleFactor(scaleFactor);
     });
 
-    drawingView.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        // String constants are interned
-        if ("scaleFactor".equals(evt.getPropertyName())) {
-          double scaleFactor = (double) evt.getNewValue();
+    drawingView.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+      // String constants are interned
+      if ("scaleFactor".equals(evt.getPropertyName())) {
+        double scaleFactor = (double) evt.getNewValue();
 
-          for (int i = 0; i < comboBox.getItemCount(); i++) {
-            // One of the predefined scale factors was selected
-            if (scaleFactor == comboBox.getItemAt(i).getScaleFactor()) {
-              comboBox.setSelectedIndex(i);
-              break;
-            }
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+          // One of the predefined scale factors was selected
+          if (scaleFactor == comboBox.getItemAt(i).getScaleFactor()) {
+            comboBox.setSelectedIndex(i);
+            break;
+          }
 
-            if (i + 1 < comboBox.getItemCount()
-                && scaleFactor < comboBox.getItemAt(i).getScaleFactor()
-                && scaleFactor > comboBox.getItemAt(i + 1).getScaleFactor()) {
-              // Insert the new scale factor between the next smaller / larger entries
-              ZoomItem newItem = new ZoomItem(scaleFactor);
-              comboBox.insertItemAt(newItem, i + 1);
-              comboBox.setSelectedItem(newItem);
-            }
-            else if (scaleFactor > comboBox.getItemAt(0).getScaleFactor()) {
-              // Insert new item for scale factor larger than the largest predefined factor
-              ZoomItem newItem = new ZoomItem(scaleFactor);
-              comboBox.insertItemAt(newItem, 0);
-              comboBox.setSelectedItem(newItem);
-            }
-            else if (scaleFactor < comboBox.getItemAt(comboBox.getItemCount() - 1).getScaleFactor()) {
-              // Insert new item for scale factor larger than the largest predefined factor
-              ZoomItem newItem = new ZoomItem(scaleFactor);
-              comboBox.insertItemAt(newItem, comboBox.getItemCount());
-              comboBox.setSelectedItem(newItem);
-            }
+          if (i + 1 < comboBox.getItemCount()
+              && scaleFactor < comboBox.getItemAt(i).getScaleFactor()
+              && scaleFactor > comboBox.getItemAt(i + 1).getScaleFactor()) {
+            // Insert the new scale factor between the next smaller / larger entries
+            ZoomItem newItem = new ZoomItem(scaleFactor);
+            comboBox.insertItemAt(newItem, i + 1);
+            comboBox.setSelectedItem(newItem);
+          }
+          else if (scaleFactor > comboBox.getItemAt(0).getScaleFactor()) {
+            // Insert new item for scale factor larger than the largest predefined factor
+            ZoomItem newItem = new ZoomItem(scaleFactor);
+            comboBox.insertItemAt(newItem, 0);
+            comboBox.setSelectedItem(newItem);
+          }
+          else if (scaleFactor < comboBox.getItemAt(comboBox.getItemCount() - 1).getScaleFactor()) {
+            // Insert new item for scale factor larger than the largest predefined factor
+            ZoomItem newItem = new ZoomItem(scaleFactor);
+            comboBox.insertItemAt(newItem, comboBox.getItemCount());
+            comboBox.setSelectedItem(newItem);
           }
         }
       }
@@ -194,22 +181,17 @@ public class DrawingViewPlacardPanel
    */
   private JButton zoomViewToWindowButton(final OpenTCSDrawingView drawingView) {
     final JButton button = new JButton();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
-    button.setToolTipText(labels.getString("view.zoomViewToWindow.toolTipText"));
+    button.setToolTipText(
+        labels.getString("drawingViewPlacardPanel.button_zoomViewToWindow.tooltipText")
+    );
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/zoom-fit-best-4.png");
-    button.setIcon(new ImageIcon(url));
+    button.setIcon(ImageDirectory.getImageIcon("/menu/zoom-fit-best-4.png"));
 
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setFocusable(false);
 
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        drawingView.zoomViewToWindow();
-      }
-    });
+    button.addActionListener((ActionEvent e) -> drawingView.zoomViewToWindow());
 
     return button;
   }
@@ -222,21 +204,19 @@ public class DrawingViewPlacardPanel
    */
   private JToggleButton toggleConstrainerButton(final OpenTCSDrawingView drawingView) {
     final JToggleButton toggleButton = new JToggleButton();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    
-    toggleButton.setToolTipText(labels.getString("view.toggleGrid.toolTipText"));
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/view-split.png");
-    toggleButton.setIcon(new ImageIcon(url));
-    
+
+    toggleButton.setToolTipText(
+        labels.getString("drawingViewPlacardPanel.button_toggleGrid.tooltipText")
+    );
+
+    toggleButton.setIcon(ImageDirectory.getImageIcon("/menu/view-split.png"));
+
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
-    toggleButton.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent event) {
-        drawingView.setConstrainerVisible(toggleButton.isSelected());
-      }
-    });
+    toggleButton.addItemListener(
+        (ItemEvent event) -> drawingView.setConstrainerVisible(toggleButton.isSelected())
+    );
 
     return toggleButton;
   }
@@ -248,12 +228,13 @@ public class DrawingViewPlacardPanel
    */
   private JToggleButton toggleRulersButton() {
     final JToggleButton toggleButton = new JToggleButton();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    
-    toggleButton.setToolTipText(labels.getString("view.toggleRulers.toolTipText"));
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/document-page-setup.16x16.png");
-    toggleButton.setIcon(new ImageIcon(url));
-    
+
+    toggleButton.setToolTipText(
+        labels.getString("drawingViewPlacardPanel.button_toggleRulers.tooltipText")
+    );
+
+    toggleButton.setIcon(ImageDirectory.getImageIcon("/toolbar/document-page-setup.16x16.png"));
+
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
@@ -268,21 +249,19 @@ public class DrawingViewPlacardPanel
    */
   private JToggleButton toggleLabelsButton(final OpenTCSDrawingView drawingView) {
     final JToggleButton toggleButton = new JToggleButton();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
-    toggleButton.setToolTipText(labels.getString("view.toggleLabels.toolTipText"));
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/comment-add.16.png");
-    toggleButton.setIcon(new ImageIcon(url));
+    toggleButton.setToolTipText(
+        labels.getString("drawingViewPlacardPanel.button_toggleLabels.tooltipText")
+    );
+
+    toggleButton.setIcon(ImageDirectory.getImageIcon("/menu/comment-add.16.png"));
 
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
-    toggleButton.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent event) {
-        drawingView.setLabelsVisible(toggleButton.isSelected());
-      }
-    });
+    toggleButton.addItemListener(
+        (ItemEvent event) -> drawingView.setLabelsVisible(toggleButton.isSelected())
+    );
 
     return toggleButton;
   }
@@ -295,21 +274,19 @@ public class DrawingViewPlacardPanel
    */
   private JToggleButton toggleBlocksButton(final OpenTCSDrawingView drawingView) {
     final JToggleButton toggleButton = new JToggleButton();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    
-    toggleButton.setToolTipText(labels.getString("view.toggleBlocks.toolTipText"));
-    URL url = getClass().getResource(ImageDirectory.DIR + "/tree/block.18x18.png");
-    toggleButton.setIcon(new ImageIcon(url));
-    
+
+    toggleButton.setToolTipText(
+        labels.getString("drawingViewPlacardPanel.button_toggleBlocks.tooltipText")
+    );
+
+    toggleButton.setIcon(ImageDirectory.getImageIcon("/tree/block.18x18.png"));
+
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
-    toggleButton.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent event) {
-        drawingView.setBlocksVisible(toggleButton.isSelected());
-      }
-    });
+    toggleButton.addItemListener(
+        (ItemEvent event) -> drawingView.setBlocksVisible(toggleButton.isSelected())
+    );
 
     return toggleButton;
   }

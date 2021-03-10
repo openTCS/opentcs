@@ -44,7 +44,6 @@ import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.Colors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,8 +90,6 @@ public class VehicleAdapter
                            PercentProperty.Unit.PERCENT);
       model.getPropertyEnergyLevel().setValueAndUnit(vehicle.getEnergyLevel(),
                                                      PercentProperty.Unit.PERCENT);
-
-      updateModelEnergyState(model, vehicle);
 
       model.getPropertyLoaded().setValue(vehicle.getLoadHandlingDevices().stream().anyMatch(lhe -> lhe.isFull()));
       model.getPropertyState().setValue(vehicle.getState());
@@ -213,24 +210,6 @@ public class VehicleAdapter
     else {
       vehicleModel.placeOnPoint(null);
       vehicleModel.getPropertyPoint().setText("null");
-    }
-  }
-
-  private void updateModelEnergyState(VehicleModel vehicleModel, Vehicle vehicle) {
-    if (vehicle.isEnergyLevelCritical()) {
-      vehicleModel.getPropertyEnergyState().setValue(VehicleModel.EnergyState.CRITICAL);
-      vehicleModel.getPropertyEnergyState().setHelptext(
-          ResourceBundleUtil.getBundle().getString("vehicle.energyLevelCritical.helptext"));
-    }
-    else if (vehicle.isEnergyLevelDegraded()) {
-      vehicleModel.getPropertyEnergyState().setValue(VehicleModel.EnergyState.DEGRADED);
-      vehicleModel.getPropertyEnergyState().setHelptext(
-          ResourceBundleUtil.getBundle().getString("vehicle.energyLevelDegraded.helptext"));
-    }
-    else if (vehicle.isEnergyLevelGood()) {
-      vehicleModel.getPropertyEnergyState().setValue(VehicleModel.EnergyState.GOOD);
-      vehicleModel.getPropertyEnergyState().setHelptext(
-          ResourceBundleUtil.getBundle().getString("vehicle.energyLevelGood.helptext"));
     }
   }
 

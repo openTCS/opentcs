@@ -18,6 +18,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -30,6 +31,7 @@ public class LoadModelFromKernelAction
 
   public static final String ID = "synchronize.loadModelFromKernel";
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * The OpenTCS view.
    */
@@ -50,8 +52,9 @@ public class LoadModelFromKernelAction
                                    OpenTCSDrawingEditor openTCSDrawingEditor) {
     this.openTCSView = requireNonNull(openTCSView);
     this.openTCSDrawingEditor = requireNonNull(openTCSDrawingEditor);
-    ResourceBundleUtil.getBundle().configureAction(this, ID, false);
-    
+
+    putValue(NAME, BUNDLE.getString("loadModelFromKernelAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("loadModelFromKernelAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt K"));
     putValue(MNEMONIC_KEY, Integer.valueOf('K'));
   }

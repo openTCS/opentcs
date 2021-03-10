@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.AbstractQuantity;
 import org.opentcs.guing.components.properties.type.Property;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,8 @@ public class QuantityEditorPanel
 
   @Override
   public String getTitle() {
-    return ResourceBundleUtil.getBundle().getString("QuantityEditorPanel.title");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH)
+        .getString("quantityEditorPanel.title");
   }
 
   /**

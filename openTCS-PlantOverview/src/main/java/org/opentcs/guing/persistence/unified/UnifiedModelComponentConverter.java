@@ -59,7 +59,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import static org.opentcs.guing.model.elements.PointModel.PointType.HALT;
+import static org.opentcs.guing.model.elements.PointModel.Type.HALT;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.util.Colors;
 import org.opentcs.util.persistence.v002.PropertyTO;
@@ -111,7 +111,7 @@ public class UnifiedModelComponentConverter {
                      0);
 
     Point.Type type;
-    switch ((PointModel.PointType) pointModel.getPropertyType().getValue()) {
+    switch ((PointModel.Type) pointModel.getPropertyType().getValue()) {
       case HALT:
         type = HALT_POSITION;
         break;
@@ -144,6 +144,7 @@ public class UnifiedModelComponentConverter {
     return result;
   }
 
+  @SuppressWarnings("deprecation")
   private PathCreationTO convertPath(PathModel pathModel) {
     return new PathCreationTO(pathModel.getPropertyName().getText(),
                               pathModel.getPropertyStartComponent().getText(),
@@ -265,7 +266,7 @@ public class UnifiedModelComponentConverter {
 
   private BlockCreationTO convertBlock(BlockModel blockModel) {
     Block.Type type;
-    switch ((BlockModel.BlockType) blockModel.getPropertyType().getValue()) {
+    switch ((BlockModel.Type) blockModel.getPropertyType().getValue()) {
       case SAME_DIRECTION_ONLY:
         type = Block.Type.SAME_DIRECTION_ONLY;
         break;
@@ -370,13 +371,13 @@ public class UnifiedModelComponentConverter {
     List<ModelLayoutElementCreationTO> result = new ArrayList<>();
 
     for (PathModel path : paths) {
-      PathModel.LinerType pathType = (PathModel.LinerType) path.getPropertyPathConnType().getValue();
+      PathModel.Type pathType = (PathModel.Type) path.getPropertyPathConnType().getValue();
 
       Map<String, String> properties = new HashMap<>();
       properties.put(ElementPropKeys.PATH_CONN_TYPE, pathType.name());
 
-      if (Objects.equals(pathType, PathModel.LinerType.BEZIER)
-          || Objects.equals(pathType, PathModel.LinerType.BEZIER_3)) {
+      if (Objects.equals(pathType, PathModel.Type.BEZIER)
+          || Objects.equals(pathType, PathModel.Type.BEZIER_3)) {
         properties.put(ElementPropKeys.PATH_CONTROL_POINTS, path.getPropertyPathControlPoints().getText());
       }
 
@@ -446,13 +447,13 @@ public class UnifiedModelComponentConverter {
 
     switch (pointTO.getType()) {
       case HALT_POSITION:
-        model.getPropertyType().setValue(PointModel.PointType.HALT);
+        model.getPropertyType().setValue(PointModel.Type.HALT);
         break;
       case PARK_POSITION:
-        model.getPropertyType().setValue(PointModel.PointType.PARK);
+        model.getPropertyType().setValue(PointModel.Type.PARK);
         break;
       case REPORT_POSITION:
-        model.getPropertyType().setValue(PointModel.PointType.REPORT);
+        model.getPropertyType().setValue(PointModel.Type.REPORT);
         break;
       default:
         throw new IllegalArgumentException("Unknown point type.");
@@ -505,6 +506,7 @@ public class UnifiedModelComponentConverter {
     return model;
   }
 
+  @SuppressWarnings("deprecation")
   public PathModel convertPathTO(PathCreationTO pathTO, VisualLayoutCreationTO visualLayoutTO) {
     PathModel model = new PathModel();
 
@@ -531,7 +533,7 @@ public class UnifiedModelComponentConverter {
                                                               pathTO.getName(),
                                                               ElementPropKeys.PATH_CONN_TYPE);
       if (!Strings.isNullOrEmpty(propertyValue)) {
-        model.getPropertyPathConnType().setValue(PathModel.LinerType.valueOf(propertyValue));
+        model.getPropertyPathConnType().setValue(PathModel.Type.valueOf(propertyValue));
       }
 
       propertyValue = getPropertyValueFromVisualLayout(visualLayoutTO,
@@ -732,17 +734,17 @@ public class UnifiedModelComponentConverter {
     return model;
   }
 
-  private BlockModel.BlockType convertBlockType(BlockCreationTO blockTO) {
+  private BlockModel.Type convertBlockType(BlockCreationTO blockTO) {
     switch (blockTO.getType()) {
       case SAME_DIRECTION_ONLY:
-        return BlockModel.BlockType.SAME_DIRECTION_ONLY;
+        return BlockModel.Type.SAME_DIRECTION_ONLY;
       case SINGLE_VEHICLE_ONLY:
-        return BlockModel.BlockType.SINGLE_VEHICLE_ONLY;
+        return BlockModel.Type.SINGLE_VEHICLE_ONLY;
       default:
         LOG.warn("Unhandled block type '{}'. Falling back to '{}'",
                  blockTO.getType(),
-                 BlockModel.BlockType.SINGLE_VEHICLE_ONLY);
-        return BlockModel.BlockType.SINGLE_VEHICLE_ONLY;
+                 BlockModel.Type.SINGLE_VEHICLE_ONLY);
+        return BlockModel.Type.SINGLE_VEHICLE_ONLY;
     }
   }
 

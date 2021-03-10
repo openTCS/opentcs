@@ -15,7 +15,6 @@
  */
 package org.opentcs.guing.application.action.draw;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,6 +32,8 @@ import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.FigureSelectionEvent;
 import org.jhotdraw.undo.CompositeEdit;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -44,6 +45,8 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ApplyAttributesAction
     extends AbstractSelectedAction {
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
+
   private Set<AttributeKey<?>> excludedAttributes = new HashSet<>(
       Arrays.asList(new AttributeKey<?>[] {TRANSFORM, TEXT}));
 
@@ -54,12 +57,13 @@ public class ApplyAttributesAction
    */
   public ApplyAttributesAction(DrawingEditor editor) {
     super(editor);
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureAction(this, "edit.applyAttributes");
-    
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/view-media-visualization.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+
+    putValue(NAME, BUNDLE.getString("applyAttributesAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("applyAttributesAction.shortDescription"));
+
+    ImageIcon icon = ImageDirectory.getImageIcon("/toolbar/view-media-visualization.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
     updateEnabledState();
   }
 
@@ -81,8 +85,8 @@ public class ApplyAttributesAction
   public void applyAttributes() {
     DrawingEditor editor = getEditor();
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    CompositeEdit edit = new CompositeEdit(labels.getString("edit.applyAttributes.text"));
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH);
+    CompositeEdit edit = new CompositeEdit(labels.getString("applyAttributesAction.undo.presentationName"));
     DrawingView view = getView();
     view.getDrawing().fireUndoableEditHappened(edit);
 

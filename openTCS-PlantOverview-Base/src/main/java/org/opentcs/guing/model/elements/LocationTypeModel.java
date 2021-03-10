@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import org.opentcs.data.ObjectPropConstants;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.LocationTypeActionsProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
@@ -42,7 +43,7 @@ public class LocationTypeModel
 
   @Override
   public String getDescription() {
-    return bundle.getString("locationType.description");
+    return bundle.getString("locationTypeModel.description");
   }
 
   @Override
@@ -66,23 +67,23 @@ public class LocationTypeModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("locationType.name.text"));
-    pName.setHelptext(bundle.getString("locationType.name.helptext"));
+    pName.setDescription(bundle.getString("locationTypeModel.property_name.description"));
+    pName.setHelptext(bundle.getString("locationTypeModel.property_name.helptext"));
     setProperty(NAME, pName);
 
-    StringSetProperty pOperations = new StringSetProperty(this);
-    pOperations.setDescription(bundle.getString("locationType.allowedOperations.text"));
-    pOperations.setHelptext(bundle.getString("locationType.allowedOperations.helptext"));
+    StringSetProperty pOperations = new LocationTypeActionsProperty(this);
+    pOperations.setDescription(bundle.getString("locationTypeModel.property_allowedOperations.description"));
+    pOperations.setHelptext(bundle.getString("locationTypeModel.property_allowedOperations.helptext"));
     setProperty(ALLOWED_OPERATIONS, pOperations);
 
     SymbolProperty pSymbol = new SymbolProperty(this);
-    pSymbol.setDescription(bundle.getString("locationType.symbol.text"));
-    pSymbol.setHelptext(bundle.getString("locationType.symbol.helptext"));
+    pSymbol.setDescription(bundle.getString("locationTypeModel.property_symbol.description"));
+    pSymbol.setHelptext(bundle.getString("locationTypeModel.property_symbol.helptext"));
     setProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, pSymbol);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("locationType.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("locationType.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("locationTypeModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("locationTypeModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 }

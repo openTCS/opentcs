@@ -9,6 +9,8 @@ package org.opentcs.common;
 
 /**
  * Defines the modes in which an application may be in.
+ *
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public enum ClientConnectionMode {
   /**

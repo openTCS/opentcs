@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
 import static org.opentcs.components.kernel.Scheduler.PROPKEY_BLOCK_ENTRY_DIRECTION;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.TCSResource;
@@ -56,15 +57,21 @@ public class SameDirectionBlockModule
    */
   private final Map<Block, BlockPermission> permissions = new HashMap<>();
   /**
+   * A global object to be used for synchronization within the kernel.
+   */
+  private final Object globalSyncObject;
+  /**
    * Whether this module is initialized.
    */
   private boolean initialized;
 
   @Inject
   public SameDirectionBlockModule(@Nonnull ReservationPool reservationPool,
-                                  @Nonnull InternalPlantModelService plantModelService) {
+                                  @Nonnull InternalPlantModelService plantModelService,
+                                  @GlobalSyncObject Object globalSyncObject) {
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
+    this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
   }
 
   @Override
@@ -118,7 +125,7 @@ public class SameDirectionBlockModule
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       Set<Block> blocks = filterBlocksContainingResources(resources,
                                                           Block.Type.SAME_DIRECTION_ONLY);
       if (blocks.isEmpty()) {
@@ -165,7 +172,7 @@ public class SameDirectionBlockModule
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    synchronized (reservationPool) {
+    synchronized (globalSyncObject) {
       for (Map.Entry<Block, BlockPermission> entry : permissions.entrySet()) {
         Block block = entry.getKey();
         BlockPermission permission = entry.getValue();

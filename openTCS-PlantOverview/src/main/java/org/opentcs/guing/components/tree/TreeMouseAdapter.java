@@ -26,6 +26,7 @@ import javax.swing.tree.TreePath;
 import org.opentcs.guing.components.tree.elements.AbstractUserObject;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -119,10 +120,10 @@ public class TreeMouseAdapter
   private void showPopupMenu(int x, int y) {
     JPopupMenu menu = new JPopupMenu();
     final JTree objectTree = treeView.getTree();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
-    JMenuItem item = new JMenuItem();
-    labels.configureMenu(item, "tree.expandAll");
+    JMenuItem item = new JMenuItem(labels.getString("treeMouseAdapter.popupMenuItem_expandAllFolders.text"));
+    item.setToolTipText(labels.getString("treeMouseAdapter.popupMenuItem_expandAllFolders.tooltipText"));
 
     item.addActionListener(new ActionListener() {
       @Override
@@ -135,8 +136,8 @@ public class TreeMouseAdapter
 
     menu.add(item);
 
-    item = new JMenuItem();
-    labels.configureMenu(item, "tree.closeAll");
+    item = new JMenuItem(labels.getString("treeMouseAdapter.popupMenuItem_closeAllFolders.text"));
+    item.setToolTipText(labels.getString("treeMouseAdapter.popupMenuItem_closeAllFolders.tooltipText"));
 
     item.addActionListener(new ActionListener() {
       @Override
@@ -151,8 +152,8 @@ public class TreeMouseAdapter
 
     menu.addSeparator();
 
-    item = new JMenuItem();
-    labels.configureMenu(item, "tree.sortAll");
+    item = new JMenuItem(labels.getString("treeMouseAdapter.popupMenuItem_sortAllItems.text"));
+    item.setToolTipText(labels.getString("treeMouseAdapter.popupMenuItem_sortAllItems.tooltipText"));
 
     item.addActionListener(new ActionListener() {
       @Override

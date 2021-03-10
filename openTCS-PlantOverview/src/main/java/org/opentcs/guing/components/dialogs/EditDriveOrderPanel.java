@@ -21,6 +21,7 @@ import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -52,7 +53,8 @@ public class EditDriveOrderPanel
   public EditDriveOrderPanel(List<LocationModel> locations) {
     initComponents();
     fLocations = sortLocations(locations);
-    setDialogTitle(ResourceBundleUtil.getBundle().getString("EditDriverOrderPanel.create"));
+    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverview.CREATETO_PATH)
+        .getString("editDriverOrderPanel.create.title"));
   }
 
   /**
@@ -65,14 +67,14 @@ public class EditDriveOrderPanel
   public EditDriveOrderPanel(List<LocationModel> locations,
                              AbstractConnectableModelComponent location, String action) {
     checkArgument(location instanceof PointModel || location instanceof LocationModel,
-                  ResourceBundleUtil.getBundle()
-                      .getFormatted("EditDriveOrderPanel.wrongLocationMessage",
-                                    location.getClass().getName()));
+                  String.format("Selected location has to be of type PointModel or LocationModel "
+                      + "and not \"%s\".", location.getClass().getName()));
     initComponents();
     fLocations = sortLocations(locations);
     fSelectedLocation = location;
     fSelectedAction = action;
-    setDialogTitle(ResourceBundleUtil.getBundle().getString("EditDriverOrderPanel.edit"));
+    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverview.CREATETO_PATH)
+        .getString("editDriverOrderPanel.edit.title"));
   }
 
   /**
@@ -150,9 +152,9 @@ public class EditDriveOrderPanel
     java.awt.GridBagConstraints gridBagConstraints;
 
     stationLabel = new javax.swing.JLabel();
-    locationComboBox = new javax.swing.JComboBox<String>();
+    locationComboBox = new javax.swing.JComboBox<>();
     actionLabel = new javax.swing.JLabel();
-    actionComboBox = new javax.swing.JComboBox<String>();
+    actionComboBox = new javax.swing.JComboBox<>();
 
     java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
     layout.columnWidths = new int[] {0, 5, 0};
@@ -160,8 +162,8 @@ public class EditDriveOrderPanel
     setLayout(layout);
 
     stationLabel.setFont(stationLabel.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    stationLabel.setText(bundle.getString("EditDriverOrderPanel.location")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/dialogs/createTransportOrder"); // NOI18N
+    stationLabel.setText(bundle.getString("editDriverOrderPanel.label_location.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -184,7 +186,7 @@ public class EditDriveOrderPanel
     add(locationComboBox, gridBagConstraints);
 
     actionLabel.setFont(actionLabel.getFont());
-    actionLabel.setText(bundle.getString("EditDriverOrderPanel.action")); // NOI18N
+    actionLabel.setText(bundle.getString("editDriverOrderPanel.label_action.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -210,23 +212,23 @@ public class EditDriveOrderPanel
    *
    * @param evt das auslösende Ereignis
    */
-    private void locationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboBoxActionPerformed
-      DefaultComboBoxModel<String> model
-          = (DefaultComboBoxModel<String>) actionComboBox.getModel();
-      model.removeAllElements();
+  private void locationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboBoxActionPerformed
+    DefaultComboBoxModel<String> model
+        = (DefaultComboBoxModel<String>) actionComboBox.getModel();
+    model.removeAllElements();
 
-      getSelectedLocation().ifPresent(location -> {
-        LocationTypeModel type = location.getLocationType();
-        StringSetProperty p = type.getPropertyAllowedOperations();
-        for (String item : new ArrayList<>(type.getPropertyAllowedOperations().getItems())) {
-          model.addElement(item);
-        }
+    getSelectedLocation().ifPresent(location -> {
+      LocationTypeModel type = location.getLocationType();
+      StringSetProperty p = type.getPropertyAllowedOperations();
+      for (String item : new ArrayList<>(type.getPropertyAllowedOperations().getItems())) {
+        model.addElement(item);
+      }
 
-        if (model.getSize() > 0) {
-          actionComboBox.setSelectedIndex(0);
-        }
-      });
-    }//GEN-LAST:event_locationComboBoxActionPerformed
+      if (model.getSize() > 0) {
+        actionComboBox.setSelectedIndex(0);
+      }
+    });
+  }//GEN-LAST:event_locationComboBoxActionPerformed
 
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -73,7 +73,7 @@ public class LinkModel
 
   @Override // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("link.description");
+    return bundle.getString("linkModel.description");
   }
 
   public StringSetProperty getPropertyAllowedOperations() {
@@ -82,25 +82,25 @@ public class LinkModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("link.name.text"));
-    pName.setHelptext(bundle.getString("link.name.helptext"));
+    pName.setDescription(bundle.getString("linkModel.property_name.description"));
+    pName.setHelptext(bundle.getString("linkModel.property_name.helptext"));
     // The name of a link cannot be changed because it is not stored in the kernel model
     pName.setModellingEditable(false);
     setProperty(NAME, pName);
 
     StringSetProperty pOperations = new LinkActionsProperty(this);
-    pOperations.setDescription(bundle.getString("link.action.text"));
-    pOperations.setHelptext(bundle.getString("link.action.helptext"));
+    pOperations.setDescription(bundle.getString("linkModel.property_operations.description"));
+    pOperations.setHelptext(bundle.getString("linkModel.property_operations.helptext"));
     setProperty(ALLOWED_OPERATIONS, pOperations);
 
     StringProperty startComponent = new StringProperty(this);
-    startComponent.setDescription(bundle.getString("element.startComponent.text"));
+    startComponent.setDescription(bundle.getString("linkModel.property_startComponent.description"));
     startComponent.setModellingEditable(false);
     startComponent.setOperatingEditable(false);
     setProperty(START_COMPONENT, startComponent);
 
     StringProperty endComponent = new StringProperty(this);
-    endComponent.setDescription(bundle.getString("element.endComponent.text"));
+    endComponent.setDescription(bundle.getString("linkModel.property_endComponent.description"));
     endComponent.setModellingEditable(false);
     endComponent.setOperatingEditable(false);
     setProperty(END_COMPONENT, endComponent);

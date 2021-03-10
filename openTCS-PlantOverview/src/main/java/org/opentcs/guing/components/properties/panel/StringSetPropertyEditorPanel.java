@@ -7,36 +7,28 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties.panel;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
-import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
-import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * User interface to edit a string set.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
-public class StringSetPropertyEditorPanel
+public abstract class StringSetPropertyEditorPanel
     extends JPanel
     implements DetailsDialogContent {
 
-  /**
-   * The bundle to be used.
-   */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
   /**
    * The property to edit.
    */
@@ -54,7 +46,7 @@ public class StringSetPropertyEditorPanel
   public void setProperty(Property property) {
     fProperty = (StringSetProperty) property;
     DefaultListModel<String> model = new DefaultListModel<>();
-    
+
     for (String item : fProperty.getItems()) {
       model.addElement(item);
     }
@@ -76,11 +68,6 @@ public class StringSetPropertyEditorPanel
   }
 
   @Override
-  public String getTitle() {
-    return bundle.getString("StringSetPropertyEditorPanel.actions");
-  }
-
-  @Override
   public Property getProperty() {
     return fProperty;
   }
@@ -88,47 +75,12 @@ public class StringSetPropertyEditorPanel
   /**
    * Edits the selected value.
    */
-  protected void edit() {
-    String value = itemsList.getSelectedValue();
-
-    if (value == null) {
-      return;
-    }
-
-    int index = itemsList.getSelectedIndex();
-    JDialog parent = (JDialog) getTopLevelAncestor();
-    StringPanel content = new StringPanel(
-        "String Editor",
-        bundle.getString("LinkActionsEditorPanel.action"), 
-        value);
-    StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
-    dialog.setLocationRelativeTo(parent);
-    dialog.setVisible(true);
-
-    if (dialog.getReturnStatus() == StandardDetailsDialog.RET_OK) {
-      DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-      model.setElementAt(content.getText(), index);
-    }
-  }
+  protected abstract void edit();
 
   /**
    * Adds a new entry.
    */
-  protected void add() {
-    JDialog parent = (JDialog) getTopLevelAncestor();
-    StringPanel content = new StringPanel(
-        "String Editor", 
-        bundle.getString("LinkActionsEditorPanel.action"),
-        "");
-    StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
-    dialog.setLocationRelativeTo(parent);
-    dialog.setVisible(true);
-
-    if (dialog.getReturnStatus() == StandardDetailsDialog.RET_OK) {
-      DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-      model.addElement(content.getText());
-    }
-  }
+  protected abstract void add();
 
   /**
    * Returns the list with the values.
@@ -150,7 +102,7 @@ public class StringSetPropertyEditorPanel
     java.awt.GridBagConstraints gridBagConstraints;
 
     itemsScrollPane = new javax.swing.JScrollPane();
-    itemsList = new javax.swing.JList<String>();
+    itemsList = new javax.swing.JList<>();
     controlPanel = new javax.swing.JPanel();
     addButton = new javax.swing.JButton();
     editButton = new javax.swing.JButton();
@@ -169,8 +121,8 @@ public class StringSetPropertyEditorPanel
     controlPanel.setLayout(new java.awt.GridBagLayout());
 
     addButton.setFont(addButton.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    addButton.setText(bundle.getString("StringSetPropertyEditorPanel.add")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/propertyEditing"); // NOI18N
+    addButton.setText(bundle.getString("stringSetPropertyEditorPanel.button_add.text")); // NOI18N
     addButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         addButtonActionPerformed(evt);
@@ -182,7 +134,7 @@ public class StringSetPropertyEditorPanel
     controlPanel.add(addButton, gridBagConstraints);
 
     editButton.setFont(editButton.getFont());
-    editButton.setText(bundle.getString("StringSetPropertyEditorPanel.edit")); // NOI18N
+    editButton.setText(bundle.getString("stringSetPropertyEditorPanel.button_edit.text")); // NOI18N
     editButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         editButtonActionPerformed(evt);
@@ -196,7 +148,7 @@ public class StringSetPropertyEditorPanel
     controlPanel.add(editButton, gridBagConstraints);
 
     removeButton.setFont(removeButton.getFont());
-    removeButton.setText(bundle.getString("StringSetPropertyEditorPanel.remove")); // NOI18N
+    removeButton.setText(bundle.getString("stringSetPropertyEditorPanel.button_remove.text")); // NOI18N
     removeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         removeButtonActionPerformed(evt);
@@ -215,7 +167,7 @@ public class StringSetPropertyEditorPanel
     controlPanel.add(rigidArea, gridBagConstraints);
 
     moveUpButton.setFont(moveUpButton.getFont());
-    moveUpButton.setText(bundle.getString("StringSetPropertyEditorPanel.up")); // NOI18N
+    moveUpButton.setText(bundle.getString("stringSetPropertyEditorPanel.button_up.text")); // NOI18N
     moveUpButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         moveUpButtonActionPerformed(evt);
@@ -229,7 +181,7 @@ public class StringSetPropertyEditorPanel
     controlPanel.add(moveUpButton, gridBagConstraints);
 
     moveDownButton.setFont(moveDownButton.getFont());
-    moveDownButton.setText(bundle.getString("StringSetPropertyEditorPanel.down")); // NOI18N
+    moveDownButton.setText(bundle.getString("stringSetPropertyEditorPanel.button_down.text")); // NOI18N
     moveDownButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         moveDownButtonActionPerformed(evt);
@@ -250,61 +202,61 @@ public class StringSetPropertyEditorPanel
    *
    * @param evt das auslösende Ereignis
    */
-    private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
-      int index = itemsList.getSelectedIndex();
+  private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
+    int index = itemsList.getSelectedIndex();
 
-      if (index == -1) {
-        return;
-      }
+    if (index == -1) {
+      return;
+    }
 
-      DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
+    DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
 
-      if (index == model.size() - 1) {
-        return;
-      }
+    if (index == model.size() - 1) {
+      return;
+    }
 
-      String value = model.getElementAt(index);
-      model.removeElementAt(index);
-      model.insertElementAt(value, index + 1);
-      itemsList.setSelectedIndex(index + 1);
-    }//GEN-LAST:event_moveDownButtonActionPerformed
+    String value = model.getElementAt(index);
+    model.removeElementAt(index);
+    model.insertElementAt(value, index + 1);
+    itemsList.setSelectedIndex(index + 1);
+  }//GEN-LAST:event_moveDownButtonActionPerformed
 
-    private void moveUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpButtonActionPerformed
-      int index = itemsList.getSelectedIndex();
+  private void moveUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpButtonActionPerformed
+    int index = itemsList.getSelectedIndex();
 
-      if (index == -1) {
-        return;
-      }
+    if (index == -1) {
+      return;
+    }
 
-      if (index == 0) {
-        return;
-      }
+    if (index == 0) {
+      return;
+    }
 
-      DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-      String value = model.getElementAt(index);
-      model.removeElementAt(index);
-      model.insertElementAt(value, index - 1);
-      itemsList.setSelectedIndex(index - 1);
-    }//GEN-LAST:event_moveUpButtonActionPerformed
+    DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
+    String value = model.getElementAt(index);
+    model.removeElementAt(index);
+    model.insertElementAt(value, index - 1);
+    itemsList.setSelectedIndex(index - 1);
+  }//GEN-LAST:event_moveUpButtonActionPerformed
 
-    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-      String value = itemsList.getSelectedValue();
+  private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+    String value = itemsList.getSelectedValue();
 
-      if (value == null) {
-        return;
-      }
+    if (value == null) {
+      return;
+    }
 
-      DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-      model.removeElement(value);
-    }//GEN-LAST:event_removeButtonActionPerformed
+    DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
+    model.removeElement(value);
+  }//GEN-LAST:event_removeButtonActionPerformed
 
-    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-      edit();
-    }//GEN-LAST:event_editButtonActionPerformed
+  private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+    edit();
+  }//GEN-LAST:event_editButtonActionPerformed
 
-    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-      add();
-    }//GEN-LAST:event_addButtonActionPerformed
+  private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+    add();
+  }//GEN-LAST:event_addButtonActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JPanel controlPanel;

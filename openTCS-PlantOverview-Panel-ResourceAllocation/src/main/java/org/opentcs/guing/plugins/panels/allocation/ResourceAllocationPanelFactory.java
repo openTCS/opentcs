@@ -15,6 +15,7 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
+import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
 
 /**
  * Provides a {@link ResourceAllocationPanel} for the plant overview if the kernel is in operating
@@ -29,8 +30,7 @@ public class ResourceAllocationPanelFactory
   /**
    * This classe's bundle.
    */
-  private final ResourceBundle bundle
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/allocation/Bundle");
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The provider for the portal.
    */
@@ -62,7 +62,7 @@ public class ResourceAllocationPanelFactory
 
   @Override
   public String getPanelDescription() {
-    return bundle.getString("resource_allocation");
+    return bundle.getString("resourceAllocationPanelFactory.panelDescription");
   }
 
   @Override

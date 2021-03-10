@@ -7,6 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -39,7 +42,11 @@ public class IsParkable
   }
 
   @Override
-  public boolean test(Vehicle vehicle) {
+  public Collection<String> apply(Vehicle vehicle) {
+    return parkable(vehicle) ? new ArrayList<>() : Arrays.asList(getClass().getName());
+  }
+
+  private boolean parkable(Vehicle vehicle) {
     return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
         && vehicle.hasProcState(Vehicle.ProcState.IDLE)
         && vehicle.hasState(Vehicle.State.IDLE)

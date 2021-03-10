@@ -32,10 +32,10 @@ public interface ControlCenterConfiguration {
 
   @ConfigurationEntry(
       type = "String",
-      description = {"The application's current language.",
-                     "Valid values: 'English', 'German'"
+      description = {"The application's current language, as a BCP 47 language tag.",
+                     "Examples: 'en', 'de', 'zh'"
       })
-  String language();
+  String locale();
 
   @ConfigurationEntry(
       type = "Integer",

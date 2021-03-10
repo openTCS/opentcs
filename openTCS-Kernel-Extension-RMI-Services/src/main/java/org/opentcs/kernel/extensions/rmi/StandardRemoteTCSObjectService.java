@@ -20,8 +20,6 @@ import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is the standard implementation of the {@link RemoteTCSObjectService} interface.
@@ -32,10 +30,6 @@ public abstract class StandardRemoteTCSObjectService
     extends KernelRemoteService
     implements RemoteTCSObjectService {
 
-  /**
-   * This class' logger.
-   */
-  private final static Logger LOG = LoggerFactory.getLogger(StandardRemoteTCSObjectService.class);
   /**
    * The object service to invoke methods on.
    */

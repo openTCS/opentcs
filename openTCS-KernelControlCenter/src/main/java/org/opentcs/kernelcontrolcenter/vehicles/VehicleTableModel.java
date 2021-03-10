@@ -20,6 +20,7 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterDescription;
 import org.slf4j.Logger;
@@ -41,17 +42,16 @@ public class VehicleTableModel
   /**
    * This class's resource bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/kernelcontrolcenter/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    BUNDLE.getString("VehicleTableModel.Vehicle"),
-    BUNDLE.getString("VehicleTableModel.State"),
-    BUNDLE.getString("VehicleTableModel.Adapter"),
-    BUNDLE.getString("VehicleTableModel.Enabled?"),
-    BUNDLE.getString("VehicleTableModel.Position")
+    BUNDLE.getString("vehicleTableModel.column_vehicle.headerText"),
+    BUNDLE.getString("vehicleTableModel.column_state.headerText"),
+    BUNDLE.getString("vehicleTableModel.column_adapter.headerText"),
+    BUNDLE.getString("vehicleTableModel.column_enabled.headerText"),
+    BUNDLE.getString("vehicleTableModel.column_position.headerText")
   };
   /**
    * The column classes.

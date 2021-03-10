@@ -10,7 +10,6 @@ package org.opentcs.guing.application.action.app;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
@@ -23,6 +22,7 @@ import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.Environment;
@@ -40,6 +40,8 @@ public class AboutAction
    * This action's ID.
    */
   public final static String ID = "application.about";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * Stores the application's current state.
    */
@@ -68,35 +70,33 @@ public class AboutAction
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
 
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+    putValue(NAME, BUNDLE.getString("aboutAction.name"));
     putValue(MNEMONIC_KEY, Integer.valueOf('A'));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/help-contents.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/menu/help-contents.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JOptionPane.showMessageDialog(
         dialogParent,
         "<html><p><b>" + OpenTCSView.NAME + "</b><br> "
-        + bundle.getFormatted("openTCS.about.baseVersion", Environment.getBaselineVersion()) + "<br>"
-        + bundle.getFormatted("openTCS.about.customization",
+        + BUNDLE.getFormatted("aboutAction.optionPane_applicationInformation.message.baselineVersion", Environment.getBaselineVersion()) + "<br>"
+        + BUNDLE.getFormatted("aboutAction.optionPane_applicationInformation.message.customization",
                               Environment.getCustomizationName(),
                               Environment.getCustomizationVersion()) + "<br>"
-        + OpenTCSView.COPYRIGHT + "<br>"
-        + bundle.getString("openTCS.about.runningOn") + "<br>"
+        + BUNDLE.getString("aboutAction.optionPane_applicationInformation.message.copyright") + "<br>"
+        + BUNDLE.getString("aboutAction.optionPane_applicationInformation.message.runningOn") + "<br>"
         + "Java: " + System.getProperty("java.version") + ", " + System.getProperty("java.vendor") + "<br>"
         + "JVM: " + System.getProperty("java.vm.version") + ", " + System.getProperty("java.vm.vendor") + "<br>"
         + "OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + "<br>"
         + "<b>Kernel</b><br>"
         + portalProvider.getPortalDescription()
-        + "<br>" + bundle.getFormatted("openTCS.about.mode", appState.getOperationMode())
+        + "<br>" + BUNDLE.getFormatted("aboutAction.optionPane_applicationInformation.message.mode", appState.getOperationMode())
         + "</p></html>",
-        bundle.getString("openTCS.about.title"),
+        BUNDLE.getString("aboutAction.optionPane_applicationInformation.title"),
         JOptionPane.PLAIN_MESSAGE,
         new ImageIcon(getClass().getResource("/org/opentcs/guing/res/symbols/openTCS/openTCS.300x132.gif")));
   }

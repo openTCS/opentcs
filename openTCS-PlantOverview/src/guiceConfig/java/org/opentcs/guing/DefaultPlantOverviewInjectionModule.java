@@ -93,8 +93,8 @@ public class DefaultPlantOverviewInjectionModule
     })
         .toInstance(configuration.connectionBookmarks());
   }
-  
-  private void configureNamingConfiguration(){
+
+  private void configureNamingConfiguration() {
     ElementNamingSchemeConfiguration configuration
         = getConfigBindingProvider().get(ElementNamingSchemeConfiguration.PREFIX,
                                          ElementNamingSchemeConfiguration.class);
@@ -141,12 +141,7 @@ public class DefaultPlantOverviewInjectionModule
   }
 
   private void configurePlantOverview(PlantOverviewApplicationConfiguration configuration) {
-    if (configuration.language().toLowerCase().equals("german")) {
-      Locale.setDefault(Locale.GERMAN);
-    }
-    else {
-      Locale.setDefault(Locale.ENGLISH);
-    }
+    Locale.setDefault(Locale.forLanguageTag(configuration.locale()));
 
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

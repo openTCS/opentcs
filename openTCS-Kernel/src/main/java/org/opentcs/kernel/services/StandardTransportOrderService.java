@@ -10,22 +10,19 @@ package org.opentcs.kernel.services;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.kernel.services.TransportOrderService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
@@ -55,10 +52,6 @@ public class StandardTransportOrderService
    * The model facade to the object pool.
    */
   private final Model model;
-  /**
-   * Provides the dispatcher instance.
-   */
-  private final Provider<Dispatcher> dispatcherProvider;
 
   /**
    * Creates a new instance.
@@ -68,26 +61,24 @@ public class StandardTransportOrderService
    * @param globalObjectPool The object pool to be used.
    * @param orderPool The oder pool to be used.
    * @param model The model to be used.
-   * @param dispatcherProvider Provides the dispatcher instance.
    */
   @Inject
   public StandardTransportOrderService(TCSObjectService objectService,
-                                       @GlobalKernelSync Object globalSyncObject,
+                                       @GlobalSyncObject Object globalSyncObject,
                                        TCSObjectPool globalObjectPool,
                                        TransportOrderPool orderPool,
-                                       Model model,
-                                       Provider<Dispatcher> dispatcherProvider) {
+                                       Model model) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
     this.orderPool = requireNonNull(orderPool, "orderPool");
     this.model = requireNonNull(model, "model");
-    this.dispatcherProvider = requireNonNull(dispatcherProvider, "dispatcherProvider");
   }
 
   @Override
+  @Deprecated
   public void registerTransportOrderRejection(TCSObjectReference<TransportOrder> ref,
-                                              Rejection rejection)
+                                              org.opentcs.data.order.Rejection rejection)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       orderPool.addTransportOrderRejection(ref, rejection);

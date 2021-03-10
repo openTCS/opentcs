@@ -17,6 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import org.opentcs.data.model.TCSResource;
+import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
 
 /**
  * A model for a resource allocation tree to display an alphabetically ordered view for vehicle
@@ -30,14 +31,13 @@ public class AllocationTreeModel
   /**
    * This class' bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
 
   /**
    * Creates a new instance.
    */
   public AllocationTreeModel() {
-    super(new DefaultMutableTreeNode(BUNDLE.getString("ResourceAllocationPanel.treeRoot.text")),
+    super(new DefaultMutableTreeNode(BUNDLE.getString("resourceAllocationPanel.treeRoot.text")),
           true);
   }
 

@@ -19,10 +19,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import javax.inject.Inject;
 import org.opentcs.guing.application.ApplicationState;
-import org.opentcs.guing.application.OpenTCSView;
 import static org.opentcs.guing.components.drawing.OpenTCSDrawingView.setViewRenderingHints;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.FigureCloner;
 
 /**
  * Draws the drawing using a BufferedImage.
@@ -42,16 +42,16 @@ public class OpenTCSDrawingViewBuffered
    * Creates new instance.
    *
    * @param appState Stores the application's current state.
-   * @param opentcsView The view to be used.
    * @param modelManager Provides the current system model.
    * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param figureCloner A helper for cloning figures.
    */
   @Inject
   public OpenTCSDrawingViewBuffered(ApplicationState appState,
-                                    OpenTCSView opentcsView,
                                     ModelManager modelManager,
-                                    TransportOrderUtil orderUtil) {
-    super(appState, opentcsView, modelManager, orderUtil);
+                                    TransportOrderUtil orderUtil,
+                                    FigureCloner figureCloner) {
+    super(appState, modelManager, orderUtil, figureCloner);
   }
 
   @Override

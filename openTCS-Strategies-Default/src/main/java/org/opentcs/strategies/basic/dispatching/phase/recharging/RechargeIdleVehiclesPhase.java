@@ -125,9 +125,9 @@ public class RechargeIdleVehiclesPhase
       return;
     }
 
-    for (Vehicle vehicle : orderService.fetchObjects(Vehicle.class, vehicleSelectionFilter)) {
-      createRechargeOrder(vehicle);
-    }
+    orderService.fetchObjects(Vehicle.class).stream()
+        .filter(vehicle -> vehicleSelectionFilter.apply(vehicle).isEmpty())
+        .forEach(vehicle -> createRechargeOrder(vehicle));
   }
 
   private void createRechargeOrder(Vehicle vehicle) {
@@ -158,7 +158,7 @@ public class RechargeIdleVehiclesPhase
     Optional<AssignmentCandidate> candidate = computeCandidate(vehicle,
                                                                vehiclePosition,
                                                                rechargeOrder)
-        .filter(assignmentCandidateSelectionFilter);
+        .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());
     // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
     if (candidate.isPresent()) {
       transportOrderUtil.assignTransportOrder(candidate.get().getVehicle(),

@@ -7,6 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelectionFilter;
 
@@ -19,8 +22,8 @@ public class IsIdleAndDegraded
     implements RechargeVehicleSelectionFilter {
 
   @Override
-  public boolean test(Vehicle vehicle) {
-    return idleAndDegraded(vehicle);
+  public Collection<String> apply(Vehicle vehicle) {
+    return idleAndDegraded(vehicle) ? new ArrayList<>() : Arrays.asList(getClass().getName());
   }
 
   private boolean idleAndDegraded(Vehicle vehicle) {

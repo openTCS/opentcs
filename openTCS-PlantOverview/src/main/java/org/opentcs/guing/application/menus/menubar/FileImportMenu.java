@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.application.action.file.ImportPlantModelAction;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -24,12 +25,12 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class FileImportMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil LABELS = ResourceBundleUtil.getBundle();
+  private static final ResourceBundleUtil LABELS = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
 
   @Inject
   public FileImportMenu(Set<PlantModelImporter> importers,
                         GuiManager guiManager) {
-    super(LABELS.getString("file.import.menu.text"));
+    super(LABELS.getString("fileImportMenu.text"));
     requireNonNull(importers, "importers");
     requireNonNull(guiManager, "guiManager");
 

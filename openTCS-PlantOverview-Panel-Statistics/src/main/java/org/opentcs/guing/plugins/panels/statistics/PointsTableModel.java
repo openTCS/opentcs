@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
+import static org.opentcs.guing.plugins.panels.statistics.I18nPlantOverviewPanelStatistics.BUNDLE_PATH;
 
 /**
  * A table model for point statistics.
@@ -23,14 +24,13 @@ class PointsTableModel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    BUNDLE.getString("Course_point"),
-    BUNDLE.getString("Time_occupied")
+    BUNDLE.getString("pointsTabelModel.column_point.headerText"),
+    BUNDLE.getString("pointsTabelModel.column_timeOccupied.headerText")
   };
   /**
    * The column classes.

@@ -9,16 +9,15 @@
 package org.opentcs.guing.components.tree.elements;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -33,7 +32,7 @@ public class ComponentContext
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param openTCSView The openTCS view
    */
   @Inject
@@ -44,24 +43,12 @@ public class ComponentContext
   @Override
   public JPopupMenu getPopupMenu(final Set<UserObject> selectedUserObjects) {
     JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
-    JMenuItem item = new JMenuItem(labels.getString("tree.createGroup"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        Set<ModelComponent> items = new HashSet<>();
-        Iterator<UserObject> it = selectedUserObjects.iterator();
-
-        while (it.hasNext()) {
-          UserObject next = it.next();
-          ModelComponent dataObject = next.getModelComponent();
-          items.add(dataObject);
-        }
-        openTCSView.createGroup(items);
-      }
-    });
+    JMenuItem item = new JMenuItem(labels.getString("componentContext.popupMenuItem_createGroup.text"));
+    item.addActionListener(
+        (ActionEvent event) -> openTCSView.createGroup(toModelComponents(selectedUserObjects))
+    );
 
     menu.add(item);
 
@@ -76,5 +63,11 @@ public class ComponentContext
   @Override
   public ContextType getType() {
     return ContextType.COMPONENT;
+  }
+
+  private Set<ModelComponent> toModelComponents(Set<UserObject> userObjects) {
+    return userObjects.stream()
+        .map(userObject -> userObject.getModelComponent())
+        .collect(Collectors.toSet());
   }
 }

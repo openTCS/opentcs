@@ -9,7 +9,6 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import java.awt.geom.Point2D;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
@@ -26,9 +25,6 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
-import org.opentcs.guing.components.drawing.figures.LocationFigure;
-import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
@@ -162,21 +158,17 @@ public class LocationAdapter
                                                  VisualLayoutCreationTO layout,
                                                  SystemModel systemModel) {
     LocationModel locationModel = (LocationModel) model;
-    LabeledLocationFigure llf = (LabeledLocationFigure) systemModel.getFigure(model);
-    LocationFigure lf = llf.getPresentationFigure();
-    double scaleX = layout.getScaleX();
-    double scaleY = layout.getScaleY();
-    int xPos = (int) ((lf.getBounds().x + lf.getBounds().width / 2) * scaleX);
-    int yPos = (int) -((lf.getBounds().y + lf.getBounds().height / 2) * scaleY);
-    TCSLabelFigure label = llf.getLabel();
-    Point2D.Double offset = label.getOffset();
 
     return layout.withModelElement(
         new ModelLayoutElementCreationTO(locationModel.getName())
-            .withProperty(ElementPropKeys.LOC_POS_X, xPos + "")
-            .withProperty(ElementPropKeys.LOC_POS_Y, yPos + "")
-            .withProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, (int) offset.x + "")
-            .withProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, (int) offset.y + "")
+            .withProperty(ElementPropKeys.LOC_POS_X,
+                          locationModel.getPropertyLayoutPositionX().getText())
+            .withProperty(ElementPropKeys.LOC_POS_Y,
+                          locationModel.getPropertyLayoutPositionY().getText())
+            .withProperty(ElementPropKeys.LOC_LABEL_OFFSET_X,
+                          locationModel.getPropertyLabelOffsetX().getText())
+            .withProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y,
+                          locationModel.getPropertyLabelOffsetY().getText())
     );
   }
 }

@@ -21,6 +21,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.action.ActionFactory;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -46,7 +47,7 @@ public class VehiclePopupMenu
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(vehicles, "vehicles");
 
-    final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+    final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.VEHICLEPOPUP_PATH);
     VehicleModel singleVehicle = vehicles.stream().findFirst().get();
     JCheckBoxMenuItem checkBoxMenuItem;
     Action action;
@@ -54,10 +55,10 @@ public class VehiclePopupMenu
     JMenuItem mi = new JMenuItem();
     mi.setEnabled(false);
     if (vehicles.size() == 1) {
-      mi.setText(bundle.getString("VehicleAction.vehicle") + singleVehicle.getName());
+      mi.setText(bundle.getString("vehiclePopupMenu.menuItem_singleVehicle.text") + singleVehicle.getName());
     }
     else {
-      mi.setText(bundle.getString("VehicleAction.multiSelect"));
+      mi.setText(bundle.getString("vehiclePopupMenu.menuItem_multipleVehicles.text"));
     }
     add(mi);
 
@@ -91,7 +92,7 @@ public class VehiclePopupMenu
     }
 
     JMenu integrateSubMenu
-        = new JMenu(bundle.getString("course.vehicle.integrateVehicleSubMenu.text"));
+        = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_integrate.text"));
 
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_IGNORED);
@@ -128,7 +129,7 @@ public class VehiclePopupMenu
     addSeparator();
 
     JMenu withdrawSubMenu
-        = new JMenu(bundle.getString("course.vehicle.withdrawTransportOrderSubMenu.text"));
+        = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_withdraw.text"));
 
     action = actionFactory.createWithdrawAction(vehicles, false);
     action.setEnabled(isAnyProcessingOrder(vehicles));

@@ -20,6 +20,7 @@ import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -48,7 +49,7 @@ public class LocationActionPanel
   public LocationActionPanel(List<LocationModel> locations) {
     initComponents();
     fLocations = locations;
-    setDialogTitle(ResourceBundleUtil.getBundle().getString("LocationActionPanel.title"));
+    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverview.VEHICLEPOPUP_PATH).getString("locationActionPanel.title"));
 
     Collections.sort(fLocations, getComparator());
 
@@ -149,8 +150,8 @@ public class LocationActionPanel
     setLayout(new java.awt.GridBagLayout());
 
     locationsLabel.setFont(locationsLabel.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    locationsLabel.setText(bundle.getString("LocationActionPanel.location")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/dialogs/vehiclePopup"); // NOI18N
+    locationsLabel.setText(bundle.getString("locationActionPanel.label_location.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
@@ -168,7 +169,7 @@ public class LocationActionPanel
     add(locationsComboBox, gridBagConstraints);
 
     actionsLabel.setFont(actionsLabel.getFont());
-    actionsLabel.setText(bundle.getString("LocationActionPanel.action")); // NOI18N
+    actionsLabel.setText(bundle.getString("locationActionPanel.label_action.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;

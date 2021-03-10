@@ -15,6 +15,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opentcs.guing.application.OpenTCSView;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -26,7 +27,11 @@ public class AddBitmapAction
     extends AbstractAction {
 
   public final static String ID = "view.addBitmap";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
+
   private final JFileChooser fc;
+
   private final OpenTCSView view;
 
   /**
@@ -44,9 +49,8 @@ public class AddBitmapAction
                                                       "bmp",
                                                       "gif"));
     this.fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+
+    putValue(NAME, BUNDLE.getString("addBitmapAction.name"));
   }
 
   @Override

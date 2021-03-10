@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import org.opentcs.access.SchedulerAllocationState;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.SchedulerService;
-import org.opentcs.kernel.GlobalKernelSync;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 
 /**
  * This class is the standard implementation of the {@link SchedulerService} interface.
@@ -38,7 +38,7 @@ public class StandardSchedulerService
    * @param scheduler The scheduler.
    */
   @Inject
-  public StandardSchedulerService(@GlobalKernelSync Object globalSyncObject,
+  public StandardSchedulerService(@GlobalSyncObject Object globalSyncObject,
                                   Scheduler scheduler) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.scheduler = requireNonNull(scheduler, "scheduler");

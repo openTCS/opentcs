@@ -14,22 +14,20 @@ import com.google.inject.multibindings.MapBinder;
 import javax.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
-import org.opentcs.guing.components.properties.panel.CoursePointPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValueSetPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.LinkActionsEditorPanel;
+import org.opentcs.guing.components.properties.panel.LocationTypeActionsEditorPanel;
 import org.opentcs.guing.components.properties.panel.OrderCategoriesPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.PropertiesPanelFactory;
-import org.opentcs.guing.components.properties.panel.StringSetPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.SymbolPropertyEditorPanel;
 import org.opentcs.guing.components.properties.table.CellEditorFactory;
 import org.opentcs.guing.components.properties.type.AbstractComplexProperty;
-import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
+import org.opentcs.guing.components.properties.type.LocationTypeActionsProperty;
 import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
-import org.opentcs.guing.components.properties.type.StringSetProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 
 /**
@@ -54,20 +52,17 @@ public class PropertiesInjectionModule
                                  new TypeLiteral<DetailsDialogContent>() {
                              });
     dialogContentMapBinder
-        .addBinding(CoursePointProperty.class)
-        .to(CoursePointPropertyEditorPanel.class);
-    dialogContentMapBinder
         .addBinding(KeyValueProperty.class)
         .to(KeyValuePropertyEditorPanel.class);
     dialogContentMapBinder
         .addBinding(KeyValueSetProperty.class)
         .to(KeyValueSetPropertyEditorPanel.class);
     dialogContentMapBinder
+        .addBinding(LocationTypeActionsProperty.class)
+        .to(LocationTypeActionsEditorPanel.class);
+    dialogContentMapBinder
         .addBinding(LinkActionsProperty.class)
         .to(LinkActionsEditorPanel.class);
-    dialogContentMapBinder
-        .addBinding(StringSetProperty.class)
-        .to(StringSetPropertyEditorPanel.class);
     dialogContentMapBinder
         .addBinding(SymbolProperty.class)
         .to(SymbolPropertyEditorPanel.class);

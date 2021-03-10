@@ -39,7 +39,7 @@ public class SelectionPropertyCellEditor
    * @param comboBox
    * @param umh
    */
-  public SelectionPropertyCellEditor(JComboBox<Object> comboBox, UserMessageHelper umh) {
+  public SelectionPropertyCellEditor(JComboBox<?> comboBox, UserMessageHelper umh) {
     super(comboBox, umh);
     comboBox.setFont(new Font("Dialog", Font.PLAIN, 12));
   }

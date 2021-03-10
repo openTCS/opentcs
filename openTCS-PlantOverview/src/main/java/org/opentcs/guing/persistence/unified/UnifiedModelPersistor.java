@@ -22,8 +22,6 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.persistence.ModelFilePersistor;
 import org.opentcs.guing.persistence.ModelValidator;
-import org.opentcs.guing.util.JOptionPaneUtil;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.persistence.ModelParser;
 
 /**
@@ -79,12 +77,7 @@ public class UnifiedModelPersistor
     if (!valid) {
       //Use a hash set to avoid duplicate errors
       Set<String> errors = new HashSet<>(validator.getErrors());
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-      JOptionPaneUtil.showDialogWithTextArea(
-          statusPanel,
-          bundle.getString("ValidationWarning.title"),
-          bundle.getString("ValidationWarning.descriptionSavingKernel"),
-          errors);
+      validator.showSavingValidationWarning(statusPanel, errors);
       if (!ignoreError) {
         return false;
       }

@@ -3,7 +3,7 @@
 <Form version="1.3" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AccessibilityProperties>
     <Property name="AccessibleContext.accessibleName" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-      <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Statistics_panel_title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+      <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.accessibleName" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
     </Property>
   </AccessibilityProperties>
   <AuxValues>
@@ -33,7 +33,7 @@
         <Component class="javax.swing.JLabel" name="analysisInputFileLbl">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Input_file" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.label_inputFile.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -55,7 +55,7 @@
         <Component class="javax.swing.JLabel" name="parsedRecordsLbl">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Parsed_records" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.label_parsedRecords.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -77,7 +77,7 @@
         <Component class="javax.swing.JButton" name="startInputParsingBtn">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Read_input_file" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.button_readInputFile.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -92,7 +92,7 @@
         <Component class="javax.swing.JLabel" name="totalRuntimeLbl">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Total_runtime" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.label_totalRuntime.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -117,8 +117,8 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="&lt;Analysis_data&gt;">
-              <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Analysis_data" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            <TitledBorder title="Analysis data">
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.panel_analysisData.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -137,8 +137,8 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="&lt;Vehicles&gt;">
-                  <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Vehicles" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                <TitledBorder title="Vehicles">
+                  <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.panel_analysisVehicles.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </TitledBorder>
               </Border>
             </Property>
@@ -181,8 +181,8 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="&lt;Course&gt;">
-                  <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Course" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                <TitledBorder title="Course">
+                  <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.panel_analysisCourse.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </TitledBorder>
               </Border>
             </Property>
@@ -222,8 +222,8 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="&lt;Orders&gt;">
-                  <ResourceString PropertyName="titleX" bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Orders" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                <TitledBorder title="Orders">
+                  <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.panel_analysisOrders.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </TitledBorder>
               </Border>
             </Property>
@@ -269,7 +269,7 @@
                 <Component class="javax.swing.JLabel" name="ordersSuccRateLbl">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Successfully_finished" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.label_ordersSuccessRate.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -283,7 +283,7 @@
                 <Component class="javax.swing.JLabel" name="ordersDeadlineRateLbl">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="org/opentcs/guing/plugins/panels/statistics/Bundle.properties" key="Crossed_deadline" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="i18n/org/opentcs/plantoverview/statisticsPanel/Bundle.properties" key="statisticsPanel.label_ordersDeadlineCrossedRate.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                 </Component>

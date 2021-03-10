@@ -33,6 +33,7 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.StringListCellRenderer;
+import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
 import org.opentcs.virtualvehicle.commands.CurrentMovementCommandFailedCommand;
 import org.opentcs.virtualvehicle.commands.PublishEventCommand;
 import org.opentcs.virtualvehicle.commands.SetEnergyLevelCommand;
@@ -67,8 +68,7 @@ public class LoopbackCommAdapterPanel
   /**
    * The resource bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * This class's Logger.
    */
@@ -244,7 +244,7 @@ public class LoopbackCommAdapterPanel
   private void updateOrientationAngle(double orientation) {
     SwingUtilities.invokeLater(() -> {
       if (Double.isNaN(orientation)) {
-        orientationAngleTxt.setText(BUNDLE.getString("OrientationAngleNotSet"));
+        orientationAngleTxt.setText(BUNDLE.getString("loopbackCommAdapterPanel.textField_orientationAngle.angleNotSetPlaceholder"));
       }
       else {
         orientationAngleTxt.setText(Double.toString(orientation));
@@ -399,11 +399,11 @@ public class LoopbackCommAdapterPanel
 
     PropsPowerInnerContainerPanel.setLayout(new javax.swing.BoxLayout(PropsPowerInnerContainerPanel, javax.swing.BoxLayout.X_AXIS));
 
-    vehiclePropsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("Vehicle_properties"))); // NOI18N
+    vehiclePropsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("loopbackCommAdapterPanel.panel_vehicleProperties.border.title"))); // NOI18N
     vehiclePropsPanel.setLayout(new java.awt.GridBagLayout());
 
     maxFwdVeloLbl.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    maxFwdVeloLbl.setText(BUNDLE.getString("maxFwdVelocityLabel")); // NOI18N
+    maxFwdVeloLbl.setText(BUNDLE.getString("loopbackCommAdapterPanel.label_maximumForwardVelocity.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.weightx = 1.0;
@@ -428,7 +428,7 @@ public class LoopbackCommAdapterPanel
     vehiclePropsPanel.add(maxFwdVeloUnitLbl, gridBagConstraints);
 
     maxRevVeloLbl.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    maxRevVeloLbl.setText(BUNDLE.getString("maxRevVelocityLabel")); // NOI18N
+    maxRevVeloLbl.setText(BUNDLE.getString("loopbackCommAdapterPanel.label_maximumReverseVelocity.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -459,7 +459,7 @@ public class LoopbackCommAdapterPanel
     vehiclePropsPanel.add(maxRevVeloUnitLbl, gridBagConstraints);
 
     maxAccelLbl.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    maxAccelLbl.setText(BUNDLE.getString("maxAccelerationLabel")); // NOI18N
+    maxAccelLbl.setText(BUNDLE.getString("loopbackCommAdapterPanel.label_maximumAcceleration.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -503,7 +503,7 @@ public class LoopbackCommAdapterPanel
     vehiclePropsPanel.add(maxDecelTxt, gridBagConstraints);
 
     maxDecelLbl.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    maxDecelLbl.setText(BUNDLE.getString("maxDecelerationLabel")); // NOI18N
+    maxDecelLbl.setText(BUNDLE.getString("loopbackCommAdapterPanel.label_maximumDeceleration.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -520,7 +520,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     vehiclePropsPanel.add(maxDecelUnitLbl, gridBagConstraints);
 
-    defaultOpTimeLbl.setText(BUNDLE.getString("defaultOperatingTime")); // NOI18N
+    defaultOpTimeLbl.setText(BUNDLE.getString("loopbackCommAdapterPanel.label_operatingTime.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;
@@ -567,11 +567,11 @@ public class LoopbackCommAdapterPanel
 
     stateContainerPanel.setLayout(new javax.swing.BoxLayout(stateContainerPanel, javax.swing.BoxLayout.Y_AXIS));
 
-    connectionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("Adapter_status"))); // NOI18N
+    connectionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("loopbackCommAdapterPanel.panel_adapterStatus.border.title"))); // NOI18N
     connectionPanel.setName("connectionPanel"); // NOI18N
     connectionPanel.setLayout(new java.awt.GridBagLayout());
 
-    chkBoxEnable.setText(BUNDLE.getString("Enable_communication_adapter")); // NOI18N
+    chkBoxEnable.setText(BUNDLE.getString("loopbackCommAdapterPanel.checkBox_enableAdapter.text")); // NOI18N
     chkBoxEnable.setName("chkBoxEnable"); // NOI18N
     chkBoxEnable.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -585,7 +585,7 @@ public class LoopbackCommAdapterPanel
 
     stateContainerPanel.add(connectionPanel);
 
-    curPosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("CurrentPositionSettings"))); // NOI18N
+    curPosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("loopbackCommAdapterPanel.panel_vehicleStatus.border.title"))); // NOI18N
     curPosPanel.setName("curPosPanel"); // NOI18N
     curPosPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -631,8 +631,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     curPosPanel.add(pauseVehicleCheckBox, gridBagConstraints);
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/virtualvehicle/Bundle"); // NOI18N
-    orientationAngleLbl.setText(bundle.getString("AngleUnit")); // NOI18N
+    orientationAngleLbl.setText("<html>&#186;");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 4;
@@ -640,7 +639,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     curPosPanel.add(orientationAngleLbl, gridBagConstraints);
 
-    precisePosUnitLabel.setText(bundle.getString("precisePosUnit")); // NOI18N
+    precisePosUnitLabel.setText("mm");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 3;
@@ -650,7 +649,8 @@ public class LoopbackCommAdapterPanel
 
     orientationAngleTxt.setEditable(false);
     orientationAngleTxt.setBackground(new java.awt.Color(255, 255, 255));
-    orientationAngleTxt.setText(bundle.getString("OrientationAngleNotSet")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/commadapter/loopback/Bundle"); // NOI18N
+    orientationAngleTxt.setText(bundle.getString("loopbackCommAdapterPanel.textField_orientationAngle.angleNotSetPlaceholder")); // NOI18N
     orientationAngleTxt.setBorder(javax.swing.BorderFactory.createEtchedBorder());
     orientationAngleTxt.setName("orientationAngleTxt"); // NOI18N
     orientationAngleTxt.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -667,7 +667,7 @@ public class LoopbackCommAdapterPanel
     curPosPanel.add(orientationAngleTxt, gridBagConstraints);
 
     energyLevelLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    energyLevelLabel.setText(bundle.getString("energyLevelLabel")); // NOI18N
+    energyLevelLabel.setText(bundle.getString("loopbackCommAdapterPanel.label_energyLevel.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -676,7 +676,7 @@ public class LoopbackCommAdapterPanel
     curPosPanel.add(energyLevelLabel, gridBagConstraints);
 
     orientationLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-    orientationLabel.setText(bundle.getString("orientationLabel")); // NOI18N
+    orientationLabel.setText(bundle.getString("loopbackCommAdapterPanel.label_orientationAngle.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;
@@ -701,7 +701,7 @@ public class LoopbackCommAdapterPanel
     curPosPanel.add(positionTxt, gridBagConstraints);
 
     positionLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    positionLabel.setText(bundle.getString("positionLabel")); // NOI18N
+    positionLabel.setText(bundle.getString("loopbackCommAdapterPanel.label_position.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -710,7 +710,7 @@ public class LoopbackCommAdapterPanel
     curPosPanel.add(positionLabel, gridBagConstraints);
 
     pauseVehicleLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    pauseVehicleLabel.setText(bundle.getString("pauseVehicle")); // NOI18N
+    pauseVehicleLabel.setText(bundle.getString("loopbackCommAdapterPanel.label_pauseVehicle.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 5;
@@ -719,7 +719,7 @@ public class LoopbackCommAdapterPanel
     curPosPanel.add(pauseVehicleLabel, gridBagConstraints);
 
     jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    jLabel2.setText(bundle.getString("stateLabel")); // NOI18N
+    jLabel2.setText(bundle.getString("loopbackCommAdapterPanel.label_state.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -746,7 +746,7 @@ public class LoopbackCommAdapterPanel
     curPosPanel.add(stateTxt, gridBagConstraints);
 
     jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    jLabel3.setText(bundle.getString("precisePosLabel")); // NOI18N
+    jLabel3.setText(bundle.getString("loopbackCommAdapterPanel.label_precisePosition.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -775,10 +775,10 @@ public class LoopbackCommAdapterPanel
     stateContainerPanel.add(curPosPanel);
     curPosPanel.getAccessibleContext().setAccessibleName("Change");
 
-    propertySetterPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("PropertySetterPanelTitel"))); // NOI18N
+    propertySetterPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("loopbackCommAdapterPanel.panel_vehicleProperty.border.title"))); // NOI18N
     propertySetterPanel.setLayout(new java.awt.GridBagLayout());
 
-    keyLabel.setText(bundle.getString("keyPanelText")); // NOI18N
+    keyLabel.setText(bundle.getString("loopbackCommAdapterPanel.label_propertyKey.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -794,7 +794,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.gridy = 2;
     propertySetterPanel.add(valueTextField, gridBagConstraints);
 
-    propSetButton.setText(bundle.getString("setPropertyButtonText")); // NOI18N
+    propSetButton.setText(bundle.getString("loopbackCommAdapterPanel.button_setProperty.text")); // NOI18N
     propSetButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         propSetButtonActionPerformed(evt);
@@ -807,7 +807,7 @@ public class LoopbackCommAdapterPanel
     propertySetterPanel.add(propSetButton, gridBagConstraints);
 
     propertyEditorGroup.add(removePropRadioBtn);
-    removePropRadioBtn.setText(bundle.getString("removePropertyRadioButtonText")); // NOI18N
+    removePropRadioBtn.setText(bundle.getString("loopbackCommAdapterPanel.radioButton_removeProperty.text")); // NOI18N
     removePropRadioBtn.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         removePropRadioBtnActionPerformed(evt);
@@ -821,7 +821,7 @@ public class LoopbackCommAdapterPanel
 
     propertyEditorGroup.add(setPropValueRadioBtn);
     setPropValueRadioBtn.setSelected(true);
-    setPropValueRadioBtn.setText(bundle.getString("setPropertyRadioButtonText")); // NOI18N
+    setPropValueRadioBtn.setText(bundle.getString("loopbackCommAdapterPanel.radioButton_setProperty.text")); // NOI18N
     setPropValueRadioBtn.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         setPropValueRadioBtnActionPerformed(evt);
@@ -848,10 +848,10 @@ public class LoopbackCommAdapterPanel
 
     stateContainerPanel.add(propertySetterPanel);
 
-    eventPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("Event_dispatching"))); // NOI18N
+    eventPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("loopbackCommAdapterPanel.panel_eventDispatching.title"))); // NOI18N
     eventPanel.setLayout(new java.awt.GridBagLayout());
 
-    includeAppendixCheckBox.setText(bundle.getString("Include_appendix")); // NOI18N
+    includeAppendixCheckBox.setText(bundle.getString("loopbackCommAdapterPanel.checkBox_includeAppendix.text")); // NOI18N
     includeAppendixCheckBox.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         includeAppendixCheckBoxItemStateChanged(evt);
@@ -869,7 +869,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     eventPanel.add(appendixTxt, gridBagConstraints);
 
-    dispatchEventButton.setText(bundle.getString("Dispatch_event")); // NOI18N
+    dispatchEventButton.setText(bundle.getString("loopbackCommAdapterPanel.button_dispatchEvent.text")); // NOI18N
     dispatchEventButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         dispatchEventButtonActionPerformed(evt);
@@ -884,7 +884,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     eventPanel.add(dispatchEventButton, gridBagConstraints);
 
-    dispatchCommandFailedButton.setText(bundle.getString("dispatchCommandFailed.button.text")); // NOI18N
+    dispatchCommandFailedButton.setText(bundle.getString("loopbackCommAdapterPanel.button_failCurrentCommand.text")); // NOI18N
     dispatchCommandFailedButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         dispatchCommandFailedButtonActionPerformed(evt);
@@ -900,11 +900,11 @@ public class LoopbackCommAdapterPanel
 
     stateContainerPanel.add(eventPanel);
 
-    controlTabPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("Command_processing"))); // NOI18N
+    controlTabPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(BUNDLE.getString("loopbackCommAdapterPanel.panel_commandProcessing.border.title"))); // NOI18N
     controlTabPanel.setLayout(new java.awt.GridBagLayout());
 
     modeButtonGroup.add(singleModeRadioButton);
-    singleModeRadioButton.setText(BUNDLE.getString("SingleStepMode")); // NOI18N
+    singleModeRadioButton.setText(BUNDLE.getString("loopbackCommAdapterPanel.checkBox_commandProcessingManual.text")); // NOI18N
     singleModeRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
     singleModeRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
     singleModeRadioButton.setName("singleModeRadioButton"); // NOI18N
@@ -923,7 +923,7 @@ public class LoopbackCommAdapterPanel
 
     modeButtonGroup.add(flowModeRadioButton);
     flowModeRadioButton.setSelected(true);
-    flowModeRadioButton.setText(BUNDLE.getString("FlowModus")); // NOI18N
+    flowModeRadioButton.setText(BUNDLE.getString("loopbackCommAdapterPanel.checkBox_commandProcessingAutomatic.text")); // NOI18N
     flowModeRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
     flowModeRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
     flowModeRadioButton.setName("flowModeRadioButton"); // NOI18N
@@ -940,7 +940,7 @@ public class LoopbackCommAdapterPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     controlTabPanel.add(flowModeRadioButton, gridBagConstraints);
 
-    triggerButton.setText(BUNDLE.getString("Next_step")); // NOI18N
+    triggerButton.setText(BUNDLE.getString("loopbackCommAdapterPanel.button_nextStep.text")); // NOI18N
     triggerButton.setEnabled(false);
     triggerButton.setName("triggerButton"); // NOI18N
     triggerButton.addActionListener(new java.awt.event.ActionListener() {
@@ -960,7 +960,7 @@ public class LoopbackCommAdapterPanel
 
     vehicleStatePanel.add(stateContainerPanel, java.awt.BorderLayout.NORTH);
 
-    loadDevicePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("LoadHandlingDevices"))); // NOI18N
+    loadDevicePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("loopbackCommAdapterPanel.panel_loadHandlingDevice.border.title"))); // NOI18N
     loadDevicePanel.setLayout(new java.awt.BorderLayout());
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -980,7 +980,7 @@ public class LoopbackCommAdapterPanel
 
     add(vehicleStatePanel, java.awt.BorderLayout.WEST);
 
-    getAccessibleContext().setAccessibleName(bundle.getString("LoopbackOptions")); // NOI18N
+    getAccessibleContext().setAccessibleName(bundle.getString("loopbackCommAdapterPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
 
   private void singleModeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_singleModeRadioButtonActionPerformed
@@ -1028,11 +1028,9 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
       Triple pos = processModel.getPrecisePosition();
       // Create panel and dialog
       TripleTextInputPanel.Builder builder
-          = new TripleTextInputPanel.Builder(BUNDLE.getString("precisePosTitle"));
-      builder.setUnitLabels(BUNDLE.getString("precisePosUnit"));
-      builder.setLabels(BUNDLE.getString("precisePosXLabel"),
-                        BUNDLE.getString("precisePosYLabel"),
-                        BUNDLE.getString("precisePosZLabel"));
+          = new TripleTextInputPanel.Builder(BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPrecisePosition.title"));
+      builder.setUnitLabels("mm");
+      builder.setLabels("X:", "Y:", "Z:");
       builder.enableResetButton(null);
       builder.enableValidation(TextInputPanel.TextInputValidator.REGEX_INT);
       if (pos != null) {
@@ -1075,9 +1073,9 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     Vehicle.State currentState = processModel.getVehicleState();
     // Create panel and dialog
-    InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("stateTitle"),
+    InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("loopbackCommAdapterPanel.dialog_setState.title"),
                                                             Arrays.asList(Vehicle.State.values()))
-        .setLabel(BUNDLE.getString("stateLabel"))
+        .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_state.text"))
         .setInitialSelection(currentState)
         .build();
     InputDialog dialog = new InputDialog(panel);
@@ -1121,8 +1119,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     }
     // Create panel and dialog
     InputPanel panel = new DropdownListInputPanel.Builder<>(
-        BUNDLE.getString("positionTitle"), pointList)
-        .setLabel(BUNDLE.getString("positionLabel"))
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPosition.title"), pointList)
+        .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_position.text"))
         .setEditable(true)
         .setInitialSelection(currentPoint)
         .setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()))
@@ -1150,9 +1148,9 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     String initialValue = (Double.isNaN(currentAngle) ? "" : Double.toString(currentAngle));
     // Create dialog and panel
     InputPanel panel = new SingleTextInputPanel.Builder(
-        BUNDLE.getString("orientationTitle"))
-        .setLabel(BUNDLE.getString("orientationLabel"))
-        .setUnitLabel(BUNDLE.getString("AngleUnit"))
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setOrientationAngle.title"))
+        .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_orientationAngle.text"))
+        .setUnitLabel("<html>&#186;")
         .setInitialValue(initialValue)
         .enableResetButton(null)
         .enableValidation(TextInputPanel.TextInputValidator.REGEX_FLOAT)
@@ -1163,7 +1161,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     InputDialog.ReturnStatus returnStatus = dialog.getReturnStatus();
     if (returnStatus == InputDialog.ReturnStatus.ACCEPTED) {
       String input = (String) dialog.getInput();
-      if (input == null) { // The reset button was pressed
+      if (input == null) {
+        // The reset button was pressed
         if (!Double.isNaN(processModel.getOrientationAngle())) {
           sendCommAdapterCommand(new SetOrientationAngleCommand(Double.NaN));
         }
@@ -1175,7 +1174,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
           angle = Double.parseDouble(input);
         }
         catch (NumberFormatException e) {
-          //TODO log message?
+          LOG.warn("Exception parsing orientation angle value '{}'", input, e);
           return;
         }
 
@@ -1200,8 +1199,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     // Create panel and dialog
     InputPanel panel = new SingleTextInputPanel.Builder(
-        BUNDLE.getString("energyLevelTitle"))
-        .setLabel(BUNDLE.getString("energyLevelLabel"))
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setEnergyLevel.title"))
+        .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_energyLevel.text"))
         .setUnitLabel("%")
         .setInitialValue(energyLevelTxt.getText())
         .enableValidation(TextInputPanel.TextInputValidator.REGEX_INT_RANGE_0_100)
@@ -1269,9 +1268,9 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
    */
   private void setPrecisePosText(Triple precisePos) {
     // Convert values to strings
-    String xS = BUNDLE.getString("PrecisePosNotSet");
-    String yS = BUNDLE.getString("PrecisePosNotSet");
-    String zS = BUNDLE.getString("PrecisePosNotSet");
+    String xS = BUNDLE.getString("loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder");
+    String yS = BUNDLE.getString("loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder");
+    String zS = BUNDLE.getString("loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder");
 
     if (precisePos != null) {
       xS = String.valueOf(precisePos.getX());

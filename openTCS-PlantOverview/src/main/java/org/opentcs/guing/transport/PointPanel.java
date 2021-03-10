@@ -24,7 +24,6 @@ import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.InputValidationListener;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Eine Benutzerschnittstelle zum Auswählen einer Station oder eines
@@ -52,7 +51,6 @@ public class PointPanel
   public PointPanel(List<PointModel> items) {
     initComponents();
     fItems = items;
-    setDialogTitle(ResourceBundleUtil.getBundle().getString("PointPanel.title"));
 
     Collections.sort(fItems, getComparator());
     List<String> names = new ArrayList<>();
@@ -168,8 +166,8 @@ public class PointPanel
     setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 5));
 
     itemsLabel.setFont(itemsLabel.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    itemsLabel.setText(bundle.getString("VehicleAction.points")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/dialogs/vehiclePopup"); // NOI18N
+    itemsLabel.setText(bundle.getString("pointPanel.label_points.text")); // NOI18N
     add(itemsLabel);
 
     itemsComboBox.setEditable(true);

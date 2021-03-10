@@ -22,7 +22,6 @@ import javax.swing.JPopupMenu;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.application.ApplicationState;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.tree.elements.UserObject;
@@ -32,6 +31,8 @@ import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.BlockSelector;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -46,7 +47,17 @@ public class BlockMouseListener
    * Stores the application's current state.
    */
   private final ApplicationState appState;
+  /**
+   * The application's drawing editor.
+   */
   private final DrawingEditor drawingEditor;
+  /**
+   * A helper for selecting blocks/block elements.
+   */
+  private final BlockSelector blockSelector;
+  /**
+   * The affected models.
+   */
   private List<ModelComponent> fAffectedModels;
 
   /**
@@ -55,14 +66,17 @@ public class BlockMouseListener
    * @param appState The application state
    * @param drawingEditor The drawing editor
    * @param treeView The tree view
+   * @param blockSelector A helper for selecting blocks/block elements.
    */
   @Inject
   public BlockMouseListener(ApplicationState appState,
                             DrawingEditor drawingEditor,
-                            TreeView treeView) {
+                            TreeView treeView,
+                            BlockSelector blockSelector) {
     super(treeView);
     this.appState = requireNonNull(appState, "appState");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
+    this.blockSelector = requireNonNull(blockSelector, "blockSelector");
   }
 
   @Override
@@ -70,13 +84,12 @@ public class BlockMouseListener
                                     UserObject userObject,
                                     Set<UserObject> oldSelection) {
     JPopupMenu menu = new JPopupMenu();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    final OpenTCSView openTCSView = OpenTCSView.instance();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
     ModelComponent modelComponent = userObject.getModelComponent();
     if (modelComponent instanceof BlockModel) {
       final BlockModel blockModel = (BlockModel) modelComponent;
-      JMenuItem item = new JMenuItem(labels.getString("blockUserObject.addSelection"));
+      JMenuItem item = new JMenuItem(labels.getString("blockMouseListener.popupMenuItem_addToBlock.text"));
       item.addActionListener(new ActionListener() {
 
         @Override
@@ -89,7 +102,7 @@ public class BlockMouseListener
       item.setEnabled(appState.hasOperationMode(OperationMode.MODELLING));
       menu.add(item);
 
-      item = new JMenuItem(labels.getString("blockUserObject.removeSelection"));
+      item = new JMenuItem(labels.getString("blockMouseListener.popupMenuItem_removeFromBlock.text"));
       item.addActionListener(new ActionListener() {
 
         @Override
@@ -104,12 +117,12 @@ public class BlockMouseListener
 
       menu.addSeparator();
 
-      item = new JMenuItem(labels.getString("blockUserObject.selectAll"));
+      item = new JMenuItem(labels.getString("blockMouseListener.popupMenuItem_selectAllElements.text"));
       item.addActionListener(new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-          openTCSView.blockSelected((blockModel));
+          blockSelector.blockSelected(blockModel);
         }
       });
 

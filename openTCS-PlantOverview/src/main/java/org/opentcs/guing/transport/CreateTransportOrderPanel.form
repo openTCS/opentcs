@@ -21,8 +21,8 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="&lt;User Code&gt;">
-              <Connection PropertyName="titleX" code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.driveOrders&quot;)" type="code"/>
+            <TitledBorder title="Drive orders">
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.panel_stations.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -61,8 +61,8 @@
                 <Font component="addButton" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.add&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.button_add.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -81,8 +81,8 @@
                 <Font component="editButton" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.edit&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.button_edit.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -101,8 +101,8 @@
                 <Font component="removeButton" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.delete&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.button_delete.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -121,8 +121,8 @@
                 <Font component="moveUpButton" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.up&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.button_up.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -141,8 +141,8 @@
                 <Font component="moveDownButton" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.down&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.button_moveDown.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -764,8 +764,8 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="&lt;User Code&gt;">
-              <Connection PropertyName="titleX" code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.deadline&quot;)" type="code"/>
+            <TitledBorder title="Deadline">
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.panel_deadline.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -778,8 +778,8 @@
                 <Font component="dateLabel" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.date&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.label_date.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -812,9 +812,10 @@
                 <Font component="timeLabel" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.time&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.label_time.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1279,8 +1280,8 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="&lt;User Code&gt;">
-              <Connection PropertyName="titleX" code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.category&quot;)" type="code"/>
+            <TitledBorder title="Category">
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.panel_category.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -1293,8 +1294,8 @@
                 <Font component="categoryLabel" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.category&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.label_category.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -1582,8 +1583,8 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="&lt;User Code&gt;">
-              <Connection PropertyName="titleX" code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.vehicle&quot;)" type="code"/>
+            <TitledBorder title="Vehicle">
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.panel_vehicle.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -1596,8 +1597,8 @@
                 <Font component="vehicleLabel" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceBundleUtil.getBundle().getString(&quot;CreateTransportOrderPanel.vehicle&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.label_vehicle.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>

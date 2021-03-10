@@ -9,14 +9,17 @@
  */
 package org.opentcs.guing.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.Selectable;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -28,6 +31,7 @@ public class SelectionPropertyEditorPanel
     extends JPanel
     implements DetailsDialogContent {
 
+  private final ListCellRenderer<Object> listCellRenderer;
   /**
    * Das Attribut.
    */
@@ -36,7 +40,11 @@ public class SelectionPropertyEditorPanel
   /**
    * Creates new form SelectionPropertyEditorPanel
    */
-  public SelectionPropertyEditorPanel() {
+  @SuppressWarnings("unchecked")
+  public SelectionPropertyEditorPanel(ListCellRenderer<?> listCellRenderer) {
+    requireNonNull(listCellRenderer, "listCellRenderer");
+    
+    this.listCellRenderer = (ListCellRenderer<Object>) listCellRenderer;
     initComponents();
   }
 
@@ -51,6 +59,7 @@ public class SelectionPropertyEditorPanel
 
     Object value = fProperty.getValue();
     valueComboBox.setSelectedItem(value);
+    valueComboBox.setRenderer(listCellRenderer);
   }
 
   @Override // DetailsDialogContent
@@ -62,7 +71,8 @@ public class SelectionPropertyEditorPanel
 
   @Override // DetailsDialogContent
   public String getTitle() {
-    return ResourceBundleUtil.getBundle().getString("SelectionPropertyEditorPanel.title");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH)
+        .getString("selectionPropertyEditorPanel.title");
   }
 
   @Override // DetailsDialogContent
@@ -86,8 +96,8 @@ public class SelectionPropertyEditorPanel
     setLayout(new java.awt.GridBagLayout());
 
     valueLabel.setFont(valueLabel.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    valueLabel.setText(bundle.getString("SelectionPropertyEditorPanel.value.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/propertyEditing"); // NOI18N
+    valueLabel.setText(bundle.getString("selectionPropertyEditorPanel.label_value.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
     add(valueLabel, gridBagConstraints);

@@ -182,6 +182,7 @@ public class XMLModelBuilder
    * @param model The model data.
    * @return A list of {@link PathCreationTO Paths} for all paths in a model.
    */
+  @SuppressWarnings("deprecation")
   private List<PathCreationTO> getPath(Model model) {
     Set<Path> paths = model.getObjectPool().getObjects(Path.class);
     List<PathCreationTO> result = new ArrayList<>();

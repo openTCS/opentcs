@@ -107,7 +107,7 @@ public class ResourceAllocationPanel
       return;
     }
     // Remove event listener in the kernel.
-    eventSource.subscribe(this);
+    eventSource.unsubscribe(this);
     sharedPortal.close();
 
     initialized = false;
@@ -181,8 +181,8 @@ public class ResourceAllocationPanel
         optionsPanel.setLayout(new java.awt.GridBagLayout());
 
         enableUpdatesCheckbox.setSelected(true);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-        enableUpdatesCheckbox.setText(bundle.getString("ResourceAllocationPanel.disableUpdates.text")); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/resourceAllocationPanel/Bundle"); // NOI18N
+        enableUpdatesCheckbox.setText(bundle.getString("resourceAllocationPanel.checkBox_enableUpdates.text")); // NOI18N
         enableUpdatesCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 enableUpdatesCheckboxActionPerformed(evt);

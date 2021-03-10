@@ -129,6 +129,7 @@ public class V002TOMapper {
     return result;
   }
 
+  @SuppressWarnings("deprecation")
   private List<PathCreationTO> toPathCreationTO(List<PathTO> paths) {
     List<PathCreationTO> result = new ArrayList<>();
 
@@ -334,6 +335,7 @@ public class V002TOMapper {
     return result;
   }
 
+  @SuppressWarnings("deprecation")
   private List<PathTO> toPathTO(List<PathCreationTO> paths) {
     List<PathTO> result = new ArrayList<>();
 
@@ -468,6 +470,7 @@ public class V002TOMapper {
 
   private List<AllowedOperationTO> toAllowedOperationTOs(Collection<String> allowedOperations) {
     return allowedOperations.stream()
+        .sorted()
         .map(allowedOperation -> (AllowedOperationTO) new AllowedOperationTO().setName(allowedOperation))
         .collect(Collectors.toList());
   }

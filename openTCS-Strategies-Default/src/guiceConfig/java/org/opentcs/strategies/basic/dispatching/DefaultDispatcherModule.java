@@ -44,12 +44,10 @@ import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter
 import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.candidates.IsProcessable;
 import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.orders.IsFreelyDispatchableToAnyVehicle;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeParkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeRechargeVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeReparkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeVehicleSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsAvailableForAnyOrder;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsIdleAndDegraded;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsParkable;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsReparkable;
@@ -70,10 +68,8 @@ public class DefaultDispatcherModule
 
   @SuppressWarnings("deprecation")
   private void configureDispatcherDependencies() {
-    Multibinder.newSetBinder(binder(), VehicleSelectionFilter.class)
-        .addBinding().to(IsAvailableForAnyOrder.class);
-    Multibinder.newSetBinder(binder(), TransportOrderSelectionFilter.class)
-        .addBinding().to(IsFreelyDispatchableToAnyVehicle.class);
+    Multibinder.newSetBinder(binder(), VehicleSelectionFilter.class);
+    Multibinder.newSetBinder(binder(), TransportOrderSelectionFilter.class);
     Multibinder.newSetBinder(binder(), ParkVehicleSelectionFilter.class)
         .addBinding().to(IsParkable.class);
     Multibinder.newSetBinder(binder(), ReparkVehicleSelectionFilter.class)

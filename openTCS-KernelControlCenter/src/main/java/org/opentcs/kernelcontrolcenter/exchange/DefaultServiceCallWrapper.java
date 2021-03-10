@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +55,7 @@ public class DefaultServiceCallWrapper
   /**
    * This class' resource bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/kernelcontrolcenter/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The application using this utility.
    */
@@ -114,8 +114,8 @@ public class DefaultServiceCallWrapper
   private boolean showRetryDialog() {
     int dialogSelection
         = JOptionPane.showConfirmDialog(null,
-                                        BUNDLE.getString("DefaultServiceUtility.RetryDialog.text"),
-                                        BUNDLE.getString("DefaultServiceUtility.RetryDialog.title"),
+                                        BUNDLE.getString("defaultServiceCallWrapper.optionPane_retryConfirmation.message"),
+                                        BUNDLE.getString("defaultServiceCallWrapper.optionPane_retryConfirmation.title"),
                                         JOptionPane.YES_NO_CANCEL_OPTION);
 
     switch (dialogSelection) {

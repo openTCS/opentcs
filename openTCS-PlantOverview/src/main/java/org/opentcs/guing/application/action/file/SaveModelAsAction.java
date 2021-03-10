@@ -9,11 +9,11 @@
 package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.application.GuiManager;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -25,6 +25,8 @@ public class SaveModelAsAction
     extends AbstractAction {
 
   public final static String ID = "file.saveModelAs";
+
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * The manager this instance is working with.
    */
@@ -37,14 +39,15 @@ public class SaveModelAsAction
    */
   public SaveModelAsAction(final GuiManager manager) {
     this.guiManager = manager;
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+
+    putValue(NAME, BUNDLE.getString("saveModelAsAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("saveModelAsAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift ctrl S"));
     putValue(MNEMONIC_KEY, Integer.valueOf('A'));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/document-save-as.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/menu/document-save-as.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   @Override

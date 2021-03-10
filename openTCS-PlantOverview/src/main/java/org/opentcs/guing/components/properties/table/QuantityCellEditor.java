@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import org.opentcs.guing.components.properties.type.AbstractQuantity;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.model.elements.LayoutModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
 
@@ -74,7 +75,7 @@ public class QuantityCellEditor
     int blankIndex = text.indexOf(' ');
     // No space means wrong format ( Number[SPACE]Unit )
     if (blankIndex == -1) {
-      showCellEditingErrorMsg("QuantityCellEditor.errorFormat");
+      showCellEditingErrorMsg("quantityCellEditor.dialog_errorFormat.message");
       return;
     }
 
@@ -83,7 +84,7 @@ public class QuantityCellEditor
 
     // Check if unitString is a valid unit
     if (!property().isPossibleUnit(unitString)) {
-      showCellEditingErrorMsg("QuantityCellEditor.errorUnit", property().getPossibleUnits());
+      showCellEditingErrorMsg("quantityCellEditor.dialog_errorUnit.message", property().getPossibleUnits());
       return;
     }
 
@@ -92,13 +93,13 @@ public class QuantityCellEditor
       newValue = Double.parseDouble(valueString);
     }
     catch (NumberFormatException e) {
-      showCellEditingErrorMsg("QuantityCellEditor.errorNumber");
+      showCellEditingErrorMsg("quantityCellEditor.dialog_errorNumber.message");
       return;
     }
 
     // Check if value is inside the valid range
     if (!property().getValidRange().isValueValid(newValue)) {
-      showCellEditingErrorMsg("QuantityCellEditor.errorRange",
+      showCellEditingErrorMsg("quantityCellEditor.dialog_errorRange.message",
                               property().getValidRange().getMin(),
                               property().getValidRange().getMax());
       return;
@@ -106,7 +107,7 @@ public class QuantityCellEditor
 
     // For the layoutModel the Scaling cannot be 0
     if (property().getModel() instanceof LayoutModel && newValue == 0) {
-      showCellEditingErrorMsg("VisualLayout.scaleInvalid.msg");
+      showCellEditingErrorMsg("quantityCellEditor.dialog_errorScale.message");
       return;
     }
 
@@ -162,9 +163,10 @@ public class QuantityCellEditor
   }
 
   private void showCellEditingErrorMsg(String resourceName, Object... arguments) {
+    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
     userMessageHelper.showMessageDialog(
-        ResourceBundleUtil.getBundle().getString("QuantityCellEditor.errorTitle"),
-        ResourceBundleUtil.getBundle().getFormatted(resourceName, arguments),
+        bundle.getString("quantityCellEditor.dialog_error.title"),
+        bundle.getFormatted(resourceName, arguments),
         UserMessageHelper.Type.ERROR);
   }
 

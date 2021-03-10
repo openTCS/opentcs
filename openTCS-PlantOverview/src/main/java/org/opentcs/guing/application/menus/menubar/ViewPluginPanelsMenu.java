@@ -21,6 +21,7 @@ import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.view.AddPluginPanelAction;
 import org.opentcs.guing.components.dockable.DockingManager;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -31,7 +32,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class ViewPluginPanelsMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle();
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
 
   /**
    * The application's main view.
@@ -50,7 +51,7 @@ public class ViewPluginPanelsMenu
   public ViewPluginPanelsMenu(OpenTCSView view,
                               PanelRegistry panelRegistry,
                               DockingManager dockingManager) {
-    super(BUNDLE.getString("view.pluginPanels.text"));
+    super(BUNDLE.getString("viewPluginPanelsMenu.text"));
 
     this.view = requireNonNull(view, "view");
     this.panelRegistry = requireNonNull(panelRegistry, "panelRegistry");
@@ -94,7 +95,7 @@ public class ViewPluginPanelsMenu
     // If the menu is empty, add a single disabled menu item to it that explains
     // to the user that no plugin panels are available.
     if (getMenuComponentCount() == 0) {
-      JMenuItem dummyItem = new JMenuItem(BUNDLE.getString("view.pluginPanels.noneAvailable.text"));
+      JMenuItem dummyItem = new JMenuItem(BUNDLE.getString("viewPluginPanelsMenu.menuItem_none.text"));
       dummyItem.setEnabled(false);
       add(dummyItem);
     }

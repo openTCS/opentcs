@@ -9,7 +9,6 @@
  */
 package org.opentcs.guing.exchange.adapter;
 
-import java.awt.geom.Point2D;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nullable;
@@ -23,8 +22,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
-import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
@@ -103,25 +100,25 @@ public class PointAdapter
   }
 
   private void updateModelType(PointModel model, Point point) {
-    PointModel.PointType value;
+    PointModel.Type value;
 
     switch (point.getType()) {
       case PARK_POSITION:
-        value = PointModel.PointType.PARK;
+        value = PointModel.Type.PARK;
         break;
       case REPORT_POSITION:
-        value = PointModel.PointType.REPORT;
+        value = PointModel.Type.REPORT;
         break;
       case HALT_POSITION:
       default:
-        value = PointModel.PointType.HALT;
+        value = PointModel.Type.HALT;
     }
 
     model.getPropertyType().setValue(value);
   }
 
   private Point.Type getKernelPointType(PointModel model) {
-    return convertPointType((PointModel.PointType) model.getPropertyType().getValue());
+    return convertPointType((PointModel.Type) model.getPropertyType().getValue());
   }
 
   private Triple getKernelCoordinates(PointModel model) {
@@ -133,7 +130,7 @@ public class PointAdapter
     return model.getPropertyVehicleOrientationAngle().getValueByUnit(AngleProperty.Unit.DEG);
   }
 
-  private Point.Type convertPointType(PointModel.PointType type) {
+  private Point.Type convertPointType(PointModel.Type type) {
     requireNonNull(type, "type");
     switch (type) {
       case PARK:
@@ -160,19 +157,18 @@ public class PointAdapter
                                                  VisualLayoutCreationTO layout,
                                                  SystemModel systemModel) {
     PointModel pointModel = (PointModel) model;
-    LabeledPointFigure lpf = (LabeledPointFigure) systemModel.getFigure(model);
-    PointFigure pf = lpf.getPresentationFigure();
-    int xPos = (int) (pf.getZoomPoint().getX() * layout.getScaleX());
-    int yPos = (int) -(pf.getZoomPoint().getY() * layout.getScaleY());
-    Point2D.Double offset = lpf.getLabel().getOffset();
 
-    VisualLayoutCreationTO result
-        = layout.withModelElement(new ModelLayoutElementCreationTO(pointModel.getName())
-            .withProperty(ElementPropKeys.POINT_POS_X, xPos + "")
-            .withProperty(ElementPropKeys.POINT_POS_Y, yPos + "")
-            .withProperty(ElementPropKeys.POINT_LABEL_OFFSET_X, (int) offset.x + "")
-            .withProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y, (int) offset.y + "")
-        );
+    VisualLayoutCreationTO result = layout.withModelElement(
+        new ModelLayoutElementCreationTO(pointModel.getName())
+            .withProperty(ElementPropKeys.POINT_POS_X,
+                          pointModel.getPropertyLayoutPosX().getText())
+            .withProperty(ElementPropKeys.POINT_POS_Y,
+                          pointModel.getPropertyLayoutPosY().getText())
+            .withProperty(ElementPropKeys.POINT_LABEL_OFFSET_X,
+                          pointModel.getPropertyPointLabelOffsetX().getText())
+            .withProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y,
+                          pointModel.getPropertyPointLabelOffsetY().getText())
+    );
 
     pointModel.getPropertyLayoutPosX().unmarkChanged();
     pointModel.getPropertyLayoutPosY().unmarkChanged();

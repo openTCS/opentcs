@@ -15,6 +15,8 @@ import javax.inject.Qualifier;
 
 /**
  * Annotation type for binding injectable components meant to be used in modelling mode.
+ *
+ * @author Stefan Walter (Fraunhofer IML)
  */
 @Qualifier
 @Target(value = {ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

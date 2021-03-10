@@ -17,6 +17,7 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInModellingMode;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -68,7 +69,7 @@ class KernelStateModelling
    * @param configuration This class's configuration.
    */
   @Inject
-  KernelStateModelling(@GlobalKernelSync Object globalSyncObject,
+  KernelStateModelling(@GlobalSyncObject Object globalSyncObject,
                        TCSObjectPool objectPool,
                        Model model,
                        NotificationBuffer messageBuffer,

@@ -18,11 +18,11 @@ import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
-import org.opentcs.guing.application.action.course.DispatchVehicleAction;
 import org.opentcs.guing.application.action.view.FindVehicleAction;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -58,10 +58,6 @@ public class ActionsMenu
    * A menu item for assuming the layout coordinates from the model coordinates.
    */
   private final JMenuItem cbiAlignModelWithLayout;
-  /**
-   * A menu item for triggering a dispatcher run.
-   */
-  private final JMenuItem menuItemDispatch;
 
   /**
    * Creates a new instance.
@@ -81,10 +77,10 @@ public class ActionsMenu
     requireNonNull(menuFactory, "menuFactory");
     requireNonNull(appConfig, "appConfig");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
 
-    this.setText(labels.getString("actions.text"));
-    this.setToolTipText(labels.getString("actions.toolTipText"));
+    this.setText(labels.getString("actionsMenu.text"));
+    this.setToolTipText(labels.getString("actionsMenu.tooltipText"));
     this.setMnemonic('A');
 
     // Menu item Actions -> Create Transport Order
@@ -97,8 +93,8 @@ public class ActionsMenu
     add(menuItemFindVehicle);
 
     // Menu item Actions -> Ignore precise position
-    cbiIgnorePrecisePosition = new JCheckBoxMenuItem("actions.ignorePrecisePosition");
-    labels.configureMenu(cbiIgnorePrecisePosition, "actions.ignorePrecisePosition");
+    cbiIgnorePrecisePosition 
+        = new JCheckBoxMenuItem(labels.getString("actionsMenu.menuItem_ignorePrecisePosition.text"));
 
     add(cbiIgnorePrecisePosition);
     cbiIgnorePrecisePosition.setSelected(appConfig.ignoreVehiclePrecisePosition());
@@ -111,8 +107,8 @@ public class ActionsMenu
     });
 
     // Menu item Actions -> Ignore orientation angle
-    cbiIgnoreOrientationAngle = new JCheckBoxMenuItem(actionMap.get("actions.ignoreOrientationAngle"));
-    labels.configureMenu(cbiIgnoreOrientationAngle, "actions.ignoreOrientationAngle");
+    cbiIgnoreOrientationAngle 
+        = new JCheckBoxMenuItem(labels.getString("actionsMenu.menuItem_ignorePreciseOrientation.text"));
 
     add(cbiIgnoreOrientationAngle);
     cbiIgnoreOrientationAngle.setSelected(appConfig.ignoreVehicleOrientationAngle());
@@ -131,11 +127,6 @@ public class ActionsMenu
     // Menu item Actions -> Copy layout to model
     cbiAlignLayoutWithModel = menuFactory.createLayoutToModelMenuItem(true);
     add(cbiAlignLayoutWithModel);
-
-    addSeparator();
-
-    menuItemDispatch = new JMenuItem(actionMap.get(DispatchVehicleAction.ID));
-    add(menuItemDispatch);
   }
 
   /**
@@ -152,6 +143,5 @@ public class ActionsMenu
     cbiIgnoreOrientationAngle.setEnabled(mode == OperationMode.OPERATING);
     cbiAlignLayoutWithModel.setEnabled(mode == OperationMode.MODELLING);
     cbiAlignModelWithLayout.setEnabled(mode == OperationMode.MODELLING);
-    menuItemDispatch.setEnabled(mode == OperationMode.OPERATING);
   }
 }

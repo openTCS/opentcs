@@ -10,6 +10,7 @@ package org.opentcs.guing.persistence.unified;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -27,7 +28,7 @@ public interface UnifiedModelConstants {
    * The file filter this persistor supports.
    */
   FileFilter DIALOG_FILE_FILTER
-      = new FileNameExtensionFilter(ResourceBundleUtil.getBundle()
-          .getFormatted("PlantOverview.kernelFile.name", FILE_ENDING_XML),
+      = new FileNameExtensionFilter(ResourceBundleUtil.getBundle(I18nPlantOverview.SYSTEM_PATH)
+          .getFormatted("unifiedModelConstants.dialogFileFilter.description", FILE_ENDING_XML),
                                     FILE_ENDING_XML);
 }

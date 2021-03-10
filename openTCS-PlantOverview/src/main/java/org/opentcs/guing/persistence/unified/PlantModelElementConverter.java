@@ -107,6 +107,7 @@ public class PlantModelElementConverter {
     return model;
   }
 
+  @SuppressWarnings("deprecation")
   public PathModel importPath(PathCreationTO pathTO, VisualLayoutCreationTO layoutTO) {
     PathModel model = new PathModel();
 
@@ -130,8 +131,8 @@ public class PlantModelElementConverter {
     // Gather information contained in visual layout
     model.getPropertyPathConnType().setValue(
         extractLayoutPropertyValue(layoutTO, pathTO.getName(), ElementPropKeys.PATH_CONN_TYPE)
-            .map(typeName -> PathModel.LinerType.valueOf(typeName))
-            .orElse(PathModel.LinerType.DIRECT)
+            .map(typeName -> PathModel.Type.valueOf(typeName))
+            .orElse(PathModel.Type.DIRECT)
     );
     model.getPropertyPathControlPoints().setText(
         extractLayoutPropertyValue(layoutTO,
@@ -156,6 +157,12 @@ public class PlantModelElementConverter {
                                                            PercentProperty.Unit.PERCENT);
     model.getPropertyEnergyLevelGood().setValueAndUnit(vehicleTO.getEnergyLevelGood(),
                                                        PercentProperty.Unit.PERCENT);
+    model.getPropertyEnergyLevelFullyRecharged().setValueAndUnit(
+        vehicleTO.getEnergyLevelFullyRecharged(), PercentProperty.Unit.PERCENT
+    );
+    model.getPropertyEnergyLevelSufficientlyRecharged().setValueAndUnit(
+        vehicleTO.getEnergyLevelSufficientlyRecharged(), PercentProperty.Unit.PERCENT
+    );
     for (Map.Entry<String, String> property : vehicleTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
                                                                     property.getKey(),
@@ -283,11 +290,11 @@ public class PlantModelElementConverter {
 
   public BlockModel importBlock(BlockCreationTO blockTO, VisualLayoutCreationTO layoutTO) {
     BlockModel model = new BlockModel();
-    
+
     model.setName(blockTO.getName());
-    
+
     model.getPropertyType().setValue(mapBlockType(blockTO.getType()));
-    
+
     for (String member : blockTO.getMemberNames()) {
       model.getPropertyElements().addItem(member);
     }
@@ -342,25 +349,25 @@ public class PlantModelElementConverter {
     return model;
   }
 
-  private PointModel.PointType mapPointType(Point.Type type) {
+  private PointModel.Type mapPointType(Point.Type type) {
     switch (type) {
       case HALT_POSITION:
-        return PointModel.PointType.HALT;
+        return PointModel.Type.HALT;
       case PARK_POSITION:
-        return PointModel.PointType.PARK;
+        return PointModel.Type.PARK;
       case REPORT_POSITION:
-        return PointModel.PointType.REPORT;
+        return PointModel.Type.REPORT;
       default:
         throw new IllegalArgumentException("Unhandled point type: " + type);
     }
   }
 
-  private BlockModel.BlockType mapBlockType(Block.Type type) {
+  private BlockModel.Type mapBlockType(Block.Type type) {
     switch (type) {
       case SINGLE_VEHICLE_ONLY:
-        return BlockModel.BlockType.SINGLE_VEHICLE_ONLY;
+        return BlockModel.Type.SINGLE_VEHICLE_ONLY;
       case SAME_DIRECTION_ONLY:
-        return BlockModel.BlockType.SAME_DIRECTION_ONLY;
+        return BlockModel.Type.SAME_DIRECTION_ONLY;
       default:
         throw new IllegalArgumentException("Unhandled block type: " + type);
     }

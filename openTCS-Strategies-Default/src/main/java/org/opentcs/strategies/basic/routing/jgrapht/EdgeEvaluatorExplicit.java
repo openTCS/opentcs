@@ -7,13 +7,16 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
 
 /**
  * Uses an edge's explicit routing cost as its weight.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated {@link Path#getRoutingCost()} is deprecated.
  */
+@Deprecated
 public class EdgeEvaluatorExplicit
     implements EdgeEvaluator {
 

@@ -166,8 +166,8 @@ public class VehiclesPanel
 
     add(scrollPaneVehicles);
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/components/dialogs/VehiclesPanel"); // NOI18N
-    getAccessibleContext().setAccessibleName(bundle.getString("VehiclesPanel.title")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/vehicleView"); // NOI18N
+    getAccessibleContext().setAccessibleName(bundle.getString("vehiclesPanel.title")); // NOI18N
     getAccessibleContext().setAccessibleDescription("");
   }// </editor-fold>//GEN-END:initComponents
 

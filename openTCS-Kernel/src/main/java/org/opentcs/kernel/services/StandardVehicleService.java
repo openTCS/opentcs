@@ -15,6 +15,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.kernel.services.VehicleService;
+import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
@@ -27,7 +28,6 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.kernel.GlobalKernelSync;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntry;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
@@ -94,7 +94,7 @@ public class StandardVehicleService
    */
   @Inject
   public StandardVehicleService(TCSObjectService objectService,
-                                @GlobalKernelSync Object globalSyncObject,
+                                @GlobalSyncObject Object globalSyncObject,
                                 TCSObjectPool globalObjectPool,
                                 LocalVehicleControllerPool vehicleControllerPool,
                                 VehicleEntryPool vehicleEntryPool,

@@ -10,7 +10,7 @@
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
@@ -19,6 +19,7 @@ import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.BlockSelector;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
@@ -33,6 +34,10 @@ public class BlockUserObject
     implements ContextObject {
 
   private final UserObjectContext context;
+  /**
+   * A helper for selecting blocks/block elements.
+   */
+  private final BlockSelector blockSelector;
 
   /**
    * Creates a new instance.
@@ -42,15 +47,18 @@ public class BlockUserObject
    * @param view The openTCS view
    * @param editor The drawing editor
    * @param modelManager The model manager
+   * @param blockSelector A helper for selecting blocks/block elements.
    */
   @Inject
   public BlockUserObject(@Assisted BlockModel dataObject,
                          @Assisted UserObjectContext context,
                          OpenTCSView view,
                          OpenTCSDrawingEditor editor,
-                         ModelManager modelManager) {
+                         ModelManager modelManager,
+                         BlockSelector blockSelector) {
     super(dataObject, view, editor, modelManager);
-    this.context = Objects.requireNonNull(context, "context");
+    this.context = requireNonNull(context, "context");
+    this.blockSelector = requireNonNull(blockSelector, "blockSelector");
   }
 
   @Override
@@ -67,7 +75,7 @@ public class BlockUserObject
 
   @Override
   public void doubleClicked() {
-    getView().blockSelected(getModelComponent());
+    blockSelector.blockSelected(getModelComponent());
   }
 
   @Override

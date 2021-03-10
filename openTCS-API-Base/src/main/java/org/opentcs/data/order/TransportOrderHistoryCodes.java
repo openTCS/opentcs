@@ -23,6 +23,36 @@ public interface TransportOrderHistoryCodes {
    */
   String ORDER_CREATED = "tcsHistory:orderCreated";
   /**
+   * An event code indicating dispatching of a transport order to a vehicle has been deferred.
+   * <p>
+   * The history entry's supplement contains a list of reasons for the deferral.
+   * </p>
+   */
+  String ORDER_DISPATCHING_DEFERRED = "tcsHistory:orderDispatchingDeferred";
+  /**
+   * An event code indicating dispatching of a transport order to a vehicle has been resumed.
+   * <p>
+   * The history entry's supplement is empty.
+   * </p>
+   */
+  String ORDER_DISPATCHING_RESUMED = "tcsHistory:orderDispatchingResumed";
+  /**
+   * An event code indicating a transport order was assigned to a vehicle.
+   * <p>
+   * The history entry's supplement contains the name of the vehicle the transport order was
+   * assigned to.
+   * </p>
+   */
+  String ORDER_ASSIGNED_TO_VEHICLE = "tcsHistory:orderAssignedToVehicle";
+  /**
+   * An event code indicating a transport order was reserved for a vehicle.
+   * <p>
+   * The history entry's supplement contains the name of the vehicle the transport order was
+   * reserved for.
+   * </p>
+   */
+  String ORDER_RESERVED_FOR_VEHICLE = "tcsHistory:orderReservedForVehicle";
+  /**
    * An event code indicating a transport order's processing vehicle changed.
    * <p>
    * The history entry's supplement contains the name of the new processing vehicle, or the empty

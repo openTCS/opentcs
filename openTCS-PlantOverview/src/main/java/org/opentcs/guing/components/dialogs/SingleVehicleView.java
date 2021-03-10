@@ -41,6 +41,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.guing.util.I18nPlantOverview;
 
 /**
  * Ein Fahrzeug im {@link AllVehiclesPanel}.
@@ -57,7 +58,7 @@ public class SingleVehicleView
    * The resource bundle this component uses.
    */
   private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org.opentcs.guing.components.dialogs.VehiclesPanel");
+      = ResourceBundle.getBundle(I18nPlantOverview.VEHICLEVIEW_PATH);
   /**
    * The color definition for orange.
    */
@@ -189,16 +190,16 @@ public class SingleVehicleView
     switch (integrationLevel) {
       case TO_BE_IGNORED:
       case TO_BE_NOTICED:
-        integratedStateLabel.setText(BUNDLE.getString("SingleVehicleView.integratedState.no.text"));
+        integratedStateLabel.setText(BUNDLE.getString("singleVehicleView.label_integratedState.no.text"));
         integratedStateLabel.setOpaque(false);
         break;
       case TO_BE_RESPECTED:
-        integratedStateLabel.setText(BUNDLE.getString("SingleVehicleView.integratedState.partially.text"));
+        integratedStateLabel.setText(BUNDLE.getString("singleVehicleView.label_integratedState.partially.text"));
         integratedStateLabel.setOpaque(true);
         integratedStateLabel.setBackground(ORANGE);
         break;
       case TO_BE_UTILIZED:
-        integratedStateLabel.setText(BUNDLE.getString("SingleVehicleView.integratedState.fully.text"));
+        integratedStateLabel.setText(BUNDLE.getString("singleVehicleView.label_integratedState.fully.text"));
         integratedStateLabel.setOpaque(true);
         integratedStateLabel.setBackground(GREEN);
         break;
@@ -231,17 +232,17 @@ public class SingleVehicleView
 
   private void updateEnergyLevel() {
     batteryLabel.setText(fVehicleModel.getPropertyEnergyLevel().getValue() + " %");
-    Object energyState = fVehicleModel.getPropertyEnergyState().getValue();
+    Vehicle vehicle = fVehicleModel.getVehicle();
 
-    if (VehicleModel.EnergyState.CRITICAL.equals(energyState)) {
+    if (vehicle.isEnergyLevelCritical()) {
       batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().
           getResource("org/opentcs/guing/res/symbols/panel/battery-caution-3.png"))));
     }
-    else if (VehicleModel.EnergyState.DEGRADED.equals(energyState)) {
+    else if (vehicle.isEnergyLevelDegraded()) {
       batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().
           getResource("org/opentcs/guing/res/symbols/panel/battery-060-2.png"))));
     }
-    else if (VehicleModel.EnergyState.GOOD.equals(energyState)) {
+    else if (vehicle.isEnergyLevelGood()) {
       batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().
           getResource("org/opentcs/guing/res/symbols/panel/battery-100-2.png"))));
     }
@@ -331,21 +332,21 @@ public class SingleVehicleView
     propertiesPanel.setLayout(new java.awt.GridBagLayout());
 
     integratedLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/components/dialogs/VehiclesPanel"); // NOI18N
-    integratedLabel.setText(bundle.getString("SingleVehicleView.integratedLabel.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/vehicleView"); // NOI18N
+    integratedLabel.setText(bundle.getString("singleVehicleView.label_integrated.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     propertiesPanel.add(integratedLabel, gridBagConstraints);
 
-    integratedStateLabel.setText(bundle.getString("SingleVehicleView.integratedState.no.text")); // NOI18N
+    integratedStateLabel.setText(bundle.getString("singleVehicleView.label_integratedState.no.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     propertiesPanel.add(integratedStateLabel, gridBagConstraints);
 
     vehicleStateLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    vehicleStateLabel.setText(bundle.getString("SingleVehicleView.stateLabel.text")); // NOI18N
+    vehicleStateLabel.setText(bundle.getString("singleVehicleView.label_state.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -362,7 +363,7 @@ public class SingleVehicleView
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 0, 0);
     propertiesPanel.add(vehicleStateValueLabel, gridBagConstraints);
 
-    positionLabel.setText(bundle.getString("SingleVehicleView.positionLabel.text")); // NOI18N
+    positionLabel.setText(bundle.getString("singleVehicleView.label_position.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -381,7 +382,7 @@ public class SingleVehicleView
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 0, 0);
     propertiesPanel.add(positionValueLabel, gridBagConstraints);
 
-    destinationLabel.setText(bundle.getString("SingleVehicleView.destinationLabel.text")); // NOI18N
+    destinationLabel.setText(bundle.getString("singleVehicleView.label_destination.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;

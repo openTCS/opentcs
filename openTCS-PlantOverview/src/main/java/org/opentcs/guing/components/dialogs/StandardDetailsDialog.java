@@ -132,8 +132,8 @@ public class StandardDetailsDialog
     buttonPanel.setOpaque(false);
 
     okButton.setFont(okButton.getFont().deriveFont(okButton.getFont().getStyle() | java.awt.Font.BOLD));
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    okButton.setText(bundle.getString("dialog.buttonOk.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/system"); // NOI18N
+    okButton.setText(bundle.getString("standardDetailsDialog.button_ok.text")); // NOI18N
     okButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         okButtonActionPerformed(evt);
@@ -142,7 +142,7 @@ public class StandardDetailsDialog
     buttonPanel.add(okButton);
 
     cancelButton.setFont(cancelButton.getFont());
-    cancelButton.setText(bundle.getString("dialog.buttonCancel.text")); // NOI18N
+    cancelButton.setText(bundle.getString("standardDetailsDialog.button_cancel.text")); // NOI18N
     cancelButton.setOpaque(false);
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {

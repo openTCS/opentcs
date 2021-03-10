@@ -55,6 +55,7 @@ import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -283,8 +284,7 @@ public class DefaultVehicleController
     Vehicle currVehicleState = (Vehicle) objectEvent.getCurrentObjectState();
 
     if (prevVehicleState.getIntegrationLevel() != currVehicleState.getIntegrationLevel()) {
-      onIntegrationLevelChange(prevVehicleState.getIntegrationLevel(),
-                               currVehicleState.getIntegrationLevel());
+      onIntegrationLevelChange(prevVehicleState, currVehicleState);
     }
   }
 
@@ -964,8 +964,11 @@ public class DefaultVehicleController
     vehicleService.updateVehicleNextPosition(vehicle.getReference(), nextPosRef);
   }
 
-  private void onIntegrationLevelChange(Vehicle.IntegrationLevel prevIntegrationLevel,
-                                        Vehicle.IntegrationLevel currIntegrationLevel) {
+  private void onIntegrationLevelChange(Vehicle prevVehicleState,
+                                        Vehicle currVehicleState) {
+    Vehicle.IntegrationLevel prevIntegrationLevel = prevVehicleState.getIntegrationLevel();
+    Vehicle.IntegrationLevel currIntegrationLevel = currVehicleState.getIntegrationLevel();
+
     synchronized (commAdapter) {
       if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED) {
         // Reset the vehicle's position to free all allocated resources
@@ -993,11 +996,17 @@ public class DefaultVehicleController
         allocateVehiclePosition();
       }
 
-      // XXX In the future the integration level won't implicitly affect the proc state, anymore
-      if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED) {
-        if (vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE)) {
-          vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
-        }
+      updateVehicleProcState(currIntegrationLevel, currVehicleState);
+    }
+  }
+
+  @ScheduledApiChange(when = "5.0",
+                      details = "Integration level won't implicitly affect the proc state, anymore")
+  private void updateVehicleProcState(Vehicle.IntegrationLevel currIntegrationLevel,
+                                      Vehicle vehicle) {
+    if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED) {
+      if (vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE)) {
+        vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
       }
     }
   }

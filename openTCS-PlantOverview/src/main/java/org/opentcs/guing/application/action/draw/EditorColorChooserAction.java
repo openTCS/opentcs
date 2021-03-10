@@ -20,12 +20,15 @@ import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.action.EditorColorIcon;
 import org.jhotdraw.draw.event.FigureSelectionEvent;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.PROPERTIES_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -60,6 +63,8 @@ public class EditorColorChooserAction
     super(editor, fixedAttributes, name, icon);
     this.key = key;
     putValue(AbstractAction.NAME, name);
+    putValue(Action.SHORT_DESCRIPTION,ResourceBundleUtil.getBundle(I18nPlantOverview.TOOLBAR_PATH)
+        .getString("editorColorChooserAction.shortDescription"));
     putValue(AbstractAction.SMALL_ICON, icon);
     updateEnabledState();
   }
@@ -67,9 +72,9 @@ public class EditorColorChooserAction
   @Override
   public void actionPerformed(java.awt.event.ActionEvent e) {
     Color initialColor = getInitialColor();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(PROPERTIES_PATH);
     Color chosenColor = JColorChooser.showDialog((Component) e.getSource(),
-                                                 labels.getString("attribute.color.text"),
+                                                 labels.getString("editorColorChooserAction.dialog_colorSelection.title"),
                                                  initialColor);
 
     if (chosenColor != null) {

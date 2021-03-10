@@ -34,13 +34,13 @@ public class LayoutModel
    * Creates a new instance.
    */
   public LayoutModel() {
-    super(ResourceBundle.getBundle(BUNDLE_PATH).getString("tree.layout.text"));
+    super(ResourceBundle.getBundle(BUNDLE_PATH).getString("layoutModel.treeViewName"));
     createProperties();
   }
 
   @Override // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("layout.description");
+    return bundle.getString("layoutModel.description");
   }
 
   public LengthProperty getPropertyScaleX() {
@@ -57,23 +57,23 @@ public class LayoutModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("layout.name.text"));
-    pName.setHelptext(bundle.getString("layout.name.helptext"));
+    pName.setDescription(bundle.getString("layoutModel.property_name.description"));
+    pName.setHelptext(bundle.getString("layoutModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     LengthProperty pScaleX = new LengthProperty(this);
-    pScaleX.setDescription(bundle.getString("layout.scaleX.text"));
-    pScaleX.setHelptext(bundle.getString("layout.scaleX.helptext"));
+    pScaleX.setDescription(bundle.getString("layoutModel.property_scaleX.description"));
+    pScaleX.setHelptext(bundle.getString("layoutModel.property_scaleX.helptext"));
     setProperty(SCALE_X, pScaleX);
 
     LengthProperty pScaleY = new LengthProperty(this);
-    pScaleY.setDescription(bundle.getString("layout.scaleY.text"));
-    pScaleY.setHelptext(bundle.getString("layout.scaleY.helptext"));
+    pScaleY.setDescription(bundle.getString("layoutModel.property_scaleY.description"));
+    pScaleY.setHelptext(bundle.getString("layoutModel.property_scaleY.helptext"));
     setProperty(SCALE_Y, pScaleY);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("layout.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("layout.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("layoutModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("layoutModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 }

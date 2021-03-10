@@ -15,7 +15,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.filechooser.FileFilter;
@@ -43,8 +42,6 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelFileReader;
 import org.opentcs.guing.persistence.ModelValidator;
-import org.opentcs.guing.util.JOptionPaneUtil;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.persistence.ModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,12 +167,7 @@ public class UnifiedModelReader
     // ImageLayoutElementTOs
     // If any errors occurred, show the dialog with all errors listed
     if (!deserializationErrors.isEmpty()) {
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-      JOptionPaneUtil
-          .showDialogWithTextArea(statusPanel,
-                                  bundle.getString("ValidationWarning.title"),
-                                  bundle.getString("ValidationWarning.descriptionLoading"),
-                                  deserializationErrors.stream().collect(Collectors.toList()));
+      validator.showLoadingValidationWarning(statusPanel, deserializationErrors);
     }
 
     return Optional.of(systemModel);
@@ -191,10 +183,8 @@ public class UnifiedModelReader
       addModelComponentToSystemModel(modelComponent, systemModel);
     }
     else {
-      String deserializationError = ResourceBundleUtil.getBundle()
-          .getFormatted("UnifiedModelReader.deserialization.error",
-                        modelComponent.getName(),
-                        validator.getErrors());
+      String deserializationError = validator.formatDeserializationErrors(modelComponent,
+                                                                          validator.getErrors());
       validator.resetErrors();
       LOG.warn("Deserialization error: {}", deserializationError);
       deserializationErrors.add(deserializationError);

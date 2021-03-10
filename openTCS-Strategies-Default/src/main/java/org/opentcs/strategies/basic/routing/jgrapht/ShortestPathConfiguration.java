@@ -40,7 +40,9 @@ public interface ShortestPathConfiguration {
         "Results of multiple evaluators are added up. Valid values:",
         "'DISTANCE': A route's cost is the sum of the lengths of its paths.",
         "'TRAVELTIME': A route's cost is the vehicle's expected driving time to the destination.",
-        "'EXPLICIT': A route's cost is the sum of the explicitly given costs of its paths."})
+        "'EXPLICIT': A route's cost is the sum of the explicitly given costs of its paths.",
+        "'EXPLICIT_PROPERTIES': Like 'EXPLICIT', but the costs are extracted from path properties."
+      })
   List<EvaluatorType> edgeEvaluators();
 
   enum Algorithm {
@@ -63,6 +65,11 @@ public interface ShortestPathConfiguration {
     DISTANCE,
     TRAVELTIME,
     HOPS,
-    EXPLICIT
+    /**
+     * @deprecated Use property-based routing costs, instead.
+     */
+    @Deprecated
+    EXPLICIT,
+    EXPLICIT_PROPERTIES
   }
 }

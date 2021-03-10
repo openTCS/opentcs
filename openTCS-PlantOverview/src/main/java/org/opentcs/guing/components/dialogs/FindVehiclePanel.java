@@ -91,19 +91,19 @@ public class FindVehiclePanel
   private void initComponents() {
 
     labelVehicles = new javax.swing.JLabel();
-    comboBoxVehicles = new javax.swing.JComboBox<String>();
+    comboBoxVehicles = new javax.swing.JComboBox<>();
     buttonFind = new javax.swing.JButton();
 
     labelVehicles.setFont(labelVehicles.getFont());
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    labelVehicles.setText(bundle.getString("findVehiclePanel.labelVehicles.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/dialogs/findVehicle"); // NOI18N
+    labelVehicles.setText(bundle.getString("findVehiclePanel.label_vehicles.text")); // NOI18N
     add(labelVehicles);
 
     comboBoxVehicles.setFont(comboBoxVehicles.getFont());
     add(comboBoxVehicles);
 
     buttonFind.setFont(buttonFind.getFont());
-    buttonFind.setText(bundle.getString("findVehiclePanel.buttonFind.text")); // NOI18N
+    buttonFind.setText(bundle.getString("findVehiclePanel.button_find.text")); // NOI18N
     buttonFind.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         buttonFindActionPerformed(evt);

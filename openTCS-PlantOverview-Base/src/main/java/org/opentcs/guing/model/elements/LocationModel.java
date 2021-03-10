@@ -97,7 +97,7 @@ public class LocationModel
 
   @Override // AbstractModelComponent
   public String getDescription() {
-    return bundle.getString("location.description");
+    return bundle.getString("locationModel.description");
   }
 
   @Override // AttributesChangeListener
@@ -172,64 +172,64 @@ public class LocationModel
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
-    pName.setDescription(bundle.getString("location.name.text"));
-    pName.setHelptext(bundle.getString("location.name.helptext"));
+    pName.setDescription(bundle.getString("locationModel.property_name.description"));
+    pName.setHelptext(bundle.getString("locationModel.property_name.helptext"));
     setProperty(NAME, pName);
 
     CoordinateProperty pPosX = new CoordinateProperty(this);
-    pPosX.setDescription(bundle.getString("location.x.text"));
-    pPosX.setHelptext(bundle.getString("location.x.helptext"));
+    pPosX.setDescription(bundle.getString("locationModel.property_modelPositionX.description"));
+    pPosX.setHelptext(bundle.getString("locationModel.property_modelPositionX.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
 
     CoordinateProperty pPosY = new CoordinateProperty(this);
-    pPosY.setDescription(bundle.getString("location.y.text"));
-    pPosY.setHelptext(bundle.getString("location.y.helptext"));
+    pPosY.setDescription(bundle.getString("locationModel.property_modelPositionY.description"));
+    pPosY.setHelptext(bundle.getString("locationModel.property_modelPositionY.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
 
     LocationTypeProperty pType = new LocationTypeProperty(this);
-    pType.setDescription(bundle.getString("location.type.text"));
-    pType.setHelptext(bundle.getString("location.type.helptext"));
+    pType.setDescription(bundle.getString("locationModel.property_type.description"));
+    pType.setHelptext(bundle.getString("locationModel.property_type.helptext"));
     setProperty(TYPE, pType);
 
     SymbolProperty pSymbol = new SymbolProperty(this);
-    pSymbol.setDescription(bundle.getString("location.symbol.text"));
-    pSymbol.setHelptext(bundle.getString("location.symbol.helptext"));
+    pSymbol.setDescription(bundle.getString("locationModel.property_symbol.description"));
+    pSymbol.setHelptext(bundle.getString("locationModel.property_symbol.helptext"));
     pSymbol.setCollectiveEditable(true);
     setProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION, pSymbol);
 
     StringProperty pLocPosX = new StringProperty(this);
-    pLocPosX.setDescription(bundle.getString("element.locPosX.text"));
-    pLocPosX.setHelptext(bundle.getString("element.locPosX.helptext"));
+    pLocPosX.setDescription(bundle.getString("locationModel.property_positionX.description"));
+    pLocPosX.setHelptext(bundle.getString("locationModel.property_positionX.helptext"));
     pLocPosX.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_POS_X, pLocPosX);
 
     StringProperty pLocPosY = new StringProperty(this);
-    pLocPosY.setDescription(bundle.getString("element.locPosY.text"));
-    pLocPosY.setHelptext(bundle.getString("element.locPosY.helptext"));
+    pLocPosY.setDescription(bundle.getString("locationModel.property_positionY.description"));
+    pLocPosY.setHelptext(bundle.getString("locationModel.property_positionY.helptext"));
     pLocPosY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_POS_Y, pLocPosY);
 
     StringProperty pLocLabelOffsetX = new StringProperty(this);
-    pLocLabelOffsetX.setDescription(bundle.getString("element.locLabelOffsetX.text"));
-    pLocLabelOffsetX.setHelptext(bundle.getString("element.locLabelOffsetX.helptext"));
+    pLocLabelOffsetX.setDescription(bundle.getString("locationModel.property_labelOffsetX.description"));
+    pLocLabelOffsetX.setHelptext(bundle.getString("locationModel.property_labelOffsetX.helptext"));
     pLocLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, pLocLabelOffsetX);
 
     StringProperty pLocLabelOffsetY = new StringProperty(this);
-    pLocLabelOffsetY.setDescription(bundle.getString("element.locLabelOffsetY.text"));
-    pLocLabelOffsetY.setHelptext(bundle.getString("element.locLabelOffsetY.helptext"));
+    pLocLabelOffsetY.setDescription(bundle.getString("locationModel.property_labelOffsetY.description"));
+    pLocLabelOffsetY.setHelptext(bundle.getString("locationModel.property_labelOffsetY.helptext"));
     pLocLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, pLocLabelOffsetY);
 
     StringProperty pLocLabelOrientationAngle = new StringProperty(this);
-    pLocLabelOrientationAngle.setDescription(bundle.getString("element.locLabelOrientationAngle.text"));
-    pLocLabelOrientationAngle.setHelptext(bundle.getString("element.locLabelOrientationAngle.helptext"));
+    pLocLabelOrientationAngle.setDescription(bundle.getString("locationModel.property_labelOrientationAngle.description"));
+    pLocLabelOrientationAngle.setHelptext(bundle.getString("locationModel.property_labelOrientationAngle.helptext"));
     pLocLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, pLocLabelOrientationAngle);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("location.miscellaneous.text"));
-    pMiscellaneous.setHelptext(bundle.getString("location.miscellaneous.helptext"));
+    pMiscellaneous.setDescription(bundle.getString("locationModel.property_miscellaneous.description"));
+    pMiscellaneous.setHelptext(bundle.getString("locationModel.property_miscellaneous.helptext"));
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 }

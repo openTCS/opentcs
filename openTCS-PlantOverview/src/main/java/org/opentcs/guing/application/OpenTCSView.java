@@ -23,7 +23,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -31,15 +30,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -60,7 +55,6 @@ import org.jhotdraw.app.action.window.ToggleVisibleAction;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
-import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.gui.URIChooser;
 import org.jhotdraw.util.ReversedList;
 import org.opentcs.access.Kernel;
@@ -90,7 +84,6 @@ import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
-import org.opentcs.guing.components.drawing.figures.BitmapFigure;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
@@ -103,7 +96,6 @@ import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.panel.PropertiesPanelFactory;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.tree.BlockFolderFilter;
 import org.opentcs.guing.components.tree.BlocksTreeViewManager;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.components.tree.GroupsTreeViewManager;
@@ -125,11 +117,9 @@ import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
-import org.opentcs.guing.model.ConnectableModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.SystemModel;
-import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LayoutModel;
@@ -143,10 +133,9 @@ import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.OrderSequencesContainerPanel;
 import org.opentcs.guing.transport.TransportOrdersContainerPanel;
 import org.opentcs.guing.util.Colors;
-import org.opentcs.guing.util.Comparators;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.Cursors;
-import org.opentcs.guing.util.ModelComponentUtil;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UniqueNameGenerator;
@@ -174,12 +163,7 @@ public class OpenTCSView
    * The name/title of this application.
    */
   public static final String NAME
-      = ResourceBundleUtil.getBundle().getString("OpenTCSView.name");
-  /**
-   * Copyright information.
-   */
-  public static final String COPYRIGHT
-      = ResourceBundleUtil.getBundle().getString("openTCS.copyright");
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.MISC_PATH).getString("openTcsView.applicationName.text");
   /**
    * Property key for the kernel's current mode of operation.
    */
@@ -203,6 +187,11 @@ public class OpenTCSView
    * classes any more and the singleton is only injected via Guice.
    */
   private static OpenTCSView instance;
+  /**
+   * This instance's resource bundle.
+   */
+  private final ResourceBundleUtil bundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.MISC_PATH);
   /**
    * Provides/manages the application's current state.
    */
@@ -331,7 +320,6 @@ public class OpenTCSView
    * The application's event bus.
    */
   private final EventBus eventBus;
-//  private final MBassador<Object> eventBus;
   /**
    * Handles focussing of dockables.
    */
@@ -358,10 +346,10 @@ public class OpenTCSView
   }
 
   /**
-   * Creates a new view.
+   * Creates a new instance.
    *
    * @param appState Provides/manages the application's current state.
-   * @param fFrame The <code>JFrame</code> this view is wrapped in.
+   * @param appFrame The <code>JFrame</code> this view is wrapped in.
    * @param progressIndicator The progress indicator to be used.
    * @param portalProvider Provides a access to a portal.
    * @param viewManager The view manager to be used.
@@ -394,7 +382,7 @@ public class OpenTCSView
    */
   @Inject
   public OpenTCSView(ApplicationState appState,
-                     @ApplicationFrame JFrame fFrame,
+                     @ApplicationFrame JFrame appFrame,
                      ProgressIndicator progressIndicator,
                      SharedKernelServicePortalProvider portalProvider,
                      ViewManager viewManager,
@@ -425,11 +413,8 @@ public class OpenTCSView
                      DrawingViewFocusHandler drawingViewFocusHandler,
                      DockableHandlerFactory dockableHandlerFactory) {
     this.appState = requireNonNull(appState, "appState");
-    // XXX Check that this frame may actually be null when embedding the plant
-    // XXX overview into another application.
-    this.fFrame = fFrame;
-    this.progressIndicator = requireNonNull(progressIndicator,
-                                            "progressIndicator");
+    this.fFrame = requireNonNull(appFrame, "appFrame");
+    this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.viewManager = requireNonNull(viewManager, "viewManager");
     this.fDrawingEditor = requireNonNull(tcsDrawingEditor, "tcsDrawingEditor");
@@ -467,16 +452,13 @@ public class OpenTCSView
   public void init() {
     eventBus.subscribe(this);
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    progressIndicator.setProgress(10, bundle.getString("OpenTCSView.progress.initialized"));
+    progressIndicator.setProgress(StartupProgressStatus.INITIALIZED);
 
     fDrawingEditor.setDrawingEditorListener(new DrawingEditorEventHandler(fModelManager));
 
-    // Hide the block folder in the generic components tree.
-    fComponentsTreeManager.setComponentFilter(new BlockFolderFilter());
     eventBus.subscribe(fComponentsTreeManager);
 
-    progressIndicator.setProgress(15, bundle.getString("OpenTCSView.progress.loadModel"));
+    progressIndicator.setProgress(StartupProgressStatus.INITIALIZE_MODEL);
     setSystemModel(fModelManager.getModel());
 
     // Properties view (lower left corner)
@@ -603,8 +585,7 @@ public class OpenTCSView
 
     int drawingViewIndex = viewManager.getNextDrawingViewIndex();
 
-    String title = ResourceBundleUtil.getBundle().getString(
-        "OpenTCSView.tab.drivingCourse") + " " + drawingViewIndex;
+    String title = bundle.getString("openTcsView.panel_operatingDrawingView.title") + " " + drawingViewIndex;
     DefaultSingleCDockable newDockable
         = dockingManager.createDockable("drivingCourse" + drawingViewIndex,
                                         title,
@@ -640,14 +621,13 @@ public class OpenTCSView
    * Adds a new transport order view.
    */
   public void addTransportOrderView() {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     int biggestIndex = viewManager.getNextTransportOrderViewIndex();
     DefaultSingleCDockable lastTOView = viewManager.getLastTransportOrderView();
     TransportOrdersContainerPanel panel = toContainerPanelProvider.get();
     DefaultSingleCDockable newDockable
         = dockingManager.createDockable("transportOrders" + biggestIndex,
                                         bundle.getString(
-                                            "OpenTCSView.tab.transportOrders")
+                                            "openTcsView.panel_operatingTransportOrdersView.title")
                                         + " " + biggestIndex, panel, true);
     viewManager.addTransportOrderView(newDockable, panel);
 
@@ -675,7 +655,6 @@ public class OpenTCSView
    * Adds a new order sequence view.
    */
   public void addTransportOrderSequenceView() {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     int biggestIndex = viewManager.getNextOrderSequenceViewIndex();
     DefaultSingleCDockable lastOSView = viewManager.getLastOrderSequenceView();
 
@@ -683,7 +662,7 @@ public class OpenTCSView
     DefaultSingleCDockable newDockable
         = dockingManager.createDockable("orderSequences" + biggestIndex,
                                         bundle.getString(
-                                            "OpenTCSView.tab.transportOrderSequences")
+                                            "openTcsView.panel_operatingOrderSequencesView.title")
                                         + " " + biggestIndex,
                                         panel, true);
     viewManager.addOrderSequenceView(newDockable, panel);
@@ -784,8 +763,7 @@ public class OpenTCSView
 
     List<ModelComponent> items = new ArrayList<>();
     for (UserObject userObject : userObjects) {
-      ModelComponent dataObject = userObject.getModelComponent();
-      items.add(dataObject);
+      items.add(userObject.getModelComponent());
       fGroupsTreeManager.removeItem(userObject);
     }
 
@@ -904,14 +882,13 @@ public class OpenTCSView
    * the model manager
    */
   private void restoreModel(@Nullable KernelServicePortal portal) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     progressIndicator.initialize();
 
-    progressIndicator.setProgress(0, bundle.getString("loadCurrentKernelModel.cleanup"));
+    progressIndicator.setProgress(ModelRestorationProgressStatus.CLEANUP);
     eventBus.onEvent(new SystemModelTransitionEvent(this,
                                                     SystemModelTransitionEvent.Stage.UNLOADING));
 
-    progressIndicator.setProgress(50, bundle.getString("loadCurrentKernelModel.startLoading"));
+    progressIndicator.setProgress(ModelRestorationProgressStatus.START_LOADING_MODEL);
     eventBus.onEvent(new SystemModelTransitionEvent(this,
                                                     SystemModelTransitionEvent.Stage.UNLOADED));
 
@@ -921,21 +898,19 @@ public class OpenTCSView
     else {
       fModelManager.restoreModel(portal);
       statusPanel.setLogMessage(Level.INFO,
-                                bundle.getFormatted("kernelPeristence.modelLoaded",
+                                bundle.getFormatted("openTcsView.message_modelLoaded.text",
                                                     fModelManager.getModel().getName()));
     }
 
-    progressIndicator.setProgress(70, bundle.getString("loadCurrentKernelModel.displayModel"));
+    progressIndicator.setProgress(ModelRestorationProgressStatus.SET_UP_MODEL_VIEW);
     eventBus.onEvent(new SystemModelTransitionEvent(this,
                                                     SystemModelTransitionEvent.Stage.LOADING));
 
     setSystemModel(fModelManager.getModel());
 
-    progressIndicator.setProgress(80, bundle.getString("loadCurrentKernelModel.showDirectoryTree"));
+    progressIndicator.setProgress(ModelRestorationProgressStatus.SET_UP_DIRECTORY_TREE);
 
-    fComponentsTreeManager.sortItems();
-
-    progressIndicator.setProgress(90, bundle.getString("loadCurrentKernelModel.setUpWorkingArea"));
+    progressIndicator.setProgress(ModelRestorationProgressStatus.SET_UP_WORKING_AREA);
 
     ModelComponent layoutComponent
         = fModelManager.getModel().getMainFolder(SystemModel.FolderKey.LAYOUT);
@@ -956,12 +931,11 @@ public class OpenTCSView
    * continue normally), <code>false</code> if the user pressed cancel.
    */
   private boolean showSwitchStateUnsavedChangesDialog() {
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    String title = labels.getString("switchPlantOverviewState.unsavedChangesTitle");
-    String text = labels.getString("switchPlantOverviewState.unsavedChangesText");
-    String[] options = {labels.getString("switchPlantOverviewState.kernel"),
-                        labels.getString("switchPlantOverviewState.discard"),
-                        labels.getString("dialog.buttonCancel.text")};
+    String title = bundle.getString("openTcsView.dialog_unsavedChanges.title");
+    String text = bundle.getString("openTcsView.dialog_unsavedChanges.message");
+    String[] options = {bundle.getString("openTcsView.dialog_unsavedChanges.option_persist.text"),
+                        bundle.getString("openTcsView.dialog_unsavedChanges.option_discard.text"),
+                        bundle.getString("openTcsView.dialog_unsavedChanges.option_cancel.text")};
     switch (userMessageHelper.showOptionsDialog(title,
                                                 text,
                                                 UserMessageHelper.Type.ERROR,
@@ -1010,9 +984,8 @@ public class OpenTCSView
             sharedPortal.close();
             sharedPortal = null;
           }
-          ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-          String text = labels.getFormatted("mode.status.kernelConnectionLost",
-                                            labels.getString("kernel.stateModelling"));
+          String text = bundle.getFormatted("openTcsView.message_kernelConnectionLost.text",
+                                            bundle.getString("openTcsView.state_modelling.text"));
           log(new UserNotification(text, UserNotification.Level.NOTEWORTHY));
         }
         break;
@@ -1063,10 +1036,9 @@ public class OpenTCSView
 
   private void handleKernelInModellingMode() {
     createEmptyModel();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    String text = labels.getFormatted("mode.status.kernelInModelling",
-                                      labels.getString("kernel.stateModelling"),
-                                      labels.getString("kernel.stateOperating"));
+    String text = bundle.getFormatted("openTcsView.message_kernelInModelling.text",
+                                      bundle.getString("openTcsView.state_modelling.text"),
+                                      bundle.getString("openTcsView.state_operating.text"));
     log(new UserNotification(text, UserNotification.Level.INFORMATIONAL));
   }
 
@@ -1171,90 +1143,6 @@ public class OpenTCSView
     }
 
     return restoredUserObjects;
-  }
-
-  public List<Figure> cloneFigures(List<Figure> figuresToClone) {
-    // Buffer for Links and Paths associated with the cloned Points and Locations
-    TreeSet<AbstractConnection> bufferedConnections
-        = new TreeSet<>(Comparators.modelComponentsByName());
-    // References the prototype Points and Locations to their clones
-    Map<ModelComponent, ModelComponent> mClones = new HashMap<>();
-    List<Figure> clonedFigures = new ArrayList<>();
-
-    for (Figure figure : figuresToClone) {
-      if (figure instanceof LabeledFigure) {
-        // Location or Point
-        ConnectableModelComponent model 
-            = (ConnectableModelComponent) figure.get(FigureConstants.MODEL);
-
-        if (model != null) {
-          bufferedConnections.addAll(model.getConnections());
-        }
-
-        LabeledFigure clonedFigure = (LabeledFigure) figure.clone();
-        ModelComponent clonedModel = clonedFigure.get(FigureConstants.MODEL);
-
-        if (model != null) {
-          mClones.put(model, clonedModel);
-        }
-        // Paste cloned figure to the drawing
-        AffineTransform tx = new AffineTransform();
-        // TODO: Make the duplicate's distance configurable.
-        // TODO: With multiple pastes, place the inserted figure relative to
-        // the predecessor, not the original.
-        tx.translate(50, 50);
-        clonedFigure.transform(tx);
-        getActiveDrawingView().getDrawing().add(clonedFigure);
-        // The new tree component will be created by "figureAdded()"
-        clonedFigures.add(clonedFigure);
-      }
-      else if (figure instanceof BitmapFigure) {
-        BitmapFigure clonedFigure
-            = new BitmapFigure(new File(((BitmapFigure) figure).getImagePath()));
-        AffineTransform tx = new AffineTransform();
-        // TODO: Make the duplicate's distance configurable.
-        // TODO: With multiple pastes, place the inserted figure relative to
-        // the predecessor, not the original.
-        tx.translate(50, 50);
-        clonedFigure.transform(tx);
-        getActiveDrawingView().addBackgroundBitmap(clonedFigure);
-      }
-    }
-
-    for (Figure figure : figuresToClone) {
-      if (figure instanceof SimpleLineConnection) {
-        // Link or Path
-        SimpleLineConnection clonedFigure = (SimpleLineConnection) figure.clone();
-        AbstractConnection model = (AbstractConnection) figure.get(FigureConstants.MODEL);
-        AbstractConnection clonedModel
-            = (AbstractConnection) clonedFigure.get(FigureConstants.MODEL);
-
-        if (bufferedConnections.contains(model)) {
-          if (model != null) {
-            ModelComponent sourcePoint = model.getStartComponent();
-            ModelComponent clonedSource = mClones.get(sourcePoint);
-            Iterator<Connector> iConnectors
-                = fModelManager.getModel().getFigure(clonedSource).getConnectors(null).iterator();
-            clonedFigure.setStartConnector(iConnectors.next());
-
-            ModelComponent destinationPoint = model.getEndComponent();
-            ModelComponent clonedDestination = mClones.get(destinationPoint);
-            iConnectors = fModelManager.getModel().getFigure(clonedDestination)
-                .getConnectors(null).iterator();
-            clonedFigure.setEndConnector(iConnectors.next());
-
-            clonedModel.setConnectedComponents(clonedSource, clonedDestination);
-            clonedModel.updateName();
-          }
-        }
-
-        getActiveDrawingView().getDrawing().add(clonedFigure);
-        // The new tree component will be created by "figureAdded()"
-        clonedFigures.add(clonedFigure);
-      }
-    }
-
-    return clonedFigures;
   }
 
   @Override  // View
@@ -1377,8 +1265,8 @@ public class OpenTCSView
           if (lm.getLocationType() == model) {
             JOptionPane.showMessageDialog(
                 this,
-                ResourceBundleUtil.getBundle().getString("message.cannotDeleteLocationType.text"),
-                ResourceBundleUtil.getBundle().getString("message.cannotDeleteLocationType.title"),
+                bundle.getString("openTcsView.optionPane_cannotDeleteLocationType.message"),
+                bundle.getString("openTcsView.optionPane_cannotDeleteLocationType.title"),
                 JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -1411,35 +1299,6 @@ public class OpenTCSView
       drawingView.addToSelection(figure);
       // Scroll view to this figure.
       drawingView.scrollTo(figure);
-    }
-  }
-
-  @Override  // GuiManager
-  public void blockSelected(BlockModel block) {
-    Rectangle2D r = null;
-
-    List<Figure> blockElementFigures
-        = ModelComponentUtil.getChildFigures(block, fModelManager.getModel());
-    for (Iterator<Figure> figureIter = blockElementFigures.iterator(); figureIter.hasNext();) {
-      Rectangle2D displayBox = figureIter.next().getDrawingArea();
-
-      if (r == null) {
-        r = displayBox;
-      }
-      else {
-        r.add(displayBox);
-      }
-    }
-
-    if (r != null) {
-      OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
-      drawingView.clearSelection();
-
-      for (Iterator<Figure> figureIter = blockElementFigures.iterator(); figureIter.hasNext();) {
-        drawingView.addToSelection(figureIter.next());
-      }
-
-      drawingView.updateBlock(block);
     }
   }
 
@@ -1517,9 +1376,8 @@ public class OpenTCSView
   }
 
   private boolean persistModel(KernelServicePortal portal) {
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     if (hasUnsavedChanges()) {
-      JOptionPane.showMessageDialog(null, labels.getString("openTCSView.modelNotSaved"));
+      JOptionPane.showMessageDialog(null, bundle.getString("openTcsView.optionPane_saveModelBeforeKernelPersist.message"));
       if (fModelManager.persistModel(true)) {
         setHasUnsavedChanges(false);
         String modelName = fModelManager.getModel().getName();
@@ -1531,8 +1389,8 @@ public class OpenTCSView
     try {
       if (portal.getState() != Kernel.State.OPERATING) {
         if (userMessageHelper.showConfirmDialog(
-            labels.getString("saveModel.kernelNotInOperating.title"),
-            labels.getString("saveModel.kernelNotInOperating.text"),
+            bundle.getString("openTcsView.dialog_saveModelConfirmation.title"),
+            bundle.getString("openTcsView.dialog_saveModelConfirmation.message"),
             UserMessageHelper.Type.QUESTION)
             != UserMessageHelper.ReturnType.OK) {
           return false;
@@ -1543,7 +1401,7 @@ public class OpenTCSView
         String modelName = fModelManager.getModel().getName();
         setModelNameProperty(modelName);
         setHasUnsavedChanges(false);
-        String persistMsg = labels.getFormatted("kernelPeristence.modelSaved", modelName);
+        String persistMsg = bundle.getFormatted("openTcsView.message_modelSaved.text", modelName);
         statusPanel.setLogMessage(Level.INFO, persistMsg);
       }
       return didSave;
@@ -1719,14 +1577,13 @@ public class OpenTCSView
       @Override
       public void run() {
         String plantOverviewState;
-        ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
 
         switch (newMode) {
           case MODELLING:
-            plantOverviewState = bundle.getString("kernel.stateModelling");
+            plantOverviewState = bundle.getString("openTcsView.state_modelling.text");
             break;
           case OPERATING:
-            plantOverviewState = bundle.getString("kernel.stateOperating");
+            plantOverviewState = bundle.getString("openTcsView.state_operating.text");
             break;
           default:
             plantOverviewState = "?";
@@ -1949,11 +1806,15 @@ public class OpenTCSView
     drawing.addUndoableEditListener(fUndoRedoManager);
 
     fComponentsTreeManager.restoreTreeView(systemModel);
+    fComponentsTreeManager.sortItems();
+    fComponentsTreeManager.getTreeView().getTree().scrollRowToVisible(0);
     fBlocksTreeManager.restoreTreeView(systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
     fBlocksTreeManager.getTreeView().sortRoot();
+    fBlocksTreeManager.getTreeView().getTree().scrollRowToVisible(0);
     fGroupsTreeManager.restoreTreeView(systemModel.getMainFolder(SystemModel.FolderKey.GROUPS));
     fGroupsTreeManager.getTreeView().sortRoot();
     fGroupsTreeManager.getTreeView().sortChildren();
+    fGroupsTreeManager.getTreeView().getTree().scrollRowToVisible(0);
 
     // Add Attribute Change Listeners to all objects
     for (VehicleModel vehicle : systemModel.getVehicleModels()) {
@@ -2041,7 +1902,7 @@ public class OpenTCSView
     DefaultSingleCDockable modellingDockable = addDrawingView();
     viewManager.initModellingDockable(
         modellingDockable,
-        ResourceBundleUtil.getBundle().getString("modellingDrawingView.name"));
+        bundle.getString("openTcsView.panel_modellingDrawingView.title"));
 
     addDrawingView();
 

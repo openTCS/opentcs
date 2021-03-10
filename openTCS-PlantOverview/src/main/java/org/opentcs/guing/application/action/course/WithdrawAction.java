@@ -20,6 +20,7 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.model.elements.VehicleModel;
+import static org.opentcs.guing.util.I18nPlantOverview.VEHICLEPOPUP_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class WithdrawAction
   public static final String ID = "course.vehicle.withdrawTransportOrder";
   public static final String IMMEDIATELY_ID = "course.vehicle.withdrawTransportOrderImmediately";
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(VEHICLEPOPUP_PATH);
   /**
    * This class's logger.
    */
@@ -77,10 +79,10 @@ public class WithdrawAction
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
 
     if (immediateAbort) {
-      ResourceBundleUtil.getBundle().configureAction(this, IMMEDIATELY_ID);
+      putValue(NAME, BUNDLE.getString("withdrawAction.withdrawImmediately.name"));
     }
     else {
-      ResourceBundleUtil.getBundle().configureAction(this, ID);
+      putValue(NAME, BUNDLE.getString("withdrawAction.withdraw.name"));
     }
 
   }
@@ -88,11 +90,10 @@ public class WithdrawAction
   @Override
   public void actionPerformed(ActionEvent evt) {
     if (immediateAbort) {
-      ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
       int dialogResult
           = JOptionPane.showConfirmDialog(dialogParent,
-                                          bundle.getString("course.vehicle.withdrawTransportOrderImmediately.confirmation.text"),
-                                          bundle.getString("course.vehicle.withdrawTransportOrderImmediately.confirmation.title"),
+                                          BUNDLE.getString("withdrawAction.optionPane_confirmWithdraw.message"),
+                                          BUNDLE.getString("withdrawAction.optionPane_confirmWithdraw.title"),
                                           JOptionPane.OK_CANCEL_OPTION,
                                           JOptionPane.WARNING_MESSAGE);
 

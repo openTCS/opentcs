@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -39,7 +40,8 @@ public class StringPropertyEditorPanel
 
   @Override // DetailsDialogContent
   public String getTitle() {
-    return ResourceBundleUtil.getBundle().getString("StringPropertyEditorPanel.title");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH)
+        .getString("stringPropertyEditorPanel.title");
   }
 
   /**

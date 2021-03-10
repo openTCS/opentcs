@@ -222,6 +222,18 @@ public class LabeledPointFigure
         lpy.setText(String.format("%d", newY));
         lpy.markChanged();
       }
+
+      // Offset of the labels of the location will be updated here.
+      StringProperty propOffsetX = model.getPropertyPointLabelOffsetX();
+      if (Strings.isNullOrEmpty(propOffsetX.getText())) {
+        propOffsetX.setText(String.format("%d", TCSLabelFigure.DEFAULT_LABEL_OFFSET_X));
+      }
+
+      StringProperty propOffsetY = model.getPropertyPointLabelOffsetY();
+      if (Strings.isNullOrEmpty(propOffsetY.getText())) {
+        propOffsetY.setText(String.format("%d", TCSLabelFigure.DEFAULT_LABEL_OFFSET_Y));
+      }
+
     }
     // Immer den Typ aktualisieren
     model.getPropertyType().markChanged();

@@ -15,6 +15,7 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 
 /**
  * Creates load generator panels.
@@ -27,8 +28,7 @@ public class ContinuousLoadPanelFactory
   /**
    * This classe's bundle.
    */
-  private final ResourceBundle bundle
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/loadgenerator/Bundle");
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * A reference to the shared portal provider.
    */
@@ -53,7 +53,7 @@ public class ContinuousLoadPanelFactory
 
   @Override
   public String getPanelDescription() {
-    return bundle.getString("Continuous_load");
+    return bundle.getString("continuousLoadPanelFactory.panelDescription");
   }
 
   @Override

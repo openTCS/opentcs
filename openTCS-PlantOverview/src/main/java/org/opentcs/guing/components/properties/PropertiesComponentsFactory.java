@@ -14,22 +14,32 @@ import org.opentcs.guing.util.UserMessageHelper;
 
 /**
  * A factory for creating instances in relation to properties.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PropertiesComponentsFactory {
 
   /**
-   * Creates a {@link CoordinateUndoActivity} for the given coordinate property.
-   * 
+   * Creates a {@link LayoutToModelCoordinateUndoActivity} for the given coordinate property.
+   *
    * @param property The property.
-   * @return The {@link CoordinateUndoActivity}.
+   * @return The {@link LayoutToModelCoordinateUndoActivity}.
    */
-  CoordinateUndoActivity createCoordinateUndoActivity(CoordinateProperty property);
+  LayoutToModelCoordinateUndoActivity createLayoutToModelCoordinateUndoActivity(
+      CoordinateProperty property);
+
+  /**
+   * Creates a {@link ModelToLayoutCoordinateUndoActivity} for the given coordinate property.
+   *
+   * @param property The property.
+   * @return The {@link ModelToLayoutCoordinateUndoActivity}.
+   */
+  ModelToLayoutCoordinateUndoActivity createModelToLayoutCoordinateUndoActivity(
+      CoordinateProperty property);
 
   /**
    * Creates a {@link CoordinateCellEditor}.
-   * 
+   *
    * @param textField The text field for the cell editor.
    * @param userMessageHelper The user message helper.
    * @return The {@link CoordinateCellEditor}.

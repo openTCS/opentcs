@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.order.TransportOrderHistoryCodes;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -25,7 +26,7 @@ public class StandardObjectHistoryEntryFormatter
   /**
    * A bundle providing localized strings.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TODETAIL_PATH);
 
   /**
    * Creates a new instance.
@@ -39,19 +40,40 @@ public class StandardObjectHistoryEntryFormatter
 
     switch (entry.getEventCode()) {
       case TransportOrderHistoryCodes.ORDER_CREATED:
-        return Optional.of(bundle.getString("historyEntry.text.orderCreated"));
+        return Optional.of(bundle.getString("standardObjectHistoryEntryFormatter.code_orderCreated.text"));
+
+      case TransportOrderHistoryCodes.ORDER_DISPATCHING_DEFERRED:
+        return Optional.of(
+            bundle.getString("standardObjectHistoryEntryFormatter.code_orderDispatchingDeferred.text")
+            + " " + entry.getSupplement().toString()
+        );
+
+      case TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED:
+        return Optional.of(bundle.getString("standardObjectHistoryEntryFormatter.code_orderDispatchingResumed.text"));
+
+      case TransportOrderHistoryCodes.ORDER_ASSIGNED_TO_VEHICLE:
+        return Optional.of(
+            bundle.getString("standardObjectHistoryEntryFormatter.code_orderAssignedToVehicle.text")
+            + " '" + entry.getSupplement().toString() + "'"
+        );
+
+      case TransportOrderHistoryCodes.ORDER_RESERVED_FOR_VEHICLE:
+        return Optional.of(
+            bundle.getString("standardObjectHistoryEntryFormatter.code_orderReservedForVehicle.text")
+            + " '" + entry.getSupplement().toString() + "'"
+        );
 
       case TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED:
         return Optional.of(
-            bundle.getString("historyEntry.text.orderProcVehicleChanged")
+            bundle.getString("standardObjectHistoryEntryFormatter.code_orderProcVehicleChanged.text")
             + " '" + entry.getSupplement().toString() + "'"
         );
 
       case TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED:
-        return Optional.of(bundle.getString("historyEntry.text.driveOrderFinished"));
+        return Optional.of(bundle.getString("standardObjectHistoryEntryFormatter.code_driveOrderFinished.text"));
 
       case TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE:
-        return Optional.of(bundle.getString("historyEntry.text.orderReachedFinalState"));
+        return Optional.of(bundle.getString("standardObjectHistoryEntryFormatter.code_orderReachedFinalState.text"));
 
       default:
         return Optional.empty();

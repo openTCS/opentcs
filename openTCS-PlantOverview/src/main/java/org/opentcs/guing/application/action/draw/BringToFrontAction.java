@@ -15,11 +15,9 @@
  */
 package org.opentcs.guing.application.action.draw;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import static javax.swing.Action.SMALL_ICON;
-import javax.swing.ImageIcon;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -28,6 +26,7 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -41,6 +40,8 @@ public class BringToFrontAction
 
   public final static String ID = "edit.bringToFront";
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
+
   /**
    * Creates a new instance.
    *
@@ -48,12 +49,11 @@ public class BringToFrontAction
    */
   public BringToFrontAction(DrawingEditor editor) {
     super(editor);
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureAction(this, ID, false);
-    
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/object-order-front.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    
+
+    putValue(NAME, BUNDLE.getString("bringToFrontAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("bringToFrontAction.shortDescription"));
+    putValue(SMALL_ICON, ImageDirectory.getImageIcon("/toolbar/object-order-front.png"));
+
     updateEnabledState();
   }
 
@@ -65,8 +65,7 @@ public class BringToFrontAction
     fireUndoableEditHappened(new AbstractUndoableEdit() {
       @Override
       public String getPresentationName() {
-        ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-        return labels.getTextProperty(ID);
+        return ResourceBundleUtil.getBundle(TOOLBAR_PATH).getString("bringToFrontAction.undo.presentationName");
       }
 
       @Override

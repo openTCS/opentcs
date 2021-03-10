@@ -35,7 +35,7 @@ public class KernelStatusPanel
   /**
    * Formats time stamps.
    */
-  private static final DateTimeFormatter dateFormat = DateTimeFormatter
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
       .ofLocalizedDateTime(FormatStyle.SHORT)
       .withLocale(Locale.getDefault())
       .withZone(ZoneId.systemDefault());
@@ -60,7 +60,7 @@ public class KernelStatusPanel
   public void display(UserNotification notification) {
     requireNonNull(notification, "message");
 
-    statusTextArea.append(dateFormat.format(notification.getTimestamp()) + " "
+    statusTextArea.append(DATE_FORMAT.format(notification.getTimestamp()) + " "
         + notification.getLevel() + ": [" + notification.getSource() + "] "
         + notification.getText() + "\n");
     statusTextArea.setCaretPosition(statusTextArea.getDocument().getLength());

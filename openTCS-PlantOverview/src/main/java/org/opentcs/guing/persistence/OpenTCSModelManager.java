@@ -79,6 +79,8 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.unified.UnifiedModelPersistor;
 import org.opentcs.guing.persistence.unified.UnifiedModelReader;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.guing.util.I18nPlantOverview;
+import static org.opentcs.guing.util.I18nPlantOverview.STATUS_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.SynchronizedFileChooser;
 import org.slf4j.Logger;
@@ -261,8 +263,8 @@ public class OpenTCSModelManager
     }
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle()
-                                    .getFormatted("modelManager.persistence.notLoaded",
+                                ResourceBundleUtil.getBundle(I18nPlantOverview.STATUS_PATH)
+                                    .getFormatted("openTcsModelManager.message_notLoaded.text",
                                                   file.getName()));
       LOG.info("Error reading file", ex);
     }
@@ -287,8 +289,8 @@ public class OpenTCSModelManager
     }
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle()
-                                    .getFormatted("modelManager.persistence.notImported"));
+                                ResourceBundleUtil.getBundle(I18nPlantOverview.STATUS_PATH)
+                                    .getFormatted("openTcsModelManager.message_notImported.text"));
       LOG.warn("Exception importing model", ex);
       return false;
     }
@@ -303,8 +305,8 @@ public class OpenTCSModelManager
     }
     catch (IllegalStateException | CredentialsException e) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle()
-                                    .getString("modelManager.persistence.notSaved"));
+                                ResourceBundleUtil.getBundle(I18nPlantOverview.STATUS_PATH)
+                                    .getString("openTcsModelManager.message_notSaved.text"));
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -323,9 +325,7 @@ public class OpenTCSModelManager
         || currentModelFile == null
         || fModelName == null
         || fModelName.isEmpty()
-        || fModelName.equals(Kernel.DEFAULT_MODEL_NAME)
-        || fModelName.equals(
-            ResourceBundleUtil.getBundle().getString("file.newModel.text"))) {
+        || fModelName.equals(Kernel.DEFAULT_MODEL_NAME)) {
       File selectedFile = showSaveDialog();
       if (selectedFile == null) {
         return false;
@@ -350,8 +350,8 @@ public class OpenTCSModelManager
     }
     catch (IOException e) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle()
-                                    .getString("modelManager.persistence.notSaved"));
+                                ResourceBundleUtil.getBundle(STATUS_PATH)
+                                    .getString("openTcsModelManager.message_notSaved.text"));
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -371,8 +371,8 @@ public class OpenTCSModelManager
     }
     catch (IOException | IllegalArgumentException ex) {
       statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle()
-                                    .getString("modelManager.persistence.notExported"));
+                                ResourceBundleUtil.getBundle(I18nPlantOverview.STATUS_PATH)
+                                    .getString("openTcsModelManager.message_notExported.text"));
       LOG.warn("Exception exporting model", ex);
       return false;
     }
@@ -615,7 +615,7 @@ public class OpenTCSModelManager
 
     for (LocationModel locationModel : locationModels) {
       LabeledLocationFigure llf = createLocationFigure(locationModel, scaleX, scaleY);
-      
+
       systemModel.registerFigure(locationModel, llf);
       locationModel.addAttributesChangeListener(llf);
 
@@ -668,8 +668,8 @@ public class OpenTCSModelManager
     // TODO: labelOrientationAngle auswerten
 //      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
-    double labelPositionX;
-    double labelPositionY;
+    int labelPositionX;
+    int labelPositionY;
     if (labelOffsetX != null && labelOffsetY != null) {
       try {
         labelPositionX = Integer.parseInt(labelOffsetX);
@@ -681,8 +681,7 @@ public class OpenTCSModelManager
         labelPositionY = -20;
       }
 
-      labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
-      label.setOffset(labelPosition);
+      label.setOffset(labelPositionX, labelPositionY);
     }
     figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
     locationFigure.setBounds(figurePosition, figurePosition);
@@ -815,8 +814,8 @@ public class OpenTCSModelManager
       pathFigure.connect(startFigure, endFigure);
     }
 
-    PathModel.LinerType connectionType
-        = (PathModel.LinerType) pathModel.getPropertyPathConnType().getValue();
+    PathModel.Type connectionType
+        = (PathModel.Type) pathModel.getPropertyPathConnType().getValue();
 
     if (connectionType != null) {
       initPathControlPoints(connectionType,
@@ -853,11 +852,11 @@ public class OpenTCSModelManager
     }
   }
 
-  private void initPathControlPoints(PathModel.LinerType connectionType,
+  private void initPathControlPoints(PathModel.Type connectionType,
                                      String sControlPoints,
                                      PathConnection pathFigure) {
-    if (connectionType != PathModel.LinerType.BEZIER
-        && connectionType != PathModel.LinerType.BEZIER_3) {
+    if (connectionType != PathModel.Type.BEZIER
+        && connectionType != PathModel.Type.BEZIER_3) {
       return;
     }
     if (Strings.isNullOrEmpty(sControlPoints)) {
@@ -951,8 +950,8 @@ public class OpenTCSModelManager
     // TODO: labelOrientationAngle auswerten
 //      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
-    double labelPositionX;
-    double labelPositionY;
+    int labelPositionX;
+    int labelPositionY;
     if (labelOffsetX != null && labelOffsetY != null) {
       try {
         labelPositionX = Integer.parseInt(labelOffsetX);
@@ -964,8 +963,7 @@ public class OpenTCSModelManager
         labelPositionY = -20;
       }
 
-      labelPosition = new Point2D.Double(labelPositionX, labelPositionY);
-      label.setOffset(labelPosition);
+      label.setOffset(labelPositionX, labelPositionY);
     }
     // Figur auf diese Position verschieben
     figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!

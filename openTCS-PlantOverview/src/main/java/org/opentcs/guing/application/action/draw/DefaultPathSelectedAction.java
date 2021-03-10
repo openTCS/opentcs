@@ -16,7 +16,6 @@ import org.opentcs.guing.application.toolbar.OpenTCSConnectionTool;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.util.ImageDirectory;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * This action manages the behaviour when the user selects the path button.
@@ -26,7 +25,7 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class DefaultPathSelectedAction
     extends org.jhotdraw.draw.action.AbstractSelectedAction {
 
-  private final PathModel.LinerType pathType;
+  private final PathModel.Type pathType;
   private final Tool tool;
   /**
    * The button this action belongs to.
@@ -78,7 +77,7 @@ public class DefaultPathSelectedAction
   public DefaultPathSelectedAction(
       DrawingEditor editor,
       Tool tool,
-      PathModel.LinerType pathType,
+      PathModel.Type pathType,
       JPopupButton popupButton,
       ButtonGroup group) {
 
@@ -90,9 +89,8 @@ public class DefaultPathSelectedAction
     this.pathType = Objects.requireNonNull(pathType);
     this.largeIcon = getLargeImageIconByType(pathType);
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
-    putValue(AbstractAction.NAME, bundle.getString("path.type." + pathType.name() + ".text"));
-    putValue(AbstractAction.SHORT_DESCRIPTION, bundle.getString("path.type." + pathType.name() + ".toolTipText"));
+    putValue(AbstractAction.NAME, pathType.getDescription());
+    putValue(AbstractAction.SHORT_DESCRIPTION, pathType.getHelptext());
     putValue(AbstractAction.SMALL_ICON, getImageIconByType(pathType));
   }
 
@@ -105,7 +103,8 @@ public class DefaultPathSelectedAction
       // Im Property muss die Kurve auch noch geändert werden
       pathConnection.getModel().getPropertyPathConnType().setValue(pathType);
 
-      ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "path.type." + pathType.name());
+      popupButton.setText(null);
+      popupButton.setToolTipText(pathType.getHelptext());
       popupButton.setIcon(largeIcon);
     }
 
@@ -123,7 +122,7 @@ public class DefaultPathSelectedAction
     }
   }
 
-  private ImageIcon getImageIconByType(PathModel.LinerType pathType) {
+  private ImageIcon getImageIconByType(PathModel.Type pathType) {
     switch (pathType) {
       case DIRECT:
         return ImageDirectory.getImageIcon("/toolbar/path-direct.22.png");
@@ -140,7 +139,7 @@ public class DefaultPathSelectedAction
     }
   }
 
-  private ImageIcon getLargeImageIconByType(PathModel.LinerType pathType) {
+  private ImageIcon getLargeImageIconByType(PathModel.Type pathType) {
     switch (pathType) {
       case DIRECT:
         return ImageDirectory.getImageIcon("/toolbar/path-direct-arrow.22.png");

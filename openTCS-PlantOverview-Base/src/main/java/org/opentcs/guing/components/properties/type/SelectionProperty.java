@@ -10,8 +10,6 @@ package org.opentcs.guing.components.properties.type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.ResourceBundle;
-import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -31,10 +29,6 @@ public class SelectionProperty<E extends Enum<E>>
    * Die möglichen Werte.
    */
   private List<E> fPossibleValues;
-  /**
-   * This class's resource bundle.
-   */
-  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
 
   /**
    * Standardkonstruktor.
@@ -78,7 +72,7 @@ public class SelectionProperty<E extends Enum<E>>
   @Override
   public void setValue(Object value) {
     if (fPossibleValues.contains(value)
-        || value.equals(bundle.getString("PropertiesCollection.differentValues.text"))) {
+        || value instanceof AcceptableInvalidValue) {
       fValue = value;
     }
   }

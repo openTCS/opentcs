@@ -8,7 +8,6 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -17,6 +16,7 @@ import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 import org.opentcs.guing.components.EditableComponent;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -33,19 +33,22 @@ public class DeleteAction
     extends TextAction {
 
   public final static String ID = "edit.delete";
+  
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
   /**
    * Creates a new instance which acts on the currently focused component.
    */
   public DeleteAction() {
     super(ID);
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
 
+    putValue(NAME, BUNDLE.getString("deleteAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("deleteAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("DEL"));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-delete-2.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon image = ImageDirectory.getImageIcon("/menu/edit-delete-2.png");
+    putValue(SMALL_ICON, image);
+    putValue(LARGE_ICON_KEY, image);
   }
 
   @Override

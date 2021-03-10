@@ -69,8 +69,8 @@ public class ClosableDialog
     });
 
     buttonClose.setFont(buttonClose.getFont().deriveFont(buttonClose.getFont().getStyle() | java.awt.Font.BOLD));
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    buttonClose.setText(bundle.getString("dialog.buttonClose.text")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/system"); // NOI18N
+    buttonClose.setText(bundle.getString("closableDialog.button_close.text")); // NOI18N
     buttonClose.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         buttonCloseActionPerformed(evt);

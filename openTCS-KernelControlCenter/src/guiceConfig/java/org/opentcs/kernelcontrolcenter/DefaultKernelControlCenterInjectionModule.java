@@ -144,12 +144,7 @@ public class DefaultKernelControlCenterInjectionModule
   }
 
   private void configureKernelControlCenter(KernelControlCenterConfiguration configuration) {
-    if (configuration.language().toLowerCase().equals("german")) {
-      Locale.setDefault(Locale.GERMAN);
-    }
-    else {
-      Locale.setDefault(Locale.ENGLISH);
-    }
+    Locale.setDefault(Locale.forLanguageTag(configuration.locale()));
 
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

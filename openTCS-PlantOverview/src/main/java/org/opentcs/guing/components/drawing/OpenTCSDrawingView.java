@@ -55,7 +55,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,7 +96,6 @@ import org.jhotdraw.gui.datatransfer.ClipboardUtil;
 import org.jhotdraw.util.ReversedList;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.application.ApplicationState;
-import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.components.EditableComponent;
 import org.opentcs.guing.components.drawing.course.Origin;
@@ -126,6 +124,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.FigureCloner;
 import org.opentcs.guing.util.ModelComponentUtil;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -151,10 +150,6 @@ public abstract class OpenTCSDrawingView
    * Decoration of paths, points and locations that are part of a block.
    */
   private static final BasicStroke BLOCK_STROKE = new BasicStroke(4.0f);
-  /**
-   * Decoration of paths and points that are part of a static route.
-   */
-  private static final BasicStroke STATIC_ROUTE_STROKE = new BasicStroke(6.0f);
   /**
    * Decoration of paths that are part of a transport order.
    */
@@ -219,10 +214,6 @@ public abstract class OpenTCSDrawingView
    */
   private final ApplicationState appState;
   /**
-   * The view we're working with.
-   */
-  private final OpenTCSView fOpenTCSView;
-  /**
    * The manager keeping/providing the currently loaded model.
    */
   private final ModelManager modelManager;
@@ -230,6 +221,10 @@ public abstract class OpenTCSDrawingView
    * A helper for creating transport orders with the kernel.
    */
   private final TransportOrderUtil orderUtil;
+  /**
+   * A helper for cloning figures.
+   */
+  private final FigureCloner figureCloner;
   /**
    * The block areas.
    */
@@ -299,18 +294,18 @@ public abstract class OpenTCSDrawingView
    * Creates new instance.
    *
    * @param appState Stores the application's current state.
-   * @param opentcsView The view to be used.
    * @param modelManager Provides the current system model.
    * @param orderUtil A helper for creating transport orders with the kernel.
+   * @param figureCloner A helper for cloning figures.
    */
   public OpenTCSDrawingView(ApplicationState appState,
-                            OpenTCSView opentcsView,
                             ModelManager modelManager,
-                            TransportOrderUtil orderUtil) {
+                            TransportOrderUtil orderUtil,
+                            FigureCloner figureCloner) {
     this.appState = requireNonNull(appState, "appState");
-    this.fOpenTCSView = requireNonNull(opentcsView, "opentcsView");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    this.figureCloner = requireNonNull(figureCloner, "figureCloner");
 
     // Set a dummy tool tip text to turn tooltips on
     setToolTipText(" ");
@@ -630,22 +625,16 @@ public abstract class OpenTCSDrawingView
    * @param yCenter The y coord that shall be in the middle.
    */
   private void scrollTo(final int xCenter, final int yCenter) {
-
-    Runnable doScroll = new Runnable() {
-      @Override
-      public void run() {
-        Point2D.Double pCenterView = new Point2D.Double(xCenter, -yCenter); // Vorzeichen!
-        Point pCenterDrawing = drawingToView(pCenterView);
-        JViewport viewport = (JViewport) getParent();
-        int xUpperLeft = pCenterDrawing.x - viewport.getSize().width / 2;
-        int yUpperLeft = pCenterDrawing.y - viewport.getSize().height / 2;
-        Point pUpperLeft = new Point(xUpperLeft, yUpperLeft);
-        Rectangle rCenter = new Rectangle(pUpperLeft, viewport.getSize());
-        scrollRectToVisible(rCenter);
-      }
-    };
-
-    SwingUtilities.invokeLater(doScroll);
+    SwingUtilities.invokeLater(() -> {
+      Point2D.Double pCenterView = new Point2D.Double(xCenter, -yCenter); // Vorzeichen!
+      Point pCenterDrawing = drawingToView(pCenterView);
+      JViewport viewport = (JViewport) getParent();
+      int xUpperLeft = pCenterDrawing.x - viewport.getSize().width / 2;
+      int yUpperLeft = pCenterDrawing.y - viewport.getSize().height / 2;
+      Point pUpperLeft = new Point(xUpperLeft, yUpperLeft);
+      Rectangle rCenter = new Rectangle(pUpperLeft, viewport.getSize());
+      scrollRectToVisible(rCenter);
+    });
   }
 
   /**
@@ -783,18 +772,13 @@ public abstract class OpenTCSDrawingView
       drawing.draw(g2d);
     }
     catch (ConcurrentModificationException e) {
-      LOG.warn("Exception from JHotDraw caught while calling DefaultDrawing.draw(). "
-          + "Continuing drawing the course.");
+      LOG.warn("Exception from JHotDraw caught while calling DefaultDrawing.draw(), continuing.");
       // TODO What to do when it is catched?
     }
 
     g2d.dispose();
   }
 
-  /**
-   *
-   * @param g2d
-   */
   private void drawHandles(Graphics2D g2d) {
     if (editor == null || editor.getActiveView() != this) {
       return;
@@ -887,23 +871,20 @@ public abstract class OpenTCSDrawingView
     }
 
     // after 3 seconds the RadialGradientPaint is removed
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          synchronized (OpenTCSDrawingView.this) {
-            OpenTCSDrawingView.this.wait(3000);
-          }
+    new Thread(() -> {
+      try {
+        synchronized (OpenTCSDrawingView.this) {
+          OpenTCSDrawingView.this.wait(3000);
         }
-        catch (InterruptedException ex) {
-        }
+      }
+      catch (InterruptedException ex) {
+      }
 
-        // prevents repainting of the drawing area if in the 3 second wait
-        // time another figure was selected
-        if (fFocusFigure == currentFocusFigure) {
-          fFocusFigure = null;
-          repaint();
-        }
+      // prevents repainting of the drawing area if in the 3 second wait
+      // time another figure was selected
+      if (fFocusFigure == currentFocusFigure) {
+        fFocusFigure = null;
+        repaint();
       }
     }).start();
   }
@@ -1091,10 +1072,7 @@ public abstract class OpenTCSDrawingView
 
     Path2D.Float path = new Path2D.Float();
 
-    Iterator<Figure> figureIter = figures.iterator();
-    while (figureIter.hasNext()) {
-      Figure figure = figureIter.next();
-
+    for (Figure figure : figures) {
       if (figure instanceof LabeledFigure) {
         Shape shape = ((LabeledFigure) figure).getShape();
         path.append(shape, false);
@@ -1111,10 +1089,6 @@ public abstract class OpenTCSDrawingView
     g2d.setStroke(currentStroke);
   }
 
-  /**
-   *
-   * @param r
-   */
   private void repaintDrawingArea(Rectangle2D.Double r) {
     Rectangle vr = drawingToView(r);
     vr.grow(1, 1);
@@ -1471,16 +1445,13 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
-   * Updates the figures of a Block or a Static Route.
+   * Updates the figures of a block.
    *
-   * @param block
+   * @param block The block.
    */
   public void updateBlock(BlockModel block) {
-    Iterator<Figure> figureIter
-        = ModelComponentUtil.getChildFigures(block, modelManager.getModel()).iterator();
-
-    while (figureIter.hasNext()) {
-      ((AbstractFigure) figureIter.next()).fireFigureChanged();
+    for (Figure figure : ModelComponentUtil.getChildFigures(block, modelManager.getModel())) {
+      ((AbstractFigure) figure).fireFigureChanged();
     }
   }
 
@@ -1690,8 +1661,7 @@ public abstract class OpenTCSDrawingView
    */
   public void createPossibleTransportOrder(Figure figure) {
     if (selectedFigures.size() == 1 && figure instanceof LabeledPointFigure) {
-      Iterator<Figure> it = selectedFigures.iterator();
-      Figure nextFigure = it.next();
+      Figure nextFigure = selectedFigures.iterator().next();
 
       if (nextFigure instanceof VehicleFigure) {
         PointModel model = (PointModel) figure.get(FigureConstants.MODEL);
@@ -2035,36 +2005,31 @@ public abstract class OpenTCSDrawingView
     // 1. Zoom to 100%
     setScaleFactor(1.0);
     // 2. Zoom delayed
-    Runnable doScaling = new Runnable() {
-      @Override
-      public void run() {
-        // Rectangle that contains all figures
-        Rectangle2D.Double drawingArea = getDrawing().getDrawingArea();
-        double wDrawing = drawingArea.width + 2 * 20;
-        double hDrawing = drawingArea.height + 2 * 20;
-        // The currently visible rectangle
-        Rectangle visibleRect = getComponent().getVisibleRect();
+    SwingUtilities.invokeLater(() -> {
+      // Rectangle that contains all figures
+      Rectangle2D.Double drawingArea = getDrawing().getDrawingArea();
+      double wDrawing = drawingArea.width + 2 * 20;
+      double hDrawing = drawingArea.height + 2 * 20;
+      // The currently visible rectangle
+      Rectangle visibleRect = getComponent().getVisibleRect();
 
-        double xFactor = visibleRect.width / wDrawing;
-        double yFactor = visibleRect.height / hDrawing;
+      double xFactor = visibleRect.width / wDrawing;
+      double yFactor = visibleRect.height / hDrawing;
 
-        double newZoom = Math.min(xFactor, yFactor);
-        newZoom = Math.min(newZoom, 4.0);  // Limit to 400%
+      double newZoom = Math.min(xFactor, yFactor);
+      newZoom = Math.min(newZoom, 4.0);  // Limit to 400%
 
-        // round it to two decimal places
-        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
-        symbols.setDecimalSeparator('.');
-        DecimalFormat twoDForm = new DecimalFormat("#.##", symbols);
-        String sZoomFactor = twoDForm.format(newZoom);
-        newZoom = Double.valueOf(sZoomFactor);
+      // round it to two decimal places
+      DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+      symbols.setDecimalSeparator('.');
+      DecimalFormat twoDForm = new DecimalFormat("#.##", symbols);
+      String sZoomFactor = twoDForm.format(newZoom);
+      newZoom = Double.valueOf(sZoomFactor);
 
-        setScaleFactor(newZoom);
-        // TODO: Center drawing with MARGIN at all sides
-        // Add the offset figures
-      }
-    };
-
-    SwingUtilities.invokeLater(doScaling);
+      setScaleFactor(newZoom);
+      // TODO: Center drawing with MARGIN at all sides
+      // Add the offset figures
+    });
   }
 
   @Override // DrawingView
@@ -2073,36 +2038,29 @@ public abstract class OpenTCSDrawingView
       return;
     }
 
-    // Save the coordinates of the current center point to jump back to there
-    // after the zoom
-    Rectangle visibleRect = getVisibleRect();
-    // Convert to drawing coordinates
-    Rectangle2D.Double visibleViewRect = viewToDrawing(visibleRect);
+    // Save the (drawing) coordinates of the current center point to jump back to there after the
+    // zoom.
+    Rectangle2D.Double visibleViewRect = viewToDrawing(getVisibleRect());
     final int centerX = (int) ((visibleViewRect.getCenterX() + 0.5));
     final int centerY = (int) ((-(visibleViewRect.getCenterY() + 0.5)));  // Vorzeichen!
     for (BitmapFigure bmFigure : bitmapFigures) {
       bmFigure.setScaleFactor(zoomX, newValue);
     }
 
-    Runnable doScaling = new Runnable() {
-      @Override
-      public void run() {
-        // TODO: Expand for zoomX != zoomY
-        double oldValue = zoomX;
-        zoomX = newValue;
-        zoomY = newValue;
-        validateViewTranslation();
-        dirtyArea.setBounds(bufferedArea);
-        revalidate();
-        repaint();
-        firePropertyChange("scaleFactor", oldValue, newValue);
+    SwingUtilities.invokeLater(() -> {
+      // TODO: Expand for zoomX != zoomY
+      double oldValue = zoomX;
+      zoomX = newValue;
+      zoomY = newValue;
+      validateViewTranslation();
+      dirtyArea.setBounds(bufferedArea);
+      revalidate();
+      repaint();
+      firePropertyChange("scaleFactor", oldValue, newValue);
 
-        // Scroll to the old center point
-        scrollTo(centerX, centerY);
-      }
-    };
-
-    SwingUtilities.invokeLater(doScaling);
+      // Scroll to the old center point
+      scrollTo(centerX, centerY);
+    });
   }
 
   @Override // DrawingView
@@ -2233,7 +2191,7 @@ public abstract class OpenTCSDrawingView
       }
     }
     // Create clones of all buffered figures
-    List<Figure> clonedFigures = fOpenTCSView.cloneFigures(figuresToClone);
+    List<Figure> clonedFigures = figureCloner.cloneFigures(figuresToClone);
     addToSelection(clonedFigures);
     if (!clonedFigures.isEmpty()) {
       // Undo for paste
@@ -2264,8 +2222,7 @@ public abstract class OpenTCSDrawingView
     // Abort, if not all of the selected figures may be removed from the drawing
     for (Figure figure : deletedFigures) {
       if (!figure.isRemovable()) {
-        LOG.info("Figure is not removable: {}", figure);
-        getToolkit().beep();
+        LOG.warn("Figure is not removable: {}. Aborting.", figure);
         return;
       }
     }
@@ -2313,12 +2270,8 @@ public abstract class OpenTCSDrawingView
     @Override // BlockChangeListener
     public void courseElementsChanged(BlockChangeEvent e) {
       BlockModel block = (BlockModel) e.getSource();
-      Iterator<Figure> figures
-          = ModelComponentUtil.getChildFigures(block, modelManager.getModel()).iterator();
 
-      while (figures.hasNext()) {
-        Figure figure = figures.next();
-
+      for (Figure figure : ModelComponentUtil.getChildFigures(block, modelManager.getModel())) {
         if (figure instanceof AbstractFigure) {
           ((AbstractFigure) figure).fireFigureChanged();
         }

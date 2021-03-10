@@ -1,5 +1,27 @@
 == Configuring openTCS
 
+=== Application language
+
+By default, all openTCS applications with user interfaces display texts in English language.
+The applications are prepared for internationalization, though, and can be configured to display texts in a different language, provided there is a translation for it.
+The openTCS distribution comes with the default (English) language and a German translation.
+Additional translations can be integrated -- how this is done is described in the Developer's Guide.
+
+For setting the language, each application has a configuration entry that needs to be set to a _language tag_ for the language to use.
+(See <<Kernel Control Center application configuration entries>> and <<Plant Overview application configuration entries>>.)
+Examples for language tags are:
+
+* "en" for English
+* "de" for German
+* "no" for Norwegian
+* "zh" for Chinese
+
+By default, the configuration entries are set to "en", resulting in English texts.
+Since a German translation is included, you can switch e.g. the Plant Overview to German by setting its `locale` configuration entry to "de".
+(Note that the application needs to be restarted for this.)
+
+Configuring an application to use a language for which there is no translation will result in the default (English) language to be used.
+
 === Kernel configuration
 
 The kernel application reads its configuration data from the following files:

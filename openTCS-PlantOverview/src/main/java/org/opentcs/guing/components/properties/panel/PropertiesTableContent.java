@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
@@ -35,6 +36,7 @@ import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.table.AttributesTable;
 import org.opentcs.guing.components.properties.table.AttributesTableModel;
+import org.opentcs.guing.components.properties.table.BlockTypePropertyCellRenderer;
 import org.opentcs.guing.components.properties.table.BooleanPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.BooleanPropertyCellRenderer;
 import org.opentcs.guing.components.properties.table.CellEditorFactory;
@@ -42,6 +44,8 @@ import org.opentcs.guing.components.properties.table.ColorPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.ColorPropertyCellRenderer;
 import org.opentcs.guing.components.properties.table.CoordinateCellEditor;
 import org.opentcs.guing.components.properties.table.IntegerPropertyCellEditor;
+import org.opentcs.guing.components.properties.table.LinerTypePropertyCellRenderer;
+import org.opentcs.guing.components.properties.table.PointTypePropertyCellRenderer;
 import org.opentcs.guing.components.properties.table.QuantityCellEditor;
 import org.opentcs.guing.components.properties.table.SelectionPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.StandardPropertyCellRenderer;
@@ -49,12 +53,15 @@ import org.opentcs.guing.components.properties.table.StringPropertyCellEditor;
 import org.opentcs.guing.components.properties.table.UndoableCellEditor;
 import org.opentcs.guing.components.properties.type.AbstractComplexProperty;
 import org.opentcs.guing.components.properties.type.AbstractQuantity;
+import org.opentcs.guing.components.properties.type.BlockTypeProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.properties.type.LinerTypeProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
+import org.opentcs.guing.components.properties.type.PointTypeProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
@@ -64,9 +71,14 @@ import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.elements.AbstractConnection;
+import org.opentcs.guing.model.elements.BlockModel;
+import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
 import org.opentcs.util.event.EventBus;
+import org.opentcs.util.gui.StringListCellRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,6 +260,9 @@ public class PropertiesTableContent
     fTable.setDefaultRenderer(Object.class, new StandardPropertyCellRenderer());
     fTable.setDefaultRenderer(BooleanProperty.class, new BooleanPropertyCellRenderer());
     fTable.setDefaultRenderer(ColorProperty.class, new ColorPropertyCellRenderer());
+    fTable.setDefaultRenderer(BlockTypeProperty.class, new BlockTypePropertyCellRenderer());
+    fTable.setDefaultRenderer(LinerTypeProperty.class, new LinerTypePropertyCellRenderer());
+    fTable.setDefaultRenderer(PointTypeProperty.class, new PointTypePropertyCellRenderer());
   }
 
   @Override  // AbstractTableContent
@@ -259,6 +274,8 @@ public class PropertiesTableContent
     // An editor allowing undo/redo
     UndoableCellEditor undoableEditor;
     UserMessageHelper umh = new UserMessageHelper();
+    
+    ListCellRenderer<Object> defaultRenderer = new StringListCellRenderer<>(this::objectToString);
 
     // String properties: Name etc.
     content = new StringPropertyEditorPanel();
@@ -304,8 +321,8 @@ public class PropertiesTableContent
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(CoordinateProperty.class, undoableEditor);
 
-    // Selection property: Path type etc.
-    content = new SelectionPropertyEditorPanel();
+    // Selection property
+    content = new SelectionPropertyEditorPanel(defaultRenderer);
     dialog = new StandardDetailsDialog(dialogParent, true, content);
     undoableEditor
         = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox<>(), umh));
@@ -314,8 +331,50 @@ public class PropertiesTableContent
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(SelectionProperty.class, undoableEditor);
 
+    // Point type property
+    ListCellRenderer<PointModel.Type> pointTypeRenderer
+        = new StringListCellRenderer<>(type -> type.getDescription());
+    content = new SelectionPropertyEditorPanel(pointTypeRenderer);
+    dialog = new StandardDetailsDialog(dialogParent, true, content);
+    JComboBox<PointModel.Type> pointTypeComboBox = new JComboBox<>();
+    pointTypeComboBox.setRenderer(pointTypeRenderer);
+    undoableEditor
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(pointTypeComboBox, umh));
+    undoableEditor.setDetailsDialog(dialog);
+    undoableEditor.setUndoManager(fUndoRedoManager);
+    fCellEditors.add(undoableEditor);
+    fTable.setDefaultEditor(PointTypeProperty.class, undoableEditor);
+
+    // Liner type property
+    ListCellRenderer<PathModel.Type> linerTypeRenderer
+        = new StringListCellRenderer<>(type -> type.getDescription());
+    content = new SelectionPropertyEditorPanel(linerTypeRenderer);
+    dialog = new StandardDetailsDialog(dialogParent, true, content);
+    JComboBox<PathModel.Type> linerTypeComboBox = new JComboBox<>();
+    linerTypeComboBox.setRenderer(linerTypeRenderer);
+    undoableEditor
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(linerTypeComboBox, umh));
+    undoableEditor.setDetailsDialog(dialog);
+    undoableEditor.setUndoManager(fUndoRedoManager);
+    fCellEditors.add(undoableEditor);
+    fTable.setDefaultEditor(LinerTypeProperty.class, undoableEditor);
+
+    // Block type property
+    ListCellRenderer<BlockModel.Type> blockTypeRenderer
+        = new StringListCellRenderer<>(type -> type.getDescription());
+    content = new SelectionPropertyEditorPanel(blockTypeRenderer);
+    dialog = new StandardDetailsDialog(dialogParent, true, content);
+    JComboBox<BlockModel.Type> blockTypeComboBox = new JComboBox<>();
+    blockTypeComboBox.setRenderer(blockTypeRenderer);
+    undoableEditor
+        = new UndoableCellEditor(new SelectionPropertyCellEditor(blockTypeComboBox, umh));
+    undoableEditor.setDetailsDialog(dialog);
+    undoableEditor.setUndoManager(fUndoRedoManager);
+    fCellEditors.add(undoableEditor);
+    fTable.setDefaultEditor(BlockTypeProperty.class, undoableEditor);
+
     // Location type property
-    content = new SelectionPropertyEditorPanel();
+    content = new SelectionPropertyEditorPanel(defaultRenderer);
     dialog = new StandardDetailsDialog(dialogParent, true, content);
     undoableEditor
         = new UndoableCellEditor(new SelectionPropertyCellEditor(new JComboBox<>(), umh));
@@ -356,9 +415,9 @@ public class PropertiesTableContent
   @Override  // AbstractTableContent
   protected TableModel createTableModel(Map<String, Property> content) {
     AttributesTableModel model = tableModelProvider.get();
-    ResourceBundleUtil r = ResourceBundleUtil.getBundle();
-    String attributeColumn = r.getString("PropertiesTableContent.column.attribute");
-    String valueColumn = r.getString("PropertiesTableContent.column.value");
+    ResourceBundleUtil r = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
+    String attributeColumn = r.getString("propertiesTableContent.column_attribute.headerText");
+    String valueColumn = r.getString("propertiesTableContent.column_value.headerText");
     model.setColumnIdentifiers(new Object[] {attributeColumn, valueColumn});
 
     for (Property property : content.values()) {
@@ -366,5 +425,9 @@ public class PropertiesTableContent
     }
 
     return model;
+  }
+
+  private String objectToString(Object o) {
+    return o == null ? "" : o.toString();
   }
 }

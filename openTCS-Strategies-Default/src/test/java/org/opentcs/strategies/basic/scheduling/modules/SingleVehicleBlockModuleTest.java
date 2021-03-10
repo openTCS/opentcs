@@ -44,7 +44,7 @@ public class SingleVehicleBlockModuleTest {
   public SingleVehicleBlockModuleTest() {
     reservationPool = mock(ReservationPool.class);
     plantModelService = mock(InternalPlantModelService.class);
-    module = new SingleVehicleBlockModule(reservationPool, plantModelService);
+    module = new SingleVehicleBlockModule(reservationPool, plantModelService, new Object());
   }
 
   @Before

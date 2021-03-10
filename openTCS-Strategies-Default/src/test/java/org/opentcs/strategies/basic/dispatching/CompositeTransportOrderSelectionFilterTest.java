@@ -9,6 +9,7 @@ package org.opentcs.strategies.basic.dispatching;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class CompositeTransportOrderSelectionFilterTest {
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
 
     long remainingTransportOrders = transportOrders.stream()
-        .filter(transportOrderSelectionFilter)
+        .filter(order -> transportOrderSelectionFilter.apply(order).isEmpty())
         .count();
 
     assertEquals(0, remainingTransportOrders);
@@ -71,7 +72,7 @@ public class CompositeTransportOrderSelectionFilterTest {
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
 
     long remainingTransportOrders = transportOrders.stream()
-        .filter(transportOrderSelectionFilter)
+        .filter(order -> transportOrderSelectionFilter.apply(order).isEmpty())
         .count();
 
     assertEquals(2, remainingTransportOrders);
@@ -84,7 +85,7 @@ public class CompositeTransportOrderSelectionFilterTest {
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
 
     long remainingTransportOrders = transportOrders.stream()
-        .filter(transportOrderSelectionFilter)
+        .filter(order -> transportOrderSelectionFilter.apply(order).isEmpty())
         .count();
 
     assertEquals(2, remainingTransportOrders);
@@ -98,7 +99,7 @@ public class CompositeTransportOrderSelectionFilterTest {
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
 
     List<TransportOrder> remainingTransportOrders = transportOrders.stream()
-        .filter(transportOrderSelectionFilter.negate())
+        .filter(order -> !transportOrderSelectionFilter.apply(order).isEmpty())
         .collect(Collectors.toList());
 
     assertEquals(3, remainingTransportOrders.size());
@@ -112,8 +113,8 @@ public class CompositeTransportOrderSelectionFilterTest {
       implements TransportOrderSelectionFilter {
 
     @Override
-    public boolean test(TransportOrder t) {
-      return false;
+    public Collection<String> apply(TransportOrder t) {
+      return Arrays.asList("just no");
     }
   }
 
@@ -121,8 +122,10 @@ public class CompositeTransportOrderSelectionFilterTest {
       implements TransportOrderSelectionFilter {
 
     @Override
-    public boolean test(TransportOrder t) {
-      return t.getName().contains("Transport");
+    public Collection<String> apply(TransportOrder t) {
+      return t.getName().contains("Transport")
+          ? new ArrayList<>()
+          : Arrays.asList("order name does not contain 'Transport'");
     }
   }
 
@@ -130,8 +133,10 @@ public class CompositeTransportOrderSelectionFilterTest {
       implements TransportOrderSelectionFilter {
 
     @Override
-    public boolean test(TransportOrder t) {
-      return t.getName().contains("Order");
+    public Collection<String> apply(TransportOrder t) {
+      return t.getName().contains("Order")
+          ? new ArrayList<>()
+          : Arrays.asList("order name does not contain 'Order'");
     }
   }
 

@@ -16,6 +16,7 @@ import org.jhotdraw.draw.BezierFigure;
 import org.jhotdraw.draw.event.BezierNodeEdit;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -53,7 +54,8 @@ public class BezierLinerEdit
 
   @Override // AbstractUndoableEdit
   public String getPresentationName() {
-    return ResourceBundleUtil.getBundle().getString("edit.bezierNode.movePoint.text");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.MISC_PATH)
+        .getString("bezierLinerEdit.presentationName");
   }
 
   @Override // AbstractUndoableEdit

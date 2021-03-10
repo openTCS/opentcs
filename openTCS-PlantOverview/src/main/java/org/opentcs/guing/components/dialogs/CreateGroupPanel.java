@@ -31,6 +31,7 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.Comparators;
+import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.gui.Icons;
 
@@ -68,7 +69,8 @@ public class CreateGroupPanel
     initComponents();
 
     setIconImages(Icons.getOpenTCSIcons());
-    setTitle(ResourceBundleUtil.getBundle().getString("CreateGroupPanel.title"));
+    setTitle(ResourceBundleUtil.getBundle(I18nPlantOverview.CREATEGROUP_PATH)
+        .getString("createGroupPanel.title"));
     initLists();
   }
 
@@ -174,8 +176,8 @@ public class CreateGroupPanel
     setPreferredSize(new java.awt.Dimension(600, 400));
     getContentPane().setLayout(new java.awt.GridBagLayout());
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/guing/res/labels"); // NOI18N
-    addButton.setText(bundle.getString("CreateGroupPanel.add")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/dialogs/createGroup"); // NOI18N
+    addButton.setText(bundle.getString("createGroupPanel.button_addElements.text")); // NOI18N
     addButton.setEnabled(false);
     addButton.setName("addButton"); // NOI18N
     addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -190,7 +192,7 @@ public class CreateGroupPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 3, 0);
     getContentPane().add(addButton, gridBagConstraints);
 
-    removeButton.setText(bundle.getString("CreateGroupPanel.remove")); // NOI18N
+    removeButton.setText(bundle.getString("createGroupPanel.button_removeElements.text")); // NOI18N
     removeButton.setEnabled(false);
     removeButton.setName("removeButton"); // NOI18N
     removeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -222,7 +224,7 @@ public class CreateGroupPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
     getContentPane().add(elementsScrollPane, gridBagConstraints);
 
-    selectLabel.setText(bundle.getString("CreateGroupPanel.selectMembers")); // NOI18N
+    selectLabel.setText(bundle.getString("createGroupPanel.label_selectMembers.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -230,7 +232,7 @@ public class CreateGroupPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 1, 0, 0);
     getContentPane().add(selectLabel, gridBagConstraints);
 
-    selectedLabel.setText(bundle.getString("CreateGroupPanel.selectedMembers")); // NOI18N
+    selectedLabel.setText(bundle.getString("createGroupPanel.label_selectedMembers.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -241,19 +243,19 @@ public class CreateGroupPanel
     listPanel.setName("listPanel"); // NOI18N
     listPanel.setLayout(new java.awt.GridBagLayout());
 
-    pointsLabel.setText(bundle.getString("CreateGroupPanel.pointsLabel")); // NOI18N
+    pointsLabel.setText(bundle.getString("createGroupPanel.label_points.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 1, 0, 0);
     listPanel.add(pointsLabel, gridBagConstraints);
 
-    pathLabel.setText(bundle.getString("CreateGroupPanel.pathsLabel")); // NOI18N
+    pathLabel.setText(bundle.getString("createGroupPanel.label_paths.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     listPanel.add(pathLabel, gridBagConstraints);
 
-    locationLabel.setText(bundle.getString("CreateGroupPanel.locationLabel")); // NOI18N
+    locationLabel.setText(bundle.getString("createGroupPanel.label_locations.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
@@ -324,7 +326,7 @@ public class CreateGroupPanel
 
     buttonPanel.setLayout(new java.awt.GridBagLayout());
 
-    createGroupButton.setText(bundle.getString("CreateGroupPanel.createGroup")); // NOI18N
+    createGroupButton.setText(bundle.getString("createGroupPanel.button_createGroup.text")); // NOI18N
     createGroupButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         createGroupButtonActionPerformed(evt);
@@ -337,7 +339,7 @@ public class CreateGroupPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     buttonPanel.add(createGroupButton, gridBagConstraints);
 
-    cancelButton.setText(bundle.getString("CreateGroupPanel.cancel")); // NOI18N
+    cancelButton.setText(bundle.getString("createGroupPanel.button_cancel.text")); // NOI18N
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         cancelButtonActionPerformed(evt);
@@ -432,7 +434,8 @@ public class CreateGroupPanel
 
     if (elements.isEmpty()) {
       JOptionPane.showMessageDialog(
-          this, ResourceBundleUtil.getBundle().getString("CreateGroupPanel.noElementsSelected"));
+          this, ResourceBundleUtil.getBundle(I18nPlantOverview.CREATEGROUP_PATH)
+              .getString("createGroupPanel.optionPane_noElementsSelected.message"));
       return;
     }
 

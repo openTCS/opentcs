@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
+import static org.opentcs.guing.plugins.panels.statistics.I18nPlantOverviewPanelStatistics.BUNDLE_PATH;
 
 /**
  * A table model for vehicle statistics.
@@ -23,17 +24,16 @@ class VehiclesTableModel
   /**
    * This class's resources bundle.
    */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle("org/opentcs/guing/plugins/panels/statistics/Bundle");
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[] {
-    BUNDLE.getString("Name"),
-    BUNDLE.getString("Usage_to_runtime"),
-    BUNDLE.getString("Waiting_time"),
-    BUNDLE.getString("Orders_processed"),
-    BUNDLE.getString("Charging_time")
+    BUNDLE.getString("vehiclesTableModel.column_name.headerText"),
+    BUNDLE.getString("vehiclesTabelModel.column_runtimeUsage.headerText"),
+    BUNDLE.getString("vehiclesTabelModel.column_waitingTime.headerText"),
+    BUNDLE.getString("vehiclesTabelModel.column_ordersProcessed.headerText"),
+    BUNDLE.getString("vehiclesTabelModel.column_chargingTime.headerText")
   };
   /**
    * The column classes.

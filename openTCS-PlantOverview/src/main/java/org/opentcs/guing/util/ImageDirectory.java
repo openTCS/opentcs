@@ -15,9 +15,10 @@ import javax.swing.ImageIcon;
  *
  * @author Leonard Schuengel (Fraunhofer IML)
  */
-final public class ImageDirectory {
-  
-  private ImageDirectory(){}
+public final class ImageDirectory {
+
+  private ImageDirectory() {
+  }
 
   /**
    * The directory where GUI images and icons are stored.
@@ -26,6 +27,7 @@ final public class ImageDirectory {
 
   /**
    * Returns an ImageIcon from a relative path inside the image directory
+   *
    * @param relPath path to file inside the image directory.
    * @return the new ImageIcon
    */

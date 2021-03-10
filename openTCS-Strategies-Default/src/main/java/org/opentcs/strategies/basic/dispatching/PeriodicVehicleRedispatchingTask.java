@@ -63,7 +63,7 @@ public class PeriodicVehicleRedispatchingTask
   }
 
   private boolean couldProcessTransportOrder(Vehicle vehicle) {
-    return vehicle.getIntegrationLevel() ==Vehicle.IntegrationLevel.TO_BE_UTILIZED
+    return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
         && vehicle.getCurrentPosition() != null
         && !vehicle.isEnergyLevelCritical()
         && (processesNoOrder(vehicle)

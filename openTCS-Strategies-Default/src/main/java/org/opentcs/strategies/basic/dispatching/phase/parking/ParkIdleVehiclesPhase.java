@@ -65,8 +65,8 @@ public class ParkIdleVehiclesPhase
 
     LOG.debug("Looking for vehicles to send to parking positions...");
 
-    for (Vehicle vehicle : getOrderService().fetchObjects(Vehicle.class, vehicleSelectionFilter)) {
-      createParkingOrder(vehicle);
-    }
+    getOrderService().fetchObjects(Vehicle.class).stream()
+        .filter(vehicle -> vehicleSelectionFilter.apply(vehicle).isEmpty())
+        .forEach(vehicle -> createParkingOrder(vehicle));
   }
 }

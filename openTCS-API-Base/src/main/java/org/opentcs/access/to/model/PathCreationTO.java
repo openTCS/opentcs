@@ -257,7 +257,9 @@ public class PathCreationTO
    * this path costs.
    *
    * @return The routing cost of this path (unitless).
+   * @deprecated Use property-based routing costs, instead.
    */
+  @Deprecated
   public long getRoutingCost() {
     return routingCost;
   }
@@ -284,7 +286,9 @@ public class PathCreationTO
    *
    * @param routingCost The new routing cost (unitless). Must be a positive value.
    * @return A copy of this object, differing in the given routing cost.
+   * @deprecated Use property-based routing costs, instead.
    */
+  @Deprecated
   public PathCreationTO withRoutingCost(long routingCost) {
     return new PathCreationTO(getName(),
                               srcPointName,

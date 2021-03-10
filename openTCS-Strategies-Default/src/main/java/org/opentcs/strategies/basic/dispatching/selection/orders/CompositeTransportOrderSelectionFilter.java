@@ -7,8 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
+import java.util.Collection;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectionFilter;
@@ -32,11 +34,9 @@ public class CompositeTransportOrderSelectionFilter
   }
 
   @Override
-  public boolean test(TransportOrder order) {
-    boolean result = true;
-    for (TransportOrderSelectionFilter filter : filters) {
-      result &= filter.test(order);
-    }
-    return result;
+  public Collection<String> apply(TransportOrder order) {
+    return filters.stream()
+        .flatMap(filter -> filter.apply(order).stream())
+        .collect(Collectors.toList());
   }
 }

@@ -131,8 +131,8 @@ public class InputDialog
     buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
     okButton.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/opentcs/virtualvehicle/inputcomponents/Bundle"); // NOI18N
-    okButton.setText(bundle.getString("okButton")); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/commadapter/loopback/Bundle"); // NOI18N
+    okButton.setText(bundle.getString("inputDialog.button_ok.text")); // NOI18N
     okButton.setName("inputDialogOkButton"); // NOI18N
     okButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -142,7 +142,7 @@ public class InputDialog
     buttonPanel.add(okButton);
 
     cancelButton.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-    cancelButton.setText(bundle.getString("cancelButton")); // NOI18N
+    cancelButton.setText(bundle.getString("inputDialog.button_cancel.text")); // NOI18N
     cancelButton.setName("inputDialogCancelButton"); // NOI18N
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -152,7 +152,7 @@ public class InputDialog
     buttonPanel.add(cancelButton);
 
     resetButton.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
-    resetButton.setText(bundle.getString("resetButton")); // NOI18N
+    resetButton.setText(bundle.getString("inputDialog.button_reset.text")); // NOI18N
     resetButton.setName("inputDialogResetButton"); // NOI18N
     resetButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {

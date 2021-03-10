@@ -15,7 +15,6 @@
  */
 package org.opentcs.guing.application.action.draw;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +30,7 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.FigureSelectionEvent;
+import static org.opentcs.guing.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -42,6 +42,8 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class PickAttributesAction
     extends AbstractSelectedAction {
 
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
+
   private Set<AttributeKey> excludedAttributes = new HashSet<>(
       Arrays.asList(new AttributeKey[] {TRANSFORM, TEXT}));
 
@@ -52,13 +54,13 @@ public class PickAttributesAction
    */
   public PickAttributesAction(DrawingEditor editor) {
     super(editor);
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureAction(this, "edit.pickAttributes");
-    
-    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/colorpicker.png");
-    putValue(SMALL_ICON, new ImageIcon(url));
-    putValue(LARGE_ICON_KEY, new ImageIcon(url));
-    
+    putValue(NAME, BUNDLE.getString("pickAttributesAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("pickAttributesAction.shortDescription"));
+
+    ImageIcon icon = ImageDirectory.getImageIcon("/toolbar/colorpicker.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
+
     updateEnabledState();
   }
 

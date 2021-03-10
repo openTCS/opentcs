@@ -18,7 +18,6 @@ package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
 import java.net.URI;
-import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -35,6 +34,7 @@ import org.jhotdraw.app.action.file.OpenFileAction;
 import org.jhotdraw.net.URIUtil;
 import org.opentcs.access.Kernel;
 import org.opentcs.guing.application.OpenTCSView;
+import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -64,6 +64,7 @@ public class CloseFileAction
   public final static String ID = "file.close";
   public final static String ID_WINDOW_CLOSING = "windowClosing";
   public final static String ID_MODEL_CLOSING = "modelClosing";
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * 0: Save file 1: Dont't save file 2: Canceled
    */
@@ -77,14 +78,15 @@ public class CloseFileAction
    */
   public CloseFileAction(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
-    ResourceBundleUtil.getBundle().configureAction(this, ID);
-    
+
+    putValue(NAME, BUNDLE.getString("closeFileAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("closeFileAction.shortDescription"));
     putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt F4"));
     putValue(Action.MNEMONIC_KEY, Integer.valueOf('C'));
 
-    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/document-close-4.png");
-    putValue(Action.SMALL_ICON, new ImageIcon(url));
-    putValue(Action.LARGE_ICON_KEY, new ImageIcon(url));
+    ImageIcon icon = ImageDirectory.getImageIcon("/menu/document-close-4.png");
+    putValue(SMALL_ICON, icon);
+    putValue(LARGE_ICON_KEY, icon);
   }
 
   public int getFileSavedStatus() {

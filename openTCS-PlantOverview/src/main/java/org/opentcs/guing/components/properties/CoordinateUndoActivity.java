@@ -7,89 +7,54 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties;
 
 import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import javax.inject.Inject;
+import static java.util.Objects.requireNonNull;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import org.opentcs.data.model.visualization.ElementPropKeys;
-import org.opentcs.guing.components.drawing.course.Origin;
-import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
-import org.opentcs.guing.components.drawing.figures.TCSFigure;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.AbstractConnectableModelComponent;
+import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.PositionableModelComponent;
 import org.opentcs.guing.persistence.ModelManager;
-import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * Ein Undo für die Änderung eines Attributs.
+ * An undo for the modification of a coordinate property.
  *
  * @author Heinz Huber (Fraunhofer IML)
+ * @author Stefan Walter (Fraunhofer IML)
  */
-public class CoordinateUndoActivity
-    extends javax.swing.undo.AbstractUndoableEdit {
+public abstract class CoordinateUndoActivity
+    extends AbstractUndoableEdit {
 
-  private final CoordinateProperty property;
-  private final CoordinateProperty pxModel;
-  private final CoordinateProperty pyModel;
+  protected final CoordinateProperty property;
+  protected final CoordinateProperty pxModel;
+  protected final CoordinateProperty pyModel;
+  protected final LabeledFigure bufferedFigure;
+  protected final AffineTransform bufferedTransform = new AffineTransform();
   private CoordinateProperty pxBeforeModification;
   private CoordinateProperty pyBeforeModification;
   private CoordinateProperty pxAfterModification;
   private CoordinateProperty pyAfterModification;
-  private final LabeledFigure bufferedFigure;
-  private final AffineTransform bufferedTransform;
-  private boolean saveTransform;
 
   /**
-   * Creates a new instance of CoordinateUndoActivity
+   * Creates a new instance.
    *
-   * @param property
+   * @param property The affected property.
+   * @param modelManager The model manager to be used.
    */
-  @Inject
-  private CoordinateUndoActivity(@Assisted CoordinateProperty property,
-                                 ModelManager modelManager) {
-    this.property = property;
-    AbstractConnectableModelComponent model = (AbstractConnectableModelComponent) property.getModel();
+  public CoordinateUndoActivity(@Assisted CoordinateProperty property,
+                                ModelManager modelManager) {
+    this.property = requireNonNull(property, "property");
+
+    ModelComponent model = property.getModel();
     pxModel = (CoordinateProperty) model.getProperty(PositionableModelComponent.MODEL_X_POSITION);
     pyModel = (CoordinateProperty) model.getProperty(PositionableModelComponent.MODEL_Y_POSITION);
     bufferedFigure = (LabeledFigure) modelManager.getModel().getFigure(model);
-    bufferedTransform = new AffineTransform();
-  }
-
-  /**
-   * Sets if the transform should be saved.
-   * 
-   * @param saveTransform True to save, false otherwise.
-   */
-  public void setSaveTransform(boolean saveTransform) {
-    this.saveTransform = saveTransform;
-    if (saveTransform) {
-      AbstractConnectableModelComponent model = (AbstractConnectableModelComponent) property.getModel();
-      StringProperty pxLayout = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_X);
-      StringProperty pyLayout = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_Y);
-
-      Origin origin = bufferedFigure.get(FigureConstants.ORIGIN);
-      TCSFigure pf = bufferedFigure.getPresentationFigure();
-      double zoomScale = pf.getZoomPoint().scale();
-      double xModel = pxModel.getValueByUnit(CoordinateProperty.Unit.MM) / (zoomScale * origin.getScaleX());
-      double yModel = pyModel.getValueByUnit(CoordinateProperty.Unit.MM) / (-zoomScale * origin.getScaleY());
-      String sx = (String) pxLayout.getComparableValue();
-      double xLayout = Double.parseDouble(sx) / (zoomScale * origin.getScaleX());
-      String sy = (String) pyLayout.getComparableValue();
-      double yLayout = Double.parseDouble(sy) / (-zoomScale * origin.getScaleY());
-
-      bufferedTransform.translate(
-          xModel - xLayout,
-          yModel - yLayout);
-    }
   }
 
   /**
@@ -98,6 +63,8 @@ public class CoordinateUndoActivity
   public void snapShotBeforeModification() {
     pxBeforeModification = (CoordinateProperty) pxModel.clone();
     pyBeforeModification = (CoordinateProperty) pyModel.clone();
+
+    saveTransformBeforeModification();
   }
 
   /**
@@ -109,19 +76,8 @@ public class CoordinateUndoActivity
   }
 
   @Override
-  public String getPresentationName() {
-    if (saveTransform) {
-      // Figure was changed
-      return ResourceBundleUtil.getBundle().getString("edit.transform.text");
-    }
-    else {
-      // Model coordinate was edited
-      return ResourceBundleUtil.getBundle().getString("edit.coordinates.text");
-    }
-  }
-
-  @Override
-  public void undo() throws CannotUndoException {
+  public void undo()
+      throws CannotUndoException {
     super.undo();
 
     pxModel.copyFrom(pxBeforeModification);
@@ -129,22 +85,14 @@ public class CoordinateUndoActivity
     pxModel.markChanged();
     pyModel.markChanged();
 
-    if (saveTransform) {
-      try {
-        AffineTransform inverse = bufferedTransform.createInverse();
-        bufferedFigure.willChange();
-        bufferedFigure.transform(inverse);
-        bufferedFigure.changed();
-      }
-      catch (NoninvertibleTransformException e) {
-      }
-    }
+    saveTransformForUndo();
 
     pxModel.getModel().propertiesChanged(new NullAttributesChangeListener());
   }
 
   @Override
-  public void redo() throws CannotRedoException {
+  public void redo()
+      throws CannotRedoException {
     super.redo();
 
     pxModel.copyFrom(pxAfterModification);
@@ -152,12 +100,14 @@ public class CoordinateUndoActivity
     pxModel.markChanged();
     pyModel.markChanged();
 
-    if (saveTransform) {
-      bufferedFigure.willChange();
-      bufferedFigure.transform(bufferedTransform);
-      bufferedFigure.changed();
-    }
+    saveTransformForRedo();
 
     pxModel.getModel().propertiesChanged(new NullAttributesChangeListener());
   }
+
+  protected abstract void saveTransformBeforeModification();
+
+  protected abstract void saveTransformForUndo();
+
+  protected abstract void saveTransformForRedo();
 }

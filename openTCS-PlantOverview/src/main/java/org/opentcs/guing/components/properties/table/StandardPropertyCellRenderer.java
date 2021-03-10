@@ -15,7 +15,9 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
+import org.opentcs.guing.components.properties.type.AcceptableInvalidValue;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
+import org.opentcs.guing.components.properties.type.MultipleDifferentValues;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
@@ -65,10 +67,23 @@ public class StandardPropertyCellRenderer
                                                                 hasFocus, row, column);
     label.setText(value.toString());
 
-    if (value instanceof Property) {
+    if (value instanceof AbstractProperty
+        && ((AbstractProperty) value).getValue() instanceof AcceptableInvalidValue) {
+      AbstractProperty property = (AbstractProperty) value;
+      AcceptableInvalidValue invalidValue = (AcceptableInvalidValue) property.getValue();
+      label.setText(invalidValue.getDescription());
+      label.setToolTipText(invalidValue.getHelptext());
+    }
+    else if (value instanceof Property) {
       label.setToolTipText(((Property) value).getHelptext());
     }
 
+    decorate(table, row, column, label, value);
+
+    return this;
+  }
+
+  protected void decorate(JTable table, int row, int column, JLabel label, Object value) {
     AttributesTable attributesTable = (AttributesTable) table;
     boolean editable = attributesTable.isEditable(row);
 
@@ -79,7 +94,7 @@ public class StandardPropertyCellRenderer
         break;
 
       case 1:
-        if (((AbstractProperty) value).isCollectionAndHasDifferentValues()) {
+        if (value instanceof MultipleDifferentValues) {
           label.setBackground(AbstractPropertyCellEditor.DIFFERENT_VALUE_COLOR);
         }
         else {
@@ -90,7 +105,5 @@ public class StandardPropertyCellRenderer
 
       default:
     }
-
-    return this;
   }
 }
