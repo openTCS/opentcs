@@ -25,7 +25,7 @@ public interface DefaultDispatcherConfiguration {
   String PREFIX = "defaultdispatcher";
 
   @ConfigurationEntry(
-      type = "List of strings",
+      type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize transport orders for assignment.",
                      "Possible values:",
                      "BY_AGE: Sort by age, oldest first.",
@@ -36,7 +36,7 @@ public interface DefaultDispatcherConfiguration {
   List<String> orderPriorities();
 
   @ConfigurationEntry(
-      type = "List of strings",
+      type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize vehicles for assignment.",
                      "Possible values:",
                      "BY_ENERGY_LEVEL: Sort by energy level, highest first.",
@@ -46,7 +46,7 @@ public interface DefaultDispatcherConfiguration {
   List<String> vehiclePriorities();
 
   @ConfigurationEntry(
-      type = "List of strings",
+      type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize vehicle candidates for assignment.",
                      "Possible values:",
                      "BY_ENERGY_LEVEL: Sort by energy level of the vehicle, highest first.",
@@ -58,7 +58,7 @@ public interface DefaultDispatcherConfiguration {
   List<String> vehicleCandidatePriorities();
 
   @ConfigurationEntry(
-      type = "List of strings",
+      type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize transport order candidates for assignment.",
                      "Possible values:",
                      "BY_AGE: Sort by transport order age, oldest first.",

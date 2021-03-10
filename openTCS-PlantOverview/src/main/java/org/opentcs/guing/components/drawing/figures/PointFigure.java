@@ -54,9 +54,6 @@ public class PointFigure
   /**
    * Creates a new instance.
    *
-   * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected
-   * model component(s).
    * @param model The model corresponding to this graphical object.
    */
   @Inject

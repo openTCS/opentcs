@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
-import org.opentcs.guing.application.ApplicationFrame;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.model.elements.VehicleModel;
 import static org.opentcs.guing.util.I18nPlantOverview.VEHICLEPOPUP_PATH;
 import org.opentcs.guing.util.ResourceBundleUtil;

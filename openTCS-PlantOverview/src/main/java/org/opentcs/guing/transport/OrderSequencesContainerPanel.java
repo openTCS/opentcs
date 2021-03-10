@@ -12,13 +12,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 import javax.inject.Inject;
@@ -33,14 +34,13 @@ import javax.swing.table.DefaultTableModel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Vehicle;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
+import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.OrderSequence;
-import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.event.KernelStateChangeEvent;
-import org.opentcs.guing.event.OrderSequenceEvent;
+import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.util.I18nPlantOverview;
 import static org.opentcs.guing.util.I18nPlantOverview.TRANSPORTORDER_PATH;
@@ -51,8 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Eine Ansicht fï¿½r Transportauftragsketten. Teil dieser Ansicht ist die
- * Tabelle, in der die Transportauftragsketten dargestellt sind.
+ * Shows a table of the kernel's order sequences.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -82,29 +81,24 @@ public class OrderSequencesContainerPanel
    */
   private final Component dialogParent;
   /**
-   * Die Tabelle, in der die Transportauftragsketten dargestellt werden.
+   * The table showing the order sequences.
    */
   private JTable fTable;
   /**
-   * Das TableModel.
+   * The table's model.
    */
   private FilterTableModel fTableModel;
   /**
-   * Die Liste der Filterbuttons.
+   * All known order sequences (unfiltered).
    */
-  private List<FilterButton> fFilterButtons;
-  /**
-   * Die Transportauftragsketten
-   */
-  private Vector<OrderSequence> fOrderSequences;
+  private final List<OrderSequence> fOrderSequences = new ArrayList<>();
 
   /**
    * Creates a new instance.
    *
    * @param portalProvider Provides a access to a portal.
    * @param transportViewFactory A factory for order sequence views.
-   * @param dialogParent The parent component for dialogs shown by this
-   * instance.
+   * @param dialogParent The parent component for dialogs shown by this instance.
    */
   @Inject
   public OrderSequencesContainerPanel(SharedKernelServicePortalProvider portalProvider,
@@ -113,19 +107,23 @@ public class OrderSequencesContainerPanel
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+
     initComponents();
   }
 
   @Override
   public void onEvent(Object event) {
-    if (event instanceof SystemModelTransitionEvent) {
-      handleSystemModelTransition((SystemModelTransitionEvent) event);
+    if (event instanceof TCSObjectEvent) {
+      handleObjectEvent((TCSObjectEvent) event);
     }
-    if (event instanceof KernelStateChangeEvent) {
-      handleKernelStateChange((KernelStateChangeEvent) event);
+    else if (event instanceof OperationModeChangeEvent) {
+      initView();
     }
-    if (event instanceof OrderSequenceEvent) {
-      handleOrderSequenceEvent((OrderSequenceEvent) event);
+    else if (event instanceof SystemModelTransitionEvent) {
+      initView();
+    }
+    else if (event instanceof KernelStateChangeEvent) {
+      initView();
     }
   }
 
@@ -150,29 +148,19 @@ public class OrderSequencesContainerPanel
     return new HashSet<>();
   }
 
-  /**
-   * Deletes all OrderSequences, eg after changing the kernel state.
-   */
-  public void clearOrderSequences() {
-    if (fOrderSequences != null) {
-      if (fTableModel != null) {
-        fTableModel.setRowCount(0);
-      }
-      fOrderSequences.clear();
-    }
-  }
-
   private void initComponents() {
     setLayout(new BorderLayout());
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TO_SEQUENCE_PATH);
 
-    String[] columns = {"Name",
-                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.headerText"),
-                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_executingVehicle.headerText"),
-                        "Index",
-                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_complete.headerText"),
-                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_finished.headerText"),
-                        bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_failureFatal.headerText")};
+    String[] columns = {
+      "Name",
+      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.headerText"),
+      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_executingVehicle.headerText"),
+      "Index",
+      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_complete.headerText"),
+      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_finished.headerText"),
+      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_failureFatal.headerText")
+    };
     fTableModel = new FilterTableModel(new DefaultTableModel(columns, 0));
     fTableModel.setColumnIndexToFilter(5);  // Column "Finished"
     fTable = new OrdersTable(fTableModel);
@@ -180,9 +168,7 @@ public class OrderSequencesContainerPanel
     JScrollPane scrollPane = new JScrollPane(fTable);
     add(scrollPane, BorderLayout.CENTER);
 
-    fFilterButtons = createFilterButtons();
-    JToolBar toolBar = createToolBar(fFilterButtons);
-//    addControlButtons(toolBar);
+    JToolBar toolBar = createToolBar(createFilterButtons());
     add(toolBar, BorderLayout.NORTH);
 
     fTable.addMouseListener(new MouseAdapter() {
@@ -203,17 +189,12 @@ public class OrderSequencesContainerPanel
   }
 
   private void showOrderSequence() {
-    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-      OrderSequence os = sharedPortal.getPortal().getTransportOrderService()
-          .fetchObject(OrderSequence.class, getSelectedOrderSequence().getReference());
+    getSelectedOrderSequence().ifPresent(os -> {
       DialogContent content = transportViewFactory.createOrderSequenceView(os);
       StandardContentDialog dialog
           = new StandardContentDialog(dialogParent, content, true, StandardContentDialog.CLOSE);
       dialog.setVisible(true);
-    }
-    catch (KernelRuntimeException e) {
-      LOG.warn("Exception fetching order sequences from kernel", e);
-    }
+    });
   }
 
   private void showPopupMenu(int x, int y) {
@@ -223,112 +204,85 @@ public class OrderSequencesContainerPanel
     JPopupMenu menu = new JPopupMenu();
     JMenuItem item = menu.add(ResourceBundleUtil.getBundle(TRANSPORTORDER_PATH)
         .getString("orderSequencesContainerPanel.table_sequences.popupMenuItem_showDetails.text"));
-    item.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent evt) {
-        showOrderSequence();
-      }
-    });
+    item.addActionListener((ActionEvent evt) -> showOrderSequence());
 
     menu.show(fTable, x, y);
   }
 
-  private OrderSequence getSelectedOrderSequence() {
+  private Optional<OrderSequence> getSelectedOrderSequence() {
     int row = fTable.getSelectedRow();
 
     if (row == -1) {
-      return null;
+      return Optional.empty();
     }
 
-    int index = fTableModel.realRowIndex(row);
+    return Optional.of(fOrderSequences.get(fTableModel.realRowIndex(row)));
+  }
 
-    return fOrderSequences.elementAt(index);
+  private void handleObjectEvent(TCSObjectEvent evt) {
+    if (evt.getCurrentOrPreviousObjectState() instanceof OrderSequence) {
+      switch (evt.getType()) {
+        case OBJECT_CREATED:
+          orderSequenceAdded((OrderSequence) evt.getCurrentOrPreviousObjectState());
+          break;
+        case OBJECT_MODIFIED:
+          orderSequenceChanged((OrderSequence) evt.getCurrentOrPreviousObjectState());
+          break;
+        case OBJECT_REMOVED:
+          orderSequenceRemoved((OrderSequence) evt.getCurrentOrPreviousObjectState());
+          break;
+        default:
+          LOG.warn("Unhandled event type: {}", evt.getType());
+      }
+    }
   }
 
   private void setOrderSequences(Set<OrderSequence> orderSequences) {
-    if (orderSequences == null) {
-      return;
-    }
-
-    fOrderSequences = new Vector<>();
-
-    for (OrderSequence sequence : orderSequences) {
-      fOrderSequences.addElement(sequence);
-      fTableModel.addRow(toTableRow(sequence));
-    }
-  }
-
-  private void handleSystemModelTransition(SystemModelTransitionEvent evt) {
-    switch (evt.getStage()) {
-      case UNLOADING:
-        // XXX Clear panel?
-        break;
-      case LOADED:
-        initView();
-        break;
-      default:
-      // Do nada.
-    }
-  }
-
-  private void handleKernelStateChange(KernelStateChangeEvent event) {
-    if (event != null && KernelStateChangeEvent.State.OPERATING != event.getNewState()) {
+    SwingUtilities.invokeLater(() -> {
+      fOrderSequences.clear();
       fTableModel.setRowCount(0);
-      fTableModel.fireTableDataChanged();
-    }
-  }
 
-  private void handleOrderSequenceEvent(OrderSequenceEvent evt) {
-    switch (evt.getType()) {
-      case SEQ_CREATED:
-        orderSequenceAdded(evt.getSequence());
-        break;
-      case SEQ_CHANGED:
-        orderSequenceChanged(evt.getSequence());
-        break;
-      case SEQ_REMOVED:
-        orderSequenceRemoved(evt.getSequence());
-        break;
-      default:
-      // Do nada.
-    }
+      for (OrderSequence sequence : orderSequences) {
+        fOrderSequences.add(sequence);
+        fTableModel.addRow(toTableRow(sequence));
+      }
+    });
   }
 
   private void orderSequenceAdded(OrderSequence os) {
-    fOrderSequences.insertElementAt(os, 0);
-    fTableModel.insertRow(0, toTableRow(os));
+    SwingUtilities.invokeLater(() -> {
+      fOrderSequences.add(0, os);
+      fTableModel.insertRow(0, toTableRow(os));
+    });
   }
 
   private void orderSequenceChanged(OrderSequence os) {
-    int rowIndex = fOrderSequences.indexOf(os);
-    Vector<Object> values = toTableRow(os);
+    SwingUtilities.invokeLater(() -> {
+      int rowIndex = fOrderSequences.indexOf(os);
+      Vector<Object> values = toTableRow(os);
 
-    for (int i = 0; i < values.size(); i++) {
-      fTableModel.setValueAt(values.elementAt(i), rowIndex, i);
-    }
+      for (int i = 0; i < values.size(); i++) {
+        fTableModel.setValueAt(values.elementAt(i), rowIndex, i);
+      }
+    });
   }
 
-  private void orderSequenceRemoved(final OrderSequence os) {
-    SwingUtilities.invokeLater(new Runnable() {
-
-      @Override
-      public void run() {
-        int i = fOrderSequences.indexOf(os);
-        fTableModel.removeRow(i);
-        fOrderSequences.removeElementAt(i);
-      }
+  private void orderSequenceRemoved(OrderSequence os) {
+    SwingUtilities.invokeLater(() -> {
+      int i = fOrderSequences.indexOf(os);
+      fTableModel.removeRow(i);
+      fOrderSequences.remove(i);
     });
   }
 
   private List<FilterButton> createFilterButtons() {
     List<FilterButton> buttons = new LinkedList<>();
-    IconToolkit iconkit = IconToolkit.instance();
 
-    FilterButton b1
-        = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
-                           fTableModel,
-                           Boolean.FALSE);
+    FilterButton b1 = new FilterButton(
+        IconToolkit.instance().getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
+        fTableModel,
+        Boolean.FALSE
+    );
     buttons.add(b1);
     b1.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverview.TO_SEQUENCE_PATH)
         .getString("orderSequencesContainerPanel.button_filterFinishedOrderSequences.tooltipText"));
@@ -347,58 +301,40 @@ public class OrderSequencesContainerPanel
   }
 
   /**
-   * Wandelt die Werte einer Transportauftragskette in eine Tabellenzeile um.
+   * Transforms the content of an order sequence to a table row.
    *
-   * @param os
-   * @return
+   * @param os The order sequence.
+   * @return The table row contents.
    */
   private Vector<Object> toTableRow(OrderSequence os) {
     Vector<Object> row = new Vector<>();
-    // Spalte 0: Name
-    String name = os.getName();
-    row.addElement(name);
 
-    // Spalte 2: Gewï¿½nschtes Fahrzeug
-    TCSObjectReference<Vehicle> intendedVehicle = os.getIntendedVehicle();
+    row.addElement(os.getName());
 
-    if (intendedVehicle != null) {
-      row.addElement(intendedVehicle.getName());
+    if (os.getIntendedVehicle() != null) {
+      row.addElement(os.getIntendedVehicle().getName());
     }
     else {
       row.addElement(ResourceBundleUtil.getBundle(I18nPlantOverview.TRANSPORTORDER_PATH)
           .getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.determinedAutomatic.text"));
     }
 
-    // Spalte 3: Ausfï¿½hrendes Fahrzeug
-    TCSObjectReference<Vehicle> processingVehicle = os.getProcessingVehicle();
-
-    if (processingVehicle != null) {
-      row.addElement(processingVehicle.getName());
+    if (os.getProcessingVehicle() != null) {
+      row.addElement(os.getProcessingVehicle().getName());
     }
     else {
       row.addElement(ResourceBundleUtil.getBundle(I18nPlantOverview.TRANSPORTORDER_PATH)
           .getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.determinedAutomatic.text"));
     }
 
-    // Spalte 4: Index
-    int finishedIndex = os.getFinishedIndex();
-    row.addElement(finishedIndex);
+    row.addElement(os.getFinishedIndex());
 
-    // Spalte 5: Complete Flag
-    Boolean complete = os.isComplete();
-    row.addElement(complete);
+    row.addElement(os.isComplete());
 
-    // Spalte 6: Finished Flag
-    Boolean finished = os.isFinished();
-    row.addElement(finished);
+    row.addElement(os.isFinished());
 
-    // Spalte 7: Failure Fatal Flag
-    Boolean failureFatal = os.isFailureFatal();
-    row.addElement(failureFatal);
+    row.addElement(os.isFailureFatal());
 
-    // Weitere Felder der Ordersequence:
-//  TCSObjectReference<TransportOrder> nextUnfinishedOrder = os.getNextUnfinishedOrder();
-//  List<TCSObjectReference<TransportOrder>> orders = os.getOrders();
     return row;
   }
 }

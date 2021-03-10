@@ -14,7 +14,9 @@ import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.ConnectionTool;
+import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
+import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -46,78 +48,100 @@ public class OpenTCSConnectionTool
 
   @Override // ConnectionTool
   public void mouseReleased(MouseEvent event) {
-    if (createdFigure != null
-        && startConnector != null && endConnector != null
-        && createdFigure.canConnect(startConnector, endConnector)) {
-      createdFigure.willChange();
-      createdFigure.setStartConnector(startConnector);
-      createdFigure.setEndConnector(endConnector);
-      if (createdFigure instanceof SimpleLineConnection) {
-        ((SimpleLineConnection) createdFigure).getModel().updateName();
+    if (!isValidConnection()) {
+      removeCreatedFigure();
+      return;
+    }
+
+    createdFigure.willChange();
+    createdFigure.setStartConnector(startConnector);
+    createdFigure.setEndConnector(endConnector);
+    if (createdFigure instanceof SimpleLineConnection) {
+      ((SimpleLineConnection) createdFigure).getModel().updateName();
+    }
+
+    createdFigure.changed();
+
+    final Figure addedFigure = createdFigure;
+    final Drawing addedDrawing = getDrawing();
+
+    getDrawing().fireUndoableEditHappened(new AbstractUndoableEdit() {
+
+      @Override
+      public String getPresentationName() {
+        return presentationName;
       }
 
-      createdFigure.changed();
+      @Override
+      public void undo()
+          throws CannotUndoException {
+        super.undo();
+        addedDrawing.remove(addedFigure);
+      }
 
-      final Figure addedFigure = createdFigure;
-      final Drawing addedDrawing = getDrawing();
+      @Override
+      public void redo()
+          throws CannotRedoException {
+        super.redo();
+        addedDrawing.add(addedFigure);
+      }
+    });
 
-      getDrawing().fireUndoableEditHappened(new AbstractUndoableEdit() {
+    targetFigure = null;
+    Point2D.Double cAnchor = startConnector.getAnchor();
+    Rectangle r = new Rectangle(getView().drawingToView(cAnchor));
+    r.grow(getAnchorWidth(), getAnchorWidth());
+    fireAreaInvalidated(r);
+    cAnchor = endConnector.getAnchor();
+    r = new Rectangle(getView().drawingToView(cAnchor));
+    r.grow(getAnchorWidth(), getAnchorWidth());
+    fireAreaInvalidated(r);
+    startConnector = null;
+    endConnector = null;
+    Figure finishedFigure = createdFigure;
+    createdFigure = null;
+    creationFinished(finishedFigure);
+  }
 
-        @Override
-        public String getPresentationName() {
-          return presentationName;
-        }
+  private void removeCreatedFigure() {
+    if (createdFigure != null) {
+      getDrawing().remove(createdFigure);
+      // TODO: Also remove figure from the model
 
-        @Override
-        public void undo()
-            throws CannotUndoException {
-          super.undo();
-          addedDrawing.remove(addedFigure);
-        }
-
-        @Override
-        public void redo()
-            throws CannotRedoException {
-          super.redo();
-          addedDrawing.add(addedFigure);
-        }
-      });
-
-      targetFigure = null;
       Point2D.Double cAnchor = startConnector.getAnchor();
       Rectangle r = new Rectangle(getView().drawingToView(cAnchor));
       r.grow(getAnchorWidth(), getAnchorWidth());
       fireAreaInvalidated(r);
-      cAnchor = endConnector.getAnchor();
       r = new Rectangle(getView().drawingToView(cAnchor));
       r.grow(getAnchorWidth(), getAnchorWidth());
       fireAreaInvalidated(r);
       startConnector = null;
       endConnector = null;
-      Figure finishedFigure = createdFigure;
       createdFigure = null;
-      creationFinished(finishedFigure);
     }
-    else {
-      if (createdFigure != null) {
-        getDrawing().remove(createdFigure);
-        // TODO: Also remove figure from the model
 
-        Point2D.Double cAnchor = startConnector.getAnchor();
-        Rectangle r = new Rectangle(getView().drawingToView(cAnchor));
-        r.grow(getAnchorWidth(), getAnchorWidth());
-        fireAreaInvalidated(r);
-        r = new Rectangle(getView().drawingToView(cAnchor));
-        r.grow(getAnchorWidth(), getAnchorWidth());
-        fireAreaInvalidated(r);
-        startConnector = null;
-        endConnector = null;
-        createdFigure = null;
-      }
-
-      if (isToolDoneAfterCreation()) {
-        fireToolDone();
-      }
+    if (isToolDoneAfterCreation()) {
+      fireToolDone();
     }
+  }
+
+  private boolean isValidConnection() {
+    // Prevent the manual creation of multiple connections with the same start and end connector.
+    return canConnect() && !connectionAlreadyPresent();
+  }
+
+  private boolean connectionAlreadyPresent() {
+    PointModel startPoint = (PointModel) startConnector.getOwner().get(FigureConstants.MODEL);
+    PointModel endPoint = (PointModel) endConnector.getOwner().get(FigureConstants.MODEL);
+    return startPoint != null
+        && endPoint != null
+        && startPoint.hasConnectionTo(endPoint);
+  }
+
+  private boolean canConnect() {
+    return createdFigure != null
+        && startConnector != null
+        && endConnector != null
+        && createdFigure.canConnect(startConnector, endConnector);
   }
 }

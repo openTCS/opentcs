@@ -20,6 +20,7 @@ import org.jhotdraw.app.View;
 import org.opentcs.common.PortalManager;
 import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.event.ModelNameChangeEvent;

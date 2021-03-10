@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.swing.filechooser.FileFilter;
-import org.opentcs.guing.model.SystemModel;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**
- * Interface to read a file containing a <code>SystemModel</code>.
+ * Interface to read a file containing a {@link PlantModelCreationTO}.
  *
  * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
@@ -25,13 +25,13 @@ public interface ModelFileReader {
   /**
    * Deserializes the model contained in the given file.
    *
-   * @param file The <code>File</code> containing the model.
-   * @return The deserialized <code>SystemModel</code> or {@link Optional#EMPTY} if deserialzation
-   * canceled.
+   * @param file The {@link File} containing the model.
+   * @return The deserialized {@link PlantModelCreationTO} or {@link Optional#EMPTY} if
+   * deserialzation canceled.
    * @throws java.io.IOException If an exception occured while reading
    * the file.
    */
-  public Optional<SystemModel> deserialize(File file)
+  public Optional<PlantModelCreationTO> deserialize(File file)
       throws IOException;
 
   /**

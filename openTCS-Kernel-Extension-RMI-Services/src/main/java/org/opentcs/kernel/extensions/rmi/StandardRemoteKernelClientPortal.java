@@ -18,13 +18,16 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.access.rmi.services.RegistrationName;
 import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.kernel.extensions.rmi.UserManager.ClientEntry;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +73,10 @@ public class StandardRemoteKernelClientPortal
    */
   private final RegistryProvider registryProvider;
   /**
+   * The event handler to publish events to.
+   */
+  private final EventHandler eventHandler;
+  /**
    * The registry with which this remote portal registers.
    */
   private Registry rmiRegistry;
@@ -87,6 +94,7 @@ public class StandardRemoteKernelClientPortal
    * @param configuration This class' configuration.
    * @param socketFactoryProvider The socket factory provider used for RMI.
    * @param registryProvider The provider for the registry with which this remote portal registers.
+   * @param eventHandler The event handler to publish events to.
    */
   @Inject
   public StandardRemoteKernelClientPortal(LocalKernel kernel,
@@ -94,13 +102,15 @@ public class StandardRemoteKernelClientPortal
                                           UserManager userManager,
                                           RmiKernelInterfaceConfiguration configuration,
                                           SocketFactoryProvider socketFactoryProvider,
-                                          RegistryProvider registryProvider) {
+                                          RegistryProvider registryProvider,
+                                          @ApplicationEventBus EventHandler eventHandler) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.remoteServices = requireNonNull(remoteServices, "remoteServices");
     this.userManager = requireNonNull(userManager, "userManager");
     this.configuration = requireNonNull(configuration, "configuration");
     this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
     this.registryProvider = requireNonNull(registryProvider, "registryProvider");
+    this.eventHandler = requireNonNull(eventHandler, "eventHandler");
   }
 
   @Override
@@ -216,5 +226,13 @@ public class StandardRemoteKernelClientPortal
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return userManager.pollEvents(clientId, timeout);
+  }
+
+  @Override
+  public void publishEvent(ClientID clientId, Object event)
+      throws KernelRuntimeException {
+    userManager.verifyCredentials(clientId, UserPermission.PUBLISH_MESSAGES);
+
+    eventHandler.onEvent(event);
   }
 }

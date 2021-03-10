@@ -18,8 +18,8 @@ dependencies {
   compile project(':openTCS-PlantOverview-Themes-Default')
   
   // There does not seem to be an official binary release for JHotDraw...
-  compile group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6'
-  compileOnly group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6', classifier: 'sources'
+  compile group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506'
+  compileOnly group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506', classifier: 'sources'
   // This preview version of Docking Frames is not in Maven Central, yet.
   compile group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11'
   compileOnly group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11', classifier: 'sources'

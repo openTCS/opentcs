@@ -14,7 +14,6 @@ import bibliothek.gui.dock.common.intern.DefaultCommonDockable;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.components.dockable.CStackDockStation;
@@ -152,15 +152,10 @@ public class ViewManager
    * the modelling view.
    */
   public List<OpenTCSDrawingView> getOperatingDrawingViews() {
-    List<OpenTCSDrawingView> views = new ArrayList<>();
-
-    for (DrawingViewScrollPane scrollPane : drawingViewMap.values()) {
-      if (drawingViewMap.get(drawingViewModellingDockable) != scrollPane) {
-        views.add(scrollPane.getDrawingView());
-      }
-    }
-
-    return views;
+    return drawingViewMap.entrySet().stream()
+        .filter(entry -> entry.getKey() != drawingViewModellingDockable)
+        .map(entry -> entry.getValue().getDrawingView())
+        .collect(Collectors.toList());
   }
 
   /**
@@ -169,15 +164,11 @@ public class ViewManager
    * @return List of strings containing the names.
    */
   public List<String> getDrawingViewNames() {
-    List<String> names = new ArrayList<>();
-    for (DefaultSingleCDockable dock : drawingViewMap.keySet()) {
-      if (dock != drawingViewModellingDockable) {
-        names.add(dock.getTitleText());
-      }
-    }
-    Collections.sort(names);
-
-    return names;
+    return drawingViewMap.keySet().stream()
+        .filter(dock -> dock != drawingViewModellingDockable)
+        .map(dock -> dock.getTitleText())
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   /**
@@ -360,9 +351,8 @@ public class ViewManager
   private void setPlantOverviewStateModelling() {
     CStackDockStation station
         = dockingManager.getTabPane(DockingManager.COURSE_TAB_PANE_ID).getStation();
-    List<DefaultSingleCDockable> drawingViews = new ArrayList<>(drawingViewMap.keySet());
-    for (int i = 0; i < drawingViews.size(); i++) {
-      DefaultSingleCDockable dock = drawingViews.get(i);
+
+    for (DefaultSingleCDockable dock : new ArrayList<>(drawingViewMap.keySet())) {
       if (dock != drawingViewModellingDockable) {
         // Setting it to closeable = false, so the ClosingListener
         // doesn't remove the dockable when it's closed
@@ -373,12 +363,10 @@ public class ViewManager
 
     for (DefaultSingleCDockable dock : new ArrayList<>(transportOrderViews.keySet())) {
       dockingManager.hideDockable(station, dock);
-      transportOrderViews.get(dock).clearTransportOrders();
     }
 
     for (DefaultSingleCDockable dock : new ArrayList<>(orderSequenceViews.keySet())) {
       dockingManager.hideDockable(station, dock);
-      orderSequenceViews.get(dock).clearOrderSequences();
     }
 
     dockingManager.setDockableVisibility(DockingManager.VEHICLES_DOCKABLE_ID, false);

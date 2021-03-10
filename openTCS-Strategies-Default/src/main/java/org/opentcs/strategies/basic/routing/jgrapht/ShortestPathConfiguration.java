@@ -25,7 +25,7 @@ public interface ShortestPathConfiguration {
   String PREFIX = "defaultrouter.shortestpath";
 
   @ConfigurationEntry(
-      type = "Strings",
+      type = "String",
       description = {
         "The routing algorithm to be used. Valid values:",
         "'DIJKSTRA': Routes are computed using Dijkstra's algorithm.",
@@ -34,7 +34,7 @@ public interface ShortestPathConfiguration {
   Algorithm algorithm();
 
   @ConfigurationEntry(
-      type = "List of strings",
+      type = "Comma-separated list of strings",
       description = {
         "The types of route evaluators/cost factors to be used.",
         "Results of multiple evaluators are added up. Valid values:",

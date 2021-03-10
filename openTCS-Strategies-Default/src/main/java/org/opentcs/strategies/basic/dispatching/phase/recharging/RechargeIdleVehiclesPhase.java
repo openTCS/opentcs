@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import java.util.UUID;
 import javax.inject.Inject;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -149,7 +148,8 @@ public class RechargeIdleVehiclesPhase
     // Create a transport order for recharging and verify its processability.
     // The recharge order may be withdrawn unless its energy level is critical.
     TransportOrder rechargeOrder = orderService.createTransportOrder(
-        new TransportOrderCreationTO("Recharge-" + UUID.randomUUID(), chargeDests)
+        new TransportOrderCreationTO("Recharge-", chargeDests)
+            .withIncompleteName(true)
             .withIntendedVehicleName(vehicle.getName())
             .withDispensable(!vehicle.isEnergyLevelCritical())
     );

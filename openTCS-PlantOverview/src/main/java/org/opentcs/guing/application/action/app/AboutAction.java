@@ -19,7 +19,7 @@ import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.opentcs.access.SharedKernelServicePortalProvider;
-import org.opentcs.guing.application.ApplicationFrame;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;

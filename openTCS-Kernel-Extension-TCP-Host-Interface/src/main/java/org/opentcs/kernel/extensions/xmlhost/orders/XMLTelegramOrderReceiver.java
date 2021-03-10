@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.inject.Inject;
@@ -392,8 +391,9 @@ public class XMLTelegramOrderReceiver
 
       try {
         TransportOrder order = transportOrderService.createTransportOrder(
-            new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+            new TransportOrderCreationTO("TOrder-",
                                          createDestinations(transport.getDestinations()))
+                .withIncompleteName(true)
                 .withDeadline(transport.getDeadline() == null
                     ? Instant.MAX
                     : transport.getDeadline().toInstant())
@@ -446,8 +446,9 @@ public class XMLTelegramOrderReceiver
 
         try {
           TransportOrderCreationTO orderTO
-              = new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+              = new TransportOrderCreationTO("TOrder-",
                                              createDestinations(curOrder.getDestinations()))
+                  .withIncompleteName(true)
                   .withIntendedVehicleName(curOrder.getIntendedVehicle());
           if (scriptFile.getSequentialDependencies() && prevOrderName != null) {
             orderTO.getDependencyNames().add(prevOrderName);

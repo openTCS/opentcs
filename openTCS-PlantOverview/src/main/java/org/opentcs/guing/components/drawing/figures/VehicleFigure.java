@@ -24,6 +24,7 @@ import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -33,6 +34,9 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.data.model.Triple;
+import org.opentcs.data.order.TransportOrder;
+import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.application.menus.VehiclePopupMenu;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
@@ -43,10 +47,10 @@ import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.AngleProperty;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
+import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
@@ -92,13 +96,17 @@ public class VehicleFigure
    */
   private final ModelManager modelManager;
   /**
+   * The application's current state.
+   */
+  private final ApplicationState applicationState;
+  /**
    * The angle at which the image is to be drawn.
    */
   private double fAngle;
   /**
    * The image.
    */
-  private transient Image fImage;
+  protected transient Image fImage;
   /**
    * Whether to ignore the vehicle's precise position or not.
    */
@@ -107,18 +115,21 @@ public class VehicleFigure
    * Whether to ignore the vehicle's orientation angle or not.
    */
   private boolean ignoreOrientationAngle;
+  /**
+   * Indicates whether figure details changed.
+   */
+  private boolean figureDetailsChanged = false;
 
   /**
    * Creates a new instance.
    *
-   * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param vehicleTheme The vehicle theme to be used.
    * @param menuFactory A factory for popup menus.
    * @param appConfig The application's configuration.
    * @param model The model corresponding to this graphical object.
    * @param textGenerator The tool tip text generator.
    * @param modelManager The model manager.
+   * @param applicationState The application's current state.
    */
   @Inject
   public VehicleFigure(VehicleTheme vehicleTheme,
@@ -126,12 +137,14 @@ public class VehicleFigure
                        PlantOverviewApplicationConfiguration appConfig,
                        @Assisted VehicleModel model,
                        ToolTipTextGenerator textGenerator,
-                       ModelManager modelManager) {
+                       ModelManager modelManager,
+                       ApplicationState applicationState) {
     super(model);
     this.vehicleTheme = requireNonNull(vehicleTheme, "vehicleTheme");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
     this.modelManager = requireNonNull(modelManager, "modelManager");
+    this.applicationState = requireNonNull(applicationState, "applicationState");
 
     fDisplayBox = new Rectangle((int) LENGTH, (int) WIDTH);
     fZoomPoint = new ZoomPoint(0.5 * LENGTH, 0.5 * WIDTH);
@@ -188,6 +201,11 @@ public class VehicleFigure
   @Override
   public String getToolTipText(Point2D.Double p) {
     return textGenerator.getToolTipText(getModel());
+  }
+
+  @Override
+  public boolean isSelectable() {
+    return super.isSelectable() && applicationState.hasOperationMode(OperationMode.OPERATING);
   }
 
   /**
@@ -274,6 +292,11 @@ public class VehicleFigure
     fDisplayBox.y = (int) (anchor.y - 0.5 * WIDTH);
     firePropertyChange(POSITION_CHANGED, oldBounds, getBounds());
 
+    updateVehicleOrientation();
+  }
+
+  private void updateVehicleOrientation() {
+    VehicleModel model = getModel();
     // Winkelausrichtung:
     // 1. Exakte Pose vom Fahrzeugtreiber gemeldet oder
     // 2. Property des aktuellen Punktes oder
@@ -293,66 +316,82 @@ public class VehicleFigure
     else if (currentPoint != null) {
       // Use orientation from current point.
       AngleProperty ap = currentPoint.getPropertyVehicleOrientationAngle();
+      angle = (double) ap.getValue();
 
-      if (ap != null) {
-        angle = (double) ap.getValue();
-
-        if (!Double.isNaN(angle)) {
-          fAngle = angle;
-        }
-        else {
-          // Wenn fï¿½r diesen Punkt keine Winkelausrichtung spezifiziert ist,
-          // Winkel zum nï¿½chsten Zielpunkt bestimmen
-          PointModel nextPoint = model.getNextPoint();
-
-          if (nextPoint == null) {
-            // Wenn es keinen Zielpunkt gibt, einen beliebigen (?) Nachbarpunkt zum aktuellen Punkt suchen
-            for (AbstractConnection connection : currentPoint.getConnections()) {
-              if (connection.getStartComponent().equals(currentPoint)) {
-                ModelComponent destinationPoint = connection.getEndComponent();
-                // Die Links (zu Locations) gehï¿½ren auch zu den Connections
-                if (destinationPoint instanceof PointModel) {
-                  nextPoint = (PointModel) connection.getEndComponent();
-                  break;
-                }
-              }
-            }
-          }
-
-          if (nextPoint != null) {
-            AbstractConnection connection = currentPoint.getConnectionTo(nextPoint);
-
-            if (connection == null) {
-              return;
-            }
-
-            PathConnection pathFigure
-                = (PathConnection) modelManager.getModel().getFigure(connection);
-            LabeledPointFigure clpf
-                = (LabeledPointFigure) modelManager.getModel().getFigure(currentPoint);
-            PointFigure cpf = clpf.getPresentationFigure();
-
-            if (pathFigure.getLiner() instanceof TupelBezierLiner
-                || pathFigure.getLiner() instanceof TripleBezierLiner) {
-              BezierPath bezierPath = pathFigure.getBezierPath();
-              Point2D.Double cp = bezierPath.get(0, BezierPath.C2_MASK);
-              double dx = cp.getX() - cpf.getZoomPoint().getX();
-              double dy = cp.getY() - cpf.getZoomPoint().getY();
-              // An die Tangente der Verbindungskurve ausrichten
-              fAngle = Math.toDegrees(Math.atan2(-dy, dx));
-            }
-            else {
-              LabeledPointFigure nlpf
-                = (LabeledPointFigure) modelManager.getModel().getFigure(nextPoint);
-              PointFigure npf = nlpf.getPresentationFigure();
-              double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
-              double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
-              // Nach dem direkten Winkel ausrichten
-              fAngle = Math.toDegrees(Math.atan2(-dy, dx));
-            }
-          }
-        }
+      if (!Double.isNaN(angle)) {
+        fAngle = angle;
       }
+      else {
+        // Wenn fï¿½r diesen Punkt keine Winkelausrichtung spezifiziert ist,
+        // Winkel zum nï¿½chsten Zielpunkt bestimmen
+        alignVehicleToNextPoint();
+      }
+    }
+  }
+
+  private void alignVehicleToNextPoint() {
+    VehicleModel model = getModel();
+    PointModel nextPoint = model.getNextPoint();
+    PointModel currentPoint = model.getPoint();
+
+    AbstractConnection connection;
+    if (model.getDriveOrderState() == TransportOrder.State.BEING_PROCESSED) {
+      if (model.getDriveOrderComponents() == null) {
+        connection = null;
+      }
+      else {
+        connection = (PathModel) model.getDriveOrderComponents().stream()
+            .filter(component -> component instanceof PathModel)
+            .findFirst()
+            .orElse(null);
+      }
+    }
+    else {
+      if (nextPoint != null) {
+        connection = currentPoint.getConnectionTo(nextPoint);
+      }
+      else {
+        // Wenn es keinen Zielpunkt gibt, einen beliebigen (?) Nachbarpunkt zum aktuellen Punkt suchen
+        connection = currentPoint.getConnections().stream()
+            .filter(con -> con instanceof PathModel)
+            .filter(con -> Objects.equals(con.getStartComponent(), currentPoint))
+            .findFirst()
+            .orElse(null);
+      }
+    }
+
+    if (connection != null) {
+      fAngle = calculateAngle(connection);
+    }
+  }
+
+  private double calculateAngle(AbstractConnection connection) {
+    PointModel currentPoint = (PointModel) connection.getStartComponent();
+    PointModel nextPoint = (PointModel) connection.getEndComponent();
+
+    PathConnection pathFigure
+        = (PathConnection) modelManager.getModel().getFigure(connection);
+    LabeledPointFigure clpf
+        = (LabeledPointFigure) modelManager.getModel().getFigure(currentPoint);
+    PointFigure cpf = clpf.getPresentationFigure();
+
+    if (pathFigure.getLiner() instanceof TupelBezierLiner
+        || pathFigure.getLiner() instanceof TripleBezierLiner) {
+      BezierPath bezierPath = pathFigure.getBezierPath();
+      Point2D.Double cp = bezierPath.get(0, BezierPath.C2_MASK);
+      double dx = cp.getX() - cpf.getZoomPoint().getX();
+      double dy = cp.getY() - cpf.getZoomPoint().getY();
+      // An die Tangente der Verbindungskurve ausrichten
+      return Math.toDegrees(Math.atan2(-dy, dx));
+    }
+    else {
+      LabeledPointFigure nlpf
+          = (LabeledPointFigure) modelManager.getModel().getFigure(nextPoint);
+      PointFigure npf = nlpf.getPresentationFigure();
+      double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
+      double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
+      // Nach dem direkten Winkel ausrichten
+      return Math.toDegrees(Math.atan2(-dy, dx));
     }
   }
 
@@ -447,49 +486,36 @@ public class VehicleFigure
 
   @Override
   public void propertiesChanged(AttributesChangeEvent e) {
-    if (e.getInitiator().equals(this)) {
-      return;
-    }
-    VehicleModel model = (VehicleModel) e.getModel();
-
-    if (model == null) {
+    if (e.getInitiator().equals(this)
+        || e.getModel() == null) {
       return;
     }
 
-    fImage = vehicleTheme.statefulImage(model.getVehicle());
+    updateFigureDetails((VehicleModel) e.getModel());
 
-    PointModel point = model.getPoint();
-    Triple precisePosition = model.getPrecisePosition();
+    if (isFigureDetailsChanged()) {
+      SwingUtilities.invokeLater(() -> {
+        // Only call if the figure is visible - will cause NPE in BoundsOutlineHandle otherwise.
+        if (isVisible()) {
+          fireFigureChanged();
+        }
+      });
 
-    if (point == null && precisePosition == null) {
-      // If neither the point nor the precise position is known, don't draw the figure.
-      SwingUtilities.invokeLater(() -> setVisible(false));
+      setFigureDetailsChanged(false);
     }
-    else if (precisePosition != null && !ignorePrecisePosition) {
-      // If a precise position exists, it is set in setBounds(), so it doesn't need any coordinates.
-      SwingUtilities.invokeLater(() -> {
-        setVisible(true);
-        setBounds(new Point2D.Double(), null);
-        // Only call if the figure is visible - will cause NPE in BoundsOutlineHandle otherwise.
-        fireFigureChanged();
-      });
-    }
-    else if (point != null) {
-      SwingUtilities.invokeLater(() -> {
-        setVisible(true);
-        Figure pointFigure = modelManager.getModel().getFigure(point);
-        Rectangle2D.Double r = pointFigure.getBounds();
-        Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
-        // Draw figure in the center of the node.
-        // Angle is set in setBounds().
-        setBounds(pCenter, null);
-        // Only call if the figure is visible - will cause NPE in BoundsOutlineHandle otherwise.
-        fireFigureChanged();
-      });
-    }
-    else {
-      SwingUtilities.invokeLater(() -> setVisible(false));
-    }
+  }
+
+  /**
+   * Updates the figure details based on the given vehicle model.
+   * <p>
+   * If figure details do change, call {@link #setFigureDetailsChanged(boolean)} to set the
+   * corresponding flag to {@code true}.
+   * When overriding this method, always remember to call the super-implementation.
+   * </p>
+   *
+   * @param model The updated vehicle model.
+   */
+  protected void updateFigureDetails(VehicleModel model) {
   }
 
   @Override
@@ -510,5 +536,21 @@ public class VehicleFigure
    */
   protected VehicleTheme getVehicleTheme() {
     return vehicleTheme;
+  }
+
+  public boolean isFigureDetailsChanged() {
+    return figureDetailsChanged;
+  }
+
+  public void setFigureDetailsChanged(boolean figureDetailsChanged) {
+    this.figureDetailsChanged = figureDetailsChanged;
+  }
+
+  public boolean isIgnorePrecisePosition() {
+    return ignorePrecisePosition;
+  }
+
+  public ModelManager getModelManager() {
+    return modelManager;
   }
 }

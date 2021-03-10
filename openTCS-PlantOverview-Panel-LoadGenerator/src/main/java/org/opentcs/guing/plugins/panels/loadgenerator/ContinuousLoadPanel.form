@@ -37,6 +37,11 @@
       </AuxValues>
     </Component>
     <Component class="javax.swing.JFileChooser" name="fileChooser">
+      <Properties>
+        <Property name="fileFilter" type="javax.swing.filechooser.FileFilter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new FileNameExtensionFilter(&quot;*.xml&quot;, &quot;xml&quot;)" type="code"/>
+        </Property>
+      </Properties>
     </Component>
   </NonVisualComponents>
   <Properties>

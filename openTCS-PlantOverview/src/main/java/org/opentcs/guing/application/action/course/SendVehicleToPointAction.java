@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import org.opentcs.guing.application.ApplicationFrame;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.model.elements.PointModel;

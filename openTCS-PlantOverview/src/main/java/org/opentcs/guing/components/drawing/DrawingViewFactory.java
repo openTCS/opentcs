@@ -14,6 +14,7 @@ import javax.inject.Provider;
 import javax.swing.JToggleButton;
 import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.application.StatusPanel;
+import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
@@ -41,16 +42,22 @@ public class DrawingViewFactory {
    * The manager keeping/providing the currently loaded model.
    */
   private final ModelManager modelManager;
+  /**
+   * A helper for creating transport orders.
+   */
+  private final TransportOrderUtil orderUtil;
 
   @Inject
   public DrawingViewFactory(Provider<OpenTCSDrawingView> drawingViewProvider,
                             OpenTCSDrawingEditor drawingEditor,
                             StatusPanel statusPanel,
-                            ModelManager modelManager) {
+                            ModelManager modelManager,
+                            TransportOrderUtil orderUtil) {
     this.drawingViewProvider = requireNonNull(drawingViewProvider, "drawingViewProvider");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.modelManager = requireNonNull(modelManager, "modelManager");
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
   }
 
   /**
@@ -95,7 +102,8 @@ public class DrawingViewFactory {
                                      linkCreationToolButton,
                                      pathCreationToolButton,
                                      statusPanel,
-                                     modelManager);
+                                     modelManager,
+                                     orderUtil);
     drawingView.addMouseListener(dragScrollListener);
     drawingView.addMouseMotionListener(dragScrollListener);
     drawingView.addMouseWheelListener(dragScrollListener);

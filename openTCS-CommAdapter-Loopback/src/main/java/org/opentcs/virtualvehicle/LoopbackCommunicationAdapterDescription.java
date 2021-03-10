@@ -24,4 +24,10 @@ public class LoopbackCommunicationAdapterDescription
     return ResourceBundle.getBundle(BUNDLE_PATH)
         .getString("loopbackCommunicationAdapterDescription.description");
   }
+
+  @Override
+  public boolean isSimVehicleCommAdapter() {
+    return true;
+  }
+
 }

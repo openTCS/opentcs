@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import java.util.UUID;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.Router;
@@ -140,7 +139,8 @@ public abstract class AbstractParkingPhase
     );
     // Create a transport order for parking and verify its processability.
     TransportOrder parkOrder = orderService.createTransportOrder(
-        new TransportOrderCreationTO("Park-" + UUID.randomUUID(), parkDests)
+        new TransportOrderCreationTO("Park-", parkDests)
+            .withIncompleteName(true)
             .withDispensable(true)
             .withIntendedVehicleName(vehicle.getName())
     );

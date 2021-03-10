@@ -35,6 +35,7 @@ import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
@@ -158,7 +159,8 @@ public class KernelStateOperatingTest {
     return spy(new KernelStateOperating(new Object(),
                                         objectPool,
                                         mock(Model.class),
-                                        new TransportOrderPool(objectPool),
+                                        new TransportOrderPool(objectPool,
+                                                               new PrefixedUlidObjectNameProvider()),
                                         new NotificationBuffer(new SimpleEventBus()),
                                         mock(ModelPersister.class),
                                         configuration,

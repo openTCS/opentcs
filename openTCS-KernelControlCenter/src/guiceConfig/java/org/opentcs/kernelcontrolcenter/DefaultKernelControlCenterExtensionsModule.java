@@ -10,7 +10,6 @@ package org.opentcs.kernelcontrolcenter;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import javax.inject.Singleton;
-import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.customizations.controlcenter.ControlCenterInjectionModule;
 import org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration;
 import org.opentcs.kernelcontrolcenter.vehicles.DriverGUI;
@@ -28,16 +27,19 @@ public class DefaultKernelControlCenterExtensionsModule
     configureControlCenterDependencies();
   }
 
+  @SuppressWarnings("deprecation")
   private void configureControlCenterDependencies() {
     KernelControlCenterConfiguration configuration
         = getConfigBindingProvider().get(KernelControlCenterConfiguration.PREFIX,
                                          KernelControlCenterConfiguration.class);
     bind(KernelControlCenterConfiguration.class).toInstance(configuration);
 
-    Multibinder<ControlCenterPanel> modellingBinder = controlCenterPanelBinderModelling();
+    Multibinder<org.opentcs.components.kernel.ControlCenterPanel> modellingBinder
+        = controlCenterPanelBinderModelling();
     // No extensions for modelling mode, yet.
 
-    Multibinder<ControlCenterPanel> operatingBinder = controlCenterPanelBinderOperating();
+    Multibinder<org.opentcs.components.kernel.ControlCenterPanel> operatingBinder
+        = controlCenterPanelBinderOperating();
     operatingBinder.addBinding().to(DriverGUI.class);
 
     install(new FactoryModuleBuilder().build(ControlCenterInfoHandlerFactory.class));

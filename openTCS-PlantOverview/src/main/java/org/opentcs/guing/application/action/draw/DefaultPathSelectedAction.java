@@ -134,6 +134,8 @@ public class DefaultPathSelectedAction
         return ImageDirectory.getImageIcon("/toolbar/path-bezier.22.png");
       case BEZIER_3:
         return ImageDirectory.getImageIcon("/toolbar/path-bezier.22.png");
+      case POLYPATH:
+        return ImageDirectory.getImageIcon("/toolbar/path-polypath.22.png");
       default:
         return null;
     }
@@ -151,6 +153,8 @@ public class DefaultPathSelectedAction
         return ImageDirectory.getImageIcon("/toolbar/path-bezier-arrow.22.png");
       case BEZIER_3:
         return ImageDirectory.getImageIcon("/toolbar/path-bezier-arrow.22.png");
+      case POLYPATH:
+        return ImageDirectory.getImageIcon("/toolbar/path-polypath-arrow.22.png");
       default:
         return null;
     }

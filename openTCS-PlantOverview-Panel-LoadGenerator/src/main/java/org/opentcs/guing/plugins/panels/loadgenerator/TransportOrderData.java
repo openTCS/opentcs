@@ -29,10 +29,6 @@ import org.opentcs.data.order.DriveOrder;
 public class TransportOrderData {
 
   /**
-   * This transport order's name.
-   */
-  private String name = "";
-  /**
    * The new transport order's deadline.
    */
   private Deadline deadline = Deadline.PLUS_ONE_HOUR;
@@ -123,29 +119,6 @@ public class TransportOrderData {
    */
   public List<DriveOrderStructure> getDriveOrders() {
     return driveOrders;
-  }
-
-  /**
-   * Returns a transport order's name.
-   *
-   * @return This transport order's name.
-   */
-  public String getName() {
-    return this.name;
-  }
-
-  /**
-   * Sets a new transport order name.
-   *
-   * @param newName The new unique name for transport order associated with its
-   * TransportOrderData instance.
-   */
-  public void setName(String newName) {
-    Objects.requireNonNull(newName, "newName is null");
-    if (newName.isEmpty()) {
-      throw new IllegalArgumentException("newName is the empty string");
-    }
-    this.name = newName;
   }
 
   /**

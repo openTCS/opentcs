@@ -7,6 +7,9 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.ExplicitOrderBatchGenerator;
+import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.OrderBatchCreator;
+import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.RandomOrderBatchCreator;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +29,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
@@ -41,6 +45,13 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
+import org.opentcs.guing.plugins.panels.loadgenerator.trigger.OrderGenerationTrigger;
+import org.opentcs.guing.plugins.panels.loadgenerator.trigger.SingleOrderGenTrigger;
+import org.opentcs.guing.plugins.panels.loadgenerator.trigger.ThresholdOrderGenTrigger;
+import org.opentcs.guing.plugins.panels.loadgenerator.trigger.TimeoutOrderGenTrigger;
+import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.DriveOrderEntry;
+import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrderEntry;
+import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrdersDocument;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.event.EventSource;
 import org.opentcs.util.gui.StringListCellRenderer;
@@ -446,6 +457,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         locationsComboBoxItemStateChanged(evt);
       }
     });
+
+    fileChooser.setFileFilter(new FileNameExtensionFilter("*.xml", "xml"));
 
     setPreferredSize(new java.awt.Dimension(520, 700));
     setLayout(new java.awt.GridBagLayout());
@@ -864,8 +877,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         orderGenTrigger.setTriggeringEnabled(true);
       }
     }
-    else // Stop order generation.
-    if (orderGenTrigger != null) {
+    else if (orderGenTrigger != null) {
       orderGenTrigger.setTriggeringEnabled(false);
       orderGenTrigger = null;
     }
@@ -990,7 +1002,9 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     TransportOrderTableModel model = (TransportOrderTableModel) toTable.getModel();
     File targetFile = fileChooser.getSelectedFile();
-    // XXX Check that the file name ends with '.xml'
+    if (!targetFile.getName().endsWith(".xml")) {
+      targetFile = new File(targetFile.getParentFile(), targetFile.getName() + ".xml");
+    }
     if (targetFile.exists()) {
       dialogResult = JOptionPane.showConfirmDialog(
           this,
@@ -1003,10 +1017,10 @@ toTable.getSelectionModel().addListSelectionListener(listener);
       }
     }
     try {
-      model.toFile(targetFile);
+      model.toXmlDocument().toFile(targetFile);
     }
     catch (IOException exc) {
-      LOG.warn("Exception saving property set to " + targetFile.getPath(), exc);
+      LOG.warn("Exception saving to " + targetFile.getPath(), exc);
       JOptionPane.showMessageDialog(this,
                                     "Exception saving property set: " + exc.getMessage(),
                                     "Exception saving property set", JOptionPane.ERROR_MESSAGE);
@@ -1029,45 +1043,42 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     }
     try {
       // unmarshal
-      List<TransportOrderXMLStructure> xmlData = TransportOrderTableModel.fromFile(targetFile);
+      TransportOrdersDocument doc = TransportOrdersDocument.fromFile(targetFile);
       List<TransportOrderData> newOrders = new ArrayList<>();
-      for (TransportOrderXMLStructure curStruc : xmlData) {
+      for (TransportOrderEntry curStruc : doc.getTransportOrders()) {
         TransportOrderData data = new TransportOrderData();
-        data.setName(curStruc.getName());
-        switch (curStruc.getDeadline().toString()) {
-          case "-5 min.":
+        switch (curStruc.getDeadline()) {
+          case MINUS_FIVE_MINUTES:
             data.setDeadline(TransportOrderData.Deadline.MINUS_FIVE_MINUTES);
             break;
-          case "5 min.":
+          case PLUS_FIVE_MINUTES:
             data.setDeadline(TransportOrderData.Deadline.PLUS_FIVE_MINUTES);
             break;
-          case "-30 min.":
+          case MINUS_HALF_HOUR:
             data.setDeadline(TransportOrderData.Deadline.MINUS_HALF_HOUR);
             break;
-          case "30 min.":
+          case PLUS_HALF_HOUR:
             data.setDeadline(TransportOrderData.Deadline.PLUS_HALF_HOUR);
             break;
-          case " 1 h.":
+          case PLUS_ONE_HOUR:
             data.setDeadline(TransportOrderData.Deadline.PLUS_ONE_HOUR);
             break;
-          case " 2 h.":
-            data.setDeadline(TransportOrderData.Deadline.PLUS_TWO_HOURS);
-            break;
+          case PLUS_TWO_HOURS:
           default:
-            data.setDeadline(TransportOrderData.Deadline.PLUS_ONE_HOUR);
+            data.setDeadline(TransportOrderData.Deadline.PLUS_TWO_HOURS);
             break;
         }
         data.setIntendedVehicle(curStruc.getIntendedVehicle() == null ? null
             : objectService.fetchObject(Vehicle.class,
                                         curStruc.getIntendedVehicle()).getReference());
-        for (TransportOrderXMLStructure.XMLMapEntry curEntry : curStruc.getProperties()) {
+        for (TransportOrderEntry.XMLMapEntry curEntry : curStruc.getProperties()) {
           data.addProperty(curEntry.getKey(), curEntry.getValue());
         }
-        for (DriveOrderXMLStructure curDOXMLS : curStruc.getDriveOrders()) {
+        for (DriveOrderEntry curDOXMLS : curStruc.getDriveOrders()) {
           DriveOrderStructure newDOS
               = new DriveOrderStructure(objectService.fetchObject(
-                  Location.class, curDOXMLS.getDriveOrderLocation()).getReference(),
-                                        curDOXMLS.getDriveOrderVehicleOperation());
+                  Location.class, curDOXMLS.getLocationName()).getReference(),
+                                        curDOXMLS.getVehicleOperation());
           data.addDriveOrder(newDOS);
         }
         newOrders.add(data);

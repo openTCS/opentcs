@@ -38,9 +38,6 @@ public abstract class TCSFigure
   /**
    * Creates a new instance.
    *
-   * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected
-   * model component(s).
    * @param modelComponent The model corresponding to this graphical object.
    */
   public TCSFigure(ModelComponent modelComponent) {
@@ -58,7 +55,7 @@ public abstract class TCSFigure
   /**
    * Setzt den ZoomPunkt.
    *
-   * @param zoomPoint Der Zoompunkt  *
+   * @param zoomPoint Der Zoompunkt *
    */
   public void setZoomPoint(ZoomPoint zoomPoint) {
     fZoomPoint = zoomPoint;

@@ -1274,8 +1274,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     if (precisePos != null) {
       xS = String.valueOf(precisePos.getX());
-      yS = String.valueOf(precisePos.getX());
-      zS = String.valueOf(precisePos.getX());
+      yS = String.valueOf(precisePos.getY());
+      zS = String.valueOf(precisePos.getZ());
     }
 
     // Clip extremely long string values

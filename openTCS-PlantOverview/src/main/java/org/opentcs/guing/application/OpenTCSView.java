@@ -68,6 +68,7 @@ import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.application.action.ToolBarManager;
 import org.opentcs.guing.application.action.ViewActionMap;
@@ -111,7 +112,6 @@ import org.opentcs.guing.event.BlockChangeListener;
 import org.opentcs.guing.event.DrawingEditorEvent;
 import org.opentcs.guing.event.DrawingEditorListener;
 import org.opentcs.guing.event.KernelStateChangeEvent;
-import org.opentcs.guing.event.ModelModificationEvent;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.ResetInteractionToolCommand;
@@ -501,9 +501,6 @@ public class OpenTCSView
     if (event instanceof SystemModelTransitionEvent) {
       handleSystemModelTransition((SystemModelTransitionEvent) event);
     }
-    if (event instanceof ModelModificationEvent) {
-      handleModelModificationEvent((ModelModificationEvent) event);
-    }
     if (event instanceof KernelStateChangeEvent) {
       handleKernelStateChangeEvent((KernelStateChangeEvent) event);
     }
@@ -519,10 +516,6 @@ public class OpenTCSView
       default:
       // Do nada.
     }
-  }
-
-  private void handleModelModificationEvent(ModelModificationEvent event) {
-    setHasUnsavedChanges(true);
   }
 
   /**
@@ -1940,10 +1933,6 @@ public class OpenTCSView
             .forEach(block -> updateBlockMembers(block));
       }
 
-      if (model instanceof SystemModel) {
-        ((SystemModel) model).setName(model.getPropertyName().getText());
-      }
-
       if (model instanceof LayoutModel) {
         // Handle scale changes.
         LengthProperty pScaleX = (LengthProperty) model.getProperty(LayoutModel.SCALE_X);
@@ -1965,7 +1954,7 @@ public class OpenTCSView
           LocationTypeModel type
               = fModelManager.getModel().getLocationTypeModel((String) p.getValue());
           ((LocationModel) model).setLocationType(type);
-          if (!(model == event.getInitiator())) {
+          if (model != event.getInitiator()) {
             model.propertiesChanged(this);
           }
         }
@@ -1979,12 +1968,7 @@ public class OpenTCSView
     }
 
     private boolean blockAffectedByNameChange(BlockModel block, ModelComponent model) {
-      for (ModelComponent member : block.getChildComponents()) {
-        if (member.equals(model)) {
-          return true;
-        }
-      }
-      return false;
+      return block.getChildComponents().stream().anyMatch(member -> member.equals(model));
     }
 
     private void updateBlockMembers(BlockModel block) {

@@ -15,9 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
@@ -27,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
@@ -76,8 +73,6 @@ import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.persistence.unified.UnifiedModelPersistor;
-import org.opentcs.guing.persistence.unified.UnifiedModelReader;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.I18nPlantOverview;
 import static org.opentcs.guing.util.I18nPlantOverview.STATUS_PATH;
@@ -138,11 +133,11 @@ public class OpenTCSModelManager
   /**
    * The file filters for different model readers that can be used to load models from a file.
    */
-  private final Map<FileFilter, ModelFileReader> modelReaderFilter = new HashMap<>();
+  private final ModelFileReader modelReader;
   /**
    * The file filters for different model persistors that can be used to save models to a file.
    */
-  private final Map<FileFilter, ModelFilePersistor> modelPersistorFilter = new HashMap<>();
+  private final ModelFilePersistor modelPersistor;
   /**
    * Converts model data on import.
    */
@@ -173,8 +168,8 @@ public class OpenTCSModelManager
    * @param statusPanel StatusPanel to log messages.
    * @param homeDir The application's home directory.
    * @param kernelPersistor Persists a model to a kernel.
-   * @param modelReaders The set of model readers
-   * @param modelPersistors The set of model persistors
+   * @param modelReader The model reader.
+   * @param modelPersistor The model persistor.
    * @param modelImportAdapter Converts model data on import.
    * @param modelExportAdapter Converts model data on export.
    */
@@ -185,8 +180,8 @@ public class OpenTCSModelManager
                              StatusPanel statusPanel,
                              @ApplicationHome File homeDir,
                              ModelKernelPersistor kernelPersistor,
-                             Set<ModelFileReader> modelReaders,
-                             Set<ModelFilePersistor> modelPersistors,
+                             ModelFileReader modelReader,
+                             ModelFilePersistor modelPersistor,
                              ModelImportAdapter modelImportAdapter,
                              ModelExportAdapter modelExportAdapter) {
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
@@ -195,30 +190,17 @@ public class OpenTCSModelManager
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     requireNonNull(homeDir, "homeDir");
     this.kernelPersistor = requireNonNull(kernelPersistor, "kernelPersistor");
+    
+    this.modelReader = requireNonNull(modelReader, "modelReader");
     this.modelReaderFileChooser = new SynchronizedFileChooser(new File(homeDir, "data"));
     this.modelReaderFileChooser.setAcceptAllFileFilterUsed(false);
-    modelReaders.stream().forEach(o -> {
-      FileFilter filter = o.getDialogFileFilter();
-      if (o instanceof UnifiedModelReader) {
-        this.modelReaderFileChooser.setFileFilter(filter);
-      }
-      else {
-        this.modelReaderFileChooser.addChoosableFileFilter(filter);
-      }
-      modelReaderFilter.put(filter, o);
-    });
+    this.modelReaderFileChooser.setFileFilter(modelReader.getDialogFileFilter());
+
+    this.modelPersistor = requireNonNull(modelPersistor, "modelPersistor");
     this.modelPersistorFileChooser = new SynchronizedFileChooser(new File(homeDir, "data"));
     this.modelPersistorFileChooser.setAcceptAllFileFilterUsed(false);
-    modelPersistors.stream().forEach(o -> {
-      FileFilter filter = o.getDialogFileFilter();
-      if (o instanceof UnifiedModelPersistor) {
-        this.modelPersistorFileChooser.setFileFilter(filter);
-      }
-      else {
-        this.modelPersistorFileChooser.addChoosableFileFilter(filter);
-      }
-      modelPersistorFilter.put(filter, o);
-    });
+    this.modelPersistorFileChooser.setFileFilter(modelPersistor.getDialogFileFilter());
+
     this.modelImportAdapter = requireNonNull(modelImportAdapter, "modelImportAdapter");
     this.modelExportAdapter = requireNonNull(modelExportAdapter, "modelExportAdapter");
 
@@ -238,8 +220,7 @@ public class OpenTCSModelManager
       return false;
     }
 
-    FileFilter chosenFileFilter = modelReaderFileChooser.getFileFilter();
-    return loadModel(file, modelReaderFilter.get(chosenFileFilter));
+    return loadModel(file, modelReader);
   }
 
   @Override
@@ -251,12 +232,12 @@ public class OpenTCSModelManager
     }
 
     try {
-      Optional<SystemModel> opt = reader.deserialize(file);
+      Optional<PlantModelCreationTO> opt = reader.deserialize(file);
       if (!opt.isPresent()) {
         LOG.debug("Loading model canceled.");
         return false;
       }
-      systemModel = opt.get();
+      systemModel = modelImportAdapter.convert(opt.get());
       currentModelFile = file;
       initializeSystemModel(systemModel);
       return true;
@@ -344,8 +325,7 @@ public class OpenTCSModelManager
 
       return persistModel(systemModel,
                           currentModelFile,
-                          modelPersistorFilter.get(modelPersistorFileChooser.getFileFilter()),
-                          true);
+                          modelPersistor);
 
     }
     catch (IOException e) {
@@ -396,13 +376,12 @@ public class OpenTCSModelManager
    */
   private boolean persistModel(SystemModel systemModel,
                                File file,
-                               ModelFilePersistor persistor,
-                               boolean ignoreError)
+                               ModelFilePersistor persistor)
       throws IOException, KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
 
-    if (!persistor.serialize(systemModel, fModelName, file, ignoreError)) {
+    if (!persistor.serialize(modelExportAdapter.convert(systemModel), file)) {
       return false;
     }
 

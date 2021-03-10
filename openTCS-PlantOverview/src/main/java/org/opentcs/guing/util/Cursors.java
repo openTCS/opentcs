@@ -24,23 +24,12 @@ public final class Cursors {
   /**
    * A cursor suitable for dragging a vehicle to a destination point.
    */
-  private static final Cursor dragVehicleCursor;
-
-  static {
-    // Load an image for the vehicle drag cursor.
-    BufferedImage bi = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
-    bi.createGraphics().drawImage(new ImageIcon(Cursors.class.getClassLoader().
-        getResource("org/opentcs/guing/res/symbols/toolbar/create-order.22.png")).
-        getImage(), 0, 0, null);
-    dragVehicleCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-        bi, new Point(0, 0), "toCursor");
-  }
+  private static final Cursor DRAG_VEHICLE_CURSOR = createDragVehicleCursor();
 
   /**
    * Prevents instantiation.
    */
   private Cursors() {
-    // Do nada.
   }
 
   /**
@@ -49,6 +38,20 @@ public final class Cursors {
    * @return A cursor suitable for dragging a vehicle to a destination point.
    */
   public static Cursor getDragVehicleCursor() {
-    return dragVehicleCursor;
+    return DRAG_VEHICLE_CURSOR;
+  }
+
+  private static Cursor createDragVehicleCursor() {
+    // Load an image for the vehicle drag cursor.
+    BufferedImage bi = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+    bi.createGraphics().drawImage(
+        new ImageIcon(
+            Cursors.class.getClassLoader().
+                getResource("org/opentcs/guing/res/symbols/toolbar/create-order.22.png")
+        ).getImage(),
+        0,
+        0,
+        null);
+    return Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0, 0), "toCursor");
   }
 }

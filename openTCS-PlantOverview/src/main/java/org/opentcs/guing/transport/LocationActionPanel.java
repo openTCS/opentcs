@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.Vector;
+import java.util.stream.Collectors;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
@@ -47,16 +49,17 @@ public class LocationActionPanel
    * @param locations The location models.
    */
   public LocationActionPanel(List<LocationModel> locations) {
+    this.fLocations = requireNonNull(locations, "locations");
+
     initComponents();
-    fLocations = locations;
+
     setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverview.VEHICLEPOPUP_PATH).getString("locationActionPanel.title"));
 
     Collections.sort(fLocations, getComparator());
 
-    List<String> names = new ArrayList<>();
-    for (LocationModel model : fLocations) {
-      names.add(model.getName());
-    }
+    List<String> names = fLocations.stream()
+        .map(location -> location.getName())
+        .collect(Collectors.toList());
 
     locationsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(names)));
 
@@ -69,17 +72,13 @@ public class LocationActionPanel
    * @return den Comparator
    */
   protected final Comparator<ModelComponent> getComparator() {
-    return new Comparator<ModelComponent>() {
+    return (ModelComponent item1, ModelComponent item2) -> {
+      String s1 = item1.getName();
+      String s2 = item2.getName();
+      s1 = s1.toLowerCase();
+      s2 = s2.toLowerCase();
 
-      @Override
-      public int compare(ModelComponent item1, ModelComponent item2) {
-        String s1 = item1.getName();
-        String s2 = item2.getName();
-        s1 = s1.toLowerCase();
-        s2 = s2.toLowerCase();
-
-        return s1.compareTo(s2);
-      }
+      return s1.compareTo(s2);
     };
   }
 

@@ -16,6 +16,7 @@ import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides clients access to kernel services.
@@ -53,7 +54,7 @@ public interface KernelServicePortal {
       throws KernelRuntimeException;
 
   /**
-   * Fetches events buffered for the given client.
+   * Fetches events buffered for the client.
    *
    * @param timeout A timeout (in ms) for which to wait for events to arrive.
    * @return A list of events (in the order they arrived).
@@ -61,6 +62,17 @@ public interface KernelServicePortal {
    */
   List<Object> fetchEvents(long timeout)
       throws KernelRuntimeException;
+
+  /**
+   * Publishes an event.
+   *
+   * @param event The event to be published.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
+  default void publishEvent(Object event)
+      throws KernelRuntimeException {
+  }
 
   /**
    * Returns the service a client can use to access methods regarding the plant model.

@@ -178,6 +178,10 @@ public class PathAdapter
     if (type.equals(PathModel.Type.BEZIER) || type.equals(PathModel.Type.BEZIER_3)) {
       sControlPoints = buildBezierControlPoints(pathModel, systemModel);
     }
+    else if( type.equals(PathModel.Type.POLYPATH)){
+      sControlPoints = buildPolyPathControlPoints(pathModel, systemModel);
+    }
+    
 
     pathModel.getPropertyPathControlPoints().setText(sControlPoints);
 
@@ -189,6 +193,11 @@ public class PathAdapter
           .withProperty(ElementPropKeys.PATH_CONTROL_POINTS, sControlPoints);
     }
     return layout.withModelElement(modelLayoutElement);
+  }
+  
+  private String buildPolyPathControlPoints(PathModel model, SystemModel systemModel){
+    PathConnection figure = (PathConnection) systemModel.getFigure(model);
+    return figure.getModel().getPropertyPathControlPoints().getText();
   }
 
   private String buildBezierControlPoints(PathModel model, SystemModel systemModel) {

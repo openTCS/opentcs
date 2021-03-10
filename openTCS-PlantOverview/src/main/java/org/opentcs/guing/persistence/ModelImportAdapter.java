@@ -24,6 +24,7 @@ import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.guing.application.StatusPanel;
+import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
@@ -112,12 +113,22 @@ public class ModelImportAdapter {
     importGroups(model, layoutTO, systemModel, collectedErrorMessages);
     importVisualLayout(layoutTO, systemModel, collectedErrorMessages);
 
+    importProperties(model, systemModel);
+
     // If any errors occurred, show the dialog with all errors listed
     if (!collectedErrorMessages.isEmpty()) {
       validator.showLoadingValidationWarning(statusPanel, collectedErrorMessages);
     }
 
     return systemModel;
+  }
+
+  private void importProperties(PlantModelCreationTO model, SystemModel systemModel) {
+    for (Map.Entry<String, String> property : model.getProperties().entrySet()) {
+      systemModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(systemModel,
+                                                                          property.getKey(),
+                                                                          property.getValue()));
+    }
   }
 
   private void importVisualLayout(VisualLayoutCreationTO layoutTO, SystemModel systemModel,

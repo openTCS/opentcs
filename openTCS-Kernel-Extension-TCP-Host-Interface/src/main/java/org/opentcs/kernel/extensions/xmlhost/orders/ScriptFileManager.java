@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.access.to.order.DestinationCreationTO;
@@ -168,8 +167,9 @@ public class ScriptFileManager
     for (TCSScriptFile.Order curOrder : scriptFile.getOrders()) {
 
       TransportOrderCreationTO orderTO
-          = new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
+          = new TransportOrderCreationTO("TOrder-",
                                          createDestinations(curOrder.getDestinations()))
+              .withIncompleteName(true)
               .withIntendedVehicleName(curOrder.getIntendedVehicle());
       if (scriptFile.getSequentialDependencies() && prevOrderName != null) {
         orderTO.getDependencyNames().add(prevOrderName);

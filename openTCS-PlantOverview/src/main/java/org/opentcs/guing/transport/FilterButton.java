@@ -10,7 +10,6 @@
 package org.opentcs.guing.transport;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 
@@ -43,13 +42,7 @@ public class FilterButton
     fTableModel = tableModel;
     fFilter = filter;
 
-    addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        changed();
-      }
-    });
+    addActionListener((ActionEvent e) -> changed());
 
     setSelected(true);
   }

@@ -149,18 +149,9 @@ public abstract class SimpleLineConnection
     ModelComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
     ModelComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
 
-    if (modelStart == null || modelEnd == null || modelEnd == modelStart) {
-      return false;
-    }
-
-    if ((modelStart instanceof PointModel) && (modelEnd instanceof PointModel)) {
-      PointModel startPoint = (PointModel) modelStart;
-      PointModel endPoint = (PointModel) modelEnd;
-      return !startPoint.hasConnectionTo(endPoint);
-    }
-    else {
-      return false;
-    }
+    return modelStart instanceof PointModel
+        && modelEnd instanceof PointModel
+        && modelStart != modelEnd;
   }
 
   @Override // LineConnectionFigure

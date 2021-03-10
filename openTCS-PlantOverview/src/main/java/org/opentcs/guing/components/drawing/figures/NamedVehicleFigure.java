@@ -9,9 +9,16 @@ package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import javax.inject.Inject;
+import javax.swing.SwingUtilities;
+import org.jhotdraw.draw.Figure;
 import org.opentcs.components.plantoverview.VehicleTheme;
+import org.opentcs.data.model.Triple;
+import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.menus.MenuFactory;
+import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
@@ -30,13 +37,15 @@ public class NamedVehicleFigure
                             PlantOverviewApplicationConfiguration appConfig,
                             @Assisted VehicleModel model,
                             ToolTipTextGenerator textGenerator,
-                            ModelManager modelManager) {
+                            ModelManager modelManager,
+                            ApplicationState applicationState) {
     super(vehicleTheme,
           menuFactory,
           appConfig,
           model,
           textGenerator,
-          modelManager);
+          modelManager,
+          applicationState);
   }
 
   @Override
@@ -47,5 +56,45 @@ public class NamedVehicleFigure
     g2d.drawString(getVehicleTheme().label(getModel().getVehicle()),
                    (int) displayBox().getCenterX() + getVehicleTheme().labelOffsetX(),
                    (int) displayBox().getCenterY() + getVehicleTheme().labelOffsetY());
+  }
+
+  @Override
+  protected void updateFigureDetails(VehicleModel model) {
+    super.updateFigureDetails(model);
+
+    fImage = getVehicleTheme().statefulImage(model.getVehicle());
+
+    PointModel point = model.getPoint();
+    Triple precisePosition = model.getPrecisePosition();
+
+    if (point == null && precisePosition == null) {
+      // If neither the point nor the precise position is known, don't draw the figure.
+      SwingUtilities.invokeLater(() -> setVisible(false));
+    }
+    else if (precisePosition != null && !isIgnorePrecisePosition()) {
+      // If a precise position exists, it is set in setBounds(), so it doesn't need any coordinates.
+      SwingUtilities.invokeLater(() -> {
+        setVisible(true);
+        setBounds(new Point2D.Double(), null);
+      });
+
+      setFigureDetailsChanged(true);
+    }
+    else if (point != null) {
+      SwingUtilities.invokeLater(() -> {
+        setVisible(true);
+        Figure pointFigure = getModelManager().getModel().getFigure(point);
+        Rectangle2D.Double r = pointFigure.getBounds();
+        Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
+        // Draw figure in the center of the node.
+        // Angle is set in setBounds().
+        setBounds(pCenter, null);
+      });
+
+      setFigureDetailsChanged(true);
+    }
+    else {
+      SwingUtilities.invokeLater(() -> setVisible(false));
+    }
   }
 }

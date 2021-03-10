@@ -208,6 +208,19 @@ public class RemoteKernelServicePortalProxy
   }
 
   @Override
+  public void publishEvent(Object event)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().publishEvent(getClientId(), event);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
   @Nonnull
   public PlantModelService getPlantModelService() {
     return plantModelService;

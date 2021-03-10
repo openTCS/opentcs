@@ -19,6 +19,7 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.access.SslParameterSet;
 import org.opentcs.common.LoggingScheduledThreadPoolExecutor;
+import org.opentcs.components.kernel.ObjectNameProvider;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
@@ -57,6 +58,7 @@ import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
+import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
 import org.opentcs.util.event.EventBus;
@@ -94,6 +96,10 @@ public class DefaultKernelInjectionModule
     bind(Model.class).in(Singleton.class);
     bind(TransportOrderPool.class).in(Singleton.class);
     bind(NotificationBuffer.class).in(Singleton.class);
+
+    bind(ObjectNameProvider.class)
+        .to(PrefixedUlidObjectNameProvider.class)
+        .in(Singleton.class);
 
     configurePersistence();
 

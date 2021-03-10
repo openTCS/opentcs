@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentcs.components.kernel.ObjectNameProvider;
 
 /**
  * A {@code TransportOrderPool} keeps all {@code TransportOrder}s for an openTCS
@@ -58,16 +60,22 @@ public class TransportOrderPool {
    * The system's global object pool.
    */
   private final TCSObjectPool objectPool;
+  /**
+   * Provides names for transport orders and order sequences.
+   */
+  private final ObjectNameProvider objectNameProvider;
 
   /**
-   * Creates a new TransportOrderPool.
+   * Creates a new instance.
    *
-   * @param globalPool The object pool serving as the container for this order
-   * pool's data.
+   * @param objectPool The object pool serving as the container for this order pool's data.
+   * @param orderNameProvider Provides names for transport orders.
    */
   @Inject
-  public TransportOrderPool(TCSObjectPool globalPool) {
-    objectPool = Objects.requireNonNull(globalPool);
+  public TransportOrderPool(TCSObjectPool objectPool,
+                            ObjectNameProvider orderNameProvider) {
+    this.objectPool = requireNonNull(objectPool, "objectPool");
+    this.objectNameProvider = requireNonNull(orderNameProvider, "orderNameProvider");
   }
 
   /**
@@ -148,7 +156,8 @@ public class TransportOrderPool {
   @SuppressWarnings("deprecation")
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
-    TransportOrder newOrder = new TransportOrder(to.getName(), toDriveOrders(to.getDestinations()))
+    TransportOrder newOrder = new TransportOrder(nameFor(to),
+                                                 toDriveOrders(to.getDestinations()))
         .withCreationTime(Instant.now())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withCategory(to.getCategory())
@@ -763,7 +772,7 @@ public class TransportOrderPool {
   @SuppressWarnings("deprecation")
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
-    OrderSequence newSequence = new OrderSequence(to.getName())
+    OrderSequence newSequence = new OrderSequence(nameFor(to))
         .withCategory(to.getCategory())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withFailureFatal(to.isFailureFatal())
@@ -1195,5 +1204,25 @@ public class TransportOrderPool {
   @Nullable
   private String getIntendedVehicleName(OrderSequence sequence) {
     return sequence.getIntendedVehicle() == null ? null : sequence.getIntendedVehicle().getName();
+  }
+
+  @Nonnull
+  private String nameFor(@Nonnull TransportOrderCreationTO to) {
+    if (to.hasIncompleteName()) {
+      return objectNameProvider.apply(to);
+    }
+    else {
+      return to.getName();
+    }
+  }
+
+  @Nonnull
+  private String nameFor(@Nonnull OrderSequenceCreationTO to) {
+    if (to.hasIncompleteName()) {
+      return objectNameProvider.apply(to);
+    }
+    else {
+      return to.getName();
+    }
   }
 }

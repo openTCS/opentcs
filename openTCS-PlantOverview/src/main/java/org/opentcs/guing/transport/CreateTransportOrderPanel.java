@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -39,9 +40,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.I18nPlantOverview;
-import org.opentcs.guing.util.ResourceBundleUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Allows creation of transport orders.
@@ -52,9 +50,10 @@ import org.slf4j.LoggerFactory;
 public class CreateTransportOrderPanel
     extends DialogContent {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CreateTransportOrderPanel.class);
-  private static final ResourceBundleUtil BUNDLE
-      = ResourceBundleUtil.getBundle(I18nPlantOverview.CREATETO_PATH);
+  /**
+   * This instance's resource bundle.
+   */
+  private final ResourceBundle bundle = ResourceBundle.getBundle(I18nPlantOverview.CREATETO_PATH);
   /**
    * The selected deadline.
    */
@@ -102,8 +101,8 @@ public class CreateTransportOrderPanel
 
     initComponents();
     Object[] columnNames = {
-      BUNDLE.getString("createTransportOrderPanel.table_driveOrdersTable.column_location.headerText"),
-      BUNDLE.getString("createTransportOrderPanel.table_driveOrdersTable.column_action.headerText")
+      bundle.getString("createTransportOrderPanel.table_driveOrdersTable.column_location.headerText"),
+      bundle.getString("createTransportOrderPanel.table_driveOrdersTable.column_action.headerText")
     };
     DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
     model.setColumnIdentifiers(columnNames);
@@ -122,7 +121,7 @@ public class CreateTransportOrderPanel
   }
 
   private void initTitle() {
-    setDialogTitle(BUNDLE.getString("transportOrdersContainerPanel.dialog.title"));
+    setDialogTitle(bundle.getString("transportOrdersContainerPanel.dialog.title"));
   }
 
   public List<AbstractConnectableModelComponent> getDestinationModels() {
@@ -168,16 +167,16 @@ public class CreateTransportOrderPanel
     }
     catch (ParseException e) {
       JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("createTransportOrderPanel.optionPane_dateTimeParseError.message"),
-                                    BUNDLE.getString("createTransportOrderPanel.optionPane_dateTimeParseError.title"),
+                                    bundle.getString("createTransportOrderPanel.optionPane_dateTimeParseError.message"),
+                                    bundle.getString("createTransportOrderPanel.optionPane_dateTimeParseError.title"),
                                     JOptionPane.ERROR_MESSAGE);
       updateFailed = true;
     }
 
     if (fDestinationModels.isEmpty()) {
       JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("createTransportOrderPanel.optionPane_noOrderError.message"),
-                                    BUNDLE.getString("createTransportOrderPanel.optionPane_noOrderError.title"),
+                                    bundle.getString("createTransportOrderPanel.optionPane_noOrderError.message"),
+                                    bundle.getString("createTransportOrderPanel.optionPane_noOrderError.title"),
                                     JOptionPane.ERROR_MESSAGE);
       updateFailed = true;
     }
@@ -185,7 +184,7 @@ public class CreateTransportOrderPanel
 
   @Override
   public void initFields() {
-    vehicleComboBox.addItem(BUNDLE.getString("createTransportOrderPanel.comboBox_automatic.text"));
+    vehicleComboBox.addItem(bundle.getString("createTransportOrderPanel.comboBox_automatic.text"));
 
     for (VehicleModel vehicleModel : fVehicles) {
       vehicleComboBox.addItem(vehicleModel.getName());

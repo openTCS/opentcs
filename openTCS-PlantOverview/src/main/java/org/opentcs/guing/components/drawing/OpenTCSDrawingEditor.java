@@ -229,7 +229,9 @@ public class OpenTCSDrawingEditor
     getDrawing().add(leftOffsetFigure);
     getDrawing().add(rightOffsetFigure);
 
-    activeView.validateViewTranslation();
+    // XXX Do we still need to call this?
+    activeView.setScaleFactor(activeView.getScaleFactor());
+//    validateViewTranslation();
   }
 
   private void initializeRuler() {

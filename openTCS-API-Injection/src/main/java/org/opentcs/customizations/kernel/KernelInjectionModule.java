@@ -9,7 +9,6 @@ package org.opentcs.customizations.kernel;
 
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
@@ -17,6 +16,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.customizations.ConfigurableInjectionModule;
+import org.opentcs.customizations.controlcenter.ControlCenterInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -125,26 +125,36 @@ public abstract class KernelInjectionModule
   }
 
   /**
-   * Returns a multibinder that can be used to register {@link ControlCenterPanel} implementations
-   * for the kernel's modelling mode.
+   * Returns a multibinder that can be used to register 
+   * {@link org.opentcs.components.kernel.ControlCenterPanel} implementations for the kernel's 
+   * modelling mode.
    *
    * @return The multibinder.
+   * @deprecated Use {@link ControlCenterInjectionModule#controlCenterPanelBinderModelling()}
+   * instead.
    */
-  protected Multibinder<ControlCenterPanel> controlCenterPanelBinderModelling() {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderModelling() {
     return Multibinder.newSetBinder(binder(),
-                                    ControlCenterPanel.class,
+                                    org.opentcs.components.kernel.ControlCenterPanel.class,
                                     ActiveInModellingMode.class);
   }
 
   /**
-   * Returns a multibinder that can be used to register {@link ControlCenterPanel} implementations
-   * for the kernel's operating mode.
+   * Returns a multibinder that can be used to register 
+   * {@link org.opentcs.components.kernel.ControlCenterPanel} implementations for the kernel's 
+   * operating mode.
    *
    * @return The multibinder.
+   * @deprecated Use {@link ControlCenterInjectionModule#controlCenterPanelBinderOperating()}
+   * instead.
    */
-  protected Multibinder<ControlCenterPanel> controlCenterPanelBinderOperating() {
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderOperating() {
     return Multibinder.newSetBinder(binder(),
-                                    ControlCenterPanel.class,
+                                    org.opentcs.components.kernel.ControlCenterPanel.class,
                                     ActiveInOperatingMode.class);
   }
 

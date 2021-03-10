@@ -33,14 +33,14 @@ public interface KernelControlCenterConfiguration {
   String locale();
 
   @ConfigurationEntry(
-      type = "List of <description>\\|<hostname>\\|<port>",
-      description = "The configured connection bookmarks.",
+      type = "Comma-separated list of <description>\\|<hostname>\\|<port>",
+      description = "Kernel connection bookmarks to be used.",
       orderKey = "1_connection_0")
   List<ConnectionParamSet> connectionBookmarks();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = {"Whether to connect automatically on startup.",
+      description = {"Whether to automatically connect to the kernel on startup.",
                      "If 'true', the first connection bookmark will be used for the initial "
                      + "connection attempt.",
                      "If 'false', a dialog will be shown to enter connection parameters."},

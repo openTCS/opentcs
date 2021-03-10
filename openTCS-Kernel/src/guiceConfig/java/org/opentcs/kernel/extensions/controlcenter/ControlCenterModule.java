@@ -31,6 +31,7 @@ public class ControlCenterModule
   private static final Logger LOG = LoggerFactory.getLogger(ControlCenterModule.class);
 
   @Override
+  @SuppressWarnings("deprecation")
   protected void configure() {
     ControlCenterConfiguration configuration
         = getConfigBindingProvider().get(ControlCenterConfiguration.PREFIX,

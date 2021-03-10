@@ -19,6 +19,9 @@ dependencies {
   compile project(':openTCS-Kernel-Extension-Statistics')
   compile project(':openTCS-Kernel-Extension-TCP-Host-Interface')
   
+  compile group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.2.0'
+  compileOnly group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.2.0', classifier: 'sources'
+  
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 

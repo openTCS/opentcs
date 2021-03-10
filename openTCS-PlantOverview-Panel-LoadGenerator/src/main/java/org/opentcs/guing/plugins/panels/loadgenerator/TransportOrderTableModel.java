@@ -7,39 +7,21 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrderEntry;
+import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrdersDocument;
 
 /**
  * A table model for transport orders.
  *
  * @author Philipp Seifert (Fraunhofer IML)
  */
-@XmlRootElement
-@XmlType(propOrder = {"xmlData"})
 class TransportOrderTableModel
     extends AbstractTableModel {
 
@@ -47,11 +29,6 @@ class TransportOrderTableModel
    * This classe's bundle.
    */
   private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
-
-  /**
-   * This class's Logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(TransportOrderTableModel.class);
   /**
    * The column names.
    */
@@ -70,11 +47,6 @@ class TransportOrderTableModel
    * The actual content.
    */
   private final List<TransportOrderData> transportOrderDataList = new ArrayList<>();
-  /**
-   * The transportOrderDataList as an XML structure.
-   */
-  @XmlElement(name = "transportOrders", required = true)
-  private final List<TransportOrderXMLStructure> xmlData = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -184,108 +156,19 @@ class TransportOrderTableModel
     }
   }
 
-  /**
-   * Creates XML classes from the actual classes.
-   */
-  private void createXMLStructure() {
-    xmlData.clear();
+  public TransportOrdersDocument toXmlDocument() {
+    TransportOrdersDocument result = new TransportOrdersDocument();
+
     for (TransportOrderData curData : transportOrderDataList) {
-      xmlData.add(new TransportOrderXMLStructure(
-          curData.getName(),
-          curData.getDeadline(),
-          curData.getDriveOrders(),
-          curData.getIntendedVehicle() == null ? null : curData.getIntendedVehicle().getName(),
-          curData.getProperties()));
+      result.getTransportOrders().add(new TransportOrderEntry(
+              curData.getDeadline(),
+              curData.getDriveOrders(),
+              curData.getIntendedVehicle() == null ? null : curData.getIntendedVehicle().getName(),
+              curData.getProperties())
+      );
     }
-  }
 
-  /**
-   * Marshals the data.
-   *
-   * @return Data as XML string
-   */
-  public String toXml() {
-    StringWriter stringWriter = new StringWriter();
-    try {
-      // Als XML in eine Datei schreiben.
-      JAXBContext jc = JAXBContext.newInstance(TransportOrderTableModel.class);
-      Marshaller marshaller = jc.createMarshaller();
-      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      marshaller.marshal(this, stringWriter);
-    }
-    catch (JAXBException exc) {
-      LOG.warn("Exception marshalling data", exc);
-      throw new IllegalStateException("Exception marshalling data", exc);
-    }
-    return stringWriter.toString();
-  }
-
-  /**
-   * Writes the file.
-   *
-   * @param file The file to write
-   * @throws IOException If an exception occured while writing
-   */
-  public void toFile(File file)
-      throws IOException {
-    requireNonNull(file, "file");
-
-    createXMLStructure();
-    try (OutputStream outStream = new FileOutputStream(file)) {
-      outStream.write(toXml().getBytes());
-      outStream.flush();
-    }
-  }
-
-  /**
-   * Reads a list of <code>TransportOrderXMLStructure</code>s from an XML file.
-   *
-   * @param xmlData The XML data
-   * @return The list of data
-   */
-  @SuppressWarnings("unchecked")
-  public static List<TransportOrderXMLStructure> fromXml(String xmlData) {
-    requireNonNull(xmlData, "xmlData");
-
-    StringReader stringReader = new StringReader(xmlData);
-    try {
-      JAXBContext jc = JAXBContext.newInstance(TransportOrderTableModel.class);
-      Unmarshaller unmarshaller = jc.createUnmarshaller();
-      Object o = unmarshaller.unmarshal(stringReader);
-      return ((TransportOrderTableModel) o).xmlData;
-    }
-    catch (JAXBException exc) {
-      LOG.warn("Exception unmarshalling data", exc);
-      throw new IllegalStateException("Exception unmarshalling data", exc);
-    }
-  }
-
-  /**
-   * Reads a list of <code>TransportOrderXMLStructure</code>s from a file.
-   *
-   * @param sourceFile The file
-   * @return The list of data
-   * @throws IOException If an exception occured while reading
-   */
-  public static List<TransportOrderXMLStructure> fromFile(File sourceFile)
-      throws IOException {
-    requireNonNull(sourceFile, "sourceFile");
-
-    final String path = sourceFile.getAbsolutePath();
-    if (!sourceFile.isFile() || !sourceFile.canRead()) {
-      throw new IOException(path + ": file not a regular file or unreadable");
-    }
-    int fileSize = (int) sourceFile.length();
-    byte[] buffer = new byte[fileSize];
-    try (InputStream inStream = new FileInputStream(sourceFile)) {
-      int bytesRead = inStream.read(buffer);
-      if (bytesRead != fileSize) {
-        throw new IOException("read() returned unexpected value: " + bytesRead
-            + ", should be :" + fileSize);
-      }
-    }
-    String fileContent = new String(buffer);
-    return fromXml(fileContent);
+    return result;
   }
 
   /**

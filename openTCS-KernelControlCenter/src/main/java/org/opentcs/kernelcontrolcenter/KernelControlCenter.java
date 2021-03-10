@@ -33,7 +33,6 @@ import org.opentcs.common.PortalManager;
 import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
 import static org.opentcs.common.PortalManager.ConnectionState.DISCONNECTED;
 import org.opentcs.components.Lifecycle;
-import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.customizations.controlcenter.ActiveInModellingMode;
@@ -52,6 +51,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  * @author Martin Grzenia (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public class KernelControlCenter
     extends JFrame
     implements Lifecycle,
@@ -72,11 +72,11 @@ public class KernelControlCenter
   /**
    * Providers for panels shown in modelling mode.
    */
-  private final Collection<Provider<ControlCenterPanel>> panelProvidersModelling;
+  private final Collection<Provider<org.opentcs.components.kernel.ControlCenterPanel>> panelProvidersModelling;
   /**
    * Providers for panels shown in operating mode.
    */
-  private final Collection<Provider<ControlCenterPanel>> panelProvidersOperating;
+  private final Collection<Provider<org.opentcs.components.kernel.ControlCenterPanel>> panelProvidersOperating;
   /**
    * An about dialog.
    */
@@ -84,7 +84,7 @@ public class KernelControlCenter
   /**
    * Panels currently active/shown.
    */
-  private final Set<ControlCenterPanel> activePanels = Collections.synchronizedSet(new HashSet<>());
+  private final Set<org.opentcs.components.kernel.ControlCenterPanel> activePanels = Collections.synchronizedSet(new HashSet<>());
   /**
    * The application running this panel.
    */
@@ -138,8 +138,8 @@ public class KernelControlCenter
       @Nonnull PortalManager portalManager,
       @ApplicationEventBus EventSource eventSource,
       @Nonnull ControlCenterInfoHandlerFactory controlCenterInfoHandlerFactory,
-      @Nonnull @ActiveInModellingMode Collection<Provider<ControlCenterPanel>> panelProvidersModelling,
-      @Nonnull @ActiveInOperatingMode Collection<Provider<ControlCenterPanel>> panelProvidersOperating) {
+      @Nonnull @ActiveInModellingMode Collection<Provider<org.opentcs.components.kernel.ControlCenterPanel>> panelProvidersModelling,
+      @Nonnull @ActiveInOperatingMode Collection<Provider<org.opentcs.components.kernel.ControlCenterPanel>> panelProvidersOperating) {
     this.application = requireNonNull(application, "application");
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
@@ -298,22 +298,22 @@ public class KernelControlCenter
     updateWindowTitle();
   }
 
-  private void addPanels(Collection<Provider<ControlCenterPanel>> providers) {
-    for (Provider<ControlCenterPanel> provider : providers) {
+  private void addPanels(Collection<Provider<org.opentcs.components.kernel.ControlCenterPanel>> providers) {
+    for (Provider<org.opentcs.components.kernel.ControlCenterPanel> provider : providers) {
       SwingUtilities.invokeLater(() -> addPanel(provider.get()));
     }
   }
 
-  private void addPanel(ControlCenterPanel panel) {
+  private void addPanel(org.opentcs.components.kernel.ControlCenterPanel panel) {
     panel.initialize();
     activePanels.add(panel);
     tabbedPaneMain.add(panel.getTitle(), panel);
   }
 
-  private void removePanels(Collection<ControlCenterPanel> panels) {
-    List<ControlCenterPanel> panelsCopy = new ArrayList<>(panels);
+  private void removePanels(Collection<org.opentcs.components.kernel.ControlCenterPanel> panels) {
+    List<org.opentcs.components.kernel.ControlCenterPanel> panelsCopy = new ArrayList<>(panels);
     SwingUtilities.invokeLater(() -> {
-      for (ControlCenterPanel panel : panelsCopy) {
+      for (org.opentcs.components.kernel.ControlCenterPanel panel : panelsCopy) {
         tabbedPaneMain.remove(panel);
         panel.terminate();
       }

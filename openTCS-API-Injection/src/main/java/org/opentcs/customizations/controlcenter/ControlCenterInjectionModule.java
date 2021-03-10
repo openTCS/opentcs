@@ -8,7 +8,7 @@
 package org.opentcs.customizations.controlcenter;
 
 import com.google.inject.multibindings.Multibinder;
-import org.opentcs.components.kernel.ControlCenterPanel;
+import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanelFactory;
 
@@ -27,9 +27,10 @@ public abstract class ControlCenterInjectionModule
    *
    * @return The multibinder.
    */
-  protected Multibinder<ControlCenterPanel> controlCenterPanelBinderModelling() {
+  @SuppressWarnings("deprecation")
+  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderModelling() {
     return Multibinder.newSetBinder(binder(),
-                                    ControlCenterPanel.class,
+                                    org.opentcs.components.kernel.ControlCenterPanel.class,
                                     ActiveInModellingMode.class);
   }
 
@@ -39,9 +40,10 @@ public abstract class ControlCenterInjectionModule
    *
    * @return The multibinder.
    */
-  protected Multibinder<ControlCenterPanel> controlCenterPanelBinderOperating() {
+  @SuppressWarnings("deprecation")
+  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderOperating() {
     return Multibinder.newSetBinder(binder(),
-                                    ControlCenterPanel.class,
+                                    org.opentcs.components.kernel.ControlCenterPanel.class,
                                     ActiveInOperatingMode.class);
   }
 

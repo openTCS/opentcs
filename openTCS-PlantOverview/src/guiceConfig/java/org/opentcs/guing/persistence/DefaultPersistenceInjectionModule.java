@@ -2,7 +2,6 @@ package org.opentcs.guing.persistence;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import com.google.inject.multibindings.Multibinder;
 import org.opentcs.guing.persistence.unified.UnifiedModelPersistor;
 import org.opentcs.guing.persistence.unified.UnifiedModelReader;
 
@@ -19,11 +18,8 @@ public class DefaultPersistenceInjectionModule
   protected void configure() {
     bind(ModelManager.class).to(OpenTCSModelManager.class).in(Singleton.class);
 
-    Multibinder.newSetBinder(binder(), ModelFileReader.class)
-        .addBinding().to(UnifiedModelReader.class);
-
-    Multibinder.newSetBinder(binder(), ModelFilePersistor.class)
-        .addBinding().to(UnifiedModelPersistor.class);
+    bind(ModelFileReader.class).to(UnifiedModelReader.class);
+    bind(ModelFilePersistor.class).to(UnifiedModelPersistor.class);
   }
 
 }

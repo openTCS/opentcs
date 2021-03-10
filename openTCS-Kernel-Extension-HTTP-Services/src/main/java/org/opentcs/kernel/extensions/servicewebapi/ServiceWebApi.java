@@ -116,7 +116,28 @@ public class ServiceWebApi
         Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         service.halt(403, "Not authenticated.");
       }
+
+      // Add a CORS header to allow cross-origin requests from all hosts.
+      // This also makes using the "try it out" buttons in the Swagger UI documentation possible.
+      response.header("Access-Control-Allow-Origin", "*");
     });
+
+    // Reflect that we allow cross-origin requests for any headers and methods.
+    service.options(
+        "/*",
+        (request, response) -> {
+          String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+          if (accessControlRequestHeaders != null) {
+            response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+          }
+
+          String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
+          if (accessControlRequestMethod != null) {
+            response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+          }
+
+          return "OK";
+        });
 
     // Register routes for API versions here.
     service.path("/v1", () -> v1RequestHandler.addRoutes(service));

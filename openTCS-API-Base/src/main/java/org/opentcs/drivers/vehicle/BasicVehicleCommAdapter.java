@@ -283,6 +283,11 @@ public abstract class BasicVehicleCommAdapter
     getSentQueue().clear();
   }
 
+  @Override
+  public void execute(AdapterCommand command) {
+    command.execute(this);
+  }
+
   /**
    * Processes updates of the {@link VehicleProcessModel}.
    *

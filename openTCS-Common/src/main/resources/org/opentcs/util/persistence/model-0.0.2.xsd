@@ -100,9 +100,17 @@
     <xsd:attribute name="vehicleOrientationAngle"
                    type="xsd:float"/>
     <xsd:attribute name="type"
-                   type="xsd:string"
+                   type="pointTypeType"
                    use="required"/>
   </xsd:complexType>
+  
+  <xsd:simpleType name="pointTypeType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="REPORT_POSITION"/>
+      <xsd:enumeration value="HALT_POSITION"/>
+      <xsd:enumeration value="PARK_POSITION"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <!-- Data type for path elements -->
   <xsd:complexType name="pathType">
@@ -369,8 +377,15 @@
                    type="xsd:string"
                    use="required"/>
     <xsd:attribute name="type"
-                   type="xsd:string"/>
+                   type="blockTypeType"/>
   </xsd:complexType>
+  
+  <xsd:simpleType name="blockTypeType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="SINGLE_VEHICLE_ONLY"/>
+      <xsd:enumeration value="SAME_DIRECTION_ONLY"/>
+    </xsd:restriction>
+  </xsd:simpleType>  
   
   <!-- Data type for group elements -->
   <xsd:complexType name="groupType">

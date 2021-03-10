@@ -28,7 +28,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.components.kernel.ControlCenterPanel;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
@@ -47,8 +46,9 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  * @author Philipp Seifert (Fraunhofer IML)
  */
+@SuppressWarnings("deprecation")
 public class DriverGUI
-    extends ControlCenterPanel {
+    extends org.opentcs.components.kernel.ControlCenterPanel {
 
   /**
    * This class's Logger.

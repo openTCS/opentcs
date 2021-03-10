@@ -28,7 +28,5 @@ public class DrawingInjectionModule
 
     bind(OpenTCSDrawingEditor.class).in(Singleton.class);
     bind(DrawingEditor.class).to(OpenTCSDrawingEditor.class);
-
-    bind(OpenTCSDrawingView.class).to(OpenTCSDrawingViewBuffered.class);
   }
 }

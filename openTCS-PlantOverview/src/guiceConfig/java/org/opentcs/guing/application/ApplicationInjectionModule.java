@@ -13,6 +13,7 @@ import java.awt.Component;
 import javax.inject.Singleton;
 import javax.swing.JFrame;
 import org.jhotdraw.app.Application;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.application.action.ActionInjectionModule;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.application.menus.MenusInjectionModule;

@@ -11,6 +11,7 @@ package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.Collection;
@@ -18,9 +19,11 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.StringJoiner;
 import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
+import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.handle.BezierOutlineHandle;
@@ -31,6 +34,7 @@ import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerControlPointHandle;
+import org.opentcs.guing.components.drawing.figures.liner.PolyPathLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
@@ -121,27 +125,7 @@ public class PathConnection
    */
   private void resetPath() {
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
-    Point2D.Double ep;
-    int size = path.size();
-
-    switch (size) {
-      case 2: // DIRECT Liner: 2 Punkte (Start / Ende)
-        ep = path.get(1, BezierPath.C0_MASK);
-        break;
-      case 3: //2 Bezier control points
-        ep = path.get(2, BezierPath.C0_MASK);
-        break;
-      case 4: // ELBOW/Slanted: zusï¿½tzlich 2 Stï¿½tzpunkte
-        ep = path.get(3, BezierPath.C0_MASK);
-        break;
-      case 7: // 3 Bezier control points
-        ep = path.get(6, BezierPath.C0_MASK);
-        break;
-
-      default:
-        LOG.warn("Path has {} points", size);
-        return;
-    }
+    Point2D.Double ep = path.get(path.size() - 1, BezierPath.C0_MASK);
 
     path.clear();
     path.add(new BezierPath.Node(sp));
@@ -162,24 +146,7 @@ public class PathConnection
    */
   private void initControlPoints(PathModel.Type type) {
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
-    Point2D.Double ep;
-    int size = path.size();
-
-    switch (size) {
-      case 2: // DIRECT Liner: 2 Punkte (Start / Ende)
-        ep = path.get(1, BezierPath.C0_MASK);
-        break;
-      case 3: //2 or 3 Bezier control points
-        ep = path.get(2, BezierPath.C0_MASK);
-        break;
-      case 4: // ELBOW/Slanted: zusï¿½tzlich 2 Stï¿½tzpunkte
-        ep = path.get(3, BezierPath.C0_MASK);
-        break;
-
-      default:
-        LOG.warn("Path has {} points", size);
-        return;
-    }
+    Point2D.Double ep = path.get(path.size() - 1, BezierPath.C0_MASK);
 
     if (sp.x != ep.x || sp.y != ep.y) {
       path.clear();
@@ -351,10 +318,34 @@ public class PathConnection
   }
 
   /**
-   * Die BEZIER-Kontrollpunkte aktualisieren
+   * Die Bezier und Polypath Kontrollpunkte aktualisieren
    */
   public void updateControlPoints() {
+    String sControlPoints = "";
+    if (getLinerType() == PathModel.Type.POLYPATH) {
+      sControlPoints = updatePolyPathControlPoints();
+    }
+    else if (getLinerType() == PathModel.Type.BEZIER || getLinerType() == PathModel.Type.BEZIER_3) {
+      sControlPoints = updateBezierControlPoints();
+    }
+
     StringProperty sProp = getModel().getPropertyPathControlPoints();
+    sProp.setText(sControlPoints);
+    invalidate();
+    sProp.markChanged();
+    getModel().propertiesChanged(this);
+  }
+
+  private String updatePolyPathControlPoints() {
+    StringJoiner rtn = new StringJoiner(";");
+    for (int i = 1; i < path.size() - 1; i++) {
+      Point2D.Double p = path.get(i, BezierPath.C0_MASK);
+      rtn.add(String.format("%d,%d", (int) p.x, (int) p.y));
+    }
+    return rtn.toString();
+  }
+
+  private String updateBezierControlPoints() {
     if (cp1 != null && cp2 != null) {
       if (cp3 != null) {
         cp1 = path.get(0, BezierPath.C2_MASK);
@@ -368,7 +359,6 @@ public class PathConnection
         cp2 = path.get(1, BezierPath.C1_MASK);
       }
     }
-
     String sControlPoints = "";
     if (cp1 != null) {
       if (cp2 != null) {
@@ -398,10 +388,7 @@ public class PathConnection
         sControlPoints = String.format("%d,%d", (int) (cp1.x), (int) (cp1.y));
       }
     }
-    sProp.setText(sControlPoints);
-    invalidate();
-    sProp.markChanged();
-    getModel().propertiesChanged(this);
+    return sControlPoints;
   }
 
   /**
@@ -473,6 +460,12 @@ public class PathConnection
           updateLiner(new TripleBezierLiner());
         }
         break;
+      case POLYPATH:
+        if (!(getLiner() instanceof PolyPathLiner)) {
+          initPolyPath();
+          updateLiner(new PolyPathLiner());
+        }
+        break;
       default:
         setLiner(null);
     }
@@ -523,6 +516,7 @@ public class PathConnection
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
     List<Handle> handles = new LinkedList<>();
+
     // see BezierFigure
     switch (detailLevel % 2) {
       case -1: // Mouse hover handles
@@ -530,15 +524,22 @@ public class PathConnection
         break;
 
       case 0:  // Mouse clicked
-        if (cp1 != null) {
-          // Startpunkt: Handle nach CP2
-          handles.add(new BezierLinerControlPointHandle(this, 0, BezierPath.C2_MASK));
-          if (cp2 != null) {
-            // Endpunkt: Handle für CP3
-            handles.add(new BezierLinerControlPointHandle(this, 1, BezierPath.C1_MASK));
-            if (cp3 != null) {
-              // Endpunkt: Handle nach EP
-              handles.add(new BezierLinerControlPointHandle(this, 2, BezierPath.C1_MASK));
+        if (getLinerType() == PathModel.Type.POLYPATH) {
+          for (int i = 1; i < path.size() - 1; i++) {
+            handles.add(new BezierLinerControlPointHandle(this, i, BezierPath.C0_MASK));
+          }
+        }
+        else {
+          if (cp1 != null) {
+            // Startpunkt: Handle nach CP2
+            handles.add(new BezierLinerControlPointHandle(this, 0, BezierPath.C2_MASK));
+            if (cp2 != null) {
+              // Endpunkt: Handle für CP3
+              handles.add(new BezierLinerControlPointHandle(this, 1, BezierPath.C1_MASK));
+              if (cp3 != null) {
+                // Endpunkt: Handle nach EP
+                handles.add(new BezierLinerControlPointHandle(this, 2, BezierPath.C1_MASK));
+              }
             }
           }
         }
@@ -697,5 +698,60 @@ public class PathConnection
     }
 
     return clone;
+  }
+
+  private void initPolyPath() {
+    Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
+    Point2D.Double ep = path.get(path.size() - 1, BezierPath.C0_MASK);
+
+    if (sp.x == ep.x && sp.y == ep.y) {
+      path.clear();
+      path.add(sp);
+      String[] coords = getModel().getPropertyPathControlPoints().getText().split("[;]");
+      for (String coordinates : coords) {
+        String[] c = coordinates.split("[,]");
+        int x = (int) java.lang.Double.parseDouble(c[0]);
+        int y = (int) java.lang.Double.parseDouble(c[1]);
+        path.add(x, y);
+      }
+
+      path.add(ep);
+    }
+    else {
+
+      path.clear();
+      path.add(new BezierPath.Node(sp));
+      path.add(new BezierPath.Node((sp.x + ep.x) / 2.0, (sp.y + ep.y) / 2.0));
+      path.add(new BezierPath.Node(ep));
+    }
+  }
+
+  @Override // SimpleLineConnection
+  public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
+    if (getLinerType() == PathModel.Type.POLYPATH) {
+      int addPointMask = MouseEvent.CTRL_DOWN_MASK;
+      int deletePointMask = MouseEvent.ALT_DOWN_MASK | MouseEvent.CTRL_DOWN_MASK;
+      if ((evt.getModifiersEx() & (addPointMask | deletePointMask)) == addPointMask) {
+        int index = path.findSegment(p, 10);
+        if (index != -1) {
+          path.add(index + 1, new BezierPath.Node(p));
+          updateConnection();
+        }
+      }
+      else if ((evt.getModifiersEx() & (deletePointMask | addPointMask)) == deletePointMask) {
+        int index = path.findSegment(p, 10);
+        if (index != -1) {
+          Point2D.Double[] points = path.toPolygonArray();
+          path.clear();
+          for (int i = 0; i < points.length; i++) {
+            if (i != index) {
+              path.add(new BezierPath.Node(points[i]));
+            }
+          }
+          updateConnection();
+        }
+      }
+    }
+    return false;
   }
 }

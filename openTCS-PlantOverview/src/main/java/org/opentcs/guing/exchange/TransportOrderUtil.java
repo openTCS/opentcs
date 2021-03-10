@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.UUID;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
@@ -134,8 +133,8 @@ public class TransportOrderUtil {
       }
 
       transportOrderService.createTransportOrder(
-          new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(),
-                                       destinations)
+          new TransportOrderCreationTO("TOrder-", destinations)
+              .withIncompleteName(true)
               .withDeadline(Instant.ofEpochMilli(deadline))
               .withIntendedVehicleName(vModel == null ? null : vModel.getName())
               .withCategory(category));
@@ -158,7 +157,8 @@ public class TransportOrderUtil {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
 
       sharedPortal.getPortal().getTransportOrderService().createTransportOrder(
-          new TransportOrderCreationTO("TOrder-" + UUID.randomUUID(), copyDestinations(pattern))
+          new TransportOrderCreationTO("TOrder-", copyDestinations(pattern))
+              .withIncompleteName(true)
               .withDeadline(Instant.ofEpochMilli(pattern.getDeadline()))
               .withIntendedVehicleName(pattern.getIntendedVehicle() == null
                   ? null
@@ -192,9 +192,10 @@ public class TransportOrderUtil {
 
       sharedPortal.getPortal().getTransportOrderService().createTransportOrder(
           new TransportOrderCreationTO(
-              "Move-" + UUID.randomUUID(),
+              "Move-",
               Collections.singletonList(new DestinationCreationTO(pointModel.getName(),
                                                                   DriveOrder.Destination.OP_MOVE)))
+              .withIncompleteName(true)
               .withDeadline(Instant.now())
               .withIntendedVehicleName(vModel.getName())
       );

@@ -22,7 +22,6 @@ import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
-import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +229,7 @@ public class VehicleTableModel
         return true;
       case POSITION_COLUMN:
         LocalVehicleEntry entry = entries.get(rowIndex);
-        return entry.getAttachedCommAdapterDescription() instanceof LoopbackCommunicationAdapterDescription
+        return entry.getAttachedCommAdapterDescription().isSimVehicleCommAdapter()
             && entry.getProcessModel().isCommAdapterEnabled();
       default:
         return false;

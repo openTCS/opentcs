@@ -31,10 +31,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
-import org.opentcs.components.kernel.ControlCenterPanel;
+import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Point;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.commands.InitPositionCommand;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
@@ -43,8 +44,6 @@ import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.BoundsPopupMenuListener;
 import org.opentcs.util.gui.StringListCellRenderer;
-import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterDescription;
-import org.opentcs.virtualvehicle.commands.InitPositionCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -281,7 +280,7 @@ public class DriverGUI
       try {
         Point newPoint = (Point) e.getItem();
         LocalVehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(getSelectedVehicleName());
-        if (vehicleEntry.getAttachedCommAdapterDescription() instanceof LoopbackCommunicationAdapterDescription) {
+        if (vehicleEntry.getAttachedCommAdapterDescription().isSimVehicleCommAdapter()) {
           callWrapper.call(() -> servicePortal.getVehicleService().sendCommAdapterCommand(
               vehicleEntry.getAttachmentInformation().getVehicleReference(),
               new InitPositionCommand(newPoint.getName())));

@@ -9,12 +9,16 @@ package org.opentcs.components.kernel;
 
 import javax.swing.JPanel;
 import org.opentcs.components.Lifecycle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A panel that can be plugged into the kernel control center.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use {@link org.opentcs.components.kernelcontrolcenter.ControlCenterPanel} instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "5.0")
 public abstract class ControlCenterPanel
     extends JPanel
     implements Lifecycle {

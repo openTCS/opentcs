@@ -33,6 +33,12 @@ public class TransportOrderCreationTO
     implements Serializable {
 
   /**
+   * Indicates whether the name is incomplete and requires to be completed when creating the actual
+   * transport order.
+   * (How exactly this is done is decided by the kernel.)
+   */
+  private final boolean incompleteName;
+  /**
    * The destinations that need to be travelled to.
    */
   @Nonnull
@@ -76,11 +82,13 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO(@Nonnull String name,
                                   @Nonnull List<DestinationCreationTO> destinations) {
     super(name);
+    this.incompleteName = false;
     this.destinations = requireNonNull(destinations, "destinations");
   }
 
   private TransportOrderCreationTO(@Nonnull String name,
                                    @Nonnull Map<String, String> properties,
+                                   boolean incompleteName,
                                    @Nonnull List<DestinationCreationTO> destinations,
                                    @Nullable String wrappingSequence,
                                    @Nonnull Set<String> dependencyNames,
@@ -89,6 +97,7 @@ public class TransportOrderCreationTO
                                    @Nonnull Instant deadline,
                                    boolean dispensable) {
     super(name, properties);
+    this.incompleteName = incompleteName;
     this.destinations = requireNonNull(destinations, "destinations");
     this.wrappingSequence = wrappingSequence;
     this.dependencyNames = requireNonNull(dependencyNames, "dependencyNames");
@@ -116,6 +125,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withName(@Nonnull String name) {
     return new TransportOrderCreationTO(name,
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -143,6 +153,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new TransportOrderCreationTO(getName(),
                                         properties,
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -174,6 +185,40 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
     return new TransportOrderCreationTO(getName(),
                                         propertiesWith(key, value),
+                                        incompleteName,
+                                        destinations,
+                                        wrappingSequence,
+                                        dependencyNames,
+                                        intendedVehicleName,
+                                        category,
+                                        deadline,
+                                        dispensable);
+  }
+
+  /**
+   * Indicates whether the name is incomplete and requires to be completed when creating the actual
+   * transport order.
+   * (How exactly this is done is decided by the kernel.)
+   *
+   * @return <code>true</code> if, and only if, the name is incomplete and requires to be completed
+   * by the kernel.
+   */
+  public boolean hasIncompleteName() {
+    return incompleteName;
+  }
+
+  /**
+   * Creates a copy of this object with the given <em>nameIncomplete</em> flag.
+   *
+   * @param incompleteName Whether the name is incomplete and requires to be completed when creating
+   * the actual transport order.
+   *
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrderCreationTO withIncompleteName(boolean incompleteName) {
+    return new TransportOrderCreationTO(getName(),
+                                        getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -216,6 +261,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withDestinations(@Nonnull List<DestinationCreationTO> destinations) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -250,9 +296,8 @@ public class TransportOrderCreationTO
   }
 
   /**
-   *
    * Creates a copy of this object with the given
-   * (optional) name of the order sequence the transport order belongs to. .
+   * (optional) name of the order sequence the transport order belongs to.
    *
    * @param wrappingSequence The name of the sequence.
    * @return A copy of this object, differing in the given name of the sequence.
@@ -260,6 +305,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withWrappingSequence(@Nullable String wrappingSequence) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -303,6 +349,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withDependencyNames(@Nonnull Set<String> dependencyNames) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -310,7 +357,6 @@ public class TransportOrderCreationTO
                                         category,
                                         deadline,
                                         dispensable);
-
   }
 
   /**
@@ -347,6 +393,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withIntendedVehicleName(@Nullable String intendedVehicleName) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -389,6 +436,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withCategory(@Nonnull String category) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -437,6 +485,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withDeadline(@Nonnull ZonedDateTime deadline) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -456,6 +505,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withDeadline(@Nonnull Instant deadline) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,
@@ -498,6 +548,7 @@ public class TransportOrderCreationTO
   public TransportOrderCreationTO withDispensable(boolean dispensable) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
+                                        incompleteName,
                                         destinations,
                                         wrappingSequence,
                                         dependencyNames,

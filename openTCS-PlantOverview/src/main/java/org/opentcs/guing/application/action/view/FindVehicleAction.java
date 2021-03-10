@@ -20,7 +20,7 @@ import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;
 import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
-import org.opentcs.guing.application.ApplicationFrame;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.ClosableDialog;
 import org.opentcs.guing.components.dialogs.FindVehiclePanel;
 import org.opentcs.guing.components.dialogs.FindVehiclePanelFactory;

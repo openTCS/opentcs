@@ -26,6 +26,12 @@ public class OrderSequenceCreationTO
     implements Serializable {
 
   /**
+   * Indicates whether the name is incomplete and requires to be completed when creating the actual
+   * order sequence.
+   * (How exactly this is done is decided by the kernel.)
+   */
+  private final boolean incompleteName;
+  /**
    * The category of the order sequence.
    */
   private String category = OrderConstants.CATEGORY_NONE;
@@ -46,14 +52,17 @@ public class OrderSequenceCreationTO
    */
   public OrderSequenceCreationTO(@Nonnull String name) {
     super(name);
+    this.incompleteName = false;
   }
 
-  public OrderSequenceCreationTO(@Nonnull String name,
-                                 @Nonnull Map<String, String> properties,
-                                 @Nonnull String category,
-                                 @Nullable String intendedVehicleName,
-                                 boolean failureFatal) {
+  private OrderSequenceCreationTO(@Nonnull String name,
+                                  @Nonnull Map<String, String> properties,
+                                  boolean incompleteName,
+                                  @Nonnull String category,
+                                  @Nullable String intendedVehicleName,
+                                  boolean failureFatal) {
     super(name, properties);
+    this.incompleteName = incompleteName;
     this.category = requireNonNull(category, "category");
     this.intendedVehicleName = intendedVehicleName;
     this.failureFatal = failureFatal;
@@ -77,6 +86,7 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO withName(@Nonnull String name) {
     return new OrderSequenceCreationTO(name,
                                        getModifiableProperties(),
+                                       incompleteName,
                                        category,
                                        intendedVehicleName,
                                        failureFatal);
@@ -100,6 +110,7 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new OrderSequenceCreationTO(getName(),
                                        properties,
+                                       incompleteName,
                                        category,
                                        intendedVehicleName,
                                        failureFatal);
@@ -127,6 +138,36 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
     return new OrderSequenceCreationTO(getName(),
                                        propertiesWith(key, value),
+                                       incompleteName,
+                                       category,
+                                       intendedVehicleName,
+                                       failureFatal);
+  }
+
+  /**
+   * Indicates whether the name is incomplete and requires to be completed when creating the actual
+   * order sequence.
+   * (How exactly this is done is decided by the kernel.)
+   *
+   * @return <code>true</code> if, and only if, the name is incomplete and requires to be completed
+   * by the kernel.
+   */
+  public boolean hasIncompleteName() {
+    return incompleteName;
+  }
+
+  /**
+   * Creates a copy of this object with the given <em>nameIncomplete</em> flag.
+   *
+   * @param incompleteName Whether the name is incomplete and requires to be completed when creating
+   * the actual order sequence.
+   *
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequenceCreationTO withIncompleteName(boolean incompleteName) {
+    return new OrderSequenceCreationTO(getName(),
+                                       getModifiableProperties(),
+                                       incompleteName,
                                        category,
                                        intendedVehicleName,
                                        failureFatal);
@@ -164,6 +205,7 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO withCategory(@Nonnull String category) {
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
+                                       incompleteName,
                                        category,
                                        intendedVehicleName,
                                        failureFatal);
@@ -203,6 +245,7 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO withIntendedVehicleName(@Nullable String intendedVehicleName) {
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
+                                       incompleteName,
                                        category,
                                        intendedVehicleName,
                                        failureFatal);
@@ -234,6 +277,7 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO withFailureFatal(boolean failureFatal) {
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
+                                       incompleteName,
                                        category,
                                        intendedVehicleName,
                                        failureFatal);

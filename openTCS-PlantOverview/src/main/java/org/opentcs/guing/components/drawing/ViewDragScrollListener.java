@@ -19,6 +19,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import javax.swing.JViewport;
@@ -26,14 +27,21 @@ import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.application.StatusPanel;
+import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
+import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
+import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.model.elements.LayoutModel;
+import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.Cursors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A listener for dragging of the drawing view and single objects inside the
@@ -46,6 +54,10 @@ import org.opentcs.guing.util.Cursors;
 public class ViewDragScrollListener
     extends MouseAdapter {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(ViewDragScrollListener.class);
   /**
    * The scroll pane enclosing the drawing view.
    */
@@ -78,6 +90,10 @@ public class ViewDragScrollListener
    * The manager keeping/providing the currently loaded model.
    */
   private final ModelManager modelManager;
+  /**
+   * A helper for creating transport orders.
+   */
+  private final TransportOrderUtil orderUtil;
   /**
    * A default cursor for the drawing view.
    */
@@ -115,6 +131,7 @@ public class ViewDragScrollListener
    * @param pathCreationTool The button for creating a path.
    * @param statusPanel The status panel to display the current mouse position in.
    * @param modelManager The manager keeping/providing the currently loaded model.
+   * @param orderUtil A helper for creating transport orders.
    */
   public ViewDragScrollListener(DrawingViewScrollPane scrollPane,
                                 JComboBox<ZoomItem> zoomComboBox,
@@ -123,7 +140,8 @@ public class ViewDragScrollListener
                                 JToggleButton linkCreationTool,
                                 JPopupButton pathCreationTool,
                                 StatusPanel statusPanel,
-                                ModelManager modelManager) {
+                                ModelManager modelManager,
+                                TransportOrderUtil orderUtil) {
     this.scrollPane = requireNonNull(scrollPane, "scrollPane");
     this.zoomComboBox = requireNonNull(zoomComboBox, "zoomComboBox");
     this.selectionTool = requireNonNull(selectionTool, "selectionTool");
@@ -132,13 +150,14 @@ public class ViewDragScrollListener
     this.pathCreationTool = requireNonNull(pathCreationTool, "pathCreationTool");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.modelManager = requireNonNull(modelManager, "modelManager");
+    this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.defaultCursor = scrollPane.getDrawingView().getCursor();
   }
 
   @Override
   public void mouseDragged(final MouseEvent evt) {
     final OpenTCSDrawingView drawingView = scrollPane.getDrawingView();
-    if (drawingView.vehicleDragged()) {
+    if (vehicleDragged()) {
       drawingView.setCursor(Cursors.getDragVehicleCursor());
     }
 
@@ -176,13 +195,10 @@ public class ViewDragScrollListener
         startPoint.setLocation(cp);
       }
     }
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        Rectangle2D.Double drawingArea = drawingView.getDrawing().getDrawingArea();
-        scrollPane.getHorizontalRuler().setPreferredWidth((int) drawingArea.width);
-        scrollPane.getVerticalRuler().setPreferredHeight((int) drawingArea.height);
-      }
+    SwingUtilities.invokeLater(() -> {
+      Rectangle2D.Double drawingArea = drawingView.getDrawing().getDrawingArea();
+      scrollPane.getHorizontalRuler().setPreferredWidth((int) drawingArea.width);
+      scrollPane.getVerticalRuler().setPreferredHeight((int) drawingArea.height);
     });
   }
 
@@ -234,7 +250,7 @@ public class ViewDragScrollListener
     final OpenTCSDrawingView drawingView = scrollPane.getDrawingView();
     Figure fig = drawingView.findFigure(evt.getPoint());
     if (fig instanceof LabeledPointFigure) {
-      drawingView.createPossibleTransportOrder(fig);
+      createPossibleTransportOrder((LabeledPointFigure) fig, drawingView.getSelectedFigures());
     }
     pressedFigure = null;
     fMouseEndPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));
@@ -361,4 +377,53 @@ public class ViewDragScrollListener
       }
     }
   }
+
+  /**
+   * Creates a transport order, assuming a single vehicle was selected before.
+   *
+   * @param figure A point figure.
+   */
+  private void createPossibleTransportOrder(LabeledPointFigure figure,
+                                            Set<Figure> selectedFigures) {
+    if (selectedFigures.size() != 1) {
+      LOG.debug("More than one figure selected, skipping.");
+      return;
+    }
+
+    Figure nextFigure = selectedFigures.iterator().next();
+
+    if (!(nextFigure instanceof VehicleFigure)) {
+      LOG.debug("Selected figure is not a VehicleFigure, skipping.");
+      return;
+    }
+
+    PointModel model = figure.getPresentationFigure().getModel();
+    VehicleModel vehicleModel = (VehicleModel) nextFigure.get(FigureConstants.MODEL);
+
+    if (vehicleModel == null) {
+      LOG.warn("Selected VehicleFigure does not have a model, skipping.");
+      return;
+    }
+    if (vehicleModel.getDriveOrderComponents() != null) {
+      LOG.debug("Selected vehicle already has an order, skipping.");
+      return;
+    }
+
+    orderUtil.createTransportOrder(model, vehicleModel);
+  }
+
+  /**
+   * Returns if a vehicle is currently being dragged.
+   *
+   * @return True if yes, false otherwise.
+   */
+  private boolean vehicleDragged() {
+    Set<Figure> selectedFigures = scrollPane.getDrawingView().getSelectedFigures();
+    if (selectedFigures.size() != 1) {
+      return false;
+    }
+
+    return selectedFigures.iterator().next() instanceof VehicleFigure;
+  }
+
 }

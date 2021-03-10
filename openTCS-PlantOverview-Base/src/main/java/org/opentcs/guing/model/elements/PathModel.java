@@ -183,6 +183,12 @@ public class PathModel
     SLANTED(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.slanted.description"),
             ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.slanted.helptext")),
     /**
+     * A polygon path with any number of vertecies.
+     */
+    POLYPATH(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.polypath.description"),
+             ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.polypath.helptext")),
+
+    /**
      * A bezier curve with 2 control points.
      */
     BEZIER(ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.bezier.description"),
@@ -194,6 +200,7 @@ public class PathModel
              ResourceBundle.getBundle(BUNDLE_PATH).getString("pathModel.type.bezier3.helptext"));
 
     private final String description;
+
     private final String helptext;
 
     private Type(String description, String helptext) {

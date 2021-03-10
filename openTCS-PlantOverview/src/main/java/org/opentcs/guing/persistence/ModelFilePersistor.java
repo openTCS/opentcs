@@ -12,26 +12,24 @@ import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.swing.filechooser.FileFilter;
-import org.opentcs.guing.model.SystemModel;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**
- * Interface for classes that persist <code>ModelComponents</code> to local files.
+ * Interface to persist a {@link PlantModelCreationTO} to a local file.
  *
  * @author Tobias Marquardt (Fraunhofer IML)
  */
 public interface ModelFilePersistor {
 
   /**
-   * Persist a system model.
+   * Persist the model to the given file.
    *
-   * @param systemModel The system model to be serialized.
-   * @param modelName The model name
-   * @param file The file to serialize into
-   * @param ignoreError Whether errors should be ignored
-   * @return <code>true</code> if, and only if, the model was successfully serialized
+   * @param model The model to be serialized.
+   * @param file The file to serialize into.
+   * @return {@code true} if, and only if, the model was successfully serialized
    * @throws java.io.IOException If an exception occurs
    */
-  public boolean serialize(SystemModel systemModel, String modelName, File file, boolean ignoreError)
+  public boolean serialize(PlantModelCreationTO model, File file)
       throws IOException;
 
   /**

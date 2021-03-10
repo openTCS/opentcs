@@ -54,4 +54,7 @@ public interface RemoteKernelServicePortal
 
   List<Object> fetchEvents(ClientID clientId, long timeout)
       throws RemoteException;
+
+  void publishEvent(ClientID clientId, Object event)
+      throws RemoteException;
 }

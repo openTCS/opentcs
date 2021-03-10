@@ -18,10 +18,12 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.ClientConnectionMode;
 import org.opentcs.components.Lifecycle;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import static org.opentcs.data.TCSObjectEvent.Type.OBJECT_MODIFIED;
+import org.opentcs.data.order.OrderSequence;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
@@ -54,14 +56,6 @@ public class OpenTCSEventDispatcher
    */
   private final MessageDisplay messageDisplay;
   /**
-   * The transport order dispatcher.
-   */
-  private final TransportOrderDispatcher fTransportOrderDispatcher;
-  /**
-   * The transport order sequence dispatcher.
-   */
-  private final OrderSequenceDispatcher fOrderSequenceDispatcher;
-  /**
    * Where we get events from and send them to.
    */
   private final EventBus eventBus;
@@ -92,8 +86,6 @@ public class OpenTCSEventDispatcher
    * @param portalProvider Provides a access to a portal.
    * @param messageDisplay A display for messages received from the kernel.
    * @param eventBus Where this instance gets events from and sends them to.
-   * @param orderDispatcher Handles events concerning transport orders.
-   * @param sequenceDispatcher Handles events concerning order sequences.
    * @param processAdapterUtil The process adapter util.
    * @param modelManager The model manager.
    */
@@ -101,15 +93,11 @@ public class OpenTCSEventDispatcher
   public OpenTCSEventDispatcher(SharedKernelServicePortalProvider portalProvider,
                                 MessageDisplay messageDisplay,
                                 @ApplicationEventBus EventBus eventBus,
-                                TransportOrderDispatcher orderDispatcher,
-                                OrderSequenceDispatcher sequenceDispatcher,
                                 ProcessAdapterUtil processAdapterUtil,
                                 ModelManager modelManager) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.messageDisplay = requireNonNull(messageDisplay, "messageDisplay");
     this.eventBus = requireNonNull(eventBus, "eventBus");
-    this.fTransportOrderDispatcher = requireNonNull(orderDispatcher, "orderDispatcher");
-    this.fOrderSequenceDispatcher = requireNonNull(sequenceDispatcher, "sequenceDispatcher");
     this.processAdapterUtil = requireNonNull(processAdapterUtil, "processAdapterUtil");
     this.modelManager = requireNonNull(modelManager, "modelManager");
   }
@@ -120,8 +108,6 @@ public class OpenTCSEventDispatcher
       return;
     }
 
-    eventBus.subscribe(fTransportOrderDispatcher);
-    eventBus.subscribe(fOrderSequenceDispatcher);
     eventBus.subscribe(this);
 
     initialized = true;
@@ -133,8 +119,6 @@ public class OpenTCSEventDispatcher
       return;
     }
 
-    eventBus.unsubscribe(fTransportOrderDispatcher);
-    eventBus.unsubscribe(fOrderSequenceDispatcher);
     eventBus.unsubscribe(this);
 
     initialized = false;
@@ -218,29 +202,37 @@ public class OpenTCSEventDispatcher
   }
 
   private void processObjectEvent(TCSObjectEvent objectEvent) {
-    LOG.debug("TCSObjectEvent received. Name: {} Event type: {}",
-              objectEvent.getCurrentOrPreviousObjectState().getName(),
-              objectEvent.getType().name());
+    LOG.debug("TCSObjectEvent received: {}", objectEvent);
 
     if (sharedPortal == null) {
       return;
     }
 
     if (objectEvent.getType() == OBJECT_MODIFIED) {
-      ModelComponent modelComponent = modelManager.getModel()
-          .getModelComponent(objectEvent.getCurrentObjectState().getReference().getName());
-      if (modelComponent == null) {
-        LOG.debug("No model component found for {}",
-                  objectEvent.getCurrentOrPreviousObjectState().getName());
-        return;
-      }
-
-      ProcessAdapter adapter = processAdapterUtil.processAdapterFor(modelComponent);
-      adapter.updateModelProperties(objectEvent.getCurrentObjectState(),
-                                    modelComponent, modelManager.getModel(),
-                                    (TCSObjectService) sharedPortal.getPortal().getPlantModelService(),
-                                    null);
+      processObjectModifiedEvent(objectEvent.getCurrentObjectState());
     }
+  }
+
+  private void processObjectModifiedEvent(TCSObject<?> tcsObject) {
+    if (tcsObject instanceof TransportOrder
+        || tcsObject instanceof OrderSequence) {
+      // We only care about model objects (with ProcessAdapters) here, not transport orders.
+      return;
+    }
+
+    ModelComponent modelComponent = modelManager.getModel()
+        .getModelComponent(tcsObject.getReference().getName());
+    if (modelComponent == null) {
+      LOG.debug("No model component found for {}", tcsObject.getName());
+      return;
+    }
+
+    ProcessAdapter adapter = processAdapterUtil.processAdapterFor(modelComponent);
+    adapter.updateModelProperties(tcsObject,
+                                  modelComponent,
+                                  modelManager.getModel(),
+                                  sharedPortal.getPortal().getPlantModelService(),
+                                  null);
   }
 
 }

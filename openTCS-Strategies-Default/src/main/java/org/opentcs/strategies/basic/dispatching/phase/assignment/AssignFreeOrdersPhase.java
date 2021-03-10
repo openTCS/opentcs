@@ -235,7 +235,8 @@ public class AssignFreeOrdersPhase
 
   private void markNewlyFilteredOrders(Collection<OrderFilterResult> filterResults) {
     filterResults.stream()
-        .filter(filterResult -> !markedAsFiltered(filterResult.getOrder()))
+        .filter(filterResult -> (!markedAsFiltered(filterResult.getOrder())
+                                 || filterReasonsChanged(filterResult)))
         .forEach(filterResult -> doMarkAsFiltered(filterResult));
   }
 
@@ -255,10 +256,9 @@ public class AssignFreeOrdersPhase
   @SuppressWarnings("unchecked")
   private boolean filterReasonsChanged(OrderFilterResult filterResult) {
     Collection<String> newReasons = filterResult.getFilterReasons();
-    Collection<String> oldReasons = new ArrayList<>();
-
-    lastRelevantDeferredHistoryEntry(filterResult.getOrder())
-        .map(entry -> oldReasons.addAll((Collection<String>) entry.getSupplement()));
+    Collection<String> oldReasons = lastRelevantDeferredHistoryEntry(filterResult.getOrder())
+        .map(entry -> (Collection<String>) entry.getSupplement())
+        .orElse(new ArrayList<>());
 
     return newReasons.size() != oldReasons.size()
         || !newReasons.containsAll(oldReasons);
