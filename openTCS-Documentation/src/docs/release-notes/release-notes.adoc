@@ -49,6 +49,11 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.13.1 (2019-02-25)
+
+* Bugs fixed:
+** Fix a bug with the loopback communication adapter that prevents resources from being properly released when the "loopback:initialPosition" property is set on vehicles.
+
 === Version 4.13 (2019-02-18)
 
 * New features:

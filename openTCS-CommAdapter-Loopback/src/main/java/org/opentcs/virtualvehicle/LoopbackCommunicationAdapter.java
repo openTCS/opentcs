@@ -12,9 +12,11 @@ import com.google.inject.assistedinject.Assisted;
 import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.opentcs.common.LoopbackAdapterConstants;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.Orientation;
@@ -63,6 +65,10 @@ public class LoopbackCommunicationAdapter
    */
   private final LoopbackAdapterComponentsFactory componentsFactory;
   /**
+   * The kernel's executor.
+   */
+  private final ExecutorService kernelExecutor;
+  /**
    * The task simulating the virtual vehicle's behaviour.
    */
   private CyclicTask vehicleSimulationTask;
@@ -85,11 +91,13 @@ public class LoopbackCommunicationAdapter
    * @param componentsFactory The factory providing additional components for this adapter.
    * @param configuration This class's configuration.
    * @param vehicle The vehicle this adapter is associated with.
+   * @param kernelExecutor The kernel's executor.
    */
   @Inject
   public LoopbackCommunicationAdapter(LoopbackAdapterComponentsFactory componentsFactory,
                                       VirtualVehicleConfiguration configuration,
-                                      @Assisted Vehicle vehicle) {
+                                      @Assisted Vehicle vehicle,
+                                      @KernelExecutor ExecutorService kernelExecutor) {
     super(new LoopbackVehicleModel(vehicle),
           configuration.commandQueueCapacity(),
           1,
@@ -97,6 +105,7 @@ public class LoopbackCommunicationAdapter
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
   @Override
@@ -193,7 +202,9 @@ public class LoopbackCommunicationAdapter
 
   @Override
   public synchronized void initVehiclePosition(String newPos) {
-    getProcessModel().setVehiclePosition(newPos);
+    kernelExecutor.submit(() -> {
+      getProcessModel().setVehiclePosition(newPos);
+    });
   }
 
   @Override
