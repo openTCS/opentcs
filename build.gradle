@@ -6,18 +6,12 @@ buildscript {
     }
   }
   dependencies {
-    // AsciiDoctor plugin(s)
-    classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-    classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
-    classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.0'
     // License plugin
     classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1'
     // Versions plugin
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
     // Stats plugin
     classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.0'
-    // Swagger generator plugin for the web API documentation
-    classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.16.0"
   }
 }
 

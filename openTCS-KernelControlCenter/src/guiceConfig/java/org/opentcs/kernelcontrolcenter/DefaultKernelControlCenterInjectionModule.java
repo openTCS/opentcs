@@ -115,6 +115,7 @@ public class DefaultKernelControlCenterInjectionModule
         .toInstance(configuration.connectionBookmarks());
   }
 
+  @SuppressWarnings("deprecation")
   private void configureSocketConnections() {
     SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
                                                                        SslConfiguration.class);

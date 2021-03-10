@@ -103,6 +103,7 @@ public class UserManager
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void initialize() {
     if (isInitialized()) {
       LOG.debug("Already initialized.");

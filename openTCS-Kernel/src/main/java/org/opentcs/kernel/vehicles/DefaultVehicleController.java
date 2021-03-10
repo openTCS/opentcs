@@ -1000,6 +1000,7 @@ public class DefaultVehicleController
     }
   }
 
+  @SuppressWarnings("deprecation")
   @ScheduledApiChange(when = "5.0",
                       details = "Integration level won't implicitly affect the proc state, anymore")
   private void updateVehicleProcState(Vehicle.IntegrationLevel currIntegrationLevel,

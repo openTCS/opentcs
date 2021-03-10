@@ -49,6 +49,14 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.17 (2019-12-10)
+
+* Bugs fixed:
+** In the Plant Overview application's "Continuous load" plugin panel, it is now possible to properly remove/delete entries in the drive order and property tables.
+** Changing the loopback driver's state through its panel in the Kernel Control Center application now works in all cases.
+* Other changes:
+** When using the Kernel's RMI interface with SSL enabled, avoid side effects on other components using SSL.
+
 === Version 4.16.1 (2019-10-30)
 
 * Bugs fixed:

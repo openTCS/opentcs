@@ -11,39 +11,51 @@ import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.function.Function;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import org.opentcs.data.TCSObject;
 
 /**
- * An editor for editable comboBoxes.
+ * An editor for editable combo boxes.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
-public class EditableComboBoxEditor
+public class EditableComboBoxEditor<E>
     extends BasicComboBoxEditor
     implements ListDataListener {
 
-  private final Set<TCSObject<?>> content = new HashSet<>();
-  private final JComboBox<?> comboBox;
+  /**
+   * Represents the model of the comboBox as a set.
+   */
+  private final Set<E> content = new HashSet<>();
+  /**
+   * The relevant combobox.
+   */
+  private final JComboBox<E> comboBox;
+  /**
+   * Returns the string representation for the combo box's selected item.
+   */
+  private final Function<E, String> representer;
 
   /**
-   * creates and instance and configures an EditableComboBoxListener for the editor.
+   * Creates and instance and configures an {@link EditableComboBoxListener} for the editor.
    *
    * @param validationListeners validation listeners.
    * @param comboBox the comboBox that is edited.
+   * @param representer Returns the string representation for the combo box's selected item.
    */
   public EditableComboBoxEditor(List<ValidationListener> validationListeners,
-                                JComboBox<?> comboBox) {
+                                JComboBox<E> comboBox,
+                                Function<E, String> representer) {
     this.comboBox = requireNonNull(comboBox, "comboBox");
-    EditableComboBoxListener comboBoxListener = new EditableComboBoxListener(content,
-                                                                             validationListeners,
-                                                                             editor);
-    editor.getDocument().addDocumentListener(comboBoxListener);
-
+    this.representer = requireNonNull(representer, "representer");
+    editor.getDocument().addDocumentListener(new EditableComboBoxListener<>(content,
+                                                                            validationListeners,
+                                                                            editor,
+                                                                            representer));
   }
 
   @Override
@@ -63,19 +75,19 @@ public class EditableComboBoxEditor
 
   private void loadContent() {
     //get the current comboBoxModel and add the modelelements to content
-    ComboBoxModel<?> model = comboBox.getModel();
+    ComboBoxModel<E> model = comboBox.getModel();
     for (int i = 0; i < model.getSize(); i++) {
-      if (model.getElementAt(i) instanceof TCSObject<?>) {
-        content.add(((TCSObject<?>) model.getElementAt(i)));
-      }
+
+      content.add(model.getElementAt(i));
+
     }
   }
 
   @Override
   public Object getItem() {
     //if the panel tries to capture the input, this method guarantees that 
-    for (TCSObject<?> p : content) {
-      if (p.getName().equals(editor.getText())) {
+    for (E p : content) {
+      if (representer.apply(p).equals(editor.getText())) {
         return p;
       }
     }
@@ -83,14 +95,8 @@ public class EditableComboBoxEditor
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void setItem(Object anObject) {
-    //works like a renderer using the names of TCSObjects
-    if (anObject instanceof TCSObject<?>) {
-      editor.setText(((TCSObject<?>) anObject).getName());
-    }
-    else if (anObject != null) {
-      editor.setText(anObject.toString());
-    }
+    editor.setText(representer.apply((E) anObject));
   }
-
 }

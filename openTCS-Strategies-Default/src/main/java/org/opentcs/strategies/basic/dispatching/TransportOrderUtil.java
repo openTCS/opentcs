@@ -273,6 +273,7 @@ public class TransportOrderUtil
                    vehiclesToDisable.contains(vehicle.getReference()));
   }
 
+  @SuppressWarnings("deprecation")
   private void finishAbortion(TCSObjectReference<TransportOrder> orderRef,
                               Vehicle vehicle,
                               boolean disableVehicle) {
@@ -309,6 +310,7 @@ public class TransportOrderUtil
    * @param disableVehicle Whether to disable the vehicle, i.e. set its
    * procState to UNAVAILABLE.
    */
+  @SuppressWarnings("deprecation")
   public void abortOrder(Vehicle vehicle,
                          boolean immediateAbort,
                          boolean disableVehicle,

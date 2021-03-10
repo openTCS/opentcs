@@ -102,6 +102,7 @@ public class DefaultPlantOverviewInjectionModule
         .toInstance(configuration);
   }
 
+  @SuppressWarnings("deprecation")
   private void configureSocketConnections() {
     SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
                                                                        SslConfiguration.class);

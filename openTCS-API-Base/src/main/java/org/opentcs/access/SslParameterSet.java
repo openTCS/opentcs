@@ -8,6 +8,7 @@
 package org.opentcs.access;
 
 import java.io.File;
+import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,7 +18,8 @@ import javax.annotation.Nullable;
  *
  * @author Mats Wilhelm (Fraunhofer IML)
  */
-public class SslParameterSet {
+public class SslParameterSet
+    implements Serializable {
 
   /**
    * The default type used for truststore and keystore files.

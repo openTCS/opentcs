@@ -10,7 +10,7 @@ package org.opentcs.virtualvehicle.inputcomponents;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.swing.ComboBoxModel;
+import java.util.function.Function;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListCellRenderer;
 
@@ -29,11 +29,6 @@ public final class DropdownListInputPanel<E>
     extends InputPanel {
 
   /**
-   * The editor for comboBox. Only used if the comboBox is editable.
-   */
-  private final EditableComboBoxEditor editableCBEditor;
-
-  /**
    * Create a new panel.
    *
    * @param title Title of the panel.
@@ -41,8 +36,6 @@ public final class DropdownListInputPanel<E>
   private DropdownListInputPanel(String title) {
     super(title);
     initComponents();
-    editableCBEditor = new EditableComboBoxEditor(
-        Collections.unmodifiableList(getValidationListeners()), comboBox);
   }
 
   @Override
@@ -143,12 +136,17 @@ public final class DropdownListInputPanel<E>
      * Strategy for presenting the E-Objects in View.
      */
     private ListCellRenderer<? super E> renderer;
+    /**
+     * Function for representing a selected element in the combo box.
+     * This is basically a renderer for the combo box editor's content.
+     */
+    private Function<E, String> selectionRepresenter = o -> o == null ? "" : o.toString();
 
     /**
      * Create a new <code>Builder</code>.
      *
-     * @param title the title of the panel
-     * @param content List of items
+     * @param title The title of the panel.
+     * @param content List of items.
      */
     public Builder(String title, List<E> content) {
       this.title = requireNonNull(title, "title");
@@ -161,14 +159,22 @@ public final class DropdownListInputPanel<E>
       panel.messageLabel.setText(message);
       panel.label.setText(label);
       panel.comboBox.setEditable(editable);
-      ComboBoxModel<E> model = new DefaultComboBoxModel<>();
+      DefaultComboBoxModel<E> model = new DefaultComboBoxModel<>();
       panel.comboBox.setModel(model);
-      model.addListDataListener(panel.editableCBEditor);
+
+      if (editable) {
+        EditableComboBoxEditor<E> editor = new EditableComboBoxEditor<>(
+            Collections.unmodifiableList(panel.getValidationListeners()),
+            panel.comboBox, selectionRepresenter);
+        panel.comboBox.setEditor(editor);
+        model.addListDataListener(editor);
+      }
+
       //to notify the editor about new input
       for (E c : content) {
-        ((DefaultComboBoxModel<E>) model).addElement(c);
+        model.addElement(c);
       }
-      panel.comboBox.setEditor(panel.editableCBEditor);
+
       if (this.renderer != null) {
         panel.comboBox.setRenderer(this.renderer);
       }
@@ -180,11 +186,11 @@ public final class DropdownListInputPanel<E>
 
     /**
      * Set the message of the panel.
-     * The user of this method must take care for the line breaks in the message,
-     * as it is not wrapped automatically!
+     * The user of this method must take care for the line breaks in the message, as it is not
+     * wrapped automatically!
      *
-     * @param message the message
-     * @return the instance of this <code>Builder</code>
+     * @param message The message.
+     * @return The builder instance.
      */
     public Builder<E> setMessage(String message) {
       this.message = message;
@@ -195,7 +201,7 @@ public final class DropdownListInputPanel<E>
      * Sets the editable flag for the combo box.
      *
      * @param editable The editable flag.
-     * @return the instance of this <code>Builder</code>
+     * @return The builder instance.
      */
     public Builder<E> setEditable(boolean editable) {
       this.editable = editable;
@@ -203,11 +209,11 @@ public final class DropdownListInputPanel<E>
     }
 
     /**
-     * Set the CellRenderer for the dropdownlist.
-     * if none is set, then the defaultrenderer will be used, which calls toString().
+     * Set the CellRenderer for the dropdown list.
+     * if none is set, then the default renderer will be used, which calls toString().
      *
-     * @param renderer the renderer
-     * @return
+     * @param renderer The renderer.
+     * @return The builder instance.
      */
     public Builder<E> setRenderer(ListCellRenderer<? super E> renderer) {
       this.renderer = renderer;
@@ -217,8 +223,8 @@ public final class DropdownListInputPanel<E>
     /**
      * Set the label of the panel.
      *
-     * @param label The Label
-     * @return the instance of this <code>Builder</code>
+     * @param label The label.
+     * @return The builder instance.
      */
     public Builder<E> setLabel(String label) {
       this.label = label;
@@ -228,8 +234,8 @@ public final class DropdownListInputPanel<E>
     /**
      * Set the initial selected list entry.
      *
-     * @param index must be > 0, will have no effect otherwise
-     * @return the instance of this <code>Builder</code>
+     * @param index Must be > 0, will have no effect otherwise.
+     * @return The builder instance.
      */
     public Builder<E> setInitialSelection(int index) {
       if (index >= 0) {
@@ -241,11 +247,9 @@ public final class DropdownListInputPanel<E>
     /**
      * Set the initial selected list entry.
      *
-     * @param element Element to select. Selection remains unchanged if
-     * element ist not in dropdown list or element is
-     * <code>null</code> and the content list does not allow
-     * null values.
-     * @return the instance fo this <code>Builder</code>
+     * @param element Element to select. Selection remains unchanged if element is not in drop down
+     * list or element is <code>null</code> and the content list does not allow null values.
+     * @return The builder instance.
      */
     public Builder<E> setInitialSelection(Object element) {
       int index;
@@ -257,6 +261,18 @@ public final class DropdownListInputPanel<E>
       }
       return setInitialSelection(index);
     }
-  }
 
+    /**
+     * Sets the representer for selected elements in the combo box.
+     * This is basically a renderer for the combo box editor's content.
+     * If none is set, a default representer will be used, which calls toString().
+     *
+     * @param selectionRepresenter Function for representing a selected element in the combo box.
+     * @return The builder instance.
+     */
+    public Builder<E> setSelectionRepresenter(Function<E, String> selectionRepresenter) {
+      this.selectionRepresenter = selectionRepresenter;
+      return this;
+    }
+  }
 }

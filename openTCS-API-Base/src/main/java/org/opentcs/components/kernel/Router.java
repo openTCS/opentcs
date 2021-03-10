@@ -158,7 +158,11 @@ public interface Router
    * @param destRef A reference to the destination location
    * @return The costs of the route, or
    * <code>Long.MAX_VALUE</code>, if no such route exists.
+   * @deprecated Use {@link #getCosts(org.opentcs.data.model.Vehicle, org.opentcs.data.model.Point,
+   * org.opentcs.data.model.Point)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   long getCosts(@Nonnull Vehicle vehicle,
                 @Nonnull TCSObjectReference<Location> srcRef,
                 @Nonnull TCSObjectReference<Location> destRef);

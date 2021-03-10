@@ -1075,6 +1075,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     // Create panel and dialog
     InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("loopbackCommAdapterPanel.dialog_setState.title"),
                                                             Arrays.asList(Vehicle.State.values()))
+        .setSelectionRepresenter(x -> x == null ? "" : x.name())
         .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_state.text"))
         .setInitialSelection(currentState)
         .build();
@@ -1120,6 +1121,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     // Create panel and dialog
     InputPanel panel = new DropdownListInputPanel.Builder<>(
         BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPosition.title"), pointList)
+        .setSelectionRepresenter(x -> x == null ? "" : x.getName())
         .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_position.text"))
         .setEditable(true)
         .setInitialSelection(currentPoint)

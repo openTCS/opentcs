@@ -18,6 +18,7 @@ import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.access.rmi.services.RemoteKernelServicePortalProxy;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.util.ClassMatcher;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Builds {@link KernelServicePortal} instances for connections to remote portals.
@@ -33,11 +34,11 @@ public class KernelServicePortalBuilder {
   /**
    * The user name for logging in.
    */
-  private String userName = RemoteKernelServicePortal.GUEST_USER;
+  private String userName;
   /**
    * The password for logging in.
    */
-  private String password = RemoteKernelServicePortal.GUEST_PASSWORD;
+  private String password;
   /**
    * The event filter to be applied for the built portal.
    */
@@ -45,8 +46,25 @@ public class KernelServicePortalBuilder {
 
   /**
    * Creates a new instance.
+   *
+   * @deprecated Use {@link #KernelServicePortalBuilder(java.lang.String, java.lang.String)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public KernelServicePortalBuilder() {
+    this(RemoteKernelServicePortal.GUEST_USER, RemoteKernelServicePortal.GUEST_PASSWORD);
+  }
+
+  /**
+   * Creates a new instance.
+   *
+   * @param userName The user name to use for logging in.
+   * @param password The password to use for logging in.
+   */
+  public KernelServicePortalBuilder(String userName, String password) {
+    this.userName = requireNonNull(userName, "userName");
+    this.password = requireNonNull(password, "password");
   }
 
   /**
@@ -85,7 +103,11 @@ public class KernelServicePortalBuilder {
    *
    * @param userName The user name.
    * @return This instance.
+   * @deprecated Use {@link #KernelServicePortalBuilder(java.lang.String, java.lang.String)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public KernelServicePortalBuilder setUserName(@Nonnull String userName) {
     this.userName = requireNonNull(userName, "userName");
     return this;
@@ -106,7 +128,11 @@ public class KernelServicePortalBuilder {
    *
    * @param password The password.
    * @return This instance.
+   * @deprecated Use {@link #KernelServicePortalBuilder(java.lang.String, java.lang.String)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public KernelServicePortalBuilder setPassword(@Nonnull String password) {
     this.password = requireNonNull(password, "password");
     return this;

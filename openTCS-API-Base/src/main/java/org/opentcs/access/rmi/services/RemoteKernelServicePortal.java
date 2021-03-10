@@ -15,6 +15,7 @@ import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.rmi.ClientID;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link KernelServicePortal} via RMI.
@@ -26,11 +27,19 @@ public interface RemoteKernelServicePortal
 
   /**
    * The default/guest user name.
+   *
+   * @deprecated In the future, user credentials will be part of the applications, not the API.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   String GUEST_USER = "Alice";
   /**
    * The default/guest password.
+   *
+   * @deprecated In the future, user credentials will be part of the applications, not the API.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   String GUEST_PASSWORD = "xyz";
 
   /**

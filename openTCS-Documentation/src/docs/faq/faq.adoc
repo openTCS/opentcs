@@ -52,8 +52,8 @@ Assuming your `data/` directory contains three model subdirectories `modelA`, `m
 After step one, the three model directories should have been copied to another location.
 After step two, the `data/` directory should be empty and after step three, it should contain only the `model.xml` from directory `modelA`._
 . Start the kernel and have it load your model.
-Then start the plant overview client in modelling mode and select menu:File[Load current kernel model] from its menu to read the model data from the kernel.
-. In the plant overview client, select menu:File[Save Model] or menu:File[Save Model As] from the menu.
+Then start the plant overview client in modelling mode and select btn:[menu:File[Load current kernel model]] from its menu to read the model data from the kernel.
+. In the plant overview client, select btn:[menu:File[Save Model]] or btn:[menu:File[Save Model As]] from the menu.
 The plant overview client will persist the model data in a file with the given name and the extension `.opentcs`.
 +
 _Example: Following the previous example a file with the name `modelA.opentcs` should exist now._
@@ -106,4 +106,9 @@ You are free to implement it either way.
 
 === How do I enable access to the RMI interface for clients when the kernel is running on a host with multiple IP addresses?
 
+See https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.
+
+=== Why does the communication between the openTCS kernel application and client applications take an extraordinary amount of time when SSL is enabled?
+
+This is probably because the kernel is running on a host with multiple IP addresses.
 See https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.

@@ -27,6 +27,7 @@ public class VehicleFilterTest {
   }
 
   @Before
+  @SuppressWarnings("deprecation")
   public void setUp() {
     vehicle1 = new Vehicle("Vehicle-001")
         .withProcState(Vehicle.ProcState.IDLE);

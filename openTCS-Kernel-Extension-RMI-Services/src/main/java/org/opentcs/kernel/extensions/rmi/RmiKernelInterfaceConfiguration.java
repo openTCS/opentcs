@@ -30,13 +30,6 @@ public interface RmiKernelInterfaceConfiguration {
   Boolean enable();
 
   @ConfigurationEntry(
-      type = "String",
-      description = {"The host name/IP address of the RMI registry.",
-                     "If 'localhost' and not running already, a RMI registry will be started."},
-      orderKey = "0_address_0")
-  String registryHost();
-
-  @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the RMI.",
       orderKey = "0_address_1")

@@ -161,6 +161,9 @@ public class ContinuousLoadPanel
         TCSObjectReference.class,
         new StringTableCellRenderer<TCSObjectReference<?>>(x -> x == null ? "" : x.getName()));
 
+    doTable.getSelectionModel().addListSelectionListener(event -> updateElementStates());
+    propertyTable.getSelectionModel().addListSelectionListener(event -> updateElementStates());
+    
     updateElementStates();
 
     initialized = true;
@@ -232,6 +235,7 @@ public class ContinuousLoadPanel
 
     doTable.setEnabled(enabled);
     toTable.setEnabled(enabled);
+    propertyTable.setEnabled(enabled);
     openButton.setEnabled(enabled);
     saveButton.setEnabled(enabled);
 

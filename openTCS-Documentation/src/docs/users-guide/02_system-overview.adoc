@@ -86,8 +86,8 @@ Dragging points and therefore changing their position in the graphical presentat
 
 To synchronize the layout coordinates with the model coordinates or the other way around you have two options:
 
-* Select menu:Actions[Copy model values to layout] or menu:Actions[Copy layout values to model] to synchronize them globally.
-* Select a single layout element, right click it and select menu:Context menu[Copy model values to layout] or menu:Context menu[Copy layout values to model] to synchronize them only for the selected element.
+* Select btn:[menu:Actions[Copy model values to layout]] or btn:[menu:Actions[Copy layout values to model]] to synchronize them globally.
+* Select a single layout element, right click it and select btn:[menu:Context menu[Copy model values to layout]] or btn:[menu:Context menu[Copy layout values to model]] to synchronize them only for the selected element.
 
 ==== Path
 

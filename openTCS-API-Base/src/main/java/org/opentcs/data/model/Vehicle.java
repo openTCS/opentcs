@@ -1891,7 +1891,11 @@ public class Vehicle
     /**
      * The vehicle is currently unavailable for order processing and cannot be
      * dispatched. This is a vehicle's initial state.
+     *
+     * @deprecated {@link #IDLE} will be the default processing state in the future.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "5.0", details = "Will be removed.")
     UNAVAILABLE,
     /**
      * The vehicle is currently not processing a transport order.

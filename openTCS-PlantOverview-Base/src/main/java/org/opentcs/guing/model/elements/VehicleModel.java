@@ -288,6 +288,7 @@ public class VehicleModel
    * @return <code>true</code> if, and only if, the vehicle's processing state
    * is not UNAVAILABLE.
    */
+  @SuppressWarnings("deprecation")
   public boolean isAvailableForOrder() {
     return vehicle != null
         && vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
@@ -497,6 +498,7 @@ public class VehicleModel
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
 
+    @SuppressWarnings("deprecation")
     SelectionProperty<Vehicle.ProcState> pProcState
         = new SelectionProperty<>(this,
                                   Arrays.asList(Vehicle.ProcState.values()),

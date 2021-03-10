@@ -1,3 +1,9 @@
+plugins {
+  id 'org.hidetake.swagger.generator' version '2.16.0'
+  // To use AsciiDoctor for documentation
+  id 'org.asciidoctor.convert' version '1.5.3'
+}
+
 evaluationDependsOn(':openTCS-API-Base')
 evaluationDependsOn(':openTCS-API-Injection')
 evaluationDependsOn(':openTCS-Common')
@@ -7,8 +13,6 @@ evaluationDependsOn(':openTCS-PlantOverview')
 evaluationDependsOn(':openTCS-PlantOverview-Panel-LoadGenerator')
 
 apply plugin: 'distribution'
-apply plugin: 'org.asciidoctor.convert'
-apply plugin: 'org.hidetake.swagger.generator'
 apply from: "${rootDir}/gradle/license-headers.gradle"
 
 def baseApiDir = file("$buildDir/api-base")
@@ -49,7 +53,10 @@ dependencies {
   configdocgen project(':openTCS-PlantOverview')
   configdocgen jar.outputs.files
   
-  swaggerUI 'org.webjars:swagger-ui:3.20.5'
+  swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '3.20.5'
+  
+  asciidoctor group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: '1.5.0'
+  asciidoctor group: 'org.asciidoctor', name: 'asciidoctorj-pdf', version: '1.5.0-alpha.11'
 }
 
 distributions {

@@ -117,7 +117,7 @@ public interface DefaultDispatcherConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to automatically create parking orders idle vehicles.",
+      description = "Whether to automatically create parking orders for idle vehicles.",
       orderKey = "2_park_0")
   boolean parkIdleVehicles();
 
