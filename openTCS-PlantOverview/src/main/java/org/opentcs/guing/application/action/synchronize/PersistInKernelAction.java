@@ -11,6 +11,9 @@ package org.opentcs.guing.application.action.synchronize;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import javax.swing.KeyStroke;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -34,6 +37,10 @@ public class PersistInKernelAction
   public PersistInKernelAction(OpenTCSView openTCSView) {
     this.openTCSView = Objects.requireNonNull(openTCSView);
     ResourceBundleUtil.getBundle().configureAction(this, ID, false);
+    
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt P"));
+    putValue(MNEMONIC_KEY, Integer.valueOf('P'));
+
   }
 
   @Override

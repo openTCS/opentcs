@@ -7,9 +7,16 @@ package org.opentcs.guing.application.action.edit;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.net.URL;
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 import org.opentcs.guing.components.EditableComponent;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -42,6 +49,12 @@ public class SelectAllAction
   public SelectAllAction(JComponent target) {
     super(target);
     ResourceBundleUtil.getBundle().configureAction(this, ID, false);
+
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl A"));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-select-all.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

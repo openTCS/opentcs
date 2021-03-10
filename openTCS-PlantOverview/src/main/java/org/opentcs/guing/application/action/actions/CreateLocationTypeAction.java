@@ -9,9 +9,14 @@
 package org.opentcs.guing.application.action.actions;
 
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.model.elements.LocationTypeModel;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -39,6 +44,10 @@ public class CreateLocationTypeAction
   public CreateLocationTypeAction(GuiManager guiManager) {
     this.guiManager = guiManager;
     ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
+    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/locationType.22.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

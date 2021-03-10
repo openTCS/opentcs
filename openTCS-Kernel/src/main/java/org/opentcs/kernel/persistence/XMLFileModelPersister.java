@@ -8,11 +8,7 @@
 package org.opentcs.kernel.persistence;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -106,10 +102,9 @@ public class XMLFileModelPersister
       if (modelFile.exists()) {
         createBackup();
       }
-      try (OutputStream outStream = new FileOutputStream(modelFile)) {
-        XMLModelWriter writer = writerProvider.get();
-        writer.writeXMLModel(model, modelName, outStream);
-      }
+
+      XMLModelWriter writer = writerProvider.get();
+      writer.writeXMLModel(model, modelName, modelFile);
     }
     catch (IOException exc) {
       throw new IllegalStateException("Exception saving model", exc);
@@ -130,7 +125,6 @@ public class XMLFileModelPersister
       return;
     }
     try {
-      LOG.debug("Loading model. '{}'", getPersistentModelName());
       // Read the model from the file.
       File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
       readXMLModel(modelFile, model);
@@ -226,9 +220,9 @@ public class XMLFileModelPersister
    */
   private String readXMLModelName(File modelFile)
       throws IllegalStateException {
-    try (InputStream inStream = new FileInputStream(modelFile)) {
+    try {
       XMLModelReader reader = readerProvider.get();
-      return reader.readModelName(inStream);
+      return reader.readModelName(modelFile);
     }
     catch (IOException | InvalidModelException exc) {
       throw new IllegalStateException("Exception parsing input", exc);
@@ -244,9 +238,9 @@ public class XMLFileModelPersister
    */
   private void readXMLModel(File modelFile, Model model)
       throws IOException {
-    try (InputStream inStream = new FileInputStream(modelFile)) {
+    try {
       XMLModelReader reader = readerProvider.get();
-      reader.readXMLModel(inStream, model);
+      reader.readXMLModel(modelFile, model);
     }
     catch (InvalidModelException exc) {
       LOG.error("Exception parsing input", exc);

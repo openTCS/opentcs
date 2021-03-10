@@ -21,6 +21,7 @@ import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PointFigure;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -35,13 +36,17 @@ public class DefaultPointSelectedAction
   /**
    * The SelectionProperty contains all point types in the model.
    */
-  private PointModel.PointType pointType;
+  private final PointModel.PointType pointType;
 
   private final Tool tool;
   /**
    * The button this action belongs to.
    */
   private final JPopupButton popupButton;
+  /**
+   * The Icon the popup button uses when this action is selected.
+   */
+  private final ImageIcon largeIcon;
   /**
    * The ButtonGroup the popupButton belongs to. It is necessary to know it,
    * because
@@ -66,6 +71,9 @@ public class DefaultPointSelectedAction
     this.tool = requireNonNull(tool);
     this.popupButton = requireNonNull(popupButton);
     this.group = requireNonNull(group);
+
+    this.pointType = null;
+    this.largeIcon = null;
   }
 
   /**
@@ -83,16 +91,17 @@ public class DefaultPointSelectedAction
                                     JPopupButton popupButton,
                                     ButtonGroup group) {
     super(editor);
-    this.pointType = pointType;
+    this.pointType = requireNonNull(pointType);
     this.tool = requireNonNull(tool);
     this.popupButton = requireNonNull(popupButton);
     this.group = requireNonNull(group);
 
+    this.largeIcon = getLargeImageIconByType(pointType);
+
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     putValue(AbstractAction.NAME, bundle.getString("point.type." + pointType.name() + ".text"));
     putValue(AbstractAction.SHORT_DESCRIPTION, bundle.getString("point.type." + pointType.name() + ".toolTipText"));
-    ImageIcon icon = new ImageIcon(getClass().getResource(bundle.getString("point.type." + pointType.name() + ".popupIcon")));
-    putValue(AbstractAction.SMALL_ICON, icon);
+    putValue(AbstractAction.SMALL_ICON, getImageIconByType(pointType));
   }
 
   @Override
@@ -104,6 +113,7 @@ public class DefaultPointSelectedAction
       pointFigure.getModel().getPropertyType().setValue(pointType);
 
       ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "point.type." + pointType.name());
+      popupButton.setIcon(largeIcon);
     }
 
     getEditor().setTool(tool);
@@ -113,5 +123,31 @@ public class DefaultPointSelectedAction
   @Override
   protected void updateEnabledState() {
     setEnabled(getView() != null && getView().isEnabled());
+  }
+
+  private ImageIcon getImageIconByType(PointModel.PointType pointType) {
+    switch (pointType) {
+      case HALT:
+        return ImageDirectory.getImageIcon("/toolbar/point-halt.22.png");
+      case REPORT:
+        return ImageDirectory.getImageIcon("/toolbar/point-report.22.png");
+      case PARK:
+        return ImageDirectory.getImageIcon("/toolbar/point-park.22.png");
+      default:
+        return null;
+    }
+  }
+
+  private ImageIcon getLargeImageIconByType(PointModel.PointType pointType) {
+    switch (pointType) {
+      case HALT:
+        return ImageDirectory.getImageIcon("/toolbar/point-halt-arrow.22.png");
+      case REPORT:
+        return ImageDirectory.getImageIcon("/toolbar/point-report-arrow.22.png");
+      case PARK:
+        return ImageDirectory.getImageIcon("/toolbar/point-park-arrow.22.png");
+      default:
+        return null;
+    }
   }
 }

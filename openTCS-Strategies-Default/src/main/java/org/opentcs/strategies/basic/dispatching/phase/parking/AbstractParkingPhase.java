@@ -25,7 +25,7 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

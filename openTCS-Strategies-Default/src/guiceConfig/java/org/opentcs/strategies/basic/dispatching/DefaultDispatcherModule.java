@@ -36,23 +36,23 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByName;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
 import org.opentcs.strategies.basic.dispatching.selection.AssignmentCandidateSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeParkVehicleSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeRechargeVehicleSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeReparkVehicleSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeTransportOrderSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeVehicleSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.FilterAssignmentCandidatesProcessable;
-import org.opentcs.strategies.basic.dispatching.selection.FilterTransportOrdersDispatchable;
-import org.opentcs.strategies.basic.dispatching.selection.FilterVehiclesAvailableForOrders;
-import org.opentcs.strategies.basic.dispatching.selection.FilterVehiclesIdleAndDegraded;
-import org.opentcs.strategies.basic.dispatching.selection.FilterVehiclesParkable;
-import org.opentcs.strategies.basic.dispatching.selection.FilterVehiclesReparkable;
 import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.ReparkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.candidates.IsProcessable;
+import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.orders.IsFreelyDispatchableToAnyVehicle;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeParkVehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeRechargeVehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeReparkVehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeVehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsAvailableForAnyOrder;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsIdleAndDegraded;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsParkable;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsReparkable;
 
 /**
  * Guice configuration for the default dispatcher.
@@ -71,17 +71,17 @@ public class DefaultDispatcherModule
   @SuppressWarnings("deprecation")
   private void configureDispatcherDependencies() {
     Multibinder.newSetBinder(binder(), VehicleSelectionFilter.class)
-        .addBinding().to(FilterVehiclesAvailableForOrders.class);
+        .addBinding().to(IsAvailableForAnyOrder.class);
     Multibinder.newSetBinder(binder(), TransportOrderSelectionFilter.class)
-        .addBinding().to(FilterTransportOrdersDispatchable.class);
+        .addBinding().to(IsFreelyDispatchableToAnyVehicle.class);
     Multibinder.newSetBinder(binder(), ParkVehicleSelectionFilter.class)
-        .addBinding().to(FilterVehiclesParkable.class);
+        .addBinding().to(IsParkable.class);
     Multibinder.newSetBinder(binder(), ReparkVehicleSelectionFilter.class)
-        .addBinding().to(FilterVehiclesReparkable.class);
+        .addBinding().to(IsReparkable.class);
     Multibinder.newSetBinder(binder(), RechargeVehicleSelectionFilter.class)
-        .addBinding().to(FilterVehiclesIdleAndDegraded.class);
+        .addBinding().to(IsIdleAndDegraded.class);
     Multibinder.newSetBinder(binder(), AssignmentCandidateSelectionFilter.class)
-        .addBinding().to(FilterAssignmentCandidatesProcessable.class);
+        .addBinding().to(IsProcessable.class);
 
     bind(CompositeParkVehicleSelectionFilter.class)
         .in(Singleton.class);

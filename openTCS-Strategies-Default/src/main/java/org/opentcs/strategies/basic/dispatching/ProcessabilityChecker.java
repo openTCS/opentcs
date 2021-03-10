@@ -79,7 +79,7 @@ public class ProcessabilityChecker {
 
     ExplainedBoolean result = vehicleControllerPool.getVehicleController(vehicle.getName())
         .canProcess(operationSequence(order));
-    if (result.isTrue()) {
+    if (result.getValue()) {
       return true;
     }
     else {

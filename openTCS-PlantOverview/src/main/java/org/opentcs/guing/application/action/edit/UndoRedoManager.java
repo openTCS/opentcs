@@ -7,9 +7,15 @@ package org.opentcs.guing.application.action.edit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.net.URL;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -18,6 +24,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import static org.opentcs.guing.event.SystemModelTransitionEvent.Stage.UNLOADING;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -311,6 +318,13 @@ public class UndoRedoManager
 
     public UndoAction() {
       ResourceBundleUtil.getBundle().configureAction(this, UNDO_ACTION_ID);
+
+      putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl Z"));
+
+      URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-undo.png");
+      putValue(SMALL_ICON, new ImageIcon(url));
+      putValue(LARGE_ICON_KEY, new ImageIcon(url));
+
       setEnabled(false);
     }
 
@@ -333,6 +347,13 @@ public class UndoRedoManager
 
     public RedoAction() {
       ResourceBundleUtil.getBundle().configureAction(this, REDO_ACTION_ID);
+
+      putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl Y"));
+
+      URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-redo.png");
+      putValue(SMALL_ICON, new ImageIcon(url));
+      putValue(LARGE_ICON_KEY, new ImageIcon(url));
+
       setEnabled(false);
     }
 

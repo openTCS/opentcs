@@ -15,6 +15,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * Actions for adding background bitmaps to the drawing view.
@@ -43,6 +44,9 @@ public class AddBitmapAction
                                                       "bmp",
                                                       "gif"));
     this.fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
   }
 
   @Override

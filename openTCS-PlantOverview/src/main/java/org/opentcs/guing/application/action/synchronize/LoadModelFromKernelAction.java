@@ -12,6 +12,9 @@ import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
@@ -48,6 +51,9 @@ public class LoadModelFromKernelAction
     this.openTCSView = requireNonNull(openTCSView);
     this.openTCSDrawingEditor = requireNonNull(openTCSDrawingEditor);
     ResourceBundleUtil.getBundle().configureAction(this, ID, false);
+    
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt K"));
+    putValue(MNEMONIC_KEY, Integer.valueOf('K'));
   }
 
   @Override

@@ -26,9 +26,9 @@ import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCandi
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCandidateComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleComparator;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeTransportOrderSelectionFilter;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeVehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeVehicleSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

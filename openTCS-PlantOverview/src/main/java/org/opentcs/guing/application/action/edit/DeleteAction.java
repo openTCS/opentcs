@@ -8,12 +8,16 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 import org.opentcs.guing.components.EditableComponent;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -36,6 +40,12 @@ public class DeleteAction
   public DeleteAction() {
     super(ID);
     ResourceBundleUtil.getBundle().configureAction(this, ID);
+
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("DEL"));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/edit-delete-2.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

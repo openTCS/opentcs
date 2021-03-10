@@ -8,7 +8,8 @@
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
@@ -18,13 +19,14 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A parking position supplier that tries to find the parking position with the highest priority
  * that is unoccupied, not on the current route of any other vehicle and as close as possible to the
- * parked vehicle's current position.
+ * vehicle's current position.
  *
  * @author Youssef Zaki (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -42,10 +44,6 @@ public class PrioritizedParkingPositionSupplier
    * A function computing the priority of a parking position.
    */
   private final ParkingPositionToPriorityFunction priorityFunction;
-  /**
-   * Compares parking positions by their priorities.
-   */
-  private final ParkingPositionPriorityComparator priorityComparator;
 
   /**
    * Creates a new instance.
@@ -53,16 +51,13 @@ public class PrioritizedParkingPositionSupplier
    * @param plantModelService The plant model service.
    * @param router A router for computing travel costs to parking positions.
    * @param priorityFunction A function computing the priority of a parking position.
-   * @param priorityComparator Compares parking positions by their priorities.
    */
   @Inject
   public PrioritizedParkingPositionSupplier(InternalPlantModelService plantModelService,
                                             Router router,
-                                            ParkingPositionToPriorityFunction priorityFunction,
-                                            ParkingPositionPriorityComparator priorityComparator) {
+                                            ParkingPositionToPriorityFunction priorityFunction) {
     super(plantModelService, router);
     this.priorityFunction = requireNonNull(priorityFunction, "priorityFunction");
-    this.priorityComparator = requireNonNull(priorityComparator, "priorityComparator");
   }
 
   @Override
@@ -73,8 +68,9 @@ public class PrioritizedParkingPositionSupplier
       return Optional.empty();
     }
 
+    int currentPriority = priorityOfCurrentPosition(vehicle);
     Set<Point> parkingPosCandidates = findUsableParkingPositions(vehicle).stream()
-        .filter(point -> priorityFunction.apply(point) != null)
+        .filter(point -> hasHigherPriorityThan(point, currentPriority))
         .collect(Collectors.toSet());
 
     if (parkingPosCandidates.isEmpty()) {
@@ -82,52 +78,45 @@ public class PrioritizedParkingPositionSupplier
       return Optional.empty();
     }
 
-    Point parkingPos = parkingPosCandidates.stream()
-        .sorted(priorityComparator)
-        .findFirst()
-        .get();
-
-    if (Objects.equals(vehicle.getCurrentPosition(), parkingPos.getReference())) {
-      LOG.debug("{}: Already at the best parking position available.", vehicle.getName());
-      return Optional.empty();
-    }
-
-    LOG.debug("{}: Selected parking position {} from candidates {}.",
+    LOG.debug("{}: Selecting parking position from candidates {}.",
               vehicle.getName(),
-              parkingPos,
               parkingPosCandidates);
+
+    parkingPosCandidates = filterPositionsWithHighestPriority(parkingPosCandidates);
+    Point parkingPos = nearestPoint(vehicle, parkingPosCandidates);
+
+    LOG.debug("{}: Selected parking position {}.", vehicle.getName(), parkingPos);
+
     return Optional.ofNullable(parkingPos);
   }
 
-  private Set<Point> findUsableParkingPositions(Vehicle vehicle) {
-    // Find out which points are destination points of the current routes of
-    // all vehicles, and keep them. (Multiple lookups ahead.)
-    Set<Point> targetedPoints = getRouter().getTargetedPoints();
+  private int priorityOfCurrentPosition(Vehicle vehicle) {
+    Point currentPos = getPlantModelService().fetchObject(Point.class,
+                                                          vehicle.getCurrentPosition());
+    return priorityFunction
+        .andThen(priority -> priority != null ? priority : Integer.MAX_VALUE)
+        .apply(currentPos);
+  }
 
-    Set<Point> parkingPosCandidates = new HashSet<>();
-    for (Point parkingPos : fetchAllParkingPositions()) {
-      // Check if all points that are required to use the parking position are
-      // free (or occupied by the same vehicle that is to be parked) and not
-      // targeted by another vehicle.
-      boolean usable = true;
-      for (Point blockPoint : expandPoints(parkingPos)) {
-        // If the point is occupied by another vehicle, give up.
-        if (blockPoint.getOccupyingVehicle() != null
-            && !blockPoint.getOccupyingVehicle().equals(vehicle.getReference())) {
-          usable = false;
-          break;
-        }
-        // If the point is the destination of another vehicle, give up.
-        else if (targetedPoints.contains(blockPoint)) {
-          usable = false;
-          break;
-        }
-      }
-      // If there's nothing keeping us from using the point, keep.
-      if (usable) {
-        parkingPosCandidates.add(parkingPos);
-      }
+  private boolean hasHigherPriorityThan(Point point, Integer priority) {
+    Integer pointPriority = priorityFunction.apply(point);
+    if (pointPriority == null) {
+      return false;
     }
-    return parkingPosCandidates;
+
+    return pointPriority < priority;
+  }
+
+  private Set<Point> filterPositionsWithHighestPriority(Set<Point> positions) {
+    checkArgument(!positions.isEmpty(), "'positions' must not be empty");
+    
+    Map<Integer, List<Point>> prioritiesToPositions = positions.stream()
+        .collect(Collectors.groupingBy(point -> priorityFunction.apply(point)));
+
+    Integer highestPriority = prioritiesToPositions.keySet().stream()
+        .reduce(Integer::min)
+        .get();
+    
+    return new HashSet<>(prioritiesToPositions.get(highestPriority));
   }
 }

@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.swing.JMenuBar;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.event.OperationModeChangeEvent;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
 
 /**
@@ -52,26 +51,20 @@ public class ApplicationMenuBar
     requireNonNull(menuView, "menuView");
     requireNonNull(menuHelp, "menuHelp");
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
     this.menuFile = menuFile;
-    labels.configureMenu(menuFile, "file");
     add(menuFile);
 
     this.menuEdit = menuEdit;
-    labels.configureMenu(menuEdit, "edit");
     add(menuEdit);
 
     this.menuActions = menuActions;
-    labels.configureMenu(menuActions, "actions");
     add(menuActions);
 
     this.menuView = menuView;
-    labels.configureMenu(menuView, "view");
     add(menuView);
 
     this.menuHelp = menuHelp;
-    labels.configureMenu(menuHelp, "help");
     add(menuHelp);
   }
 

@@ -17,12 +17,16 @@ package org.opentcs.guing.application.action.draw;
 
 import java.awt.event.ActionEvent;
 import java.awt.geom.AffineTransform;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.TransformEdit;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -105,6 +109,8 @@ public abstract class MoveAction
       super(editor, 1, 0);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
       labels.configureAction(this, ID, false);
+      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-forward.png");
+      putValue(SMALL_ICON, new ImageIcon(url));
     }
   }
 
@@ -128,6 +134,8 @@ public abstract class MoveAction
       super(editor, -1, 0);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
       labels.configureAction(this, ID, false);
+      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-back.png");
+      putValue(SMALL_ICON, new ImageIcon(url));
     }
   }
 
@@ -151,6 +159,8 @@ public abstract class MoveAction
       super(editor, 0, -1);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
       labels.configureAction(this, ID, false);
+      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-up.png");
+      putValue(SMALL_ICON, new ImageIcon(url));
     }
   }
 
@@ -174,6 +184,8 @@ public abstract class MoveAction
       super(editor, 0, 1);
       ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
       labels.configureAction(this, ID, false);
+      URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/draw-arrow-down.png");
+      putValue(SMALL_ICON, new ImageIcon(url));
     }
   }
 }

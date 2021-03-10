@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.strategies.basic.dispatching.selection.CompositeTransportOrderSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
 
 /**
  *

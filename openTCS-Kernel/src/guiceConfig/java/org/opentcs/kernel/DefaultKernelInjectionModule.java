@@ -39,7 +39,7 @@ import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
-import org.opentcs.kernel.persistence.XMLModel002Builder;
+import org.opentcs.kernel.persistence.XMLModelBuilder;
 import org.opentcs.kernel.persistence.XMLModelReader;
 import org.opentcs.kernel.persistence.XMLModelWriter;
 import org.opentcs.kernel.services.StandardDispatcherService;
@@ -165,8 +165,8 @@ public class DefaultKernelInjectionModule
 
   private void configurePersistence() {
     bind(ModelPersister.class).to(XMLFileModelPersister.class);
-    bind(XMLModelReader.class).to(XMLModel002Builder.class);
-    bind(XMLModelWriter.class).to(XMLModel002Builder.class);
+    bind(XMLModelReader.class).to(XMLModelBuilder.class);
+    bind(XMLModelWriter.class).to(XMLModelBuilder.class);
   }
 
   @SuppressWarnings("deprecation")

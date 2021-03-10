@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.persistence;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import org.opentcs.kernel.workingset.Model;
 
 /**
@@ -17,37 +17,26 @@ import org.opentcs.kernel.workingset.Model;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface XMLModelReader {
-
-  /**
-   * Returns the version an implementation supports as a String.
-   *
-   * @return The version an implementation supports as a String.
-   */
-  String getVersionString();
   
   /**
    * Extracts the name of the model in the given XML document.
    *
-   * @param inStream The input stream from which the model is to be read.
+   * @param file The file from which the model is to be read.
    * @return The name of the model in the given XML document.
    * @throws IOException If there was a problem parsing the input.
-   * @throws InvalidModelException If there was a problem interpreting the
-   * model.
+   * @throws InvalidModelException If there was a problem interpreting the model.
    */
-  String readModelName(InputStream inStream)
+  String readModelName(File file)
       throws IOException, InvalidModelException;
 
   /**
-   * Reads an XML document and transforms its data to a proper
-   * <code>Model</code>.
+   * Reads an XML document and transforms its data to a proper <code>Model</code>.
    *
-   * @param inStream The input stream from which the model is to be read.
-   * @param model The <code>Model</code> instance into which the data read is
-   * written.
+   * @param file The file from which the model is to be read.
+   * @param model The <code>Model</code> instance into which the data read is written.
    * @throws IOException If there was a problem parsing the input.
-   * @throws InvalidModelException If there was a problem interpreting the
-   * model.
+   * @throws InvalidModelException If there was a problem interpreting the model.
    */
-  void readXMLModel(InputStream inStream, Model model)
+  void readXMLModel(File file, Model model)
       throws IOException, InvalidModelException;
 }

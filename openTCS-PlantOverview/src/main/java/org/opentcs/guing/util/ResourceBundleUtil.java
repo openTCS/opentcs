@@ -35,9 +35,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.jhotdraw.util.LocaleUtil;
@@ -558,6 +556,7 @@ public class ResourceBundleUtil
    * button.
    */
   public void configureAction(Action action, String argument, Class<?> baseClass, boolean largeIcon) {
+
     action.putValue(Action.NAME, getTextProperty(argument));
     String shortDescription = getToolTipTextProperty(argument);
 
@@ -565,13 +564,6 @@ public class ResourceBundleUtil
       action.putValue(Action.SHORT_DESCRIPTION, shortDescription);
     }
 
-    action.putValue(Action.ACCELERATOR_KEY, getAcceleratorProperty(argument));
-    action.putValue(Action.MNEMONIC_KEY, Integer.valueOf(getMnemonicProperty(argument)));
-    action.putValue(Action.SMALL_ICON, getIconProperty(argument, baseClass));
-
-    if (largeIcon) {
-      action.putValue(Action.LARGE_ICON_KEY, getLargeIconProperty(argument, baseClass));
-    }
   }
 
   /**
@@ -605,7 +597,6 @@ public class ResourceBundleUtil
    */
   public void configureNamelessButton(AbstractButton button, String argument) {
     button.setText(null);
-    button.setIcon(getLargeIconProperty(argument, getBaseClass()));
     button.setToolTipText(getToolTipTextProperty(argument));
   }
 
@@ -625,17 +616,7 @@ public class ResourceBundleUtil
    * @param baseClass
    */
   public void configureToolBarButton(AbstractButton button, String argument, Class<?> baseClass) {
-    Icon icon = getIconProperty(argument, baseClass);
-
-    if (icon != null) {
-      button.setIcon(getIconProperty(argument, baseClass));
-      button.setText(null);
-    }
-    else {
-      button.setIcon(null);
-      button.setText(getTextProperty(argument));
-    }
-
+    button.setText(null);
     button.setToolTipText(getToolTipTextProperty(argument));
   }
 
@@ -647,13 +628,6 @@ public class ResourceBundleUtil
   public void configureMenu(JMenuItem menu, String argument) {
     menu.setText(getTextProperty(argument));
     menu.setToolTipText(getToolTipTextProperty(argument));
-
-    if (!(menu instanceof JMenu)) {
-      menu.setAccelerator(getAcceleratorProperty(argument));
-    }
-
-    menu.setMnemonic(getMnemonicProperty(argument));
-    menu.setIcon(getIconProperty(argument, baseClass));
   }
 
   /**

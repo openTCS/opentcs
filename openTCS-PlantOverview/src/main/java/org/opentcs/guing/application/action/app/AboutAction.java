@@ -10,15 +10,20 @@ package org.opentcs.guing.application.action.app;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.Environment;
 
@@ -64,6 +69,12 @@ public class AboutAction
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
 
     ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
+    putValue(MNEMONIC_KEY, Integer.valueOf('A'));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/help-contents.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

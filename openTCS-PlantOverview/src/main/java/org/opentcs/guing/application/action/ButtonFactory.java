@@ -52,6 +52,7 @@ import org.opentcs.guing.application.action.draw.EditorColorChooserAction;
 import org.opentcs.guing.application.action.draw.MoveAction;
 import org.opentcs.guing.application.action.draw.PickAttributesAction;
 import org.opentcs.guing.application.action.draw.SendToBackAction;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -309,14 +310,17 @@ public class ButtonFactory {
     bar.add(createEditorColorButton(editor,
                                     AttributeKeys.STROKE_COLOR,
                                     "attribute.strokeColor",
+                                    ImageDirectory.getImageIcon("/toolbar/attributeStrokeColor.png"),
                                     new HashMap<AttributeKey, Object>()));
     bar.add(createEditorColorButton(editor,
                                     AttributeKeys.FILL_COLOR,
                                     "attribute.fillColor",
+                                    ImageDirectory.getImageIcon("/toolbar/attributeFillColor.png"),
                                     new HashMap<AttributeKey, Object>()));
     bar.add(createEditorColorButton(editor,
                                     AttributeKeys.TEXT_COLOR,
                                     "attribute.textColor",
+                                    ImageDirectory.getImageIcon("/toolbar/attributeTextColor.png"),
                                     new HashMap<AttributeKey, Object>()));
   }
 
@@ -345,6 +349,7 @@ public class ButtonFactory {
       DrawingEditor editor,
       AttributeKey<Color> attributeKey,
       String labelKey,
+      ImageIcon baseIcon,
       Map<AttributeKey, Object> defaultAttributes) {
 
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
@@ -406,10 +411,12 @@ public class ButtonFactory {
     labels.configureToolBarButton(popupButton, labelKey);
     action.putValue(Action.SHORT_DESCRIPTION,
                     labels.getToolTipTextProperty("attribute.color.colorChooser"));
+
     Icon icon = new EditorColorIcon(editor,
                                     attributeKey,
-                                    labels.getIconProperty(labelKey, ButtonFactory.class).getImage(),
+                                    baseIcon.getImage(),
                                     new Rectangle(1, 17, 20, 4));
+
     popupButton.setIcon(icon);
     popupButton.setDisabledIcon(icon);
     popupButton.setFocusable(false);
@@ -437,8 +444,13 @@ public class ButtonFactory {
 
   private static JPopupButton createStrokeDecorationButton(DrawingEditor editor) {
     JPopupButton strokeDecorationPopupButton = new JPopupButton();
+
+    strokeDecorationPopupButton.setIcon(
+        ImageDirectory.getImageIcon("/toolbar/attributeStrokeDecoration.png"));
+
     ResourceBundleUtil.getBundle().configureToolBarButton(
         strokeDecorationPopupButton, "attribute.strokeDecoration");
+
     strokeDecorationPopupButton.setFocusable(false);
     strokeDecorationPopupButton.setColumnCount(2, false);
     LineDecoration[] decorations = {
@@ -480,6 +492,7 @@ public class ButtonFactory {
   private static JPopupButton createStrokeWidthButton(DrawingEditor editor) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JPopupButton strokeWidthPopupButton = new JPopupButton();
+    strokeWidthPopupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeStrokeWidth.png"));
     bundle.configureToolBarButton(strokeWidthPopupButton, "attribute.strokeWidth");
     strokeWidthPopupButton.setFocusable(false);
 
@@ -511,6 +524,7 @@ public class ButtonFactory {
   private static JPopupButton createStrokeDashesButton(DrawingEditor editor) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JPopupButton strokeDashesPopupButton = new JPopupButton();
+    strokeDashesPopupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeStrokeDashes.png"));
     bundle.configureToolBarButton(strokeDashesPopupButton, "attribute.strokeDashes");
     strokeDashesPopupButton.setFocusable(false);
 
@@ -554,6 +568,7 @@ public class ButtonFactory {
   private static JPopupButton createStrokeTypeButton(DrawingEditor editor) {
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     JPopupButton strokeTypePopupButton = new JPopupButton();
+    strokeTypePopupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeStrokeType.png"));
     labels.configureToolBarButton(strokeTypePopupButton, "attribute.strokeType");
     strokeTypePopupButton.setFocusable(false);
 
@@ -596,6 +611,7 @@ public class ButtonFactory {
   private static JPopupButton createStrokePlacementButton(DrawingEditor editor) {
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     JPopupButton strokePlacementPopupButton = new JPopupButton();
+    strokePlacementPopupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeStrokePlacement.png"));
     labels.configureToolBarButton(strokePlacementPopupButton, "attribute.strokePlacement");
     strokePlacementPopupButton.setFocusable(false);
 
@@ -688,6 +704,7 @@ public class ButtonFactory {
 
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JPopupButton popupButton = new JPopupButton();
+    popupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeStrokeCap.png"));
     bundle.configureToolBarButton(popupButton, "attribute.strokeCap");
     popupButton.setFocusable(false);
 
@@ -728,6 +745,7 @@ public class ButtonFactory {
   private static JPopupButton createStrokeJoinButton(DrawingEditor editor) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JPopupButton popupButton = new JPopupButton();
+    popupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeStrokeJoin.png"));
     bundle.configureToolBarButton(popupButton, "attribute.strokeJoin");
     popupButton.setFocusable(false);
 
@@ -774,6 +792,7 @@ public class ButtonFactory {
 
   private static JPopupButton createFontButton(DrawingEditor editor) {
     JPopupButton fontPopupButton = new JPopupButton();
+    fontPopupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeFont.png"));
     ResourceBundleUtil.getBundle().configureToolBarButton(fontPopupButton, "attribute.font");
     fontPopupButton.setFocusable(false);
 
@@ -792,6 +811,7 @@ public class ButtonFactory {
   private static JButton createFontStyleBoldButton(DrawingEditor editor) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JButton button = new JButton();
+    button.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeFontBold.png"));
     bundle.configureToolBarButton(button, "attribute.fontStyle.bold");
     button.setFocusable(false);
 
@@ -811,6 +831,7 @@ public class ButtonFactory {
   private static JButton createFontStyleItalicButton(DrawingEditor editor) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JButton button = new JButton();
+    button.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeFontItalic.png"));
     bundle.configureToolBarButton(button, "attribute.fontStyle.italic");
     button.setFocusable(false);
 
@@ -830,6 +851,7 @@ public class ButtonFactory {
   private static JButton createFontStyleUnderlineButton(DrawingEditor editor) {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     JButton button = new JButton();
+    button.setIcon(ImageDirectory.getImageIcon("/toolbar/attributeFontUnderline.png"));
     bundle.configureToolBarButton(button, "attribute.fontStyle.underline");
     button.setFocusable(false);
 

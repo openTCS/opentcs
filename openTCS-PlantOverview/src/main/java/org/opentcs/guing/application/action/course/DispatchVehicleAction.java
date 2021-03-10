@@ -15,6 +15,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,8 @@ public class DispatchVehicleAction
   @Inject
   public DispatchVehicleAction(SharedKernelServicePortalProvider portalProvider) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

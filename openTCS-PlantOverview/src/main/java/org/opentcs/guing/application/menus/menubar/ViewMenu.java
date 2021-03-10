@@ -77,27 +77,27 @@ public class ViewMenu
     requireNonNull(menuPluginPanels, "menuPluginPanels");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    
+    this.setText( labels.getString("view.text"));
+    this.setToolTipText(labels.getString("view.toolTipText"));
+    this.setMnemonic('V');
 
     // Menu item View -> Add Background Image
     menuAddBitmap = new JMenuItem(actionMap.get(AddBitmapAction.ID));
-    labels.configureMenu(menuAddBitmap, "view.addBitmap");
     add(menuAddBitmap);
 
     addSeparator();
 
     // Menu item View -> Add course view
     menuAddDrawingView = new JMenuItem(actionMap.get(AddDrawingViewAction.ID));
-    labels.configureMenu(menuAddDrawingView, "view.drawingView");
     add(menuAddDrawingView);
 
     // Menu item View -> Add transport order view
     menuTransportOrderView = new JMenuItem(actionMap.get(AddTransportOrderView.ID));
-    labels.configureMenu(menuTransportOrderView, "view.transportOrderView");
     add(menuTransportOrderView);
 
     // Menu item View -> Add transport order sequence view
     menuOrderSequenceView = new JMenuItem(actionMap.get(AddTransportOrderSequenceView.ID));
-    labels.configureMenu(menuOrderSequenceView, "view.orderSequenceView");
     add(menuOrderSequenceView);
 
     addSeparator();

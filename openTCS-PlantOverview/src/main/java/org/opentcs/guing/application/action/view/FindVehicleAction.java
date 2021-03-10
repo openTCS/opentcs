@@ -10,12 +10,17 @@ package org.opentcs.guing.application.action.view;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.ClosableDialog;
 import org.opentcs.guing.components.dialogs.FindVehiclePanel;
@@ -24,6 +29,7 @@ import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.Comparators;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -73,6 +79,12 @@ public class FindVehicleAction
     this.panelFactory = requireNonNull(panelFactory, "panelFactory");
 
     ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
+    putValue(MNEMONIC_KEY, Integer.valueOf('F'));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/find-vehicle.22.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

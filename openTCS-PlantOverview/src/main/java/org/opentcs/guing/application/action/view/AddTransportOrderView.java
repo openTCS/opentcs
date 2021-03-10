@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * An action for adding new transport order views.
@@ -21,7 +22,7 @@ import org.opentcs.guing.application.OpenTCSView;
 public class AddTransportOrderView
     extends AbstractAction {
 
-  public final static String ID = "view.addTOView";
+  public final static String ID = "view.addTransportOrderView";
   private final OpenTCSView view;
 
   /**
@@ -31,6 +32,8 @@ public class AddTransportOrderView
    */
   public AddTransportOrderView(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

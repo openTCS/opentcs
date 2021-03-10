@@ -24,6 +24,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.LocationActionPanel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  *
@@ -70,6 +71,9 @@ public class SendVehicleToLocationAction
     this.applicationFrame = requireNonNull(applicationFrame, "applicationFrame");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
   }
 
   @Override

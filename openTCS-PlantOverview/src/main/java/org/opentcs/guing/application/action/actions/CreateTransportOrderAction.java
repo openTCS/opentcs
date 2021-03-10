@@ -10,15 +10,21 @@ package org.opentcs.guing.application.action.actions;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.transport.CreateTransportOrderPanel;
 import org.opentcs.guing.transport.OrderCategorySuggestionsPool;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -71,6 +77,12 @@ public class CreateTransportOrderAction
     this.categorySuggestionsPool = requireNonNull(categorySuggestionsPool,
                                                   "categorySuggestionsPool");
     ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
+    putValue(MNEMONIC_KEY, Integer.valueOf('T'));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/create-order.22.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

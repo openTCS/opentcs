@@ -9,9 +9,13 @@
 package org.opentcs.guing.application.action.view;
 
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
@@ -21,6 +25,8 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.ImageDirectory;
+import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +71,13 @@ public class PauseAllVehiclesAction
                                 SharedKernelServicePortalProvider portalProvider) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
+
+    URL urlSmall = getClass().getResource(ImageDirectory.DIR + "/toolbar/pause-vehicles.16.png");
+    URL urlLarge = getClass().getResource(ImageDirectory.DIR + "/toolbar/pause-vehicles.22.png");
+    putValue(SMALL_ICON, new ImageIcon(urlSmall));
+    putValue(LARGE_ICON_KEY, new ImageIcon(urlLarge));
   }
 
   @Override

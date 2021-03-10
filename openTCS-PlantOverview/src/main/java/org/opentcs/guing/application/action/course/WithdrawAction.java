@@ -75,6 +75,14 @@ public class WithdrawAction
     this.immediateAbort = requireNonNull(immediateAbort, "immediateAbort");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+
+    if (immediateAbort) {
+      ResourceBundleUtil.getBundle().configureAction(this, IMMEDIATELY_ID);
+    }
+    else {
+      ResourceBundleUtil.getBundle().configureAction(this, ID);
+    }
+
   }
 
   @Override

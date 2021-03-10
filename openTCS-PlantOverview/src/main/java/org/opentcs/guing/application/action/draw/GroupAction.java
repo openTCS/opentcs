@@ -15,8 +15,11 @@
  */
 package org.opentcs.guing.application.action.draw;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -27,6 +30,7 @@ import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.GroupFigure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -77,6 +81,10 @@ public class GroupAction
     this.isGroupingAction = isGroupingAction;
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     labels.configureAction(this, ID, false);
+    
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/object-group-2.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    
     updateEnabledState();
   }
 

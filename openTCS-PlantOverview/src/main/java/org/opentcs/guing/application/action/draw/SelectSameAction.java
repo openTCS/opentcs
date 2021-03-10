@@ -15,11 +15,15 @@
  */
 package org.opentcs.guing.application.action.draw;
 
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -41,6 +45,10 @@ public class SelectSameAction
     super(editor);
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     labels.configureAction(this, ID, false);
+    
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/kcharselect.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    
     updateEnabledState();
   }
 

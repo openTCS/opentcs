@@ -9,6 +9,7 @@
 package org.opentcs.guing.application.action;
 
 import java.awt.Rectangle;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -54,6 +56,7 @@ import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
 
@@ -204,6 +207,7 @@ public class ToolBarManager
                                          editor,
                                          creationTool,
                                          "openTCS.createLocation",
+                                         ImageDirectory.getImageIcon("/toolbar/location.22.png"),
                                          labels);
     creationTool.setToolDoneAfterCreation(false);
 
@@ -220,6 +224,7 @@ public class ToolBarManager
                                      editor,
                                      connectionTool,
                                      "openTCS.createLink",
+                                     ImageDirectory.getImageIcon("/toolbar/link.22.png"),
                                      labels);
     connectionTool.setToolDoneAfterCreation(false);
 
@@ -229,22 +234,22 @@ public class ToolBarManager
 
     // --- Location Type: No Figure, just creates a tree entry (only in Modelling mode) ---
     buttonCreateLocationType = new JButton(actionMap.get(CreateLocationTypeAction.ID));
-    labels.configureNamelessButton(buttonCreateLocationType, CreateLocationTypeAction.ID);
+    buttonCreateLocationType.setText(null);
     toolBarCreation.add(buttonCreateLocationType);
 
     // --- Create Vehicle Figure (only in Modelling mode) ---
     buttonCreateVehicle = new JButton(actionMap.get(CreateVehicleAction.ID));
-    labels.configureNamelessButton(buttonCreateVehicle, CreateVehicleAction.ID);
+    buttonCreateVehicle.setText(null);
     toolBarCreation.add(buttonCreateVehicle);
 
     // --- Create Block (only in Modelling mode) ---
     buttonCreateBlock = new JButton(actionMap.get(CreateBlockAction.ID));
-    labels.configureNamelessButton(buttonCreateBlock, CreateBlockAction.ID);
+    buttonCreateBlock.setText(null);
     toolBarCreation.add(buttonCreateBlock);
 
     // --- Create Group (both modes) ---
     buttonCreateGroup = new JButton(actionMap.get(CreateGroupAction.ID));
-    labels.configureNamelessButton(buttonCreateGroup, CreateGroupAction.ID);
+    buttonCreateGroup.setText(null);
     toolBarCreation.add(buttonCreateGroup);
 
     sep = new JToolBar.Separator();
@@ -253,21 +258,21 @@ public class ToolBarManager
 
     // --- Create Transport Order (only in Operating mode) ---
     buttonCreateOrder = new JButton(actionMap.get(CreateTransportOrderAction.ID));
-    labels.configureNamelessButton(buttonCreateOrder, CreateTransportOrderAction.ID);
+    buttonCreateOrder.setText(null);
     toolBarCreation.add(buttonCreateOrder);
 
     toolBarCreation.addSeparator();
 
     // --- Find Vehicle (only in Operating mode) ---
     buttonFindVehicle = new JButton(actionMap.get(FindVehicleAction.ID));
-    labels.configureNamelessButton(buttonFindVehicle, FindVehicleAction.ID);
+    buttonFindVehicle.setText(null);
     toolBarCreation.add(buttonFindVehicle);
 
     toolBarCreation.addSeparator();
 
     // --- Pause All Vehicles (only in Operating mode) ---
     buttonPauseAllVehicles = new JToggleButton(actionMap.get(PauseAllVehiclesAction.ID));
-    labels.configureNamelessButton(buttonPauseAllVehicles, PauseAllVehiclesAction.ID);
+    buttonPauseAllVehicles.setText(null);
     toolBarCreation.add(buttonPauseAllVehicles);
 
     toolBarCreation.setName(labels.getString("toolBarCreation.title"));
@@ -405,7 +410,12 @@ public class ToolBarManager
       toolBar.putClientProperty("toolHandler", toolHandler);
     }
 
-    ResourceBundleUtil.getBundle().configureToolBarButton(toggleButton, "openTCS.selectionTool");
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/select-2.png");
+    toggleButton.setIcon( new ImageIcon(url) );
+    toggleButton.setText(null);
+    toggleButton.setToolTipText( ResourceBundleUtil.getBundle().getString("openTCS.selectionTool.toolTipText") );
+    
     toggleButton.setSelected(true);
     toggleButton.addItemListener(new ToolButtonListener(selectionTool, editor));
 //    toggleButton.setFocusable(false);
@@ -435,8 +445,10 @@ public class ToolBarManager
       toolBar.putClientProperty("toolHandler", toolHandler);
     }
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(button, "openTCS.dragTool");
+    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/cursor-opened-hand.png");
+    button.setIcon( new ImageIcon(url) );
+    button.setText(null);
+    button.setToolTipText( ResourceBundleUtil.getBundle().getString("openTCS.dragTool.toolTipText") );
 
     button.setSelected(false);
     button.addItemListener(new ToolButtonListener(dragTool, editor));
@@ -477,6 +489,7 @@ public class ToolBarManager
     }
 
     labels.configureNamelessButton(popupButton, "point.type." + PointModel.PointType.values()[0].name());
+    popupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/point-halt-arrow.22.png"));
     popupButton.setFocusable(true);
 
     group.add(popupButton);
@@ -500,9 +513,11 @@ public class ToolBarManager
                                       DrawingEditor editor,
                                       Tool tool,
                                       String labelKey,
+                                      ImageIcon iconBase,
                                       ResourceBundleUtil labels) {
     JToggleButton toggleButton = new JToggleButton();
 
+    toggleButton.setIcon(iconBase);
     labels.configureToolBarButton(toggleButton, labelKey);
     toggleButton.addItemListener(new ToolButtonListener(tool, editor));
 //    toggleButton.setFocusable(false);
@@ -546,6 +561,7 @@ public class ToolBarManager
 
     ResourceBundleUtil.getBundle().configureNamelessButton(
         popupButton, "path.type." + PathModel.LinerType.values()[0].name());
+    popupButton.setIcon(ImageDirectory.getImageIcon("/toolbar/path-direct-arrow.22.png"));
     popupButton.setFocusable(true);
 
     group.add(popupButton);

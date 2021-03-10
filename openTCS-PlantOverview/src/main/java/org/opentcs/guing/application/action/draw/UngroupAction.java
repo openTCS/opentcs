@@ -15,9 +15,13 @@
  */
 package org.opentcs.guing.application.action.draw;
 
+import java.net.URL;
+import static javax.swing.Action.SMALL_ICON;
+import javax.swing.ImageIcon;
 import org.jhotdraw.draw.CompositeFigure;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.GroupFigure;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -39,6 +43,10 @@ public class UngroupAction
     super(editor, new GroupFigure(), false);
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     labels.configureAction(this, ID, false);
+    
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/object-ungroup-2.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    
     updateEnabledState();
   }
 
@@ -46,6 +54,10 @@ public class UngroupAction
     super(editor, prototype, false);
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
     labels.configureAction(this, ID, false);
+    
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/object-ungroup-2.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    
     updateEnabledState();
   }
 }

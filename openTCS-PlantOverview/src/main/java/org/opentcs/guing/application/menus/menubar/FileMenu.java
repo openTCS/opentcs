@@ -96,25 +96,25 @@ public class FileMenu
     this.menuExport = requireNonNull(menuExport, "menuExport");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    
+    this.setText( labels.getString("file.text"));
+    this.setToolTipText(labels.getString("file.toolTipText"));
+    this.setMnemonic('F');
 
     // Menu item File -> New Model (nur in Mode Modelling)
     menuItemNewModel = new JMenuItem(actionMap.get(NewModelAction.ID));
-    labels.configureMenu(menuItemNewModel, NewModelAction.ID);
     add(menuItemNewModel);
 
     // Menu item File -> Load Model (nur in Mode Modelling)
     menuItemLoadModel = new JMenuItem(actionMap.get(LoadModelAction.ID));
-    labels.configureMenu(menuItemLoadModel, LoadModelAction.ID);
     add(menuItemLoadModel);
 
     // Menu item File -> Save Model
     menuItemSaveModel = new JMenuItem(actionMap.get(SaveModelAction.ID));
-    labels.configureMenu(menuItemSaveModel, SaveModelAction.ID);
     add(menuItemSaveModel);
 
     // Menu item File -> Save Model As
     menuItemSaveModelAs = new JMenuItem(actionMap.get(SaveModelAsAction.ID));
-    labels.configureMenu(menuItemSaveModelAs, SaveModelAsAction.ID);
     add(menuItemSaveModelAs);
 
     addSeparator();
@@ -126,12 +126,10 @@ public class FileMenu
 
     // Load model from kernel
     menuItemLoadModelFromKernel = new JMenuItem(actionMap.get(LoadModelFromKernelAction.ID));
-    labels.configureMenu(menuItemLoadModelFromKernel, LoadModelFromKernelAction.ID);
     add(menuItemLoadModelFromKernel);
 
     // Persist model in kernel
     menuItemPersistInKernel = new JMenuItem(actionMap.get(PersistInKernelAction.ID));
-    labels.configureMenu(menuItemPersistInKernel, PersistInKernelAction.ID);
     add(menuItemPersistInKernel);
 
     add(menuMode);
@@ -139,14 +137,12 @@ public class FileMenu
     addSeparator();
 
     menuItemModelProperties = new JMenuItem(actionMap.get(ModelPropertiesAction.ID));
-    labels.configureMenu(menuItemModelProperties, ModelPropertiesAction.ID);
     add(menuItemModelProperties);
 
     addSeparator();
 
     // Menu item File -> Close
     menuItemClose = new JMenuItem(actionMap.get(CloseFileAction.ID));
-    labels.configureMenu(menuItemClose, CloseFileAction.ID);
     add(menuItemClose); // TODO: Nur bei "Stand-Alone" Frame
   }
 

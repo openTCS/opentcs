@@ -21,6 +21,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.PointPanel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  *
@@ -67,6 +68,8 @@ public class SendVehicleToPointAction
     this.applicationFrame = requireNonNull(applicationFrame, "applicationFrame");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

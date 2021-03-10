@@ -21,6 +21,7 @@ import org.opentcs.guing.application.action.edit.DuplicateAction;
 import org.opentcs.guing.application.action.edit.PasteAction;
 import org.opentcs.guing.application.action.edit.SelectAllAction;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * The application's "Edit" menu.
@@ -42,6 +43,12 @@ public class EditMenu
   @Inject
   public EditMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
+    
+    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    
+    this.setText( labels.getString("edit.text"));
+    this.setToolTipText(labels.getString("edit.toolTipText"));
+    this.setMnemonic('E');
 
     // Undo, Redo
     add(actionMap.get(UndoRedoManager.UNDO_ACTION_ID));

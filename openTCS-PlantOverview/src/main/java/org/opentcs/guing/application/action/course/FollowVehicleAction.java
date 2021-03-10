@@ -16,6 +16,7 @@ import javax.swing.JCheckBoxMenuItem;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  *
@@ -48,6 +49,8 @@ public class FollowVehicleAction
                              OpenTCSDrawingEditor drawingEditor) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

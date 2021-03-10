@@ -15,6 +15,7 @@ import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.application.toolbar.OpenTCSConnectionTool;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -25,12 +26,16 @@ import org.opentcs.guing.util.ResourceBundleUtil;
 public class DefaultPathSelectedAction
     extends org.jhotdraw.draw.action.AbstractSelectedAction {
 
-  private PathModel.LinerType pathType;
+  private final PathModel.LinerType pathType;
   private final Tool tool;
   /**
    * The button this action belongs to.
    */
   private final JPopupButton popupButton;
+  /**
+   * The Icon the popup button uses when this action is selected.
+   */
+  private final ImageIcon largeIcon;
   /**
    * The ButtonGroup the popupButton belongs to. It is necessary to know it,
    * because
@@ -54,12 +59,11 @@ public class DefaultPathSelectedAction
       ButtonGroup group) {
 
     super(editor);
-    Objects.requireNonNull(tool);
-    this.tool = tool;
-    Objects.requireNonNull(popupButton);
-    this.popupButton = popupButton;
-    Objects.requireNonNull(group);
-    this.group = group;
+    this.tool = Objects.requireNonNull(tool);
+    this.popupButton = Objects.requireNonNull(popupButton);
+    this.group = Objects.requireNonNull(group);
+    this.pathType = null;
+    this.largeIcon = null;
   }
 
   /**
@@ -79,19 +83,17 @@ public class DefaultPathSelectedAction
       ButtonGroup group) {
 
     super(editor);
-    this.pathType = pathType;
-    Objects.requireNonNull(tool);
-    this.tool = tool;
-    Objects.requireNonNull(popupButton);
-    this.popupButton = popupButton;
-    Objects.requireNonNull(group);
-    this.group = group;
+    this.tool = Objects.requireNonNull(tool);
+    this.popupButton = Objects.requireNonNull(popupButton);
+    this.group = Objects.requireNonNull(group);
+
+    this.pathType = Objects.requireNonNull(pathType);
+    this.largeIcon = getLargeImageIconByType(pathType);
 
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
     putValue(AbstractAction.NAME, bundle.getString("path.type." + pathType.name() + ".text"));
     putValue(AbstractAction.SHORT_DESCRIPTION, bundle.getString("path.type." + pathType.name() + ".toolTipText"));
-    ImageIcon icon = new ImageIcon(getClass().getResource(bundle.getString("path.type." + pathType.name() + ".popupIcon")));
-    putValue(AbstractAction.SMALL_ICON, icon);
+    putValue(AbstractAction.SMALL_ICON, getImageIconByType(pathType));
   }
 
   @Override
@@ -104,6 +106,7 @@ public class DefaultPathSelectedAction
       pathConnection.getModel().getPropertyPathConnType().setValue(pathType);
 
       ResourceBundleUtil.getBundle().configureNamelessButton(popupButton, "path.type." + pathType.name());
+      popupButton.setIcon(largeIcon);
     }
 
     getEditor().setTool(tool);
@@ -117,6 +120,40 @@ public class DefaultPathSelectedAction
     }
     else {
       setEnabled(false);
+    }
+  }
+
+  private ImageIcon getImageIconByType(PathModel.LinerType pathType) {
+    switch (pathType) {
+      case DIRECT:
+        return ImageDirectory.getImageIcon("/toolbar/path-direct.22.png");
+      case ELBOW:
+        return ImageDirectory.getImageIcon("/toolbar/path-elbow.22.png");
+      case SLANTED:
+        return ImageDirectory.getImageIcon("/toolbar/path-slanted.22.png");
+      case BEZIER:
+        return ImageDirectory.getImageIcon("/toolbar/path-bezier.22.png");
+      case BEZIER_3:
+        return ImageDirectory.getImageIcon("/toolbar/path-bezier.22.png");
+      default:
+        return null;
+    }
+  }
+
+  private ImageIcon getLargeImageIconByType(PathModel.LinerType pathType) {
+    switch (pathType) {
+      case DIRECT:
+        return ImageDirectory.getImageIcon("/toolbar/path-direct-arrow.22.png");
+      case ELBOW:
+        return ImageDirectory.getImageIcon("/toolbar/path-elbow-arrow.22.png");
+      case SLANTED:
+        return ImageDirectory.getImageIcon("/toolbar/path-slanted-arrow.22.png");
+      case BEZIER:
+        return ImageDirectory.getImageIcon("/toolbar/path-bezier-arrow.22.png");
+      case BEZIER_3:
+        return ImageDirectory.getImageIcon("/toolbar/path-bezier-arrow.22.png");
+      default:
+        return null;
     }
   }
 }

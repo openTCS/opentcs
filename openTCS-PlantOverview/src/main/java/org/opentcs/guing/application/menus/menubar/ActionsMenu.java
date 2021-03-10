@@ -83,20 +83,23 @@ public class ActionsMenu
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
 
+    this.setText(labels.getString("actions.text"));
+    this.setToolTipText(labels.getString("actions.toolTipText"));
+    this.setMnemonic('A');
+
     // Menu item Actions -> Create Transport Order
     menuItemCreateTransportOrder = new JMenuItem(actionMap.get(CreateTransportOrderAction.ID));
-    labels.configureMenu(menuItemCreateTransportOrder, CreateTransportOrderAction.ID);
     add(menuItemCreateTransportOrder);
     addSeparator();
 
     // Menu item Actions -> Find Vehicle
     menuItemFindVehicle = new JMenuItem(actionMap.get(FindVehicleAction.ID));
-    labels.configureMenu(menuItemFindVehicle, FindVehicleAction.ID);
     add(menuItemFindVehicle);
 
     // Menu item Actions -> Ignore precise position
     cbiIgnorePrecisePosition = new JCheckBoxMenuItem("actions.ignorePrecisePosition");
     labels.configureMenu(cbiIgnorePrecisePosition, "actions.ignorePrecisePosition");
+
     add(cbiIgnorePrecisePosition);
     cbiIgnorePrecisePosition.setSelected(appConfig.ignoreVehiclePrecisePosition());
     cbiIgnorePrecisePosition.addActionListener((ActionEvent e) -> {
@@ -110,6 +113,7 @@ public class ActionsMenu
     // Menu item Actions -> Ignore orientation angle
     cbiIgnoreOrientationAngle = new JCheckBoxMenuItem(actionMap.get("actions.ignoreOrientationAngle"));
     labels.configureMenu(cbiIgnoreOrientationAngle, "actions.ignoreOrientationAngle");
+
     add(cbiIgnoreOrientationAngle);
     cbiIgnoreOrientationAngle.setSelected(appConfig.ignoreVehicleOrientationAngle());
     cbiIgnoreOrientationAngle.addActionListener((ActionEvent e) -> {
@@ -131,7 +135,6 @@ public class ActionsMenu
     addSeparator();
 
     menuItemDispatch = new JMenuItem(actionMap.get(DispatchVehicleAction.ID));
-    labels.configureMenu(menuItemDispatch, DispatchVehicleAction.ID);
     add(menuItemDispatch);
   }
 

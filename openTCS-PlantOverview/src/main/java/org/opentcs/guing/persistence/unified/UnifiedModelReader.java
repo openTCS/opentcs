@@ -8,13 +8,8 @@
  */
 package org.opentcs.guing.persistence.unified;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -24,6 +19,14 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.filechooser.FileFilter;
+import org.opentcs.access.to.model.BlockCreationTO;
+import org.opentcs.access.to.model.GroupCreationTO;
+import org.opentcs.access.to.model.LocationCreationTO;
+import org.opentcs.access.to.model.LocationTypeCreationTO;
+import org.opentcs.access.to.model.PathCreationTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.Property;
@@ -42,14 +45,7 @@ import org.opentcs.guing.persistence.ModelFileReader;
 import org.opentcs.guing.persistence.ModelValidator;
 import org.opentcs.guing.util.JOptionPaneUtil;
 import org.opentcs.guing.util.ResourceBundleUtil;
-import org.opentcs.util.persistence.binding.BlockTO;
-import org.opentcs.util.persistence.binding.GroupTO;
-import org.opentcs.util.persistence.binding.LocationTO;
-import org.opentcs.util.persistence.binding.LocationTypeTO;
-import org.opentcs.util.persistence.binding.PathTO;
-import org.opentcs.util.persistence.binding.PlantModelTO;
-import org.opentcs.util.persistence.binding.PointTO;
-import org.opentcs.util.persistence.binding.VehicleTO;
+import org.opentcs.util.persistence.ModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +71,10 @@ public class UnifiedModelReader
    */
   private final ModelValidator validator;
   /**
+   * The model parser.
+   */
+  private final ModelParser modelParser;
+  /**
    * The status panel of the plant overview.
    */
   private final StatusPanel statusPanel;
@@ -84,10 +84,13 @@ public class UnifiedModelReader
   private final Set<String> deserializationErrors = new HashSet<>();
 
   @Inject
-  public UnifiedModelReader(Provider<SystemModel> systemModelProvider, ModelValidator validator,
+  public UnifiedModelReader(Provider<SystemModel> systemModelProvider,
+                            ModelValidator validator,
+                            ModelParser modelParser,
                             StatusPanel statusPanel) {
     this.systemModelProvider = requireNonNull(systemModelProvider, "systemModelProvider");
     this.validator = requireNonNull(validator, "validator");
+    this.modelParser = requireNonNull(modelParser, "modelParser");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
   }
 
@@ -104,61 +107,56 @@ public class UnifiedModelReader
       systemModel.setName(modelName);
     }
 
-    PlantModelTO plantModel;
-    try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                                                                  Charset.forName("UTF-8")))) {
-      plantModel = PlantModelTO.fromXml(reader);
-    }
+    PlantModelCreationTO plantModel = modelParser.readModel(file);
 
-    plantModel.getProperties().stream()
-        .forEach(
-            propertyTo -> systemModel.getPropertyMiscellaneous().addItem(
-                new KeyValueProperty(systemModel, propertyTo.getName(), propertyTo.getValue())
-            )
-        );
+    plantModel.getProperties().forEach(
+        (key, value) -> systemModel.getPropertyMiscellaneous().addItem(
+            new KeyValueProperty(systemModel, key, value)
+        )
+    );
 
     if (plantModel.getVisualLayouts().size() > 1) {
       LOG.warn("There is more than one visual layout. Using only the first one.");
     }
 
     UnifiedModelComponentConverter modelConverter = new UnifiedModelComponentConverter();
-    for (PointTO point : plantModel.getPoints()) {
+    for (PointCreationTO point : plantModel.getPoints()) {
       validateAndAddModelComponent(
           modelConverter.convertPointTO(point, plantModel.getVisualLayouts().get(0)),
           systemModel);
     }
-    for (PathTO path : plantModel.getPaths()) {
+    for (PathCreationTO path : plantModel.getPaths()) {
       validateAndAddModelComponent(
           modelConverter.convertPathTO(path, plantModel.getVisualLayouts().get(0)),
           systemModel);
     }
-    for (VehicleTO vehicle : plantModel.getVehicles()) {
+    for (VehicleCreationTO vehicle : plantModel.getVehicles()) {
       validateAndAddModelComponent(
           modelConverter.convertVehicleTO(vehicle, plantModel.getVisualLayouts().get(0)),
           systemModel);
     }
-    for (LocationTypeTO locationType : plantModel.getLocationTypes()) {
+    for (LocationTypeCreationTO locationType : plantModel.getLocationTypes()) {
       validateAndAddModelComponent(modelConverter.convertLocationTypeTO(locationType),
                                    systemModel);
     }
-    for (LocationTO location : plantModel.getLocations()) {
+    for (LocationCreationTO location : plantModel.getLocations()) {
       validateAndAddModelComponent(
           modelConverter.convertLocationTO(location,
                                            plantModel.getLocations(),
                                            plantModel.getVisualLayouts().get(0)),
           systemModel);
 
-      for (LocationTO.Link link : location.getLinks()) {
+      for (Map.Entry<String, Set<String>> link : location.getLinks().entrySet()) {
         validateAndAddModelComponent(modelConverter.convertLinkTO(link, location),
                                      systemModel);
       }
     }
-    for (BlockTO block : plantModel.getBlocks()) {
+    for (BlockCreationTO block : plantModel.getBlocks()) {
       validateAndAddModelComponent(
           modelConverter.convertBlockTO(block, plantModel.getVisualLayouts().get(0)),
           systemModel);
     }
-    for (GroupTO group : plantModel.getGroups()) {
+    for (GroupCreationTO group : plantModel.getGroups()) {
       validateAndAddModelComponent(
           modelConverter.convertGroupTO(group),
           systemModel);

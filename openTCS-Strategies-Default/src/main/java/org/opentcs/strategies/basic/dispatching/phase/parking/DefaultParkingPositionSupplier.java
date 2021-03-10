@@ -10,7 +10,6 @@ package org.opentcs.strategies.basic.dispatching.phase.parking;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION;
@@ -96,47 +95,5 @@ public class DefaultParkingPositionSupplier
         .filter(point -> name.equals(point.getName()))
         .findAny()
         .orElse(null);
-  }
-
-  private Set<Point> findUsableParkingPositions(Vehicle vehicle) {
-    // Find out which points are destination points of the current routes of
-    // all vehicles, and keep them. (Multiple lookups ahead.)
-    Set<Point> targetedPoints = getRouter().getTargetedPoints();
-
-    return fetchAllParkingPositions().stream()
-        .filter(point -> isPointUnoccupiedFor(point, vehicle, targetedPoints))
-        .collect(Collectors.toSet());
-  }
-
-  /**
-   * Checks if ALL points within the same block as the given access point are NOT occupied or
-   * targeted by any other vehicle than the given one.
-   *
-   * @param accessPoint The point to be checked.
-   * @param vehicle The vehicle to be checked for.
-   * @param targetedPoints All currently known targeted points.
-   * @return <code>true</code> if, and only if, ALL points within the same block as the given access
-   * point are NOT occupied or targeted by any other vehicle than the given one.
-   */
-  private boolean isPointUnoccupiedFor(Point accessPoint,
-                                       Vehicle vehicle,
-                                       Set<Point> targetedPoints) {
-    return expandPoints(accessPoint).stream()
-        .allMatch(point -> !pointOccupiedOrTargetedByOtherVehicle(point,
-                                                                  vehicle,
-                                                                  targetedPoints));
-  }
-
-  private boolean pointOccupiedOrTargetedByOtherVehicle(Point pointToCheck,
-                                                        Vehicle vehicle,
-                                                        Set<Point> targetedPoints) {
-    if (pointToCheck.getOccupyingVehicle() != null
-        && !pointToCheck.getOccupyingVehicle().equals(vehicle.getReference())) {
-      return true;
-    }
-    else if (targetedPoints.contains(pointToCheck)) {
-      return true;
-    }
-    return false;
   }
 }

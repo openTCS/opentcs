@@ -9,8 +9,12 @@
 package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
 import org.opentcs.guing.application.GuiManager;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -34,6 +38,13 @@ public class SaveModelAsAction
   public SaveModelAsAction(final GuiManager manager) {
     this.guiManager = manager;
     ResourceBundleUtil.getBundle().configureAction(this, ID);
+    
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift ctrl S"));
+    putValue(MNEMONIC_KEY, Integer.valueOf('A'));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/document-save-as.png");
+    putValue(SMALL_ICON, new ImageIcon(url));
+    putValue(LARGE_ICON_KEY, new ImageIcon(url));
   }
 
   @Override

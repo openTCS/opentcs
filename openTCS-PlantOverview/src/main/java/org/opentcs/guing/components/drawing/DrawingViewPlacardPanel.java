@@ -15,12 +15,15 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import static java.util.Objects.requireNonNull;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -192,7 +195,12 @@ public class DrawingViewPlacardPanel
   private JButton zoomViewToWindowButton(final OpenTCSDrawingView drawingView) {
     final JButton button = new JButton();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(button, "view.zoomViewToWindow");
+
+    button.setToolTipText(labels.getString("view.zoomViewToWindow.toolTipText"));
+
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/zoom-fit-best-4.png");
+    button.setIcon(new ImageIcon(url));
+
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setFocusable(false);
 
@@ -215,7 +223,11 @@ public class DrawingViewPlacardPanel
   private JToggleButton toggleConstrainerButton(final OpenTCSDrawingView drawingView) {
     final JToggleButton toggleButton = new JToggleButton();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(toggleButton, toggleGridActionID);
+    
+    toggleButton.setToolTipText(labels.getString("view.toggleGrid.toolTipText"));
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/view-split.png");
+    toggleButton.setIcon(new ImageIcon(url));
+    
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
@@ -237,7 +249,11 @@ public class DrawingViewPlacardPanel
   private JToggleButton toggleRulersButton() {
     final JToggleButton toggleButton = new JToggleButton();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(toggleButton, toggleRulersActionID);
+    
+    toggleButton.setToolTipText(labels.getString("view.toggleRulers.toolTipText"));
+    URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/document-page-setup.16x16.png");
+    toggleButton.setIcon(new ImageIcon(url));
+    
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
@@ -253,7 +269,11 @@ public class DrawingViewPlacardPanel
   private JToggleButton toggleLabelsButton(final OpenTCSDrawingView drawingView) {
     final JToggleButton toggleButton = new JToggleButton();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(toggleButton, toggleLabelsActionID);
+
+    toggleButton.setToolTipText(labels.getString("view.toggleLabels.toolTipText"));
+    URL url = getClass().getResource(ImageDirectory.DIR + "/menu/comment-add.16.png");
+    toggleButton.setIcon(new ImageIcon(url));
+
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 
@@ -276,7 +296,11 @@ public class DrawingViewPlacardPanel
   private JToggleButton toggleBlocksButton(final OpenTCSDrawingView drawingView) {
     final JToggleButton toggleButton = new JToggleButton();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(toggleButton, toggleBlocksActionID);
+    
+    toggleButton.setToolTipText(labels.getString("view.toggleBlocks.toolTipText"));
+    URL url = getClass().getResource(ImageDirectory.DIR + "/tree/block.18x18.png");
+    toggleButton.setIcon(new ImageIcon(url));
+    
     toggleButton.setMargin(new Insets(0, 0, 0, 0));
     toggleButton.setFocusable(false);
 

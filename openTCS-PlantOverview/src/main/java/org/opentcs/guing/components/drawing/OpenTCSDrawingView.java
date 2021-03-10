@@ -127,7 +127,6 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ModelComponentUtil;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -646,47 +645,6 @@ public abstract class OpenTCSDrawingView
       }
     };
 
-    SwingUtilities.invokeLater(doScroll);
-  }
-
-  /**
-   * Scales and positions the drawing according to the given bookmark.
-   *
-   * @param bookmark The bookmark.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void scaleAndScrollTo(org.opentcs.data.model.visualization.ViewBookmark bookmark) {
-    scaleAndScrollTo(bookmark.getViewScaleX(),
-                     bookmark.getCenterX(),
-                     bookmark.getCenterY());
-  }
-
-  /**
-   * Scales the drawing and moves to the given point afterwards.
-   *
-   * @param newScale The new scale factor.
-   * @param xCenter The x coord that shall be in the middle.
-   * @param yCenter The y coord that shall be in the middle.
-   */
-  private void scaleAndScrollTo(final double newScale,
-                                final int xCenter,
-                                final int yCenter) {
-    final Runnable doScroll = new Runnable() {
-      @Override
-      public void run() {
-        scrollTo(xCenter, yCenter);
-      }
-    };
-
-    double oldScale = zoomX;
-    zoomX = newScale;
-    zoomY = newScale;
-    validateViewTranslation();
-    dirtyArea.setBounds(bufferedArea);
-    revalidate();
-    repaint();
-    firePropertyChange("scaleFactor", oldScale, newScale);
     SwingUtilities.invokeLater(doScroll);
   }
 
@@ -2068,35 +2026,6 @@ public abstract class OpenTCSDrawingView
   public double getScaleFactor() {
     // TODO: Was ist, wenn zoomX != zoomY ?
     return zoomX;
-  }
-
-  /**
-   * Returns a newly created bookmark for this view's current position and zoom
-   * factor.
-   *
-   * @return A newly created bookmark for this view's current position and zoom
-   * factor.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public org.opentcs.data.model.visualization.ViewBookmark bookmark() {
-    org.opentcs.data.model.visualization.ViewBookmark bookmark
-        = new org.opentcs.data.model.visualization.ViewBookmark();
-
-    // Currently visible part of the drawing in drawing coordinates.
-    Rectangle2D.Double visibleViewRect = viewToDrawing(getVisibleRect());
-
-    int centerX = (int) visibleViewRect.getCenterX();
-    int centerY = (int) -visibleViewRect.getCenterY();  // signum!
-    bookmark.setCenterX(centerX);
-    bookmark.setCenterY(centerY);
-    double zoomFactor = getScaleFactor();
-    bookmark.setViewScaleX(zoomFactor);
-    bookmark.setViewScaleY(zoomFactor);  // TODO: discriminate x/y
-    bookmark.setViewRotation(0);  // TODO    
-    bookmark.setLabel("");
-
-    return bookmark;
   }
 
   /**

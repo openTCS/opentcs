@@ -11,6 +11,9 @@ import com.google.inject.Inject;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import javax.swing.KeyStroke;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -37,6 +40,9 @@ public class SwitchToModellingAction
   public SwitchToModellingAction(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
     ResourceBundleUtil.getBundle().configureAction(this, ID, false);
+    
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt M"));
+    putValue(MNEMONIC_KEY, Integer.valueOf('M'));
   }
 
   @Override

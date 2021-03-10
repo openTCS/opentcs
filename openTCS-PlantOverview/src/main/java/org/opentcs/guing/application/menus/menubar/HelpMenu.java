@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.app.AboutAction;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * The application's "Help" menu.
@@ -37,6 +38,12 @@ public class HelpMenu
   @Inject
   public HelpMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
+    
+    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
+    
+    this.setText( labels.getString("help.text"));
+    this.setToolTipText(labels.getString("help.toolTipText"));
+    this.setMnemonic('?');
 
     menuItemAbout = add(actionMap.get(AboutAction.ID));
   }

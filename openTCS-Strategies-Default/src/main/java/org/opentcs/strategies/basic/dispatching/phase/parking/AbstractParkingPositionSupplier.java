@@ -94,6 +94,23 @@ public abstract class AbstractParkingPositionSupplier
   }
 
   /**
+   * Returns a set of parking positions usable for the given vehicle (usable in the sense that these
+   * positions are not occupied by other vehicles).
+   *
+   * @param vehicle The vehicles to find parking positions for.
+   * @return The set of usable parking positions.
+   */
+  protected Set<Point> findUsableParkingPositions(Vehicle vehicle) {
+    // Find out which points are destination points of the current routes of
+    // all vehicles, and keep them. (Multiple lookups ahead.)
+    Set<Point> targetedPoints = getRouter().getTargetedPoints();
+
+    return fetchAllParkingPositions().stream()
+        .filter(point -> isPointUnoccupiedFor(point, vehicle, targetedPoints))
+        .collect(Collectors.toSet());
+  }
+
+  /**
    * Returns from the given set of points the one that is nearest to the given
    * vehicle.
    *
@@ -135,6 +152,38 @@ public abstract class AbstractParkingPositionSupplier
 
   protected Set<Point> fetchAllParkingPositions() {
     return plantModelService.fetchObjects(Point.class, point -> point.isParkingPosition());
+  }
+
+  /**
+   * Checks if ALL points within the same block as the given access point are NOT occupied or
+   * targeted by any other vehicle than the given one.
+   *
+   * @param accessPoint The point to be checked.
+   * @param vehicle The vehicle to be checked for.
+   * @param targetedPoints All currently known targeted points.
+   * @return <code>true</code> if, and only if, ALL points within the same block as the given access
+   * point are NOT occupied or targeted by any other vehicle than the given one.
+   */
+  private boolean isPointUnoccupiedFor(Point accessPoint,
+                                       Vehicle vehicle,
+                                       Set<Point> targetedPoints) {
+    return expandPoints(accessPoint).stream()
+        .allMatch(point -> !pointOccupiedOrTargetedByOtherVehicle(point,
+                                                                  vehicle,
+                                                                  targetedPoints));
+  }
+
+  private boolean pointOccupiedOrTargetedByOtherVehicle(Point pointToCheck,
+                                                        Vehicle vehicle,
+                                                        Set<Point> targetedPoints) {
+    if (pointToCheck.getOccupyingVehicle() != null
+        && !pointToCheck.getOccupyingVehicle().equals(vehicle.getReference())) {
+      return true;
+    }
+    else if (targetedPoints.contains(pointToCheck)) {
+      return true;
+    }
+    return false;
   }
 
   private PointCandidate parkingPositionCandidate(Vehicle vehicle,

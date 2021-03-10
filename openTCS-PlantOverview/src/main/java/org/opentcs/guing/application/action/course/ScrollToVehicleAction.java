@@ -17,6 +17,7 @@ import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  *
@@ -56,6 +57,8 @@ public class ScrollToVehicleAction
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.modelManager = requireNonNull(modelManager, "modelManager");
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

@@ -9,6 +9,7 @@ package org.opentcs.util;
 
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A boolean with an explanation/reason for its value.
@@ -20,7 +21,7 @@ public class ExplainedBoolean {
   /**
    * The actual value.
    */
-  private final boolean isTrue;
+  private final boolean value;
   /**
    * A reason/explanation for the value.
    */
@@ -29,11 +30,11 @@ public class ExplainedBoolean {
   /**
    * Creates a new instance.
    *
-   * @param isTrue The actual value.
+   * @param value The actual value.
    * @param reason A reason/explanation for the value.
    */
-  public ExplainedBoolean(boolean isTrue, @Nonnull String reason) {
-    this.isTrue = isTrue;
+  public ExplainedBoolean(boolean value, @Nonnull String reason) {
+    this.value = value;
     this.reason = requireNonNull(reason, "reason");
   }
 
@@ -42,8 +43,20 @@ public class ExplainedBoolean {
    *
    * @return The actual value.
    */
+  public boolean getValue() {
+    return value;
+  }
+
+  /**
+   * Returns the actual value.
+   *
+   * @return The actual value.
+   * @deprecated Use {@link #getValue()} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   public boolean isTrue() {
-    return isTrue;
+    return value;
   }
 
   /**

@@ -11,6 +11,7 @@ package org.opentcs.guing.application.action.view;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * An action for adding new drawing views.
@@ -30,6 +31,8 @@ public class AddDrawingViewAction
    */
   public AddDrawingViewAction(OpenTCSView view) {
     this.view = view;
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

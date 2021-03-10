@@ -18,6 +18,7 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,21 @@ public class IntegrationLevelChangeAction
     this.vehicles = requireNonNull(vehicles, "vehicles");
     this.level = requireNonNull(level, "level");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+
+    switch (level) {
+      case TO_BE_NOTICED:
+        ResourceBundleUtil.getBundle().configureAction(this, NOTICE_ID);
+        break;
+      case TO_BE_RESPECTED:
+        ResourceBundleUtil.getBundle().configureAction(this, RESPECT_ID);
+        break;
+      case TO_BE_UTILIZED:
+        ResourceBundleUtil.getBundle().configureAction(this, UTILIZE_ID);
+        break;
+      default:
+        ResourceBundleUtil.getBundle().configureAction(this, IGNORE_ID);
+        break;
+    }
   }
 
   @Override

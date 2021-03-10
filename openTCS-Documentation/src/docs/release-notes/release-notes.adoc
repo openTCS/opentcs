@@ -49,6 +49,16 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.14 (2019-03-22)
+
+* Bugs fixed:
+** With the `defaultdispatcher.reparkVehiclesToHigherPriorityPositions` configuration enabled:
+   Prevent a vehicle from being re-parked to positions that have the same priority as the vehicle's current parking position.
+** Fix a bug where charging vehicles don't execute transport orders after they have reached the "sufficiently recharged" state.
+* Other changes:
+** The Kernel application does no longer persist `Color`s and `ViewBookmark`s of the visual layout. 
+   (For some time now, these elements could no longer be created with the PlantOverview application and were ignored when a model was loaded, anyway.)
+
 === Version 4.13.1 (2019-02-25)
 
 * Bugs fixed:
@@ -485,6 +495,7 @@ So far, the developers involved were/are (in alphabetical order by last name):
 * Tobias Marquardt
 * Sebastian Naumann
 * Volkmar Pontow
+* Leonard Schüngel
 * Philipp Seifert
 * Andreas Trautmann
 * Stefan Walter

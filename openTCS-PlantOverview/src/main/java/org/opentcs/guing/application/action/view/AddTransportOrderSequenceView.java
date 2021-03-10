@@ -11,6 +11,7 @@ package org.opentcs.guing.application.action.view;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.opentcs.guing.application.OpenTCSView;
+import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
  * An action for adding new transport order sequence views.
@@ -20,7 +21,7 @@ import org.opentcs.guing.application.OpenTCSView;
 public class AddTransportOrderSequenceView
     extends AbstractAction {
 
-  public final static String ID = "view.addOSView";
+  public final static String ID = "view.addOrderSequenceView";
   private final OpenTCSView view;
 
   /**
@@ -30,6 +31,8 @@ public class AddTransportOrderSequenceView
    */
   public AddTransportOrderSequenceView(OpenTCSView view) {
     this.view = view;
+    
+    ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
 
   @Override

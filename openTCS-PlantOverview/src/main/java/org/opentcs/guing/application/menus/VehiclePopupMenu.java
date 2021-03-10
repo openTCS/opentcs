@@ -19,12 +19,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.action.ActionFactory;
-import org.opentcs.guing.application.action.course.FollowVehicleAction;
-import org.opentcs.guing.application.action.course.IntegrationLevelChangeAction;
-import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
-import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
-import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
-import org.opentcs.guing.application.action.course.WithdrawAction;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -71,11 +65,9 @@ public class VehiclePopupMenu
 
     if (vehicles.size() == 1) {
       action = actionFactory.createScrollToVehicleAction(singleVehicle);
-      bundle.configureAction(action, ScrollToVehicleAction.ID);
       add(action);
 
       action = actionFactory.createFollowVehicleAction(singleVehicle);
-      bundle.configureAction(action, FollowVehicleAction.ID);
       JCheckBoxMenuItem followCheckBox = new JCheckBoxMenuItem();
       followCheckBox.setAction(action);
       followCheckBox.setSelected(singleVehicle.isViewFollows());
@@ -86,13 +78,11 @@ public class VehiclePopupMenu
 
     if (vehicles.size() == 1) {
       action = actionFactory.createSendVehicleToPointAction(singleVehicle);
-      bundle.configureAction(action, SendVehicleToPointAction.ID);
       action.setEnabled(singleVehicle.isAvailableForOrder()
           && !modelManager.getModel().getPointModels().isEmpty());
       add(action);
 
       action = actionFactory.createSendVehicleToLocationAction(singleVehicle);
-      bundle.configureAction(action, SendVehicleToLocationAction.ID);
       action.setEnabled(singleVehicle.isAvailableForOrder()
           && !modelManager.getModel().getLocationModels().isEmpty());
       add(action);
@@ -105,7 +95,6 @@ public class VehiclePopupMenu
 
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_IGNORED);
-    bundle.configureAction(action, IntegrationLevelChangeAction.IGNORE_ID);
     action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
@@ -114,7 +103,6 @@ public class VehiclePopupMenu
 
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_NOTICED);
-    bundle.configureAction(action, IntegrationLevelChangeAction.NOTICE_ID);
     action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
@@ -123,7 +111,6 @@ public class VehiclePopupMenu
 
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_RESPECTED);
-    bundle.configureAction(action, IntegrationLevelChangeAction.RESPECT_ID);
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
                                                          Vehicle.IntegrationLevel.TO_BE_RESPECTED));
@@ -131,7 +118,6 @@ public class VehiclePopupMenu
 
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_UTILIZED);
-    bundle.configureAction(action, IntegrationLevelChangeAction.UTILIZE_ID);
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
                                                          Vehicle.IntegrationLevel.TO_BE_UTILIZED));
@@ -145,12 +131,10 @@ public class VehiclePopupMenu
         = new JMenu(bundle.getString("course.vehicle.withdrawTransportOrderSubMenu.text"));
 
     action = actionFactory.createWithdrawAction(vehicles, false);
-    bundle.configureAction(action, WithdrawAction.ID);
     action.setEnabled(isAnyProcessingOrder(vehicles));
     withdrawSubMenu.add(action);
 
     action = actionFactory.createWithdrawAction(vehicles, true);
-    bundle.configureAction(action, WithdrawAction.IMMEDIATELY_ID);
     action.setEnabled(isAnyProcessingOrder(vehicles));
     withdrawSubMenu.add(action);
 

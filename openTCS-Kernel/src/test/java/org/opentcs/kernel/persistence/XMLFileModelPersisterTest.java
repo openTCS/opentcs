@@ -9,8 +9,6 @@ package org.opentcs.kernel.persistence;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Objects;
 import javax.inject.Provider;
 import org.junit.*;
@@ -78,7 +76,7 @@ public class XMLFileModelPersisterTest {
       }
     }).when(writer).writeXMLModel(any(Model.class),
                                   any(),
-                                  any(OutputStream.class));
+                                  any(File.class));
     // We don't really load the model on readXMLModel file, but make sure
     // it has at least the same name as the persisted model.
     doAnswer(new Answer<Object>() {
@@ -89,7 +87,7 @@ public class XMLFileModelPersisterTest {
         model.setName(persistedModel.getName());
         return null;
       }
-    }).when(reader).readXMLModel(any(InputStream.class), any(Model.class));
+    }).when(reader).readXMLModel(any(File.class), any(Model.class));
     // Create persister with providers that return the mocked objects
     persister = new XMLFileModelPersister(
         TestEnvironment.getKernelHomeDirectory(),
@@ -108,7 +106,7 @@ public class XMLFileModelPersisterTest {
     Model model = createTestModel(MODEL_NAME);
     persister.saveModel(model, null);
     verify(writer, times(1))
-        .writeXMLModel(any(Model.class), any(), any(OutputStream.class));
+        .writeXMLModel(any(Model.class), any(), any(File.class));
     assertEquals(persistedModel, model);
   }
 
@@ -120,7 +118,7 @@ public class XMLFileModelPersisterTest {
     Model model = new Model(new TCSObjectPool(new SimpleEventBus()));
     persister.loadModel(model);
     verify(reader, atLeastOnce())
-        .readXMLModel(any(InputStream.class), any(Model.class));
+        .readXMLModel(any(File.class), any(Model.class));
   }
 
   @Test
@@ -159,13 +157,6 @@ public class XMLFileModelPersisterTest {
     assertTrue(model.getStaticRoutes(null).isEmpty());
     assertTrue(model.getVehicles(null).isEmpty());
     assertTrue(model.getName().isEmpty());
-  }
-
-  @Test
-  public void shouldHaveModelAfterSavingModel()
-      throws IOException {
-    persister.saveModel(createTestModel(MODEL_NAME), MODEL_NAME);
-    assertTrue(persister.hasSavedModel());
   }
 
   @Test

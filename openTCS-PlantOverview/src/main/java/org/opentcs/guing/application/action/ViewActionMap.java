@@ -10,7 +10,6 @@ package org.opentcs.guing.application.action;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import javax.swing.Action;
 import javax.swing.ActionMap;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.action.actions.CreateBlockAction;
@@ -133,22 +132,15 @@ public class ViewActionMap
     put(CreateTransportOrderAction.ID, createTransportOrderAction);
     put(DispatchVehicleAction.ID, dispatchAction);
 
-    Action action;
     // --- Menu View ---
     // Menu View -> Add drawing view
-    action = new AddDrawingViewAction(view);
-    put(AddDrawingViewAction.ID, action);
-    action.putValue(Action.NAME, AddDrawingViewAction.ID);
+    put(AddDrawingViewAction.ID, new AddDrawingViewAction(view));
 
     // Menu View -> Add transport order view
-    action = new AddTransportOrderView(view);
-    put(AddTransportOrderView.ID, action);
-    action.putValue(Action.NAME, AddTransportOrderView.ID);
+    put(AddTransportOrderView.ID, new AddTransportOrderView(view));
 
     // Menu View -> Add transport order sequence view
-    action = new AddTransportOrderSequenceView(view);
-    put(AddTransportOrderSequenceView.ID, action);
-    action.putValue(Action.NAME, AddTransportOrderSequenceView.ID);
+    put(AddTransportOrderSequenceView.ID, new AddTransportOrderSequenceView(view));
 
     put(AddBitmapAction.ID, new AddBitmapAction(view));
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));
