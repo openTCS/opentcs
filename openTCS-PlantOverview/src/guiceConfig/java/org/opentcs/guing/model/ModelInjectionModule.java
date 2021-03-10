@@ -9,8 +9,6 @@
 package org.opentcs.guing.model;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
-import org.opentcs.guing.storage.OpenTCSModelManager;
 
 /**
  * A Guice module for the model package.
@@ -24,8 +22,6 @@ public class ModelInjectionModule
   @Override
   protected void configure() {
     bind(SystemModel.class).to(StandardSystemModel.class);
-
-    bind(ModelManager.class).to(OpenTCSModelManager.class).in(Singleton.class);
   }
 
 }

@@ -9,6 +9,7 @@
 package org.opentcs.guing.transport;
 
 import org.opentcs.data.order.OrderSequence;
+import org.opentcs.data.order.TransportOrder;
 
 /**
  * Creates transport order-related GUI components.
@@ -16,6 +17,14 @@ import org.opentcs.data.order.OrderSequence;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface TransportViewFactory {
+
+  /**
+   * Creates a new view for a transport order.
+   *
+   * @param order The transport order to be shown.
+   * @return A new view for a transport order.
+   */
+  TransportOrderView createTransportOrderView(TransportOrder order);
 
   /**
    * Creates a new view for an order sequence.

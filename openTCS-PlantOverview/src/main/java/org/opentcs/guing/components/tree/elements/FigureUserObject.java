@@ -18,9 +18,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
@@ -32,7 +31,6 @@ import org.opentcs.guing.util.IconToolkit;
  * <b>Entwurfsmuster:</b> Befehl. FigureUserObject ist ein konkreter Befehl.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @see FigureComponent
  */
 public class FigureUserObject
     extends AbstractUserObject {

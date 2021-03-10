@@ -10,6 +10,7 @@ package org.opentcs.data.model;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -56,6 +57,25 @@ public abstract class TCSResource<E extends TCSResource<E>>
    * @param objectID The new object's ID.
    * @param name The new resource's name.
    * @param properties A set of properties (key-value pairs) associated with this object.
+   * @param history A history of events related to this object.
+   * @deprecated Will be removed.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  protected TCSResource(int objectID,
+                        String name,
+                        Map<String, String> properties,
+                        ObjectHistory history) {
+    super(objectID, name, properties, history);
+    reference = new TCSResourceReference<>(this);
+  }
+
+  /**
+   * Creates a new TCSResource.
+   *
+   * @param objectID The new object's ID.
+   * @param name The new resource's name.
+   * @param properties A set of properties (key-value pairs) associated with this object.
    * @deprecated Will be removed.
    */
   @Deprecated
@@ -70,7 +90,22 @@ public abstract class TCSResource<E extends TCSResource<E>>
    *
    * @param name The new resource's name.
    * @param properties A set of properties (key-value pairs) associated with this object.
+   * @param history A history of events related to this object.
    */
+  protected TCSResource(String name, Map<String, String> properties, ObjectHistory history) {
+    super(name, properties, history);
+    reference = new TCSResourceReference<>(this);
+  }
+
+  /**
+   * Creates a new TCSResource.
+   *
+   * @param name The new resource's name.
+   * @param properties A set of properties (key-value pairs) associated with this object.
+   * @deprecated Will be removed.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
   protected TCSResource(String name, Map<String, String> properties) {
     super(name, properties);
     reference = new TCSResourceReference<>(this);

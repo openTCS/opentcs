@@ -30,6 +30,7 @@ import org.opentcs.guing.components.dialogs.DetailsDialog;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.AbstractTableContent;
+import org.opentcs.guing.components.properties.PropertiesComponentsFactory;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.table.AttributesTable;
@@ -103,6 +104,10 @@ public class PropertiesTableContent
    * A parent for dialogs created by this instance.
    */
   private final JPanel dialogParent;
+  /**
+   * The components factory.
+   */
+  private final PropertiesComponentsFactory componentsFactory;
 
   /**
    * Creates a new instance.
@@ -112,13 +117,15 @@ public class PropertiesTableContent
    * @param tableModelProvider Provides attribute table models.
    * @param eventBus The application's event bus.
    * @param dialogParent A parent for dialogs created by this instance.
+   * @param componentsFactory The components factory.
    */
   @Inject
   public PropertiesTableContent(CellEditorFactory cellEditorFactory,
                                 Provider<AttributesTable> tableProvider,
                                 Provider<AttributesTableModel> tableModelProvider,
                                 @ApplicationEventBus EventBus eventBus,
-                                @Assisted JPanel dialogParent) {
+                                @Assisted JPanel dialogParent,
+                                PropertiesComponentsFactory componentsFactory) {
     super(tableProvider);
     this.cellEditorFactory = requireNonNull(cellEditorFactory,
                                             "cellEditorFactory");
@@ -126,6 +133,7 @@ public class PropertiesTableContent
                                              "tableModelProvider");
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+    this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
   }
 
   @Override  // AbstractTableContent
@@ -288,7 +296,7 @@ public class PropertiesTableContent
     dialog = new StandardDetailsDialog(dialogParent, true, content);
     // CoordinateCellEditor with buttons "copy model <-> layout"
     CoordinateCellEditor wrappedCoordinateCellEditor
-        = new CoordinateCellEditor(new JTextField(), umh);
+        = componentsFactory.createCoordinateCellEditor(new JTextField(), umh);
     wrappedCoordinateCellEditor.addCellEditorListener(this);
     undoableEditor = new UndoableCellEditor(wrappedCoordinateCellEditor);
     undoableEditor.setDetailsDialog(dialog);

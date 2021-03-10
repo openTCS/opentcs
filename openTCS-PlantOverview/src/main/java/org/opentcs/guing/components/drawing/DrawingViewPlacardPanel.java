@@ -35,7 +35,6 @@ public class DrawingViewPlacardPanel
   private static final String toggleRulersActionID = "view.toggleRulers";
   private static final String toggleLabelsActionID = "view.toggleLabels";
   private static final String toggleBlocksActionID = "view.toggleBlocks";
-  private static final String toggleStaticRoutesActionID = "view.toggleStaticRoutes";
   /**
    * The drawing view.
    */
@@ -82,12 +81,6 @@ public class DrawingViewPlacardPanel
     JToggleButton toggleBlocksButton = toggleBlocksButton(drawingView);
     toggleBlocksButton.setSelected(drawingView.isBlocksVisible());
     this.add(toggleBlocksButton);
-
-    // Show/hide static routes
-    JToggleButton toggleStaticRoutesButton = toggleStaticRoutesButton(drawingView);
-    toggleStaticRoutesButton.setSelected(drawingView.isStaticRoutesVisible());
-    this.add(toggleStaticRoutesButton);
-
   }
 
   public JComboBox<ZoomItem> getZoomComboBox() {
@@ -296,28 +289,4 @@ public class DrawingViewPlacardPanel
 
     return toggleButton;
   }
-
-  /**
-   * Creates a button to toggle the static routes in the drawing.
-   *
-   * @param view The DrawingView the button will belong to.
-   * @return The created button.
-   */
-  private JToggleButton toggleStaticRoutesButton(final OpenTCSDrawingView drawingView) {
-    final JToggleButton toggleButton = new JToggleButton();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle();
-    labels.configureToolBarButton(toggleButton, toggleStaticRoutesActionID);
-    toggleButton.setMargin(new Insets(0, 0, 0, 0));
-    toggleButton.setFocusable(false);
-
-    toggleButton.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent event) {
-        drawingView.setStaticRoutesVisible(toggleButton.isSelected());
-      }
-    });
-
-    return toggleButton;
-  }
-
 }

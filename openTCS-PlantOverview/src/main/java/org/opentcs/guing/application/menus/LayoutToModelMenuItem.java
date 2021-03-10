@@ -25,6 +25,7 @@ import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.properties.CoordinateUndoActivity;
+import org.opentcs.guing.components.properties.PropertiesComponentsFactory;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
@@ -57,6 +58,10 @@ public class LayoutToModelMenuItem
    */
   private final EventHandler eventHandler;
   /**
+   * The components factory.
+   */
+  private final PropertiesComponentsFactory componentsFactory;
+  /**
    * A flag if the values of ALL points and location shall be copied when
    * the menu item is clicked. If false only the selected figures will be
    * considered.
@@ -69,6 +74,7 @@ public class LayoutToModelMenuItem
    * @param drawingEditor A <code>DrawingEditor</code> instance.
    * @param undoRedoManager The application's undo/redo manager.
    * @param eventHandler Where this instance sends events.
+   * @param componentsFactory The components factory.
    * @param copyAll Indicates whether the values of ALL points and locations
    * shall be copied when the menu item is clicked. If false only the selected
    * figures will be considered.
@@ -77,11 +83,13 @@ public class LayoutToModelMenuItem
   public LayoutToModelMenuItem(OpenTCSDrawingEditor drawingEditor,
                                UndoRedoManager undoRedoManager,
                                @ApplicationEventBus EventHandler eventHandler,
+                               PropertiesComponentsFactory componentsFactory,
                                @Assisted boolean copyAll) {
     super(ResourceBundleUtil.getBundle().getString("propertiesTable.fromLayout"));
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
+    this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.copyAll = copyAll;
 
     setIcon(new ImageIcon(
@@ -124,7 +132,7 @@ public class LayoutToModelMenuItem
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);
     }
-    cua = new CoordinateUndoActivity(modelProperty);
+    cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
     StringProperty spy;
     if (model instanceof PointModel) {
@@ -152,7 +160,7 @@ public class LayoutToModelMenuItem
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_X_POSITION);
     }
-    CoordinateUndoActivity cua = new CoordinateUndoActivity(modelProperty);
+    CoordinateUndoActivity cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
     StringProperty spx;
     if (model instanceof PointModel) {

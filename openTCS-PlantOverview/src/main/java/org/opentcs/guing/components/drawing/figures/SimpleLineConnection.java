@@ -14,7 +14,6 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.EventObject;
-import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.LineConnectionFigure;
@@ -22,11 +21,9 @@ import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.decoration.ArrowTip;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
-import org.opentcs.guing.components.tree.TreeViewManager;
-import org.opentcs.guing.model.FigureComponent;
+import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.slf4j.Logger;
@@ -56,30 +53,11 @@ public abstract class SimpleLineConnection
       = LoggerFactory.getLogger(SimpleLineConnection.class);
 
   /**
-   * The manager for the components tree view.
-   */
-  private final TreeViewManager componentsTreeManager;
-  /**
-   * Displays properties of the currently selected model component(s).
-   */
-  private final SelectionPropertiesComponent propertiesComponent;
-
-  /**
    * Creates a new instance.
    *
-   * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected
-   * model component(s).
    * @param model The model corresponding to this graphical object.
    */
-  public SimpleLineConnection(TreeViewManager componentsTreeManager,
-                              SelectionPropertiesComponent propertiesComponent,
-                              AbstractConnection model) {
-    this.componentsTreeManager = requireNonNull(componentsTreeManager,
-                                                "componentsTreeManager");
-    this.propertiesComponent = requireNonNull(propertiesComponent,
-                                              "propertiesComponent");
-
+  public SimpleLineConnection(AbstractConnection model) {
     set(FigureConstants.MODEL, model);
     initConnectionFigure();
   }
@@ -168,8 +146,8 @@ public abstract class SimpleLineConnection
    */
   @Override // LineConnectionFigure
   public boolean canConnect(Connector start, Connector end) {
-    FigureComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
-    FigureComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
+    ModelComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
+    ModelComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
 
     if (modelStart == null || modelEnd == null || modelEnd == modelStart) {
       return false;
@@ -188,8 +166,8 @@ public abstract class SimpleLineConnection
   @Override // LineConnectionFigure
   protected void handleConnect(Connector start, Connector end) {
     if (start != null && end != null) {
-      FigureComponent startModel = start.getOwner().get(FigureConstants.MODEL);
-      FigureComponent endModel = end.getOwner().get(FigureConstants.MODEL);
+      ModelComponent startModel = start.getOwner().get(FigureConstants.MODEL);
+      ModelComponent endModel = end.getOwner().get(FigureConstants.MODEL);
       getModel().setConnectedComponents(startModel, endModel);
       updateModel();
     }
@@ -204,13 +182,7 @@ public abstract class SimpleLineConnection
 
   @Override // LineConnectionFigure
   public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
-    // Bei Doppelclick auf eine Strecke:
-    // 1. Das zugehï¿½rige Objekt im Tree markieren
-    // 2. Die Eigenschaften dieses Objekts im Property Panel anzeigen
-    AbstractConnection model = getModel();
-    componentsTreeManager.selectItem(model);
-    propertiesComponent.setModel(model);
-
+    // TODO Do we need to override this method?
     return false;
   }
 

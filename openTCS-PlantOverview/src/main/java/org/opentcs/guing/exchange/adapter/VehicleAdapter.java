@@ -39,7 +39,6 @@ import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty.Unit;
-import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PathModel;
@@ -147,12 +146,15 @@ public class VehicleAdapter
                 .withMaxReverseVelocity(getMaximumReverseVelocity(vehicleModel))
                 .withProperties(getKernelProperties(vehicleModel))
         )
-        .withVisualLayouts(updatedLayouts(vehicleModel, plantModel.getVisualLayouts()));
+        .withVisualLayouts(updatedLayouts(vehicleModel,
+                                          plantModel.getVisualLayouts(),
+                                          systemModel));
   }
 
   @Override
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout) {
+                                                 VisualLayoutCreationTO layout,
+                                                 SystemModel systemModel) {
     VehicleModel vehicleModel = (VehicleModel) model;
     return layout.withModelElement(
         new ModelLayoutElementCreationTO(vehicleModel.getName())
@@ -169,9 +171,9 @@ public class VehicleAdapter
     TransportOrder transportOrder = getTransportOrder(objectService, vehicle.getTransportOrder());
 
     if (transportOrder != null) {
-      List<FigureComponent> c = composeDriveOrderComponents(transportOrder.getCurrentDriveOrder(),
-                                                            vehicle.getRouteProgressIndex(),
-                                                            systemModel);
+      List<ModelComponent> c = composeDriveOrderComponents(transportOrder.getCurrentDriveOrder(),
+                                                           vehicle.getRouteProgressIndex(),
+                                                           systemModel);
       vehicleModel.setDriveOrderComponents(c);
       vehicleModel.setDriveOrderState(transportOrder.getState());
     }
@@ -302,14 +304,14 @@ public class VehicleAdapter
    * @return List containing the left over course elements or <code>null</code>
    * if driveOrder is <code>null</code>.
    */
-  private List<FigureComponent> composeDriveOrderComponents(@Nullable DriveOrder driveOrder,
-                                                            int routeProgressIndex,
-                                                            SystemModel systemModel) {
+  private List<ModelComponent> composeDriveOrderComponents(@Nullable DriveOrder driveOrder,
+                                                           int routeProgressIndex,
+                                                           SystemModel systemModel) {
     if (driveOrder == null) {
       return null;
     }
 
-    List<FigureComponent> result = new LinkedList<>();
+    List<ModelComponent> result = new LinkedList<>();
     List<Route.Step> lSteps = driveOrder.getRoute().getSteps();
 
     ProcessAdapter adapter;
@@ -333,7 +335,7 @@ public class VehicleAdapter
     TCSObjectReference<?> ref = driveOrder.getDestination().getDestination();
     ModelComponent pointOrLocationModel = systemModel.getModelComponent(ref.getName());
     if (pointOrLocationModel != null) {
-      result.add((FigureComponent) pointOrLocationModel);
+      result.add(pointOrLocationModel);
     }
 
     return result;

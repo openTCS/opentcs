@@ -219,13 +219,13 @@ public class TransportOrderUtil
     // Let the router know about the route chosen.
     router.selectRoute(vehicle, Collections.unmodifiableList(driveOrders));
     // Update the transport order's copy.
-    transportOrder = transportOrderService.fetchObject(TransportOrder.class, orderRef);
-    DriveOrder driveOrder = transportOrder.getCurrentDriveOrder();
+    TransportOrder updatedOrder = transportOrderService.fetchObject(TransportOrder.class, orderRef);
+    DriveOrder driveOrder = updatedOrder.getCurrentDriveOrder();
     // If the drive order must be assigned, do so.
     if (mustAssign(driveOrder, vehicle)) {
       // Let the vehicle controller know about the first drive order.
       vehicleControllerPool.getVehicleController(vehicle.getName())
-          .setDriveOrder(driveOrder, transportOrder.getProperties());
+          .setDriveOrder(driveOrder, updatedOrder.getProperties());
     }
     // If the drive order need not be assigned, let the kernel know that the
     // vehicle is waiting for its next order - it will be dispatched again for

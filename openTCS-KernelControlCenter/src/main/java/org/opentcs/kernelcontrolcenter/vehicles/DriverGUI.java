@@ -64,7 +64,7 @@ public class DriverGUI
   /**
    * This instance's resource bundle.
    */
-  private final ResourceBundle BUNDLE
+  private final ResourceBundle bundle
       = ResourceBundle.getBundle("org/opentcs/kernelcontrolcenter/Bundle");
   /**
    * The service portal to use for kernel interaction.
@@ -227,8 +227,8 @@ public class DriverGUI
 
       int reply = JOptionPane.showConfirmDialog(
           null,
-          BUNDLE.getString("CommAdapterComboBox.confirmation.driverChange.text"),
-          BUNDLE.getString("CommAdapterComboBox.confirmation.driverChange.title"),
+          bundle.getString("CommAdapterComboBox.confirmation.driverChange.text"),
+          bundle.getString("CommAdapterComboBox.confirmation.driverChange.title"),
           JOptionPane.YES_NO_OPTION);
       if (reply == JOptionPane.NO_OPTION) {
         return;

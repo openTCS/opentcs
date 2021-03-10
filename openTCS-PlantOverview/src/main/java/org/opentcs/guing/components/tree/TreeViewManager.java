@@ -188,7 +188,7 @@ public abstract class TreeViewManager
    * @param component
    */
   public void restoreTreeView(ModelComponent component) {
-    component.treeRestore(null, this);
+    restoreTreeViewRecursively(null, component);
   }
 
   public void setComponentFilter(Predicate<ModelComponent> componentFilter) {
@@ -267,5 +267,20 @@ public abstract class TreeViewManager
     }
 
     fTreeView.selectItems(visibleComponents);
+  }
+
+  private void restoreTreeViewRecursively(ModelComponent parent, ModelComponent item) {
+    if (accepts(item)) {
+      addItem(parent, item);
+    }
+
+    for (ModelComponent child : item.getChildComponents()) {
+      if (!child.getChildComponents().isEmpty()) {
+        restoreTreeViewRecursively(item, child);
+      }
+      else if (accepts(child)) {
+        addItem(item, child);
+      }
+    }
   }
 }

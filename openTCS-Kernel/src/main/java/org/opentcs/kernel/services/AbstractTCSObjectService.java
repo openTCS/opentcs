@@ -13,7 +13,9 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -71,6 +73,12 @@ public abstract class AbstractTCSObjectService
                                    @Nullable String value)
       throws ObjectUnknownException, CredentialsException {
     getObjectService().updateObjectProperty(ref, key, value);
+  }
+
+  @Override
+  public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
+      throws ObjectUnknownException, KernelRuntimeException {
+    getObjectService().appendObjectHistoryEntry(ref, entry);
   }
 
   /**

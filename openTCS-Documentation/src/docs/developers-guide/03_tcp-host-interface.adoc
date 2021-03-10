@@ -1,4 +1,5 @@
 
+[#section-tcp-host-interfaces]
 == TCP/IP-based interfaces to other systems
 
 IMPORTANT: This interface is *deprecated and scheduled for removal with openTCS 5.0* in favour of the kernel's web API.

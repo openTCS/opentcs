@@ -17,9 +17,9 @@ import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.adapter.PathLockAdapter;
 import org.opentcs.guing.exchange.adapter.VehicleProcessableCategoriesAdapter;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class AttributeAdapterRegistry
   /**
    * This class' logger.
    */
-  private final Logger LOG = LoggerFactory.getLogger(AttributeAdapterRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AttributeAdapterRegistry.class);
   /**
    * Provides access to a portal.
    */

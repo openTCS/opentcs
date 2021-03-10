@@ -35,10 +35,10 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.EditDriveOrderPanel;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
-import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class CreateTransportOrderPanel
   /**
    * The destinations to drive to.
    */
-  private final List<AbstractFigureComponent> fDestinationModels = new ArrayList<>();
+  private final List<AbstractConnectableModelComponent> fDestinationModels = new ArrayList<>();
   /**
    * The actions to perform at the destinations.
    */
@@ -118,7 +118,7 @@ public class CreateTransportOrderPanel
     fCategories = new ArrayList<>(categorySuggestionsPool.getCategorySuggestions());
   }
 
-  public List<AbstractFigureComponent> getDestinationModels() {
+  public List<AbstractConnectableModelComponent> getDestinationModels() {
     return fDestinationModels;
   }
 
@@ -218,7 +218,7 @@ public class CreateTransportOrderPanel
         row[0] = destination;
         row[1] = action;
         model.addRow(row);
-        AbstractFigureComponent destModel = fModelManager.getModel().getLocationModel(destination);
+        AbstractConnectableModelComponent destModel = fModelManager.getModel().getLocationModel(destination);
         if (destModel == null) {
           destModel = fModelManager.getModel().getPointModel(destination);
         }
@@ -514,7 +514,7 @@ public class CreateTransportOrderPanel
       model.moveRow(index, index, index + 1);
       driveOrdersTable.getSelectionModel().setSelectionInterval(index + 1, index + 1);
 
-      AbstractFigureComponent location = fDestinationModels.remove(index);
+      AbstractConnectableModelComponent location = fDestinationModels.remove(index);
       fDestinationModels.add(index + 1, location);
 
       String action = fActions.remove(index);
@@ -537,7 +537,7 @@ public class CreateTransportOrderPanel
       model.moveRow(index, index, index - 1);
       driveOrdersTable.getSelectionModel().setSelectionInterval(index - 1, index - 1);
 
-      AbstractFigureComponent location = fDestinationModels.remove(index);
+      AbstractConnectableModelComponent location = fDestinationModels.remove(index);
       fDestinationModels.add(index - 1, location);
 
       String action = fActions.remove(index);
@@ -572,7 +572,7 @@ public class CreateTransportOrderPanel
         return;
       }
 
-      AbstractFigureComponent location = fDestinationModels.get(index);
+      AbstractConnectableModelComponent location = fDestinationModels.get(index);
       String action = fActions.get(index);
       EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels(), location, action);
       StandardContentDialog dialog

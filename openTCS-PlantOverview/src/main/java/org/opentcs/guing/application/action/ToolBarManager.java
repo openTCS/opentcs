@@ -137,11 +137,6 @@ public class ToolBarManager
    * Available in modelling mode only.
    */
   private final JButton buttonCreateBlock;
-//  /**
-//   * A button for creating static routes.
-//   * Available in modelling mode only.
-//   */
-//  private final JButton buttonCreateStaticRoute;
   /**
    * A button for creating groups.
    * Available in modelling mode.
@@ -247,10 +242,6 @@ public class ToolBarManager
     labels.configureNamelessButton(buttonCreateBlock, CreateBlockAction.ID);
     toolBarCreation.add(buttonCreateBlock);
 
-//    // --- Create Static Route (only in Modelling mode) ---
-//    buttonCreateStaticRoute = new JButton(actionMap.get(CreateStaticRouteAction.ID));
-//    labels.configureNamelessButton(buttonCreateStaticRoute, CreateStaticRouteAction.ID);
-//    toolBarCreation.add(buttonCreateStaticRoute);
     // --- Create Group (both modes) ---
     buttonCreateGroup = new JButton(actionMap.get(CreateGroupAction.ID));
     labels.configureNamelessButton(buttonCreateGroup, CreateGroupAction.ID);
@@ -355,7 +346,6 @@ public class ToolBarManager
     buttonCreateVehicle.setVisible(mode == OperationMode.MODELLING);
     buttonCreateBlock.setVisible(mode == OperationMode.MODELLING);
     buttonCreateGroup.setVisible(mode == OperationMode.MODELLING);
-//    buttonCreateStaticRoute.setVisible(mode == OperationMode.MODELLING);
 
     for (JToolBar.Separator sep : separatorList) {
       sep.setVisible(mode == OperationMode.MODELLING);

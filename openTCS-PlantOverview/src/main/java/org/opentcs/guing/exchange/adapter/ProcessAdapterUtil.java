@@ -19,7 +19,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -37,7 +36,6 @@ public class ProcessAdapterUtil {
   private final LocationTypeAdapter locationTypeAdapter;
   private final PathAdapter pathAdapter;
   private final PointAdapter pointAdapter;
-  private final StaticRouteAdapter staticRouteAdapter;
   private final VehicleAdapter vehicleAdapter;
 
   @Inject
@@ -49,7 +47,6 @@ public class ProcessAdapterUtil {
                             LocationTypeAdapter locationTypeAdapter,
                             PathAdapter pathAdapter,
                             PointAdapter pointAdapter,
-                            StaticRouteAdapter staticRouteAdapter,
                             VehicleAdapter vehicleAdapter) {
     this.blockAdapter = requireNonNull(blockAdapter, "blockAdapter");
     this.groupAdapter = requireNonNull(groupAdapter, "groupAdapter");
@@ -59,7 +56,6 @@ public class ProcessAdapterUtil {
     this.locationTypeAdapter = requireNonNull(locationTypeAdapter, "locationTypeAdapter");
     this.pathAdapter = requireNonNull(pathAdapter, "pathAdapter");
     this.pointAdapter = requireNonNull(pointAdapter, "pointAdapter");
-    this.staticRouteAdapter = requireNonNull(staticRouteAdapter, "staticRouteAdapter");
     this.vehicleAdapter = requireNonNull(vehicleAdapter, "vehicleAdapter");
   }
 
@@ -76,9 +72,6 @@ public class ProcessAdapterUtil {
     }
     else if (model instanceof LocationModel) {
       return locationAdapter;
-    }
-    else if (model instanceof StaticRouteModel) {
-      return staticRouteAdapter;
     }
     else if (model instanceof BlockModel) {
       return blockAdapter;

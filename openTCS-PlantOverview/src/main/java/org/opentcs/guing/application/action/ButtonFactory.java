@@ -30,7 +30,6 @@ import org.jhotdraw.color.HSBColorSpace;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.DrawingEditor;
-import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.action.AttributeToggler;
 import org.jhotdraw.draw.action.EditorColorIcon;
 import org.jhotdraw.draw.action.FontChooserHandler;
@@ -352,10 +351,6 @@ public class ButtonFactory {
     final JPopupButton popupButton = new JPopupButton();
     popupButton.setPopupAlpha(1f);
 
-    if (defaultAttributes == null) {
-      defaultAttributes = new HashMap<>();
-    }
-
     popupButton.setAction(
         new DefaultAttributeAction(editor, attributeKey, defaultAttributes),
         new Rectangle(0, 0, 22, 22));
@@ -363,7 +358,6 @@ public class ButtonFactory {
     boolean hasNullColor = false;
 
     for (ColorIcon swatch : DEFAULT_COLOR_ICONS) {
-      AttributeAction action;
       HashMap<AttributeKey, Object> attributes = new HashMap<>(defaultAttributes);
       Color swatchColor = swatch.getColor();
       attributes.put(attributeKey, swatchColor);
@@ -372,28 +366,28 @@ public class ButtonFactory {
         hasNullColor = true;
       }
 
-      popupButton.add(action
-          = new AttributeAction(editor,
-                                attributes,
-                                labels.getToolTipTextProperty(labelKey),
-                                swatch));
+      AttributeAction action = new AttributeAction(editor,
+                                                   attributes,
+                                                   labels.getToolTipTextProperty(labelKey),
+                                                   swatch);
+      popupButton.add(action);
       action.putValue(Action.SHORT_DESCRIPTION, swatch.getName());
       action.setUpdateEnabledState(false);
     }
 
     // No color
     if (!hasNullColor) {
-      AttributeAction action;
       HashMap<AttributeKey, Object> attributes = new HashMap<>(defaultAttributes);
       attributes.put(attributeKey, null);
-      popupButton.add(action
+      AttributeAction action
           = new AttributeAction(editor,
                                 attributes,
                                 labels.getToolTipTextProperty("attribute.color.noColor"),
                                 new ColorIcon(null,
                                               labels.getToolTipTextProperty("attribute.color.noColor"),
                                               DEFAULT_COLOR_ICONS.get(0).getIconWidth(),
-                                              DEFAULT_COLOR_ICONS.get(0).getIconHeight())));
+                                              DEFAULT_COLOR_ICONS.get(0).getIconHeight()));
+      popupButton.add(action);
       action.putValue(Action.SHORT_DESCRIPTION,
                       labels.getToolTipTextProperty("attribute.color.noColor"));
       action.setUpdateEnabledState(false);
@@ -403,13 +397,12 @@ public class ButtonFactory {
     ImageIcon chooserIcon = new ImageIcon(
         Images.createImage(ButtonFactory.class,
                            "/org/jhotdraw/draw/action/images/attribute.color.colorChooser.png"));
-    Action action;
-    popupButton.add(action
-        = new EditorColorChooserAction(editor,
-                                       attributeKey,
-                                       "color",
-                                       chooserIcon,
-                                       defaultAttributes));
+    Action action = new EditorColorChooserAction(editor,
+                                                 attributeKey,
+                                                 "color",
+                                                 chooserIcon,
+                                                 defaultAttributes);
+    popupButton.add(action);
     labels.configureToolBarButton(popupButton, labelKey);
     action.putValue(Action.SHORT_DESCRIPTION,
                     labels.getToolTipTextProperty("attribute.color.colorChooser"));
@@ -550,9 +543,8 @@ public class ButtonFactory {
                                                  10f,
                                                  fdashes,
                                                  0));
-      AttributeAction action;
-      AbstractButton button = strokeDashesPopupButton.add(action
-          = new AttributeAction(editor, AttributeKeys.STROKE_DASHES, dash, null, icon));
+      AbstractButton button = strokeDashesPopupButton.add(
+          new AttributeAction(editor, AttributeKeys.STROKE_DASHES, dash, null, icon));
       button.setDisabledIcon(icon);
     }
 
@@ -704,19 +696,31 @@ public class ButtonFactory {
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_BUTT);
-    AttributeAction a;
-    popupButton.add(a = new AttributeAction(editor, attributes, bundle.getString("attribute.strokeCap.butt"), null));
-    dsp.add(a);
+    AttributeAction action;
+    action = new AttributeAction(editor,
+                                 attributes,
+                                 bundle.getString("attribute.strokeCap.butt"),
+                                 null);
+    popupButton.add(action);
+    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_ROUND);
-    popupButton.add(a = new AttributeAction(editor, attributes, bundle.getString("attribute.strokeCap.round"), null));
-    dsp.add(a);
+    action = new AttributeAction(editor,
+                                 attributes,
+                                 bundle.getString("attribute.strokeCap.round"),
+                                 null);
+    popupButton.add(action);
+    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_SQUARE);
-    popupButton.add(a = new AttributeAction(editor, attributes, bundle.getString("attribute.strokeCap.square"), null));
-    dsp.add(a);
+    action = new AttributeAction(editor,
+                                 attributes,
+                                 bundle.getString("attribute.strokeCap.square"),
+                                 null);
+    popupButton.add(action);
+    dsp.add(action);
 
     return popupButton;
   }
@@ -732,19 +736,31 @@ public class ButtonFactory {
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_BEVEL);
-    AttributeAction a;
-    popupButton.add(a = new AttributeAction(editor, attributes, bundle.getString("attribute.strokeJoin.bevel"), null));
-    dsp.add(a);
+    AttributeAction action;
+    action = new AttributeAction(editor,
+                                 attributes,
+                                 bundle.getString("attribute.strokeJoin.bevel"),
+                                 null);
+    popupButton.add(action);
+    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_ROUND);
-    popupButton.add(a = new AttributeAction(editor, attributes, bundle.getString("attribute.strokeJoin.round"), null));
-    dsp.add(a);
+    action = new AttributeAction(editor,
+                                 attributes,
+                                 bundle.getString("attribute.strokeJoin.round"),
+                                 null);
+    popupButton.add(action);
+    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_MITER);
-    popupButton.add(a = new AttributeAction(editor, attributes, bundle.getString("attribute.strokeJoin.miter"), null));
-    dsp.add(a);
+    action = new AttributeAction(editor,
+                                 attributes,
+                                 bundle.getString("attribute.strokeJoin.miter"),
+                                 null);
+    popupButton.add(action);
+    dsp.add(action);
 
     return popupButton;
   }
@@ -837,38 +853,23 @@ public class ButtonFactory {
    * @param editor
    */
   public static void addAlignmentButtonsTo(JToolBar bar, final DrawingEditor editor) {
-    java.util.List<Disposable> dsp = new LinkedList<>();
-    AbstractSelectedAction action;
-
-    bar.add(action = new AlignAction.West(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new AlignAction.East(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new AlignAction.Horizontal(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new AlignAction.North(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new AlignAction.South(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new AlignAction.Vertical(editor)).setFocusable(false);
-    dsp.add(action);
+    bar.add(new AlignAction.West(editor)).setFocusable(false);
+    bar.add(new AlignAction.East(editor)).setFocusable(false);
+    bar.add(new AlignAction.Horizontal(editor)).setFocusable(false);
+    bar.add(new AlignAction.North(editor)).setFocusable(false);
+    bar.add(new AlignAction.South(editor)).setFocusable(false);
+    bar.add(new AlignAction.Vertical(editor)).setFocusable(false);
 
     bar.addSeparator();
 
-    bar.add(action = new MoveAction.West(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new MoveAction.East(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new MoveAction.North(editor)).setFocusable(false);
-    dsp.add(action);
-    bar.add(action = new MoveAction.South(editor)).setFocusable(false);
-    dsp.add(action);
+    bar.add(new MoveAction.West(editor)).setFocusable(false);
+    bar.add(new MoveAction.East(editor)).setFocusable(false);
+    bar.add(new MoveAction.North(editor)).setFocusable(false);
+    bar.add(new MoveAction.South(editor)).setFocusable(false);
 
     bar.addSeparator();
 
     bar.add(new BringToFrontAction(editor)).setFocusable(false);
-    dsp.add(action);
     bar.add(new SendToBackAction(editor)).setFocusable(false);
-    dsp.add(action);
   }
 }

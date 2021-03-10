@@ -15,6 +15,8 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -102,6 +104,7 @@ public class Point
   private Point(int objectID,
                 String name,
                 Map<String, String> properties,
+                ObjectHistory history,
                 Triple position,
                 Type type,
                 double vehicleOrientationAngle,
@@ -109,7 +112,7 @@ public class Point
                 Set<TCSObjectReference<Path>> outgoingPaths,
                 Set<Location.Link> attachedLinks,
                 TCSObjectReference<Vehicle> occupyingVehicle) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.position = requireNonNull(position, "position");
     this.type = requireNonNull(type, "type");
     checkArgument(Double.isNaN(vehicleOrientationAngle)
@@ -128,6 +131,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      propertiesWith(key, value),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -142,6 +146,37 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      properties,
+                     getHistory(),
+                     position,
+                     type,
+                     vehicleOrientationAngle,
+                     incomingPaths,
+                     outgoingPaths,
+                     attachedLinks,
+                     occupyingVehicle);
+  }
+
+  @Override
+  public TCSObject<Point> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new Point(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory().withEntryAppended(entry),
+                     position,
+                     type,
+                     vehicleOrientationAngle,
+                     incomingPaths,
+                     outgoingPaths,
+                     attachedLinks,
+                     occupyingVehicle);
+  }
+
+  @Override
+  public TCSObject<Point> withHistory(ObjectHistory history) {
+    return new Point(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     history,
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -182,6 +217,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -229,6 +265,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -269,6 +306,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -339,6 +377,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -396,6 +435,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -453,6 +493,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -523,6 +564,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,
@@ -544,6 +586,7 @@ public class Point
     return new Point(getIdWithoutDeprecationWarning(),
                      getName(),
                      getProperties(),
+                     getHistory(),
                      position,
                      type,
                      vehicleOrientationAngle,

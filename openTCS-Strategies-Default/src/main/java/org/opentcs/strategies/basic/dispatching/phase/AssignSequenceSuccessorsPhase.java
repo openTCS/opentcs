@@ -18,8 +18,8 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 
 /**
  * Assigns vehicles to the next transport orders in their respective order sequences, if any.
@@ -38,9 +38,9 @@ public class AssignSequenceSuccessorsPhase
    */
   private final Router router;
   /**
-   * Checks processability of transport orders for vehicles.
+   * A collection of predicates for filtering assignment candidates.
    */
-  private final ProcessabilityChecker processabilityChecker;
+  private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
 
   private final TransportOrderUtil transportOrderUtil;
   /**
@@ -49,13 +49,15 @@ public class AssignSequenceSuccessorsPhase
   private boolean initialized;
 
   @Inject
-  public AssignSequenceSuccessorsPhase(TCSObjectService objectService,
-                                       Router router,
-                                       ProcessabilityChecker processabilityChecker,
-                                       TransportOrderUtil transportOrderUtil) {
+  public AssignSequenceSuccessorsPhase(
+      TCSObjectService objectService,
+      Router router,
+      CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
+      TransportOrderUtil transportOrderUtil) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
-    this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
+    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
+                                                             "assignmentCandidateSelectionFilter");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }
 
@@ -91,8 +93,7 @@ public class AssignSequenceSuccessorsPhase
   private void tryAssignNextOrderInSequence(Vehicle vehicle) {
     nextOrderInCurrentSequence(vehicle)
         .map(order -> computeCandidate(vehicle, order))
-        .filter(candidate -> processabilityChecker.checkProcessability(vehicle,
-                                                                       candidate.getTransportOrder()))
+        .filter(assignmentCandidateSelectionFilter)
         .ifPresent(candidate -> transportOrderUtil.assignTransportOrder(vehicle,
                                                                         candidate.getTransportOrder(),
                                                                         candidate.getDriveOrders()));

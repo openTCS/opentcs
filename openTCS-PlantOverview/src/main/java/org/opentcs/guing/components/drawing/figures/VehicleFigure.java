@@ -28,6 +28,7 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
+import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.components.plantoverview.VehicleTheme;
@@ -39,17 +40,16 @@ import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.figures.decoration.VehicleOutlineHandle;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.properties.type.AngleProperty;
-import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
 /**
@@ -88,6 +88,10 @@ public class VehicleFigure
    */
   private final ToolTipTextGenerator textGenerator;
   /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
+  /**
    * The angle at which the image is to be drawn.
    */
   private double fAngle;
@@ -114,19 +118,20 @@ public class VehicleFigure
    * @param appConfig The application's configuration.
    * @param model The model corresponding to this graphical object.
    * @param textGenerator The tool tip text generator.
+   * @param modelManager The model manager.
    */
   @Inject
-  public VehicleFigure(ComponentsTreeViewManager componentsTreeManager,
-                       SelectionPropertiesComponent propertiesComponent,
-                       VehicleTheme vehicleTheme,
+  public VehicleFigure(VehicleTheme vehicleTheme,
                        MenuFactory menuFactory,
                        PlantOverviewApplicationConfiguration appConfig,
                        @Assisted VehicleModel model,
-                       ToolTipTextGenerator textGenerator) {
-    super(componentsTreeManager, propertiesComponent, model);
+                       ToolTipTextGenerator textGenerator,
+                       ModelManager modelManager) {
+    super(model);
     this.vehicleTheme = requireNonNull(vehicleTheme, "vehicleTheme");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
 
     fDisplayBox = new Rectangle((int) LENGTH, (int) WIDTH);
     fZoomPoint = new ZoomPoint(0.5 * LENGTH, 0.5 * WIDTH);
@@ -200,7 +205,8 @@ public class VehicleFigure
       setVisible(!ignorePrecisePosition);
     }
     else {
-      Rectangle2D.Double r = point.getFigure().getBounds();
+      Figure pointFigure = modelManager.getModel().getFigure(point);
+      Rectangle2D.Double r = pointFigure.getBounds();
       Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
       setBounds(pCenter, null);
       fireFigureChanged();
@@ -223,7 +229,8 @@ public class VehicleFigure
       setVisible(!ignorePrecisePosition);
     }
     else {
-      Rectangle2D.Double r = point.getFigure().getBounds();
+      Figure pointFigure = modelManager.getModel().getFigure(point);
+      Rectangle2D.Double r = pointFigure.getBounds();
       Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
       setBounds(pCenter, null);
       fireFigureChanged();
@@ -319,8 +326,11 @@ public class VehicleFigure
               return;
             }
 
-            PathConnection pathFigure = (PathConnection) connection.getFigure();
-            PointFigure cpf = currentPoint.getFigure().getPresentationFigure();
+            PathConnection pathFigure
+                = (PathConnection) modelManager.getModel().getFigure(connection);
+            LabeledPointFigure clpf
+                = (LabeledPointFigure) modelManager.getModel().getFigure(currentPoint);
+            PointFigure cpf = clpf.getPresentationFigure();
 
             if (pathFigure.getLiner() instanceof TupelBezierLiner
                 || pathFigure.getLiner() instanceof TripleBezierLiner) {
@@ -332,7 +342,9 @@ public class VehicleFigure
               fAngle = Math.toDegrees(Math.atan2(-dy, dx));
             }
             else {
-              PointFigure npf = nextPoint.getFigure().getPresentationFigure();
+              LabeledPointFigure nlpf
+                = (LabeledPointFigure) modelManager.getModel().getFigure(nextPoint);
+              PointFigure npf = nlpf.getPresentationFigure();
               double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
               double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
               // Nach dem direkten Winkel ausrichten
@@ -425,10 +437,8 @@ public class VehicleFigure
   public boolean handleMouseClick(Point2D.Double p,
                                   MouseEvent evt,
                                   DrawingView drawingView) {
+    // This gets executed on a double click AND a right click on the figure
     VehicleModel model = getModel();
-    getComponentsTreeManager().selectItem(model);
-    getPropertiesComponent().setModel(model);
-
     VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(Arrays.asList(model));
     menu.show((OpenTCSDrawingView) drawingView, evt.getX(), evt.getY());
 
@@ -467,7 +477,8 @@ public class VehicleFigure
     else if (point != null) {
       SwingUtilities.invokeLater(() -> {
         setVisible(true);
-        Rectangle2D.Double r = point.getFigure().getBounds();
+        Figure pointFigure = modelManager.getModel().getFigure(point);
+        Rectangle2D.Double r = pointFigure.getBounds();
         Point2D.Double pCenter = new Point2D.Double(r.getCenterX(), r.getCenterY());
         // Draw figure in the center of the node.
         // Angle is set in setBounds().

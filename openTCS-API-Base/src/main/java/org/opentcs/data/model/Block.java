@@ -14,6 +14,8 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.TCSObject;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -67,9 +69,10 @@ public class Block
   private Block(int objectID,
                 String name,
                 Map<String, String> properties,
+                ObjectHistory history,
                 Type type,
                 Set<TCSResourceReference<?>> members) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.type = type;
     this.members = new HashSet<>(requireNonNull(members, "members"));
   }
@@ -79,6 +82,7 @@ public class Block
     return new Block(getIdWithoutDeprecationWarning(),
                      getName(),
                      propertiesWith(key, value),
+                     getHistory(),
                      type,
                      members);
   }
@@ -88,6 +92,27 @@ public class Block
     return new Block(getIdWithoutDeprecationWarning(),
                      getName(),
                      properties,
+                     getHistory(),
+                     type,
+                     members);
+  }
+
+  @Override
+  public TCSObject<Block> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new Block(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory().withEntryAppended(entry),
+                     type,
+                     members);
+  }
+
+  @Override
+  public TCSObject<Block> withHistory(ObjectHistory history) {
+    return new Block(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     history,
                      type,
                      members);
   }
@@ -108,7 +133,12 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withType(Type type) {
-    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), type, members);
+    return new Block(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory(),
+                     type,
+                     members);
   }
 
   /**
@@ -152,7 +182,12 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withMembers(Set<TCSResourceReference<?>> members) {
-    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), type, members);
+    return new Block(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory(),
+                     type,
+                     members);
   }
 
   /**
@@ -183,7 +218,12 @@ public class Block
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public Block clone() {
-    return new Block(getIdWithoutDeprecationWarning(), getName(), getProperties(), type, members);
+    return new Block(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory(),
+                     type,
+                     members);
   }
 
   /**

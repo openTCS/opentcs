@@ -25,8 +25,8 @@ import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**

@@ -16,8 +16,6 @@ import org.jhotdraw.draw.LineConnectionFigure;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.geom.BezierPath;
-import org.jhotdraw.xml.DOMInput;
-import org.jhotdraw.xml.DOMOutput;
 
 /**
  * A {@link Liner} that constrains a connection to a fourth-order curved
@@ -27,9 +25,7 @@ import org.jhotdraw.xml.DOMOutput;
  * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class TripleBezierLiner
-    implements 
-    org.jhotdraw.draw.liner.Liner, 
-    org.jhotdraw.xml.DOMStorable {
+    implements org.jhotdraw.draw.liner.Liner {
 
   /**
    * Creates a new instance.
@@ -49,14 +45,6 @@ public class TripleBezierLiner
     if (path != null) {
       path.invalidatePath();
     }
-  }
-
-  @Override // DOMStorable
-  public void read(DOMInput in) {
-  }
-
-  @Override // DOMStorable
-  public void write(DOMOutput out) {
   }
 
   @Override // Object

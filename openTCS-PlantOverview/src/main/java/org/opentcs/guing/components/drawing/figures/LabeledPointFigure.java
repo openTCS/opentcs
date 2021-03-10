@@ -13,7 +13,6 @@ import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.LinkedList;
@@ -28,8 +27,6 @@ import org.jhotdraw.draw.handle.DragHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.MoveHandle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
-import org.jhotdraw.xml.DOMInput;
-import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.decoration.PointOutlineHandle;
@@ -116,23 +113,6 @@ public class LabeledPointFigure
     }
 
     return that;
-  }
-
-  @Override
-  public void read(DOMInput in)
-      throws IOException {
-    double x = in.getAttribute("x", 0d);
-    double y = in.getAttribute("y", 0d);
-    setBounds(new Point2D.Double(x, y), new Point2D.Double(x, y));
-  }
-
-  @Override
-  public void write(DOMOutput out)
-      throws IOException {
-    PointFigure pf = getPresentationFigure();
-    out.addAttribute("x", pf.getZoomPoint().getX());
-    out.addAttribute("y", pf.getZoomPoint().getY());
-    out.addAttribute("name", get(FigureConstants.MODEL).getName());
   }
 
   @Override

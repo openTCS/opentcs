@@ -28,7 +28,7 @@ import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.MessageDisplay;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;

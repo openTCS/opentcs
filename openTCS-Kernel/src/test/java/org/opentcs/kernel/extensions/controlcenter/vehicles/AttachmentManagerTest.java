@@ -55,8 +55,8 @@ public class AttachmentManagerTest {
 
   private static final String VEHICLE_1_NAME = "Vehicle1";
   private static final String VEHICLE_2_NAME = "Vehicle2";
-  private final Vehicle VEHICLE_1;
-  private final Vehicle VEHICLE_2;
+  private final Vehicle vehicle1;
+  private final Vehicle vehicle2;
 
   public AttachmentManagerTest() {
     objectService = mock(TCSObjectService.class);
@@ -72,8 +72,8 @@ public class AttachmentManagerTest {
                                                   eventHandler,
                                                   mock(KernelApplicationConfiguration.class)));
 
-    VEHICLE_1 = new Vehicle(VEHICLE_1_NAME);
-    VEHICLE_2 = new Vehicle(VEHICLE_2_NAME)
+    vehicle1 = new Vehicle(VEHICLE_1_NAME);
+    vehicle2 = new Vehicle(VEHICLE_2_NAME)
         .withProperty(Vehicle.PREFERRED_ADAPTER,
                       SimpleCommAdapterFactory.class.getName());
   }
@@ -81,8 +81,8 @@ public class AttachmentManagerTest {
   @Before
   public void setUp() {
     Set<Vehicle> vehicles = new HashSet<>();
-    vehicles.add(VEHICLE_1);
-    vehicles.add(VEHICLE_2);
+    vehicles.add(vehicle1);
+    vehicles.add(vehicle2);
     when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
     attachmentManager.initialize();
     for (VehicleEntry entry : vehicleEntryPool.getEntries().values()) {
@@ -107,8 +107,8 @@ public class AttachmentManagerTest {
   @Test
   @SuppressWarnings("deprecation")
   public void shouldAttachAdapterToVehicle() {
-    VehicleCommAdapter commAdapter = new SimpleCommAdapter(VEHICLE_1);
-    when(commAdapterFactory.getAdapterFor(VEHICLE_1)).thenReturn(commAdapter);
+    VehicleCommAdapter commAdapter = new SimpleCommAdapter(vehicle1);
+    when(commAdapterFactory.getAdapterFor(vehicle1)).thenReturn(commAdapter);
     when(commAdapterFactory.getAdapterDescription()).thenReturn("");
     when(commAdapterFactory.getDescription()).thenCallRealMethod();
 
@@ -128,8 +128,8 @@ public class AttachmentManagerTest {
   @Test
   @SuppressWarnings("deprecation")
   public void shouldDetachAdapterFromVehicle() {
-    VehicleCommAdapter commAdapter = new SimpleCommAdapter(VEHICLE_1);
-    when(commAdapterFactory.getAdapterFor(VEHICLE_1)).thenReturn(commAdapter);
+    VehicleCommAdapter commAdapter = new SimpleCommAdapter(vehicle1);
+    when(commAdapterFactory.getAdapterFor(vehicle1)).thenReturn(commAdapter);
     when(commAdapterFactory.getAdapterDescription()).thenReturn("");
     when(commAdapterFactory.getDescription()).thenCallRealMethod();
 
@@ -162,7 +162,7 @@ public class AttachmentManagerTest {
     List<VehicleCommAdapterFactory> factories = Arrays.asList(new SimpleCommAdapterFactory(),
                                                               new NullVehicleCommAdapterFactory());
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
-    when(commAdapterRegistry.findFactoriesFor(VEHICLE_1)).thenReturn(factories);
+    when(commAdapterRegistry.findFactoriesFor(vehicle1)).thenReturn(factories);
 
     attachmentManager.autoAttachAdapterToVehicle(VEHICLE_1_NAME);
 
@@ -209,12 +209,12 @@ public class AttachmentManagerTest {
 
     @Override
     public boolean providesAdapterFor(Vehicle vehicle) {
-      return (vehicle.equals(VEHICLE_1) || vehicle.equals(VEHICLE_2));
+      return (vehicle.equals(vehicle1) || vehicle.equals(vehicle2));
     }
 
     @Override
     public VehicleCommAdapter getAdapterFor(Vehicle vehicle) {
-      if (vehicle.equals(VEHICLE_1) || vehicle.equals(VEHICLE_2)) {
+      if (vehicle.equals(vehicle1) || vehicle.equals(vehicle2)) {
         return new SimpleCommAdapter(vehicle);
       }
       else {

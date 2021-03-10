@@ -9,26 +9,26 @@
  */
 package org.opentcs.guing.transport;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
+import javax.swing.JComponent;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Rejection;
-import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
@@ -38,95 +38,118 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  * A view on a transport order.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderView
     extends DialogContent {
 
   /**
-   * Der anzuzeigende Transportauftrag.
+   * A formatter for timestamps.
+   */
+  private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+  /**
+   * A formatter for history entries.
+   */
+  private final ObjectHistoryEntryFormatter historyEntryFormatter;
+  /**
+   * The transport order to be shown.
    */
   private final TransportOrder fTransportOrder;
-  /**
-   * Sämtliche Fahraufträge.
-   */
-  private List<DriveOrder> fDriveOrders;
 
   /**
    * Creates new instance.
    *
    * @param order The transport order.
+   * @param historyEntryFormatter A formatter for history entries.
    */
-  public TransportOrderView(TransportOrder order) {
-    fTransportOrder = Objects.requireNonNull(order, "order is null");
+  @Inject
+  public TransportOrderView(@Assisted TransportOrder order,
+                            CompositeObjectHistoryEntryFormatter historyEntryFormatter) {
+    this.fTransportOrder = requireNonNull(order, "order");
+    this.historyEntryFormatter = requireNonNull(historyEntryFormatter, "historyEntryFormatter");
+
     initComponents();
     setDialogTitle(ResourceBundleUtil.getBundle().getString("TransportOrderView.detailedView"));
   }
 
-  /**
-   * Liefert den Transportauftrag.
-   *
-   * @return den Transportauftrag
-   */
-  public TransportOrder getTransportOrder() {
-    return fTransportOrder;
-  }
-
   @Override
   public void update() {
-    // Do nada.
   }
 
   @Override
   public final void initFields() {
-    // Name
-    String name = getTransportOrder().getName();
-    nameTextField.setText(name);
-    // Erzeugt
-    SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-    long creationTime = getTransportOrder().getCreationTime();
-    createdTextField.setText(f.format(new Date(creationTime)));
-    // Beendet
-    long finishedTime = getTransportOrder().getFinishedTime();
+    nameTextField.setText(fTransportOrder.getName());
 
-    if (finishedTime > 0) {
-      finishedTextField.setText(f.format(new Date(finishedTime)));
-    }
-    // Frist
-    long deadline = getTransportOrder().getDeadline();
-    deadlineTextField.setText(f.format(new Date(deadline)));
-    // Fahrzeug
-    TCSObjectReference<Vehicle> processingVehicle = getTransportOrder().getProcessingVehicle();
-    //Dispensable
-    boolean dispensable = getTransportOrder().isDispensable();
-    dispensableTextField.setText(Boolean.toString(dispensable));
+    createdTextField.setText(TIMESTAMP_FORMAT.format(new Date(fTransportOrder.getCreationTime())));
 
-    if (processingVehicle != null) {
-      vehicleTextField.setText(processingVehicle.getName());
+    finishedTextField.setText(fTransportOrder.getFinishedTime() != Long.MAX_VALUE
+        ? TIMESTAMP_FORMAT.format(new Date(fTransportOrder.getFinishedTime()))
+        : "-"
+    );
+
+    deadlineTextField.setText(fTransportOrder.getDeadline() != Long.MAX_VALUE
+        ? TIMESTAMP_FORMAT.format(new Date(fTransportOrder.getDeadline()))
+        : "-"
+    );
+
+    dispensableTextField.setText(Boolean.toString(fTransportOrder.isDispensable()));
+
+    if (fTransportOrder.getProcessingVehicle() != null) {
+      vehicleTextField.setText(fTransportOrder.getProcessingVehicle().getName());
     }
 
-    categoryTextField.setText(getTransportOrder().getCategory());
+    categoryTextField.setText(fTransportOrder.getCategory());
 
-    // --- Fahraufträge ---
-    // Tabelle Transportauftrag Properties
+    propertiesTable.setModel(createPropertiesTableModel());
+
+    driveOrdersTable.setModel(createDriveOrdersTableModel());
+    driveOrdersTable.getSelectionModel().addListSelectionListener((ListSelectionEvent evt) -> {
+      if (!evt.getValueIsAdjusting()) {
+        driveOrdersTableSelectionChanged();
+      }
+    });
+
+    driveOrdersScrollPane.setPreferredSize(new Dimension(200, 150));
+
+    driveOrderPropertiesTable.setModel(createDriveOrderPropertiesTableModel());
+
+    routeTable.setModel(createRouteTableModel());
+
+    dependenciesTable.setModel(createDependenciesTableModel());
+
+    rejectionsTable.setModel(createRejectionsTableModel());
+    rejectionsTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    rejectionsTable.getColumnModel().getColumn(1).setPreferredWidth(300);
+    rejectionsTable.getColumnModel().getColumn(1).setCellRenderer(new ToolTipCellRenderer());
+
+    historyTable.setModel(createHistoryTableModel());
+    historyTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    historyTable.getColumnModel().getColumn(1).setPreferredWidth(300);
+    historyTable.getColumnModel().getColumn(1).setCellRenderer(new ToolTipCellRenderer());
+  }
+
+  private TableModel createPropertiesTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
+
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("TransportOrderView.key"),
       ResourceBundleUtil.getBundle().getString("TransportOrderView.value")});
-    for (Entry<String, String> entry : getTransportOrder().getProperties().entrySet()) {
+    for (Entry<String, String> entry : fTransportOrder.getProperties().entrySet()) {
       tableModel.addRow(new String[] {entry.getKey(), entry.getValue()});
     }
-    propertiesTable.setModel(tableModel);
-    // Tabelle Route
-    tableModel = new UneditableTableModel();
+
+    return tableModel;
+  }
+
+  private TableModel createDriveOrdersTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("TransportOrderView.target"),
       "Operation",
       "Status"});
-    // Past drive orders
-    fDriveOrders = new LinkedList<>();
-    fDriveOrders.addAll(getTransportOrder().getAllDriveOrders());
 
-    for (DriveOrder o : fDriveOrders) {
+    for (DriveOrder o : fTransportOrder.getAllDriveOrders()) {
       String[] row = new String[3];
       row[0] = o.getDestination().getDestination().getName();
       row[1] = o.getDestination().getOperation();
@@ -134,77 +157,81 @@ public class TransportOrderView
       tableModel.addRow(row);
     }
 
-    driveOrdersTable.setModel(tableModel);
-    driveOrdersTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+    return tableModel;
+  }
 
-      @Override
-      public void valueChanged(ListSelectionEvent evt) {
-        if (!evt.getValueIsAdjusting()) {
-          driveOrdersTableSelectionChanged();
-        }
-      }
-    });
+  private TableModel createDriveOrderPropertiesTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
 
-    driveOrdersScrollPane.setPreferredSize(new Dimension(200, 150));
-    //  List<DriveOrder> allDriveOrders = getTransportOrder().getAllDriveOrders();
-    //  TCSObjectReference<Vehicle> intendedVehicle = getTransportOrder().getIntendedVehicle();
-    //  State state = getTransportOrder().getState();
-    //  TCSObjectReference<OrderSequence> wrappingSequence = getTransportOrder().getWrappingSequence();
-
-    // DriveOrder Properties
-    tableModel = new UneditableTableModel();
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("TransportOrderView.key"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.value")});
-    driveOrderPropertiesTable.setModel(tableModel);
+      ResourceBundleUtil.getBundle().getString("TransportOrderView.value")
+    });
 
-    // Route
-    tableModel = new UneditableTableModel();
+    return tableModel;
+  }
+
+  private TableModel createRouteTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("TransportOrderView.route"),
       ResourceBundleUtil.getBundle().getString("TransportOrderView.destination")});
-    routeTable.setModel(tableModel);
 
-    // --- Abhängigkeiten ---
-    tableModel = new UneditableTableModel();
+    return tableModel;
+  }
+
+  private TableModel createDependenciesTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("TransportOrderView.to")});
 
-    Iterator<TCSObjectReference<TransportOrder>> iDependencies
-        = getTransportOrder().getDependencies().iterator();
-    TCSObjectReference<TransportOrder> refTransportOrder;
-
-    while (iDependencies.hasNext()) {
-      refTransportOrder = iDependencies.next();
+    for (TCSObjectReference<TransportOrder> refTransportOrder
+             : fTransportOrder.getDependencies()) {
       String[] row = new String[1];
       row[0] = refTransportOrder.getName();
       tableModel.addRow(row);
     }
 
-    dependenciesTable.setModel(tableModel);
+    return tableModel;
+  }
 
-    // --- Zurückweisungen ---
-    tableModel = new UneditableTableModel();
+  private TableModel createRejectionsTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
     tableModel.setColumnIdentifiers(new String[] {
       ResourceBundleUtil.getBundle().getString("CreateTransportOrderPanel.vehicle"),
-      ResourceBundleUtil.getBundle().getString("TransportOrderView.reason")});
-    ResourceBundleUtil.getBundle().getString("TransportOrderView.timestamp");
-    Iterator<Rejection> iRejections = getTransportOrder().getRejections().iterator();
-    Rejection rejection;
+      ResourceBundleUtil.getBundle().getString("TransportOrderView.reason")
+    });
 
-    while (iRejections.hasNext()) {
-      rejection = iRejections.next();
-      String[] row = new String[3];
-      row[0] = rejection.getVehicle().getName();
-      row[1] = rejection.getReason();
-      SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-      row[2] = sdf.format(rejection.getTimestamp());
-      tableModel.addRow(row);
+    for (Rejection rejection : fTransportOrder.getRejections()) {
+      tableModel.addRow(new String[] {
+        rejection.getVehicle().getName(),
+        rejection.getReason(),
+        TIMESTAMP_FORMAT.format(new Date(rejection.getTimestamp()))
+      });
     }
 
-    rejectionsTable.setModel(tableModel);
-    rejectionsTable.getColumnModel().getColumn(0).setCellRenderer(new LineWrapCellRenderer());
-    rejectionsTable.getColumnModel().getColumn(1).setCellRenderer(new LineWrapCellRenderer());
+    return tableModel;
+  }
+
+  private TableModel createHistoryTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
+    tableModel.setColumnIdentifiers(new String[] {
+      ResourceBundleUtil.getBundle().getString("TransportOrderView.historyTimestamp"),
+      ResourceBundleUtil.getBundle().getString("TransportOrderView.historyEvent")
+    });
+
+    for (ObjectHistory.Entry entry : fTransportOrder.getHistory().getEntries()) {
+      tableModel.addRow(new String[] {
+        TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
+        historyEntryFormatter.apply(entry).get()
+      });
+    }
+
+    return tableModel;
   }
 
   /**
@@ -212,45 +239,34 @@ public class TransportOrderView
    * geändert hat.
    */
   private void driveOrdersTableSelectionChanged() {
-    int index = driveOrdersTable.getSelectedRow();
-    DriveOrder o = fDriveOrders.get(index);
-    DefaultTableModel m = (DefaultTableModel) routeTable.getModel();
-    DefaultTableModel m2 = (DefaultTableModel) driveOrderPropertiesTable.getModel();
+    DriveOrder driveOrder
+        = fTransportOrder.getAllDriveOrders().get(driveOrdersTable.getSelectedRow());
+    DefaultTableModel routeTableModel = (DefaultTableModel) routeTable.getModel();
+    DefaultTableModel driveOrderPropsTableModel
+        = (DefaultTableModel) driveOrderPropertiesTable.getModel();
 
-    while (m.getRowCount() > 0) {
-      m.removeRow(0);
+    while (routeTableModel.getRowCount() > 0) {
+      routeTableModel.removeRow(0);
     }
-    while (m2.getRowCount() > 0) {
-      m2.removeRow(0);
-    }
-
-    for (Entry<String, String> entry : o.getDestination().getProperties().entrySet()) {
-      m2.addRow(new String[] {entry.getKey(), entry.getValue()});
+    while (driveOrderPropsTableModel.getRowCount() > 0) {
+      driveOrderPropsTableModel.removeRow(0);
     }
 
-    Route route = o.getRoute();
+    for (Entry<String, String> entry : driveOrder.getDestination().getProperties().entrySet()) {
+      driveOrderPropsTableModel.addRow(new String[] {entry.getKey(), entry.getValue()});
+    }
 
-    if (route == null) {
+    if (driveOrder.getRoute() == null) {
       return;
     }
 
-    long costs = route.getCosts();
-    costsTextField.setText(Long.toString(costs));
-    Iterator<Step> i = route.getSteps().iterator();
+    costsTextField.setText(Long.toString(driveOrder.getRoute().getCosts()));
 
-    while (i.hasNext()) {
-      Step step = i.next();
-      String[] row = new String[2];
-
-      if (step.getPath() != null) {
-        row[0] = step.getPath().getName();
-      }
-      else {
-        row[0] = "";
-      }
-
-      row[1] = step.getDestinationPoint().getName();
-      m.addRow(row);
+    for (Step step : driveOrder.getRoute().getSteps()) {
+      routeTableModel.addRow(new String[] {
+        step.getPath() == null ? "" : step.getPath().getName(),
+        step.getDestinationPoint().getName()
+      });
     }
   }
 
@@ -279,15 +295,18 @@ public class TransportOrderView
     dispensableTextField = new javax.swing.JTextField();
     categoryLabel = new javax.swing.JLabel();
     categoryTextField = new javax.swing.JTextField();
-    propertiesPanel = new javax.swing.JPanel();
-    propertiesScrollPane = new javax.swing.JScrollPane();
-    propertiesTable = new javax.swing.JTable();
     dependenciesPanel = new javax.swing.JPanel();
     dependenciesScrollPane = new javax.swing.JScrollPane();
     dependenciesTable = new javax.swing.JTable();
+    propertiesPanel = new javax.swing.JPanel();
+    propertiesScrollPane = new javax.swing.JScrollPane();
+    propertiesTable = new javax.swing.JTable();
     rejectionsPanel = new javax.swing.JPanel();
     rejectionsScrollPane = new javax.swing.JScrollPane();
     rejectionsTable = new javax.swing.JTable();
+    historyPanel = new javax.swing.JPanel();
+    historyScrollPane = new javax.swing.JScrollPane();
+    historyTable = new javax.swing.JTable();
     driveOrdersPanel = new javax.swing.JPanel();
     driveOrdersScrollPane = new javax.swing.JScrollPane();
     driveOrdersTable = new javax.swing.JTable();
@@ -453,24 +472,6 @@ public class TransportOrderView
     gridBagConstraints.weightx = 0.1;
     add(generalPanel, gridBagConstraints);
 
-    propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.propertiesPanel.title"))); // NOI18N
-    propertiesPanel.setLayout(new java.awt.BorderLayout());
-
-    propertiesScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
-
-    propertiesTable.setFont(propertiesTable.getFont());
-    propertiesScrollPane.setViewportView(propertiesTable);
-
-    propertiesPanel.add(propertiesScrollPane, java.awt.BorderLayout.CENTER);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.5;
-    gridBagConstraints.weighty = 0.5;
-    add(propertiesPanel, gridBagConstraints);
-
     dependenciesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.dependenciesPanel.title"))); // NOI18N
     dependenciesPanel.setLayout(new java.awt.BorderLayout());
 
@@ -496,6 +497,24 @@ public class TransportOrderView
     gridBagConstraints.weightx = 0.5;
     gridBagConstraints.weighty = 0.5;
     add(dependenciesPanel, gridBagConstraints);
+
+    propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.propertiesPanel.title"))); // NOI18N
+    propertiesPanel.setLayout(new java.awt.BorderLayout());
+
+    propertiesScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
+
+    propertiesTable.setFont(propertiesTable.getFont());
+    propertiesScrollPane.setViewportView(propertiesTable);
+
+    propertiesPanel.add(propertiesScrollPane, java.awt.BorderLayout.CENTER);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.5;
+    gridBagConstraints.weighty = 0.5;
+    add(propertiesPanel, gridBagConstraints);
 
     rejectionsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.rejectionsPanel.title"))); // NOI18N
     rejectionsPanel.setLayout(new java.awt.BorderLayout());
@@ -523,6 +542,32 @@ public class TransportOrderView
     gridBagConstraints.weightx = 0.5;
     gridBagConstraints.weighty = 0.5;
     add(rejectionsPanel, gridBagConstraints);
+
+    historyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.historyPanel.title"))); // NOI18N
+    historyPanel.setLayout(new java.awt.BorderLayout());
+
+    historyScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
+
+    historyTable.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][] {
+
+      },
+      new String [] {
+
+      }
+    ));
+    historyScrollPane.setViewportView(historyTable);
+
+    historyPanel.add(historyScrollPane, java.awt.BorderLayout.CENTER);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.5;
+    gridBagConstraints.weighty = 0.5;
+    add(historyPanel, gridBagConstraints);
 
     driveOrdersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("TransportOrderView.driveOrdersPanel.title"))); // NOI18N
     driveOrdersPanel.setLayout(new java.awt.GridBagLayout());
@@ -597,7 +642,7 @@ public class TransportOrderView
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.gridwidth = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -628,6 +673,9 @@ public class TransportOrderView
   private javax.swing.JLabel finishedLabel;
   private javax.swing.JTextField finishedTextField;
   private javax.swing.JPanel generalPanel;
+  private javax.swing.JPanel historyPanel;
+  private javax.swing.JScrollPane historyScrollPane;
+  private javax.swing.JTable historyTable;
   private javax.swing.JLabel nameLabel;
   private javax.swing.JTextField nameTextField;
   private javax.swing.JPanel propertiesPanel;
@@ -644,18 +692,15 @@ public class TransportOrderView
   // CHECKSTYLE:ON
 
   /**
-   * A cell renderer that supports multiple lines.
+   * A cell renderer that adds a tool tip with the cell's value.
    */
-  private class LineWrapCellRenderer
-      extends JTextArea
-      implements TableCellRenderer {
+  private static class ToolTipCellRenderer
+      extends DefaultTableCellRenderer {
 
     /**
-     * Creates a new LineWrapCellRenderer.
+     * Creates a new instance.
      */
-    public LineWrapCellRenderer() {
-      this.setWrapStyleWord(true);
-      this.setLineWrap(true);
+    public ToolTipCellRenderer() {
     }
 
     @Override
@@ -665,15 +710,16 @@ public class TransportOrderView
                                                    boolean hasFocus,
                                                    int row,
                                                    int column) {
+      Component component = super.getTableCellRendererComponent(table,
+                                                                value,
+                                                                isSelected,
+                                                                hasFocus,
+                                                                row,
+                                                                column);
 
-      setText((String) value);
-      setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
+      ((JComponent) component).setToolTipText(value.toString());
 
-      if (table.getRowHeight(row) != getPreferredSize().height) {
-        table.setRowHeight(row, getPreferredSize().height);
-      }
-
-      return this;
+      return component;
     }
   }
 }

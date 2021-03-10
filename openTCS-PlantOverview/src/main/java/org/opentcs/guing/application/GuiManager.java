@@ -11,8 +11,8 @@ package org.opentcs.guing.application;
 
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
-import org.opentcs.guing.model.FiguresFolder;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.elements.BlockModel;
 
 /**
  * Provides some central services for various parts of the plant overview application.
@@ -55,9 +55,9 @@ public interface GuiManager {
    * Called when a block was selected in the tree view.
    * Should select all figures in the drawing view belonging to the block.
    *
-   * @param blockFiguresFolder
+   * @param blockModel
    */
-  void blockSelected(FiguresFolder blockFiguresFolder);
+  void blockSelected(BlockModel blockModel);
 
   /**
    * Creates a new, empty model and initializes it.

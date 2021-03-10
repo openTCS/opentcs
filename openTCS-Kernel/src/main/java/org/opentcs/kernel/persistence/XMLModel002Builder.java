@@ -72,8 +72,6 @@ import org.opentcs.util.persistence.binding.PathTO;
 import org.opentcs.util.persistence.binding.PlantModelTO;
 import org.opentcs.util.persistence.binding.PointTO;
 import org.opentcs.util.persistence.binding.PropertyTO;
-import org.opentcs.util.persistence.binding.StaticRouteTO;
-import org.opentcs.util.persistence.binding.StaticRouteTO.Hop;
 import org.opentcs.util.persistence.binding.VehicleTO;
 import org.opentcs.util.persistence.binding.VisualLayoutTO;
 import org.slf4j.Logger;
@@ -128,7 +126,6 @@ public class XMLModel002Builder
         .setLocationTypes(getLocationTypes(model))
         .setLocations(getLocations(model))
         .setBlocks(getBlocks(model))
-        .setStaticRoutes(getStaticRoutes(model))
         .setGroups(getGroups(model))
         .setVisualLayouts(getVisualLayouts(model));
 
@@ -181,7 +178,6 @@ public class XMLModel002Builder
       List<LocationTypeTO> locTypeElements = plantModel.getLocationTypes();
       List<LocationTO> locationElements = plantModel.getLocations();
       List<BlockTO> blockElements = plantModel.getBlocks();
-      List<StaticRouteTO> staticRouteElements = plantModel.getStaticRoutes();
       List<GroupTO> groupElements = plantModel.getGroups();
       List<VisualLayoutTO> visuLayoutElements = plantModel.getVisualLayouts();
 
@@ -191,7 +187,6 @@ public class XMLModel002Builder
       readLocationTypes(locTypeElements, model);
       readLocations(locationElements, model);
       readBlocks(blockElements, model);
-      readStaticRoutes(staticRouteElements, model);
       readGroups(groupElements, model);
       readVisualLayouts(visuLayoutElements, model);
     }
@@ -380,33 +375,6 @@ public class XMLModel002Builder
           .setProperties(convertProperties(curBlock.getProperties()));
 
       result.add(block);
-    }
-    return result;
-  }
-
-  /**
-   * Returns a list of {@link StaticRouteTO StaticRoutes} for all static routes in a model.
-   *
-   * @param model The model data.
-   * @return A list of {@link StaticRouteTO StaticRoutes} for all static routes in a model.
-   */
-  @SuppressWarnings("deprecation")
-  private static List<StaticRouteTO> getStaticRoutes(Model model) {
-    Set<org.opentcs.data.model.StaticRoute> routes = new TreeSet<>(Comparators.objectsByName());
-    routes.addAll(model.getStaticRoutes(null));
-    List<StaticRouteTO> result = new ArrayList<>();
-    for (org.opentcs.data.model.StaticRoute curRoute : routes) {
-      StaticRouteTO staticRoute = new StaticRouteTO();
-      staticRoute.setName(curRoute.getName());
-
-      List<StaticRouteTO.Hop> hops = new ArrayList<>();
-      for (TCSObjectReference<Point> curRef : curRoute.getHops()) {
-        hops.add(new StaticRouteTO.Hop().setName(curRef.getName()));
-      }
-      staticRoute.setHops(hops)
-          .setProperties(convertProperties(curRoute.getProperties()));
-
-      result.add(staticRoute);
     }
     return result;
   }
@@ -752,32 +720,6 @@ public class XMLModel002Builder
               .withMemberNames(getMemberNames(groupTO.getMembers()))
               .withProperties(convertProperties(groupTO.getProperties())));
     }
-  }
-
-  /**
-   * Reads the given list of {@link StaticRouteTO StaticRoutes} into the model.
-   *
-   * @param staticRouteTOs The static route elements.
-   * @param model The model.
-   * @throws ObjectExistsException In case of duplicate objects.
-   */
-  @SuppressWarnings("deprecation")
-  private void readStaticRoutes(List<StaticRouteTO> staticRouteTOs, Model model)
-      throws ObjectExistsException {
-    for (StaticRouteTO staticRouteTO : staticRouteTOs) {
-      model.createStaticRoute(
-          new org.opentcs.access.to.model.StaticRouteCreationTO(staticRouteTO.getName())
-              .setHopNames(getHopNames(staticRouteTO.getHops()))
-              .setProperties(convertProperties(staticRouteTO.getProperties())));
-    }
-  }
-
-  private List<String> getHopNames(Collection<Hop> hops) {
-    List<String> result = new LinkedList<>();
-    for (Hop hop : hops) {
-      result.add(hop.getName());
-    }
-    return result;
   }
 
   /**

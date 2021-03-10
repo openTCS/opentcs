@@ -32,7 +32,7 @@ import org.opentcs.guing.components.ComponentsInjectionModule;
 import org.opentcs.guing.exchange.ExchangeInjectionModule;
 import org.opentcs.guing.exchange.SslConfiguration;
 import org.opentcs.guing.model.ModelInjectionModule;
-import org.opentcs.guing.storage.DefaultStorageInjectionModule;
+import org.opentcs.guing.persistence.DefaultPersistenceInjectionModule;
 import org.opentcs.guing.transport.TransportInjectionModule;
 import org.opentcs.guing.util.ElementNamingSchemeConfiguration;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
@@ -68,12 +68,14 @@ public class DefaultPlantOverviewInjectionModule
     install(new ComponentsInjectionModule());
     install(new ExchangeInjectionModule());
     install(new ModelInjectionModule());
-    install(new DefaultStorageInjectionModule());
+    install(new DefaultPersistenceInjectionModule());
     install(new TransportInjectionModule());
     install(new UtilInjectionModule());
 
     // Ensure there is at least an empty binder for pluggable panels.
     pluggablePanelFactoryBinder();
+    // Ensure there is at least an empty binder for history entry formatters.
+    objectHistoryEntryFormatterBinder();
   }
 
   private void configurePlantOverviewDependencies() {

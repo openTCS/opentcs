@@ -10,13 +10,17 @@
 
 package org.opentcs.guing.components.properties.table;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.Component;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import org.opentcs.guing.components.properties.CoordinateUndoActivity;
+import org.opentcs.guing.components.properties.PropertiesComponentsFactory;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 
@@ -33,6 +37,10 @@ public class CoordinateCellEditor
     extends QuantityCellEditor {
 
   /**
+   * The components factory.
+   */
+  private final PropertiesComponentsFactory componentsFactory;
+  /**
    * Undo/Redo for a coordinate property.
    */
   private CoordinateUndoActivity coordinateUndoActivity;
@@ -42,8 +50,12 @@ public class CoordinateCellEditor
    *
    * @param textField
    */
-  public CoordinateCellEditor(JTextField textField, UserMessageHelper umh) {
+  @Inject
+  public CoordinateCellEditor(@Assisted JTextField textField, 
+                              @Assisted UserMessageHelper umh,
+                              PropertiesComponentsFactory componentsFactory) {
     super(textField, umh);
+    this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
   }
 
   /**
@@ -83,7 +95,7 @@ public class CoordinateCellEditor
       JTable table, Object value, boolean isSelected, int row, int column) {
 
     CoordinateProperty coordinateProperty = (CoordinateProperty) value;
-    coordinateUndoActivity = new CoordinateUndoActivity(coordinateProperty);
+    coordinateUndoActivity = componentsFactory.createCoordinateUndoActivity(coordinateProperty);
     coordinateUndoActivity.snapShotBeforeModification();
 
     return super.getTableCellEditorComponent(table, value, isSelected, row, column);

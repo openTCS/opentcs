@@ -29,8 +29,6 @@ ext.collectableDistDir = file("$buildDir/install")
 configurations {
   schemagen
   configdocgen
-  baselineapibase
-  baselineapiinjection
 }
 
 swaggerSources {
@@ -51,10 +49,7 @@ dependencies {
   configdocgen project(':openTCS-PlantOverview')
   configdocgen jar.outputs.files
   
-  swaggerUI 'org.webjars:swagger-ui:3.10.0'
-  
-  baselineapibase  'org.opentcs:opentcs-api-base:4.0.0@jar'
-  baselineapiinjection  'org.opentcs:opentcs-api-injection:4.0.0@jar'
+  swaggerUI 'org.webjars:swagger-ui:3.20.5'
 }
 
 distributions {
@@ -495,10 +490,10 @@ task schemagenXml {
       classpath configurations.schemagen
       main = "org.opentcs.documentation.JAXBSchemaGenerator"
       args = [ "${schemagenDir}/opentcs-plantoverview-persistence.xsd",
-             "org.opentcs.guing.persistence.CourseModel",
-             "org.opentcs.guing.persistence.CourseElement",
-             "org.opentcs.guing.persistence.CourseObjectProperty",
-             "org.opentcs.guing.persistence.KeyValueSetListWrapper" ]
+             "org.opentcs.guing.persistence.legacy.CourseModel",
+             "org.opentcs.guing.persistence.legacy.CourseElement",
+             "org.opentcs.guing.persistence.legacy.CourseObjectProperty",
+             "org.opentcs.guing.persistence.legacy.KeyValueSetListWrapper" ]
     }
   }
 }

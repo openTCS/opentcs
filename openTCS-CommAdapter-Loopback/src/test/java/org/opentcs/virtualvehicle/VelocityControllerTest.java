@@ -150,15 +150,15 @@ public class VelocityControllerTest {
 
   @Test
   public void testAccelerationToMaxVelocity() {
-    final int max_fwd_velocity = 500; // mm/s
-    final int max_acceleration = 250; // mm/s^2
+    final int maxFwdVelocity = 500; // mm/s
+    final int maxAcceleration = 250; // mm/s^2
     VelocityController controller
-        = new VelocityController(MAX_DECEL, max_acceleration,
-                                 MAX_REV_VELO, max_fwd_velocity);
+        = new VelocityController(MAX_DECEL, maxAcceleration,
+                                 MAX_REV_VELO, maxFwdVelocity);
     // Way point with enough length to reach the max. velocity and with
     // a higher velocity limit than the vehicle's max velocity:
     VelocityController.WayEntry wayEntry
-        = new VelocityController.WayEntry(100000, 2 * max_fwd_velocity,
+        = new VelocityController.WayEntry(100000, 2 * maxFwdVelocity,
                                           POINT_NAME, Vehicle.Orientation.FORWARD);
     controller.addWayEntry(wayEntry);
 
@@ -177,14 +177,14 @@ public class VelocityControllerTest {
 
   @Test
   public void testVelocityLimitOnWayEntryRestrictsMaxVelocityOfVehicle() {
-    final int max_fwd_velocity = 500; // mm/s
-    final int max_acceleration = 500; // mm/s^2
+    final int maxFwdVelocity = 500; // mm/s
+    final int maxAcceleration = 500; // mm/s^2
     VelocityController controller
-        = new VelocityController(MAX_DECEL, max_acceleration,
-                                 MAX_REV_VELO, max_fwd_velocity);
+        = new VelocityController(MAX_DECEL, maxAcceleration,
+                                 MAX_REV_VELO, maxFwdVelocity);
     // Way point with a velocity limit less than the vehicle's max velocity:
     VelocityController.WayEntry wayEntry
-        = new VelocityController.WayEntry(10000, max_fwd_velocity - 250,
+        = new VelocityController.WayEntry(10000, maxFwdVelocity - 250,
                                           POINT_NAME, Vehicle.Orientation.FORWARD);
     controller.addWayEntry(wayEntry);
 

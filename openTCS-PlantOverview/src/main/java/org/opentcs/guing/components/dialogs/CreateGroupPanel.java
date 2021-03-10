@@ -23,13 +23,14 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import org.opentcs.guing.application.OpenTCSView;
-import org.opentcs.guing.model.AbstractFigureComponent;
+import org.opentcs.guing.model.AbstractModelComponent;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.Comparators;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.util.gui.Icons;
 
@@ -78,13 +79,13 @@ public class CreateGroupPanel
     SystemModel systemModel = modelManager.getModel();
 
     points = systemModel.getPointModels();
-    Collections.sort(points);
+    Collections.sort(points, Comparators.modelComponentsByName());
 
     paths = systemModel.getPathModels();
-    Collections.sort(paths);
+    Collections.sort(paths, Comparators.modelComponentsByName());
 
     locations = systemModel.getLocationModels();
-    Collections.sort(locations);
+    Collections.sort(locations, Comparators.modelComponentsByName());
 
     DefaultListModel<PointModel> pointListModel = new DefaultListModel<>();
     for (PointModel model : points) {
@@ -357,10 +358,10 @@ public class CreateGroupPanel
   // CHECKSTYLE:ON
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-    DefaultListModel<AbstractFigureComponent> listModel = new DefaultListModel<>();
-    List<AbstractFigureComponent> mergedList = new ArrayList<>();
-    Enumeration<AbstractFigureComponent> baseValues
-        = ((DefaultListModel<AbstractFigureComponent>) elementsList.getModel()).elements();
+    DefaultListModel<AbstractModelComponent> listModel = new DefaultListModel<>();
+    List<AbstractModelComponent> mergedList = new ArrayList<>();
+    Enumeration<AbstractModelComponent> baseValues
+        = ((DefaultListModel<AbstractModelComponent>) elementsList.getModel()).elements();
 
     while (baseValues.hasMoreElements()) {
       mergedList.add(baseValues.nextElement());
@@ -388,9 +389,9 @@ public class CreateGroupPanel
       }
     }
 
-    Collections.sort(mergedList);
+    Collections.sort(mergedList, Comparators.modelComponentsByName());
 
-    for (AbstractFigureComponent o : mergedList) {
+    for (AbstractModelComponent o : mergedList) {
       listModel.addElement(o);
     }
 
@@ -400,15 +401,15 @@ public class CreateGroupPanel
   }//GEN-LAST:event_addButtonActionPerformed
 
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-    DefaultListModel<AbstractFigureComponent> listModel
-        = (DefaultListModel<AbstractFigureComponent>) elementsList.getModel();
-    List<AbstractFigureComponent> selectedObjects = new ArrayList<>();
+    DefaultListModel<AbstractModelComponent> listModel
+        = (DefaultListModel<AbstractModelComponent>) elementsList.getModel();
+    List<AbstractModelComponent> selectedObjects = new ArrayList<>();
 
     for (int i : elementsList.getSelectedIndices()) {
       selectedObjects.add(listModel.get(i));
     }
 
-    for (AbstractFigureComponent o : selectedObjects) {
+    for (AbstractModelComponent o : selectedObjects) {
       listModel.removeElement(o);
     }
 
@@ -421,8 +422,8 @@ public class CreateGroupPanel
 
   private void createGroupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGroupButtonActionPerformed
     Set<ModelComponent> elements = new HashSet<>();
-    DefaultListModel<AbstractFigureComponent> listModel
-        = (DefaultListModel<AbstractFigureComponent>) elementsList.getModel();
+    DefaultListModel<AbstractModelComponent> listModel
+        = (DefaultListModel<AbstractModelComponent>) elementsList.getModel();
 
     for (Object o : listModel.toArray()) {
       ModelComponent comp = (ModelComponent) o;
@@ -461,7 +462,7 @@ public class CreateGroupPanel
   private javax.swing.JPanel buttonPanel;
   private javax.swing.JButton cancelButton;
   private javax.swing.JButton createGroupButton;
-  private javax.swing.JList<AbstractFigureComponent> elementsList;
+  private javax.swing.JList<AbstractModelComponent> elementsList;
   private javax.swing.JScrollPane elementsScrollPane;
   private javax.swing.JPanel listPanel;
   private javax.swing.JLabel locationLabel;

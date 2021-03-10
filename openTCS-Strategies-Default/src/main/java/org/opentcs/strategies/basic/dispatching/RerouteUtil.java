@@ -8,6 +8,7 @@
 package org.opentcs.strategies.basic.dispatching;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -80,8 +81,15 @@ public class RerouteUtil {
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
+  public void reroute(Collection<Vehicle> vehicles) {
+    for (Vehicle vehicle : vehicles) {
+      reroute(vehicle);
+    }
+  }
+
   public void reroute(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
+    LOG.debug("Trying to reroute vehicle '{}'...", vehicle.getName());
 
     if (!vehicle.isProcessingOrder()) {
       LOG.warn("{} can't be rerouted without processing a transport order.", vehicle.getName());
@@ -105,8 +113,14 @@ public class RerouteUtil {
     List<DriveOrder> newDriveOrders;
     if (optOrders.isPresent()) {
       newDriveOrders = optOrders.get();
+      LOG.debug("Found a new route for {} from point {}: {}",
+                vehicle.getName(),
+                rerouteSource.getName(),
+                newDriveOrders);
     }
     else {
+      LOG.debug("Couldn't find a new route for {}. Updating the current one...", 
+                vehicle.getName());
       unfinishedOrders = updatePathLocks(unfinishedOrders);
       unfinishedOrders
           = markRestrictedSteps(unfinishedOrders,
@@ -117,11 +131,7 @@ public class RerouteUtil {
 
     adjustFirstDriveOrder(newDriveOrders, vehicle, originalOrder, rerouteSource);
 
-    LOG.debug("Adjusted route of transport order {} from point {}: {}",
-              originalOrder.getName(),
-              rerouteSource.getName(),
-              newDriveOrders);
-
+    LOG.debug("Updating transport order {}...", originalOrder.getName());
     updateTransportOrder(originalOrder, newDriveOrders, vehicle);
   }
 
@@ -221,7 +231,7 @@ public class RerouteUtil {
   public Optional<List<DriveOrder>> tryReroute(List<DriveOrder> driveOrders,
                                                Vehicle vehicle,
                                                Point sourcePoint) {
-    LOG.debug("Trying to re-route drive orders for {} from {}: {}",
+    LOG.debug("Trying to reroute drive orders for {} from {}: {}",
               vehicle.getName(),
               sourcePoint,
               driveOrders);

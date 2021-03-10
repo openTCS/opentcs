@@ -1,4 +1,3 @@
-
 == System overview
 
 === System components and structure
@@ -187,24 +186,42 @@ When creating a transport order, the following attributes can be set:
   A vehicle may only be assigned to a transport order if the order's category is in the vehicle's set of processable categories.
   (Examples for potentially useful categories are `"Transport"` and `"Maintenance"`.)
 * An optional _intended vehicle_, telling the dispatcher to assign the transport order to the specified vehicle instead of selecting one automatically.
+* An optional set of _dependencies_, i.e. references to other transport orders that need to be processed before the transport order.
+  Dependencies are transitive, meaning that if order A depends on order B and order B depends on order C, C must be processed first, then B, then A.
+  As a result, dependencies are a means to impose an order on sets of transport orders.
+  (They do not, however, implicitly require all the transport orders to be processed by the same vehicle.
+  This can optionally be achieved by also setting the _intended vehicle_ attribute of the transport orders.)
+  The following image shows an example of dependencies between multiple transport orders:
+
+.Transport order dependencies
+image::transportorder_dependencies_example.png[]
 
 ==== Order sequence
 
-An order sequence describes a process spanning multiple transport orders which are to be executed subsequently by a single vehicle.
-They can be used when the whole process cannot be mapped to a single transport order, for instance because some steps are only known after processing previous ones.
+NOTE: The plant overview application currently does not provide a way to create order sequences.
+They can only be created programmatically, using dedicated clients that are not part of the openTCS distribution.
+
+An order sequence describes a process spanning multiple transport orders which are to be executed subsequently -- in the exact order defined by the sequence -- by a single vehicle.
+Once a vehicle is assigned to an order sequence, it may not process transport orders not belonging to the sequence, until the latter is finished.
+
+Order sequences are useful when a complex process to be executed by one and the same vehicle cannot be mapped to a single transport order.
+This can be the case, for instance, when the details of some steps in the process become known only after processing previous steps.
+
 An order sequence carries the following attributes:
 
 * A sequence of _transport orders_, which may be extended as long the complete flag (see below) is not set, yet.
 * A _complete_ flag, indicating that no further transport orders will be added to the sequence.
   This cannot be reset.
 * A _failure fatal_ flag, indicating that, if one transport order in the sequence fails, all orders following it should immediately be considered as failed, too.
+* A _finished_ flag, indicating that the order sequence has been processed (and the vehicle is not bound to it, anymore).
+  An order sequence can only be marked as finished if it has been marked as complete before.
 * An optional _category_ -- see <<Transport order>>.
   If set, categories set with transport orders in the sequence will be ignored.
 * An optional _intended vehicle_, telling the dispatcher to assign the order sequence to the specified vehicle instead of selecting one automatically.
   If set, all transport orders added to the order sequence must carry the same intended vehicle value.
 
-NOTE: The plant overview application currently does not provide a way to create order sequences.
-They can only created programmatically, using dedicated clients that are not part of the openTCS distribution.
+.An order sequence
+image::ordersequence_example.png[]
 
 === Common element attributes
 

@@ -11,7 +11,7 @@ package org.opentcs.guing.components.drawing.figures;
 
 import org.jhotdraw.draw.AttributeKey;
 import org.opentcs.guing.components.drawing.course.Origin;
-import org.opentcs.guing.model.FigureComponent;
+import org.opentcs.guing.model.ModelComponent;
 
 /**
  * Allgemeine Konstanten, die insbesondere Figures betreffen.
@@ -23,7 +23,7 @@ public interface FigureConstants {
   /**
    * Über diesen Schlüssel greifen Figures auf ihr Model zu.
    */
-  AttributeKey<FigureComponent> MODEL = new AttributeKey<>("Model", FigureComponent.class);
+  AttributeKey<ModelComponent> MODEL = new AttributeKey<>("Model", ModelComponent.class);
   /**
    * Über dieses Attribut erhalten Figures Zugriff auf den Referenzpunkt.
    */

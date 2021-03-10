@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jhotdraw.draw.Drawing;
+import org.jhotdraw.draw.Figure;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
@@ -32,7 +33,6 @@ import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.OtherGraphicalElement;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -92,6 +92,22 @@ public interface SystemModel
    * @return Liste aller Objekte
    */
   List<ModelComponent> getAll();
+
+  /**
+   * Registers the given figure and associates it with the given model component.
+   *
+   * @param component The model component.
+   * @param figure The figure to register.
+   */
+  void registerFigure(ModelComponent component, Figure figure);
+
+  /**
+   * Returns the figure for the given model component.
+   *
+   * @param component The model component.
+   * @return The figure for the given model component.
+   */
+  Figure getFigure(ModelComponent component);
 
   /**
    * Liefert die Zeichnung.
@@ -262,21 +278,6 @@ public interface SystemModel
   List<GroupModel> getGroupModels();
 
   /**
-   * Returns the static route model for the given name.
-   *
-   * @param name The static route's name.
-   * @return The static route model.
-   */
-  StaticRouteModel getStaticRouteModel(String name);
-
-  /**
-   * Liefert alle statischen Routen.
-   *
-   * @return eine Liste aller statischen Routen
-   */
-  List<StaticRouteModel> getStaticRouteModels();
-
-  /**
    * Liefert alle grafischen Objekte, die lediglich eine illustrierende Wirkung
    * haben. Diese Objekte sind für den Fahrkurs irrelevant.
    *
@@ -323,7 +324,6 @@ public interface SystemModel
     LOCATION_TYPES,
     BLOCKS,
     GROUPS,
-    STATIC_ROUTES,
     OTHER_GRAPHICAL_ELEMENTS
   }
 }

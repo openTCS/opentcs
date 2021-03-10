@@ -13,8 +13,8 @@ import com.google.inject.assistedinject.Assisted;
 import javax.inject.Inject;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LayoutModel;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * Die Repräsentation eines Point-Objekts in der Baumansicht.

@@ -9,6 +9,7 @@ package org.opentcs.customizations.plantoverview;
 
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.plantoverview.LocationTheme;
+import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.components.plantoverview.OrderCategorySuggestions;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
@@ -94,5 +95,14 @@ public abstract class PlantOverviewInjectionModule
    */
   protected Multibinder<OrderCategorySuggestions> orderCategorySuggestionsBinder() {
     return Multibinder.newSetBinder(binder(), OrderCategorySuggestions.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register {@link ObjectHistoryEntryFormatter}s.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<ObjectHistoryEntryFormatter> objectHistoryEntryFormatterBinder() {
+    return Multibinder.newSetBinder(binder(), ObjectHistoryEntryFormatter.class);
   }
 }

@@ -80,7 +80,9 @@ public class PointAdapter
                 .withType(getKernelPointType((PointModel) modelComponent))
                 .withProperties(getKernelProperties(modelComponent))
         )
-        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts()));
+        .withVisualLayouts(updatedLayouts(modelComponent,
+                                          plantModel.getVisualLayouts(),
+                                          systemModel));
 
     unmarkAllPropertiesChanged(modelComponent);
 
@@ -155,9 +157,10 @@ public class PointAdapter
 
   @Override
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout) {
+                                                 VisualLayoutCreationTO layout,
+                                                 SystemModel systemModel) {
     PointModel pointModel = (PointModel) model;
-    LabeledPointFigure lpf = pointModel.getFigure();
+    LabeledPointFigure lpf = (LabeledPointFigure) systemModel.getFigure(model);
     PointFigure pf = lpf.getPresentationFigure();
     int xPos = (int) (pf.getZoomPoint().getX() * layout.getScaleX());
     int yPos = (int) -(pf.getZoomPoint().getY() * layout.getScaleY());

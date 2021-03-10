@@ -19,7 +19,7 @@ import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.DRIVE_ORDER_FINISHED;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.RerouteTask;
+import org.opentcs.strategies.basic.dispatching.RerouteUtil;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +49,9 @@ public class AssignNextDriveOrdersPhase
   private final VehicleControllerPool vehicleControllerPool;
   private final TransportOrderUtil transportOrderUtil;
   /**
-   * The task performing the rerouting.
+   * The utility class for rerouting vehicles.
    */
-  private final RerouteTask rerouteTask;
+  private final RerouteUtil rerouteUtil;
   /**
    * The dispatcher configuration.
    */
@@ -67,14 +67,14 @@ public class AssignNextDriveOrdersPhase
                                     Router router,
                                     VehicleControllerPool vehicleControllerPool,
                                     TransportOrderUtil transportOrderUtil,
-                                    RerouteTask rerouteTask,
+                                    RerouteUtil rerouteUtil,
                                     DefaultDispatcherConfiguration configuration) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.router = requireNonNull(router, "router");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
-    this.rerouteTask = requireNonNull(rerouteTask, "rerouteTask");
+    this.rerouteUtil = requireNonNull(rerouteUtil, "rerouteUtil");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -134,7 +134,9 @@ public class AssignNextDriveOrdersPhase
       DriveOrder currentDriveOrder = vehicleOrder.getCurrentDriveOrder();
       if (transportOrderUtil.mustAssign(currentDriveOrder, vehicle)) {
         if (configuration.rerouteTrigger() == DRIVE_ORDER_FINISHED) {
-          rerouteTask.run();
+          LOG.debug("Trying to reroute vehicle '{}' before assigning the next drive order...",
+                    vehicle.getName());
+          rerouteUtil.reroute(vehicle);
         }
         
         // Get an up-to-date copy of the transport order in case the route changed

@@ -21,7 +21,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -68,9 +67,6 @@ public class UserObjectUtil {
     }
     else if (model instanceof PointModel) {
       return factory.createPointUserObject((PointModel) model, context);
-    }
-    else if (model instanceof StaticRouteModel) {
-      return factory.createStaticRouteUserObject((StaticRouteModel) model);
     }
     else if (model instanceof VehicleModel) {
       return factory.createVehicleUserObject((VehicleModel) model);

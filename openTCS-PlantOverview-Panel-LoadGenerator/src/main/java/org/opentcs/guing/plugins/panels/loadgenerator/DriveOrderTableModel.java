@@ -32,14 +32,14 @@ class DriveOrderTableModel
   /**
    * The column names.
    */
-  private final String[] COLUMN_NAMES = new String[] {
+  private final String[] columnNames = new String[] {
     bundle.getString("location.description"),
     bundle.getString("operation.description")
   };
   /**
    * The column classes.
    */
-  private final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
+  private final Class<?>[] columnClasses = new Class<?>[] {
     TCSObjectReference.class,
     String.class
   };
@@ -74,7 +74,7 @@ class DriveOrderTableModel
 
   @Override
   public int getColumnCount() {
-    return COLUMN_NAMES.length;
+    return columnNames.length;
   }
 
   @Override
@@ -105,12 +105,12 @@ class DriveOrderTableModel
 
   @Override
   public String getColumnName(int columnIndex) {
-    return COLUMN_NAMES[columnIndex];
+    return columnNames[columnIndex];
   }
 
   @Override
   public Class<?> getColumnClass(int columnIndex) {
-    return COLUMN_CLASSES[columnIndex];
+    return columnClasses[columnIndex];
   }
 
   @Override

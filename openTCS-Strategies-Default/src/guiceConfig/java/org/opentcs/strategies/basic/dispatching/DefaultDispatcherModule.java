@@ -35,11 +35,14 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByEnergyLevel;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByName;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
+import org.opentcs.strategies.basic.dispatching.selection.AssignmentCandidateSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeParkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeRechargeVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeReparkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeTransportOrderSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeVehicleSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.FilterAssignmentCandidatesProcessable;
 import org.opentcs.strategies.basic.dispatching.selection.FilterTransportOrdersDispatchable;
 import org.opentcs.strategies.basic.dispatching.selection.FilterVehiclesAvailableForOrders;
 import org.opentcs.strategies.basic.dispatching.selection.FilterVehiclesIdleAndDegraded;
@@ -77,6 +80,8 @@ public class DefaultDispatcherModule
         .addBinding().to(FilterVehiclesReparkable.class);
     Multibinder.newSetBinder(binder(), RechargeVehicleSelectionFilter.class)
         .addBinding().to(FilterVehiclesIdleAndDegraded.class);
+    Multibinder.newSetBinder(binder(), AssignmentCandidateSelectionFilter.class)
+        .addBinding().to(FilterAssignmentCandidatesProcessable.class);
 
     bind(CompositeParkVehicleSelectionFilter.class)
         .in(Singleton.class);
@@ -87,6 +92,8 @@ public class DefaultDispatcherModule
     bind(CompositeTransportOrderSelectionFilter.class)
         .in(Singleton.class);
     bind(CompositeVehicleSelectionFilter.class)
+        .in(Singleton.class);
+    bind(CompositeAssignmentCandidateSelectionFilter.class)
         .in(Singleton.class);
 
     bind(DefaultDispatcherConfiguration.class)

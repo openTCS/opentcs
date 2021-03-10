@@ -29,7 +29,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -72,10 +71,6 @@ public class CourseObjectFactory {
 
   public GroupModel createGroupModel() {
     return new GroupModel();
-  }
-
-  public StaticRouteModel createStaticRouteModel() {
-    return new StaticRouteModel();
   }
 
   public LabeledPointFigure createPointFigure() {

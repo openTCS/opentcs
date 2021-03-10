@@ -12,7 +12,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentcs.access.to.*;
+import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.util.annotations.ScheduledApiChange;
 

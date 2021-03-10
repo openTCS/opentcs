@@ -99,7 +99,9 @@ public class LocationAdapter
                                    getPosition((LocationModel) modelComponent))
                 .withProperties(getKernelProperties(modelComponent))
         )
-        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts()));
+        .withVisualLayouts(updatedLayouts(modelComponent,
+                                          plantModel.getVisualLayouts(),
+                                          systemModel));
 
     unmarkAllPropertiesChanged(modelComponent);
 
@@ -157,9 +159,10 @@ public class LocationAdapter
 
   @Override
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout) {
+                                                 VisualLayoutCreationTO layout,
+                                                 SystemModel systemModel) {
     LocationModel locationModel = (LocationModel) model;
-    LabeledLocationFigure llf = locationModel.getFigure();
+    LabeledLocationFigure llf = (LabeledLocationFigure) systemModel.getFigure(model);
     LocationFigure lf = llf.getPresentationFigure();
     double scaleX = layout.getScaleX();
     double scaleY = layout.getScaleY();

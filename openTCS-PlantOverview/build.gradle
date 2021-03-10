@@ -11,6 +11,7 @@ dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
   compile project(':openTCS-Impl-Configuration-cfg4j')
+  compile project(':openTCS-PlantOverview-Base')
   compile project(':openTCS-PlantOverview-Panel-LoadGenerator')
   compile project(':openTCS-PlantOverview-Panel-ResourceAllocation')
   compile project(':openTCS-PlantOverview-Panel-Statistics')

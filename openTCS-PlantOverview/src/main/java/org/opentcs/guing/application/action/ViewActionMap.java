@@ -16,7 +16,6 @@ import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.action.actions.CreateBlockAction;
 import org.opentcs.guing.application.action.actions.CreateGroupAction;
 import org.opentcs.guing.application.action.actions.CreateLocationTypeAction;
-import org.opentcs.guing.application.action.actions.CreateStaticRouteAction;
 import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
 import org.opentcs.guing.application.action.app.AboutAction;
@@ -131,7 +130,6 @@ public class ViewActionMap
     put(CreateLocationTypeAction.ID, new CreateLocationTypeAction(view));
     put(CreateVehicleAction.ID, new CreateVehicleAction(view));
     put(CreateBlockAction.ID, new CreateBlockAction(view));
-    put(CreateStaticRouteAction.ID, new CreateStaticRouteAction(view));
     put(CreateTransportOrderAction.ID, createTransportOrderAction);
     put(DispatchVehicleAction.ID, dispatchAction);
 

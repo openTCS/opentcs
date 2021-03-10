@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -62,8 +63,9 @@ public class Group
   private Group(int objectID,
                 String name,
                 Map<String, String> properties,
+                ObjectHistory history,
                 Set<TCSObjectReference<?>> members) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.members = new HashSet<>(requireNonNull(members, "members"));
   }
 
@@ -72,6 +74,7 @@ public class Group
     return new Group(getIdWithoutDeprecationWarning(),
                      getName(),
                      propertiesWith(key, value),
+                     getHistory(),
                      members);
   }
 
@@ -80,6 +83,25 @@ public class Group
     return new Group(getIdWithoutDeprecationWarning(),
                      getName(),
                      properties,
+                     getHistory(),
+                     members);
+  }
+
+  @Override
+  public TCSObject<Group> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new Group(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory().withEntryAppended(entry),
+                     members);
+  }
+
+  @Override
+  public TCSObject<Group> withHistory(ObjectHistory history) {
+    return new Group(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     history,
                      members);
   }
 
@@ -125,7 +147,11 @@ public class Group
    * @return A copy of this object, differing in the given value.
    */
   public Group withMembers(Set<TCSObjectReference<?>> members) {
-    return new Group(getIdWithoutDeprecationWarning(), getName(), getProperties(), members);
+    return new Group(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory(),
+                     members);
   }
 
   /**
@@ -152,7 +178,11 @@ public class Group
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public Group clone() {
-    return new Group(getIdWithoutDeprecationWarning(), getName(), getProperties(), members);
+    return new Group(getIdWithoutDeprecationWarning(),
+                     getName(),
+                     getProperties(),
+                     getHistory(),
+                     members);
   }
 
   @SuppressWarnings("deprecation")

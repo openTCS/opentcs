@@ -69,7 +69,7 @@ public class DefaultDispatcher
 
   private final DefaultDispatcherConfiguration configuration;
 
-  private final RerouteTask rerouteTask;
+  private final RerouteUtil rerouteUtil;
   /**
    *
    */
@@ -101,7 +101,7 @@ public class DefaultDispatcher
                            FullDispatchTask fullDispatchTask,
                            Provider<PeriodicVehicleRedispatchingTask> periodicDispatchTaskProvider,
                            DefaultDispatcherConfiguration configuration,
-                           RerouteTask rerouteTask) {
+                           RerouteUtil rerouteUtil) {
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
@@ -112,7 +112,7 @@ public class DefaultDispatcher
     this.periodicDispatchTaskProvider = requireNonNull(periodicDispatchTaskProvider,
                                                        "periodicDispatchTaskProvider");
     this.configuration = requireNonNull(configuration, "configuration");
-    this.rerouteTask = requireNonNull(rerouteTask, "rerouteTask");
+    this.rerouteUtil = requireNonNull(rerouteUtil, "rerouteUtil");
   }
 
   @Override
@@ -292,7 +292,10 @@ public class DefaultDispatcher
   public void topologyChanged() {
     if (configuration.rerouteTrigger() == TOPOLOGY_CHANGE) {
       LOG.debug("Scheduling reroute task...");
-      kernelExecutor.submit(rerouteTask);
+      kernelExecutor.submit(() -> {
+        LOG.debug("Rerouting vehicles due to topology change...");
+        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class));
+      });
     }
   }
 

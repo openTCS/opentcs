@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.Router;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -74,6 +75,7 @@ public class StaticRoute
   private StaticRoute(int objectID,
                       String name,
                       Map<String, String> properties,
+                      ObjectHistory history,
                       List<TCSObjectReference<Point>> hops) {
     super(objectID, name, properties);
     this.hops = listWithoutNullValues(requireNonNull(hops, "hops"));
@@ -84,12 +86,35 @@ public class StaticRoute
     return new StaticRoute(getIdWithoutDeprecationWarning(),
                            getName(),
                            propertiesWith(key, value),
+                           getHistory(),
                            hops);
   }
 
   @Override
   public StaticRoute withProperties(Map<String, String> properties) {
-    return new StaticRoute(getIdWithoutDeprecationWarning(), getName(), properties, hops);
+    return new StaticRoute(getIdWithoutDeprecationWarning(),
+                           getName(),
+                           properties,
+                           getHistory(),
+                           hops);
+  }
+
+  @Override
+  public TCSObject<StaticRoute> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new StaticRoute(getIdWithoutDeprecationWarning(),
+                           getName(),
+                           getProperties(),
+                           getHistory().withEntryAppended(entry),
+                           hops);
+  }
+
+  @Override
+  public TCSObject<StaticRoute> withHistory(ObjectHistory history) {
+    return new StaticRoute(getIdWithoutDeprecationWarning(),
+                           getName(),
+                           getProperties(),
+                           history,
+                           hops);
   }
 
   /**
@@ -153,7 +178,11 @@ public class StaticRoute
    * @return A copy of this object, differing in the given value.
    */
   public StaticRoute withHops(List<TCSObjectReference<Point>> hops) {
-    return new StaticRoute(getIdWithoutDeprecationWarning(), getName(), getProperties(), hops);
+    return new StaticRoute(getIdWithoutDeprecationWarning(),
+                           getName(),
+                           getProperties(),
+                           getHistory(),
+                           hops);
   }
 
   /**
@@ -186,7 +215,11 @@ public class StaticRoute
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public StaticRoute clone() {
-    return new StaticRoute(getIdWithoutDeprecationWarning(), getName(), getProperties(), hops);
+    return new StaticRoute(getIdWithoutDeprecationWarning(),
+                           getName(),
+                           getProperties(),
+                           getHistory(),
+                           hops);
   }
 
   @SuppressWarnings("deprecation")

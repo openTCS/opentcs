@@ -10,14 +10,17 @@
 
 package org.opentcs.guing.components.dialogs;
 
+import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.JPanel;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * Panel zur Auswahl eines Fahrzeugs, das dann im View gesucht werden kann.
@@ -36,17 +39,25 @@ public class FindVehiclePanel
    * The view to show the found vehicle in.
    */
   private final OpenTCSDrawingView fDrawingView;
+  /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
 
   /**
    * Creates a new instance.
    *
    * @param vehicles A list of existing vehicles.
    * @param drawingView The view to show the found vehicle in.
+   * @param modelManager The model manager.
    */
-  public FindVehiclePanel(Collection<VehicleModel> vehicles,
-                          OpenTCSDrawingView drawingView) {
+  @Inject
+  public FindVehiclePanel(@Assisted Collection<VehicleModel> vehicles,
+                          @Assisted OpenTCSDrawingView drawingView,
+                          ModelManager modelManager) {
     fVehicles = new ArrayList<>(requireNonNull(vehicles, "vehicles"));
     fDrawingView = requireNonNull(drawingView, "drawingView");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
 
     initComponents();
 
@@ -112,7 +123,7 @@ public class FindVehiclePanel
         return;
       }
 
-      VehicleFigure figure = vehicle.getFigure();
+      VehicleFigure figure = (VehicleFigure) modelManager.getModel().getFigure(vehicle);
       if (figure != null) {
         fDrawingView.scrollTo(figure);
       }

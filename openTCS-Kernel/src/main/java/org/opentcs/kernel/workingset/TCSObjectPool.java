@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectExistsException;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
@@ -461,6 +462,29 @@ public class TCSObjectPool {
     emitObjectEvent(object.clone(),
                     previousState,
                     TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  /**
+   * Appends a history entry to the referenced object.
+   *
+   * @param ref A reference to the object to be modified.
+   * @param entry The history entry to be appended.
+   * @throws ObjectUnknownException If the referenced object does not exist.
+   */
+  @SuppressWarnings("deprecation")
+  public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
+      throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
+    TCSObject<?> object = objectsByName.get(ref.getName());
+    if (object == null) {
+      throw new ObjectUnknownException("No object with name " + ref.getName());
+    }
+    TCSObject<?> previousState = object.clone();
+    LOG.debug("Appending history entry to object named '{}': {}", ref.getName(), entry);
+    object = object.withHistoryEntry(entry);
+    objectsByName.put(object.getName(), object);
+    emitObjectEvent(object.clone(), previousState, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**

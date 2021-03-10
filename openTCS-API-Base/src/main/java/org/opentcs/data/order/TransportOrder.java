@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,9 +20,14 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_CREATED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -66,10 +72,14 @@ public class TransportOrder
    */
   @Nonnull
   private List<Rejection> rejections = new LinkedList<>();
-
+  /**
+   * The drive orders this transport order consists of.
+   */
   @Nonnull
   private List<DriveOrder> driveOrders = new ArrayList<>();
-
+  /**
+   * The index of the currently processed drive order.
+   */
   private int currentDriveOrderIndex = -1;
   /**
    * This transport order's current state.
@@ -129,7 +139,10 @@ public class TransportOrder
                         String name,
                         List<DriveOrder.Destination> destinations,
                         long creationTime) {
-    super(objectID, name);
+    super(objectID,
+          name,
+          new HashMap<>(),
+          new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED)));
     this.driveOrders = createDriveOrders(destinations);
     this.currentDriveOrderIndex = -1;
     this.creationTime = Instant.ofEpochMilli(creationTime);
@@ -152,7 +165,10 @@ public class TransportOrder
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public TransportOrder(int objectID, String name, List<DriveOrder> driveOrders) {
-    super(objectID, name);
+    super(objectID,
+          name,
+          new HashMap<>(),
+          new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED)));
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.currentDriveOrderIndex = -1;
     this.creationTime = Instant.EPOCH;
@@ -171,7 +187,9 @@ public class TransportOrder
    * order.
    */
   public TransportOrder(String name, List<DriveOrder> driveOrders) {
-    super(name);
+    super(name,
+          new HashMap<>(),
+          new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED)));
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.currentDriveOrderIndex = -1;
     this.creationTime = Instant.EPOCH;
@@ -195,6 +213,7 @@ public class TransportOrder
   private TransportOrder(int objectID,
                          String name,
                          Map<String, String> properties,
+                         ObjectHistory history,
                          String category,
                          List<DriveOrder> driveOrders,
                          int currentDriveOrderIndex,
@@ -208,7 +227,7 @@ public class TransportOrder
                          TCSObjectReference<Vehicle> processingVehicle,
                          State state,
                          Instant finishedTime) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.category = requireNonNull(category, "category");
     requireNonNull(driveOrders, "driveOrders");
     this.driveOrders = new LinkedList<>();
@@ -233,7 +252,9 @@ public class TransportOrder
   public TransportOrder withProperty(String key, String value) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
-                              propertiesWith(key, value), category,
+                              propertiesWith(key, value),
+                              getHistory(),
+                              category,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -253,6 +274,49 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               properties,
+                              getHistory(),
+                              category,
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  @Override
+  public TransportOrder withHistoryEntry(ObjectHistory.Entry entry) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              getHistory().withEntryAppended(entry),
+                              category,
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  @Override
+  public TransportOrder withHistory(ObjectHistory history) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              history,
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -288,6 +352,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -355,6 +420,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              historyForNewState(state),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -403,6 +469,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -466,6 +533,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -484,10 +552,10 @@ public class TransportOrder
   /**
    * Returns the point of time at which this transport order was finished.
    * If the transport order has not been finished, yet,
-   * <code>Long.MIN_VALUE</code> is returned.
+   * <code>Long.MAX_VALUE</code> is returned.
    *
    * @return The point of time at which this transport order was finished, or
-   * <code>Long.MIN_VALUE</code>, if the transport order has not been finished,
+   * <code>Long.MAX_VALUE</code>, if the transport order has not been finished,
    * yet.
    */
   @ScheduledApiChange(when = "5.0", details = "Will return an Instant instead.")
@@ -518,6 +586,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -569,6 +638,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -621,6 +691,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              historyForNewProcessingVehicle(processingVehicle),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -688,6 +759,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -736,6 +808,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -835,6 +908,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -924,6 +998,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -967,15 +1042,16 @@ public class TransportOrder
   public TransportOrder withCurrentDriveOrderState(@Nonnull DriveOrder.State driveOrderState) {
     requireNonNull(driveOrderState, "driveOrderState");
 
-    List<DriveOrder> driveOrders = new ArrayList<>(this.driveOrders);
-    driveOrders.set(currentDriveOrderIndex,
-                    driveOrders.get(currentDriveOrderIndex).withState(driveOrderState));
+    List<DriveOrder> newDriveOrders = new ArrayList<>(this.driveOrders);
+    newDriveOrders.set(currentDriveOrderIndex,
+                       newDriveOrders.get(currentDriveOrderIndex).withState(driveOrderState));
 
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              historyForNewDriveOrderState(driveOrderState),
                               category,
-                              driveOrders,
+                              newDriveOrders,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -1026,6 +1102,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -1072,6 +1149,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -1099,6 +1177,7 @@ public class TransportOrder
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
+                              getHistory(),
                               category,
                               driveOrders,
                               currentDriveOrderIndex,
@@ -1137,6 +1216,25 @@ public class TransportOrder
   @SuppressWarnings("deprecation")
   private int getIdWithoutDeprecationWarning() {
     return getId();
+  }
+
+  private ObjectHistory historyForNewState(State state) {
+    return state.isFinalState()
+        ? getHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_REACHED_FINAL_STATE))
+        : getHistory();
+  }
+
+  private ObjectHistory historyForNewDriveOrderState(DriveOrder.State state) {
+    return state == DriveOrder.State.FINISHED
+        ? getHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_DRIVE_ORDER_FINISHED))
+        : getHistory();
+  }
+
+  private ObjectHistory historyForNewProcessingVehicle(TCSObjectReference<Vehicle> ref) {
+    return getHistory().withEntryAppended(
+        new ObjectHistory.Entry(ORDER_PROCESSING_VEHICLE_CHANGED,
+                                ref == null ? "" : ref.getName())
+    );
   }
 
   private List<Rejection> rejectionsWithAppended(@Nonnull Rejection rejection) {

@@ -16,6 +16,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.annotation.Nonnull;
+import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -87,10 +89,11 @@ public class Location
   private Location(int objectID,
                    String name,
                    Map<String, String> properties,
+                   ObjectHistory history,
                    TCSObjectReference<LocationType> locationType,
                    Triple position,
                    Set<Link> attachedLinks) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     type = requireNonNull(locationType, "locationType");
     this.position = requireNonNull(position, "position");
     this.attachedLinks = new HashSet<>(requireNonNull(attachedLinks, "attachedLinks"));
@@ -101,6 +104,7 @@ public class Location
     return new Location(getIdWithoutDeprecationWarning(),
                         getName(),
                         propertiesWith(key, value),
+                        getHistory(),
                         type,
                         position,
                         attachedLinks);
@@ -111,6 +115,29 @@ public class Location
     return new Location(getIdWithoutDeprecationWarning(),
                         getName(),
                         properties,
+                        getHistory(),
+                        type,
+                        position,
+                        attachedLinks);
+  }
+
+  @Override
+  public TCSObject<Location> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        getProperties(),
+                        getHistory().withEntryAppended(entry),
+                        type,
+                        position,
+                        attachedLinks);
+  }
+
+  @Override
+  public TCSObject<Location> withHistory(ObjectHistory history) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        getProperties(),
+                        history,
                         type,
                         position,
                         attachedLinks);
@@ -148,6 +175,7 @@ public class Location
     return new Location(getIdWithoutDeprecationWarning(),
                         getName(),
                         getProperties(),
+                        getHistory(),
                         type,
                         position,
                         attachedLinks);
@@ -238,6 +266,7 @@ public class Location
     return new Location(getIdWithoutDeprecationWarning(),
                         getName(),
                         getProperties(),
+                        getHistory(),
                         type,
                         position,
                         attachedLinks);
@@ -255,6 +284,7 @@ public class Location
     return new Location(getIdWithoutDeprecationWarning(),
                         getName(),
                         getProperties(),
+                        getHistory(),
                         type,
                         position,
                         attachedLinks);

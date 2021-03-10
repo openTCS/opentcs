@@ -21,12 +21,12 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCandidateComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCandidateComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleComparator;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeTransportOrderSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeVehicleSelectionFilter;
 import org.slf4j.Logger;
@@ -53,10 +53,6 @@ public class AssignFreeOrdersPhase
    * The Router instance calculating route costs.
    */
   private final Router router;
-  /**
-   * Checks processability of transport orders for vehicles.
-   */
-  private final ProcessabilityChecker processabilityChecker;
   /**
    * Stores reservations of orders for vehicles.
    */
@@ -85,6 +81,10 @@ public class AssignFreeOrdersPhase
    * A collection of predicates for filtering transport orders.
    */
   private final CompositeTransportOrderSelectionFilter transportOrderSelectionFilter;
+  /**
+   * A collection of predicates for filtering assignment candidates.
+   */
+  private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
 
   private final TransportOrderUtil transportOrderUtil;
 
@@ -97,7 +97,6 @@ public class AssignFreeOrdersPhase
   public AssignFreeOrdersPhase(
       TCSObjectService objectService,
       Router router,
-      ProcessabilityChecker processabilityChecker,
       OrderReservationPool orderReservationPool,
       CompositeVehicleComparator vehicleComparator,
       CompositeOrderComparator orderComparator,
@@ -105,12 +104,11 @@ public class AssignFreeOrdersPhase
       CompositeVehicleCandidateComparator vehicleCandidateComparator,
       CompositeVehicleSelectionFilter vehicleSelectionFilter,
       CompositeTransportOrderSelectionFilter transportOrderSelectionFilter,
+      CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
-    this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
-    this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.vehicleComparator = requireNonNull(vehicleComparator, "vehicleComparator");
     this.orderComparator = requireNonNull(orderComparator, "orderComparator");
     this.orderCandidateComparator = requireNonNull(orderCandidateComparator,
@@ -120,6 +118,9 @@ public class AssignFreeOrdersPhase
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.transportOrderSelectionFilter = requireNonNull(transportOrderSelectionFilter,
                                                         "transportOrderSelectionFilter");
+    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
+                                                             "assignmentCandidateSelectionFilter");
+    this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }
 
   @Override
@@ -181,8 +182,7 @@ public class AssignFreeOrdersPhase
         .map(order -> computeCandidate(vehicle, vehiclePosition, order))
         .filter(optCandidate -> optCandidate.isPresent())
         .map(optCandidate -> optCandidate.get())
-        .filter(candidate -> processabilityChecker.checkProcessability(vehicle,
-                                                                       candidate.getTransportOrder()))
+        .filter(assignmentCandidateSelectionFilter)
         .sorted(orderCandidateComparator)
         .findFirst()
         .ifPresent(candidate -> assignOrder(candidate));
@@ -194,11 +194,13 @@ public class AssignFreeOrdersPhase
     objectService.fetchObjects(Vehicle.class,
                                vehicle -> availableForOrder(vehicle, order))
         .stream()
-        .map(vehicle -> computeCandidate(vehicle, order))
+        .map(vehicle -> computeCandidate(vehicle,
+                                         objectService.fetchObject(Point.class,
+                                                                   vehicle.getCurrentPosition()),
+                                         order))
         .filter(optCandidate -> optCandidate.isPresent())
         .map(optCandidate -> optCandidate.get())
-        .filter(candidate -> processabilityChecker.checkProcessability(candidate.getVehicle(),
-                                                                       order))
+        .filter(assignmentCandidateSelectionFilter)
         .sorted(vehicleCandidateComparator)
         .findFirst()
         .ifPresent(candidate -> assignOrder(candidate));
@@ -209,15 +211,15 @@ public class AssignFreeOrdersPhase
     // directly, but must abort the old one (DefaultDispatcher.abortOrder()) and wait for the
     // vehicle's ProcState to become IDLE.
     if (candidate.getVehicle().getTransportOrder() == null) {
-      LOG.debug("Assigning transport order '{}' to vehicle '{}' to ...",
-                candidate.getVehicle().getName(),
-                candidate.getTransportOrder().getName());
+      LOG.debug("Assigning transport order '{}' to vehicle '{}'...",
+                candidate.getTransportOrder().getName(),
+                candidate.getVehicle().getName());
       transportOrderUtil.assignTransportOrder(candidate.getVehicle(),
                                               candidate.getTransportOrder(),
                                               candidate.getDriveOrders());
     }
     else {
-      LOG.debug("Reserving transport order '{}' for vehicle '{}' ",
+      LOG.debug("Reserving transport order '{}' for vehicle '{}'...",
                 candidate.getTransportOrder().getName(),
                 candidate.getVehicle().getName());
       // Remember that the new order is reserved for this vehicle.
@@ -225,12 +227,6 @@ public class AssignFreeOrdersPhase
                                           candidate.getVehicle().getReference());
       transportOrderUtil.abortOrder(candidate.getVehicle(), false, false, false);
     }
-  }
-
-  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle, TransportOrder order) {
-    return computeCandidate(vehicle, objectService.fetchObject(Point.class,
-                                                               vehicle.getCurrentPosition()),
-                            order);
   }
 
   private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,

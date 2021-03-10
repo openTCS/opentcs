@@ -37,14 +37,14 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class CreateTransportOrderTest {
 
-  private TransportOrderService internalTransportOrderService;
-  private DispatcherService dispatcherService;
+  private TransportOrderService orderService;
+  private DispatcherService dispService;
 
   @Before
   public void setUp() {
-    internalTransportOrderService = mock(InternalTransportOrderService.class);
-    dispatcherService = mock(DispatcherService.class);
-    when(internalTransportOrderService.createTransportOrder(any(TransportOrderCreationTO.class)))
+    orderService = mock(InternalTransportOrderService.class);
+    dispService = mock(DispatcherService.class);
+    when(orderService.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenReturn(new TransportOrder(
             "Transportorder",
             Collections.singletonList(new DriveOrder(
@@ -124,11 +124,11 @@ public class CreateTransportOrderTest {
   }
 
   private TransportOrderService getATransportOrderServiceReference() {
-    return internalTransportOrderService;
+    return orderService;
   }
 
   private DispatcherService getADispatcherServiceReference() {
-    return dispatcherService;
+    return dispService;
   }
 
   private String getDestinationOperation() {

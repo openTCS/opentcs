@@ -49,6 +49,23 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.13 (2019-02-18)
+
+* New features:
+** Introduce an event history for transport orders that can be filled with arbitrary event data.
+** Introduce `"*"` as a wildcard in a vehicle's processable categories to allow processing of transport orders in _any_ category.
+** The Plant Overview's vehicle panel now also shows the current destination of each vehicle.
+* Bugs fixed:
+** With the `defaultdispatcher.rerouteTrigger` configuration entry set to `DRIVE_ORDER_FINISHED`, ensure that the rerouting is only applied to the vehicle that has actually finished a drive order.
+** For vehicles selected in the Plant Overview, re-allow changing their integration levels via the context menu to either "to be utilized" or "to be respected" if any of them is currently processing a transport order, too.
+* Other changes:
+** Remove the included integration project generator and document usage of the example integration project, instead.
+** Update the web API specification to OpenAPI 3.
+** Update Gradle to 4.10.3.
+** Update Checkstyle to 8.16.
+** Update JUnit to 5.3.2.
+** Update Guice to 4.2.2.
+
 === Version 4.12 (2018-12-20)
 
 * New features:

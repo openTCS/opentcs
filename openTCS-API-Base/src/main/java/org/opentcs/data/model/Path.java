@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -105,6 +107,7 @@ public class Path
   private Path(int objectID,
                String name,
                Map<String, String> properties,
+               ObjectHistory history,
                TCSObjectReference<Point> sourcePoint,
                TCSObjectReference<Point> destinationPoint,
                long length,
@@ -112,7 +115,7 @@ public class Path
                int maxVelocity,
                int maxReverseVelocity,
                boolean locked) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
     this.length = checkInRange(length, 1, Long.MAX_VALUE, "length");
@@ -130,6 +133,7 @@ public class Path
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     propertiesWith(key, value),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -144,6 +148,37 @@ public class Path
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     properties,
+                    getHistory(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
+  }
+
+  @Override
+  public TCSObject<Path> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    getHistory().withEntryAppended(entry),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    routingCost,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    locked);
+  }
+
+  @Override
+  public TCSObject<Path> withHistory(ObjectHistory history) {
+    return new Path(getIdWithoutDeprecationWarning(),
+                    getName(),
+                    getProperties(),
+                    history,
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -188,6 +223,7 @@ public class Path
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     getProperties(),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -231,6 +267,7 @@ public class Path
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     getProperties(),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -288,13 +325,14 @@ public class Path
   /**
    * Creates a copy of this object, with the given maximum velocity.
    *
-   * @param maxVelocity  The value to be set in the copy.
+   * @param maxVelocity The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withMaxVelocity(int maxVelocity) {
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     getProperties(),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -334,13 +372,14 @@ public class Path
   /**
    * Creates a copy of this object, with the given maximum reverse velocity.
    *
-   * @param maxReverseVelocity  The value to be set in the copy.
+   * @param maxReverseVelocity The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withMaxReverseVelocity(int maxReverseVelocity) {
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     getProperties(),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -377,13 +416,14 @@ public class Path
   /**
    * Creates a copy of this object, with the given locked flag.
    *
-   * @param locked  The value to be set in the copy.
+   * @param locked The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withLocked(boolean locked) {
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     getProperties(),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
@@ -448,6 +488,7 @@ public class Path
     return new Path(getIdWithoutDeprecationWarning(),
                     getName(),
                     getProperties(),
+                    getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,

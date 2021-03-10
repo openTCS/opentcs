@@ -95,8 +95,10 @@ public class OpenTCSDragTracker
       }
 
       if (dragRect != null) {
-        anchorPoint = previousPoint = view.viewToDrawing(anchor);
-        anchorOrigin = previousOrigin = new Point2D.Double(dragRect.x, dragRect.y);
+        anchorPoint = view.viewToDrawing(anchor);
+        previousPoint = anchorPoint;
+        anchorOrigin = new Point2D.Double(dragRect.x, dragRect.y);
+        previousOrigin = anchorOrigin;
       }
     }
   }

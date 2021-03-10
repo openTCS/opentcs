@@ -17,7 +17,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.guing.application.ApplicationFrame;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**

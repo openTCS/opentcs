@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -99,6 +100,14 @@ public class StandardTCSObjectService
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
       getGlobalObjectPool().setObjectProperty(ref, key, value);
+    }
+  }
+
+  @Override
+  public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
+      throws ObjectUnknownException {
+    synchronized (getGlobalSyncObject()) {
+      getGlobalObjectPool().appendObjectHistoryEntry(ref, entry);
     }
   }
 

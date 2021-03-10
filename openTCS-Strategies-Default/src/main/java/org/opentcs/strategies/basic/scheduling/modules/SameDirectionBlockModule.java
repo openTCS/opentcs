@@ -253,21 +253,19 @@ public class SameDirectionBlockModule
     public void permitPendingRequests() {
       while (hasPendingRequests()) {
         PermissionRequest request = pendingRequests.poll();
-        Scheduler.Client client = request.getClient();
-        String entryDirection = request.getEntryDirection();
 
-        if (clientAlreadyInBlock(client)) {
+        if (clientAlreadyInBlock(request.getClient())) {
           LOG.debug("{}: Permission for {} already granted",
                     block.getName(),
-                    client.getId());
+                    request.getClient().getId());
         }
-        else if (entryPermissible(entryDirection)) {
-          clients.add(client);
-          this.entryDirection = entryDirection;
+        else if (entryPermissible(request.getEntryDirection())) {
+          clients.add(request.getClient());
+          this.entryDirection = request.getEntryDirection();
           LOG.debug("{}: Permission granted for {} (entryDirection={})",
                     block.getName(),
-                    client.getId(),
-                    entryDirection);
+                    request.getClient().getId(),
+                    request.getEntryDirection());
         }
       }
     }

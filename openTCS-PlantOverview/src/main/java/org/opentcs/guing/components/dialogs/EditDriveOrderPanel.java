@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
-import org.opentcs.guing.model.AbstractFigureComponent;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PointModel;
@@ -38,7 +38,7 @@ public class EditDriveOrderPanel
   /**
    * Die ausgewählte Station.
    */
-  private AbstractFigureComponent fSelectedLocation;
+  private AbstractConnectableModelComponent fSelectedLocation;
   /**
    * Die ausgewählte Aktion.
    */
@@ -63,7 +63,7 @@ public class EditDriveOrderPanel
    * @param action die Aktion
    */
   public EditDriveOrderPanel(List<LocationModel> locations,
-                             AbstractFigureComponent location, String action) {
+                             AbstractConnectableModelComponent location, String action) {
     checkArgument(location instanceof PointModel || location instanceof LocationModel,
                   ResourceBundleUtil.getBundle()
                       .getFormatted("EditDriveOrderPanel.wrongLocationMessage",

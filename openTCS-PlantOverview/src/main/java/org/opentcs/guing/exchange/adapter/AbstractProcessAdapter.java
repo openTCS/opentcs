@@ -19,6 +19,7 @@ import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.SystemModel;
 
 /**
  * Basic implementation of a <code>ProcessAdapter</code>.
@@ -73,18 +74,20 @@ public abstract class AbstractProcessAdapter
   }
 
   protected List<VisualLayoutCreationTO> updatedLayouts(ModelComponent model,
-                                                        List<VisualLayoutCreationTO> layouts) {
+                                                        List<VisualLayoutCreationTO> layouts,
+                                                        SystemModel systemModel) {
     List<VisualLayoutCreationTO> result = new ArrayList<>(layouts.size());
 
     for (VisualLayoutCreationTO layout : layouts) {
-      result.add(updatedLayout(model, layout));
+      result.add(updatedLayout(model, layout, systemModel));
     }
 
     return result;
   }
 
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout) {
+                                                 VisualLayoutCreationTO layout,
+                                                 SystemModel systemModel) {
     return layout;
   }
 }

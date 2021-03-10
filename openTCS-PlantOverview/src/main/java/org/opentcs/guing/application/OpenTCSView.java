@@ -60,10 +60,7 @@ import org.jhotdraw.app.action.window.ToggleVisibleAction;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
-import org.jhotdraw.draw.QuadTreeDrawing;
 import org.jhotdraw.draw.connector.Connector;
-import org.jhotdraw.draw.io.InputFormat;
-import org.jhotdraw.draw.io.OutputFormat;
 import org.jhotdraw.gui.URIChooser;
 import org.jhotdraw.util.ReversedList;
 import org.opentcs.access.Kernel;
@@ -126,14 +123,10 @@ import org.opentcs.guing.event.ModelModificationEvent;
 import org.opentcs.guing.event.ModelNameChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.ResetInteractionToolCommand;
-import org.opentcs.guing.event.StaticRouteChangeEvent;
-import org.opentcs.guing.event.StaticRouteChangeListener;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
-import org.opentcs.guing.model.FigureComponent;
-import org.opentcs.guing.model.FiguresFolder;
+import org.opentcs.guing.model.ConnectableModelComponent;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.PropertiesCollection;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
@@ -145,15 +138,15 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.storage.OpenTCSFactory;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.OrderSequencesContainerPanel;
 import org.opentcs.guing.transport.TransportOrdersContainerPanel;
 import org.opentcs.guing.util.Colors;
+import org.opentcs.guing.util.Comparators;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.Cursors;
-import org.opentcs.guing.util.DefaultInputOutputFormat;
+import org.opentcs.guing.util.ModelComponentUtil;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UniqueNameGenerator;
@@ -294,11 +287,6 @@ public class OpenTCSView
    * A factory for drawing views.
    */
   private final DrawingViewFactory drawingViewFactory;
-  /**
-   * Handles static route events.
-   */
-  private final StaticRouteChangeListener staticRouteEventHandler
-      = new StaticRouteEventHandler();
   /**
    * Handles block events.
    */
@@ -818,7 +806,7 @@ public class OpenTCSView
     requireNonNull(groupModel, "groupModel");
 
     for (Figure figure : fDrawingEditor.getActiveView().getSelectedFigures()) {
-      FigureComponent model = figure.get(FigureConstants.MODEL);
+      ModelComponent model = figure.get(FigureConstants.MODEL);
 
       if (model instanceof LinkModel) {
         // LinkModels are automatically set in/visible
@@ -1133,9 +1121,8 @@ public class OpenTCSView
       if (folder.contains(modelComponent)) {
         try {
           // Paste after Copy: Create clones of tree components (and figures)
-          if (modelComponent instanceof FigureComponent) {
-            Figure figure = ((FigureComponent) modelComponent).getFigure();
-
+          Figure figure = fModelManager.getModel().getFigure(modelComponent);
+          if (figure != null) {
             if (figure instanceof LabeledFigure) {
               // Point, Location
               // Create new Figure with a "cloned" model
@@ -1158,7 +1145,7 @@ public class OpenTCSView
             }
           }
           else {
-            // LocationType, Block, StaticRoute, Group
+            // LocationType, Block, Group
             modelComponent = modelComponent.clone();
           }
         }
@@ -1167,11 +1154,10 @@ public class OpenTCSView
         }
       }
 
-      if (modelComponent instanceof FigureComponent) {
-        if (!getActiveDrawingView().getDrawing().contains(
-            ((FigureComponent) modelComponent).getFigure())) {
-          getActiveDrawingView().getDrawing().add(((FigureComponent) modelComponent).getFigure());
-        }
+      Figure figure = fModelManager.getModel().getFigure(modelComponent);
+      if (figure != null
+          && !getActiveDrawingView().getDrawing().contains(figure)) {
+        getActiveDrawingView().getDrawing().add(figure);
       }
 
       addModelComponent(folder, modelComponent);
@@ -1189,22 +1175,24 @@ public class OpenTCSView
 
   public List<Figure> cloneFigures(List<Figure> figuresToClone) {
     // Buffer for Links and Paths associated with the cloned Points and Locations
-    TreeSet<AbstractConnection> bufferedConnections = new TreeSet<>();
+    TreeSet<AbstractConnection> bufferedConnections
+        = new TreeSet<>(Comparators.modelComponentsByName());
     // References the prototype Points and Locations to their clones
-    Map<FigureComponent, FigureComponent> mClones = new HashMap<>();
+    Map<ModelComponent, ModelComponent> mClones = new HashMap<>();
     List<Figure> clonedFigures = new ArrayList<>();
 
     for (Figure figure : figuresToClone) {
       if (figure instanceof LabeledFigure) {
         // Location or Point
-        FigureComponent model = figure.get(FigureConstants.MODEL);
+        ConnectableModelComponent model 
+            = (ConnectableModelComponent) figure.get(FigureConstants.MODEL);
 
         if (model != null) {
           bufferedConnections.addAll(model.getConnections());
         }
 
         LabeledFigure clonedFigure = (LabeledFigure) figure.clone();
-        FigureComponent clonedModel = clonedFigure.get(FigureConstants.MODEL);
+        ModelComponent clonedModel = clonedFigure.get(FigureConstants.MODEL);
 
         if (model != null) {
           mClones.put(model, clonedModel);
@@ -1243,15 +1231,16 @@ public class OpenTCSView
 
         if (bufferedConnections.contains(model)) {
           if (model != null) {
-            FigureComponent sourcePoint = (FigureComponent) model.getStartComponent();
-            FigureComponent clonedSource = mClones.get(sourcePoint);
+            ModelComponent sourcePoint = model.getStartComponent();
+            ModelComponent clonedSource = mClones.get(sourcePoint);
             Iterator<Connector> iConnectors
-                = clonedSource.getFigure().getConnectors(null).iterator();
+                = fModelManager.getModel().getFigure(clonedSource).getConnectors(null).iterator();
             clonedFigure.setStartConnector(iConnectors.next());
 
-            FigureComponent destinationPoint = (FigureComponent) model.getEndComponent();
-            FigureComponent clonedDestination = mClones.get(destinationPoint);
-            iConnectors = clonedDestination.getFigure().getConnectors(null).iterator();
+            ModelComponent destinationPoint = model.getEndComponent();
+            ModelComponent clonedDestination = mClones.get(destinationPoint);
+            iConnectors = fModelManager.getModel().getFigure(clonedDestination)
+                .getConnectors(null).iterator();
             clonedFigure.setEndConnector(iConnectors.next());
 
             clonedModel.setConnectedComponents(clonedSource, clonedDestination);
@@ -1271,32 +1260,11 @@ public class OpenTCSView
   @Override  // View
   public void write(URI f, URIChooser chooser)
       throws IOException {
-    Drawing drawing = fDrawingEditor.getDrawing();
-    OutputFormat outputFormat = drawing.getOutputFormats().get(0);
-    outputFormat.write(f, drawing);
   }
 
   @Override  // View
   public void read(URI f, URIChooser chooser)
       throws IOException {
-    try {
-      final Drawing drawing = createDrawing();
-      InputFormat inputFormat = drawing.getInputFormats().get(0);
-      inputFormat.read(f, drawing, true);
-
-      SwingUtilities.invokeAndWait(() -> {
-        for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-          OpenTCSDrawingView tcsDrawView = (OpenTCSDrawingView) drawView;
-          tcsDrawView.getDrawing().removeUndoableEditListener(fUndoRedoManager);
-          tcsDrawView.setDrawing(drawing);
-          tcsDrawView.getDrawing().addUndoableEditListener(fUndoRedoManager);
-        }
-        fUndoRedoManager.discardAllEdits();
-      });
-    }
-    catch (InterruptedException | InvocationTargetException e) {
-      throw new InternalError(e);
-    }
   }
 
   @Override  // AbstractView
@@ -1384,7 +1352,7 @@ public class OpenTCSView
     if (appState.hasOperationMode(OperationMode.MODELLING)) {
       // Point/Location: Remove corresponding Figure.
       if (model instanceof PointModel || model instanceof LocationModel) {
-        LabeledFigure lf = (LabeledFigure) ((FigureComponent) model).getFigure();
+        LabeledFigure lf = (LabeledFigure) fModelManager.getModel().getFigure(model);
         // Die Drawing l�scht auch ggf. mit dem Point verbundene PathConnections
         // bzw. eine mit der Location verbundenen LinkConnection
         fDrawingEditor.getActiveView().getDrawing().remove(lf);
@@ -1393,13 +1361,13 @@ public class OpenTCSView
       // Link/Path: Remove corresponding Figure.
       else if ((model instanceof LinkModel || model instanceof PathModel)
           && !(model.getParent() instanceof BlockModel)) {
-        SimpleLineConnection figure = (SimpleLineConnection) ((FigureComponent) model).getFigure();
+        SimpleLineConnection figure = (SimpleLineConnection) fModelManager.getModel().getFigure(model);
         fDrawingEditor.getActiveView().getDrawing().remove(figure);
         componentRemoved = true;
       }
       // Vehicle: Remove corresponding Figure.
       else if (model instanceof VehicleModel) {
-        VehicleFigure vf = (VehicleFigure) ((FigureComponent) model).getFigure();
+        VehicleFigure vf = (VehicleFigure) fModelManager.getModel().getFigure(model);
         fDrawingEditor.getActiveView().getDrawing().remove(vf);
         componentRemoved = true;
       }
@@ -1447,10 +1415,12 @@ public class OpenTCSView
   }
 
   @Override  // GuiManager
-  public void blockSelected(FiguresFolder blockFiguresFolder) {
+  public void blockSelected(BlockModel block) {
     Rectangle2D r = null;
 
-    for (Iterator<Figure> figureIter = blockFiguresFolder.figures(); figureIter.hasNext();) {
+    List<Figure> blockElementFigures
+        = ModelComponentUtil.getChildFigures(block, fModelManager.getModel());
+    for (Iterator<Figure> figureIter = blockElementFigures.iterator(); figureIter.hasNext();) {
       Rectangle2D displayBox = figureIter.next().getDrawingArea();
 
       if (r == null) {
@@ -1465,11 +1435,11 @@ public class OpenTCSView
       OpenTCSDrawingView drawingView = fDrawingEditor.getActiveView();
       drawingView.clearSelection();
 
-      for (Iterator<Figure> figureIter = blockFiguresFolder.figures(); figureIter.hasNext();) {
+      for (Iterator<Figure> figureIter = blockElementFigures.iterator(); figureIter.hasNext();) {
         drawingView.addToSelection(figureIter.next());
       }
 
-      drawingView.updateBlock(blockFiguresFolder);
+      drawingView.updateBlock(block);
     }
   }
 
@@ -1632,9 +1602,6 @@ public class OpenTCSView
           .setColor(Colors.unusedBlockColor(fModelManager.getModel().getBlockModels()));
       model = blockModel;
     }
-    else if (clazz == StaticRouteModel.class) {
-      model = crsObjFactory.createStaticRouteModel();
-    }
     else {
       throw new IllegalArgumentException("Unhandled component class: " + clazz);
     }
@@ -1794,19 +1761,6 @@ public class OpenTCSView
   }
 
   /**
-   * Creates a new Drawing for this view.
-   */
-  private Drawing createDrawing() {
-    QuadTreeDrawing drawing = new QuadTreeDrawing();
-    // TODO: Don't save drawing in XML file but via the kernel.
-    DefaultInputOutputFormat ioFormat = new DefaultInputOutputFormat(new OpenTCSFactory());
-    drawing.addInputFormat(ioFormat);
-    drawing.addOutputFormat(ioFormat);
-
-    return drawing;
-  }
-
-  /**
    * Adds the given model component to the given folder.
    *
    * @param folder The folder.
@@ -1876,12 +1830,6 @@ public class OpenTCSView
       }
       fGroupsTreeManager.getTreeView().sortChildren();
     }
-    else if (modelComponent instanceof StaticRouteModel) {
-      StaticRouteModel routeModel = (StaticRouteModel) modelComponent;
-      routeModel.addStaticRouteChangeListener(staticRouteEventHandler);
-      // Add hops (Points) to StaticRoute
-      staticRouteEventHandler.pointsChanged(new StaticRouteChangeEvent(routeModel));
-    }
     else if (modelComponent instanceof VehicleModel) {
       fDrawingEditor.addVehicle((VehicleModel) modelComponent);
     }
@@ -1906,7 +1854,6 @@ public class OpenTCSView
         || model instanceof LocationModel
         || model instanceof BlockModel
         || model instanceof GroupModel
-        || model instanceof StaticRouteModel
         || model instanceof LayoutModel
         || model instanceof VehicleModel) {
       return true;
@@ -1931,9 +1878,8 @@ public class OpenTCSView
     boolean componentRemoved = false;
 
     synchronized (model) {
-      if (!BlockModel.class.isInstance(folder)
-          && !StaticRouteModel.class.isInstance(folder)) {
-        // don't delete objects from a Blocks or StaticRoutes folder
+      if (!BlockModel.class.isInstance(folder)) {
+        // don't delete objects from a Blocks folder
         synchronized (folder) {
           folder.remove(model);
         }
@@ -1958,10 +1904,7 @@ public class OpenTCSView
         fComponentsTreeManager.removeItem(model);
       }
 
-      if (model instanceof StaticRouteModel) {
-        ((StaticRouteModel) model).removeStaticRouteChangeListener(staticRouteEventHandler);
-      }
-      else if (model instanceof LocationTypeModel) {
+      if (model instanceof LocationTypeModel) {
         for (LocationModel location : fModelManager.getModel().getLocationModels()) {
           location.updateTypeProperty(fModelManager.getModel().getLocationTypeModels());
         }
@@ -1983,10 +1926,7 @@ public class OpenTCSView
    * <code>null</code>, if there isn't any.
    */
   private Figure findFigure(ModelComponent model) {
-    if (model instanceof FigureComponent) {
-      return ((FigureComponent) model).getFigure();
-    }
-    return null;
+    return fModelManager.getModel().getFigure(model);
   }
 
   private void setSystemModel(SystemModel systemModel) {
@@ -2007,10 +1947,6 @@ public class OpenTCSView
     // --- Undo, Redo, Clipboard ---
     Drawing drawing = fDrawingEditor.getDrawing();
     drawing.addUndoableEditListener(fUndoRedoManager);
-    // TODO: Do not save drawing directly to an XML file, but via the kernel.
-    DefaultInputOutputFormat ioFormat = new DefaultInputOutputFormat(new OpenTCSFactory());
-    drawing.addInputFormat(ioFormat);
-    drawing.addOutputFormat(ioFormat);
 
     fComponentsTreeManager.restoreTreeView(systemModel);
     fBlocksTreeManager.restoreTreeView(systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
@@ -2059,11 +1995,6 @@ public class OpenTCSView
       block.addAttributesChangeListener(attributesEventHandler);
       block.addBlockChangeListener(blockEventHandler);
       modelCompNameGen.addString(block.getName());
-    }
-
-    for (StaticRouteModel staticRoute : systemModel.getStaticRouteModels()) {
-      staticRoute.addStaticRouteChangeListener(staticRouteEventHandler);
-      modelCompNameGen.addString(staticRoute.getName());
     }
 
     LOG.debug("setSystemModel() took {} ms.", System.currentTimeMillis() - timeBefore);
@@ -2238,39 +2169,6 @@ public class OpenTCSView
   }
 
   /**
-   * Handles events emitted for changes of static routes.
-   */
-  private class StaticRouteEventHandler
-      implements StaticRouteChangeListener {
-
-    /**
-     * Creates a new instance.
-     */
-    public StaticRouteEventHandler() {
-    }
-
-    @Override  // StaticRouteChangeListener
-    public void pointsChanged(StaticRouteChangeEvent event) {
-      StaticRouteModel staticRoute = (StaticRouteModel) event.getSource();
-      // Remove all elements from the static route and re-add the ones left.
-      fComponentsTreeManager.removeChildren(staticRoute);
-      for (ModelComponent component : staticRoute.getChildComponents()) {
-        fComponentsTreeManager.addItem(staticRoute, component);
-      }
-
-      setHasUnsavedChanges(true);
-    }
-
-    @Override// DrawingEditorListener
-    public void colorChanged(StaticRouteChangeEvent event) {
-    }
-
-    @Override
-    public void staticRouteRemoved(StaticRouteChangeEvent event) {
-    }
-  }
-
-  /**
    * Handles events emitted by the drawing editor.
    */
   private class DrawingEditorEventHandler
@@ -2293,7 +2191,7 @@ public class OpenTCSView
     @Override  // DrawingEditorListener
     public ModelComponent figureAdded(DrawingEditorEvent event) {
       Figure figure = event.getFigure();
-      FigureComponent model = figure.get(FigureConstants.MODEL);
+      ModelComponent model = figure.get(FigureConstants.MODEL);
 
       // Some figures do not have a model - OriginFigure, for instance.
       // XXX Check if we can't unify all figures to have a model.
@@ -2315,9 +2213,7 @@ public class OpenTCSView
         }
       }
 
-      if (model instanceof FigureComponent) {
-        model.setFigure(figure);
-      }
+      fModelManager.getModel().registerFigure(model, figure);
 
       ModelComponent folder = modelManager.getModel().getFolder(model);
       addModelComponent(folder, model);
@@ -2337,7 +2233,7 @@ public class OpenTCSView
         return null;
       }
 
-      FigureComponent model = figure.get(FigureConstants.MODEL);
+      ModelComponent model = figure.get(FigureConstants.MODEL);
 
       if (model == null) {
         return null;
@@ -2355,7 +2251,6 @@ public class OpenTCSView
         }
         // Disassociate from blocks, static routes and groups...
         removeFromAllBlocks(model);
-        removeFromAllStaticRoutes(model);
         removeFromAllGroups(model);
         // ...and remove the object itself.
         ModelComponent folder = modelManager.getModel().getFolder(model);
@@ -2379,7 +2274,7 @@ public class OpenTCSView
         Figure figure = event.getFigure();
 
         if (figure != null) {
-          FigureComponent model = figure.get(FigureConstants.MODEL);
+          ModelComponent model = figure.get(FigureConstants.MODEL);
 
           if (model != null) {
             model.addAttributesChangeListener(attributesEventHandler);
@@ -2396,7 +2291,7 @@ public class OpenTCSView
         Set<ModelComponent> components = new HashSet<>();
 
         for (Figure figure : event.getFigures()) {
-          FigureComponent model = figure.get(FigureConstants.MODEL);
+          ModelComponent model = figure.get(FigureConstants.MODEL);
           if (model != null) {
             models.add(model);
             components.add(model);
@@ -2463,43 +2358,6 @@ public class OpenTCSView
         for (ModelComponent groupFolder : mainFolder.getChildComponents()) {
           groupFolder.remove(model);
           fGroupsTreeManager.removeItem(model);
-        }
-      }
-    }
-
-    /**
-     * Removes a component from all static routes in the model.
-     *
-     * @param model The component to be removed.
-     */
-    private void removeFromAllStaticRoutes(ModelComponent model) {
-      // The "Static Routes" folder of the "Components" tree...
-      ModelComponent mainFolder
-          = modelManager.getModel().getMainFolder(
-              SystemModel.FolderKey.STATIC_ROUTES);
-
-      synchronized (mainFolder) {
-        // ... contains one folder for each StaticRoute
-
-        for (ModelComponent routeFolderComp : mainFolder.getChildComponents()) {
-          StaticRouteModel staticRoute = (StaticRouteModel) routeFolderComp;
-          List<ModelComponent> elementsToRemove = new ArrayList<>();
-          // All child components (Points, Paths) of one Block
-          for (ModelComponent routeChildComp : staticRoute.getChildComponents()) {
-            if (model == routeChildComp) {
-              elementsToRemove.add(routeChildComp);
-            }
-          }
-
-          if (!elementsToRemove.isEmpty()) {
-            // At least one component found
-            for (ModelComponent mc : elementsToRemove) {
-              if (mc instanceof PointModel) {
-                staticRoute.removePoint((PointModel) mc);
-              }
-            }
-            staticRoute.pointsChanged();
-          }
         }
       }
     }

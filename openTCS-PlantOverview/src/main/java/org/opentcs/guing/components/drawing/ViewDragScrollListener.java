@@ -31,8 +31,8 @@ import org.opentcs.guing.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LayoutModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.Cursors;
 
 /**

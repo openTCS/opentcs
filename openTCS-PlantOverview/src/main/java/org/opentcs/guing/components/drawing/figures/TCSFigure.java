@@ -10,19 +10,11 @@
 package org.opentcs.guing.components.drawing.figures;
 
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.awt.geom.Rectangle2D;
-import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.AbstractAttributedDecoratedFigure;
-import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.guing.components.drawing.ZoomPoint;
-import org.opentcs.guing.components.properties.AttributesComponent;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
-import org.opentcs.guing.components.tree.TreeViewManager;
-import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -34,14 +26,6 @@ import org.opentcs.guing.model.ModelComponent;
 public abstract class TCSFigure
     extends AbstractAttributedDecoratedFigure {
 
-  /**
-   * The manager for the components tree view.
-   */
-  private final TreeViewManager componentsTreeManager;
-  /**
-   * Displays properties of the currently selected model component(s).
-   */
-  private final SelectionPropertiesComponent propertiesComponent;
   /**
    * The enclosing rectangle.
    */
@@ -59,14 +43,8 @@ public abstract class TCSFigure
    * model component(s).
    * @param modelComponent The model corresponding to this graphical object.
    */
-  public TCSFigure(TreeViewManager componentsTreeManager,
-                   SelectionPropertiesComponent propertiesComponent,
-                   FigureComponent modelComponent) {
+  public TCSFigure(ModelComponent modelComponent) {
     super();
-    this.componentsTreeManager = requireNonNull(componentsTreeManager,
-                                                "componentsTreeManager");
-    this.propertiesComponent = requireNonNull(propertiesComponent,
-                                              "propertiesComponent");
     set(FigureConstants.MODEL, modelComponent);
   }
 
@@ -97,7 +75,7 @@ public abstract class TCSFigure
     try {
       TCSFigure that = (TCSFigure) super.clone();
       that.fDisplayBox = new Rectangle(fDisplayBox);
-      that.setModel((FigureComponent) getModel().clone());
+      that.setModel(getModel().clone());
 
       return that;
     }
@@ -124,11 +102,11 @@ public abstract class TCSFigure
    *
    * @return The model object for this figure.
    */
-  public FigureComponent getModel() {
+  public ModelComponent getModel() {
     return get(FigureConstants.MODEL);
   }
 
-  public void setModel(FigureComponent model) {
+  public void setModel(ModelComponent model) {
     set(FigureConstants.MODEL, model);
   }
 
@@ -148,37 +126,5 @@ public abstract class TCSFigure
     Geom.grow(r2d, 10d, 10d);
 
     return (r2d.contains(p));
-  }
-
-  @Override
-  public boolean handleMouseClick(Double p, MouseEvent evt, DrawingView drawingView) {
-    // Bei Doppelclick auf eine Figur:
-    // 1. Das zugehörige Objekt im Tree markieren
-    // 2. Die Eigenschaften dieses Objekts im Property Panel anzeigen
-    ModelComponent model = getModel();
-    componentsTreeManager.selectItem(model);
-    propertiesComponent.setModel(model);
-
-    return false;
-  }
-
-  /**
-   * Returns the manager for the components tree view.
-   *
-   * @return The manager for the components tree view.
-   */
-  protected TreeViewManager getComponentsTreeManager() {
-    return componentsTreeManager;
-  }
-
-  /**
-   * Returns the component that displays properties for the currently selected
-   * model component.
-   *
-   * @return The component that displays properties for the currently selected
-   * model component.
-   */
-  protected AttributesComponent getPropertiesComponent() {
-    return propertiesComponent;
   }
 }

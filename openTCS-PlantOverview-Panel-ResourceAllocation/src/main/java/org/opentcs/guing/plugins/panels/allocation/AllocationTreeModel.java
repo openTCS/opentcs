@@ -7,7 +7,9 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -56,13 +58,15 @@ public class AllocationTreeModel
    * @param allocatedVehicles The vehicles which have a resource allocation
    */
   private void removeNotAllocatedVehicles(Set<String> allocatedVehicles) {
-    for (int x = 0; x < root.getChildCount(); x++) {
-      DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) root.getChildAt(x);
+    @SuppressWarnings("unchecked")
+    List<DefaultMutableTreeNode> rootChildren
+        = Collections.list((Enumeration<DefaultMutableTreeNode>) root.children());
+
+    for (DefaultMutableTreeNode currentNode : rootChildren) {
       Object userObject = currentNode.getUserObject();
       //If we have a vehicle node but the vehicle name is not in the set, remove it
       if (userObject instanceof String && !allocatedVehicles.contains((String) userObject)) {
         removeNodeFromParent(currentNode);
-        x = x - 1;
       }
     }
   }
@@ -83,16 +87,13 @@ public class AllocationTreeModel
     }
     if (vehicleNode == null) {
       vehicleNode = createNewVehicleNode(vehicleName);
-
     }
     //Remove all children that are not in the new allocation
-
-    for (int x = 0; x < vehicleNode.getChildCount(); x++) {
-      DefaultMutableTreeNode current = (DefaultMutableTreeNode) vehicleNode.getChildAt(x);
-      TCSResource<?> resource = (TCSResource<?>) current.getUserObject();
-      if (!resources.contains(resource)) {
-        vehicleNode.remove(x);
-        x--;
+    @SuppressWarnings("unchecked")
+    List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children());
+    for (DefaultMutableTreeNode current : vehicleChildren) {
+      if (!resources.contains((TCSResource<?>) current.getUserObject())) {
+        vehicleNode.remove(current);
       }
     }
     //Add new resources that are not in the jtree already at the correct position

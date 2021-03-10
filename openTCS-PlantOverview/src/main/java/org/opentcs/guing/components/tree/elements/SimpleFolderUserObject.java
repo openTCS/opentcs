@@ -15,7 +15,7 @@ import javax.swing.JComponent;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.model.CompositeModelComponent;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * Ein einfacher Ordner in der Baumansicht, dem keine weitere Funktionalität

@@ -22,7 +22,7 @@ public abstract class KernelRemoteService
   /**
    * The message to log when a service method execution failed.
    */
-  String EXECUTION_FAILED_MESSAGE = "Failed to execute service method";
+  private static final String EXECUTION_FAILED_MESSAGE = "Failed to execute service method";
 
   /**
    * Wraps the given exception into a suitable {@link RuntimeException}.

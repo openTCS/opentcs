@@ -21,10 +21,11 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeRechargeVehicleSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +56,12 @@ public class RechargeIdleVehiclesPhase
    */
   private final Router router;
   /**
-   * Checks processability of transport orders for vehicles.
+   * A collection of predicates for filtering assignment candidates.
    */
-  private final ProcessabilityChecker processabilityChecker;
+  private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
 
   private final CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter;
-  
+
   private final TransportOrderUtil transportOrderUtil;
   /**
    * The dispatcher configuration.
@@ -77,14 +78,15 @@ public class RechargeIdleVehiclesPhase
       InternalTransportOrderService orderService,
       org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier,
       Router router,
-      ProcessabilityChecker processabilityChecker,
+      CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter,
       TransportOrderUtil transportOrderUtil,
       DefaultDispatcherConfiguration configuration) {
     this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.rechargePosSupplier = requireNonNull(rechargePosSupplier, "rechargePosSupplier");
-    this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
+    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
+                                                             "assignmentCandidateSelectionFilter");
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -153,16 +155,27 @@ public class RechargeIdleVehiclesPhase
     );
 
     Point vehiclePosition = orderService.fetchObject(Point.class, vehicle.getCurrentPosition());
-    Optional<List<DriveOrder>> driveOrders
-        = router.getRoute(vehicle, vehiclePosition, rechargeOrder);
-    if (processabilityChecker.checkProcessability(vehicle, rechargeOrder)
-        && driveOrders.isPresent()) {
-      transportOrderUtil.assignTransportOrder(vehicle, rechargeOrder, driveOrders.get());
+    Optional<AssignmentCandidate> candidate = computeCandidate(vehicle,
+                                                               vehiclePosition,
+                                                               rechargeOrder)
+        .filter(assignmentCandidateSelectionFilter);
+    // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
+    if (candidate.isPresent()) {
+      transportOrderUtil.assignTransportOrder(candidate.get().getVehicle(),
+                                              candidate.get().getTransportOrder(),
+                                              candidate.get().getDriveOrders());
     }
     else {
       // Mark the order as failed, since the vehicle cannot execute it.
       orderService.updateTransportOrderState(rechargeOrder.getReference(),
                                              TransportOrder.State.FAILED);
     }
+  }
+
+  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
+                                                         Point vehiclePosition,
+                                                         TransportOrder order) {
+    return router.getRoute(vehicle, vehiclePosition, order)
+        .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
 }

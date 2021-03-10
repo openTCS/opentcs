@@ -83,6 +83,10 @@ public class TransportOrdersContainerPanel
    */
   private final Provider<CreateTransportOrderPanel> orderPanelProvider;
   /**
+   * A factory for creating transport order views.
+   */
+  private final TransportViewFactory transportViewFactory;
+  /**
    * Die Tabelle, in der die Transportaufträge dargestellt werden.
    */
   private JTable fTable;
@@ -105,15 +109,18 @@ public class TransportOrdersContainerPanel
    * @param portalProvider Provides a access to a portal.
    * @param orderUtil A helper for creating transport orders with the kernel.
    * @param orderPanelProvider Provides panels for entering new transport orders.
+   * @param transportViewFactory A factory for creating transport order views.
    */
   @Inject
   public TransportOrdersContainerPanel(SharedKernelServicePortalProvider portalProvider,
                                        TransportOrderUtil orderUtil,
-                                       Provider<CreateTransportOrderPanel> orderPanelProvider) {
+                                       Provider<CreateTransportOrderPanel> orderPanelProvider,
+                                       TransportViewFactory transportViewFactory) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
-    this.orderPanelProvider = requireNonNull(orderPanelProvider,
-                                             "orderPanelProvider");
+    this.orderPanelProvider = requireNonNull(orderPanelProvider, "orderPanelProvider");
+    this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
+
     initComponents();
   }
 
@@ -203,7 +210,7 @@ public class TransportOrdersContainerPanel
       if (transportOrder != null) {
         transportOrder = sharedPortal.getPortal().getTransportOrderService()
             .fetchObject(TransportOrder.class, transportOrder.getReference());
-        DialogContent content = new TransportOrderView(transportOrder);
+        DialogContent content = transportViewFactory.createTransportOrderView(transportOrder);
         StandardContentDialog dialog
             = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
                                         content,

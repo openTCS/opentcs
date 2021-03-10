@@ -30,16 +30,16 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class WithdrawTransportOrderTest {
 
-  private DispatcherService dispatcherService;
-  private TCSObjectService objectService;
+  private DispatcherService dispService;
+  private TCSObjectService objService;
   private Vehicle vehicle;
 
   @Before
   public void setUp() {
-    dispatcherService = mock(DispatcherService.class);
-    objectService = mock(TCSObjectService.class);
+    dispService = mock(DispatcherService.class);
+    objService = mock(TCSObjectService.class);
     vehicle = new Vehicle("Vehicle");
-    when(objectService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
+    when(objService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
   }
 
   @Test
@@ -86,11 +86,11 @@ public class WithdrawTransportOrderTest {
   }
 
   private DispatcherService getDispatcherServiceFromSomewhere() {
-    return dispatcherService;
+    return dispService;
   }
 
   private TCSObjectService getTCSObjectServiceFromSomewhere() {
-    return objectService;
+    return objService;
   }
 
   private TransportOrder getTransportOrderToWithdraw() {

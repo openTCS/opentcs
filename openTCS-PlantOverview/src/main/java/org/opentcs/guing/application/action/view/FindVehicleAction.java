@@ -19,9 +19,11 @@ import javax.swing.AbstractAction;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.ClosableDialog;
 import org.opentcs.guing.components.dialogs.FindVehiclePanel;
+import org.opentcs.guing.components.dialogs.FindVehiclePanelFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.Comparators;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -48,6 +50,10 @@ public class FindVehicleAction
    * The parent component for dialogs shown by this action.
    */
   private final Component dialogParent;
+  /**
+   * The panel factory.
+   */
+  private final FindVehiclePanelFactory panelFactory;
 
   /**
    * Creates a new instance.
@@ -59,10 +65,12 @@ public class FindVehicleAction
   @Inject
   public FindVehicleAction(ModelManager modelManager,
                            OpenTCSDrawingEditor drawingEditor,
-                           @ApplicationFrame Component dialogParent) {
+                           @ApplicationFrame Component dialogParent,
+                           FindVehiclePanelFactory panelFactory) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+    this.panelFactory = requireNonNull(panelFactory, "panelFactory");
 
     ResourceBundleUtil.getBundle().configureAction(this, ID);
   }
@@ -79,9 +87,9 @@ public class FindVehicleAction
       return;
     }
 
-    Collections.sort(vehicles);
-    FindVehiclePanel content
-        = new FindVehiclePanel(vehicles, drawingEditor.getActiveView());
+    Collections.sort(vehicles, Comparators.modelComponentsByName());
+    FindVehiclePanel content = panelFactory.createFindVehiclesPanel(vehicles,
+                                                                    drawingEditor.getActiveView());
     String title = ResourceBundleUtil.getBundle().getString("findVehiclePanel.title");
     ClosableDialog dialog = new ClosableDialog(dialogParent, true, content, title);
     dialog.setLocationRelativeTo(dialogParent);

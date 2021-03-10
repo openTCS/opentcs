@@ -15,8 +15,8 @@ import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
-import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.CompositeReparkVehicleSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,18 +39,19 @@ public class PrioritizedReparkPhase
   private final ParkingPositionPriorityComparator priorityComparator;
 
   @Inject
-  public PrioritizedReparkPhase(InternalTransportOrderService orderService,
-                                PrioritizedParkingPositionSupplier parkingPosSupplier,
-                                Router router,
-                                ProcessabilityChecker processabilityChecker,
-                                TransportOrderUtil transportOrderUtil,
-                                DefaultDispatcherConfiguration configuration,
-                                CompositeReparkVehicleSelectionFilter vehicleSelectionFilter,
-                                ParkingPositionPriorityComparator priorityComparator) {
+  public PrioritizedReparkPhase(
+      InternalTransportOrderService orderService,
+      PrioritizedParkingPositionSupplier parkingPosSupplier,
+      Router router,
+      CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
+      TransportOrderUtil transportOrderUtil,
+      DefaultDispatcherConfiguration configuration,
+      CompositeReparkVehicleSelectionFilter vehicleSelectionFilter,
+      ParkingPositionPriorityComparator priorityComparator) {
     super(orderService,
           parkingPosSupplier,
           router,
-          processabilityChecker,
+          assignmentCandidateSelectionFilter,
           transportOrderUtil,
           configuration);
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");

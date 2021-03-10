@@ -41,17 +41,17 @@ public class UniqueStringGeneratorTest {
 
   @Test
   public void shouldProvideConfiguredPatterns() {
-    final String NAME_PATTERN_PREFIX = "SomePrefix";
-    final String NAME_PATTERN_PREFIX2 = "AnotherPrefix";
+    final String namePatternPrefix = "SomePrefix";
+    final String namePatterPrefix2 = "AnotherPrefix";
     final Object selector = new Object();
     final Object selector2 = new Object();
     
-    generator.registerNamePattern(selector, NAME_PATTERN_PREFIX, "0000");
-    generator.registerNamePattern(selector2, NAME_PATTERN_PREFIX2, "0000");
+    generator.registerNamePattern(selector, namePatternPrefix, "0000");
+    generator.registerNamePattern(selector2, namePatterPrefix2, "0000");
 
-    assertEquals(NAME_PATTERN_PREFIX + "0001",
+    assertEquals(namePatternPrefix + "0001",
                  generator.getUniqueString(selector));
-    assertEquals(NAME_PATTERN_PREFIX2 + "0001",
+    assertEquals(namePatterPrefix2 + "0001",
                  generator.getUniqueString(selector2));
   }
 

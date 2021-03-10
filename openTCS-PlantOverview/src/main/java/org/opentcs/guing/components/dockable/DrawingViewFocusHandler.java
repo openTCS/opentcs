@@ -60,7 +60,6 @@ public class DrawingViewFocusHandler
     drawView.setConstrainerVisible(drawView.isConstrainerVisible());
     drawView.setLabelsVisible(drawView.isLabelsVisible());
     scrollPane.setRulersVisible(scrollPane.isRulersVisible());
-    drawView.setStaticRoutesVisible(drawView.isStaticRoutesVisible());
     drawView.setBlocksVisible(drawView.isBlocksVisible());
     drawView.dispatchEvent(new FocusEvent(scrollPane, FocusEvent.FOCUS_GAINED));
   }

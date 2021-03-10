@@ -23,7 +23,7 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.guing.event.ModelNameChangeEvent;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;

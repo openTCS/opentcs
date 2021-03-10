@@ -19,8 +19,8 @@ import javax.swing.JPanel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.type.CoursePointProperty;
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**

@@ -17,7 +17,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.util.UniqueStringGenerator;
 
@@ -37,7 +36,6 @@ public class UniqueNameGenerator
     registerNamePattern(LinkModel.class, config.linkPrefix(), config.linkNumberPattern());
     registerNamePattern(BlockModel.class, config.blockPrefix(), config.blockNumberPattern());
     registerNamePattern(GroupModel.class, config.groupPrefix(), config.groupNumberPattern());
-    registerNamePattern(StaticRouteModel.class, "StaticRoute-", "0000");
     registerNamePattern(LayoutModel.class, config.layoutPrefix(), config.layoutNumberPattern());
     registerNamePattern(VehicleModel.class, config.vehiclePrefix(), config.vehicleNumberPattern());
   }

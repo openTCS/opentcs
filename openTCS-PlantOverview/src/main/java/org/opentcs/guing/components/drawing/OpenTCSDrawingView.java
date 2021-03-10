@@ -114,23 +114,19 @@ import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.event.BlockChangeEvent;
 import org.opentcs.guing.event.BlockChangeListener;
-import org.opentcs.guing.event.StaticRouteChangeEvent;
-import org.opentcs.guing.event.StaticRouteChangeListener;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
-import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.FigureComponent;
-import org.opentcs.guing.model.FiguresFolder;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.AbstractConnection;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.GroupModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
+import org.opentcs.guing.util.ModelComponentUtil;
 import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -240,10 +236,6 @@ public abstract class OpenTCSDrawingView
    */
   private ModelComponent fBlocks;
   /**
-   * The static routes.
-   */
-  private ModelComponent fStaticRoutes;
-  /**
    * Flag whether the labels shall be drawn.
    */
   private boolean labelsVisible = true;
@@ -251,10 +243,6 @@ public abstract class OpenTCSDrawingView
    * Flag whether the blocks shall be drawn.
    */
   private boolean blocksVisible = true;
-  /**
-   * Flag whether the static routes shall be drawn.
-   */
-  private boolean staticRoutesVisible = false;
   /**
    * Contains the vehicle on the drawing, for which transport order shall
    * be drawn.
@@ -264,10 +252,6 @@ public abstract class OpenTCSDrawingView
    * A pointer to a figure that shall be highlighted by a red circle.
    */
   private Figure fFocusFigure;
-  /**
-   * The Static Route the view should highlight.
-   */
-  private StaticRouteModel fFocusStaticRoute;
   /**
    * The vehicle the view should highlight and follow.
    */
@@ -311,10 +295,6 @@ public abstract class OpenTCSDrawingView
    * Handles events for blocks.
    */
   private final BlockChangeHandler blockChangeHandler = new BlockChangeHandler();
-  /**
-   * Handles events for static routes.
-   */
-  private final StaticRouteChangeHandler routeChangeHandler = new StaticRouteChangeHandler();
 
   /**
    * Creates new instance.
@@ -352,11 +332,11 @@ public abstract class OpenTCSDrawingView
   @Override
   public void processKeyEvent(KeyEvent e) {
     if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-      if (e.getKeyCode() == KeyEvent.VK_X // Cut
-          || e.getKeyCode() == KeyEvent.VK_C // Copy
-          || e.getKeyCode() == KeyEvent.VK_V // Paste
-          || e.getKeyCode() == KeyEvent.VK_D) // Duplicate
-      {
+      // Cut, copy, paste and duplicate
+      if (e.getKeyCode() == KeyEvent.VK_X
+          || e.getKeyCode() == KeyEvent.VK_C
+          || e.getKeyCode() == KeyEvent.VK_V
+          || e.getKeyCode() == KeyEvent.VK_D) {
         if (!appState.hasOperationMode(OperationMode.MODELLING)) {
           return;
         }
@@ -451,18 +431,18 @@ public abstract class OpenTCSDrawingView
   public void setGroupVisible(List<ModelComponent> components, boolean visible) {
     for (ModelComponent model : components) {
       if (!(model instanceof GroupModel)) {
-        AbstractFigureComponent abstractFigure = (AbstractFigureComponent) model;
+        AbstractConnectableModelComponent abstractFigure = (AbstractConnectableModelComponent) model;
 
         if (model instanceof LocationModel) {
           LocationModel locModel = (LocationModel) model;
 
           for (AbstractConnection connection : locModel.getConnections()) {
-            AbstractFigure figure = (AbstractFigure) connection.getFigure();
+            AbstractFigure figure = (AbstractFigure) modelManager.getModel().getFigure(connection);
             figure.setVisible(visible);
           }
         }
 
-        AbstractFigure figure = (AbstractFigure) abstractFigure.getFigure();
+        AbstractFigure figure = (AbstractFigure) modelManager.getModel().getFigure(abstractFigure);
 
         if (visible) {
           invisibleFigures.remove(figure);
@@ -495,17 +475,6 @@ public abstract class OpenTCSDrawingView
         lf.setLabelVisible(newValue);
       }
     }
-    // Repaint the whole layout.
-    dirtyArea.add(getVisibleRect());
-    repaint();
-  }
-
-  public boolean isStaticRoutesVisible() {
-    return staticRoutesVisible;
-  }
-
-  public void setStaticRoutesVisible(boolean newValue) {
-    staticRoutesVisible = newValue;
     // Repaint the whole layout.
     dirtyArea.add(getVisibleRect());
     repaint();
@@ -629,13 +598,13 @@ public abstract class OpenTCSDrawingView
       PointModel pointModel = vehicleModel.getNextPoint();
 
       if (pointModel != null) {
-        bounds.add(pointModel.getFigure().getBounds());
+        Figure pointFigure = modelManager.getModel().getFigure(pointModel);
+        bounds.add(pointFigure.getBounds());
       }
     }
 
     if (fFocusVehicle == null) {
       fFocusFigure = figure;
-      fFocusStaticRoute = null;
     }
 
     final int margin = 50;
@@ -711,7 +680,8 @@ public abstract class OpenTCSDrawingView
     };
 
     double oldScale = zoomX;
-    zoomX = zoomY = newScale;
+    zoomX = newScale;
+    zoomY = newScale;
     validateViewTranslation();
     dirtyArea.setBounds(bufferedArea);
     revalidate();
@@ -732,7 +702,7 @@ public abstract class OpenTCSDrawingView
     stopFollowVehicle();
     fFocusVehicle = model;
     fFocusVehicle.setViewFollows(true);
-    VehicleFigure vFigure = fFocusVehicle.getFigure();
+    VehicleFigure vFigure = (VehicleFigure) modelManager.getModel().getFigure(fFocusVehicle);
     if (vFigure != null) {
       vFigure.addPropertyChangeListener(this);
       scrollTo(vFigure);
@@ -748,7 +718,7 @@ public abstract class OpenTCSDrawingView
     }
 
     fFocusVehicle.setViewFollows(false);
-    VehicleFigure vFigure = fFocusVehicle.getFigure();
+    VehicleFigure vFigure = (VehicleFigure) modelManager.getModel().getFigure(fFocusVehicle);
     if (vFigure != null) {
       vFigure.removePropertyChangeListener(this);
     }
@@ -756,14 +726,10 @@ public abstract class OpenTCSDrawingView
     repaint();
   }
 
-  public void highlightStaticRoute(StaticRouteModel staticRoute) {
-    fFocusStaticRoute = staticRoute;
-  }
-
   @Override // PropertyChangeListener
   public void propertyChange(PropertyChangeEvent evt) {
     if (evt.getPropertyName().equals(VehicleFigure.POSITION_CHANGED)) {
-      scrollTo(fFocusVehicle.getFigure());
+      scrollTo((VehicleFigure) modelManager.getModel().getFigure(fFocusVehicle));
     }
   }
 
@@ -852,7 +818,6 @@ public abstract class OpenTCSDrawingView
       drawBlocks(g2d);
     }
 
-    drawStaticRoutes(g2d);
     drawDriveOrderElements(g2d);
 
     drawing.setFontRenderContext(g2d.getFontRenderContext());
@@ -898,9 +863,6 @@ public abstract class OpenTCSDrawingView
     if (fFocusVehicle != null) {
       // Set focus on the selected vehicle and its destination point
       highlightVehicle(g2d);
-    }
-    else if (fFocusStaticRoute != null) {
-      highlightStaticRoute(g2d);
     }
     else {
       // Set focus on the selected figure
@@ -998,7 +960,7 @@ public abstract class OpenTCSDrawingView
       return;
     }
 
-    final Figure currentVehicleFigure = fFocusVehicle.getFigure();
+    final Figure currentVehicleFigure = modelManager.getModel().getFigure(fFocusVehicle);
     if (currentVehicleFigure == null) {
       return;
     }
@@ -1033,7 +995,7 @@ public abstract class OpenTCSDrawingView
     PointModel pointModel = fFocusVehicle.getNextPoint();
 
     if (pointModel != null) {
-      Figure nextPoint = pointModel.getFigure();
+      Figure nextPoint = modelManager.getModel().getFigure(pointModel);
       bounds = nextPoint.getBounds();
       xCenter = bounds.getCenterX();
       yCenter = bounds.getCenterY();
@@ -1061,7 +1023,7 @@ public abstract class OpenTCSDrawingView
     pointModel = fFocusVehicle.getPoint();
 
     if (pointModel != null && fFocusVehicle.getPrecisePosition() != null) {
-      Figure lastPoint = pointModel.getFigure();
+      Figure lastPoint = modelManager.getModel().getFigure(pointModel);
       bounds = lastPoint.getBounds();
       xCenter = bounds.getCenterX();
       yCenter = bounds.getCenterY();
@@ -1102,108 +1064,6 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
-   * Sets a radial gradient for the start and end Points of a Static Route.
-   *
-   * @param g2d
-   */
-  private void highlightStaticRoute(Graphics2D g2d) {
-    if (fFocusStaticRoute == null) {
-      return;
-    }
-
-    PointModel startPoint = fFocusStaticRoute.getStartPoint();
-    PointModel endPoint = fFocusStaticRoute.getEndPoint();
-
-    if (startPoint == null) {
-      return;
-    }
-
-    final Figure startFigure = startPoint.getFigure();
-    Rectangle2D.Double bounds = startFigure.getBounds();
-    double xCenter = bounds.getCenterX();
-    double yCenter = bounds.getCenterY();
-    Point2D.Double pCenterView = new Point2D.Double(xCenter, yCenter);
-    Point pCenterDrawing = drawingToView(pCenterView);
-
-    // Create a radial gradient, transparent in the middle.
-    Point2D center = new Point2D.Float((float) pCenterDrawing.x, (float) pCenterDrawing.y);
-    float radius = 15f;
-    float[] dist = {0.0f, 0.7f, 0.8f, 1.0f};
-    Color[] colorsStart = {
-      new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-      new Color(1.0f, 1.0f, 1.0f, 0.0f),
-      new Color(0.0f, 0.0f, 1.0f, 0.7f), // Circle: blue
-      new Color(0.9f, 0.9f, 0.9f, 0.5f) // Background
-    };
-    RadialGradientPaint paint
-        = new RadialGradientPaint(center, radius, dist, colorsStart,
-                                  MultipleGradientPaint.CycleMethod.NO_CYCLE);
-
-    Graphics2D gFocusStart = (Graphics2D) g2d.create();
-    gFocusStart.setPaint(paint);
-    gFocusStart.fillRect(0, 0, getWidth(), getHeight());
-    gFocusStart.dispose();
-
-    if (endPoint != null && endPoint != startPoint) {
-      Figure endFigure = endPoint.getFigure();
-      bounds = endFigure.getBounds();
-      xCenter = bounds.getCenterX();
-      yCenter = bounds.getCenterY();
-      pCenterView = new Point2D.Double(xCenter, yCenter);
-      pCenterDrawing = drawingToView(pCenterView);
-      // Create a radial gradient, transparent in the middle.
-      center = new Point2D.Float((float) pCenterDrawing.x, (float) pCenterDrawing.y);
-      radius = 20f;
-      Color[] colorsEnd = {
-        new Color(1.0f, 0.0f, 0.0f, 1.0f), // Focus: 100% transparent
-        new Color(1.0f, 1.0f, 1.0f, 0.0f),
-        new Color(0.0f, 1.0f, 0.5f, 0.7f), // Circle: green
-        new Color(0.9f, 0.9f, 0.9f, 0.5f) // Background
-      };
-      paint = new RadialGradientPaint(center, radius, dist, colorsEnd,
-                                      MultipleGradientPaint.CycleMethod.NO_CYCLE);
-
-      Graphics2D gFocusEnd = (Graphics2D) g2d.create();
-      gFocusEnd.setPaint(paint);
-      gFocusEnd.fillRect(0, 0, getWidth(), getHeight());
-      gFocusEnd.dispose();
-    }
-
-    Rectangle visibleRect = getVisibleRect();
-    dirtyArea.add(visibleRect);
-
-    // After drawing the RadialGradientPaint the drawing area needs to be
-    // repainted, otherwise the GradientPaint isn't drawn correctly or
-    // the old one isn't removed. We make sure the repaint() call doesn't
-    // end in an infinite loop.
-    if (doRepaint) {
-      repaint();
-      doRepaint = false;
-    }
-    else {
-      doRepaint = true;
-    }
-
-    // after 3 seconds the RadialGradientPaint is removed
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          synchronized (OpenTCSDrawingView.this) {
-            OpenTCSDrawingView.this.wait(3000);
-          }
-        }
-        catch (InterruptedException ex) {
-          LOG.warn("Unexpected exception", ex);
-        }
-
-        fFocusStaticRoute = null;
-        repaint();
-      }
-    }).start();
-  }
-
-  /**
    * Marks the elements of all blocks.
    *
    * @param g2d
@@ -1217,36 +1077,10 @@ public abstract class OpenTCSDrawingView
     synchronized (blockComps) {
       for (ModelComponent blockComp : blockComps) {
         BlockModel block = (BlockModel) blockComp;
-        drawPathDecoration(g2d, block.figures(), block.getColor(), BLOCK_STROKE);
-      }
-    }
-  }
-
-  /**
-   * Marks the elements of all static routes.
-   *
-   * @param g2d
-   */
-  private void drawStaticRoutes(Graphics2D g2d) {
-    if (fStaticRoutes == null) {
-      return;
-    }
-
-    if (fFocusStaticRoute != null) {
-      // Only draw selected Static Route
-      drawPathDecoration(g2d,
-                         fFocusStaticRoute.figures(),
-                         fFocusStaticRoute.getColor(),
-                         STATIC_ROUTE_STROKE);
-    }
-    else if (staticRoutesVisible) {
-      // Draw all Static Routes
-      for (ModelComponent routeComp : fStaticRoutes.getChildComponents()) {
-        StaticRouteModel route = (StaticRouteModel) routeComp;
         drawPathDecoration(g2d,
-                           route.figures(),
-                           route.getColor(),
-                           STATIC_ROUTE_STROKE);
+                           ModelComponentUtil.getChildFigures(block, modelManager.getModel()),
+                           block.getColor(),
+                           BLOCK_STROKE);
       }
     }
   }
@@ -1258,7 +1092,7 @@ public abstract class OpenTCSDrawingView
    */
   private void drawDriveOrderElements(Graphics2D g2d) {
     for (VehicleModel vehicle : fVehicles) {
-      List<FigureComponent> driveOrderComponents = vehicle.getDriveOrderComponents();
+      List<ModelComponent> driveOrderComponents = vehicle.getDriveOrderComponents();
 
       if (driveOrderComponents != null) {
         List<Figure> figures = getFigures(driveOrderComponents);
@@ -1268,13 +1102,13 @@ public abstract class OpenTCSDrawingView
         if (!appState.hasOperationMode(OperationMode.MODELLING)) {
           if (driveOrderState == TransportOrder.State.WITHDRAWN) {
             drawPathDecoration(g2d,
-                               (new LinkedList<>(figures)).iterator(),
+                               (new LinkedList<>(figures)),
                                Color.GRAY,
                                WITHDRAWN_PATH_STROKE);
           }
           else {
             drawPathDecoration(g2d,
-                               (new LinkedList<>(figures)).iterator(),
+                               (new LinkedList<>(figures)),
                                driveOrderColor,
                                PATH_STROKE);
           }
@@ -1291,7 +1125,7 @@ public abstract class OpenTCSDrawingView
    * @param color The color to draw.
    */
   private void drawPathDecoration(Graphics2D g2d,
-                                  Iterator<Figure> figures,
+                                  List<Figure> figures,
                                   Color color,
                                   Stroke stroke) {
     // Draw the basecolor of the block or transport order transparent with alpha = 192/256
@@ -1299,8 +1133,9 @@ public abstract class OpenTCSDrawingView
 
     Path2D.Float path = new Path2D.Float();
 
-    while (figures.hasNext()) {
-      Figure figure = figures.next();
+    Iterator<Figure> figureIter = figures.iterator();
+    while (figureIter.hasNext()) {
+      Figure figure = figureIter.next();
 
       if (figure instanceof LabeledFigure) {
         Shape shape = ((LabeledFigure) figure).getShape();
@@ -1621,26 +1456,12 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
-   * Sets the figures, that belong to the static route.
-   *
-   * @param staticRoutes A <code>ModelComponent</code> which childs must be
-   * <code>StaticRouteModels</code>.
-   */
-  public void setStaticRoutes(ModelComponent staticRoutes) {
-    fStaticRoutes = staticRoutes;
-    for (ModelComponent routeComp : staticRoutes.getChildComponents()) {
-      StaticRouteModel route = (StaticRouteModel) routeComp;
-      route.addStaticRouteChangeListener(routeChangeHandler);
-    }
-  }
-
-  /**
    * Looks for all figures that belong to the given drive route.
    *
    * @param driveOrder The list with elements of the drive route.
    * @return The figures.
    */
-  private List<Figure> getFigures(List<FigureComponent> driveOrder) {
+  private List<Figure> getFigures(List<ModelComponent> driveOrder) {
     if (driveOrder == null) {
       return null;
     }
@@ -1649,7 +1470,7 @@ public abstract class OpenTCSDrawingView
     List<Figure> figures = new ArrayList<>();
 
     for (Figure figure : children) {
-      FigureComponent model = figure.get(FigureConstants.MODEL);
+      ModelComponent model = figure.get(FigureConstants.MODEL);
 
       if (model == null) {
         continue;
@@ -1696,8 +1517,9 @@ public abstract class OpenTCSDrawingView
    *
    * @param block
    */
-  public void updateBlock(FiguresFolder block) {
-    Iterator<Figure> figureIter = block.figures();
+  public void updateBlock(BlockModel block) {
+    Iterator<Figure> figureIter
+        = ModelComponentUtil.getChildFigures(block, modelManager.getModel()).iterator();
 
     while (figureIter.hasNext()) {
       ((AbstractFigure) figureIter.next()).fireFigureChanged();
@@ -2543,19 +2365,6 @@ public abstract class OpenTCSDrawingView
   }
 
   /**
-   * Refreshes the display of a static route.
-   *
-   * @param route
-   */
-  private void updateStaticRoute(StaticRouteModel route) {
-    Iterator<Figure> figureIter = route.figures();
-
-    while (figureIter.hasNext()) {
-      ((AbstractFigure) figureIter.next()).fireFigureChanged();
-    }
-  }
-
-  /**
    * Enables the listener for updating the offset figures.
    */
   private void addOffsetListener() {
@@ -2575,7 +2384,8 @@ public abstract class OpenTCSDrawingView
     @Override // BlockChangeListener
     public void courseElementsChanged(BlockChangeEvent e) {
       BlockModel block = (BlockModel) e.getSource();
-      Iterator<Figure> figures = block.figures();
+      Iterator<Figure> figures
+          = ModelComponentUtil.getChildFigures(block, modelManager.getModel()).iterator();
 
       while (figures.hasNext()) {
         Figure figure = figures.next();
@@ -2596,33 +2406,6 @@ public abstract class OpenTCSDrawingView
       BlockModel block = (BlockModel) e.getSource();
       block.removeBlockChangeListener(this);
       updateBlock(block);
-    }
-  }
-
-  private class StaticRouteChangeHandler
-      implements StaticRouteChangeListener {
-
-    /**
-     * Creates a new instance.
-     */
-    public StaticRouteChangeHandler() {
-    }
-
-    @Override // StaticRouteChangeListener
-    public void pointsChanged(StaticRouteChangeEvent e) {
-      updateStaticRoute((StaticRouteModel) e.getSource());
-    }
-
-    @Override // StaticRouteChangeListener
-    public void colorChanged(StaticRouteChangeEvent e) {
-      updateStaticRoute((StaticRouteModel) e.getSource());
-    }
-
-    @Override // StaticRouteChangeListener
-    public void staticRouteRemoved(StaticRouteChangeEvent e) {
-      StaticRouteModel route = (StaticRouteModel) e.getSource();
-      route.removeStaticRouteChangeListener(this);
-      updateStaticRoute(route);
     }
   }
 

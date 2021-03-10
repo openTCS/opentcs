@@ -60,6 +60,10 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * The name of the business object.
    */
   private String name;
+  /**
+   * A history of events related to this object.
+   */
+  private final ObjectHistory history;
 
   /**
    * Creates a new TCSObject.
@@ -76,6 +80,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
     id = objectID;
     name = objectName;
     reference = new TCSObjectReference<>(this);
+    history = new ObjectHistory();
   }
 
   /**
@@ -100,11 +105,30 @@ public abstract class TCSObject<E extends TCSObject<E>>
   protected TCSObject(int objectID,
                       @Nonnull String objectName,
                       @Nonnull Map<String, String> properties) {
+    this(objectID, objectName, properties, new ObjectHistory());
+  }
+
+  /**
+   * Creates a new TCSObject.
+   *
+   * @param objectID The new object's ID.
+   * @param objectName The new object's name.
+   * @param properties A set of properties (key-value pairs) associated with this object.
+   * @param history A history of events related to this object.
+   * @deprecated Will be removed.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  protected TCSObject(int objectID,
+                      @Nonnull String objectName,
+                      @Nonnull Map<String, String> properties,
+                      @Nonnull ObjectHistory history) {
     this.id = objectID;
     this.name = requireNonNull(objectName, "objectName");
     this.properties = mapWithoutNullValues(properties);
     this.propertiesReadOnly = Collections.unmodifiableMap(this.properties);
     this.reference = new TCSObjectReference<>(this);
+    this.history = requireNonNull(history, "history");
   }
 
   /**
@@ -112,13 +136,30 @@ public abstract class TCSObject<E extends TCSObject<E>>
    *
    * @param objectName The new object's name.
    * @param properties A set of properties (key-value pairs) associated with this object.
+   * @param history A history of events related to this object.
    */
-  protected TCSObject(@Nonnull String objectName, @Nonnull Map<String, String> properties) {
+  protected TCSObject(@Nonnull String objectName,
+                      @Nonnull Map<String, String> properties,
+                      @Nonnull ObjectHistory history) {
     this.name = requireNonNull(objectName, "objectName");
     this.properties = mapWithoutNullValues(properties);
     this.propertiesReadOnly = Collections.unmodifiableMap(this.properties);
     this.id = nextId.getAndIncrement();
     this.reference = new TCSObjectReference<>(this);
+    this.history = requireNonNull(history, "history");
+  }
+
+  /**
+   * Creates a new TCSObject.
+   *
+   * @param objectName The new object's name.
+   * @param properties A set of properties (key-value pairs) associated with this object.
+   * @deprecated Will be removed.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  protected TCSObject(@Nonnull String objectName, @Nonnull Map<String, String> properties) {
+    this(objectName, properties, new ObjectHistory());
   }
 
   /**
@@ -236,6 +277,26 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @return A copy of this object, with the given properties.
    */
   public abstract TCSObject<E> withProperties(Map<String, String> properties);
+
+  public ObjectHistory getHistory() {
+    return history;
+  }
+
+  /**
+   * Creates a copy of this object, with the given history entry integrated.
+   *
+   * @param entry The history entry to be integrated.
+   * @return A copy of this object, with the given history entry integrated.
+   */
+  public abstract TCSObject<E> withHistoryEntry(ObjectHistory.Entry entry);
+
+  /**
+   * Creates a copy of this object, with the given history.
+   *
+   * @param history The history.
+   * @return A copy of this object, with the given history.
+   */
+  public abstract TCSObject<E> withHistory(ObjectHistory history);
 
   @Override
   public String toString() {

@@ -38,15 +38,16 @@ import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.NamedVehicleFigure;
 import org.opentcs.guing.components.drawing.figures.OffsetFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
+import org.opentcs.guing.components.drawing.figures.VehicleFigure;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.event.DrawingEditorEvent;
 import org.opentcs.guing.event.DrawingEditorListener;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.util.event.EventHandler;
 
@@ -154,7 +155,7 @@ public class OpenTCSDrawingEditor
       getDrawing().add(vehicleFigure);
     });
     vehicleModel.addAttributesChangeListener(vehicleFigure);
-    vehicleModel.setFigure(vehicleFigure);
+    modelManager.getModel().registerFigure(vehicleModel, vehicleFigure);
 
     vehicleModel.setDisplayDriveOrders(true);
     for (OpenTCSDrawingView view : getAllViews()) {
@@ -275,8 +276,6 @@ public class OpenTCSDrawingEditor
     for (DrawingView drawView : getDrawingViews()) {
       ((OpenTCSDrawingView) drawView).setBlocks(
           systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
-      ((OpenTCSDrawingView) drawView).setStaticRoutes(
-          systemModel.getMainFolder(SystemModel.FolderKey.STATIC_ROUTES));
     }
   }
 
@@ -429,7 +428,8 @@ public class OpenTCSDrawingEditor
    */
   public void showVehicles(boolean show) {
     for (VehicleModel vehModel : modelManager.getModel().getVehicleModels()) {
-      vehModel.getFigure().setVisible(show);
+      VehicleFigure figure = (VehicleFigure) modelManager.getModel().getFigure(vehModel);
+      figure.setVisible(show);
     }
   }
 

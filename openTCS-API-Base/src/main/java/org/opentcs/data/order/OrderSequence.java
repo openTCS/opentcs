@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -132,6 +133,7 @@ public class OrderSequence
   private OrderSequence(int objectID,
                         String name,
                         Map<String, String> properties,
+                        ObjectHistory history,
                         String category,
                         TCSObjectReference<Vehicle> intendedVehicle,
                         List<TCSObjectReference<TransportOrder>> orders,
@@ -140,7 +142,7 @@ public class OrderSequence
                         boolean failureFatal,
                         boolean finished,
                         TCSObjectReference<Vehicle> processingVehicle) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.category = requireNonNull(category, "category");
     this.intendedVehicle = intendedVehicle;
     this.orders = new ArrayList<>(requireNonNull(orders, "orders"));
@@ -156,6 +158,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              propertiesWith(key, value),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -171,6 +174,39 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              properties,
+                             getHistory(),
+                             category,
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
+  }
+
+  @Override
+  public TCSObject<OrderSequence> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             getHistory().withEntryAppended(entry),
+                             category,
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
+  }
+
+  @Override
+  public TCSObject<OrderSequence> withHistory(ObjectHistory history) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             history,
                              category,
                              intendedVehicle,
                              orders,
@@ -201,6 +237,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -263,6 +300,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              ordersWithAppended(order),
@@ -329,6 +367,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -371,6 +410,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -415,6 +455,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -459,6 +500,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -503,6 +545,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -547,6 +590,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,
@@ -582,6 +626,7 @@ public class OrderSequence
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
+                             getHistory(),
                              category,
                              intendedVehicle,
                              orders,

@@ -539,19 +539,19 @@ public class GridConstrainer
     }
 
     // Rotate into the specified direction by theta
-    angle = constrainAngle(angle);
+    double result = constrainAngle(angle);
 
     switch (dir) {
       case CLOCKWISE:
-        angle += theta;
+        result += theta;
         break;
 
       case COUNTER_CLOCKWISE:
       default:
-        angle -= theta;
+        result -= theta;
         break;
     }
 
-    return angle;
+    return result;
   }
 }

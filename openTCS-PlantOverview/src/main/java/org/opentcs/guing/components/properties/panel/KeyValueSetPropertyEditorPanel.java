@@ -46,7 +46,7 @@ public class KeyValueSetPropertyEditorPanel
   /**
    * A resource bundle.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
+  private final ResourceBundleUtil resBundle = ResourceBundleUtil.getBundle();
   /**
    * Das zu bearbeitende Attribut.
    */
@@ -69,8 +69,8 @@ public class KeyValueSetPropertyEditorPanel
     itemsTable.setModel(new javax.swing.table.DefaultTableModel(
         new Object[][] {},
         new String[] {
-          bundle.getString("KeyValueSetPropertyEditorPanel.key.text"),
-          bundle.getString("KeyValueSetPropertyEditorPanel.value.text")}) {
+          resBundle.getString("KeyValueSetPropertyEditorPanel.key.text"),
+          resBundle.getString("KeyValueSetPropertyEditorPanel.value.text")}) {
       private final Class[] types = new Class[] {
         java.lang.String.class, java.lang.String.class
       };
@@ -220,7 +220,7 @@ public class KeyValueSetPropertyEditorPanel
       if (itemsTable.getValueAt(i, 0).equals(key)) {
         JOptionPane.showMessageDialog(
             this,
-            bundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + key);
+            resBundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + key);
         return;
       }
     }
@@ -249,7 +249,7 @@ public class KeyValueSetPropertyEditorPanel
               && Objects.equals(itemsTable.getValueAt(newKeyRow, 0), newKey)) {
             JOptionPane.showMessageDialog(
                 this,
-                bundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + newKey);
+                resBundle.getString("KeyValueSetPropertyEditorPanel.message.keyExists") + ": " + newKey);
             return;
           }
         }

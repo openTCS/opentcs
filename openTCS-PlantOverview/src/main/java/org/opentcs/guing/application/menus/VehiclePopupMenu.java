@@ -25,8 +25,8 @@ import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
 import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
 import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
 import org.opentcs.guing.application.action.course.WithdrawAction;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -85,7 +85,6 @@ public class VehiclePopupMenu
     }
 
     if (vehicles.size() == 1) {
-
       action = actionFactory.createSendVehicleToPointAction(singleVehicle);
       bundle.configureAction(action, SendVehicleToPointAction.ID);
       action.setEnabled(singleVehicle.isAvailableForOrder()
@@ -125,7 +124,6 @@ public class VehiclePopupMenu
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_RESPECTED);
     bundle.configureAction(action, IntegrationLevelChangeAction.RESPECT_ID);
-    action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
                                                          Vehicle.IntegrationLevel.TO_BE_RESPECTED));
@@ -134,7 +132,6 @@ public class VehiclePopupMenu
     action = actionFactory.createIntegrationLevelChangeAction(vehicles,
                                                               Vehicle.IntegrationLevel.TO_BE_UTILIZED);
     bundle.configureAction(action, IntegrationLevelChangeAction.UTILIZE_ID);
-    action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
                                                          Vehicle.IntegrationLevel.TO_BE_UTILIZED));
@@ -158,20 +155,21 @@ public class VehiclePopupMenu
     withdrawSubMenu.add(action);
 
     add(withdrawSubMenu);
-
   }
 
   private boolean isAnyProcessingOrder(Collection<VehicleModel> vehicles) {
-    return vehicles.stream().anyMatch(
-        vehicle -> vehicle.getPropertyProcState().getValue() == Vehicle.ProcState.PROCESSING_ORDER
-        || vehicle.getPropertyProcState().getValue() == Vehicle.ProcState.AWAITING_ORDER);
+    return vehicles.stream().anyMatch(vehicle -> isProcessingOrder(vehicle));
+  }
 
+  private boolean isProcessingOrder(VehicleModel vehicle) {
+    return vehicle.getPropertyProcState().getValue() == Vehicle.ProcState.PROCESSING_ORDER
+        || vehicle.getPropertyProcState().getValue() == Vehicle.ProcState.AWAITING_ORDER;
   }
 
   private boolean isAnyAtIntegrationLevel(Collection<VehicleModel> vehicles,
                                           Vehicle.IntegrationLevel level) {
     return vehicles.stream().anyMatch(
-        vehicle -> vehicle.getPropertyIntegrationLevel().getComparableValue().equals(level));
-
+        vehicle -> vehicle.getPropertyIntegrationLevel().getComparableValue().equals(level)
+    );
   }
 }

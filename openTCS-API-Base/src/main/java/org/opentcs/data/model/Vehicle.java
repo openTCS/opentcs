@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.OrderConstants;
@@ -117,7 +118,7 @@ public class Vehicle
    * The set of transport order categories this vehicle can process.
    */
   private Set<String> processableCategories
-      = new HashSet<>(Arrays.asList(OrderConstants.CATEGORY_NONE));
+      = new HashSet<>(Arrays.asList(OrderConstants.CATEGORY_ANY));
   /**
    * The index of the last route step travelled for the current drive order of the current transport
    * order.
@@ -212,6 +213,7 @@ public class Vehicle
   private Vehicle(int objectID,
                   String name,
                   Map<String, String> properties,
+                  ObjectHistory history,
                   int length,
                   int energyLevelGood,
                   int energyLevelCritical,
@@ -234,7 +236,7 @@ public class Vehicle
                   double orientationAngle,
                   int energyLevel,
                   List<LoadHandlingDevice> loadHandlingDevices) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.length = checkInRange(length, 1, Integer.MAX_VALUE, "length");
     this.energyLevelGood = checkInRange(energyLevelGood, 0, 100, "energyLevelGood");
     this.energyLevelCritical = checkInRange(energyLevelCritical, 0, 100, "energyLevelCritical");
@@ -278,6 +280,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        propertiesWith(key, value),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -307,6 +310,67 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        properties,
+                       getHistory(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       processableCategories,
+                       routeProgressIndex,
+                       adapterState,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices);
+  }
+
+  @Override
+  public TCSObject<Vehicle> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new Vehicle(getIdWithoutDeprecationWarning(),
+                       getName(),
+                       getProperties(),
+                       getHistory().withEntryAppended(entry),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       processableCategories,
+                       routeProgressIndex,
+                       adapterState,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices);
+  }
+
+  @Override
+  public TCSObject<Vehicle> withHistory(ObjectHistory history) {
+    return new Vehicle(getIdWithoutDeprecationWarning(),
+                       getName(),
+                       getProperties(),
+                       history,
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -367,6 +431,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -482,6 +547,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -546,6 +612,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -589,6 +656,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -633,6 +701,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -692,6 +761,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -748,6 +818,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -806,6 +877,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -864,6 +936,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -930,6 +1003,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -982,6 +1056,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1040,6 +1115,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1103,6 +1179,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1163,6 +1240,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1223,6 +1301,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1283,6 +1362,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1326,6 +1406,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1384,6 +1465,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1441,6 +1523,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1498,6 +1581,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1558,6 +1642,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1623,6 +1708,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,
@@ -1680,6 +1766,7 @@ public class Vehicle
     return new Vehicle(getIdWithoutDeprecationWarning(),
                        getName(),
                        getProperties(),
+                       getHistory(),
                        length,
                        energyLevelGood,
                        energyLevelCritical,

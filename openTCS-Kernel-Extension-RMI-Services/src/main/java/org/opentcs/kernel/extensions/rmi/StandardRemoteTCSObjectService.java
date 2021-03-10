@@ -17,6 +17,7 @@ import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.services.RemoteTCSObjectService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.slf4j.Logger;
@@ -108,4 +109,19 @@ public abstract class StandardRemoteTCSObjectService
       throw findSuitableExceptionFor(exc);
     }
   }
+
+  @Override
+  public void appendObjectHistoryEntry(ClientID clientId,
+                                       TCSObjectReference<?> ref,
+                                       ObjectHistory.Entry entry) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
+
+    try {
+      kernelExecutor.submit(() -> objectService.appendObjectHistoryEntry(ref, entry)).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
 }

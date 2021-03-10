@@ -15,11 +15,11 @@ import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
-import org.opentcs.strategies.basic.dispatching.VehicleOrderSelection;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 
 /**
  * Assigns reserved transport orders (if any) to vehicles that have just finished their withdrawn
@@ -39,9 +39,9 @@ public class AssignReservedOrdersPhase
    */
   private final Router router;
   /**
-   * Checks processability of transport orders for vehicles.
+   * A collection of predicates for filtering assignment candidates.
    */
-  private final ProcessabilityChecker processabilityChecker;
+  private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
   /**
    * Stores reservations of orders for vehicles.
    */
@@ -54,14 +54,16 @@ public class AssignReservedOrdersPhase
   private boolean initialized;
 
   @Inject
-  public AssignReservedOrdersPhase(TCSObjectService objectService,
-                                   Router router,
-                                   ProcessabilityChecker processabilityChecker,
-                                   OrderReservationPool orderReservationPool,
-                                   TransportOrderUtil transportOrderUtil) {
+  public AssignReservedOrdersPhase(
+      TCSObjectService objectService,
+      Router router,
+      CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
+      OrderReservationPool orderReservationPool,
+      TransportOrderUtil transportOrderUtil) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
-    this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
+    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
+                                                             "assignmentCandidateSelectionFilter");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }
@@ -96,7 +98,7 @@ public class AssignReservedOrdersPhase
 
   private void checkForReservedOrder(Vehicle vehicle) {
     // Check if there's an order reserved for this vehicle that is in an assignable state. If yes,
-    // assign that.
+    // try to assign that.
     // Note that we expect no more than a single reserved order, and remove ALL reservations if we
     // find at least one, even if it cannot be processed by the vehicle in the end.
     orderReservationPool.findReservations(vehicle.getReference()).stream()
@@ -104,15 +106,18 @@ public class AssignReservedOrdersPhase
         .filter(order -> order.hasState(TransportOrder.State.DISPATCHABLE))
         .limit(1)
         .peek(order -> orderReservationPool.removeReservations(vehicle.getReference()))
-        .filter(order -> processabilityChecker.checkProcessability(vehicle, order))
+        .map(order -> computeCandidate(vehicle,
+                                       objectService.fetchObject(Point.class,
+                                                                 vehicle.getCurrentPosition()),
+                                       order))
+        .filter(optCandidate -> optCandidate.isPresent())
+        .map(optCandidate -> optCandidate.get())
+        .filter(assignmentCandidateSelectionFilter)
         .findFirst()
-        .map(order -> computeRoute(vehicle, order))
-        .filter(optSelection -> optSelection.isPresent())
-        .map(optSelection -> optSelection.get())
         .ifPresent(
-            selection -> transportOrderUtil.assignTransportOrder(vehicle,
-                                                                 selection.getTransportOrder(),
-                                                                 selection.getDriveOrders())
+            candidate -> transportOrderUtil.assignTransportOrder(vehicle,
+                                                                 candidate.getTransportOrder(),
+                                                                 candidate.getDriveOrders())
         );
   }
 
@@ -122,12 +127,10 @@ public class AssignReservedOrdersPhase
             || vehicle.hasState(Vehicle.State.CHARGING));
   }
 
-  private Optional<VehicleOrderSelection> computeRoute(Vehicle vehicle, TransportOrder order) {
-    return router.getRoute(vehicle,
-                           objectService.fetchObject(Point.class,
-                                                     vehicle.getCurrentPosition()),
-                           order)
-        .map(driveOrders -> new VehicleOrderSelection(order, vehicle, driveOrders));
+  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
+                                                         Point vehiclePosition,
+                                                         TransportOrder order) {
+    return router.getRoute(vehicle, vehiclePosition, order)
+        .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
-
 }

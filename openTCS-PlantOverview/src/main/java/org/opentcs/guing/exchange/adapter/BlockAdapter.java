@@ -73,7 +73,7 @@ public class BlockAdapter
             .withMemberNames(getMemberNames((BlockModel) modelComponent))
             .withProperties(getKernelProperties(modelComponent))
         )
-        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts()));
+        .withVisualLayouts(updatedLayouts(modelComponent, plantModel.getVisualLayouts(), systemModel));
   }
 
   private void updateModelLayoutProperties(BlockModel model, ModelLayoutElement layoutElement) {
@@ -125,7 +125,8 @@ public class BlockAdapter
 
   @Override
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout) {
+                                                 VisualLayoutCreationTO layout,
+                                                 SystemModel systemModel) {
     BlockModel blockModel = (BlockModel) model;
 
     return layout.withModelElement(

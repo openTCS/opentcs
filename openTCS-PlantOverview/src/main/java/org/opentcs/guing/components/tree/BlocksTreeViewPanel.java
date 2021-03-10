@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * A TreeViewPanel for blocks.
@@ -28,8 +29,9 @@ public class BlocksTreeViewPanel
    * @param undoRedoManager The undo redo manager
    */
   @Inject
-  public BlocksTreeViewPanel(UndoRedoManager undoRedoManager) {
-    super(undoRedoManager);
+  public BlocksTreeViewPanel(UndoRedoManager undoRedoManager,
+                             ModelManager modelManager) {
+    super(undoRedoManager, modelManager);
   }
 
   @Override // EditableComponent

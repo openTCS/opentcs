@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import org.jhotdraw.draw.DefaultDrawing;
 import org.jhotdraw.draw.Drawing;
+import org.jhotdraw.draw.Figure;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
@@ -45,7 +46,6 @@ import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.OtherGraphicalElement;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -80,6 +80,10 @@ class StandardSystemModel
    * konfigurierbar, welche ModelComponent-Objekte in welchen Ordner gehören.
    */
   private final Map<Class<?>, ModelComponent> fParentFolders = new HashMap<>();
+  /**
+   * Maps model components to the corresponding figures.
+   */
+  private final Map<ModelComponent, Figure> figuresMap = new HashMap<>();
   /**
    * Die Zeichnung.
    */
@@ -162,6 +166,16 @@ class StandardSystemModel
       }
     }
     return items;
+  }
+
+  @Override
+  public void registerFigure(ModelComponent component, Figure figure) {
+    figuresMap.put(component, figure);
+  }
+
+  @Override
+  public Figure getFigure(ModelComponent component) {
+    return figuresMap.get(component);
   }
 
   @Override // SystemModel
@@ -343,22 +357,6 @@ class StandardSystemModel
     return getAll(FolderKey.GROUPS, GroupModel.class);
   }
 
-  @Override
-  public StaticRouteModel getStaticRouteModel(String name) {
-    for (StaticRouteModel staticRoute : getStaticRouteModels()) {
-      if (staticRoute.getName().equals(name)) {
-        return staticRoute;
-      }
-    }
-
-    return null;
-  }
-
-  @Override // SystemModel
-  public List<StaticRouteModel> getStaticRouteModels() {
-    return getAll(FolderKey.STATIC_ROUTES, StaticRouteModel.class);
-  }
-
   @Override // SystemModel
   public List<OtherGraphicalElement> getOtherGraphicalElements() {
     return getAll(FolderKey.OTHER_GRAPHICAL_ELEMENTS, OtherGraphicalElement.class);
@@ -475,8 +473,6 @@ class StandardSystemModel
                      new SimpleFolder(bundle.getString("tree.blocks.text")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.GROUPS,
                      new SimpleFolder(bundle.getString("tree.groups.text")));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.STATIC_ROUTES,
-                     new SimpleFolder(bundle.getString("tree.staticRoutes.text")));
     createMainFolder(getMainFolder(FolderKey.LAYOUT), FolderKey.OTHER_GRAPHICAL_ELEMENTS,
                      new SimpleFolder(bundle.getString("tree.otherGraphicals.text")));
   }
@@ -520,7 +516,6 @@ class StandardSystemModel
     fParentFolders.put(LinkModel.class, getMainFolder(FolderKey.LINKS));
     fParentFolders.put(BlockModel.class, getMainFolder(FolderKey.BLOCKS));
     fParentFolders.put(GroupModel.class, getMainFolder(FolderKey.GROUPS));
-    fParentFolders.put(StaticRouteModel.class, getMainFolder(FolderKey.STATIC_ROUTES));
     fParentFolders.put(OtherGraphicalElement.class, getMainFolder(FolderKey.OTHER_GRAPHICAL_ELEMENTS));
   }
 }

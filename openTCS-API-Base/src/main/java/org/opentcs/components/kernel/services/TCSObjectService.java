@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -74,9 +75,9 @@ public interface TCSObjectService {
   <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
                                                @Nonnull Predicate<? super T> predicate)
       throws KernelRuntimeException;
-  
+
   /**
-   * Updates an {@link TCSObject}'s property.
+   * Updates a {@link TCSObject}'s property.
    *
    * @param ref A reference to the TCSObject to be modified.
    * @param key The property's key.
@@ -85,5 +86,16 @@ public interface TCSObjectService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void updateObjectProperty(TCSObjectReference<?> ref, String key, @Nullable String value)
+      throws ObjectUnknownException, KernelRuntimeException;
+
+  /**
+   * Appends a history entry to a {@link TCSObject}.
+   *
+   * @param ref A reference to the TCSObject to be modified.
+   * @param entry The history entry to be appended.
+   * @throws ObjectUnknownException If the referenced object does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
       throws ObjectUnknownException, KernelRuntimeException;
 }

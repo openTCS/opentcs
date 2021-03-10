@@ -27,10 +27,8 @@ import org.jhotdraw.geom.Geom;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.components.drawing.ZoomPoint;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
-import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 
@@ -63,11 +61,9 @@ public class LocationFigure
    * @param model The model corresponding to this graphical object.
    */
   @Inject
-  public LocationFigure(ComponentsTreeViewManager componentsTreeManager,
-                        SelectionPropertiesComponent propertiesComponent,
-                        LocationTheme locationTheme,
+  public LocationFigure(LocationTheme locationTheme,
                         @Assisted LocationModel model) {
-    super(componentsTreeManager, propertiesComponent, model);
+    super(model);
     this.locationTheme = requireNonNull(locationTheme, "locationTheme");
 
     fWidth = 30;

@@ -1,6 +1,5 @@
 /.gradle/
 /.nb-gradle/
-/openTCS-Base/build/
 /openTCS-CommAdapter-Loopback/build/
 /openTCS-Strategies-Default/build/
 /openTCS-Kernel/build/
@@ -11,8 +10,6 @@
 /openTCS-Common/build/
 /openTCS-API-Injection/build/
 /openTCS-API-Base/build/
-/buildSrc/build/
-/buildSrc/.gradle/
 /openTCS-KernelControlCenter/.nb-gradle/
 /openTCS-KernelControlCenter/build/
 /openTCS-Impl-Configuration-cfg4j/build/
@@ -24,3 +21,4 @@
 /openTCS-PlantOverview-Panel-ResourceAllocation/build/
 /openTCS-PlantOverview-Panel-Statistics/build/
 /openTCS-PlantOverview-Themes-Default/build/
+/openTCS-PlantOverview-Base/build/

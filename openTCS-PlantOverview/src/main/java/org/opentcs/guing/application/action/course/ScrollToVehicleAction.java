@@ -16,6 +16,7 @@ import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  *
@@ -36,23 +37,30 @@ public class ScrollToVehicleAction
    * The drawing editor.
    */
   private final OpenTCSDrawingEditor drawingEditor;
+  /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
 
   /**
    * Creates a new instance.
    *
    * @param vehicle The selected vehicle.
    * @param drawingEditor The application's drawing editor.
+   * @param modelManager The model manager.
    */
   @Inject
   public ScrollToVehicleAction(@Assisted VehicleModel vehicle,
-                               OpenTCSDrawingEditor drawingEditor) {
+                               OpenTCSDrawingEditor drawingEditor,
+                               ModelManager modelManager) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    Figure figure = vehicleModel.getFigure();
+    Figure figure = modelManager.getModel().getFigure(vehicleModel);
     OpenTCSDrawingView drawingView = drawingEditor.getActiveView();
 
     if (drawingView != null && figure != null) {

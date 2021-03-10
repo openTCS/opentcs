@@ -36,16 +36,16 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class CreateTransportOrderSequenceTest {
 
-  private TransportOrderService internalTransportOrderService;
-  private DispatcherService dispatcherService;
+  private TransportOrderService orderService;
+  private DispatcherService dispService;
 
   @Before
   public void setUp() {
-    internalTransportOrderService = mock(InternalTransportOrderService.class);
-    dispatcherService = mock(DispatcherService.class);
-    when(internalTransportOrderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
+    orderService = mock(InternalTransportOrderService.class);
+    dispService = mock(DispatcherService.class);
+    when(orderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
         .thenReturn(new OrderSequence("OrderSequence"));
-    when(internalTransportOrderService.createTransportOrder(any(TransportOrderCreationTO.class)))
+    when(orderService.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenReturn(new TransportOrder(
             "Transportorder",
             Collections.singletonList(new DriveOrder(
@@ -100,10 +100,10 @@ public class CreateTransportOrderSequenceTest {
   }
 
   private TransportOrderService getATransportOrderServiceReference() {
-    return internalTransportOrderService;
+    return orderService;
   }
 
   private DispatcherService getADispatcherServiceReference() {
-    return dispatcherService;
+    return dispService;
   }
 }

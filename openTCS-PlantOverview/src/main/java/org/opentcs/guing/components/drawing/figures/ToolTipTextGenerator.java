@@ -10,20 +10,21 @@ package org.opentcs.guing.components.drawing.figures;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.model.ModelComponent;
 import static org.opentcs.guing.model.ModelComponent.MISCELLANEOUS;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * Generates tooltip texts for various model elements.
@@ -32,6 +33,10 @@ import org.opentcs.guing.util.ResourceBundleUtil;
  */
 public class ToolTipTextGenerator {
 
+  /**
+   * This class's resource bundle.
+   */
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The model manager.
    */
@@ -43,7 +48,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(PointModel model) {
-    String pointDesc = ResourceBundleUtil.getBundle().getString("point.description");
+    String pointDesc = bundle.getString("point.description");
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(pointDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
 
@@ -56,7 +61,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(LocationModel model) {
-    String locationDesc = ResourceBundleUtil.getBundle().getString("location.description");
+    String locationDesc = bundle.getString("location.description");
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(locationDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
 
@@ -69,7 +74,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(PathModel model) {
-    String pathDesc = ResourceBundleUtil.getBundle().getString("path.description");
+    String pathDesc = bundle.getString("path.description");
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(pathDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
 
@@ -81,13 +86,13 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(VehicleModel model) {
-    String vehicleDesc = ResourceBundleUtil.getBundle().getString("vehicle.description");
-    String positionDesc = ResourceBundleUtil.getBundle().getString("vehicle.point.text");
-    String nextPositionDesc = ResourceBundleUtil.getBundle().getString("vehicle.nextPoint.text");
-    String stateDesc = ResourceBundleUtil.getBundle().getString("vehicle.state.text");
-    String procStateDesc = ResourceBundleUtil.getBundle().getString("vehicle.procState.text");
-    String integrationLevelDesc = ResourceBundleUtil.getBundle().getString("vehicle.integrationLevel.text");
-    String energyDesc = ResourceBundleUtil.getBundle().getString("vehicle.energyLevel.text");
+    String vehicleDesc = bundle.getString("vehicle.description");
+    String positionDesc = bundle.getString("vehicle.point.text");
+    String nextPositionDesc = bundle.getString("vehicle.nextPoint.text");
+    String stateDesc = bundle.getString("vehicle.state.text");
+    String procStateDesc = bundle.getString("vehicle.procState.text");
+    String integrationLevelDesc = bundle.getString("vehicle.integrationLevel.text");
+    String energyDesc = bundle.getString("vehicle.energyLevel.text");
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(vehicleDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
     sb.append("<br>").append(positionDesc).append(": ")
@@ -126,7 +131,7 @@ public class ToolTipTextGenerator {
   }
 
   public String getToolTipText(LinkModel model) {
-    String linkDesc = ResourceBundleUtil.getBundle().getString("link.description");
+    String linkDesc = bundle.getString("link.description");
     StringBuilder sb = new StringBuilder("<html>");
     sb.append(linkDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
     sb.append("</html>");
@@ -178,7 +183,7 @@ public class ToolTipTextGenerator {
 
     blocks.sort((b1, b2) -> b1.getName().compareTo(b2.getName()));
 
-    String desc = ResourceBundleUtil.getBundle().getString("modelComponent.blocks.description");
+    String desc = bundle.getString("modelComponent.blocks.description");
     StringBuilder sb = new StringBuilder("<br>").append(desc);
     for (BlockModel block : blocks) {
       sb.append(block.getName()).append(", ");

@@ -18,8 +18,8 @@ import javax.inject.Inject;
 import javax.swing.JPanel;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.util.event.EventHandler;
 
 /**

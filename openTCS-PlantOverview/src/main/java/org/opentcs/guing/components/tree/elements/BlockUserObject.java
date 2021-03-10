@@ -17,8 +17,8 @@ import javax.swing.JPopupMenu;
 import org.opentcs.data.model.Block;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.BlockModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**

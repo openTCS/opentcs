@@ -13,15 +13,12 @@ import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
-import org.jhotdraw.xml.DOMInput;
-import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
@@ -89,23 +86,6 @@ public class LabeledLocationFigure
     thatPresentationFigure.propertiesChanged(null);
 
     return that;
-  }
-
-  @Override
-  public void read(DOMInput in)
-      throws IOException {
-    double x = in.getAttribute("x", 0d);
-    double y = in.getAttribute("y", 0d);
-    setBounds(new Point2D.Double(x, y), new Point2D.Double(x, y));
-  }
-
-  @Override
-  public void write(DOMOutput out)
-      throws IOException {
-    LocationFigure lf = getPresentationFigure();
-    out.addAttribute("x", lf.getZoomPoint().getX());
-    out.addAttribute("y", lf.getZoomPoint().getY());
-    out.addAttribute("name", get(FigureConstants.MODEL).getName());
   }
 
   @Override

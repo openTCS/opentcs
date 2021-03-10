@@ -15,6 +15,11 @@ package org.opentcs.data.order;
 public interface OrderConstants {
 
   /**
+   * A category string indicating <em>any</em> category, primarily intended to be used for a
+   * vehicle to indicate there are no restrictions to its processable categories.
+   */
+  String CATEGORY_ANY = "*";
+  /**
    * The default category name for orders.
    */
   String CATEGORY_NONE = "-";

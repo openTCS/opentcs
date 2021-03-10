@@ -18,11 +18,7 @@ import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
-import org.jhotdraw.xml.DOMInput;
-import org.jhotdraw.xml.DOMOutput;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
-import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
-import org.opentcs.guing.model.FigureComponent;
+import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LinkModel;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
@@ -46,17 +42,13 @@ public class LinkConnection
   /**
    * Creates a new instance.
    *
-   * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param model The model corresponding to this graphical object.
    * @param textGenerator The tool tip text generator.
    */
   @Inject
-  public LinkConnection(ComponentsTreeViewManager componentsTreeManager,
-                        SelectionPropertiesComponent propertiesComponent,
-                        @Assisted LinkModel model,
+  public LinkConnection(@Assisted LinkModel model,
                         ToolTipTextGenerator textGenerator) {
-    super(componentsTreeManager, propertiesComponent, model);
+    super(model);
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
 
     double[] dash = {5.0, 5.0};
@@ -101,8 +93,8 @@ public class LinkConnection
 
   @Override // SimpleLineConnection
   public boolean canConnect(Connector start, Connector end) {
-    FigureComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
-    FigureComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
+    ModelComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
+    ModelComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
 
     if (modelStart == null || modelEnd == null) {
       return false;
@@ -123,16 +115,6 @@ public class LinkConnection
     }
 
     return false;
-  }
-
-  @Override
-  public void write(DOMOutput out) {
-    out.addAttribute("sourceName", getStartFigure().get(FigureConstants.MODEL).getName());
-    out.addAttribute("destName", getEndFigure().get(FigureConstants.MODEL).getName());
-  }
-
-  @Override
-  public void read(DOMInput in) {
   }
 
   @Override

@@ -21,10 +21,11 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeAssignmentCandidateSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,9 @@ public abstract class AbstractParkingPhase
    */
   private final Router router;
   /**
-   * Checks processability of transport orders for vehicles.
+   * A collection of predicates for filtering assignment candidates.
    */
-  private final ProcessabilityChecker processabilityChecker;
+  private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
   /**
    * Provides service functions for working with transport orders.
    */
@@ -75,13 +76,14 @@ public abstract class AbstractParkingPhase
       InternalTransportOrderService orderService,
       org.opentcs.components.kernel.ParkingPositionSupplier parkingPosSupplier,
       Router router,
-      ProcessabilityChecker processabilityChecker,
+      CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
       DefaultDispatcherConfiguration configuration) {
     this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.parkingPosSupplier = requireNonNull(parkingPosSupplier, "parkingPosSupplier");
-    this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
+    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
+                                                             "assignmentCandidateSelectionFilter");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -142,13 +144,24 @@ public abstract class AbstractParkingPhase
             .withDispensable(true)
             .withIntendedVehicleName(vehicle.getName())
     );
-    Optional<List<DriveOrder>> driveOrders = router.getRoute(vehicle, vehiclePosition, parkOrder);
-    if (processabilityChecker.checkProcessability(vehicle, parkOrder) && driveOrders.isPresent()) {
-      transportOrderUtil.assignTransportOrder(vehicle, parkOrder, driveOrders.get());
+    Optional<AssignmentCandidate> candidate = computeCandidate(vehicle, vehiclePosition, parkOrder)
+        .filter(assignmentCandidateSelectionFilter);
+    // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
+    if (candidate.isPresent()) {
+      transportOrderUtil.assignTransportOrder(candidate.get().getVehicle(),
+                                              candidate.get().getTransportOrder(),
+                                              candidate.get().getDriveOrders());
     }
     else {
       // Mark the order as failed, since the vehicle cannot execute it.
       orderService.updateTransportOrderState(parkOrder.getReference(), TransportOrder.State.FAILED);
     }
+  }
+
+  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
+                                                         Point vehiclePosition,
+                                                         TransportOrder order) {
+    return router.getRoute(vehicle, vehiclePosition, order)
+        .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
 }

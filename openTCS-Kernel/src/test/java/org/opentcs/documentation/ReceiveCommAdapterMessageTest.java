@@ -32,7 +32,7 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class ReceiveCommAdapterMessageTest {
 
-  private TCSObjectService objectService;
+  private TCSObjectService objService;
 
   private Vehicle sampleVehicle;
 
@@ -40,11 +40,11 @@ public class ReceiveCommAdapterMessageTest {
 
   @Before
   public void setUp() {
-    objectService = mock(TCSObjectService.class);
+    objService = mock(TCSObjectService.class);
     sampleVehicle = createSampleVehicle();
     sampleTransportOrder = createSampleTransportOrder();
-    when(objectService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(sampleVehicle);
-    when(objectService.fetchObject(eq(TransportOrder.class), any(String.class)))
+    when(objService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(sampleVehicle);
+    when(objService.fetchObject(eq(TransportOrder.class), any(String.class)))
         .thenReturn(sampleTransportOrder);
   }
 
@@ -107,6 +107,6 @@ public class ReceiveCommAdapterMessageTest {
   }
 
   private TCSObjectService getTCSObjectServiceFromSomewhere() {
-    return objectService;
+    return objService;
   }
 }

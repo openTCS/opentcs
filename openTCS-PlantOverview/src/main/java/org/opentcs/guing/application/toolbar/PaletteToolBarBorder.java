@@ -69,10 +69,8 @@ public class PaletteToolBarBorder
   }
 
   @Override
-  public Insets getBorderInsets(Component component, Insets newInsets) {
-    if (newInsets == null) {
-      newInsets = new Insets(0, 0, 0, 0);
-    }
+  public Insets getBorderInsets(Component component, Insets insets) {
+    Insets newInsets = (insets == null) ? new Insets(0, 0, 0, 0) : insets;
 
     JComponent c = (JComponent) component;
 

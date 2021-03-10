@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 
@@ -55,5 +56,10 @@ public interface RemoteTCSObjectService
                             TCSObjectReference<?> ref,
                             String key,
                             String value)
+      throws RemoteException;
+
+  void appendObjectHistoryEntry(ClientID clientId,
+                                TCSObjectReference<?> ref,
+                                ObjectHistory.Entry entry)
       throws RemoteException;
 }

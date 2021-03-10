@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -81,8 +82,7 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
   }
 
   @Override
-  public void updateObjectProperty(
-      TCSObjectReference<?> ref, String key, String value)
+  public void updateObjectProperty(TCSObjectReference<?> ref, String key, String value)
       throws ObjectUnknownException, KernelRuntimeException {
     checkServiceAvailability();
 
@@ -93,4 +93,18 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
       throw findSuitableExceptionFor(ex);
     }
   }
+
+  @Override
+  public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().appendObjectHistoryEntry(getClientId(), ref, entry);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
 }

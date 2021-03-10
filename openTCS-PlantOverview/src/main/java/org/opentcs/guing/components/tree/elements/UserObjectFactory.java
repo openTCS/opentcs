@@ -17,7 +17,6 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -44,8 +43,6 @@ public interface UserObjectFactory {
   PointUserObject createPointUserObject(PointModel model, UserObjectContext context);
 
   SimpleFolderUserObject createSimpleFolderUserObject(CompositeModelComponent model);
-
-  StaticRouteUserObject createStaticRouteUserObject(StaticRouteModel model);
 
   VehicleUserObject createVehicleUserObject(VehicleModel model);
 

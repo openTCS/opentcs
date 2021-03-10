@@ -22,8 +22,6 @@ import java.awt.geom.Rectangle2D;
 import javax.inject.Inject;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.guing.components.drawing.ZoomPoint;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
-import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
@@ -62,10 +60,8 @@ public class PointFigure
    * @param model The model corresponding to this graphical object.
    */
   @Inject
-  public PointFigure(ComponentsTreeViewManager componentsTreeManager,
-                     SelectionPropertiesComponent propertiesComponent,
-                     @Assisted PointModel model) {
-    super(componentsTreeManager, propertiesComponent, model);
+  public PointFigure(@Assisted PointModel model) {
+    super(model);
 
     // TO DO: Grid Constrainer anpassen, sodass auch kleinere Figur auf das "10er" Raster gezogen wird.
     fDiameter = 10;

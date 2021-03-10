@@ -14,9 +14,9 @@ import javax.inject.Provider;
 import javax.swing.JToggleButton;
 import org.jhotdraw.gui.JPopupButton;
 import org.opentcs.guing.application.StatusPanel;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * A factory for drawing views.
@@ -80,7 +80,6 @@ public class DrawingViewFactory {
       drawingView.displayDriveOrders(vehicle, vehicle.getDisplayDriveOrders());
     }
     drawingView.setBlocks(systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
-    drawingView.setStaticRoutes(systemModel.getMainFolder(SystemModel.FolderKey.STATIC_ROUTES));
 
     DrawingViewPlacardPanel placardPanel = new DrawingViewPlacardPanel(drawingView);
 

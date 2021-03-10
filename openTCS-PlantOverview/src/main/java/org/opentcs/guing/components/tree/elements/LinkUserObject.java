@@ -14,8 +14,8 @@ import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.LinkModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**

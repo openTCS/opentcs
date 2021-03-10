@@ -15,7 +15,7 @@ import org.jhotdraw.draw.LabelFigure;
 import org.jhotdraw.draw.event.FigureEvent;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.FigureComponent;
+import org.opentcs.guing.model.ModelComponent;
 
 /**
  * A label belonging to another {@code Figure} that shows the name of the affiliated object in the
@@ -100,7 +100,7 @@ public class TCSLabelFigure
 
     if (fParent != null) {
       TCSFigure figure = fParent.getPresentationFigure();
-      FigureComponent model = figure.getModel();
+      ModelComponent model = figure.getModel();
 
       Point2D.Double newOffset = new Point2D.Double(
           getBounds().getX() - figure.getBounds().x,
@@ -144,7 +144,7 @@ public class TCSLabelFigure
     if (event.getFigure() instanceof LabeledFigure) {
       LabeledFigure lf = (LabeledFigure) event.getFigure();
       TCSFigure figure = lf.getPresentationFigure();
-      FigureComponent model = figure.getModel();
+      ModelComponent model = figure.getModel();
       String name = model.getName();
       setText(name);
 

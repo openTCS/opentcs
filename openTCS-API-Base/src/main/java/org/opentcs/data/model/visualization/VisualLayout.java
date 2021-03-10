@@ -18,6 +18,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -99,12 +100,13 @@ public class VisualLayout
   private VisualLayout(int objectID,
                        String name,
                        Map<String, String> properties,
+                       ObjectHistory history,
                        double scaleX,
                        double scaleY,
                        Map<String, Color> colors,
                        Set<LayoutElement> layoutElements,
                        List<ViewBookmark> viewBookmarks) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.colors = new TreeMap<>(mapWithoutNullValues(colors));
@@ -117,6 +119,7 @@ public class VisualLayout
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),
                             propertiesWith(key, value),
+                            getHistory(),
                             scaleX,
                             scaleY,
                             colors,
@@ -129,6 +132,33 @@ public class VisualLayout
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),
                             properties,
+                            getHistory(),
+                            scaleX,
+                            scaleY,
+                            colors,
+                            layoutElements,
+                            viewBookmarks);
+  }
+
+  @Override
+  public TCSObject<VisualLayout> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new VisualLayout(getIdWithoutDeprecationWarning(),
+                            getName(),
+                            getProperties(),
+                            getHistory().withEntryAppended(entry),
+                            scaleX,
+                            scaleY,
+                            colors,
+                            layoutElements,
+                            viewBookmarks);
+  }
+
+  @Override
+  public TCSObject<VisualLayout> withHistory(ObjectHistory history) {
+    return new VisualLayout(getIdWithoutDeprecationWarning(),
+                            getName(),
+                            getProperties(),
+                            history,
                             scaleX,
                             scaleY,
                             colors,
@@ -167,6 +197,7 @@ public class VisualLayout
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),
                             getProperties(),
+                            getHistory(),
                             scaleX,
                             scaleY,
                             colors,
@@ -205,6 +236,7 @@ public class VisualLayout
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),
                             getProperties(),
+                            getHistory(),
                             scaleX,
                             scaleY,
                             colors,
@@ -269,6 +301,7 @@ public class VisualLayout
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),
                             getProperties(),
+                            getHistory(),
                             scaleX,
                             scaleY,
                             colors,
@@ -313,6 +346,7 @@ public class VisualLayout
     return new VisualLayout(getIdWithoutDeprecationWarning(),
                             getName(),
                             getProperties(),
+                            getHistory(),
                             scaleX,
                             scaleY,
                             colors,

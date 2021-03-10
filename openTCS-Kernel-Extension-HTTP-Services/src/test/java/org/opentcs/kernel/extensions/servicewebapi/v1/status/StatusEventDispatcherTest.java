@@ -50,29 +50,29 @@ public class StatusEventDispatcherTest {
 
   @Test
   public void respectConfiguredCapacity() {
-    final int CAPACITY = 10;
-    final int EVENT_COUNT = CAPACITY * 2;
-    when(configuration.statusEventsCapacity()).thenReturn(CAPACITY);
+    final int capacity = 10;
+    final int eventCount = capacity * 2;
+    when(configuration.statusEventsCapacity()).thenReturn(capacity);
     statusEventDispatcher.initialize();
 
     TransportOrder order = new TransportOrder("SomeOrder", new ArrayList<>());
-    for (int i = 0; i < EVENT_COUNT; i++) {
+    for (int i = 0; i < eventCount; i++) {
       statusEventDispatcher.onEvent(
           new TCSObjectEvent(order, order, TCSObjectEvent.Type.OBJECT_MODIFIED)
       );
     }
 
     StatusMessageList list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
-    assertThat(list.getStatusMessages().size(), is(CAPACITY));
-    assertThat(list.getStatusMessages().get(CAPACITY - 1).getSequenceNumber(),
-               is((long) EVENT_COUNT - 1));
+    assertThat(list.getStatusMessages().size(), is(capacity));
+    assertThat(list.getStatusMessages().get(capacity - 1).getSequenceNumber(),
+               is((long) eventCount - 1));
   }
 
   @Test
   public void keepAllEventsIfLessThanCapacity() {
-    final int CAPACITY = 10;
-    final int EVENT_COUNT = CAPACITY / 2;
-    when(configuration.statusEventsCapacity()).thenReturn(CAPACITY);
+    final int capacity = 10;
+    final int eventCount = capacity / 2;
+    when(configuration.statusEventsCapacity()).thenReturn(capacity);
     statusEventDispatcher.initialize();
 
     TransportOrder order = new TransportOrder("SomeOrder", new ArrayList<>());
@@ -83,8 +83,8 @@ public class StatusEventDispatcherTest {
     }
 
     StatusMessageList list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
-    assertThat(list.getStatusMessages().size(), is(EVENT_COUNT));
-    assertThat(list.getStatusMessages().get(EVENT_COUNT - 1).getSequenceNumber(),
-               is((long) EVENT_COUNT - 1));
+    assertThat(list.getStatusMessages().size(), is(eventCount));
+    assertThat(list.getStatusMessages().get(eventCount - 1).getSequenceNumber(),
+               is((long) eventCount - 1));
   }
 }

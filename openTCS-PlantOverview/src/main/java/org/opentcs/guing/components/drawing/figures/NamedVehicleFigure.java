@@ -12,9 +12,8 @@ import java.awt.Graphics2D;
 import javax.inject.Inject;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.guing.application.menus.MenuFactory;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
-import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
 /**
@@ -26,20 +25,18 @@ public class NamedVehicleFigure
     extends VehicleFigure {
 
   @Inject
-  public NamedVehicleFigure(ComponentsTreeViewManager componentsTreeManager,
-                            SelectionPropertiesComponent propertiesComponent,
-                            VehicleTheme vehicleTheme,
+  public NamedVehicleFigure(VehicleTheme vehicleTheme,
                             MenuFactory menuFactory,
                             PlantOverviewApplicationConfiguration appConfig,
                             @Assisted VehicleModel model,
-                            ToolTipTextGenerator textGenerator) {
-    super(componentsTreeManager,
-          propertiesComponent,
-          vehicleTheme,
+                            ToolTipTextGenerator textGenerator,
+                            ModelManager modelManager) {
+    super(vehicleTheme,
           menuFactory,
           appConfig,
           model,
-          textGenerator);
+          textGenerator,
+          modelManager);
   }
 
   @Override

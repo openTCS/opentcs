@@ -90,7 +90,8 @@ public class OpenTCSConnectionTool
       r = new Rectangle(getView().drawingToView(cAnchor));
       r.grow(getAnchorWidth(), getAnchorWidth());
       fireAreaInvalidated(r);
-      startConnector = endConnector = null;
+      startConnector = null;
+      endConnector = null;
       Figure finishedFigure = createdFigure;
       createdFigure = null;
       creationFinished(finishedFigure);
@@ -107,7 +108,8 @@ public class OpenTCSConnectionTool
         r = new Rectangle(getView().drawingToView(cAnchor));
         r.grow(getAnchorWidth(), getAnchorWidth());
         fireAreaInvalidated(r);
-        startConnector = endConnector = null;
+        startConnector = null;
+        endConnector = null;
         createdFigure = null;
       }
 

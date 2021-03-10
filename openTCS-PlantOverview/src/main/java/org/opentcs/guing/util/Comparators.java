@@ -10,7 +10,7 @@ package org.opentcs.guing.util;
 
 import java.util.Comparator;
 import org.opentcs.guing.model.ModelComponent;
-import org.opentcs.guing.persistence.CourseObjectProperty;
+import org.opentcs.guing.persistence.legacy.CourseObjectProperty;
 
 /**
  *

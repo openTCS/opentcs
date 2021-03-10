@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -60,8 +61,9 @@ public class LocationType
   private LocationType(int objectID,
                        String name,
                        Map<String, String> properties,
+                       ObjectHistory history,
                        List<String> allowedOperations) {
-    super(objectID, name, properties);
+    super(objectID, name, properties, history);
     this.allowedOperations = listWithoutNullValues(requireNonNull(allowedOperations,
                                                                   "allowedOperations"));
   }
@@ -71,6 +73,7 @@ public class LocationType
     return new LocationType(getIdWithoutDeprecationWarning(),
                             getName(),
                             propertiesWith(key, value),
+                            getHistory(),
                             allowedOperations);
   }
 
@@ -79,6 +82,25 @@ public class LocationType
     return new LocationType(getIdWithoutDeprecationWarning(),
                             getName(),
                             properties,
+                            getHistory(),
+                            allowedOperations);
+  }
+
+  @Override
+  public TCSObject<LocationType> withHistoryEntry(ObjectHistory.Entry entry) {
+    return new LocationType(getIdWithoutDeprecationWarning(),
+                            getName(),
+                            getProperties(),
+                            getHistory().withEntryAppended(entry),
+                            allowedOperations);
+  }
+
+  @Override
+  public TCSObject<LocationType> withHistory(ObjectHistory history) {
+    return new LocationType(getIdWithoutDeprecationWarning(),
+                            getName(),
+                            getProperties(),
+                            history,
                             allowedOperations);
   }
 
@@ -148,6 +170,7 @@ public class LocationType
     return new LocationType(getIdWithoutDeprecationWarning(),
                             getName(),
                             getProperties(),
+                            getHistory(),
                             allowedOperations);
   }
 
@@ -168,6 +191,7 @@ public class LocationType
     return new LocationType(getIdWithoutDeprecationWarning(),
                             getName(),
                             getProperties(),
+                            getHistory(),
                             allowedOperations);
   }
 }

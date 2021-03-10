@@ -29,20 +29,15 @@ import org.jhotdraw.draw.liner.ElbowLiner;
 import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
-import org.jhotdraw.xml.DOMInput;
-import org.jhotdraw.xml.DOMOutput;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.figures.liner.BezierLinerControlPointHandle;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.components.drawing.figures.liner.TupelBezierLiner;
-import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
-import org.opentcs.guing.model.FigureComponent;
 import org.opentcs.guing.model.elements.PathModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,17 +93,13 @@ public class PathConnection
   /**
    * Creates a new instance.
    *
-   * @param componentsTreeManager The manager for the components tree view.
-   * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param model The model corresponding to this graphical object.
    * @param textGenerator The tool tip text generator.
    */
   @Inject
-  public PathConnection(ComponentsTreeViewManager componentsTreeManager,
-                        SelectionPropertiesComponent propertiesComponent,
-                        @Assisted PathModel model,
+  public PathConnection(@Assisted PathModel model,
                         ToolTipTextGenerator textGenerator) {
-    super(componentsTreeManager, propertiesComponent, model);
+    super(model);
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
     resetPath();
   }
@@ -155,7 +146,11 @@ public class PathConnection
     path.clear();
     path.add(new BezierPath.Node(sp));
     path.add(new BezierPath.Node(ep));
-    cp1 = cp2 = cp3 = cp4 = cp5 = null;
+    cp1 = null;
+    cp2 = null;
+    cp3 = null;
+    cp4 = null;
+    cp5 = null;
     getModel().getPropertyPathControlPoints().markChanged();
   }
 
@@ -573,23 +568,6 @@ public class PathConnection
   }
 
   @Override
-  public void write(DOMOutput out) {
-    // Das bringt nichts, da bei Paste ein neues PathModel mit den Default-Parametern erzeugt wird
-//    SelectionProperty pLinerType = (SelectionProperty) getModel().getProperty(ElementPropKeys.PATH_CONN_TYPE);
-//    PathModel.LinerType value = (PathModel.LinerType) pLinerType.getValue();
-//    out.addAttribute("liner", value.name());
-    FigureComponent startModel = requireNonNull(getStartFigure().get(FigureConstants.MODEL));
-    FigureComponent endModel = requireNonNull(getEndFigure().get(FigureConstants.MODEL));
-    out.addAttribute("sourceName", startModel.getName());
-    out.addAttribute("destName", endModel.getName());
-  }
-
-  @Override
-  public void read(DOMInput in) {
-    // Don't do anything, as a new PathModel with default values is created on paste.
-  }
-
-  @Override
   public void propertiesChanged(AttributesChangeEvent e) {
     if (!e.getInitiator().equals(this)) {
       setLinerByType((PathModel.LinerType) getModel().getPropertyPathConnType().getValue());
@@ -717,8 +695,6 @@ public class PathConnection
     else if (getLiner() instanceof SlantedLiner) {
       pConnType.setValue(PathModel.LinerType.SLANTED);
     }
-
-    clone.getModel().setFigure(clone);
 
     return clone;
   }

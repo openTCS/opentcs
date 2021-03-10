@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.Rejection;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
@@ -66,7 +67,8 @@ public class ProcessabilityChecker {
     requireNonNull(order, "order");
 
     // Check for matching categories
-    if (!vehicle.getProcessableCategories().contains(order.getCategory())) {
+    if (!vehicle.getProcessableCategories().contains(OrderConstants.CATEGORY_ANY)
+        && !vehicle.getProcessableCategories().contains(order.getCategory())) {
       LOG.debug("Category '{}' of order '{}' not in categories '{}' of vehicle '{}'.",
                 order.getCategory(),
                 order.getName(),

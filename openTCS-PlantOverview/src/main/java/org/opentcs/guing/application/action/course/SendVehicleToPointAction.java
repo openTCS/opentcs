@@ -17,9 +17,9 @@ import javax.swing.JFrame;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
-import org.opentcs.guing.model.ModelManager;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.PointPanel;
 
 /**

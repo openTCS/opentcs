@@ -21,11 +21,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import org.jhotdraw.draw.Figure;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
@@ -35,7 +37,9 @@ import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.components.tree.TreeViewManager;
+import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.CourseObjectFactory;
 
 /**
@@ -88,6 +92,10 @@ public class SingleVehicleView
    */
   private final MenuFactory menuFactory;
   /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
+  /**
    * Die Zeichenfläche im Dialog.
    */
   private final JPanel fVehicleView;
@@ -113,7 +121,8 @@ public class SingleVehicleView
                            SelectionPropertiesComponent propertiesComponent,
                            OpenTCSDrawingEditor drawingEditor,
                            CourseObjectFactory crsObjFactory,
-                           MenuFactory menuFactory) {
+                           MenuFactory menuFactory,
+                           ModelManager modelManager) {
     this.fVehicleModel = requireNonNull(vehicle, "vehicle");
     this.treeViewManager = requireNonNull(treeViewManager, "treeViewManager");
     this.propertiesComponent = requireNonNull(propertiesComponent,
@@ -121,6 +130,7 @@ public class SingleVehicleView
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
     this.fVehicleView = new VehicleView(fVehicleModel);
 
     initComponents();
@@ -158,8 +168,19 @@ public class SingleVehicleView
     updateVehicleState();
     updateVehiclePosition();
     updateEnergyLevel();
+    updateVehicleDestination();
 
     revalidate();
+  }
+
+  private void updateVehicleDestination() {
+    List<ModelComponent> components = getVehicleModel().getDriveOrderComponents();
+    if (components != null && !components.isEmpty()) {
+      destinationValueLabel.setText(components.get(components.size() - 1).getName());
+    }
+    else {
+      destinationValueLabel.setText("-");
+    }
   }
 
   private void updateVehicleIntegrationLevel() {
@@ -264,6 +285,8 @@ public class SingleVehicleView
     vehicleStateValueLabel = new javax.swing.JLabel();
     positionLabel = new javax.swing.JLabel();
     positionValueLabel = new javax.swing.JLabel();
+    destinationLabel = new javax.swing.JLabel();
+    destinationValueLabel = new javax.swing.JLabel();
     fillLabel = new javax.swing.JLabel();
 
     setMinimumSize(new java.awt.Dimension(200, 59));
@@ -358,6 +381,22 @@ public class SingleVehicleView
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 0, 0);
     propertiesPanel.add(positionValueLabel, gridBagConstraints);
 
+    destinationLabel.setText(bundle.getString("SingleVehicleView.destinationLabel.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(3, 3, 0, 0);
+    propertiesPanel.add(destinationLabel, gridBagConstraints);
+
+    destinationValueLabel.setText("-");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    gridBagConstraints.insets = new java.awt.Insets(3, 3, 0, 0);
+    propertiesPanel.add(destinationValueLabel, gridBagConstraints);
+
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -373,6 +412,8 @@ public class SingleVehicleView
   private javax.swing.JLabel batteryIcon;
   private javax.swing.JLabel batteryLabel;
   private javax.swing.JPanel batteryPanel;
+  private javax.swing.JLabel destinationLabel;
+  private javax.swing.JLabel destinationValueLabel;
   private javax.swing.JLabel fillLabel;
   private javax.swing.JLabel integratedLabel;
   private javax.swing.JLabel integratedStateLabel;
@@ -400,9 +441,10 @@ public class SingleVehicleView
 
       setBackground(Color.WHITE);
 
-      Rectangle2D.Double r2d = vehicleModel.getFigure() == null
+      Figure vehicleFigure = modelManager.getModel().getFigure(vehicleModel);
+      Rectangle2D.Double r2d = vehicleFigure == null
           ? new Rectangle2D.Double(0, 0, 30, 20)
-          : vehicleModel.getFigure().getBounds();
+          : vehicleFigure.getBounds();
       Rectangle r = r2d.getBounds();
       r.grow(10, 10);
       setPreferredSize(new Dimension(r.width, r.height));
@@ -434,7 +476,8 @@ public class SingleVehicleView
       }
 
       if (evt.getClickCount() == 2) {
-        drawingEditor.getActiveView().scrollTo(vehicleModel.getFigure());
+        Figure vehicleFigure = modelManager.getModel().getFigure(vehicleModel);
+        drawingEditor.getActiveView().scrollTo(vehicleFigure);
       }
 
       if (evt.getButton() == MouseEvent.BUTTON3) {

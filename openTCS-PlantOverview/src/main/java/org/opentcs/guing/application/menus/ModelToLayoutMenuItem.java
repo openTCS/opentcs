@@ -26,13 +26,13 @@ import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.properties.CoordinateUndoActivity;
+import org.opentcs.guing.components.properties.PropertiesComponentsFactory;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.event.ResetInteractionToolCommand;
-import org.opentcs.guing.model.AbstractFigureComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
@@ -61,6 +61,10 @@ public class ModelToLayoutMenuItem
    */
   private final EventHandler eventBus;
   /**
+   * The components factory.
+   */
+  private final PropertiesComponentsFactory componentsFactory;
+  /**
    * A flag if the values of ALL points and location shall be copied when
    * the menu item is clicked. If false only the selected figures will be
    * considered.
@@ -73,6 +77,7 @@ public class ModelToLayoutMenuItem
    * @param drawingEditor A <code>DrawingEditor</code> instance.
    * @param undoRedoManager The application's undo/redo manager.
    * @param eventHandler Where this instance sends events.
+   * @param componentsFactory The components factory.
    * @param copyAll Indicates whether the values of ALL points and locations
    * shall be copied when the menu item is clicked. If false only the selected
    * figures will be considered.
@@ -81,11 +86,13 @@ public class ModelToLayoutMenuItem
   public ModelToLayoutMenuItem(OpenTCSDrawingEditor drawingEditor,
                                UndoRedoManager undoRedoManager,
                                @ApplicationEventBus EventHandler eventHandler,
+                               PropertiesComponentsFactory componentsFactory,
                                @Assisted boolean copyAll) {
     super(ResourceBundleUtil.getBundle().getString("propertiesTable.toLayout"));
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.eventBus = requireNonNull(eventHandler, "eventHandler");
+    this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.copyAll = copyAll;
 
     setIcon(new ImageIcon(
@@ -107,7 +114,7 @@ public class ModelToLayoutMenuItem
             updateLayoutX(model);
             updateLayoutY(model);
             // ... and move the figure
-            final LabeledFigure labeledFigure = (LabeledFigure) ((AbstractFigureComponent) model).getFigure();
+            final LabeledFigure labeledFigure = (LabeledFigure) figure;
             labeledFigure.propertiesChanged(new AttributesChangeEvent(
                 new NullAttributesChangeListener(), model));
 
@@ -132,7 +139,7 @@ public class ModelToLayoutMenuItem
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_Y_POSITION);
     }
-    cua = new CoordinateUndoActivity(modelProperty);
+    cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
     cua.setSaveTransform(true);
     modelProperty.setChangeState(ModelAttribute.ChangeState.DETAIL_CHANGED);
@@ -157,7 +164,7 @@ public class ModelToLayoutMenuItem
     else {
       modelProperty = (CoordinateProperty) model.getProperty(LocationModel.MODEL_X_POSITION);
     }
-    CoordinateUndoActivity cua = new CoordinateUndoActivity(modelProperty);
+    CoordinateUndoActivity cua = componentsFactory.createCoordinateUndoActivity(modelProperty);
     cua.snapShotBeforeModification();
     cua.setSaveTransform(true);
     modelProperty.setChangeState(ModelAttribute.ChangeState.DETAIL_CHANGED);

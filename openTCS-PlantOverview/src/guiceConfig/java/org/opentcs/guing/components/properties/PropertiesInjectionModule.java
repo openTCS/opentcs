@@ -45,6 +45,7 @@ public class PropertiesInjectionModule
 
     install(new FactoryModuleBuilder().build(PropertiesPanelFactory.class));
     install(new FactoryModuleBuilder().build(CellEditorFactory.class));
+    install(new FactoryModuleBuilder().build(PropertiesComponentsFactory.class));
 
     MapBinder<Class<? extends AbstractComplexProperty>, DetailsDialogContent> dialogContentMapBinder
         = MapBinder.newMapBinder(binder(),

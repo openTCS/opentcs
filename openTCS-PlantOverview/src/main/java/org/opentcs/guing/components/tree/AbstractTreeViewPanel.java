@@ -16,7 +16,6 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
@@ -40,12 +39,11 @@ import org.opentcs.guing.components.EditableComponent;
 import org.opentcs.guing.components.tree.elements.LayoutUserObject;
 import org.opentcs.guing.components.tree.elements.SimpleFolderUserObject;
 import org.opentcs.guing.components.tree.elements.UserObject;
-import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.FigureComponent;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SimpleFolder;
 import org.opentcs.guing.model.elements.LayoutModel;
-import org.opentcs.guing.model.elements.StaticRouteModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -73,6 +71,10 @@ public abstract class AbstractTreeViewPanel
    */
   private DefaultTreeModel fTreeModel;
   /**
+   * The model manager.
+   */
+  private final ModelManager modelManager;
+  /**
    *
    */
   protected final UndoRedoManager fUndoRedoManager;
@@ -91,8 +93,10 @@ public abstract class AbstractTreeViewPanel
    * @param undoRedoManager The undo redo manager
    */
   @Inject
-  public AbstractTreeViewPanel(UndoRedoManager undoRedoManager) {
+  public AbstractTreeViewPanel(UndoRedoManager undoRedoManager,
+                               ModelManager modelManager) {
     this.fUndoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
+    this.modelManager = requireNonNull(modelManager, "modelManager");
 
     initComponents();
     objectTree.setCellRenderer(new TreeViewCellRenderer());
@@ -145,9 +149,8 @@ public abstract class AbstractTreeViewPanel
         if (doDelete) {
           ModelComponent modelComponent = userObject.getModelComponent();
 
-          if (modelComponent instanceof AbstractFigureComponent) {
-            Figure figure = ((AbstractFigureComponent) modelComponent).getFigure();
-            bufferedFigures.add(figure);
+          if (modelComponent instanceof AbstractConnectableModelComponent) {
+            bufferedFigures.add(modelManager.getModel().getFigure(modelComponent));
           }
         }
       }
@@ -221,38 +224,12 @@ public abstract class AbstractTreeViewPanel
     @SuppressWarnings("unchecked")
     Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
 
-    // boolean to prevent selecting the model in an other folder than "Static routes"
-    // when selecting in element in a static route
-    boolean selectStaticRouteComponent = false;
-
     while (e.hasMoreElements()) {
       DefaultMutableTreeNode node = e.nextElement();
       UserObject userObject = (UserObject) node.getUserObject();
-      ModelComponent modelComponent = (ModelComponent) Objects.requireNonNull(dataObject);
-      ModelComponent parentComponent = modelComponent.getParent();
-
-      if (parentComponent instanceof StaticRouteModel) {
-        selectStaticRouteComponent = true;
-      }
 
       // Select point and path "directly", not the entries in a block area.
       if (dataObject != null && dataObject.equals(userObject.getModelComponent())) {
-        // if we aren't in the static routes folder and looking for a 
-        // static route model continue
-        if (selectStaticRouteComponent) {
-          if (node.getUserObject() instanceof SimpleFolder) {
-            SimpleFolder sf = (SimpleFolder) node.getUserObject();
-
-            if (!sf.getTreeViewName().equals(
-                ResourceBundleUtil.getBundle().getString("tree.staticRoutes.text"))) {
-              continue;
-            }
-          }
-          else {
-            continue;
-          }
-        }
-
         // pseifert @ 20.05.14: Is this still neccessary?
 //        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
 //        if (parentNode != null) {
@@ -306,15 +283,6 @@ public abstract class AbstractTreeViewPanel
       ResourceBundleUtil bundle = ResourceBundleUtil.getBundle();
       String treeViewName;
       boolean sorting = true;  // Die Kindelemente des Knotens sollen sortiert werden
-      // Statische Routen sollen nicht sortiert werden
-      if (parent instanceof SimpleFolder) {
-        SimpleFolder folder = (SimpleFolder) parent;
-        treeViewName = folder.getTreeViewName();
-
-        if (treeViewName.equals(bundle.getString("tree.staticRoutes.text"))) {
-          sorting = false;
-        }
-      }
 
       if (item instanceof LayoutUserObject) {
         sorting = false; // Kindelemente des Layouts nicht sortieren
@@ -343,9 +311,6 @@ public abstract class AbstractTreeViewPanel
         }
         else if (treeViewName.equals(bundle.getString("tree.blocks.text"))) {
           insertElementAt(treeItem, parentItem, 5);
-        }
-        else if (treeViewName.equals(bundle.getString("tree.staticRoutes.text"))) {
-          insertElementAt(treeItem, parentItem, 6);
         }
         else if (treeViewName.equals(bundle.getString("tree.otherGraphicals.text"))) {
           insertElementAt(treeItem, parentItem, 7);
@@ -640,8 +605,8 @@ public abstract class AbstractTreeViewPanel
       for (UserObject userObject : userObjects) {
         userObject.removed();
 
-        if (userObject.getModelComponent() instanceof FigureComponent) {
-          Figure figure = ((FigureComponent) userObject.getModelComponent()).getFigure();
+        Figure figure = modelManager.getModel().getFigure(userObject.getModelComponent());
+        if (figure != null) {
           figures.add(figure);
         }
       }

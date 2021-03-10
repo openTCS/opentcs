@@ -91,7 +91,7 @@ public class PathAdapter
                 .withProperties(getKernelProperties(pathModel))
                 .withLocked(getLocked(pathModel))
         )
-        .withVisualLayouts(updatedLayouts(pathModel, plantModel.getVisualLayouts()));
+        .withVisualLayouts(updatedLayouts(pathModel, plantModel.getVisualLayouts(), systemModel));
 
     unmarkAllPropertiesChanged(pathModel);
 
@@ -154,7 +154,8 @@ public class PathAdapter
 
   @Override
   protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout) {
+                                                 VisualLayoutCreationTO layout,
+                                                 SystemModel systemModel) {
     PathModel pathModel = (PathModel) model;
     // Connection type
     PathModel.LinerType type = (PathModel.LinerType) pathModel.getPropertyPathConnType().getValue();
@@ -162,7 +163,7 @@ public class PathAdapter
     // BEZIER control points
     String sControlPoints = "";
     if (type.equals(PathModel.LinerType.BEZIER) || type.equals(PathModel.LinerType.BEZIER_3)) {
-      sControlPoints = buildBezierControlPoints(pathModel);
+      sControlPoints = buildBezierControlPoints(pathModel, systemModel);
     }
 
     pathModel.getPropertyPathControlPoints().setText(sControlPoints);
@@ -174,9 +175,9 @@ public class PathAdapter
     );
   }
 
-  private String buildBezierControlPoints(PathModel model) {
+  private String buildBezierControlPoints(PathModel model, SystemModel systemModel) {
     String result = "";
-    PathConnection figure = (PathConnection) model.getFigure();
+    PathConnection figure = (PathConnection) systemModel.getFigure(model);
     Point2D.Double cp1 = figure.getCp1();
     if (cp1 != null) {
       Point2D.Double cp2 = figure.getCp2();

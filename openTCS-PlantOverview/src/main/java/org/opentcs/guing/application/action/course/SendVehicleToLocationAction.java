@@ -19,10 +19,10 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.guing.application.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
-import org.opentcs.guing.model.AbstractFigureComponent;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.LocationActionPanel;
 
 /**
@@ -84,7 +84,7 @@ public class SendVehicleToLocationAction
 
       if (fDialog.getReturnStatus() == StandardContentDialog.RET_OK) {
         LocationModel location = contentPanel.getSelectedLocation();
-        List<AbstractFigureComponent> destinationModels = new ArrayList<>();
+        List<AbstractConnectableModelComponent> destinationModels = new ArrayList<>();
         destinationModels.add(location);
         List<String> actions = new ArrayList<>();
         actions.add(contentPanel.getSelectedAction());

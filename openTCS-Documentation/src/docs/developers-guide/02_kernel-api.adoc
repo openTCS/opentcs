@@ -1,4 +1,5 @@
 
+[#section-kernel-api]
 == The kernel's Java API
 
 The interfaces and classes required to use the kernel API are part of the `opentcs-api-base` JAR file, so you should add that to your classpath/declare a dependency on it.

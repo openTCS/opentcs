@@ -30,7 +30,7 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.guing.model.AbstractFigureComponent;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
@@ -74,7 +74,7 @@ public class TransportOrderUtil {
    * @param category The category.
    */
   @SuppressWarnings("unchecked")
-  public void createTransportOrder(List<AbstractFigureComponent> destModels,
+  public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
                                    List<String> actions,
                                    long deadline,
                                    VehicleModel vModel,
@@ -94,7 +94,7 @@ public class TransportOrderUtil {
    * @param category The category.
    */
   @SuppressWarnings("unchecked")
-  public void createTransportOrder(List<AbstractFigureComponent> destModels,
+  public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
                                    List<String> actions,
                                    List<Map<String, String>> propertiesList,
                                    long deadline,
@@ -112,7 +112,7 @@ public class TransportOrderUtil {
           = sharedPortal.getPortal().getTransportOrderService();
       List<DestinationCreationTO> destinations = new ArrayList<>();
       for (int i = 0; i < destModels.size(); i++) {
-        AbstractFigureComponent locModel = destModels.get(i);
+        AbstractConnectableModelComponent locModel = destModels.get(i);
         String action = actions.get(i);
         Map<String, String> properties = new HashMap<>();
         if (!propertiesList.isEmpty()) {

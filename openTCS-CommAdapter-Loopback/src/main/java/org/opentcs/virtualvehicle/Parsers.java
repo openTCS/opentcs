@@ -18,6 +18,12 @@ import javax.annotation.Nullable;
 public class Parsers {
 
   /**
+   * Prevents instantiation of this utility class.
+   */
+  private Parsers() {
+  }
+
+  /**
    * Parses a String to an int. If <code>toParse</code> could not be parsed successfully then the
    * default value <code>retOnFail</code> is returned.
    *

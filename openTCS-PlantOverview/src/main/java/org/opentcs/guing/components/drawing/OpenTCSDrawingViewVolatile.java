@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.exchange.TransportOrderUtil;
-import org.opentcs.guing.model.ModelManager;
+import org.opentcs.guing.persistence.ModelManager;
 
 /**
  * Draws the drawing using a VolatileImage.
@@ -157,7 +157,8 @@ public class OpenTCSDrawingViewVolatile
                         drawingBuffer.getHeight() - Math.abs(shift.y),
                         shift.x,
                         shift.y);
-          shift.x = shift.y = 0;
+          shift.x = 0;
+          shift.y = 0;
         }
 
         // Clip the dirty area

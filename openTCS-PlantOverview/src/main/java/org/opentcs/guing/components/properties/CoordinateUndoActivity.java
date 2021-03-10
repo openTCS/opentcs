@@ -10,8 +10,10 @@
 
 package org.opentcs.guing.components.properties;
 
+import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import javax.inject.Inject;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import org.opentcs.data.model.visualization.ElementPropKeys;
@@ -22,7 +24,9 @@ import org.opentcs.guing.components.drawing.figures.TCSFigure;
 import org.opentcs.guing.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
-import org.opentcs.guing.model.AbstractFigureComponent;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
+import org.opentcs.guing.model.PositionableModelComponent;
+import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
@@ -49,12 +53,14 @@ public class CoordinateUndoActivity
    *
    * @param property
    */
-  public CoordinateUndoActivity(CoordinateProperty property) {
+  @Inject
+  private CoordinateUndoActivity(@Assisted CoordinateProperty property,
+                                 ModelManager modelManager) {
     this.property = property;
-    AbstractFigureComponent model = (AbstractFigureComponent) property.getModel();
-    pxModel = (CoordinateProperty) model.getProperty(AbstractFigureComponent.MODEL_X_POSITION);
-    pyModel = (CoordinateProperty) model.getProperty(AbstractFigureComponent.MODEL_Y_POSITION);
-    bufferedFigure = (LabeledFigure) model.getFigure();
+    AbstractConnectableModelComponent model = (AbstractConnectableModelComponent) property.getModel();
+    pxModel = (CoordinateProperty) model.getProperty(PositionableModelComponent.MODEL_X_POSITION);
+    pyModel = (CoordinateProperty) model.getProperty(PositionableModelComponent.MODEL_Y_POSITION);
+    bufferedFigure = (LabeledFigure) modelManager.getModel().getFigure(model);
     bufferedTransform = new AffineTransform();
   }
 
@@ -66,7 +72,7 @@ public class CoordinateUndoActivity
   public void setSaveTransform(boolean saveTransform) {
     this.saveTransform = saveTransform;
     if (saveTransform) {
-      AbstractFigureComponent model = (AbstractFigureComponent) property.getModel();
+      AbstractConnectableModelComponent model = (AbstractConnectableModelComponent) property.getModel();
       StringProperty pxLayout = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_X);
       StringProperty pyLayout = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_Y);
 
