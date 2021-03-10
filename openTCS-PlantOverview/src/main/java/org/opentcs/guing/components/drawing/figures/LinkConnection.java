@@ -111,7 +111,7 @@ public class LinkConnection
       LocationModel location = (LocationModel) modelStart;
       PointModel point = (PointModel) modelEnd;
 
-      return !location.hasConnectionTo(point);
+      return !point.hasConnectionTo(location);
     }
 
     return false;

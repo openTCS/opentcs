@@ -49,6 +49,11 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.16.1 (2019-10-30)
+
+* Bugs fixed:
+** Fix creating links between points and locations in the Plant Overview application.
+
 === Version 4.16 (2019-10-22)
 
 * New features:

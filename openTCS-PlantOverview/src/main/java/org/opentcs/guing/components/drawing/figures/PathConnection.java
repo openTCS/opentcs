@@ -42,7 +42,9 @@ import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PathModel;
+import org.opentcs.guing.model.elements.PointModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -511,6 +513,23 @@ public class PathConnection
   @Override
   public String getToolTipText(Point2D.Double p) {
     return textGenerator.getToolTipText(getModel());
+  }
+
+  /**
+   * Checks whether two points can be connected with each other.
+   *
+   * @param start The start connector.
+   * @param end The end connector.
+   * @return {@code true}, if the two points can be connected, otherwise {@code false}.
+   */
+  @Override
+  public boolean canConnect(Connector start, Connector end) {
+    ModelComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
+    ModelComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
+
+    return modelStart instanceof PointModel
+        && modelEnd instanceof PointModel
+        && modelStart != modelEnd;
   }
 
   @Override

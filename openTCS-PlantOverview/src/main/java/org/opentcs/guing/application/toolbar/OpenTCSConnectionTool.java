@@ -16,7 +16,7 @@ import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.ConnectionTool;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
-import org.opentcs.guing.model.elements.PointModel;
+import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
@@ -131,11 +131,14 @@ public class OpenTCSConnectionTool
   }
 
   private boolean connectionAlreadyPresent() {
-    PointModel startPoint = (PointModel) startConnector.getOwner().get(FigureConstants.MODEL);
-    PointModel endPoint = (PointModel) endConnector.getOwner().get(FigureConstants.MODEL);
-    return startPoint != null
-        && endPoint != null
-        && startPoint.hasConnectionTo(endPoint);
+    AbstractConnectableModelComponent startComponent
+        = (AbstractConnectableModelComponent) startConnector.getOwner().get(FigureConstants.MODEL);
+    AbstractConnectableModelComponent endComponent
+        = (AbstractConnectableModelComponent) endConnector.getOwner().get(FigureConstants.MODEL);
+    
+    return startComponent != null
+        && endComponent != null
+        && startComponent.hasConnectionTo(endComponent);
   }
 
   private boolean canConnect() {

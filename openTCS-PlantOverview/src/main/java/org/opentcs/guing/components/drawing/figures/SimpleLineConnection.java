@@ -25,7 +25,6 @@ import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.AbstractConnection;
-import org.opentcs.guing.model.elements.PointModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,27 +130,6 @@ public abstract class SimpleLineConnection
   }
 
   public void updateDecorations() {
-  }
-
-  /**
-   * Prï¿½ft, ob zwei Figures durch eine Strecke miteinander verbunden werden
-   * kï¿½nnen. Verbunden werden dï¿½rfen nur Meldepunkte mit Stï¿½tzknoten in
-   * beliebiger Kombination, nicht jedoch Meldepunkte mit Arbeitsstationen.
-   *
-   * @param start
-   * @param end
-   * @return
-   * <code>true</code>, wenn eine Verbindung mï¿½glich ist, ansonsten
-   * <code>false</code>
-   */
-  @Override // LineConnectionFigure
-  public boolean canConnect(Connector start, Connector end) {
-    ModelComponent modelStart = start.getOwner().get(FigureConstants.MODEL);
-    ModelComponent modelEnd = end.getOwner().get(FigureConstants.MODEL);
-
-    return modelStart instanceof PointModel
-        && modelEnd instanceof PointModel
-        && modelStart != modelEnd;
   }
 
   @Override // LineConnectionFigure
