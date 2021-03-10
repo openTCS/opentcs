@@ -1,0 +1,9 @@
+apply plugin: 'maven'
+
+configure(install.repositories.mavenInstaller) {
+  pom.project {
+    groupId = project.group
+    artifactId = project.name.toLowerCase()
+    version = project.version
+  }
+}

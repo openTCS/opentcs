@@ -68,7 +68,7 @@ abstract class KernelStateOnline
   public void savePlantModel()
       throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {
-      getModelPersister().saveModel(getModel(), getModel().getName());
+      getModelPersister().saveModel(getModel().createPlantModelCreationTO());
     }
   }
 
@@ -77,7 +77,7 @@ abstract class KernelStateOnline
   public void saveModel(String modelName)
       throws IOException {
     synchronized (getGlobalSyncObject()) {
-      getModelPersister().saveModel(getModel(), modelName);
+      getModelPersister().saveModel(getModel().createPlantModelCreationTO());
     }
   }
 

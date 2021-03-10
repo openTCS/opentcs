@@ -20,18 +20,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
-import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
+import org.opentcs.guing.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.components.properties.type.Property;
-import org.opentcs.guing.transport.OrderCategorySuggestionsPool;
+import org.opentcs.guing.transport.OrderTypeSuggestionsPool;
 import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.guing.util.ResourceBundleUtil;
 
 /**
- * User interface to edit a set of category strings.
+ * User interface to edit a set of order type strings.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
-public class OrderCategoriesPropertyEditorPanel
+public class OrderTypesPropertyEditorPanel
     extends JPanel
     implements DetailsDialogContent {
 
@@ -40,30 +40,29 @@ public class OrderCategoriesPropertyEditorPanel
    */
   private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
   /**
-   * The pool of categories to suggest.
+   * The pool of types to suggest.
    */
-  private final OrderCategorySuggestionsPool categorySuggestionsPool;
+  private final OrderTypeSuggestionsPool typeSuggestionsPool;
   /**
    * The property to edit.
    */
-  private OrderCategoriesProperty fProperty;
+  private OrderTypesProperty fProperty;
 
   /**
    * Creates a new instance.
    *
-   * @param categorySuggestionsPool The pool of categories to suggest.
+   * @param typeSuggestionsPool The pool of types to suggest.
    */
   @Inject
-  public OrderCategoriesPropertyEditorPanel(OrderCategorySuggestionsPool categorySuggestionsPool) {
-    this.categorySuggestionsPool = requireNonNull(categorySuggestionsPool,
-                                                  "categorySuggestionsPool");
+  public OrderTypesPropertyEditorPanel(OrderTypeSuggestionsPool typeSuggestionsPool) {
+    this.typeSuggestionsPool = requireNonNull(typeSuggestionsPool, "typeSuggestionsPool");
     initComponents();
     initCategoryCombobox();
   }
 
   @Override
   public void setProperty(Property property) {
-    fProperty = (OrderCategoriesProperty) property;
+    fProperty = (OrderTypesProperty) property;
     DefaultListModel<String> model = new DefaultListModel<>();
 
     for (String item : fProperty.getItems()) {
@@ -88,7 +87,7 @@ public class OrderCategoriesPropertyEditorPanel
 
   @Override
   public String getTitle() {
-    return bundle.getString("orderCategoriesPropertyEditorPanel.title");
+    return bundle.getString("orderTypesPropertyEditorPanel.title");
   }
 
   @Override
@@ -101,7 +100,7 @@ public class OrderCategoriesPropertyEditorPanel
    */
   protected void add() {
     DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-    String category = categoryComboBox.getSelectedItem().toString();
+    String category = typeComboBox.getSelectedItem().toString();
 
     // Check for already added categories
     Enumeration<String> entries = model.elements();
@@ -109,14 +108,14 @@ public class OrderCategoriesPropertyEditorPanel
       String entry = entries.nextElement();
       if (entry.equals(category)) {
         JOptionPane.showMessageDialog(this,
-                                      bundle.getString("orderCategoriesPropertyEditorPanel.optionPane_categoryAlreadyPresentError.message"));
+                                      bundle.getString("orderTypesPropertyEditorPanel.optionPane_typeAlreadyPresentError.message"));
         return;
       }
     }
 
     model.addElement(category);
 
-    categorySuggestionsPool.addCategorySuggestion(category);
+    typeSuggestionsPool.addTypeSuggestion(category);
     // Re-initialize the combo box since there may be a new entry
     initCategoryCombobox();
   }
@@ -131,9 +130,9 @@ public class OrderCategoriesPropertyEditorPanel
   }
 
   private void initCategoryCombobox() {
-    categoryComboBox.removeAllItems();
-    for (String suggestion : categorySuggestionsPool.getCategorySuggestions()) {
-      categoryComboBox.addItem(suggestion);
+    typeComboBox.removeAllItems();
+    for (String suggestion : typeSuggestionsPool.getTypeSuggestions()) {
+      typeComboBox.addItem(suggestion);
     }
   }
 
@@ -149,7 +148,7 @@ public class OrderCategoriesPropertyEditorPanel
 
     itemsScrollPane = new javax.swing.JScrollPane();
     itemsList = new javax.swing.JList<>();
-    categoryComboBox = new javax.swing.JComboBox<>();
+    typeComboBox = new javax.swing.JComboBox<>();
     addButton = new javax.swing.JButton();
     removeButton = new javax.swing.JButton();
 
@@ -167,17 +166,17 @@ public class OrderCategoriesPropertyEditorPanel
     gridBagConstraints.weighty = 1.0;
     add(itemsScrollPane, gridBagConstraints);
 
-    categoryComboBox.setEditable(true);
+    typeComboBox.setEditable(true);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
-    add(categoryComboBox, gridBagConstraints);
+    add(typeComboBox, gridBagConstraints);
 
     addButton.setFont(addButton.getFont());
     java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/propertyEditing"); // NOI18N
-    addButton.setText(bundle.getString("orderCategoriesPropertyEditorPanel.button_add.text")); // NOI18N
+    addButton.setText(bundle.getString("orderTypesPropertyEditorPanel.button_add.text")); // NOI18N
     addButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         addButtonActionPerformed(evt);
@@ -191,7 +190,7 @@ public class OrderCategoriesPropertyEditorPanel
     add(addButton, gridBagConstraints);
 
     removeButton.setFont(removeButton.getFont());
-    removeButton.setText(bundle.getString("orderCategoriesPropertyEditorPanel.button_remove.text")); // NOI18N
+    removeButton.setText(bundle.getString("orderTypesPropertyEditorPanel.button_remove.text")); // NOI18N
     removeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         removeButtonActionPerformed(evt);
@@ -222,10 +221,10 @@ public class OrderCategoriesPropertyEditorPanel
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
-  private javax.swing.JComboBox<String> categoryComboBox;
   private javax.swing.JList<String> itemsList;
   private javax.swing.JScrollPane itemsScrollPane;
   private javax.swing.JButton removeButton;
+  private javax.swing.JComboBox<String> typeComboBox;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
 }

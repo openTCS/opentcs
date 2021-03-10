@@ -111,7 +111,7 @@ public class OrderSequenceView
       textFieldProcessingVehicle.setText(processingVehicle.getName());
     }
 
-    textCategory.setText(getOrderSequence().getCategory());
+    textType.setText(getOrderSequence().getType());
 
 //    TCSObjectReference<TransportOrder> nextUnfinishedOrder = getOrderSequence().getNextUnfinishedOrder();
     // TODO...
@@ -148,8 +148,8 @@ public class OrderSequenceView
     textFieldIntendedVehicle = new javax.swing.JTextField();
     labelProcessingVehicle = new javax.swing.JLabel();
     textFieldProcessingVehicle = new javax.swing.JTextField();
-    labelCategroy = new javax.swing.JLabel();
-    textCategory = new javax.swing.JTextField();
+    labelType = new javax.swing.JLabel();
+    textType = new javax.swing.JTextField();
     jPanel2 = new javax.swing.JPanel();
     checkBoxComplete = new javax.swing.JCheckBox();
     checkBoxFinished = new javax.swing.JCheckBox();
@@ -247,25 +247,25 @@ public class OrderSequenceView
     gridBagConstraints.weightx = 0.5;
     jPanel1.add(textFieldProcessingVehicle, gridBagConstraints);
 
-    labelCategroy.setFont(labelCategroy.getFont());
-    labelCategroy.setText(bundle.getString("orderSequenceView.label_category.text")); // NOI18N
+    labelType.setFont(labelType.getFont());
+    labelType.setText(bundle.getString("orderSequenceView.label_type.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
-    jPanel1.add(labelCategroy, gridBagConstraints);
+    jPanel1.add(labelType, gridBagConstraints);
 
-    textCategory.setEditable(false);
-    textCategory.setColumns(10);
-    textCategory.setFont(textCategory.getFont());
+    textType.setEditable(false);
+    textType.setColumns(10);
+    textType.setFont(textType.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
-    jPanel1.add(textCategory, gridBagConstraints);
+    jPanel1.add(textType, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -369,16 +369,16 @@ public class OrderSequenceView
   private javax.swing.JPanel generalPanel;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
-  private javax.swing.JLabel labelCategroy;
   private javax.swing.JLabel labelFinishedIndex;
   private javax.swing.JLabel labelIntendedVehicle;
   private javax.swing.JLabel labelName;
   private javax.swing.JLabel labelProcessingVehicle;
-  private javax.swing.JTextField textCategory;
+  private javax.swing.JLabel labelType;
   private javax.swing.JTextField textFieldFinishedIndex;
   private javax.swing.JTextField textFieldIntendedVehicle;
   private javax.swing.JTextField textFieldName;
   private javax.swing.JTextField textFieldProcessingVehicle;
+  private javax.swing.JTextField textType;
   private javax.swing.JPanel transportOrdersPanel;
   private javax.swing.JScrollPane transportOrdersScrollPane;
   private javax.swing.JTable transportOrdersTable;

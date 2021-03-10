@@ -314,11 +314,19 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void updateVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
                                                  Set<String> processableCategories)
       throws ObjectUnknownException {
+    updateVehicleAllowedOrderTypes(ref, processableCategories);
+  }
+
+  @Override
+  public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
+                                             Set<String> allowedOrderTypes)
+      throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleProcessableCategories(ref, processableCategories);
+      model.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
     }
   }
 }

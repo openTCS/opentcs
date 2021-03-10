@@ -24,17 +24,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Updates a vehicle's processable categories with the kernel when it changes.
+ * Updates a vehicle's allowed order types with the kernel when it changes.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
-public class VehicleProcessableCategoriesAdapter
+public class VehicleAllowedOrderTypesAdapter
     implements AttributesChangeListener {
 
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(VehicleProcessableCategoriesAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleAllowedOrderTypesAdapter.class);
   /**
    * The vehicle model.
    */
@@ -48,9 +48,9 @@ public class VehicleProcessableCategoriesAdapter
    */
   private final ApplicationState applicationState;
   /**
-   * The vehicle's processable categories the last time we checked them.
+   * The vehicle's allowed order types the last time we checked them.
    */
-  private Set<String> previousProcessableCategories;
+  private Set<String> previousAllowedOrderTypes;
 
   /**
    * Creates a new instance.
@@ -59,13 +59,13 @@ public class VehicleProcessableCategoriesAdapter
    * @param applicationState Keeps the plant overview's state.
    * @param model The vehicle model.
    */
-  public VehicleProcessableCategoriesAdapter(SharedKernelServicePortalProvider portalProvider,
-                                             ApplicationState applicationState,
-                                             VehicleModel model) {
+  public VehicleAllowedOrderTypesAdapter(SharedKernelServicePortalProvider portalProvider,
+                                         ApplicationState applicationState,
+                                         VehicleModel model) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.applicationState = requireNonNull(applicationState, "applicationState");
     this.model = requireNonNull(model, "model");
-    this.previousProcessableCategories = getProcessableCategories();
+    this.previousAllowedOrderTypes = getAllowedOrderTypes();
   }
 
   @Override
@@ -79,35 +79,35 @@ public class VehicleProcessableCategoriesAdapter
       return;
     }
 
-    Set<String> processableCategories = getProcessableCategories();
-    if (previousProcessableCategories.size() == processableCategories.size()
-        && previousProcessableCategories.containsAll(processableCategories)) {
-      LOG.debug("Ignoring vehicle properties update because the processable categories did not "
+    Set<String> allowedOrderTypes = getAllowedOrderTypes();
+    if (previousAllowedOrderTypes.size() == allowedOrderTypes.size()
+        && previousAllowedOrderTypes.containsAll(allowedOrderTypes)) {
+      LOG.debug("Ignoring vehicle properties update because the allowed order types did not "
           + "change");
       return;
     }
 
-    previousProcessableCategories = processableCategories;
-    new Thread(() -> updateProcessableCategoriesInKernel(processableCategories)).start();
+    previousAllowedOrderTypes = allowedOrderTypes;
+    new Thread(() -> updateAllowedOrderTypesInKernel(allowedOrderTypes)).start();
   }
 
-  private Set<String> getProcessableCategories() {
-    return model.getPropertyProcessableCategories().getItems();
+  private Set<String> getAllowedOrderTypes() {
+    return model.getPropertyAllowedOrderTypes().getItems();
   }
 
-  private void updateProcessableCategoriesInKernel(Set<String> processableCategories) {
+  private void updateAllowedOrderTypesInKernel(Set<String> allowedOrderTypes) {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       KernelServicePortal portal = sharedPortal.getPortal();
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
         Vehicle vehicle = portal.getVehicleService().fetchObject(Vehicle.class, model.getName());
-        if (vehicle.getProcessableCategories().size() == processableCategories.size()
-            && vehicle.getProcessableCategories().containsAll(processableCategories)) {
+        if (vehicle.getAllowedOrderTypes().size() == allowedOrderTypes.size()
+            && vehicle.getAllowedOrderTypes().containsAll(allowedOrderTypes)) {
           LOG.debug("Ignoring vehicle properties update. Already up do date.");
           return;
         }
-        portal.getVehicleService().updateVehicleProcessableCategories(vehicle.getReference(),
-                                                                      processableCategories);
+        portal.getVehicleService().updateVehicleAllowedOrderTypes(vehicle.getReference(),
+                                                                  allowedOrderTypes);
       }
 
     }

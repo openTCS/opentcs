@@ -109,7 +109,7 @@ public class VehicleAdapter
       updateCurrentTransportName(vehicle, model);
       updateCurrentOrderSequenceName(vehicle, model);
 
-      model.getPropertyProcessableCategories().setItems(vehicle.getProcessableCategories());
+      model.getPropertyAllowedOrderTypes().setItems(vehicle.getAllowedOrderTypes());
       model.setVehicle(vehicle);
 
       updateMiscModelProperties(model, vehicle);

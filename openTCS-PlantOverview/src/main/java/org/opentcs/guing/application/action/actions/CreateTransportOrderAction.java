@@ -22,7 +22,7 @@ import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.transport.CreateTransportOrderPanel;
-import org.opentcs.guing.transport.OrderCategorySuggestionsPool;
+import org.opentcs.guing.transport.OrderTypeSuggestionsPool;
 import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.util.ImageDirectory;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -55,9 +55,9 @@ public class CreateTransportOrderAction
    */
   private final Provider<CreateTransportOrderPanel> orderPanelProvider;
   /**
-   * The pool of suggested transport order categories.
+   * The pool of suggested transport order types.
    */
-  private final OrderCategorySuggestionsPool categorySuggestionsPool;
+  private final OrderTypeSuggestionsPool typeSuggestionsPool;
 
   /**
    * Creates a new instance.
@@ -65,19 +65,17 @@ public class CreateTransportOrderAction
    * @param orderUtil A helper for creating transport orders with the kernel.
    * @param dialogParent The parent component for dialogs shown by this action.
    * @param orderPanelProvider Provides panels for entering new transport orders.
-   * @param categorySuggestionsPool The pool of suggested transport order categories.
+   * @param typeSuggestionsPool The pool of suggested transport order types.
    */
   @Inject
   public CreateTransportOrderAction(TransportOrderUtil orderUtil,
                                     @ApplicationFrame Component dialogParent,
                                     Provider<CreateTransportOrderPanel> orderPanelProvider,
-                                    OrderCategorySuggestionsPool categorySuggestionsPool) {
+                                    OrderTypeSuggestionsPool typeSuggestionsPool) {
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
-    this.orderPanelProvider = requireNonNull(orderPanelProvider,
-                                             "orderPanelProvider");
-    this.categorySuggestionsPool = requireNonNull(categorySuggestionsPool,
-                                                  "categorySuggestionsPool");
+    this.orderPanelProvider = requireNonNull(orderPanelProvider, "orderPanelProvider");
+    this.typeSuggestionsPool = requireNonNull(typeSuggestionsPool, "typeSuggestionsPool");
 
     putValue(NAME, BUNDLE.getString("createTransportOrderAction.name"));
     putValue(MNEMONIC_KEY, Integer.valueOf('T'));
@@ -104,8 +102,8 @@ public class CreateTransportOrderAction
                                    contentPanel.getActions(),
                                    contentPanel.getSelectedDeadline(),
                                    contentPanel.getSelectedVehicle(),
-                                   contentPanel.getSelectedCategory());
+                                   contentPanel.getSelectedType());
 
-    categorySuggestionsPool.addCategorySuggestion(contentPanel.getSelectedCategory());
+    typeSuggestionsPool.addTypeSuggestion(contentPanel.getSelectedType());
   }
 }

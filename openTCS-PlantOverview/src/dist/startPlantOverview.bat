@@ -24,7 +24,9 @@ set JAVA=javaw
 
 rem Start plant overview
 start /b %JAVA% -enableassertions ^
+    -Dopentcs.base="%OPENTCS_BASE%" ^
     -Dopentcs.home="%OPENTCS_HOME%" ^
+    -Dopentcs.cfg4j.reload.interval=10000 ^
     -Djava.util.logging.config.file="%OPENTCS_CONFIGDIR%\logging.config" ^
     -Djava.security.policy="file:%OPENTCS_CONFIGDIR%\java.policy" ^
     -Dsun.java2d.d3d=false ^

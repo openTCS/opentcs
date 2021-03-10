@@ -29,7 +29,7 @@ public interface Dispatcher
     extends Lifecycle {
 
   /**
-   * The key of a parking position property defining it's priority.
+   * The key of a parking position property defining its priority.
    * <p>
    * Whether and in what way this is respected for assigning a parking position to a vehicle is
    * implementation-specific.

@@ -12,8 +12,14 @@ evaluationDependsOn(':openTCS-KernelControlCenter')
 evaluationDependsOn(':openTCS-PlantOverview')
 evaluationDependsOn(':openTCS-PlantOverview-Panel-LoadGenerator')
 
-apply plugin: 'distribution'
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-artifacts.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/maven-publishing.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
+apply plugin: 'org.kordamp.gradle.stats'
+
+apply plugin: 'distribution'
 
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")

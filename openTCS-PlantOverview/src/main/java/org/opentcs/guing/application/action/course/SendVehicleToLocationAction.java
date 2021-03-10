@@ -98,7 +98,7 @@ public class SendVehicleToLocationAction
                                        actions,
                                        System.currentTimeMillis(),
                                        fVehicle,
-                                       OrderConstants.CATEGORY_NONE);
+                                       OrderConstants.TYPE_NONE);
       }
     }
   }

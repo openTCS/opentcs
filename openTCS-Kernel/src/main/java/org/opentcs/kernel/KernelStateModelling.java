@@ -144,8 +144,6 @@ class KernelStateModelling
   @Deprecated
   public void createPlantModel(PlantModelCreationTO to) {
     synchronized (getGlobalSyncObject()) {
-      getModel().clear();
-      getModel().setName(to.getName());
       getModel().createPlantModelObjects(to);
     }
   }
@@ -155,7 +153,7 @@ class KernelStateModelling
   public void loadPlantModel()
       throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {
-      getModelPersister().loadModel(getModel());
+      getModel().createPlantModelObjects(getModelPersister().readModel());
     }
   }
 

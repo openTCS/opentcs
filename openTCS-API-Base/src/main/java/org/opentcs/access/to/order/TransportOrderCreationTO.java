@@ -59,10 +59,10 @@ public class TransportOrderCreationTO
   @Nullable
   private String intendedVehicleName;
   /**
-   * The category of the transport order.
+   * The type of the transport order.
    */
   @Nonnull
-  private String category = OrderConstants.CATEGORY_NONE;
+  private String type = OrderConstants.TYPE_NONE;
   /**
    * The point of time at which execution of the transport order is supposed to be finished.
    */
@@ -93,7 +93,7 @@ public class TransportOrderCreationTO
                                    @Nullable String wrappingSequence,
                                    @Nonnull Set<String> dependencyNames,
                                    @Nullable String intendedVehicleName,
-                                   @Nonnull String category,
+                                   @Nonnull String type,
                                    @Nonnull Instant deadline,
                                    boolean dispensable) {
     super(name, properties);
@@ -102,7 +102,7 @@ public class TransportOrderCreationTO
     this.wrappingSequence = wrappingSequence;
     this.dependencyNames = requireNonNull(dependencyNames, "dependencyNames");
     this.intendedVehicleName = intendedVehicleName;
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(type, "type");
     this.deadline = requireNonNull(deadline, "deadline");
     this.dispensable = dispensable;
   }
@@ -130,7 +130,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -158,7 +158,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -190,7 +190,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -223,7 +223,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -266,7 +266,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -310,7 +310,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -354,7 +354,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -398,7 +398,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -407,10 +407,13 @@ public class TransportOrderCreationTO
    * Returns the (optional) category of the transport order.
    *
    * @return The (optional) category of the transport order.
+   * @deprecated Use {@link #getType()} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public String getCategory() {
-    return category;
+    return type;
   }
 
   /**
@@ -423,7 +426,7 @@ public class TransportOrderCreationTO
   @ScheduledApiChange(when = "5.0")
   @Nonnull
   public TransportOrderCreationTO setCategory(@Nonnull String category) {
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(category, "category");
     return this;
   }
 
@@ -432,7 +435,10 @@ public class TransportOrderCreationTO
    *
    * @param category The category.
    * @return A copy of this object, differing in the given category.
+   * @deprecated Use {@link #withType(java.lang.String)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public TransportOrderCreationTO withCategory(@Nonnull String category) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
@@ -442,6 +448,35 @@ public class TransportOrderCreationTO
                                         dependencyNames,
                                         intendedVehicleName,
                                         category,
+                                        deadline,
+                                        dispensable);
+  }
+
+  /**
+   * Returns the (optional) type of the transport order.
+   *
+   * @return The (optional) type of the transport order.
+   */
+  @Nonnull
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Creates a copy of this object with the given (optional) type of the transport order.
+   *
+   * @param type The type.
+   * @return A copy of this object, differing in the given type.
+   */
+  public TransportOrderCreationTO withType(@Nonnull String type) {
+    return new TransportOrderCreationTO(getName(),
+                                        getModifiableProperties(),
+                                        incompleteName,
+                                        destinations,
+                                        wrappingSequence,
+                                        dependencyNames,
+                                        intendedVehicleName,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -490,7 +525,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline.toInstant(),
                                         dispensable);
   }
@@ -510,7 +545,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }
@@ -553,7 +588,7 @@ public class TransportOrderCreationTO
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
-                                        category,
+                                        type,
                                         deadline,
                                         dispensable);
   }

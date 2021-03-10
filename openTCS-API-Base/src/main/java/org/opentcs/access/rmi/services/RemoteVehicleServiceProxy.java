@@ -122,7 +122,7 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  public void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref, 
+  public void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                             Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException, KernelRuntimeException {
     checkServiceAvailability();
@@ -136,6 +136,7 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
+  @Deprecated
   public void updateVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
                                                  Set<String> processableCategories)
       throws ObjectUnknownException, KernelRuntimeException {
@@ -145,6 +146,22 @@ class RemoteVehicleServiceProxy
       getRemoteService().updateVehicleProcessableCategories(getClientId(),
                                                             ref,
                                                             processableCategories);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
+                                             Set<String> allowedOrderTypes)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateVehicleAllowedOrderTypes(getClientId(),
+                                                        ref,
+                                                        allowedOrderTypes);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

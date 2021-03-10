@@ -1,5 +1,10 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-artifacts.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
 apply from: "${rootDir}/gradle/guice-application.gradle"
+apply from: "${rootDir}/gradle/maven-publishing.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
+apply plugin: 'org.kordamp.gradle.stats'
 
 if (!hasProperty('mainClass')) {
   ext.mainClass = 'org.opentcs.kernelcontrolcenter.RunKernelControlCenter'
@@ -43,7 +48,8 @@ run {
                     'java.security.policy':'file:./config/java.policy',\
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
-                    'opentcs.home':'.'])
+                    'opentcs.home':'.',\
+                    'opentcs.cfg4j.reload.interval':'10000'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\
           '-splash:bin/splash-image.gif')
 }

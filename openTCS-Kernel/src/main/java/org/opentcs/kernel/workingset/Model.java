@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.GroupCreationTO;
@@ -46,6 +47,7 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.visualization.ImageLayoutElement;
 import org.opentcs.data.model.visualization.LayoutElement;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.model.visualization.ShapeLayoutElement;
@@ -184,6 +186,10 @@ public class Model {
   @SuppressWarnings("deprecation")
   public void createPlantModelObjects(PlantModelCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
+    clear();
+    setName(to.getName());
+    setProperties(to.getProperties());
+
     for (PointCreationTO point : to.getPoints()) {
       createPoint(point);
     }
@@ -2047,15 +2053,15 @@ public class Model {
   }
 
   @SuppressWarnings("deprecation")
-  public Vehicle setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
-                                                 Set<String> processableCategories)
+  public Vehicle setVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
+                                             Set<String> allowedOrderTypes)
       throws ObjectUnknownException {
     Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
     }
     Vehicle previousState = vehicle.clone();
-    vehicle = objectPool.replaceObject(vehicle.withProcessableCategories(processableCategories));
+    vehicle = objectPool.replaceObject(vehicle.withAllowedOrderTypes(allowedOrderTypes));
     objectPool.emitObjectEvent(vehicle.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2523,6 +2529,266 @@ public class Model {
                                TCSObjectEvent.Type.OBJECT_CREATED);
     // Return the newly created group.
     return newGroup;
+  }
+
+  public PlantModelCreationTO createPlantModelCreationTO() {
+    return new PlantModelCreationTO(name)
+        .withProperties(getProperties())
+        .withPoints(getPoints())
+        .withPaths(getPaths())
+        .withVehicles(getVehicles())
+        .withLocationTypes(getLocationTypes())
+        .withLocations(getLocations())
+        .withBlocks(getBlocks())
+        .withGroups(getGroups())
+        .withVisualLayouts(getVisualLayouts());
+  }
+
+  /**
+   * Returns a list of {@link PointCreationTO Points} for all points in a model.
+   *
+   * @return A list of {@link PointCreationTO Points} for all points in a model.
+   */
+  private List<PointCreationTO> getPoints() {
+    Set<Point> points = objectPool.getObjects(Point.class);
+    List<PointCreationTO> result = new ArrayList<>();
+
+    for (Point curPoint : points) {
+      result.add(
+          new PointCreationTO(curPoint.getName())
+              .withPosition(curPoint.getPosition())
+              .withVehicleOrientationAngle(curPoint.getVehicleOrientationAngle())
+              .withType(curPoint.getType())
+              .withProperties(curPoint.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link PathCreationTO Paths} for all paths in a model.
+   *
+   * @param model The model data.
+   * @return A list of {@link PathCreationTO Paths} for all paths in a model.
+   */
+  @SuppressWarnings("deprecation")
+  private List<PathCreationTO> getPaths() {
+    Set<Path> paths = objectPool.getObjects(Path.class);
+    List<PathCreationTO> result = new ArrayList<>();
+
+    for (Path curPath : paths) {
+      result.add(
+          new PathCreationTO(curPath.getName(),
+                             curPath.getSourcePoint().getName(),
+                             curPath.getDestinationPoint().getName())
+              .withLength(curPath.getLength())
+              .withRoutingCost(curPath.getRoutingCost())
+              .withMaxVelocity(curPath.getMaxVelocity())
+              .withMaxReverseVelocity(curPath.getMaxReverseVelocity())
+              .withLocked(curPath.isLocked())
+              .withProperties(curPath.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link VehicleCreationTO Vehicles} for all vehicles in a model.
+   *
+   * @param model The model data.
+   * @return A list of {@link VehicleCreationTO Vehicles} for all vehicles in a model.
+   */
+  private List<VehicleCreationTO> getVehicles() {
+    Set<Vehicle> vehicles = objectPool.getObjects(Vehicle.class);
+    List<VehicleCreationTO> result = new ArrayList<>();
+
+    for (Vehicle curVehicle : vehicles) {
+      result.add(
+          new VehicleCreationTO(curVehicle.getName())
+              .withLength(curVehicle.getLength())
+              .withEnergyLevelGood(curVehicle.getEnergyLevelGood())
+              .withEnergyLevelCritical(curVehicle.getEnergyLevelCritical())
+              .withEnergyLevelFullyRecharged(curVehicle.getEnergyLevelFullyRecharged())
+              .withEnergyLevelSufficientlyRecharged(curVehicle.getEnergyLevelSufficientlyRecharged())
+              .withMaxVelocity(curVehicle.getMaxVelocity())
+              .withMaxReverseVelocity(curVehicle.getMaxReverseVelocity())
+              .withProperties(curVehicle.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link LocationTypeCreationTO LocationTypes} for all location types in a
+   * model.
+   *
+   * @param model The model data.
+   * @return A list of {@link LocationTypeCreationTO LocationTypes} for all location types in a
+   * model.
+   */
+  private List<LocationTypeCreationTO> getLocationTypes() {
+    Set<LocationType> locTypes = objectPool.getObjects(LocationType.class);
+    List<LocationTypeCreationTO> result = new ArrayList<>();
+
+    for (LocationType curType : locTypes) {
+      result.add(
+          new LocationTypeCreationTO(curType.getName())
+              .withAllowedOperations(curType.getAllowedOperations())
+              .withProperties(curType.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link LocationCreationTO Locations} for all locations in a model.
+   *
+   * @param model The model data.
+   * @return A list of {@link LocationCreationTO Locations} for all locations in a model.
+   */
+  private List<LocationCreationTO> getLocations() {
+    Set<Location> locations = objectPool.getObjects(Location.class);
+    List<LocationCreationTO> result = new ArrayList<>();
+
+    for (Location curLoc : locations) {
+      result.add(
+          new LocationCreationTO(curLoc.getName(),
+                                 curLoc.getType().getName(),
+                                 curLoc.getPosition())
+              .withLinks(curLoc.getAttachedLinks().stream()
+                  .collect(Collectors.toMap(link -> link.getPoint().getName(),
+                                            Location.Link::getAllowedOperations)))
+              .withProperties(curLoc.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link BlockCreationTO Blocks} for all blocks in a model.
+   *
+   * @param model The model data.
+   * @return A list of {@link BlockCreationTO Blocks} for all blocks in a model.
+   */
+  private List<BlockCreationTO> getBlocks() {
+    Set<Block> blocks = objectPool.getObjects(Block.class);
+    List<BlockCreationTO> result = new ArrayList<>();
+
+    for (Block curBlock : blocks) {
+      result.add(
+          new BlockCreationTO(curBlock.getName())
+              .withMemberNames(curBlock.getMembers().stream()
+                  .map(member -> member.getName())
+                  .collect(Collectors.toSet()))
+              .withType(curBlock.getType())
+              .withProperties(curBlock.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link GroupCreationTO Groups} for all groups in a model.
+   *
+   * @param model The model data.
+   * @return A list of {@link GroupCreationTO Groups} for all groups in a model.
+   */
+  private List<GroupCreationTO> getGroups() {
+    Set<Group> groups = objectPool.getObjects(Group.class);
+    List<GroupCreationTO> result = new ArrayList<>();
+
+    for (Group curGroup : groups) {
+      result.add(
+          new GroupCreationTO(curGroup.getName())
+              .withMemberNames(curGroup.getMembers().stream()
+                  .map(member -> member.getName())
+                  .collect(Collectors.toSet()))
+              .withProperties(curGroup.getProperties())
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns a list of {@link VisualLayoutCreationTO VisualLayouts} for all visual layouts in a
+   * model.
+   *
+   * @param model The model data.
+   * @return A list of {@link VisualLayoutCreationTO VisualLayouts} for all visual layouts in a
+   * model.
+   */
+  private List<VisualLayoutCreationTO> getVisualLayouts() {
+    Set<VisualLayout> layouts = objectPool.getObjects(VisualLayout.class);
+    List<VisualLayoutCreationTO> result = new ArrayList<>();
+
+    // Separate our various kinds of layout elements.
+    for (VisualLayout curLayout : layouts) {
+      List<ShapeLayoutElement> shapeLayoutElements = new LinkedList<>();
+      Map<TCSObject<?>, ModelLayoutElement> modelLayoutElements = new HashMap<>();
+
+      for (LayoutElement layoutElement : curLayout.getLayoutElements()) {
+        if (layoutElement instanceof ShapeLayoutElement) {
+          shapeLayoutElements.add((ShapeLayoutElement) layoutElement);
+        }
+        else if (layoutElement instanceof ImageLayoutElement) {
+          // XXX Do something with these elements?
+        }
+        else if (layoutElement instanceof ModelLayoutElement) {
+          // Map the result of getVisualizedObject() to the corresponding TCSObject, since the name
+          // of the TCSObject might change but won't be changed in the reference the 
+          // ModelLayoutElement holds.
+          ModelLayoutElement mle = (ModelLayoutElement) layoutElement;
+          TCSObject<?> vObj = objectPool.getObjectOrNull(mle.getVisualizedObject());
+          // Don't persist layout elements for model elements that don't exist, but leave a log 
+          // message in that case.
+          if (vObj == null) {
+            LOG.error("Visualized object {} does not exist (any more?), not persisting layout element",
+                      mle.getVisualizedObject());
+            continue;
+          }
+          modelLayoutElements.put(vObj, mle);
+        }
+        // XXX GroupLayoutElement is not implemented, yet.
+//        else if (layoutElement instanceof GroupLayout)
+      }
+
+      // Persist ShapeLayoutElements
+      List<ShapeLayoutElementCreationTO> slElements = new ArrayList<>();
+      for (ShapeLayoutElement curSLE : shapeLayoutElements) {
+        ShapeLayoutElementCreationTO slElement = new ShapeLayoutElementCreationTO("")
+            .withLayer(curSLE.getLayer())
+            .withProperties(curSLE.getProperties());
+
+        slElements.add(slElement);
+      }
+
+      // Persist ModelLayoutElements
+      List<ModelLayoutElementCreationTO> mlElements = new ArrayList<>();
+      for (Map.Entry<TCSObject<?>, ModelLayoutElement> curMLE : modelLayoutElements.entrySet()) {
+        ModelLayoutElementCreationTO mlElement = new ModelLayoutElementCreationTO(curMLE.getKey().getName())
+            .withLayer(curMLE.getValue().getLayer())
+            .withProperties(curMLE.getValue().getProperties());
+
+        mlElements.add(mlElement);
+      }
+
+      result.add(
+          new VisualLayoutCreationTO(curLayout.getName())
+              .withScaleX(curLayout.getScaleX())
+              .withScaleY(curLayout.getScaleY())
+              .withModelElements(mlElements)
+              .withShapeElements(slElements)
+              .withProperties(curLayout.getProperties())
+      );
+    }
+    return result;
   }
 
   /**

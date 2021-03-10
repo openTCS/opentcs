@@ -146,7 +146,7 @@ A vehicle provides the following attributes:
       The vehicle is not available for transport orders. 
   ** ..._utilized_:
      The vehicle is available for transport orders and will be utilized by the openTCS.
-* A set of _processable transport order categories_, which are strings used for filtering transport orders assigned to the vehicle.
+* A set of _allowed transport order types_, which are strings used for filtering transport orders (by their type) that are allowed to be assigned to the vehicle.
   Also see <<Transport order>>.
 * A _route color_, which is the color used for visualizing the route the vehicle is taking to its destination.
 
@@ -182,9 +182,9 @@ When creating a transport order, the following attributes can be set:
 * A sequence of _destinations_ that the processing vehicle must process (in their given order).
   Each destination consists of a location that the vehicle must travel to and an operation that it must perform there.
 * An optional _deadline_, indicating when the transport order is supposed to have been processed.
-* An optional _category_, which is a string used for filtering vehicles that may be assigned to the transport order.
-  A vehicle may only be assigned to a transport order if the order's category is in the vehicle's set of processable categories.
-  (Examples for potentially useful categories are `"Transport"` and `"Maintenance"`.)
+* An optional _type_, which is a string used for filtering vehicles that may be assigned to the transport order.
+  A vehicle may only be assigned to a transport order if the order's type is in the vehicle's set of allowed order types.
+  (Examples for potentially useful types are `"Transport"` and `"Maintenance"`.)
 * An optional _intended vehicle_, telling the dispatcher to assign the transport order to the specified vehicle instead of selecting one automatically.
 * An optional set of _dependencies_, i.e. references to other transport orders that need to be processed before the transport order.
   Dependencies are transitive, meaning that if order A depends on order B and order B depends on order C, C must be processed first, then B, then A.
@@ -215,8 +215,8 @@ An order sequence carries the following attributes:
 * A _failure fatal_ flag, indicating that, if one transport order in the sequence fails, all orders following it should immediately be considered as failed, too.
 * A _finished_ flag, indicating that the order sequence has been processed (and the vehicle is not bound to it, anymore).
   An order sequence can only be marked as finished if it has been marked as complete before.
-* An optional _category_ -- see <<Transport order>>.
-  If set, categories set with transport orders in the sequence will be ignored.
+* An optional _type_ -- see <<Transport order>>.
+  An order sequence and all transport orders it contains (must) share the same type.
 * An optional _intended vehicle_, telling the dispatcher to assign the order sequence to the specified vehicle instead of selecting one automatically.
   If set, all transport orders added to the order sequence must carry the same intended vehicle value.
 

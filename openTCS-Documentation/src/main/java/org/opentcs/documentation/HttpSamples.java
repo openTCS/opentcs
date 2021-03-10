@@ -143,14 +143,14 @@ public class HttpSamples {
   }
 
   private static TransportOrder createSampleTransportOrder(int index,
-                                                           String category,
+                                                           String type,
                                                            Vehicle intendedVehicle) {
     List<DriveOrder> driveOrders = new ArrayList<>();
     DriveOrder.Destination dest = new DriveOrder.Destination(getSampleDestinationLocation().getReference());
     driveOrders.add(new DriveOrder(dest));
     TransportOrder someTransportOrder = new TransportOrder("TransportOrder-" + index, driveOrders)
         .withProperty("someKey", "someValue")
-        .withCategory(category)
+        .withType(type)
         .withIntendedVehicle(intendedVehicle.getReference());
     return someTransportOrder;
   }

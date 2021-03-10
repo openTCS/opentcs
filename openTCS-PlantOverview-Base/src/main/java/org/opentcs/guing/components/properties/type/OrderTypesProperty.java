@@ -13,16 +13,16 @@ import java.util.TreeSet;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * A property that contains a set of transport order categories represented by strings.
+ * A property that contains a set of transport order types represented by strings.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Martin Grzenia (Fraunhofer IML)
  */
-public class OrderCategoriesProperty
+public class OrderTypesProperty
     extends AbstractComplexProperty {
 
   /**
-   * The set of transport order categories.
+   * The set of transport order types.
    */
   private Set<String> fItems = new TreeSet<>();
 
@@ -31,7 +31,7 @@ public class OrderCategoriesProperty
    *
    * @param model The model component this property belongs to.
    */
-  public OrderCategoriesProperty(ModelComponent model) {
+  public OrderTypesProperty(ModelComponent model) {
     super(model);
   }
 
@@ -75,7 +75,7 @@ public class OrderCategoriesProperty
 
   @Override
   public void copyFrom(Property property) {
-    OrderCategoriesProperty other = (OrderCategoriesProperty) property;
+    OrderTypesProperty other = (OrderTypesProperty) property;
     Set<String> items = new TreeSet<>(other.getItems());
     setItems(items);
   }
@@ -98,7 +98,7 @@ public class OrderCategoriesProperty
 
   @Override
   public Object clone() {
-    OrderCategoriesProperty clone = (OrderCategoriesProperty) super.clone();
+    OrderTypesProperty clone = (OrderTypesProperty) super.clone();
     Set<String> items = new TreeSet<>(getItems());
     clone.setItems(items);
     return clone;

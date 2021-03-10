@@ -26,6 +26,7 @@ rem Start kernel
 %JAVA% -enableassertions ^
     -Dopentcs.base="%OPENTCS_BASE%" ^
     -Dopentcs.home="%OPENTCS_HOME%" ^
+    -Dopentcs.cfg4j.reload.interval=10000 ^
     -Djava.util.logging.config.file="%OPENTCS_CONFIGDIR%\logging.config" ^
     -Djava.security.policy="file:%OPENTCS_CONFIGDIR%\java.policy" ^
     -XX:-OmitStackTraceInFastThrow ^

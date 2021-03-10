@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel.services;
 
-import java.util.HashMap;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -118,13 +118,14 @@ public class StandardPlantModelService
       }
 
       final String oldModelName = getLoadedModelName();
-      final String newModelName = modelPersister.getPersistentModelName().orElse("");
+      // Load the new model
+      PlantModelCreationTO modelCreationTO = modelPersister.readModel();
+      final String newModelName = isNullOrEmpty(modelCreationTO.getName())
+          ? ""
+          : modelCreationTO.getName();
       // Let listeners know we're in transition.
       emitModelEvent(oldModelName, newModelName, true, false);
-
-      // Load the new model
-      modelPersister.loadModel(model);
-
+      model.createPlantModelObjects(modelCreationTO);
       // Let listeners know we're done with the transition.
       emitModelEvent(oldModelName, newModelName, true, true);
       notificationService.publishUserNotification(
@@ -137,7 +138,7 @@ public class StandardPlantModelService
   public void savePlantModel()
       throws IllegalStateException {
     synchronized (globalSyncObject) {
-      modelPersister.saveModel(model, model.getName());
+      modelPersister.saveModel(model.createPlantModelCreationTO());
     }
   }
 
@@ -156,9 +157,6 @@ public class StandardPlantModelService
 
     // Create the plant model
     synchronized (globalSyncObject) {
-      model.clear();
-      model.setName(to.getName());
-      model.setProperties(new HashMap<>(to.getProperties()));
       model.createPlantModelObjects(to);
     }
 

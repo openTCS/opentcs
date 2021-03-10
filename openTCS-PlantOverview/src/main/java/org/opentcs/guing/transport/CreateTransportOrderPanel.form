@@ -1276,26 +1276,26 @@
         </CodeStatement>
       </LayoutCode>
     </Container>
-    <Container class="javax.swing.JPanel" name="categoryPanel">
+    <Container class="javax.swing.JPanel" name="typePanel">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Category">
-              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.panel_category.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            <TitledBorder title="Type">
+              <ResourceString PropertyName="titleX" bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.panel_type.border.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
       </Properties>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="categoryLabel">
+        <Component class="javax.swing.JLabel" name="typeLabel">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
               <FontInfo relative="true">
-                <Font component="categoryLabel" property="font" relativeSize="true" size="0"/>
+                <Font component="typeLabel" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.label_category.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="i18n/org/opentcs/plantoverview/dialogs/createTransportOrder.properties" key="createTransportOrderPanel.label_type.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -1304,12 +1304,12 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JComboBox" name="categoryComboBox">
+        <Component class="javax.swing.JComboBox" name="typeComboBox">
           <Properties>
             <Property name="editable" type="boolean" value="true"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
               <FontInfo relative="true">
-                <Font component="categoryComboBox" property="font" relativeSize="true" size="0"/>
+                <Font component="typeComboBox" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
           </Properties>
@@ -1325,8 +1325,8 @@
       </SubComponents>
       <LayoutCode>
         <CodeStatement>
-          <CodeExpression id="75_categoryPanelLayout">
-            <CodeVariable name="categoryPanelLayout" type="4096" declaredType="java.awt.GridBagLayout"/>
+          <CodeExpression id="75_typePanelLayout">
+            <CodeVariable name="typePanelLayout" type="4096" declaredType="java.awt.GridBagLayout"/>
             <ExpressionOrigin>
               <ExpressionProvider type="CodeConstructor">
                 <CodeConstructor class="java.awt.GridBagLayout" parameterTypes=""/>
@@ -1334,11 +1334,11 @@
             </ExpressionOrigin>
           </CodeExpression>
           <StatementProvider type="CodeExpression">
-            <CodeExpression id="75_categoryPanelLayout"/>
+            <CodeExpression id="75_typePanelLayout"/>
           </StatementProvider>
         </CodeStatement>
         <CodeStatement>
-          <CodeExpression id="75_categoryPanelLayout"/>
+          <CodeExpression id="75_typePanelLayout"/>
           <StatementProvider type="CodeField">
             <CodeField name="columnWidths" class="java.awt.GridBagLayout"/>
           </StatementProvider>
@@ -1353,7 +1353,7 @@
           </Parameters>
         </CodeStatement>
         <CodeStatement>
-          <CodeExpression id="75_categoryPanelLayout"/>
+          <CodeExpression id="75_typePanelLayout"/>
           <StatementProvider type="CodeField">
             <CodeField name="rowHeights" class="java.awt.GridBagLayout"/>
           </StatementProvider>
@@ -1368,11 +1368,11 @@
           </Parameters>
         </CodeStatement>
         <CodeStatement>
-          <CodeExpression id="78_categoryPanel">
-            <CodeVariable name="categoryPanel" type="8194" declaredType="javax.swing.JPanel"/>
+          <CodeExpression id="78_typePanel">
+            <CodeVariable name="typePanel" type="8194" declaredType="javax.swing.JPanel"/>
             <ExpressionOrigin>
               <ExpressionProvider type="ComponentRef">
-                <ComponentRef name="categoryPanel"/>
+                <ComponentRef name="typePanel"/>
               </ExpressionProvider>
             </ExpressionOrigin>
           </CodeExpression>
@@ -1380,7 +1380,7 @@
             <CodeMethod name="setLayout" class="java.awt.Container" parameterTypes="java.awt.LayoutManager"/>
           </StatementProvider>
           <Parameters>
-            <CodeExpression id="75_categoryPanelLayout"/>
+            <CodeExpression id="75_typePanelLayout"/>
           </Parameters>
         </CodeStatement>
         <CodeStatement>
@@ -1451,16 +1451,16 @@
           </Parameters>
         </CodeStatement>
         <CodeStatement>
-          <CodeExpression id="78_categoryPanel"/>
+          <CodeExpression id="78_typePanel"/>
           <StatementProvider type="CodeMethod">
             <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component, java.lang.Object"/>
           </StatementProvider>
           <Parameters>
-            <CodeExpression id="84_categoryLabel">
-              <CodeVariable name="categoryLabel" type="8194" declaredType="javax.swing.JLabel"/>
+            <CodeExpression id="84_typeLabel">
+              <CodeVariable name="typeLabel" type="8194" declaredType="javax.swing.JLabel"/>
               <ExpressionOrigin>
                 <ExpressionProvider type="ComponentRef">
-                  <ComponentRef name="categoryLabel"/>
+                  <ComponentRef name="typeLabel"/>
                 </ExpressionProvider>
               </ExpressionOrigin>
             </CodeExpression>
@@ -1561,16 +1561,16 @@
           </Parameters>
         </CodeStatement>
         <CodeStatement>
-          <CodeExpression id="78_categoryPanel"/>
+          <CodeExpression id="78_typePanel"/>
           <StatementProvider type="CodeMethod">
             <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component, java.lang.Object"/>
           </StatementProvider>
           <Parameters>
-            <CodeExpression id="92_categoryComboBox">
-              <CodeVariable name="categoryComboBox" type="8194" declaredType="javax.swing.JComboBox"/>
+            <CodeExpression id="92_typeComboBox">
+              <CodeVariable name="typeComboBox" type="8194" declaredType="javax.swing.JComboBox"/>
               <ExpressionOrigin>
                 <ExpressionProvider type="ComponentRef">
-                  <ComponentRef name="categoryComboBox"/>
+                  <ComponentRef name="typeComboBox"/>
                 </ExpressionProvider>
               </ExpressionOrigin>
             </CodeExpression>

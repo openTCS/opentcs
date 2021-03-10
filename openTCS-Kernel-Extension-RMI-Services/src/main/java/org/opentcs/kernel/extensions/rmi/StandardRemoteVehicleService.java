@@ -257,14 +257,21 @@ public class StandardRemoteVehicleService
   }
 
   @Override
+  @Deprecated
   public void updateVehicleProcessableCategories(ClientID clientId,
                                                  TCSObjectReference<Vehicle> ref,
                                                  Set<String> processableCategories) {
+    updateVehicleAllowedOrderTypes(clientId, ref, processableCategories);
+  }
+
+  @Override
+  public void updateVehicleAllowedOrderTypes(ClientID clientId, TCSObjectReference<Vehicle> ref,
+                                             Set<String> allowedOrderTypes) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
     try {
       kernelExecutor.submit(
-          () -> vehicleService.updateVehicleProcessableCategories(ref, processableCategories))
+          () -> vehicleService.updateVehicleAllowedOrderTypes(ref, allowedOrderTypes))
           .get();
     }
     catch (InterruptedException | ExecutionException exc) {

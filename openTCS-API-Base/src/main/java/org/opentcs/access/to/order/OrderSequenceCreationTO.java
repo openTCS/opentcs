@@ -32,9 +32,9 @@ public class OrderSequenceCreationTO
    */
   private final boolean incompleteName;
   /**
-   * The category of the order sequence.
+   * The type of the order sequence.
    */
-  private String category = OrderConstants.CATEGORY_NONE;
+  private String type = OrderConstants.TYPE_NONE;
   /**
    * The (optional) name of the vehicle that is supposed to execute the transport order.
    */
@@ -58,12 +58,12 @@ public class OrderSequenceCreationTO
   private OrderSequenceCreationTO(@Nonnull String name,
                                   @Nonnull Map<String, String> properties,
                                   boolean incompleteName,
-                                  @Nonnull String category,
+                                  @Nonnull String type,
                                   @Nullable String intendedVehicleName,
                                   boolean failureFatal) {
     super(name, properties);
     this.incompleteName = incompleteName;
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(type, "type");
     this.intendedVehicleName = intendedVehicleName;
     this.failureFatal = failureFatal;
   }
@@ -87,7 +87,7 @@ public class OrderSequenceCreationTO
     return new OrderSequenceCreationTO(name,
                                        getModifiableProperties(),
                                        incompleteName,
-                                       category,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }
@@ -111,7 +111,7 @@ public class OrderSequenceCreationTO
     return new OrderSequenceCreationTO(getName(),
                                        properties,
                                        incompleteName,
-                                       category,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }
@@ -139,7 +139,7 @@ public class OrderSequenceCreationTO
     return new OrderSequenceCreationTO(getName(),
                                        propertiesWith(key, value),
                                        incompleteName,
-                                       category,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }
@@ -168,7 +168,7 @@ public class OrderSequenceCreationTO
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
                                        incompleteName,
-                                       category,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }
@@ -177,10 +177,13 @@ public class OrderSequenceCreationTO
    * Returns the (optional) category of the order sequence.
    *
    * @return The (optional) category of the order sequence.
+   * @deprecated Use {@link #getType()} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public String getCategory() {
-    return category;
+    return type;
   }
 
   /**
@@ -192,7 +195,7 @@ public class OrderSequenceCreationTO
   @Deprecated
   @ScheduledApiChange(when = "5.0")
   public OrderSequenceCreationTO setCategory(@Nonnull String category) {
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(category, "category");
     return this;
   }
 
@@ -201,12 +204,40 @@ public class OrderSequenceCreationTO
    *
    * @param category The category.
    * @return A copy of this object, differing in the given category.
+   * @deprecated Use {@link #withType(java.lang.String)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public OrderSequenceCreationTO withCategory(@Nonnull String category) {
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
                                        incompleteName,
                                        category,
+                                       intendedVehicleName,
+                                       failureFatal);
+  }
+
+  /**
+   * Returns the (optional) type of the order sequence.
+   *
+   * @return The (optional) type of the order sequence.
+   */
+  @Nonnull
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Creates a copy of this object with the given type.
+   *
+   * @param type The type.
+   * @return A copy of this object, differing in the given type.
+   */
+  public OrderSequenceCreationTO withType(@Nonnull String type) {
+    return new OrderSequenceCreationTO(getName(),
+                                       getModifiableProperties(),
+                                       incompleteName,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }
@@ -246,7 +277,7 @@ public class OrderSequenceCreationTO
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
                                        incompleteName,
-                                       category,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }
@@ -278,7 +309,7 @@ public class OrderSequenceCreationTO
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),
                                        incompleteName,
-                                       category,
+                                       type,
                                        intendedVehicleName,
                                        failureFatal);
   }

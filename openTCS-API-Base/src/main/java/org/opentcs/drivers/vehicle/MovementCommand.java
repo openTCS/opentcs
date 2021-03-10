@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -22,6 +23,7 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@ScheduledApiChange(when = "5.0", details = "Will become an interface.")
 public class MovementCommand {
 
   /**
@@ -120,7 +122,10 @@ public class MovementCommand {
    * @param finalOperation The operation to be executed at the destination
    * position.
    * @param properties Properties of the order this command is part of.
+   * @deprecated This class will become an interface.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "This class will become an interface.")
   public MovementCommand(@Nonnull Step step,
                          @Nonnull String operation,
                          @Nullable Location opLocation,
@@ -140,6 +145,17 @@ public class MovementCommand {
       throw new NullPointerException("opLocation");
     }
     this.opLocation = opLocation;
+  }
+
+  /**
+   * Returns the route that this movement belongs to.
+   *
+   * @return The route that this movement belongs to.
+   */
+  @Nullable
+  @ScheduledApiChange(when = "5.0", details = "Will become non-null.")
+  public Route getRoute() {
+    return null;
   }
 
   /**

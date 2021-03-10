@@ -303,6 +303,7 @@ public class DefaultVehicleController
                  currentDriveOrder,
                  newOrder);
 
+      LOG.debug("{}: Setting drive order: {}", vehicle.getName(), newOrder);
       scheduler.claim(this, asResourceSequence(newOrder.getRoute().getSteps()));
 
       currentDriveOrder = newOrder;
@@ -334,6 +335,7 @@ public class DefaultVehicleController
                     "The new drive order contains steps the vehicle didn't process for the current "
                     + "drive order.");
 
+      LOG.debug("{}: Updating drive order: {}", vehicle.getName(), newOrder);
       // XXX Be a bit more thoughtful of which resource to claim/unclaim
       // XXX Unclaim only resources that would have been allocated in the future...
       scheduler.unclaim(this);
@@ -550,9 +552,11 @@ public class DefaultVehicleController
         }
         return false;
       }
+
       pendingCommand = null;
       pendingResources = null;
 
+      LOG.debug("{}: Accepting allocated resources: {}", vehicle.getName(), resources);
       allocatedResources.add(resources);
       // Send the command to the communication adapter.
       checkState(commAdapter.enqueueCommand(command),
@@ -784,14 +788,17 @@ public class DefaultVehicleController
         String operation = isFinalMovement ? op : MovementCommand.NO_OPERATION;
         Location location = isFinalMovement ? finalDestinationLocation : null;
 
-        futureCommands.add(new MovementCommand(curStep,
-                                               operation,
-                                               location,
-                                               isFinalMovement,
-                                               finalDestinationLocation,
-                                               finalDestination,
-                                               op,
-                                               mergeProperties(orderProperties, destProperties)));
+        futureCommands.add(
+            new MovementCommandImpl(orderRoute,
+                                    curStep,
+                                    operation,
+                                    location,
+                                    isFinalMovement,
+                                    finalDestinationLocation,
+                                    finalDestination,
+                                    op,
+                                    mergeProperties(orderProperties, destProperties))
+        );
       }
     }
   }
@@ -826,9 +833,12 @@ public class DefaultVehicleController
     int sendableCommands = Math.min(commAdapter.getCommandQueueCapacity() - commandsSent.size(),
                                     futureCommands.size());
     if (sendableCommands <= 0) {
-      LOG.debug("{}: Cannot send, number of sendable commands: {}",
+      LOG.debug("{}: Cannot send, number of sendable commands: {} (commandQueueCapacity={}, commandsSent={}, futureCommandsSize={})",
                 vehicle.getName(),
-                sendableCommands);
+                sendableCommands,
+                commAdapter.getCommandQueueCapacity(),
+                commandsSent.size(),
+                futureCommands.size());
       return false;
     }
     if (!futureCommands.peek().getStep().isExecutionAllowed()) {

@@ -71,9 +71,9 @@ public class CreateTransportOrderPanel
    */
   private final List<Map<String, String>> fPropertiesList = new ArrayList<>();
   /**
-   * The transport order's category.
+   * The possible types for the transport order.
    */
-  private final List<String> fCategories;
+  private final List<String> fPossibleTypes;
   /**
    * The available vehicles.
    */
@@ -91,13 +91,13 @@ public class CreateTransportOrderPanel
    * Creates new instance.
    *
    * @param modelManager The manager for accessing the current system model.
-   * @param categorySuggestionsPool The transport order categories to suggest.
+   * @param orderTypeSuggestionsPool The transport order types to suggest.
    */
   @Inject
   public CreateTransportOrderPanel(ModelManager modelManager,
-                                   OrderCategorySuggestionsPool categorySuggestionsPool) {
+                                   OrderTypeSuggestionsPool orderTypeSuggestionsPool) {
     this.fModelManager = requireNonNull(modelManager, "modelManager");
-    requireNonNull(categorySuggestionsPool, "categorySuggestionsPool");
+    requireNonNull(orderTypeSuggestionsPool, "orderTypeSuggestionsPool");
 
     initComponents();
     Object[] columnNames = {
@@ -116,7 +116,7 @@ public class CreateTransportOrderPanel
     fVehicles = fModelManager.getModel().getVehicleModels();
     Collections.sort(fVehicles, (v1, v2) -> v1.getName().compareToIgnoreCase(v2.getName()));
 
-    fCategories = new ArrayList<>(categorySuggestionsPool.getCategorySuggestions());
+    fPossibleTypes = new ArrayList<>(orderTypeSuggestionsPool.getTypeSuggestions());
     initTitle();
   }
 
@@ -148,12 +148,12 @@ public class CreateTransportOrderPanel
     return fVehicles.get(vehicleComboBox.getSelectedIndex() - 1);
   }
 
-  public String getSelectedCategory() {
-    if (categoryComboBox.getSelectedItem() == null) {
-      return OrderConstants.CATEGORY_NONE;
+  public String getSelectedType() {
+    if (typeComboBox.getSelectedItem() == null) {
+      return OrderConstants.TYPE_NONE;
     }
 
-    return categoryComboBox.getSelectedItem().toString();
+    return typeComboBox.getSelectedItem().toString();
   }
 
   @Override
@@ -190,8 +190,8 @@ public class CreateTransportOrderPanel
       vehicleComboBox.addItem(vehicleModel.getName());
     }
 
-    for (String category : fCategories) {
-      categoryComboBox.addItem(category);
+    for (String tag : fPossibleTypes) {
+      typeComboBox.addItem(tag);
     }
 
     ZonedDateTime newDeadline = ZonedDateTime.now(ZoneId.systemDefault()).plusHours(1);
@@ -208,7 +208,7 @@ public class CreateTransportOrderPanel
         vehicleComboBox.setSelectedItem(fPattern.getIntendedVehicle().getName());
       }
 
-      categoryComboBox.setSelectedItem(fPattern.getCategory());
+      typeComboBox.setSelectedItem(fPattern.getType());
 
       List<DriveOrder> driveOrders = new LinkedList<>();
       driveOrders.addAll(fPattern.getAllDriveOrders());
@@ -280,9 +280,9 @@ public class CreateTransportOrderPanel
     dateTextField = new javax.swing.JTextField();
     timeLabel = new javax.swing.JLabel();
     timeTextField = new javax.swing.JTextField();
-    categoryPanel = new javax.swing.JPanel();
-    categoryLabel = new javax.swing.JLabel();
-    categoryComboBox = new javax.swing.JComboBox<>();
+    typePanel = new javax.swing.JPanel();
+    typeLabel = new javax.swing.JLabel();
+    typeComboBox = new javax.swing.JComboBox<>();
     vehiclePanel = new javax.swing.JPanel();
     vehicleLabel = new javax.swing.JLabel();
     vehicleComboBox = new javax.swing.JComboBox<>();
@@ -299,17 +299,19 @@ public class CreateTransportOrderPanel
     driveOrdersScrollPane.setPreferredSize(new java.awt.Dimension(200, 200));
 
     driveOrdersTable.setModel(new javax.swing.table.DefaultTableModel(
-        new Object[][] {},
-        new String[] {
-          "Station", "Aktion"
-        }
+      new Object [][] {
+
+      },
+      new String [] {
+        "Station", "Aktion"
+      }
     ) {
-      boolean[] canEdit = new boolean[] {
+      boolean[] canEdit = new boolean [] {
         false, false
       };
 
       public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return canEdit[columnIndex];
+        return canEdit [columnIndex];
       }
     });
     driveOrdersScrollPane.setViewportView(driveOrdersTable);
@@ -448,23 +450,23 @@ public class CreateTransportOrderPanel
 
     add(deadlinePanel);
 
-    categoryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("createTransportOrderPanel.panel_category.border.title"))); // NOI18N
-    java.awt.GridBagLayout categoryPanelLayout = new java.awt.GridBagLayout();
-    categoryPanelLayout.columnWidths = new int[] {0, 5, 0};
-    categoryPanelLayout.rowHeights = new int[] {0};
-    categoryPanel.setLayout(categoryPanelLayout);
+    typePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("createTransportOrderPanel.panel_type.border.title"))); // NOI18N
+    java.awt.GridBagLayout typePanelLayout = new java.awt.GridBagLayout();
+    typePanelLayout.columnWidths = new int[] {0, 5, 0};
+    typePanelLayout.rowHeights = new int[] {0};
+    typePanel.setLayout(typePanelLayout);
 
-    categoryLabel.setFont(categoryLabel.getFont());
-    categoryLabel.setText(bundle.getString("createTransportOrderPanel.label_category.text")); // NOI18N
+    typeLabel.setFont(typeLabel.getFont());
+    typeLabel.setText(bundle.getString("createTransportOrderPanel.label_type.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-    categoryPanel.add(categoryLabel, gridBagConstraints);
+    typePanel.add(typeLabel, gridBagConstraints);
 
-    categoryComboBox.setEditable(true);
-    categoryComboBox.setFont(categoryComboBox.getFont());
+    typeComboBox.setEditable(true);
+    typeComboBox.setFont(typeComboBox.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 0;
@@ -472,9 +474,9 @@ public class CreateTransportOrderPanel
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-    categoryPanel.add(categoryComboBox, gridBagConstraints);
+    typePanel.add(typeComboBox, gridBagConstraints);
 
-    add(categoryPanel);
+    add(typePanel);
 
     vehiclePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("createTransportOrderPanel.panel_vehicle.border.title"))); // NOI18N
     java.awt.GridBagLayout vehiclePanelLayout = new java.awt.GridBagLayout();
@@ -633,9 +635,6 @@ public class CreateTransportOrderPanel
   }//GEN-LAST:event_addButtonActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
-  private javax.swing.JComboBox<String> categoryComboBox;
-  private javax.swing.JLabel categoryLabel;
-  private javax.swing.JPanel categoryPanel;
   private javax.swing.JLabel dateLabel;
   private javax.swing.JTextField dateTextField;
   private javax.swing.JPanel deadlinePanel;
@@ -648,6 +647,9 @@ public class CreateTransportOrderPanel
   private javax.swing.JPanel stationsPanel;
   private javax.swing.JLabel timeLabel;
   private javax.swing.JTextField timeTextField;
+  private javax.swing.JComboBox<String> typeComboBox;
+  private javax.swing.JLabel typeLabel;
+  private javax.swing.JPanel typePanel;
   private javax.swing.JComboBox<String> vehicleComboBox;
   private javax.swing.JLabel vehicleLabel;
   private javax.swing.JPanel vehiclePanel;

@@ -56,11 +56,11 @@ public class OrderSequence
                Cloneable {
 
   /**
-   * The category of this order sequence.
-   * An order sequence and all transport orders it contains share the same category.
+   * The type of this order sequence.
+   * An order sequence and all transport orders it contains share the same type.
    */
   @Nonnull
-  private String category = OrderConstants.CATEGORY_NONE;
+  private String type = OrderConstants.TYPE_NONE;
   /**
    * Transport orders belonging to this sequence that still need to be processed.
    */
@@ -134,7 +134,7 @@ public class OrderSequence
                         String name,
                         Map<String, String> properties,
                         ObjectHistory history,
-                        String category,
+                        String type,
                         TCSObjectReference<Vehicle> intendedVehicle,
                         List<TCSObjectReference<TransportOrder>> orders,
                         int finishedIndex,
@@ -143,7 +143,7 @@ public class OrderSequence
                         boolean finished,
                         TCSObjectReference<Vehicle> processingVehicle) {
     super(objectID, name, properties, history);
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(type, "type");
     this.intendedVehicle = intendedVehicle;
     this.orders = new ArrayList<>(requireNonNull(orders, "orders"));
     this.finishedIndex = finishedIndex;
@@ -159,7 +159,7 @@ public class OrderSequence
                              getName(),
                              propertiesWith(key, value),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -175,7 +175,7 @@ public class OrderSequence
                              getName(),
                              properties,
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -191,7 +191,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory().withEntryAppended(entry),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -207,7 +207,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              history,
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -221,10 +221,14 @@ public class OrderSequence
    * Returns this order sequence's category.
    *
    * @return This order sequence's category.
+   * @deprecated Order sequence categories are replaced by types.
+   * Use {@link #getType()} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public String getCategory() {
-    return category;
+    return type;
   }
 
   /**
@@ -232,13 +236,47 @@ public class OrderSequence
    *
    * @param category The category to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Order sequence categories are replaced by types.
+   * Use {@link #withType(java.lang.String)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public OrderSequence withCategory(String category) {
     return new OrderSequence(getIdWithoutDeprecationWarning(),
                              getName(),
                              getProperties(),
                              getHistory(),
                              category,
+                             intendedVehicle,
+                             orders,
+                             finishedIndex,
+                             complete,
+                             failureFatal,
+                             finished,
+                             processingVehicle);
+  }
+  /**
+   * Returns this order sequence's type.
+   *
+   * @return This order sequence's type.
+   */
+  @Nonnull
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Creates a copy of this object, with the given type.
+   *
+   * @param type The type to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withType(String type) {
+    return new OrderSequence(getIdWithoutDeprecationWarning(),
+                             getName(),
+                             getProperties(),
+                             getHistory(),
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -301,7 +339,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              ordersWithAppended(order),
                              finishedIndex,
@@ -368,7 +406,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -411,7 +449,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -456,7 +494,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -501,7 +539,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -546,7 +584,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -591,7 +629,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,
@@ -627,7 +665,7 @@ public class OrderSequence
                              getName(),
                              getProperties(),
                              getHistory(),
-                             category,
+                             type,
                              intendedVehicle,
                              orders,
                              finishedIndex,

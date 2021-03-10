@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.persistence;
 
+import static com.google.common.base.Strings.emptyToNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,13 +15,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import static java.util.Optional.ofNullable;
 import javax.inject.Inject;
-import javax.inject.Provider;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.customizations.ApplicationHome;
-import org.opentcs.kernel.workingset.Model;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.FileSystems;
+import org.opentcs.util.persistence.ModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,30 +48,27 @@ public class XMLFileModelPersister
    */
   private final File dataDirectory;
   /**
-   * Provider for an XMLModelReader, used to instanciate a new reader every time
-   * a model is read from file.
+   * The model file.
    */
-  private final Provider<XMLModelReader> readerProvider;
+  private final File modelFile;
   /**
-   * Provider for an XMLModelWriter, used to instanciate a new writer every time
-   * a model is written to file.
+   * Reads and writes models into xml files.
    */
-  private final Provider<XMLModelWriter> writerProvider;
+  private final ModelParser modelParser;
 
   /**
    * Creates a new XMLFileModelPersister.
    *
    * @param directory The application's home directory.
-   * @param readerProvider Provider for XMLModelReaders.
-   * @param writerProvider Porivder for XMLModelWriters.
+   * @param modelParser Reads and writes into the xml file.
    */
   @Inject
   public XMLFileModelPersister(@ApplicationHome File directory,
-                               Provider<XMLModelReader> readerProvider,
-                               Provider<XMLModelWriter> writerProvider) {
-    this.readerProvider = requireNonNull(readerProvider, "readerProvider");
-    this.writerProvider = requireNonNull(writerProvider, "writerProvider");
+                               ModelParser modelParser) {
+    this.modelParser = requireNonNull(modelParser, "modelParser");
     this.dataDirectory = new File(requireNonNull(directory, "directory"), "data");
+
+    this.modelFile = new File(dataDirectory, MODEL_FILE_NAME);
   }
 
   @Override
@@ -79,18 +77,16 @@ public class XMLFileModelPersister
     if (!hasSavedModel()) {
       return Optional.empty();
     }
-    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     return Optional.of(readXMLModelName(modelFile));
   }
 
   @Override
-  public void saveModel(Model model, @Nullable String modelName)
+  public void saveModel(PlantModelCreationTO model)
       throws IllegalStateException {
     requireNonNull(model, "model");
 
-    LOG.debug("Saving model '{}', modelName is '{}'.", model.getName(), modelName);
+    LOG.debug("Saving model '{}'.", model.getName());
 
-    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     // Check if writing the model is possible.
     checkState(dataDirectory.isDirectory() || dataDirectory.mkdirs(),
                "%s is not an existing directory and could not be created, either.",
@@ -103,8 +99,7 @@ public class XMLFileModelPersister
         createBackup();
       }
 
-      XMLModelWriter writer = writerProvider.get();
-      writer.writeXMLModel(model, modelName, modelFile);
+      modelParser.writeModel(model, modelFile);
     }
     catch (IOException exc) {
       throw new IllegalStateException("Exception saving model", exc);
@@ -112,27 +107,15 @@ public class XMLFileModelPersister
   }
 
   @Override
-  public void loadModel(Model model)
+  public PlantModelCreationTO readModel()
       throws IllegalStateException {
-    requireNonNull(model, "model");
     // Return empty model if there is no saved model
     if (!hasSavedModel()) {
-      model.clear();
-      return;
+      return new PlantModelCreationTO("empty model");
     }
-    if (!modelFileExists()) {
-      LOG.debug("There is no model file, doing nothing.");
-      return;
-    }
-    try {
-      // Read the model from the file.
-      File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
-      readXMLModel(modelFile, model);
-      LOG.debug("Successfully loaded model '" + model.getName() + "'");
-    }
-    catch (IOException exc) {
-      throw new IllegalArgumentException("Exception loading model", exc);
-    }
+
+    // Read the model from the file.
+    return readXMLModel(modelFile);
   }
 
   @Override
@@ -171,7 +154,7 @@ public class XMLFileModelPersister
       }
     }
     // Backup the model file
-    Files.copy(new File(dataDirectory, MODEL_FILE_NAME).toPath(),
+    Files.copy(modelFile.toPath(),
                new File(modelBackupDirectory, modelBackupName).toPath());
   }
 
@@ -182,11 +165,10 @@ public class XMLFileModelPersister
    * @throws IOException If check failed.
    */
   private boolean modelFileExists() {
-    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     if (!modelFile.exists()) {
       return false;
     }
-    if (modelFile.exists() && !modelFile.isFile()) {
+    if (!modelFile.isFile()) {
       return false;
     }
     return true;
@@ -196,7 +178,6 @@ public class XMLFileModelPersister
   public void removeModel()
       throws IllegalStateException {
     LOG.debug("Removing model...");
-    File modelFile = new File(dataDirectory, MODEL_FILE_NAME);
     // If the model file does not exist, don't do anything
     if (!modelFileExists()) {
       return;
@@ -220,13 +201,8 @@ public class XMLFileModelPersister
    */
   private String readXMLModelName(File modelFile)
       throws IllegalStateException {
-    try {
-      XMLModelReader reader = readerProvider.get();
-      return reader.readModelName(modelFile);
-    }
-    catch (IOException | InvalidModelException exc) {
-      throw new IllegalStateException("Exception parsing input", exc);
-    }
+    return ofNullable(emptyToNull(readXMLModel(modelFile).getName()))
+        .orElse("ModelNameMissing");
   }
 
   /**
@@ -236,15 +212,14 @@ public class XMLFileModelPersister
    * @param model The model to be built.
    * @throws IOException If an exception occured while loading
    */
-  private void readXMLModel(File modelFile, Model model)
-      throws IOException {
+  private PlantModelCreationTO readXMLModel(File modelFile)
+      throws IllegalStateException {
     try {
-      XMLModelReader reader = readerProvider.get();
-      reader.readXMLModel(modelFile, model);
+      return modelParser.readModel(modelFile);
     }
-    catch (InvalidModelException exc) {
+    catch (IOException exc) {
       LOG.error("Exception parsing input", exc);
-      throw new IOException("Exception parsing input: " + exc.getMessage());
+      throw new IllegalStateException("Exception parsing input", exc);
     }
   }
 

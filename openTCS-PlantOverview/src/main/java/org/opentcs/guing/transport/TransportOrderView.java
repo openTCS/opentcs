@@ -99,7 +99,7 @@ public class TransportOrderView
       vehicleTextField.setText(fTransportOrder.getProcessingVehicle().getName());
     }
 
-    categoryTextField.setText(fTransportOrder.getCategory());
+    typeTextField.setText(fTransportOrder.getType());
 
     propertiesTable.setModel(createPropertiesTableModel());
 
@@ -270,8 +270,8 @@ public class TransportOrderView
     vehicleTextField = new javax.swing.JTextField();
     dispensableLabel = new javax.swing.JLabel();
     dispensableTextField = new javax.swing.JTextField();
-    categoryLabel = new javax.swing.JLabel();
-    categoryTextField = new javax.swing.JTextField();
+    typeLabel = new javax.swing.JLabel();
+    typeTextField = new javax.swing.JTextField();
     dependenciesPanel = new javax.swing.JPanel();
     dependenciesScrollPane = new javax.swing.JScrollPane();
     dependenciesTable = new javax.swing.JTable();
@@ -419,25 +419,25 @@ public class TransportOrderView
     gridBagConstraints.weightx = 0.5;
     generalPanel.add(dispensableTextField, gridBagConstraints);
 
-    categoryLabel.setFont(categoryLabel.getFont());
-    categoryLabel.setText(bundle.getString("transportOrderView.label_category.text")); // NOI18N
+    typeLabel.setFont(typeLabel.getFont());
+    typeLabel.setText(bundle.getString("transportOrderView.label_type.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
-    generalPanel.add(categoryLabel, gridBagConstraints);
+    generalPanel.add(typeLabel, gridBagConstraints);
 
-    categoryTextField.setEditable(false);
-    categoryTextField.setColumns(10);
-    categoryTextField.setFont(categoryTextField.getFont());
+    typeTextField.setEditable(false);
+    typeTextField.setColumns(10);
+    typeTextField.setFont(typeTextField.getFont());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 3;
     gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
-    generalPanel.add(categoryTextField, gridBagConstraints);
+    generalPanel.add(typeTextField, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -603,8 +603,6 @@ public class TransportOrderView
     add(driveOrdersPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel categoryLabel;
-  private javax.swing.JTextField categoryTextField;
   private javax.swing.JLabel costsLabel;
   private javax.swing.JTextField costsTextField;
   private javax.swing.JLabel createdLabel;
@@ -636,6 +634,8 @@ public class TransportOrderView
   private javax.swing.JPanel routePanel;
   private javax.swing.JScrollPane routeScrollPane;
   private javax.swing.JTable routeTable;
+  private javax.swing.JLabel typeLabel;
+  private javax.swing.JTextField typeTextField;
   private javax.swing.JLabel vehicleLabel;
   private javax.swing.JTextField vehicleTextField;
   // End of variables declaration//GEN-END:variables

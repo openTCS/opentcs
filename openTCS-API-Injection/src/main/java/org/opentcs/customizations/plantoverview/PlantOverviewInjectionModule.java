@@ -10,7 +10,6 @@ package org.opentcs.customizations.plantoverview;
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
-import org.opentcs.components.plantoverview.OrderCategorySuggestions;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
@@ -18,6 +17,7 @@ import org.opentcs.components.plantoverview.PropertySuggestions;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.util.annotations.ScheduledApiChange;
+import org.opentcs.components.plantoverview.OrderTypeSuggestions;
 
 /**
  * A base class for Guice modules adding or customizing bindings for the plant overview application.
@@ -92,9 +92,22 @@ public abstract class PlantOverviewInjectionModule
    * categories.
    *
    * @return The multibinder.
+   * @deprecated Use {@link #orderTypeSuggestionsBinder()} instead.
    */
-  protected Multibinder<OrderCategorySuggestions> orderCategorySuggestionsBinder() {
-    return Multibinder.newSetBinder(binder(), OrderCategorySuggestions.class);
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
+  protected Multibinder<org.opentcs.components.plantoverview.OrderCategorySuggestions> orderCategorySuggestionsBinder() {
+    return Multibinder.newSetBinder(binder(),
+                                    org.opentcs.components.plantoverview.OrderCategorySuggestions.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register classes that provide suggested order types.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<OrderTypeSuggestions> orderTypeSuggestionsBinder() {
+    return Multibinder.newSetBinder(binder(), OrderTypeSuggestions.class);
   }
 
   /**

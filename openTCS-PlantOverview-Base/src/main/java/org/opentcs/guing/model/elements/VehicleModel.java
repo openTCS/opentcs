@@ -23,7 +23,7 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
-import org.opentcs.guing.components.properties.type.OrderCategoriesProperty;
+import org.opentcs.guing.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
@@ -59,7 +59,7 @@ public class VehicleModel
   public static final String CURRENT_SEQUENCE_NAME = "currentOrderSequenceName";
   public static final String MAXIMUM_VELOCITY = "MaximumVelocity";
   public static final String MAXIMUM_REVERSE_VELOCITY = "MaximumReverseVelocity";
-  public static final String PROCESSABLE_CATEGORIES = "ProcessableCategories";
+  public static final String ALLOWED_ORDER_TYPES = "AllowedOrderTypes";
   /**
    * This class's resource bundle.
    */
@@ -385,9 +385,9 @@ public class VehicleModel
   public StringProperty getPropertyCurrentSequenceName() {
     return (StringProperty) getProperty(CURRENT_SEQUENCE_NAME);
   }
-
-  public OrderCategoriesProperty getPropertyProcessableCategories() {
-    return (OrderCategoriesProperty) getProperty(PROCESSABLE_CATEGORIES);
+  
+  public OrderTypesProperty getPropertyAllowedOrderTypes() {
+    return (OrderTypesProperty) getProperty(ALLOWED_ORDER_TYPES);
   }
 
   public KeyValueSetProperty getPropertyMiscellaneous() {
@@ -582,15 +582,15 @@ public class VehicleModel
     curOrderSequenceName.setModellingEditable(false);
     setProperty(CURRENT_SEQUENCE_NAME, curOrderSequenceName);
 
-    OrderCategoriesProperty pProcessableCategories = new OrderCategoriesProperty(this);
-    pProcessableCategories.setDescription(
-        bundle.getString("vehicleModel.property_processableCategories.description")
+    OrderTypesProperty pAllowedOrderTypes = new OrderTypesProperty(this);
+    pAllowedOrderTypes.setDescription(
+        bundle.getString("vehicleModel.property_allowedOrderTypes.description")
     );
-    pProcessableCategories.setHelptext(
-        bundle.getString("vehicleModel.property_processableCategories.helptext")
+    pAllowedOrderTypes.setHelptext(
+        bundle.getString("vehicleModel.property_allowedOrderTypes.helptext")
     );
-    pProcessableCategories.setModellingEditable(false);
-    pProcessableCategories.setOperatingEditable(true);
-    setProperty(PROCESSABLE_CATEGORIES, pProcessableCategories);
+    pAllowedOrderTypes.setModellingEditable(false);
+    pAllowedOrderTypes.setOperatingEditable(true);
+    setProperty(ALLOWED_ORDER_TYPES, pAllowedOrderTypes);
   }
 }

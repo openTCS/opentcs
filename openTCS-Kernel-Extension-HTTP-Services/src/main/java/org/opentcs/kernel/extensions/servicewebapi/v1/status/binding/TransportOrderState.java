@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  *
@@ -24,9 +25,9 @@ public class TransportOrderState {
 
   @JsonPropertyDescription("The name of the transport order.")
   private String name = "";
-
-  @JsonPropertyDescription("The category of the transport order.")
-  private String category = "";
+  
+  @JsonPropertyDescription("The type of the transport order.")
+  private String type = "";
 
   @JsonPropertyDescription("The transport order's current state.")
   private TransportOrder.State state = TransportOrder.State.RAW;
@@ -53,12 +54,24 @@ public class TransportOrderState {
     this.name = requireNonNull(name, "name");
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of order types.")
   public String getCategory() {
-    return category;
+    return type;
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of order types.")
   public void setCategory(String category) {
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(category, "category");
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public TransportOrder.State getState() {
@@ -107,7 +120,7 @@ public class TransportOrderState {
     }
     TransportOrderState transportOrderState = new TransportOrderState();
     transportOrderState.setName(transportOrder.getName());
-    transportOrderState.setCategory(transportOrder.getCategory());
+    transportOrderState.setType(transportOrder.getType());
     transportOrderState.setDestinations(
         transportOrder.getAllDriveOrders()
             .stream()

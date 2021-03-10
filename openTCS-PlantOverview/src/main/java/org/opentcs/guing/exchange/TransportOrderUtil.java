@@ -90,7 +90,7 @@ public class TransportOrderUtil {
    * @param deadline The deadline.
    * @param vModel The vehicle that shall execute this order. Pass <code>null</code> to let the
    * kernel determine one.
-   * @param category The category.
+   * @param type The type.
    */
   @SuppressWarnings("unchecked")
   public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
@@ -98,7 +98,7 @@ public class TransportOrderUtil {
                                    List<Map<String, String>> propertiesList,
                                    long deadline,
                                    VehicleModel vModel,
-                                   String category) {
+                                   String type) {
     requireNonNull(destModels, "locations");
     requireNonNull(actions, "actions");
     requireNonNull(propertiesList, "propertiesList");
@@ -137,7 +137,7 @@ public class TransportOrderUtil {
               .withIncompleteName(true)
               .withDeadline(Instant.ofEpochMilli(deadline))
               .withIntendedVehicleName(vModel == null ? null : vModel.getName())
-              .withCategory(category));
+              .withType(type));
 
       sharedPortal.getPortal().getDispatcherService().dispatch();
     }
@@ -163,7 +163,7 @@ public class TransportOrderUtil {
               .withIntendedVehicleName(pattern.getIntendedVehicle() == null
                   ? null
                   : pattern.getIntendedVehicle().getName())
-              .withCategory(pattern.getCategory())
+              .withType(pattern.getType())
               .withProperties(pattern.getProperties()));
 
       sharedPortal.getPortal().getDispatcherService().dispatch();

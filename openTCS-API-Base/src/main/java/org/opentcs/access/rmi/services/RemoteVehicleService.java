@@ -18,6 +18,7 @@ import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link VehicleService} via RMI.
@@ -71,8 +72,15 @@ public interface RemoteVehicleService
                                      Vehicle.IntegrationLevel integrationLevel)
       throws RemoteException;
 
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of allowed order types.")
   void updateVehicleProcessableCategories(ClientID clientId,
                                           TCSObjectReference<Vehicle> ref,
                                           Set<String> processableCategories)
+      throws RemoteException;
+
+  void updateVehicleAllowedOrderTypes(ClientID clientId,
+                                      TCSObjectReference<Vehicle> ref,
+                                      Set<String> allowedOrderTypes)
       throws RemoteException;
 }

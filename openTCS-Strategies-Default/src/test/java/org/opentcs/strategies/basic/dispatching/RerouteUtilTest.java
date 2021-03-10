@@ -145,9 +145,22 @@ public class RerouteUtilTest {
     return commandsSent;
   }
 
+  @SuppressWarnings("deprecation")
   private MovementCommand createMovementCommand(DriveOrder order, int stepIndex) {
-    return new MovementCommand(order.getRoute().getSteps().get(stepIndex), "NOP", null, false, null,
-                               order.getRoute().getFinalDestinationPoint(), "NOP", new HashMap<>());
+    return new MovementCommand(order.getRoute().getSteps().get(stepIndex),
+                               "NOP",
+                               null,
+                               false,
+                               null,
+                               order.getRoute().getFinalDestinationPoint(),
+                               "NOP",
+                               new HashMap<>()) {
+
+      @Override
+      public Route getRoute() {
+        return order.getRoute();
+      }
+    };
   }
 
   private DriveOrder createDriveOrder(long routeCosts, String startPoint, String... pointNames) {

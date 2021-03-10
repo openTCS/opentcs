@@ -19,9 +19,7 @@ apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
 apply plugin: 'com.github.ben-manes.versions'
 
-apply from: "${rootDir}/gradle/versioning.gradle"
-
-group = 'org.opentcs'
+apply from: "${rootDir}/gradle/common.gradle"
 
 subprojects {
   apply from: rootProject.file('gradle/common.gradle')

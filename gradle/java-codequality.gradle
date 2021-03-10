@@ -1,0 +1,16 @@
+apply plugin: 'checkstyle'
+
+checkstyle {
+  toolVersion = '8.16'
+  configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+  configProperties = [suppressions_file:rootDir.absolutePath + "/config/checkstyle/suppressions.xml"]
+  showViolations = false
+}
+
+project.afterEvaluate { project ->
+  project.tasks.withType(Checkstyle) {
+    reports {
+      html.stylesheet resources.text.fromFile(rootProject.file("config/checkstyle/checkstyle-noframes-severity-sorted.xsl"))
+    }
+  }
+}

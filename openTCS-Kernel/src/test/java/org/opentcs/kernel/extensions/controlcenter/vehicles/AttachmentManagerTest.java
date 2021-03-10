@@ -11,12 +11,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import org.junit.*;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -123,27 +120,6 @@ public class AttachmentManagerTest {
                is(commAdapterFactory));
     assertThat(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getProcessModel(),
                is(commAdapter.getProcessModel()));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldDetachAdapterFromVehicle() {
-    VehicleCommAdapter commAdapter = new SimpleCommAdapter(vehicle1);
-    when(commAdapterFactory.getAdapterFor(vehicle1)).thenReturn(commAdapter);
-    when(commAdapterFactory.getAdapterDescription()).thenReturn("");
-    when(commAdapterFactory.getDescription()).thenCallRealMethod();
-
-    attachmentManager.attachAdapterToVehicle(VEHICLE_1_NAME, commAdapterFactory);
-
-    attachmentManager.detachAdapterFromVehicle(VEHICLE_1_NAME, true);
-
-    verify(vehicleControllerPool, times(2)).detachVehicleController(VEHICLE_1_NAME);
-    assertNotNull(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME));
-    assertNull(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getCommAdapter());
-    assertThat(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getCommAdapterFactory(),
-               is(instanceOf(NullVehicleCommAdapterFactory.class)));
-    assertThat(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getProcessModel(),
-               not(commAdapter.getProcessModel()));
   }
 
   @Test

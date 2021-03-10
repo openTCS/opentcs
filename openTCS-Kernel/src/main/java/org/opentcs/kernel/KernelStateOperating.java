@@ -454,7 +454,7 @@ class KernelStateOperating
   public void setVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
                                               Set<String> processableCategories) {
     synchronized (getGlobalSyncObject()) {
-      getModel().setVehicleProcessableCategories(ref, processableCategories);
+      getModel().setVehicleAllowedOrderTypes(ref, processableCategories);
     }
   }
 

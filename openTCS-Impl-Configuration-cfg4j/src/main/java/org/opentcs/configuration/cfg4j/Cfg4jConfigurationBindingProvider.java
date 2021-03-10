@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.ServiceLoader;
 import org.cfg4j.provider.ConfigurationProvider;
 import org.cfg4j.provider.ConfigurationProviderBuilder;
 import org.cfg4j.source.ConfigurationSource;
@@ -36,6 +37,10 @@ public class Cfg4jConfigurationBindingProvider
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(Cfg4jConfigurationBindingProvider.class);
+  /**
+   * The key of the (system) property containing the reload interval.
+   */
+  private static final String PROPKEY_RELOAD_INTERVAL = "opentcs.cfg4j.reload.interval";
   /**
    * Default configuration file name.
    */
@@ -73,8 +78,31 @@ public class Cfg4jConfigurationBindingProvider
     return new ConfigurationProviderBuilder()
         .withConfigurationSource(buildSource(environment))
         .withEnvironment(environment)
-        .withReloadStrategy(new PeriodicalReloadStrategy(10000))
+        .withReloadStrategy(new PeriodicalReloadStrategy(reloadInterval()))
         .build();
+  }
+
+  private long reloadInterval() {
+    final long DEFAULT_RELOAD_INTERVAL = 10000;
+    String valueString = System.getProperty(PROPKEY_RELOAD_INTERVAL);
+
+    if (valueString == null) {
+      LOG.info("Using default configuration reload interval ({} ms).", DEFAULT_RELOAD_INTERVAL);
+      return DEFAULT_RELOAD_INTERVAL;
+    }
+
+    try {
+      long value = Long.parseLong(valueString);
+      LOG.info("Using configuration reload interval of {} ms.", value);
+      return value;
+    }
+    catch (NumberFormatException exc) {
+      LOG.warn("Could not parse '{}', using default configuration reload interval ({} ms).",
+               valueString,
+               DEFAULT_RELOAD_INTERVAL,
+               exc);
+      return DEFAULT_RELOAD_INTERVAL;
+    }
   }
 
   private ConfigurationSource buildSource(Environment environment) {
@@ -99,6 +127,12 @@ public class Cfg4jConfigurationBindingProvider
         LOG.warn("Supplementary configuration file {} not found, skipped.",
                  supplementaryPath.toFile().getAbsolutePath());
       }
+    }
+
+    for (ConfigurationSource source : ServiceLoader.load(SupplementaryConfigurationSource.class)) {
+      LOG.info("Using overrides from additional configuration source implementation {}...",
+               source.getClass());
+      sources.add(source);
     }
 
     ConfigurationSource mergedSource

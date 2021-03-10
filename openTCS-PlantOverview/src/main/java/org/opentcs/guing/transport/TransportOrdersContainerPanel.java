@@ -231,7 +231,7 @@ public class TransportOrdersContainerPanel
                                        content.getPropertiesList(),
                                        content.getSelectedDeadline(),
                                        content.getSelectedVehicle(),
-                                       content.getSelectedCategory());
+                                       content.getSelectedType());
       }
     });
   }

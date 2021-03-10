@@ -434,6 +434,7 @@ public abstract class BasicVehicleCommAdapter
           curCmd = getCommandQueue().poll();
           if (curCmd != null) {
             try {
+              LOG.debug("{}: Sending command: {}", getName(), curCmd);
               sendCommand(curCmd);
               // Remember that we sent this command to the vehicle.
               getSentQueue().add(curCmd);

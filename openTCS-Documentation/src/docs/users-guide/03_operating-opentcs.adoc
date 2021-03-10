@@ -129,7 +129,7 @@ Transport orders are defined as a sequence of destination locations at which act
 You can select a destination location and action from a dropdown menu.
 You may also optionally select the vehicle intended to process this order.
 If none is explicitly selected, the control system automatically assigns the order to a vehicle according to its internal strategies - with the default strategy, it will pick the vehicle that will most likely finish the transport order the soonest.
-You may also optionally select or define a category for the transport order to be created.
+You may also optionally select or define a type for the transport order to be created.
 Furthermore, a transport order can be given a deadline specifying the point of time at which the order should be finished at the latest.
 This deadline will primarily be considered when there are multiple transport orders in the pool and openTCS needs to decide which to assign next.
 

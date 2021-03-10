@@ -57,10 +57,10 @@ public class TransportOrder
    */
   private static final Logger LOG = LoggerFactory.getLogger(TransportOrder.class);
   /**
-   * The category of this transport order.
+   * The type of this transport order.
    */
   @Nonnull
-  private String category = OrderConstants.CATEGORY_NONE;
+  private String type = OrderConstants.TYPE_NONE;
   /**
    * A set of TransportOrders that must have been finished before this one may
    * be processed.
@@ -215,7 +215,7 @@ public class TransportOrder
                          String name,
                          Map<String, String> properties,
                          ObjectHistory history,
-                         String category,
+                         String type,
                          List<DriveOrder> driveOrders,
                          int currentDriveOrderIndex,
                          Instant creationTime,
@@ -229,7 +229,7 @@ public class TransportOrder
                          State state,
                          Instant finishedTime) {
     super(objectID, name, properties, history);
-    this.category = requireNonNull(category, "category");
+    this.type = requireNonNull(type, "type");
     requireNonNull(driveOrders, "driveOrders");
     this.driveOrders = new LinkedList<>();
     for (DriveOrder driveOrder : driveOrders) {
@@ -255,7 +255,7 @@ public class TransportOrder
                               getName(),
                               propertiesWith(key, value),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -276,7 +276,7 @@ public class TransportOrder
                               getName(),
                               properties,
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -297,7 +297,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory().withEntryAppended(entry),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -318,7 +318,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               history,
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -337,10 +337,14 @@ public class TransportOrder
    * Retruns this transport order's category.
    *
    * @return This transport order's category.
+   * @deprecated Transport order categories are replaced by types.
+   * Use {@link #getType()} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public String getCategory() {
-    return category;
+    return type;
   }
 
   /**
@@ -348,13 +352,52 @@ public class TransportOrder
    *
    * @param category The category to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Transport order categories are replaced by types.
+   * Use {@link #withType(java.lang.String)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
   public TransportOrder withCategory(@Nonnull String category) {
     return new TransportOrder(getIdWithoutDeprecationWarning(),
                               getName(),
                               getProperties(),
                               getHistory(),
                               category,
+                              driveOrders,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              rejections,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  /**
+   * Retruns this transport order's type.
+   *
+   * @return This transport order's type.
+   */
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Creates a copy of this obejct, with the given type.
+   *
+   * @param type The tpye to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withType(String type) {
+    return new TransportOrder(getIdWithoutDeprecationWarning(),
+                              getName(),
+                              getProperties(),
+                              getHistory(),
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -422,7 +465,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               historyForNewState(state),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -471,7 +514,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -535,7 +578,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -588,7 +631,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -640,7 +683,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -693,7 +736,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               historyForNewProcessingVehicle(processingVehicle),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -761,7 +804,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -815,7 +858,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -915,7 +958,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1005,7 +1048,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1056,7 +1099,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               historyForNewDriveOrderState(driveOrderState),
-                              category,
+                              type,
                               newDriveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1109,7 +1152,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1156,7 +1199,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1184,7 +1227,7 @@ public class TransportOrder
                               getName(),
                               getProperties(),
                               getHistory(),
-                              category,
+                              type,
                               driveOrders,
                               currentDriveOrderIndex,
                               creationTime,
@@ -1211,7 +1254,7 @@ public class TransportOrder
         + ", finishedTime=" + finishedTime
         + ", wrappingSequence=" + wrappingSequence
         + ", dispensable=" + dispensable
-        + ", category=" + category
+        + ", type=" + type
         + ", dependencies=" + dependencies
         + ", driveOrders=" + driveOrders
         + ", currentDriveOrderIndex=" + currentDriveOrderIndex

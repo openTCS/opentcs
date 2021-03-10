@@ -34,10 +34,10 @@ public class IsProcessable
     implements AssignmentCandidateSelectionFilter {
 
   /**
-   * An error code indicating that there's a conflict between the category of a transport order and
-   * the categories a vehicle is able to process.
+   * An error code indicating that there's a conflict between the type of a transport order and
+   * the types a vehicle is allowed to process.
    */
-  private static final String ORDER_CATEGORY_CONFLICT = "notProcessableOrderCategory";
+  private static final String ORDER_TYPE_CONFLICT = "notAllowedOrderType";
   /**
    * This class's logger.
    */
@@ -77,15 +77,15 @@ public class IsProcessable
     requireNonNull(vehicle, "vehicle");
     requireNonNull(order, "order");
 
-    // Check for matching categories
-    if (!vehicle.getProcessableCategories().contains(OrderConstants.CATEGORY_ANY)
-        && !vehicle.getProcessableCategories().contains(order.getCategory())) {
-      LOG.debug("Category '{}' of order '{}' not in categories '{}' of vehicle '{}'.",
-                order.getCategory(),
+    // Check for matching order types
+    if (!vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY)
+        && !vehicle.getAllowedOrderTypes().contains(order.getType())) {
+      LOG.debug("Type '{}' of order '{}' not in allowed types '{}' of vehicle '{}'.",
+                order.getType(),
                 order.getName(),
-                vehicle.getProcessableCategories(),
+                vehicle.getAllowedOrderTypes(),
                 vehicle.getName());
-      return new ExplainedBoolean(false, ORDER_CATEGORY_CONFLICT);
+      return new ExplainedBoolean(false, ORDER_TYPE_CONFLICT);
     }
 
     return vehicleControllerPool.getVehicleController(vehicle.getName())

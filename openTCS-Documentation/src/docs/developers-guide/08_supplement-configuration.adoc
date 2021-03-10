@@ -1,0 +1,23 @@
+
+== Supplementing configuration sources
+
+As described in the openTCS User's Guide, the openTCS Kernel, Kernel Control Center and Plant Overview applications read their configurations from properties files.
+This functionality is provided by the link:http://www.cfg4j.org/[cfg4j] library.
+
+It is possible to register additional configuration sources, e.g. for reading configuration data from network resources or files in different formats.
+The mechanism provided by `java.util.ServiceLoader` is used for this.
+The following steps are required for registering a configuration source:
+
+. Build a JAR file with the following content:
+.. An implementation of `SupplementaryConfigurationSource`.
+   This interface is part of the `opentcs-impl-configuration-cfg4j` artifact, which must be on your project's classpath.
+.. A plain text file named `META-INF/services/org.opentcs.configuration.cfg4j.SupplementaryConfigurationSource`.
+   This file should contain a single line of text with the fully qualified class name of your implementation.
+. Ensure that the JAR file is part of the classpath when you start the respective application.
+
+It is possible to register multiple supplementary configuration sources this way.
+
+The configuration entries provided by any registered supplementary configuration source may override configuration entries provided by the properties files that are read by default.
+Note that the order in which these additional configuration sources are processed is unspecified.
+
+For more information on how the automatic registration works, see the documentation of `java.util.ServiceLoader` in the Java class library.

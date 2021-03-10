@@ -56,6 +56,7 @@ public class CachedConfigurationSource
   @Override
   public void reload() {
     try {
+      delegate.reload();
       properties.set(delegate.getConfiguration(this.environment));
       LOG.debug("Reloaded properties : {}", properties);
     }

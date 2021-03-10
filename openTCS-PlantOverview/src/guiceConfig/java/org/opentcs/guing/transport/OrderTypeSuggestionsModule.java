@@ -11,19 +11,19 @@ import javax.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 
 /**
- * A Guice module for the transport order category suggestions.
+ * A Guice module for the transport order type suggestions.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
-public class OrderCategorySuggestionsModule
+public class OrderTypeSuggestionsModule
     extends PlantOverviewInjectionModule {
 
   @Override
   protected void configure() {
-    orderCategorySuggestionsBinder().addBinding()
-        .to(DefaultOrderCategorySuggestions.class)
+    orderTypeSuggestionsBinder().addBinding()
+        .to(DefaultOrderTypeSuggestions.class)
         .in(Singleton.class);
 
-    bind(OrderCategorySuggestionsPool.class).in(Singleton.class);
+    bind(OrderTypeSuggestionsPool.class).in(Singleton.class);
   }
 }

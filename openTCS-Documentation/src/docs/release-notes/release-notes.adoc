@@ -49,6 +49,17 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.18 (2020-04-09)
+
+* New features:
+** Provide the route to be travelled to vehicle drivers with every movement order, for cases in which vehicles require some information about it.
+** Allow supplementary configuration sources to be registered via service loader.
+** Allow a configuration reload interval to be set via a system property.
+* Other changes:
+** Improve performance of loading a plant model file into the kernel.
+** Rename transport order category to transport order type.
+** Update Spark to 2.9.1.
+
 === Version 4.17 (2019-12-10)
 
 * Bugs fixed:

@@ -25,7 +25,6 @@ import org.opentcs.drivers.vehicle.DefaultVehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
-import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.AttachmentEvent;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
@@ -169,8 +168,6 @@ public class AttachmentManager
       return;
     }
 
-    detachAdapterFromVehicle(vehicleName, true);
-
     VehicleCommAdapter commAdapter = factory.getAdapterFor(vehicleEntry.getVehicle());
     if (commAdapter == null) {
       LOG.warn("Factory {} did not provide adapter for vehicle {}, ignoring.",
@@ -178,6 +175,10 @@ public class AttachmentManager
                vehicleEntry.getVehicle().getName());
       return;
     }
+    
+    // Perform a cleanup for the old adapter.
+    disableAndTerminateAdapter(vehicleEntry);
+    controllerPool.detachVehicleController(vehicleEntry.getVehicle().getName());
 
     commAdapter.initialize();
     controllerPool.attachVehicleController(vehicleEntry.getVehicle().getName(), commAdapter);
@@ -191,34 +192,6 @@ public class AttachmentManager
                                        factory.getClass().getName());
 
     updateAttachmentInformation(vehicleEntry);
-  }
-
-  public void detachAdapterFromVehicle(@Nonnull String vehicleName,
-                                       boolean doDetachVehicleController) {
-    requireNonNull(vehicleName, "vehicleName");
-
-    VehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(vehicleName);
-    if (vehicleEntry == null) {
-      LOG.warn("No vehicle entry found for '{}'. Entries: {}",
-               vehicleName,
-               vehicleEntryPool);
-      return;
-    }
-
-    VehicleCommAdapter commAdapter = vehicleEntry.getCommAdapter();
-    if (commAdapter != null) {
-      commAdapter.disable();
-      // Let the adapter know cleanup time is here.
-      vehicleEntry.setCommAdapter(null);
-      commAdapter.terminate();
-      VehicleCommAdapterFactory factory = new NullVehicleCommAdapterFactory();
-      vehicleEntry.setCommAdapterFactory(factory);
-      vehicleEntry.setProcessModel(new VehicleProcessModel(vehicleEntry.getVehicle()));
-      updateAttachmentInformation(vehicleEntry);
-    }
-    if (doDetachVehicleController) {
-      controllerPool.detachVehicleController(vehicleEntry.getVehicle().getName());
-    }
   }
 
   public void autoAttachAdapterToVehicle(@Nonnull String vehicleName) {
@@ -274,6 +247,17 @@ public class AttachmentManager
 
   public Map<String, AttachmentInformation> getAttachmentPool() {
     return attachmentPool;
+  }
+
+  private void disableAndTerminateAdapter(@Nonnull VehicleEntry vehicleEntry) {
+    requireNonNull(vehicleEntry, "vehicleEntry");
+
+    VehicleCommAdapter commAdapter = vehicleEntry.getCommAdapter();
+    if (commAdapter != null) {
+      commAdapter.disable();
+      // Let the adapter know cleanup time is here.
+      commAdapter.terminate();
+    }
   }
 
   private void initAttachmentPool() {
@@ -335,7 +319,7 @@ public class AttachmentManager
   private void detachAllAdapters() {
     LOG.debug("Detaching vehicle communication adapters...");
     vehicleEntryPool.getEntries().forEach((vehicleName, entry) -> {
-      detachAdapterFromVehicle(vehicleName, false);
+      disableAndTerminateAdapter(entry);
     });
     LOG.debug("Detached vehicle communication adapters");
   }
