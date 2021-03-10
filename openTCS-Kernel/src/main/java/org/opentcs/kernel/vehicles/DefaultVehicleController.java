@@ -342,9 +342,10 @@ public class DefaultVehicleController
 
       // Update the current drive order and future commands
       currentDriveOrder = newOrder;
-      futureCommands.clear();
-      createFutureCommands(newOrder, orderProperties);
+      // There is a new drive order, so discard all the future/scheduled commands of the old one.
+      discardFutureCommands();
 
+      createFutureCommands(newOrder, orderProperties);
       // The current drive order got updated but our queue of future commands now contains commands
       // that have already been processed, so discard these
       discardSentFutureCommands();
@@ -381,6 +382,16 @@ public class DefaultVehicleController
 
     LOG.debug("Comparing {} and {} for equality.", oldProcessedSteps, newProcessedSteps);
     return Objects.equals(oldProcessedSteps, newProcessedSteps);
+  }
+
+  private void discardFutureCommands() {
+    futureCommands.clear();
+    if (waitingForAllocation) {
+      LOG.debug("{}: Discarding pending command but still waiting for allocation: {}",
+                vehicle.getName(),
+                pendingCommand);
+    }
+    pendingCommand = null;
   }
 
   private void discardSentFutureCommands() {
@@ -530,6 +541,13 @@ public class DefaultVehicleController
                  resources);
         waitingForAllocation = false;
         pendingResources = null;
+        // In case the contoller's vehicle got rerouted while waiting for resource allocation
+        // the pending command is reset and therefore the associated allocation will be ignored. 
+        // Since there's now a new/updated route we need to trigger the next allocation. Otherwise
+        // the vehicle would wait forever to get the next command.
+        if (canSendNextCommand()) {
+          allocateForNextCommand();
+        }
         return false;
       }
       pendingCommand = null;

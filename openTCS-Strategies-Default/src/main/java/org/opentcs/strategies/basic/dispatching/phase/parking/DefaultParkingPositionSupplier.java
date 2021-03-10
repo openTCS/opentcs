@@ -102,10 +102,8 @@ public class DefaultParkingPositionSupplier
     // Find out which points are destination points of the current routes of
     // all vehicles, and keep them. (Multiple lookups ahead.)
     Set<Point> targetedPoints = getRouter().getTargetedPoints();
-    Set<Point> parkingPositions
-        = getPlantModelService().fetchObjects(Point.class, point -> point.isParkingPosition());
 
-    return parkingPositions.stream()
+    return fetchAllParkingPositions().stream()
         .filter(point -> isPointUnoccupiedFor(point, vehicle, targetedPoints))
         .collect(Collectors.toSet());
   }

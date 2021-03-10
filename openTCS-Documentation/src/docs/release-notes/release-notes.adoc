@@ -49,6 +49,18 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.12 (2018-12-20)
+
+* New features:
+** Introduce optional priorities for parking positions.
+   With these, vehicles are parked at the one with the highest priority.
+   Optionally, vehicles already parking may be reparked to unoccupied positions with higher priorities.
+** Provide additional energy levels for vehicles to influence when recharging may be stopped.
+** Make the Plant Overview's naming schemes for plant model elements configurable.
+** In the Plant Overview, allow multiple vehicles to be selected for changing the integration level or withdrawing transport orders.
+* Bugs fixed:
+** Prevent a movement order from being sent to a vehicle a second time after the vehicle got rerouted while waiting for resource allocation.
+
 === Version 4.11 (2018-12-04)
 
 * New features:

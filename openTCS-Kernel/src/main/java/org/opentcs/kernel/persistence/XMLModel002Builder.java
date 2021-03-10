@@ -276,6 +276,8 @@ public class XMLModel002Builder
       vehicle.setLength((long) curVehicle.getLength())
           .setEnergyLevelCritical((long) curVehicle.getEnergyLevelCritical())
           .setEnergyLevelGood((long) curVehicle.getEnergyLevelGood())
+          .setEnergyLevelFullyRecharged((long) curVehicle.getEnergyLevelFullyRecharged())
+          .setEnergyLevelSufficientlyRecharged((long) curVehicle.getEnergyLevelSufficientlyRecharged())
           .setMaxVelocity(curVehicle.getMaxVelocity())
           .setMaxReverseVelocity(curVehicle.getMaxReverseVelocity())
           .setProperties(convertProperties(curVehicle.getProperties()));
@@ -608,6 +610,8 @@ public class XMLModel002Builder
               .withLength(vehicleTO.getLength().intValue())
               .withEnergyLevelCritical(vehicleTO.getEnergyLevelCritical().intValue())
               .withEnergyLevelGood(vehicleTO.getEnergyLevelGood().intValue())
+              .withEnergyLevelFullyRecharged(vehicleTO.getEnergyLevelFullyRecharged().intValue())
+              .withEnergyLevelSufficientlyRecharged(vehicleTO.getEnergyLevelSufficientlyRecharged().intValue())
               .withMaxReverseVelocity(vehicleTO.getMaxReverseVelocity())
               .withMaxVelocity(vehicleTO.getMaxVelocity())
               .withProperties(convertProperties(vehicleTO.getProperties()))

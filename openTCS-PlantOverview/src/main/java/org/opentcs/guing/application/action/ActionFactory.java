@@ -8,16 +8,14 @@
  */
 package org.opentcs.guing.application.action;
 
+import java.util.Collection;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.action.course.FollowVehicleAction;
-import org.opentcs.guing.application.action.course.IntegrationLevelIgnoreAction;
-import org.opentcs.guing.application.action.course.IntegrationLevelNoticeAction;
-import org.opentcs.guing.application.action.course.IntegrationLevelRespectAction;
-import org.opentcs.guing.application.action.course.IntegrationLevelUtilizeAction;
+import org.opentcs.guing.application.action.course.IntegrationLevelChangeAction;
 import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
 import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
 import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
 import org.opentcs.guing.application.action.course.WithdrawAction;
-import org.opentcs.guing.application.action.course.WithdrawImmediatelyAction;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -35,15 +33,8 @@ public interface ActionFactory {
 
   SendVehicleToLocationAction createSendVehicleToLocationAction(VehicleModel vehicleModel);
 
-  WithdrawAction createWithdrawAction(VehicleModel vehicleModel);
+  WithdrawAction createWithdrawAction(Collection<VehicleModel> vehicles, boolean immediateAbort);
 
-  WithdrawImmediatelyAction createWithdrawImmediatelyAction(VehicleModel vehicleModel);
-
-  IntegrationLevelIgnoreAction createIntegrationLevelIgnoreAction(VehicleModel vehicleModel);
-
-  IntegrationLevelNoticeAction createIntegrationLevelNoticeAction(VehicleModel vehicleModel);
-
-  IntegrationLevelRespectAction createIntegrationLevelRespectAction(VehicleModel vehicleModel);
-
-  IntegrationLevelUtilizeAction createIntegrationLevelUtilizeAction(VehicleModel vehicleModel);
+  IntegrationLevelChangeAction createIntegrationLevelChangeAction(Collection<VehicleModel> vehicles,
+                                                                  Vehicle.IntegrationLevel level);
 }

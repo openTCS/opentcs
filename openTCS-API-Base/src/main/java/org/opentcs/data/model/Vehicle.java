@@ -60,6 +60,14 @@ public class Vehicle
    */
   private int energyLevelCritical;
   /**
+   * The value at/above which the vehicle's energy level is considered fully recharged.
+   */
+  private final int energyLevelFullyRecharged;
+  /**
+   * The value at/above which the vehicle's energy level is considered sufficiently recharged.
+   */
+  private final int energyLevelSufficientlyRecharged;
+  /**
    * This vehicle's remaining energy (in percent of the maximum).
    */
   private int energyLevel;
@@ -149,6 +157,8 @@ public class Vehicle
     this.length = 1000;
     this.energyLevelGood = 90;
     this.energyLevelCritical = 30;
+    this.energyLevelFullyRecharged = 90;
+    this.energyLevelSufficientlyRecharged = 30;
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
     this.rechargeOperation = "CHARGE";
@@ -178,6 +188,8 @@ public class Vehicle
     this.length = 1000;
     this.energyLevelGood = 90;
     this.energyLevelCritical = 30;
+    this.energyLevelFullyRecharged = 90;
+    this.energyLevelSufficientlyRecharged = 30;
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
     this.rechargeOperation = "CHARGE";
@@ -203,6 +215,8 @@ public class Vehicle
                   int length,
                   int energyLevelGood,
                   int energyLevelCritical,
+                  int energyLevelFullyRecharged,
+                  int energyLevelSufficientlyRecharged,
                   int maxVelocity,
                   int maxReverseVelocity,
                   String rechargeOperation,
@@ -224,6 +238,14 @@ public class Vehicle
     this.length = checkInRange(length, 1, Integer.MAX_VALUE, "length");
     this.energyLevelGood = checkInRange(energyLevelGood, 0, 100, "energyLevelGood");
     this.energyLevelCritical = checkInRange(energyLevelCritical, 0, 100, "energyLevelCritical");
+    this.energyLevelFullyRecharged = checkInRange(energyLevelFullyRecharged,
+                                                  0,
+                                                  100,
+                                                  "energyLevelFullyRecharged");
+    this.energyLevelSufficientlyRecharged = checkInRange(energyLevelSufficientlyRecharged,
+                                                         0,
+                                                         100,
+                                                         "energyLevelSufficientlyRecharged");
     this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE, "maxVelocity");
     this.maxReverseVelocity = checkInRange(maxReverseVelocity,
                                            0,
@@ -259,6 +281,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -286,6 +310,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -344,6 +370,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -375,7 +403,7 @@ public class Vehicle
 
   /**
    * Checks whether the vehicle's energy level is degraded (not <em>good</em>
-   * any more.
+   * any more).
    *
    * @return <code>true</code> if, and only if, the vehicle's energy level is
    * degraded.
@@ -392,6 +420,26 @@ public class Vehicle
    */
   public boolean isEnergyLevelGood() {
     return energyLevel > energyLevelGood;
+  }
+
+  /**
+   * Checks whether the vehicle's energy level is fully recharged.
+   *
+   * @return <code>true</code> if, and only if, the vehicle's energy level is
+   * fully recharged.
+   */
+  public boolean isEnergyLevelFullyRecharged() {
+    return energyLevel >= energyLevelFullyRecharged;
+  }
+
+  /**
+   * Checks whether the vehicle's energy level is sufficiently recharged.
+   *
+   * @return <code>true</code> if, and only if, the vehicle's energy level is
+   * sufficiently recharged.
+   */
+  public boolean isEnergyLevelSufficientlyRecharged() {
+    return energyLevel >= energyLevelSufficientlyRecharged;
   }
 
   /**
@@ -437,6 +485,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -499,6 +549,95 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       processableCategories,
+                       routeProgressIndex,
+                       adapterState,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices);
+  }
+
+  /**
+   * Returns this vehicle's energy level for being fully recharged (in percent of the maximum).
+   *
+   * @return This vehicle's fully recharged treshold.
+   */
+  public int getEnergyLevelFullyRecharged() {
+    return energyLevelFullyRecharged;
+  }
+
+  /**
+   * Creates a copy of this object, with the given fully recharged energy level.
+   *
+   * @param energyLevelFullyRecharged The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
+    return new Vehicle(getIdWithoutDeprecationWarning(),
+                       getName(),
+                       getProperties(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       processableCategories,
+                       routeProgressIndex,
+                       adapterState,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices);
+  }
+
+  /**
+   * Returns this vehicle's energy level for being sufficiently recharged (in percent of the
+   * maximum).
+   *
+   * @return This vehicle's sufficiently recharged energy level.
+   */
+  public int getEnergyLevelSufficientlyRecharged() {
+    return energyLevelSufficientlyRecharged;
+  }
+
+  /**
+   * Creates a copy of this object, with the given sufficiently recharged energy level.
+   *
+   * @param energyLevelSufficientlyRecharged The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withEnergyLevelSufficientlyRecharged(int energyLevelSufficientlyRecharged) {
+    return new Vehicle(getIdWithoutDeprecationWarning(),
+                       getName(),
+                       getProperties(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -556,6 +695,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -610,6 +751,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -666,6 +809,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -722,6 +867,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -786,6 +933,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -836,6 +985,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -892,6 +1043,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -953,6 +1106,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1011,6 +1166,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1069,6 +1226,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1127,6 +1286,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1168,6 +1329,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1224,6 +1387,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1279,6 +1444,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1334,6 +1501,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1392,6 +1561,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1455,6 +1626,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1510,6 +1683,8 @@ public class Vehicle
                        length,
                        energyLevelGood,
                        energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
                        maxVelocity,
                        maxReverseVelocity,
                        rechargeOperation,
@@ -1549,6 +1724,8 @@ public class Vehicle
         + ", orderSequence=" + orderSequence
         + ", energyLevelGood=" + energyLevelGood
         + ", energyLevelCritical=" + energyLevelCritical
+        + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
+        + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
         + ", maxVelocity=" + maxVelocity
         + ", maxReverseVelocity=" + maxReverseVelocity
         + ", rechargeOperation=" + rechargeOperation

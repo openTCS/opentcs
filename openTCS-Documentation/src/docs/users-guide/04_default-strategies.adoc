@@ -41,7 +41,9 @@ To make this decision, the default dispatcher takes the following steps:
 *** It must be at a known position in the driving course.
 *** It must not be at a parking position already.
 
-When sending a vehicle to a recharge location or parking position, the closest (according to the router) unoccupied position is selected by default.
+==== Default parking position selection
+
+When sending a vehicle to a parking position, the closest (according to the router) unoccupied position is selected by default.
 It is possible to assign fixed positions to vehicles instead, by setting properties with the following keys on them:
 
 * `tcs:preferredParkingPosition`:
@@ -51,6 +53,22 @@ It is possible to assign fixed positions to vehicles instead, by setting propert
   Expected to be the name of a point in the model.
   If this point is already occupied, the vehicle is not sent to any other parking position, i.e. remains where it is.
   Takes precedence over `tcs:preferredParkingPosition`.
+
+==== Optional parking position priorities
+
+Optionally (see <<Default dispatcher configuration entries>> for how to enable it), parking positions may be explicitly prioritized, and vehicles can be reparked in a kind of "parking position queues".
+This can be desirable e.g. to park vehicles close to locations that are frequent first destinations for transport orders.
+(For example, imagine a plant in which goods are transported from A to B all the time.
+Even if there currently aren't any transport orders, it might nevertheless be a good idea to prefer parking positions near A to reduce reaction times when transport orders arrive.)
+
+To assign a priority to a parking position, set a property with the key `tcs:parkingPositionPriority` on the point.
+The property's value should be a decimal integer, with lower values resulting in a higher priority for the parking position.
+
+==== Default recharging location selection
+
+When sending a vehicle to a recharge location, the closest (according to the router) unoccupied position is selected by default.
+It is possible to assign fixed positions to vehicles instead, by setting properties with the following keys on them:
+
 * `tcs:preferredRechargeLocation`:
   Expected to be the name of a location.
   If this location is already occupied, the closest unoccupied recharging location (if any) is selected instead.

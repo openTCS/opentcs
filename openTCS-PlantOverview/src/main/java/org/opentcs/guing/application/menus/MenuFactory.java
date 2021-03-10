@@ -8,6 +8,7 @@
  */
 package org.opentcs.guing.application.menus;
 
+import java.util.Collection;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
@@ -18,12 +19,12 @@ import org.opentcs.guing.model.elements.VehicleModel;
 public interface MenuFactory {
 
   /**
-   * Creates a popup menu with actions for the given vehicle.
+   * Creates a popup menu with actions for a set of vehicles.
    *
-   * @param model The vehicle model for which to create the popup menu.
+   * @param vehicles The vehicle models for which to create the popup menu.
    * @return A popup menu with actions for the given vehicle.
    */
-  VehiclePopupMenu createVehiclePopupMenu(VehicleModel model);
+  VehiclePopupMenu createVehiclePopupMenu(Collection<VehicleModel> vehicles);
 
   /**
    * Creates a menu item for copying the value of the layout properties of

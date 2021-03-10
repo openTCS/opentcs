@@ -29,6 +29,14 @@ public interface Dispatcher
     extends Lifecycle {
 
   /**
+   * The key of a parking position property defining it's priority.
+   * <p>
+   * Whether and in what way this is respected for assigning a parking position to a vehicle is
+   * implementation-specific.
+   * </p>
+   */
+  String PROPKEY_PARKING_POSITION_PRIORITY = "tcs:parkingPositionPriority";
+  /**
    * The key of a vehicle property defining the name of the vehicle's assigned parking position.
    * <p>
    * Whether and in what way this is respected for selecting a parking position is
@@ -162,7 +170,7 @@ public interface Dispatcher
   @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
   default void topologyChanged() {
   }
-  
+
   /**
    * Returns a human readable text describing this dispatcher's internal state.
    *

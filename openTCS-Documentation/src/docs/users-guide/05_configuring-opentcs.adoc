@@ -132,3 +132,9 @@ include::{configdoc}/PlantOverviewApplicationConfigurationEntries.adoc[]
 The plant overview application's SSL connections can be configured using the following configuration entries:
 
 include::{configdoc}/PoSslConfigurationEntries.adoc[]
+
+==== Plant Overview element naming scheme configuration entries
+
+The plant overview application's element naming schemes can be configured using the following configuration entries:
+
+include::{configdoc}/PO_ElementNamingSchemeConfigurationEntries.adoc[]

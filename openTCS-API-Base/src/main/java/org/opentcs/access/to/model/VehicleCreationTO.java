@@ -37,6 +37,14 @@ public class VehicleCreationTO
    */
   private int energyLevelGood = 90;
   /**
+   * The energy level value at/above which the vehicle is considered fully recharged.
+   */
+  private int energyLevelFullyRecharged = 90;
+  /**
+   * The energy level value at/above which the vehicle is considered sufficiently recharged.
+   */
+  private int energyLevelSufficientlyRecharged = 30;
+  /**
    * The vehicle's maximum velocity (in mm/s).
    */
   private int maxVelocity = 1000;
@@ -59,12 +67,16 @@ public class VehicleCreationTO
                             int length,
                             int energyLevelCritical,
                             int energyLevelGood,
+                            int energyLevelFullyRecharged,
+                            int energyLevelSufficientlyRecharged,
                             int maxVelocity,
                             int maxReverseVelocity) {
     super(name, properties);
     this.length = length;
     this.energyLevelCritical = energyLevelCritical;
     this.energyLevelGood = energyLevelGood;
+    this.energyLevelFullyRecharged = energyLevelFullyRecharged;
+    this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
     this.maxVelocity = maxVelocity;
     this.maxReverseVelocity = maxReverseVelocity;
   }
@@ -96,6 +108,8 @@ public class VehicleCreationTO
                                  length,
                                  energyLevelCritical,
                                  energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
   }
@@ -127,6 +141,8 @@ public class VehicleCreationTO
                                  length,
                                  energyLevelCritical,
                                  energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
   }
@@ -163,6 +179,8 @@ public class VehicleCreationTO
                                  length,
                                  energyLevelCritical,
                                  energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
   }
@@ -205,6 +223,8 @@ public class VehicleCreationTO
                                  length,
                                  energyLevelCritical,
                                  energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
   }
@@ -251,6 +271,8 @@ public class VehicleCreationTO
                                  length,
                                  energyLevelCritical,
                                  energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
   }
@@ -264,62 +286,6 @@ public class VehicleCreationTO
    */
   public int getEnergyLevelGood() {
     return energyLevelGood;
-  }
-
-  public int getMaxVelocity() {
-    return maxVelocity;
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public VehicleCreationTO setMaxVelocity(int maxVelocity) {
-    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
-    return this;
-  }
-
-  /**
-   * Creates a copy of this object with the given maximum velocity (in mm/s).
-   *
-   * @param maxVelocity the new max velocity.
-   * @return A copy of this object, differing in the given value.
-   */
-  public VehicleCreationTO withMaxVelocity(int maxVelocity) {
-    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 maxVelocity,
-                                 maxReverseVelocity);
-  }
-
-  public int getMaxReverseVelocity() {
-    return maxReverseVelocity;
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public VehicleCreationTO setMaxReverseVelocity(int maxReverseVelocity) {
-    this.maxReverseVelocity = checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
-    return this;
-  }
-
-  /**
-   * Creates a copy of this object with the given maximum reverse velocity (in mm/s).
-   *
-   * @param maxReverseVelocity the new maximum reverse velocity.
-   * @return A copy of this object, differing in the given value.
-   */
-  public VehicleCreationTO withMaxReverseVelocity(int maxReverseVelocity) {
-    checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 maxVelocity,
-                                 maxReverseVelocity);
   }
 
   /**
@@ -356,6 +322,129 @@ public class VehicleCreationTO
                                  length,
                                  energyLevelCritical,
                                  energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
+                                 maxVelocity,
+                                 maxReverseVelocity);
+  }
+
+  /**
+   * Returns this vehicle's fully recharged energy level (in percent of the maximum).
+   *
+   * @return This vehicle's fully recharged energy level.
+   */
+  public int getEnergyLevelFullyRecharged() {
+    return energyLevelFullyRecharged;
+  }
+
+  /**
+   * Creates a copy of this object with the vehicle's fully recharged energy level (in percent of
+   * the maximum).
+   *
+   * @param energyLevelFullyRecharged The new fully recharged energy level.
+   * Must not be smaller than 0 or greater than 100.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
+    checkInRange(energyLevelFullyRecharged, 0, 100);
+    return new VehicleCreationTO(getName(),
+                                 getModifiableProperties(),
+                                 length,
+                                 energyLevelCritical,
+                                 energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
+                                 maxVelocity,
+                                 maxReverseVelocity);
+  }
+
+  /**
+   * Returns this vehicle's sufficiently recharged energy level (in percent of the maximum).
+   *
+   * @return This vehicle's sufficiently recharged energy level.
+   */
+  public int getEnergyLevelSufficientlyRecharged() {
+    return energyLevelSufficientlyRecharged;
+  }
+
+  /**
+   * Creates a copy of this object with the vehicle's sufficiently recharged energy level (in
+   * percent of the maximum).
+   *
+   * @param energyLevelSufficientlyRecharged The new sufficiently recharged energy level.
+   * Must not be smaller than 0 or greater than 100.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withEnergyLevelSufficientlyRecharged(
+      int energyLevelSufficientlyRecharged) {
+    checkInRange(energyLevelSufficientlyRecharged, 0, 100);
+    return new VehicleCreationTO(getName(),
+                                 getModifiableProperties(),
+                                 length,
+                                 energyLevelCritical,
+                                 energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
+                                 maxVelocity,
+                                 maxReverseVelocity);
+  }
+
+  public int getMaxVelocity() {
+    return maxVelocity;
+  }
+
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public VehicleCreationTO setMaxVelocity(int maxVelocity) {
+    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
+    return this;
+  }
+
+  /**
+   * Creates a copy of this object with the given maximum velocity (in mm/s).
+   *
+   * @param maxVelocity the new max velocity.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withMaxVelocity(int maxVelocity) {
+    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
+    return new VehicleCreationTO(getName(),
+                                 getModifiableProperties(),
+                                 length,
+                                 energyLevelCritical,
+                                 energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
+                                 maxVelocity,
+                                 maxReverseVelocity);
+  }
+
+  public int getMaxReverseVelocity() {
+    return maxReverseVelocity;
+  }
+
+  @Deprecated
+  @ScheduledApiChange(when = "5.0")
+  public VehicleCreationTO setMaxReverseVelocity(int maxReverseVelocity) {
+    this.maxReverseVelocity = checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
+    return this;
+  }
+
+  /**
+   * Creates a copy of this object with the given maximum reverse velocity (in mm/s).
+   *
+   * @param maxReverseVelocity the new maximum reverse velocity.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withMaxReverseVelocity(int maxReverseVelocity) {
+    checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
+    return new VehicleCreationTO(getName(),
+                                 getModifiableProperties(),
+                                 length,
+                                 energyLevelCritical,
+                                 energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
   }

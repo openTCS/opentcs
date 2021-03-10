@@ -5,17 +5,17 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching;
+package org.opentcs.strategies.basic.dispatching.selection;
 
 import java.util.function.Predicate;
-import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.model.Vehicle;
 
 /**
- * A predicate for {@link TransportOrder}s.
- * Returns {@code true} if the given {@link TransportOrder} should NOT be processed, yet.
+ * A predicate for {@link Vehicle}s.
+ * Returns {@code true} if the given {@link Vehicle} should be selected.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
-public interface TransportOrderSelectionVeto
-    extends Predicate<TransportOrder> {
+public interface VehicleSelectionFilter
+    extends Predicate<Vehicle> {
 }

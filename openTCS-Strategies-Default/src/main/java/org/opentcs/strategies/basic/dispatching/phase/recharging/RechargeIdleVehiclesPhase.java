@@ -25,6 +25,7 @@ import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeRechargeVehicleSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-@SuppressWarnings("deprecation")
 public class RechargeIdleVehiclesPhase
     implements Phase {
 
@@ -48,6 +48,7 @@ public class RechargeIdleVehiclesPhase
   /**
    * The strategy used for finding suitable recharge locations.
    */
+  @SuppressWarnings("deprecation")
   private final org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier;
   /**
    * The Router instance calculating route costs.
@@ -58,6 +59,8 @@ public class RechargeIdleVehiclesPhase
    */
   private final ProcessabilityChecker processabilityChecker;
 
+  private final CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter;
+  
   private final TransportOrderUtil transportOrderUtil;
   /**
    * The dispatcher configuration.
@@ -69,17 +72,20 @@ public class RechargeIdleVehiclesPhase
   private boolean initialized;
 
   @Inject
+  @SuppressWarnings("deprecation")
   public RechargeIdleVehiclesPhase(
       InternalTransportOrderService orderService,
       org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier,
       Router router,
       ProcessabilityChecker processabilityChecker,
+      CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter,
       TransportOrderUtil transportOrderUtil,
       DefaultDispatcherConfiguration configuration) {
     this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.rechargePosSupplier = requireNonNull(rechargePosSupplier, "rechargePosSupplier");
     this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
+    this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -117,7 +123,7 @@ public class RechargeIdleVehiclesPhase
       return;
     }
 
-    for (Vehicle vehicle : orderService.fetchObjects(Vehicle.class, this::idleAndDegraded)) {
+    for (Vehicle vehicle : orderService.fetchObjects(Vehicle.class, vehicleSelectionFilter)) {
       createRechargeOrder(vehicle);
     }
   }
@@ -159,14 +165,4 @@ public class RechargeIdleVehiclesPhase
                                              TransportOrder.State.FAILED);
     }
   }
-
-  private boolean idleAndDegraded(Vehicle vehicle) {
-    return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
-        && vehicle.hasProcState(Vehicle.ProcState.IDLE)
-        && vehicle.hasState(Vehicle.State.IDLE)
-        && vehicle.getCurrentPosition() != null
-        && vehicle.getOrderSequence() == null
-        && vehicle.isEnergyLevelDegraded();
-  }
-
 }

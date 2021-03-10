@@ -32,6 +32,7 @@ public class DefaultPropertySuggestions
   public DefaultPropertySuggestions() {
     keySuggestions.add(Scheduler.PROPKEY_BLOCK_ENTRY_DIRECTION);
     keySuggestions.add(Router.PROPKEY_ROUTING_GROUP);
+    keySuggestions.add(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY);
     keySuggestions.add(Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION);
     keySuggestions.add(Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION);
     keySuggestions.add(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION);

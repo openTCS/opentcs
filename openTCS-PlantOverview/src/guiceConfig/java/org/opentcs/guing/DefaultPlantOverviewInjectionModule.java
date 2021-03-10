@@ -34,6 +34,7 @@ import org.opentcs.guing.exchange.SslConfiguration;
 import org.opentcs.guing.model.ModelInjectionModule;
 import org.opentcs.guing.storage.DefaultStorageInjectionModule;
 import org.opentcs.guing.transport.TransportInjectionModule;
+import org.opentcs.guing.util.ElementNamingSchemeConfiguration;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.guing.util.UtilInjectionModule;
 import org.opentcs.util.ClassMatcher;
@@ -70,7 +71,7 @@ public class DefaultPlantOverviewInjectionModule
     install(new DefaultStorageInjectionModule());
     install(new TransportInjectionModule());
     install(new UtilInjectionModule());
-    
+
     // Ensure there is at least an empty binder for pluggable panels.
     pluggablePanelFactoryBinder();
   }
@@ -84,10 +85,19 @@ public class DefaultPlantOverviewInjectionModule
     configurePlantOverview(configuration);
     configureThemes(configuration);
     configureSocketConnections();
+    configureNamingConfiguration();
 
     bind(new TypeLiteral<List<ConnectionParamSet>>() {
     })
         .toInstance(configuration.connectionBookmarks());
+  }
+  
+  private void configureNamingConfiguration(){
+    ElementNamingSchemeConfiguration configuration
+        = getConfigBindingProvider().get(ElementNamingSchemeConfiguration.PREFIX,
+                                         ElementNamingSchemeConfiguration.class);
+    bind(ElementNamingSchemeConfiguration.class)
+        .toInstance(configuration);
   }
 
   private void configureSocketConnections() {

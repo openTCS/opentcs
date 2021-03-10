@@ -222,6 +222,8 @@ public class UnifiedModelComponentConverter {
     vehicle.setMaxReverseVelocity(((Double) vehicleModel.getPropertyMaxReverseVelocity().getValueByUnit(Unit.MM_S)).intValue());
     vehicle.setEnergyLevelGood((long) vehicleModel.getPropertyEnergyLevelGood().getValueByUnit(PercentProperty.Unit.PERCENT));
     vehicle.setEnergyLevelCritical((long) vehicleModel.getPropertyEnergyLevelCritical().getValueByUnit(PercentProperty.Unit.PERCENT));
+    vehicle.setEnergyLevelFullyRecharged((long) vehicleModel.getPropertyEnergyLevelFullyRecharged().getValueByUnit(PercentProperty.Unit.PERCENT));
+    vehicle.setEnergyLevelSufficientlyRecharged((long) vehicleModel.getPropertyEnergyLevelSufficientlyRecharged().getValueByUnit(PercentProperty.Unit.PERCENT));
 
     for (KeyValueProperty kvp : vehicleModel.getPropertyMiscellaneous().getItems()) {
       vehicle.getProperties().add(new PropertyTO().setName(kvp.getKey()).setValue(kvp.getValue()));
@@ -641,6 +643,12 @@ public class UnifiedModelComponentConverter {
                                                            PercentProperty.Unit.PERCENT);
     model.getPropertyEnergyLevelGood().setValueAndUnit(vehicleTO.getEnergyLevelGood(),
                                                        PercentProperty.Unit.PERCENT);
+    model.getPropertyEnergyLevelFullyRecharged()
+        .setValueAndUnit(vehicleTO.getEnergyLevelFullyRecharged(),
+                         PercentProperty.Unit.PERCENT);
+    model.getPropertyEnergyLevelSufficientlyRecharged()
+        .setValueAndUnit(vehicleTO.getEnergyLevelSufficientlyRecharged(),
+                         PercentProperty.Unit.PERCENT);
 
     for (PropertyTO property : vehicleTO.getProperties()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,

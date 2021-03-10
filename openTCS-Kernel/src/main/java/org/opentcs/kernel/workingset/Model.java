@@ -1698,6 +1698,8 @@ public class Model {
         .withLength(to.getLength())
         .withEnergyLevelGood(to.getEnergyLevelGood())
         .withEnergyLevelCritical(to.getEnergyLevelCritical())
+        .withEnergyLevelFullyRecharged(to.getEnergyLevelFullyRecharged())
+        .withEnergyLevelSufficientlyRecharged(to.getEnergyLevelSufficientlyRecharged())
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
         .withProperties(to.getProperties());

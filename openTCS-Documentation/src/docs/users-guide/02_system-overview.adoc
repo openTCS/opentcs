@@ -128,6 +128,10 @@ A vehicle provides the following attributes:
   This value may be used at plant operation time to decide when it is crucial to recharge a vehicle's energy storage.
 * A _good energy level_, which is the threshold above which the vehicle's energy level is considered good.
   This value may be used at plant operation time to decide when it is unnecessary to recharge a vehicle's energy storage.
+* A _fully recharged energy level_, which is the threshold above which the vehicle is considered being fully recharged.
+  This value may be used at plant operation time to decide when a vehicle should stop charging.
+* A _sufficiently recharged energy level_, which is the threshold above which the vehicle is considered sufficiently recharged.
+  This value may be used at plant operation time to decide when a vehicle may stop charging.
 * A _maximum velocity_ and _maximum reverse velocity_.
   Depending on the router configuration, it may be used for computing routing costs/finding an optimal route to a destination point.
 * An _integration level_, indicating how far the vehicle is currently allowed to be integrated into the system.

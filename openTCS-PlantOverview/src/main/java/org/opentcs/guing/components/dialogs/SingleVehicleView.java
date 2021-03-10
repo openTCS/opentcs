@@ -20,6 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.inject.Inject;
@@ -149,7 +150,7 @@ public class SingleVehicleView
   }
 
   private void showPopup(int x, int y) {
-    menuFactory.createVehiclePopupMenu(fVehicleModel).show(this, x, y);
+    menuFactory.createVehiclePopupMenu(Arrays.asList(fVehicleModel)).show(this, x, y);
   }
 
   private void updateVehicle() {

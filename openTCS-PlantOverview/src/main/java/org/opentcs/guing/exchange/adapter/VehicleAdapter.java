@@ -84,6 +84,12 @@ public class VehicleAdapter
                                                              PercentProperty.Unit.PERCENT);
       model.getPropertyEnergyLevelGood().setValueAndUnit(vehicle.getEnergyLevelGood(),
                                                          PercentProperty.Unit.PERCENT);
+      model.getPropertyEnergyLevelFullyRecharged()
+          .setValueAndUnit(vehicle.getEnergyLevelFullyRecharged(),
+                           PercentProperty.Unit.PERCENT);
+      model.getPropertyEnergyLevelSufficientlyRecharged()
+          .setValueAndUnit(vehicle.getEnergyLevelSufficientlyRecharged(),
+                           PercentProperty.Unit.PERCENT);
       model.getPropertyEnergyLevel().setValueAndUnit(vehicle.getEnergyLevel(),
                                                      PercentProperty.Unit.PERCENT);
 
@@ -135,6 +141,8 @@ public class VehicleAdapter
                 .withLength(getLength(vehicleModel))
                 .withEnergyLevelCritical(getEnergyLevelCritical(vehicleModel))
                 .withEnergyLevelGood(getEnergyLevelGood(vehicleModel))
+                .withEnergyLevelFullyRecharged(getEnergyLevelFullyRecharged(vehicleModel))
+                .withEnergyLevelSufficientlyRecharged(getEnergyLevelSufficientlyRecharged(vehicleModel))
                 .withMaxVelocity(getMaximumVelocity(vehicleModel))
                 .withMaxReverseVelocity(getMaximumReverseVelocity(vehicleModel))
                 .withProperties(getKernelProperties(vehicleModel))
@@ -266,6 +274,14 @@ public class VehicleAdapter
 
   private int getEnergyLevelGood(VehicleModel model) {
     return (Integer) model.getPropertyEnergyLevelGood().getValue();
+  }
+
+  private int getEnergyLevelFullyRecharged(VehicleModel model) {
+    return (Integer) model.getPropertyEnergyLevelFullyRecharged().getValue();
+  }
+
+  private int getEnergyLevelSufficientlyRecharged(VehicleModel model) {
+    return (Integer) model.getPropertyEnergyLevelSufficientlyRecharged().getValue();
   }
 
   @Nullable

@@ -13,9 +13,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -24,10 +24,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.opentcs.guing.components.tree.elements.AbstractUserObject;
-import org.opentcs.guing.components.tree.elements.BlockUserObject;
-import org.opentcs.guing.components.tree.elements.LocationUserObject;
-import org.opentcs.guing.components.tree.elements.PathUserObject;
-import org.opentcs.guing.components.tree.elements.PointUserObject;
 import org.opentcs.guing.components.tree.elements.UserObject;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.util.ResourceBundleUtil;
@@ -58,43 +54,31 @@ public class TreeMouseAdapter
   @Override
   public void mousePressed(MouseEvent e) {
     JTree objectTree = treeView.getTree();
-    int selRow = objectTree.getRowForLocation(e.getX(), e.getY());
     TreePath selPath = objectTree.getPathForLocation(e.getX(), e.getY());
-    Set<UserObject> oldSelection = treeView.getSelectedItems();
-
-    if (selRow != -1) {
-      if (!e.isControlDown()) {
-        objectTree.setSelectionPath(selPath);
-      }
-
-      UserObject userObject = getUserObject();
-
-      if (userObject == null) {
-        return;
-      }
-
-      if (e.getClickCount() == 1) {
-        if (e.getModifiers() == MouseEvent.BUTTON3_MASK) {
-          // right mouse button 
-          evaluateRightClick(e, userObject, oldSelection);
-        }
-        else {
-          // left mouse button
-          if (e.isControlDown()) {
-            ((AbstractUserObject) userObject).selectMultipleObjects();
-          }
-          else {
-            userObject.selected();
-          }
-        }
-      }
-      else if (e.getClickCount() == 2) {
-        userObject.doubleClicked();
+    if (selPath == null) {
+      if (e.getButton() == MouseEvent.BUTTON3) {
+        showPopupMenu(e.getX(), e.getY());
       }
     }
-    else if (e.getModifiers() == MouseEvent.BUTTON3_MASK) {
-      showPopupMenu(e.getX(), e.getY());
+    else {
+      UserObject userObject = getUserObject(selPath);
+
+      if (e.getButton() == MouseEvent.BUTTON3) {
+        evaluateRightClick(e, userObject, treeView.getSelectedItems());
+      }
+      else if (e.getButton() == MouseEvent.BUTTON1) {
+
+        //This Method tells the OpenTCSView what elements are currently selected
+        ((AbstractUserObject) userObject).selectMultipleObjects();
+
+        if (e.getClickCount() == 2) {
+          userObject.doubleClicked();
+        }
+
+      }
+
     }
+
   }
 
   /**
@@ -102,37 +86,28 @@ public class TreeMouseAdapter
    *
    * @param e The MouseEvent.
    * @param userObject The user object that was right clicked.
-   * @param oldSelection The user objects that were selected.
+   * @param currentSelection The user objects that were selected.
    */
   protected void evaluateRightClick(MouseEvent e,
                                     UserObject userObject,
-                                    Set<UserObject> oldSelection) {
-    if (userObject instanceof BlockUserObject
-        || userObject instanceof PointUserObject
-        || userObject instanceof LocationUserObject
-        || userObject instanceof PathUserObject) {
-      oldSelection.add(userObject);
-      Set<ModelComponent> dataObjects = new HashSet<>();
+                                    Set<UserObject> currentSelection) {
 
-      for (UserObject userObj : oldSelection) {
-        dataObjects.add(userObj.getModelComponent());
-      }
-
-      treeView.selectItems(dataObjects);
+    if (!currentSelection.contains(userObject)) {
+      currentSelection.clear();
+      currentSelection.add(userObject);
     }
+
+    Set<ModelComponent> dataObjects = currentSelection.stream()
+        .map(userObj -> userObj.getModelComponent())
+        .collect(Collectors.toSet());
+
+    treeView.selectItems(dataObjects);
+
     userObject.rightClicked(treeView.getTree(), e.getX(), e.getY());
   }
 
-  /**
-   * Returns the UserObject in the currently selected path.
-   *
-   * @return An UserObject.
-   */
-  private UserObject getUserObject() {
-    DefaultMutableTreeNode treeNode
-        = (DefaultMutableTreeNode) treeView.getTree().getLastSelectedPathComponent();
-
-    return treeNode != null ? (UserObject) treeNode.getUserObject() : null;
+  private UserObject getUserObject(TreePath path) {
+    return (UserObject) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
   }
 
   /**

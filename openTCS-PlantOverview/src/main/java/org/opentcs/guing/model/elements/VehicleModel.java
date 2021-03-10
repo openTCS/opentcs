@@ -46,6 +46,8 @@ public class VehicleModel
   public static final String LENGTH = "Length";
   public static final String ENERGY_LEVEL_CRITICAL = "EnergyLevelCritical";
   public static final String ENERGY_LEVEL_GOOD = "EnergyLevelGood";
+  public static final String ENERGY_LEVEL_FULLY_RECHARGED = "EnergyLevelFullyRecharged";
+  public static final String ENERGY_LEVEL_SUFFICIENTLY_RECHARGED = "EnergyLevelSufficientlyRecharged";
   public static final String LOADED = "Loaded";
   public static final String STATE = "State";
   public static final String PROC_STATE = "ProcState";
@@ -332,6 +334,14 @@ public class VehicleModel
     return (PercentProperty) getProperty(ENERGY_LEVEL_GOOD);
   }
 
+  public PercentProperty getPropertyEnergyLevelFullyRecharged() {
+    return (PercentProperty) getProperty(ENERGY_LEVEL_FULLY_RECHARGED);
+  }
+
+  public PercentProperty getPropertyEnergyLevelSufficientlyRecharged() {
+    return (PercentProperty) getProperty(ENERGY_LEVEL_SUFFICIENTLY_RECHARGED);
+  }
+
   public PercentProperty getPropertyEnergyLevel() {
     return (PercentProperty) getProperty(ENERGY_LEVEL);
   }
@@ -425,6 +435,22 @@ public class VehicleModel
     pEnergyLevelGood.setDescription(bundle.getString("vehicle.energyLevelGood.text"));
     pEnergyLevelGood.setHelptext(bundle.getString("vehicle.energyLevelGood.helptext"));
     setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
+
+    PercentProperty pEnergyLevelFullyRecharged = new PercentProperty(this,
+                                                                     30,
+                                                                     PercentProperty.Unit.PERCENT,
+                                                                     true);
+    pEnergyLevelFullyRecharged.setDescription(bundle.getString("vehicle.energyLevelFullyRecharged.text"));
+    pEnergyLevelFullyRecharged.setHelptext(bundle.getString("vehicle.energyLevelFullyRecharged.helptext"));
+    setProperty(ENERGY_LEVEL_FULLY_RECHARGED, pEnergyLevelFullyRecharged);
+
+    PercentProperty pEnergyLevelSufficientlyRecharged = new PercentProperty(this,
+                                                                            90,
+                                                                            PercentProperty.Unit.PERCENT,
+                                                                            true);
+    pEnergyLevelSufficientlyRecharged.setDescription(bundle.getString("vehicle.energyLevelSufficientlyRecharged.text"));
+    pEnergyLevelSufficientlyRecharged.setHelptext(bundle.getString("vehicle.energyLevelSufficientlyRecharged.helptext"));
+    setProperty(ENERGY_LEVEL_SUFFICIENTLY_RECHARGED, pEnergyLevelSufficientlyRecharged);
 
     SpeedProperty pMaximumVelocity = new SpeedProperty(this, 1000, SpeedProperty.Unit.MM_S);
     pMaximumVelocity.setDescription(bundle.getString("vehicle.maximumVelocity.text"));

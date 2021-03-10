@@ -123,15 +123,28 @@ public interface DefaultDispatcherConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
+      description = "Whether to consider parking position priorities when creating parking orders.",
+      orderKey = "2_park_1")
+  boolean considerParkingPositionPriorities();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to repark vehicles to parking positions with higher priorities.",
+      orderKey = "2_park_2")
+  boolean reparkVehiclesToHigherPriorityPositions();
+
+  @ConfigurationEntry(
+      type = "Boolean",
       description = "Whether to automatically create recharge orders for idle vehicles.",
       orderKey = "3_recharge_0")
   boolean rechargeIdleVehicles();
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to keep recharging vehicles until their energy level is good.",
+      description = {"Whether vehicles must be recharged until they are fully charged.",
+                     "If false, vehicle must only be recharged until sufficiently charged."},
       orderKey = "3_recharge_1")
-  boolean keepRechargingUntilGood();
+  boolean keepRechargingUntilFullyCharged();
 
   @ConfigurationEntry(
       type = "Integer",

@@ -246,10 +246,10 @@
     <path name="Point-0054 --- Point-0048" sourcePoint="Point-0054" destinationPoint="Point-0048" length="3752" routingCost="1" maxVelocity="1000" maxReverseVelocity="0" locked="false"/>
     <path name="Point-0055 --- Point-0046" sourcePoint="Point-0055" destinationPoint="Point-0046" length="8443" routingCost="1" maxVelocity="1000" maxReverseVelocity="0" locked="false"/>
     <path name="Point-0056 --- Point-0023" sourcePoint="Point-0056" destinationPoint="Point-0023" length="6882" routingCost="1" maxVelocity="1000" maxReverseVelocity="0" locked="false"/>
-    <vehicle name="Vehicle-01" length="1000" energyLevelCritical="30" energyLevelGood="90" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
-    <vehicle name="Vehicle-02" length="1000" energyLevelCritical="30" energyLevelGood="90" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
-    <vehicle name="Vehicle-03" length="1000" energyLevelCritical="30" energyLevelGood="90" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
-    <vehicle name="Vehicle-04" length="1000" energyLevelCritical="30" energyLevelGood="90" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
+    <vehicle name="Vehicle-01" length="1000" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
+    <vehicle name="Vehicle-02" length="1000" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
+    <vehicle name="Vehicle-03" length="1000" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
+    <vehicle name="Vehicle-04" length="1000" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" type=""/>
     <locationType name="Recharge station">
         <allowedOperation name="NOP"/>
         <allowedOperation name="CHARGE"/>
@@ -1010,5 +1010,5 @@
             <property name="POSITION_Y" value="-3000"/>
         </modelLayoutElement>
     </visualLayout>
-    <property name="tcs:modelFileLastModified" value="2018-10-24T06:18:37.323Z"/>
+    <property name="tcs:modelFileLastModified" value="2018-12-19T09:57:52.340Z"/>
 </model>

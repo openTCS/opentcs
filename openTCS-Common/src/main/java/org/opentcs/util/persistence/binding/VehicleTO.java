@@ -21,8 +21,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(
-      propOrder = {"name", "id", "length", "energyLevelCritical", "energyLevelGood", "maxVelocity", "maxReverseVelocity",
-                   "properties"})
+    propOrder = {"name", "id", "length", "energyLevelCritical", "energyLevelGood",
+                 "energyLevelFullyRecharged", "energyLevelSufficientlyRecharged",
+                 "maxVelocity", "maxReverseVelocity",
+                 "properties"})
 public class VehicleTO
     extends PlantModelElementTO {
 
@@ -34,6 +36,8 @@ public class VehicleTO
   private Long length = 0L;
   private Long energyLevelCritical = 0L;
   private Long energyLevelGood = 0L;
+  private Long energyLevelFullyRecharged = 0L;
+  private Long energyLevelSufficientlyRecharged = 0L;
 
   @XmlAttribute
   public String getType() {
@@ -79,6 +83,31 @@ public class VehicleTO
   public VehicleTO setEnergyLevelGood(@Nonnull Long energyLevelGood) {
     requireNonNull(energyLevelGood, "energyLevelGood");
     this.energyLevelGood = energyLevelGood;
+    return this;
+  }
+
+  @XmlAttribute
+  @XmlSchemaType(name = "unsignedInt")
+  public Long getEnergyLevelFullyRecharged() {
+    return energyLevelFullyRecharged;
+  }
+
+  public VehicleTO setEnergyLevelFullyRecharged(@Nonnull Long energyLevelFullyRecharged) {
+    requireNonNull(energyLevelFullyRecharged, "energyLevelFullyRecharged");
+    this.energyLevelFullyRecharged = energyLevelFullyRecharged;
+    return this;
+  }
+
+  @XmlAttribute
+  @XmlSchemaType(name = "unsignedInt")
+  public Long getEnergyLevelSufficientlyRecharged() {
+    return energyLevelSufficientlyRecharged;
+  }
+
+  public VehicleTO setEnergyLevelSufficientlyRecharged(
+      @Nonnull Long energyLevelSufficientlyRecharged) {
+    requireNonNull(energyLevelSufficientlyRecharged, "energyLevelSufficientlyRecharged");
+    this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
     return this;
   }
 

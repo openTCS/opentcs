@@ -705,5 +705,12 @@ task configdocgen {
       args = ["${configDocDir}/PoSslConfigurationEntries.adoc",
               "org.opentcs.guing.exchange.SslConfiguration"]
     }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
+              "org.opentcs.guing.util.ElementNamingSchemeConfiguration"]
+    }
   }
 }

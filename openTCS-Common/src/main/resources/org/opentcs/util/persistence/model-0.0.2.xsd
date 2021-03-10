@@ -263,6 +263,10 @@
                    type="xsd:unsignedInt"/>
     <xsd:attribute name="energyLevelGood"
                    type="xsd:unsignedInt"/>
+    <xsd:attribute name="energyLevelFullyRecharged"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="energyLevelSufficientlyRecharged"
+                   type="xsd:unsignedInt"/>
     <xsd:attribute name="maxVelocity"
                    type="xsd:unsignedInt"/>
     <xsd:attribute name="maxReverseVelocity"

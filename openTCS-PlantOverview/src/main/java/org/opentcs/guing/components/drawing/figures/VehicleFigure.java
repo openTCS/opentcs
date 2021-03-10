@@ -21,6 +21,7 @@ import java.awt.image.ImageObserver;
 import static java.awt.image.ImageObserver.ABORT;
 import static java.awt.image.ImageObserver.ALLBITS;
 import static java.awt.image.ImageObserver.FRAMEBITS;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
@@ -428,7 +429,7 @@ public class VehicleFigure
     getComponentsTreeManager().selectItem(model);
     getPropertiesComponent().setModel(model);
 
-    VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(model);
+    VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(Arrays.asList(model));
     menu.show((OpenTCSDrawingView) drawingView, evt.getX(), evt.getY());
 
     return false;

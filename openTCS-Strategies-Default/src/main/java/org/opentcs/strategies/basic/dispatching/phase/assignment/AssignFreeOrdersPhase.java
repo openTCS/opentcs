@@ -17,11 +17,8 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
-import org.opentcs.strategies.basic.dispatching.CompositeTransportOrderSelectionVeto;
-import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.ProcessabilityChecker;
@@ -30,6 +27,8 @@ import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCandi
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCandidateComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleComparator;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeTransportOrderSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.CompositeVehicleSelectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,13 +78,16 @@ public class AssignFreeOrdersPhase
    */
   private final Comparator<AssignmentCandidate> vehicleCandidateComparator;
   /**
+   * A collection of predicates for filtering vehicles.
+   */
+  private final CompositeVehicleSelectionFilter vehicleSelectionFilter;
+  /**
    * A collection of predicates for filtering transport orders.
    */
-  private final CompositeTransportOrderSelectionVeto transportOrderSelectionVeto;
+  private final CompositeTransportOrderSelectionFilter transportOrderSelectionFilter;
 
   private final TransportOrderUtil transportOrderUtil;
 
-  private final DefaultDispatcherConfiguration configuration;
   /**
    * Indicates whether this component is initialized.
    */
@@ -101,9 +103,9 @@ public class AssignFreeOrdersPhase
       CompositeOrderComparator orderComparator,
       CompositeOrderCandidateComparator orderCandidateComparator,
       CompositeVehicleCandidateComparator vehicleCandidateComparator,
-      CompositeTransportOrderSelectionVeto transportOrderSelectionVeto,
-      TransportOrderUtil transportOrderUtil,
-      DefaultDispatcherConfiguration configuration) {
+      CompositeVehicleSelectionFilter vehicleSelectionFilter,
+      CompositeTransportOrderSelectionFilter transportOrderSelectionFilter,
+      TransportOrderUtil transportOrderUtil) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.processabilityChecker = requireNonNull(processabilityChecker, "processabilityChecker");
@@ -115,9 +117,9 @@ public class AssignFreeOrdersPhase
                                                    "orderCandidateComparator");
     this.vehicleCandidateComparator = requireNonNull(vehicleCandidateComparator,
                                                      "vehicleCandidateComparator");
-    this.transportOrderSelectionVeto = requireNonNull(transportOrderSelectionVeto,
-                                                      "transportOrderSelectionVeto");
-    this.configuration = requireNonNull(configuration, "configuration");
+    this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
+    this.transportOrderSelectionFilter = requireNonNull(transportOrderSelectionFilter,
+                                                        "transportOrderSelectionFilter");
   }
 
   @Override
@@ -144,13 +146,13 @@ public class AssignFreeOrdersPhase
   @Override
   public void run() {
     Set<Vehicle> availableVehicles = objectService.fetchObjects(Vehicle.class,
-                                                                this::availableForAnyOrder);
+                                                                vehicleSelectionFilter);
     if (availableVehicles.isEmpty()) {
       LOG.debug("No vehicles available, skipping potentially expensive fetching of orders.");
       return;
     }
     Set<TransportOrder> availableOrders = objectService.fetchObjects(TransportOrder.class,
-                                                                     this::dispatchable);
+                                                                     transportOrderSelectionFilter);
 
     LOG.debug("Available for dispatching: {} transport orders and {} vehicles.",
               availableOrders.size(),
@@ -241,35 +243,12 @@ public class AssignFreeOrdersPhase
   private boolean dispatchableForVehicle(TransportOrder order, Vehicle vehicle) {
     // We only want to check dispatchable transport orders.
     // Filter out transport orders that are intended for other vehicles.
-    return dispatchable(order)
+    return transportOrderSelectionFilter.test(order)
         && orderAssignableToVehicle(order, vehicle);
   }
 
-  private boolean dispatchable(TransportOrder order) {
-    // We only want to check dispatchable transport orders.
-    // Filter out transport orders that are intended for other vehicles.
-    // Also filter out all transport orders with reservations. We assume that a check for reserved
-    // orders has been performed already, and if any had been found, we wouldn't have been called.
-    // Also filter out any transport orders that we have a veto condition for.
-    return order.hasState(TransportOrder.State.DISPATCHABLE)
-        && !partOfOtherVehiclesSequence(order)
-        && !orderReservationPool.isReserved(order.getReference())
-        && !transportOrderSelectionVeto.test(order);
-  }
-
-  private boolean partOfOtherVehiclesSequence(TransportOrder order) {
-    if (order.getWrappingSequence() != null) {
-      OrderSequence seq = objectService.fetchObject(OrderSequence.class,
-                                                    order.getWrappingSequence());
-      if (seq != null && seq.getProcessingVehicle() != null) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private boolean availableForOrder(Vehicle vehicle, TransportOrder order) {
-    return availableForAnyOrder(vehicle)
+    return vehicleSelectionFilter.test(vehicle)
         && orderAssignableToVehicle(order, vehicle);
   }
 
@@ -277,38 +256,4 @@ public class AssignFreeOrdersPhase
     return order.getIntendedVehicle() == null
         || Objects.equals(order.getIntendedVehicle(), vehicle.getReference());
   }
-
-  private boolean availableForAnyOrder(Vehicle vehicle) {
-    return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
-        && vehicle.getCurrentPosition() != null
-        && vehicle.getOrderSequence() == null
-        && !vehicle.isEnergyLevelCritical()
-        && !needsMoreCharging(vehicle)
-        && (processesNoOrder(vehicle)
-            || processesDispensableOrder(vehicle))
-        && !hasOrderReservation(vehicle);
-  }
-
-  private boolean needsMoreCharging(Vehicle vehicle) {
-    return configuration.keepRechargingUntilGood()
-        && vehicle.hasState(Vehicle.State.CHARGING)
-        && vehicle.isEnergyLevelDegraded();
-  }
-
-  private boolean processesNoOrder(Vehicle vehicle) {
-    return vehicle.hasProcState(Vehicle.ProcState.IDLE)
-        && (vehicle.hasState(Vehicle.State.IDLE)
-            || vehicle.hasState(Vehicle.State.CHARGING));
-  }
-
-  private boolean processesDispensableOrder(Vehicle vehicle) {
-    return vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
-        && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
-            .isDispensable();
-  }
-
-  private boolean hasOrderReservation(Vehicle vehicle) {
-    return !orderReservationPool.findReservations(vehicle.getReference()).isEmpty();
-  }
-
 }

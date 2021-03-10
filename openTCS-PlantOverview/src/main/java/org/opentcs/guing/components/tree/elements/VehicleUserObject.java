@@ -10,10 +10,16 @@
 package org.opentcs.guing.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
+import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OpenTCSView;
 import org.opentcs.guing.application.OperationMode;
@@ -42,6 +48,10 @@ public class VehicleUserObject
    * A factory for popup menus.
    */
   private final MenuFactory menuFactory;
+  /**
+   * All selected vehicles.
+   */
+  protected Set<VehicleModel> selectedVehicles;
 
   /**
    * Creates a new instance.
@@ -75,10 +85,16 @@ public class VehicleUserObject
     getView().figureSelected(getModelComponent());
   }
 
+  @Override // UserObject
+  public void rightClicked(JComponent component, int x, int y) {
+    selectedVehicles = getSelectedVehicles(((JTree) component));
+    super.rightClicked(component, x, y);
+  }
+
   @Override  // AbstractUserObject
   public JPopupMenu getPopupMenu() {
     if (appState.hasOperationMode(OperationMode.OPERATING)) {
-      return menuFactory.createVehiclePopupMenu(getModelComponent());
+      return menuFactory.createVehiclePopupMenu(selectedVehicles);
     }
 
     return null;
@@ -87,5 +103,30 @@ public class VehicleUserObject
   @Override  // AbstractUserObject
   public ImageIcon getIcon() {
     return IconToolkit.instance().createImageIcon("tree/vehicle.18x18.png");
+  }
+
+  /**
+   * Returns the selected vehicle models in the tree.
+   *
+   * @param objectTree The tree to find the selected items.
+   * @return All selected vehicle models.
+   */
+  private Set<VehicleModel> getSelectedVehicles(JTree objectTree) {
+    Set<VehicleModel> objects = new HashSet<>();
+    TreePath[] selectionPaths = objectTree.getSelectionPaths();
+
+    if (selectionPaths != null) {
+      for (TreePath path : selectionPaths) {
+        if (path != null) {
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+          //vehicles can only be selected with other vehicles
+          if (node.getUserObject() instanceof VehicleUserObject) {
+            objects.add((VehicleModel) ((UserObject) node.getUserObject()).getModelComponent());
+          }
+        }
+      }
+    }
+
+    return objects;
   }
 }

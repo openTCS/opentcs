@@ -57,7 +57,7 @@ public abstract class AbstractParkingPositionSupplier
     if (initialized) {
       return;
     }
-    
+
     initialized = true;
   }
 
@@ -133,9 +133,13 @@ public abstract class AbstractParkingPositionSupplier
         .collect(Collectors.toSet());
   }
 
+  protected Set<Point> fetchAllParkingPositions() {
+    return plantModelService.fetchObjects(Point.class, point -> point.isParkingPosition());
+  }
+
   private PointCandidate parkingPositionCandidate(Vehicle vehicle,
-                                               Point srcPosition,
-                                               Point destPosition) {
+                                                  Point srcPosition,
+                                                  Point destPosition) {
     return new PointCandidate(destPosition, router.getCosts(vehicle, srcPosition, destPosition));
   }
 

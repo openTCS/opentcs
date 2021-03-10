@@ -17,6 +17,8 @@ import org.opentcs.strategies.basic.dispatching.phase.FinishWithdrawalsPhase;
 import org.opentcs.strategies.basic.dispatching.phase.assignment.AssignFreeOrdersPhase;
 import org.opentcs.strategies.basic.dispatching.phase.assignment.AssignNextDriveOrdersPhase;
 import org.opentcs.strategies.basic.dispatching.phase.parking.ParkIdleVehiclesPhase;
+import org.opentcs.strategies.basic.dispatching.phase.parking.PrioritizedParkingPhase;
+import org.opentcs.strategies.basic.dispatching.phase.parking.PrioritizedReparkPhase;
 import org.opentcs.strategies.basic.dispatching.phase.recharging.RechargeIdleVehiclesPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,8 @@ public class FullDispatchTask
   private final AssignSequenceSuccessorsPhase assignSequenceSuccessorsPhase;
   private final AssignFreeOrdersPhase assignFreeOrdersPhase;
   private final RechargeIdleVehiclesPhase rechargeIdleVehiclesPhase;
+  private final PrioritizedReparkPhase prioritizedReparkPhase;
+  private final PrioritizedParkingPhase prioritizedParkingPhase;
   private final ParkIdleVehiclesPhase parkIdleVehiclesPhase;
   /**
    * Indicates whether this component is enabled.
@@ -56,6 +60,8 @@ public class FullDispatchTask
                           AssignSequenceSuccessorsPhase assignSequenceSuccessorsPhase,
                           AssignFreeOrdersPhase assignFreeOrdersPhase,
                           RechargeIdleVehiclesPhase rechargeIdleVehiclesPhase,
+                          PrioritizedReparkPhase prioritizedReparkPhase,
+                          PrioritizedParkingPhase prioritizedParkingPhase,
                           ParkIdleVehiclesPhase parkIdleVehiclesPhase) {
     this.checkNewOrdersPhase = requireNonNull(checkNewOrdersPhase, "checkNewOrdersPhase");
     this.finishWithdrawalsPhase = requireNonNull(finishWithdrawalsPhase, "finishWithdrawalsPhase");
@@ -68,6 +74,9 @@ public class FullDispatchTask
     this.assignFreeOrdersPhase = requireNonNull(assignFreeOrdersPhase, "assignFreeOrdersPhase");
     this.rechargeIdleVehiclesPhase = requireNonNull(rechargeIdleVehiclesPhase,
                                                     "rechargeIdleVehiclesPhase");
+    this.prioritizedReparkPhase = requireNonNull(prioritizedReparkPhase, "prioritizedReparkPhase");
+    this.prioritizedParkingPhase = requireNonNull(prioritizedParkingPhase,
+                                                  "prioritizedParkingPhase");
     this.parkIdleVehiclesPhase = requireNonNull(parkIdleVehiclesPhase, "parkIdleVehiclesPhase");
   }
 
@@ -84,6 +93,8 @@ public class FullDispatchTask
     assignSequenceSuccessorsPhase.initialize();
     assignFreeOrdersPhase.initialize();
     rechargeIdleVehiclesPhase.initialize();
+    prioritizedReparkPhase.initialize();
+    prioritizedParkingPhase.initialize();
     parkIdleVehiclesPhase.initialize();
 
     initialized = true;
@@ -102,6 +113,8 @@ public class FullDispatchTask
     assignSequenceSuccessorsPhase.terminate();
     assignFreeOrdersPhase.terminate();
     rechargeIdleVehiclesPhase.terminate();
+    prioritizedReparkPhase.terminate();
+    prioritizedParkingPhase.terminate();
     parkIdleVehiclesPhase.terminate();
 
     initialized = false;
@@ -128,7 +141,7 @@ public class FullDispatchTask
 
     LOG.debug("Finished full dispatch run.");
   }
-  
+
   /**
    * Assignment of orders to vehicles.
    * <p>
@@ -139,7 +152,7 @@ public class FullDispatchTask
     assignReservedOrdersPhase.run();
     assignFreeOrdersPhase.run();
   }
-  
+
   /**
    * Recharging of vehicles.
    * <p>
@@ -157,6 +170,8 @@ public class FullDispatchTask
    * </p>
    */
   protected void parkVehicles() {
+    prioritizedReparkPhase.run();
+    prioritizedParkingPhase.run();
     parkIdleVehiclesPhase.run();
   }
 }

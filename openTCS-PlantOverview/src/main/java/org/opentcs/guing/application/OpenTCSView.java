@@ -156,8 +156,8 @@ import org.opentcs.guing.util.Cursors;
 import org.opentcs.guing.util.DefaultInputOutputFormat;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.guing.util.UniqueNameGenerator;
 import org.opentcs.guing.util.UserMessageHelper;
-import org.opentcs.util.UniqueStringGenerator;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -310,7 +310,7 @@ public class OpenTCSView
   /**
    * Generates names for model objects.
    */
-  private final UniqueStringGenerator<Class<? extends ModelComponent>> modelCompNameGen;
+  private final UniqueNameGenerator modelCompNameGen;
   /**
    * A factory for UserObject instances.
    */
@@ -417,7 +417,7 @@ public class OpenTCSView
                      CourseObjectFactory crsObjFactory,
                      UserMessageHelper userMessageHelper,
                      DrawingViewFactory drawingViewFactory,
-                     UniqueStringGenerator<Class<? extends ModelComponent>> modelCompNameGen,
+                     UniqueNameGenerator modelCompNameGen,
                      UndoRedoManager undoRedoManager,
                      ComponentsTreeViewManager componentsTreeManager,
                      BlocksTreeViewManager blocksTreeManager,

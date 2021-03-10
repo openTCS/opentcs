@@ -93,7 +93,9 @@ public class FigureUserObject
       for (TreePath path : selectionPaths) {
         if (path != null) {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-          objects.add((UserObject) node.getUserObject());
+          if (node.getUserObject() instanceof FigureUserObject) {
+            objects.add((UserObject) node.getUserObject());
+          }
         }
       }
     }
