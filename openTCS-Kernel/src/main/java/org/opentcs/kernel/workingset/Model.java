@@ -1279,6 +1279,7 @@ public class Model {
     LocationType type = objectPool.getObject(LocationType.class, to.getTypeName());
     Location newLocation = new Location(to.getName(), type.getReference())
         .withPosition(to.getPosition())
+        .withLocked(to.isLocked())
         .withProperties(to.getProperties());
 
     Set<Location.Link> locationLinks = new HashSet<>();
@@ -1410,6 +1411,27 @@ public class Model {
     }
     Location previousState = location.clone();
     location.setType(type.getReference());
+    objectPool.emitObjectEvent(location.clone(),
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return location;
+  }
+
+  /**
+   * Locks/Unlocks a location.
+   *
+   * @param ref A reference to the location to be modified.
+   * @param newLocked If {@code true}, this path will be locked when the method call returns; 
+   * if {@code false}, this path will be unlocked.
+   * @return The modified path.
+   * @throws ObjectUnknownException If the referenced path does not exist.
+   */
+  @SuppressWarnings("deprecation")
+  public Location setLocationLocked(TCSObjectReference<Location> ref, boolean newLocked)
+      throws ObjectUnknownException {
+    Location location = objectPool.getObject(Location.class, ref);
+    Location previousState = location.clone();
+    location = objectPool.replaceObject(location.withLocked(newLocked));
     objectPool.emitObjectEvent(location.clone(),
                                previousState,
                                TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -2662,6 +2684,7 @@ public class Model {
               .withLinks(curLoc.getAttachedLinks().stream()
                   .collect(Collectors.toMap(link -> link.getPoint().getName(),
                                             Location.Link::getAllowedOperations)))
+              .withLocked(curLoc.isLocked())
               .withProperties(curLoc.getProperties())
       );
     }

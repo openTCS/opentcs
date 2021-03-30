@@ -10,6 +10,7 @@
 package org.opentcs.guing.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -20,6 +21,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
@@ -43,6 +45,10 @@ public class LocationFigure
     extends TCSFigure
     implements ImageObserver {
 
+  /**
+   * The fill color for locked locations.
+   */
+  private static final Color LOCKED_COLOR = new Color(255, 50, 50);
   /**
    * The image representing the location.
    */
@@ -158,6 +164,15 @@ public class LocationFigure
     return thatFigure;
   }
 
+  @Override  // ImageObserver
+  public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+    if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
+      invalidate();
+    }
+
+    return (infoflags & (ALLBITS | ABORT)) == 0;
+  }
+
   /**
    * Wird aus LabeledLocationFigure.propertiesChanged() aufgerufen wenn das
    * Symbol fï¿½r die Station geï¿½ndert wird.
@@ -165,6 +180,11 @@ public class LocationFigure
    * @param e
    */
   public void propertiesChanged(AttributesChangeEvent e) {
+    handleLocationTypeChanged();
+    handleLocationLockChanged();
+  }
+
+  private void handleLocationTypeChanged() {
     LocationTypeModel locationType = getModel().getLocationType();
 
     if (locationType != null) {
@@ -189,12 +209,8 @@ public class LocationFigure
     }
   }
 
-  @Override  // ImageObserver
-  public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-    if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
-      invalidate();
-    }
-
-    return (infoflags & (ALLBITS | ABORT)) == 0;
+  private void handleLocationLockChanged() {
+    set(AttributeKeys.FILL_COLOR,
+        (Boolean) getModel().getPropertyLocked().getValue() ? LOCKED_COLOR : Color.WHITE);
   }
 }

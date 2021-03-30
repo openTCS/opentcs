@@ -12,6 +12,8 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -79,4 +81,16 @@ public interface PlantModelService
   @ScheduledApiChange(when = "5.0")
   String getPersistentModelName()
       throws KernelRuntimeException, IllegalStateException;
+
+  /**
+   * Updates a location's lock state.
+   *
+   * @param ref A reference to the location to be updated.
+   * @param locked Indicates whether the location is to be locked ({@code true}) or unlocked
+   * ({@code false}).
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
+      throws ObjectUnknownException, KernelRuntimeException;
 }

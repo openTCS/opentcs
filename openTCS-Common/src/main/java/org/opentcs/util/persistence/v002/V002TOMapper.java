@@ -176,6 +176,7 @@ public class V002TOMapper {
                                             location.getyPosition(),
                                             location.getzPosition()))
               .withLinks(getLinks(location))
+              .withLocked(location.isLocked())
               .withProperties(convertProperties(location.getProperties()))
       );
     }
@@ -387,6 +388,7 @@ public class V002TOMapper {
           .setyPosition(location.getPosition().getY())
           .setType(location.getTypeName())
           .setLinks(toLocationTOLinks(location.getLinks()))
+          .setLocked(location.isLocked())
           .setProperties(convertProperties(location.getProperties()));
 
       result.add(locationTO);

@@ -70,6 +70,7 @@ public class LocationAdapter
 
       // Type
       model.getPropertyType().setValue(location.getType().getName());
+      model.getPropertyLocked().setValue(location.isLocked());
 
       // Misc properties
       updateMiscModelProperties(model, location);
@@ -78,6 +79,8 @@ public class LocationAdapter
       if (layoutElement != null) {
         updateModelLayoutElements(model, layoutElement);
       }
+      
+      model.propertiesChanged(model);
     }
     catch (IllegalArgumentException e) {
       LOG.warn("", e);
@@ -88,11 +91,14 @@ public class LocationAdapter
   public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
                                                 SystemModel systemModel,
                                                 PlantModelCreationTO plantModel) {
+    LocationModel locationModel = (LocationModel) modelComponent;
+    
     PlantModelCreationTO result = plantModel
         .withLocation(
             new LocationCreationTO(modelComponent.getName(),
-                                   ((LocationModel) modelComponent).getLocationType().getName(),
-                                   getPosition((LocationModel) modelComponent))
+                                   locationModel.getLocationType().getName(),
+                                   getPosition(locationModel))
+                .withLocked(getLocked(locationModel))
                 .withProperties(getKernelProperties(modelComponent))
         )
         .withVisualLayouts(updatedLayouts(modelComponent,
@@ -129,6 +135,13 @@ public class LocationAdapter
   private Triple getPosition(LocationModel model) {
     return convertToTriple(model.getPropertyModelPositionX(),
                            model.getPropertyModelPositionY());
+  }
+
+  private boolean getLocked(LocationModel model) {
+    if (model.getPropertyLocked().getValue() instanceof Boolean) {
+      return (boolean) model.getPropertyLocked().getValue();
+    }
+    return false;
   }
 
   @Override

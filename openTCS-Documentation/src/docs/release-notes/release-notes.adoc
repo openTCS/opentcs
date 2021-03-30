@@ -49,6 +49,11 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.19 (2020-07-02)
+
+* New features:
+** As with paths, locations can now be locked via the Plant Overview application to prevent them from being used by vehicles.
+
 === Version 4.18 (2020-04-09)
 
 * New features:

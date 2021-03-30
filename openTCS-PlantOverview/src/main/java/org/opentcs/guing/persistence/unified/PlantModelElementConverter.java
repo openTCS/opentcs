@@ -226,6 +226,7 @@ public class PlantModelElementConverter {
     }
     model.getPropertyType().setPossibleValues(possibleLocationTypes);
     model.getPropertyType().setValue(locationTO.getTypeName());
+    model.getPropertyLocked().setValue(locationTO.isLocked());
 
     for (Map.Entry<String, String> property : locationTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,

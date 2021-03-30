@@ -44,6 +44,7 @@ import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter
 import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.candidates.IsProcessable;
 import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
+import org.opentcs.strategies.basic.dispatching.selection.orders.ContainsLockedTargetLocations;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeParkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeRechargeVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeReparkVehicleSelectionFilter;
@@ -69,7 +70,8 @@ public class DefaultDispatcherModule
   @SuppressWarnings("deprecation")
   private void configureDispatcherDependencies() {
     Multibinder.newSetBinder(binder(), VehicleSelectionFilter.class);
-    Multibinder.newSetBinder(binder(), TransportOrderSelectionFilter.class);
+    Multibinder.newSetBinder(binder(), TransportOrderSelectionFilter.class)
+        .addBinding().to(ContainsLockedTargetLocations.class);
     Multibinder.newSetBinder(binder(), ParkVehicleSelectionFilter.class)
         .addBinding().to(IsParkable.class);
     Multibinder.newSetBinder(binder(), ReparkVehicleSelectionFilter.class)

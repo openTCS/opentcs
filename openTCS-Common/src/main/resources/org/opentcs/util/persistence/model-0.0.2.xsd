@@ -334,6 +334,8 @@
     <xsd:attribute name="type"
                    type="xsd:string"
                    use="required"/>
+    <xsd:attribute name="locked"
+                   type="xsd:boolean"/>
   </xsd:complexType>
   
   <!-- Data type for location link elements -->

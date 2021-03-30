@@ -14,6 +14,8 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
 
 /**
  * The default implementation of the plant model service.
@@ -80,6 +82,19 @@ class RemotePlantModelServiceProxy
 
     try {
       return getRemoteService().getPersistentModelName(getClientId());
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateLocationLock(getClientId(), ref, locked);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

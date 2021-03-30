@@ -54,6 +54,11 @@ public class Location
    * A set of links attached to this location.
    */
   private final Set<Link> attachedLinks;
+  /**
+   * A flag for marking this location as locked (i.e. to prevent transport orders leading to it
+   * from being assigned to vehicles).
+   */
+  private final boolean locked;
 
   /**
    * Creates a new Location.
@@ -70,6 +75,7 @@ public class Location
     this.type = requireNonNull(type, "type");
     this.position = new Triple(0, 0, 0);
     this.attachedLinks = new HashSet<>();
+    this.locked = false;
   }
 
   /**
@@ -83,6 +89,7 @@ public class Location
     this.type = requireNonNull(type, "type");
     this.position = new Triple(0, 0, 0);
     this.attachedLinks = new HashSet<>();
+    this.locked = false;
   }
 
   @SuppressWarnings("deprecation")
@@ -92,11 +99,13 @@ public class Location
                    ObjectHistory history,
                    TCSObjectReference<LocationType> locationType,
                    Triple position,
-                   Set<Link> attachedLinks) {
+                   Set<Link> attachedLinks,
+                   boolean locked) {
     super(objectID, name, properties, history);
     type = requireNonNull(locationType, "locationType");
     this.position = requireNonNull(position, "position");
     this.attachedLinks = new HashSet<>(requireNonNull(attachedLinks, "attachedLinks"));
+    this.locked = locked;
   }
 
   @Override
@@ -107,7 +116,8 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
   }
 
   @Override
@@ -118,7 +128,8 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
   }
 
   @Override
@@ -129,7 +140,8 @@ public class Location
                         getHistory().withEntryAppended(entry),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
   }
 
   @Override
@@ -140,7 +152,8 @@ public class Location
                         history,
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
   }
 
   /**
@@ -178,7 +191,8 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
   }
 
   /**
@@ -269,7 +283,35 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
+  }
+
+  /**
+   * Returns the lock status of this location (i.e. whether it my be used by vehicles or not).
+   *
+   * @return {@code true} if this location is currently locked (i.e. it may not be used
+   * by vehicles), else {@code false}.
+   */
+  public boolean isLocked() {
+    return locked;
+  }
+
+  /**
+   * Creates a copy of this object, with the given locked flag.
+   *
+   * @param locked The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Location withLocked(boolean locked) {
+    return new Location(getIdWithoutDeprecationWarning(),
+                        getName(),
+                        getProperties(),
+                        getHistory(),
+                        type,
+                        position,
+                        attachedLinks,
+                        locked);
   }
 
   /**
@@ -287,7 +329,8 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked);
   }
 
   @SuppressWarnings("deprecation")

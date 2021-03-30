@@ -43,6 +43,10 @@ public class LocationCreationTO
    */
   @Nonnull
   private Map<String, Set<String>> links = new HashMap<>();
+  /**
+   * A flag for marking this location as locked (i.e. to prevent vehicles from using it).
+   */
+  private boolean locked;
 
   /**
    * Creates a new isntance.
@@ -58,6 +62,7 @@ public class LocationCreationTO
 
   /**
    * Creates a new instance
+   *
    * @param name The name of this location.
    * @param typeName The name of this location's type.
    * @param position The position of this location.
@@ -74,11 +79,13 @@ public class LocationCreationTO
                              @Nonnull Map<String, String> properties,
                              @Nonnull String typeName,
                              @Nonnull Triple position,
-                             @Nonnull Map<String, Set<String>> links) {
+                             @Nonnull Map<String, Set<String>> links,
+                             boolean locked) {
     super(name, properties);
     this.typeName = requireNonNull(typeName, "typeName");
     this.position = requireNonNull(position, "position");
     this.links = requireNonNull(links, "links");
+    this.locked = locked;
   }
 
   /**
@@ -103,7 +110,12 @@ public class LocationCreationTO
    */
   @Override
   public LocationCreationTO withName(@Nonnull String name) {
-    return new LocationCreationTO(name, getModifiableProperties(), typeName, position, links);
+    return new LocationCreationTO(name,
+                                  getModifiableProperties(),
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 
   /**
@@ -137,7 +149,12 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the given type.
    */
   public LocationCreationTO withTypeName(@Nonnull String typeName) {
-    return new LocationCreationTO(getName(), getModifiableProperties(), typeName, position, links);
+    return new LocationCreationTO(getName(),
+                                  getModifiableProperties(),
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 
   /**
@@ -171,7 +188,12 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the given position.
    */
   public LocationCreationTO withPosition(@Nonnull Triple position) {
-    return new LocationCreationTO(getName(), getModifiableProperties(), typeName, position, links);
+    return new LocationCreationTO(getName(),
+                                  getModifiableProperties(),
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 
   /**
@@ -206,7 +228,12 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the given links.
    */
   public LocationCreationTO withLinks(@Nonnull Map<String, Set<String>> links) {
-    return new LocationCreationTO(getName(), getModifiableProperties(), typeName, position, links);
+    return new LocationCreationTO(getName(),
+                                  getModifiableProperties(),
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 
   /**
@@ -222,7 +249,33 @@ public class LocationCreationTO
                                   getModifiableProperties(),
                                   typeName,
                                   position,
-                                  mapWithMapping(links, pointName, allowedOperations));
+                                  mapWithMapping(links, pointName, allowedOperations),
+                                  locked);
+  }
+
+  /**
+   * Returns the lock status of this location (i.e. whether it my be used by vehicles or not).
+   *
+   * @return {@code true} if this location is currently locked (i.e. it may not be used
+   * by vehicles), else {@code false}.
+   */
+  public boolean isLocked() {
+    return locked;
+  }
+
+  /**
+   * Creates a copy of this object with the given locked flag.
+   *
+   * @param locked The new locked attribute.
+   * @return A copy of this object, differing in the locked attribute.
+   */
+  public LocationCreationTO withLocked(boolean locked) {
+    return new LocationCreationTO(getName(),
+                                  getModifiableProperties(),
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 
   /**
@@ -247,7 +300,12 @@ public class LocationCreationTO
    */
   @Override
   public LocationCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new LocationCreationTO(getName(), properties, typeName, position, links);
+    return new LocationCreationTO(getName(),
+                                  properties,
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 
   /**
@@ -277,6 +335,11 @@ public class LocationCreationTO
    */
   @Override
   public LocationCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new LocationCreationTO(getName(), propertiesWith(key, value), typeName, position, links);
+    return new LocationCreationTO(getName(),
+                                  propertiesWith(key, value),
+                                  typeName,
+                                  position,
+                                  links,
+                                  locked);
   }
 }

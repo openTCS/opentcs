@@ -16,6 +16,7 @@ import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
+import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
@@ -38,6 +39,10 @@ public class LocationModel
    * The property key for the location's type.
    */
   public static final String TYPE = "Type";
+  /**
+   * Key for the locked state.
+   */
+  public static final String LOCKED = "locked";
   /**
    * This class's resource bundle.
    */
@@ -142,6 +147,10 @@ public class LocationModel
     return (LocationTypeProperty) getProperty(TYPE);
   }
 
+  public BooleanProperty getPropertyLocked() {
+    return (BooleanProperty) getProperty(LOCKED);
+  }
+
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
@@ -190,6 +199,13 @@ public class LocationModel
     pType.setDescription(bundle.getString("locationModel.property_type.description"));
     pType.setHelptext(bundle.getString("locationModel.property_type.helptext"));
     setProperty(TYPE, pType);
+
+    BooleanProperty pLocked = new BooleanProperty(this);
+    pLocked.setDescription(bundle.getString("locationModel.property_locked.description"));
+    pLocked.setHelptext(bundle.getString("locationModel.property_locked.helptext"));
+    pLocked.setCollectiveEditable(true);
+    pLocked.setOperatingEditable(true);
+    setProperty(LOCKED, pLocked);
 
     SymbolProperty pSymbol = new SymbolProperty(this);
     pSymbol.setDescription(bundle.getString("locationModel.property_symbol.description"));

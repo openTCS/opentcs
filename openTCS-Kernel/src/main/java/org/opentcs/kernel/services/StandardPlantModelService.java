@@ -25,6 +25,8 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.notification.UserNotification;
@@ -199,6 +201,14 @@ public class StandardPlantModelService
   public String getPersistentModelName()
       throws IllegalStateException {
     return modelPersister.getPersistentModelName().orElse("");
+  }
+
+  @Override
+  public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      model.setLocationLocked(ref, locked);
+    }
   }
 
   /**
