@@ -85,6 +85,7 @@ task distSrcZip(type: Zip) {
   includes << 'gradlew.bat'
 
   excludes << '.gitlab'
+  excludes << '.gitlab-ci.yml'
   excludes << '.gradle'
   excludes << '**/build'
 }

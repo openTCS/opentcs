@@ -1,0 +1,22 @@
+image: adoptopenjdk:8-jdk
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  # Put GRADLE_USER_HOME into the cache directory so the wrapper is not
+  # re-downloaded for every job.
+  - export GRADLE_USER_HOME=/cache/.gradle
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+
+stages:
+  - build
+
+build:
+  stage: build
+  tags:
+    - asprunner
+  script:
+    - ./gradlew build

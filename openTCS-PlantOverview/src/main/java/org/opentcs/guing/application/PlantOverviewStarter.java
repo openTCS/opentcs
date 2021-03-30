@@ -15,6 +15,7 @@ import org.opentcs.guing.event.EventLogger;
 import org.opentcs.guing.exchange.AttributeAdapterRegistry;
 import org.opentcs.guing.exchange.KernelEventFetcher;
 import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
+import org.opentcs.guing.transport.TransportOrdersContainer;
 import org.opentcs.guing.util.PlantOverviewApplicationConfiguration;
 
 /**
@@ -55,6 +56,10 @@ public class PlantOverviewStarter {
   private final OpenTCSEventDispatcher eventDispatcher;
 
   private final AttributeAdapterRegistry attributeAdapterRegistry;
+  /**
+   * Maintains a set of all transport orders existing on the kernel side.
+   */
+  private final TransportOrdersContainer transportOrdersContainer;
 
   /**
    * Creates a new instance.
@@ -67,6 +72,8 @@ public class PlantOverviewStarter {
    * the local event bus.
    * @param eventDispatcher Dispatches openTCS event from kernel objects to corresponding model
    * components.
+   * @param transportOrdersContainer Maintains a set of all transport orders existing on the kernel
+   * side.
    */
   @Inject
   public PlantOverviewStarter(PlantOverviewApplicationConfiguration configuration,
@@ -76,7 +83,8 @@ public class PlantOverviewStarter {
                               EventLogger eventLogger,
                               KernelEventFetcher kernelEventFetcher,
                               OpenTCSEventDispatcher eventDispatcher,
-                              AttributeAdapterRegistry attributeAdapterRegistry1) {
+                              AttributeAdapterRegistry attributeAdapterRegistry,
+                              TransportOrdersContainer transportOrdersContainer) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
     this.application = requireNonNull(application, "application");
@@ -84,8 +92,10 @@ public class PlantOverviewStarter {
     this.eventLogger = requireNonNull(eventLogger, "eventLogger");
     this.kernelEventFetcher = requireNonNull(kernelEventFetcher, "kernelEventFetcher");
     this.eventDispatcher = requireNonNull(eventDispatcher, "eventDispatcher");
-    this.attributeAdapterRegistry = requireNonNull(attributeAdapterRegistry1,
-                                                   "attributeAdapterRegistry1");
+    this.attributeAdapterRegistry = requireNonNull(attributeAdapterRegistry,
+                                                   "attributeAdapterRegistry");
+    this.transportOrdersContainer = requireNonNull(transportOrdersContainer,
+                                                   "transportOrdersContainer");
   }
 
   public void startPlantOverview() {
@@ -93,6 +103,7 @@ public class PlantOverviewStarter {
     kernelEventFetcher.initialize();
     eventDispatcher.initialize();
     attributeAdapterRegistry.initialize();
+    transportOrdersContainer.initialize();
 
     opentcsView.init();
     opentcsView.switchPlantOverviewState(initialMode());

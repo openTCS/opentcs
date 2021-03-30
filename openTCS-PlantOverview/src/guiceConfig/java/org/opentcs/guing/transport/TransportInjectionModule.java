@@ -10,6 +10,7 @@ package org.opentcs.guing.transport;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import javax.inject.Singleton;
 
 /**
  * A Guice module for this package.
@@ -22,5 +23,8 @@ public class TransportInjectionModule
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(TransportViewFactory.class));
+    
+    bind(TransportOrdersContainer.class)
+        .in(Singleton.class);
   }
 }

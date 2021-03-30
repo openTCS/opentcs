@@ -258,8 +258,21 @@ public class DefaultScheduler
     requireNonNull(client, "client");
 
     synchronized (globalSyncObject) {
-      LOG.debug("{}: Releasing all resources", client.getId());
+      Set<TCSResource<?>> freedResources = reservationPool.allocatedResources(client);
+
+      LOG.debug("{}: Releasing all resources...", client.getId());
       reservationPool.freeAll(client);
+      LOG.debug("{}: Clearing pending allocation requests...", client.getId());
+      deferredAllocations.removeIf(allocate -> client.equals(allocate.getClient()));
+
+      kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                              reservationPool,
+                                              deferredAllocations,
+                                              allocationAdvisor,
+                                              kernelExecutor,
+                                              globalSyncObject,
+                                              new AllocationsReleased(client,
+                                                                      freedResources)));
     }
     kernelExecutor.submit(new AllocatorTask(plantModelService,
                                             reservationPool,

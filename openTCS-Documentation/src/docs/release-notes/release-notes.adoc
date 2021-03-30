@@ -49,6 +49,14 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 4.20 (2020-12-18)
+
+* Fixes:
+** Default `Scheduler`: Properly handle requests for _same-direction_ blocks for some edge cases.
+** Default `Scheduler`: Really free all resources when taking a vehicle out of the driving course.
+* Other changes:
+** Plant Overview: Improve performance for vehicle state updates.
+
 === Version 4.19 (2020-07-02)
 
 * New features:

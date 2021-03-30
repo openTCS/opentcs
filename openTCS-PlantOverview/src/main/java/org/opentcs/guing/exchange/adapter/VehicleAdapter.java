@@ -15,7 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -44,6 +46,7 @@ import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
+import org.opentcs.guing.transport.TransportOrdersContainer;
 import org.opentcs.util.Colors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +64,21 @@ public class VehicleAdapter
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(VehicleAdapter.class);
+  /**
+   * Maintains a set of all transport orders.
+   */
+  private final TransportOrdersContainer transportOrdersContainer;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param transportOrdersContainer Maintains a set of all transport orders.
+   */
+  @Inject
+  public VehicleAdapter(@Nonnull TransportOrdersContainer transportOrdersContainer) {
+    this.transportOrdersContainer = requireNonNull(transportOrdersContainer,
+                                                   "transportOrdersContainer");
+  }
 
   @Override // OpenTCSProcessAdapter
   public void updateModelProperties(TCSObject<?> tcsObject,
@@ -272,7 +290,8 @@ public class VehicleAdapter
     if (ref == null) {
       return null;
     }
-    return objectService.fetchObject(TransportOrder.class, ref);
+//    return objectService.fetchObject(TransportOrder.class, ref);
+    return transportOrdersContainer.getTransportOrder(ref.getName()).orElse(null);
   }
 
   /**

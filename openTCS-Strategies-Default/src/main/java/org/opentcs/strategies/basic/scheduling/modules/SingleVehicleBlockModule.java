@@ -113,18 +113,20 @@ public class SingleVehicleBlockModule
                                                           Block.Type.SINGLE_VEHICLE_ONLY);
 
       if (blocks.isEmpty()) {
+        LOG.debug("{}: No blocks to be checked, allocation allowed.", client.getId());
         return true;
       }
 
       Set<TCSResource<?>> resourcesExpanded = expandResources(resources);
       resourcesExpanded = filterRelevantResources(resourcesExpanded, blocks);
 
-      LOG.debug("{}: Checking if all resources are available...", client.getId());
+      LOG.debug("{}: Checking resource availability: {}", client.getId(), resources);
       if (!reservationPool.resourcesAvailableForUser(resourcesExpanded, client)) {
-        LOG.debug("{}: Resources unavailable: {}", client.getId(), resources);
+        LOG.debug("{}: Resources unavailable.", client.getId());
         return false;
       }
 
+      LOG.debug("{}: Resources available, allocation allowed.", client.getId());
       return true;
     }
   }

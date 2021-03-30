@@ -164,7 +164,7 @@ A block has two relevant attributes:
 ** _Same direction only_:
    The resources aggregated in this block can be used by multiple vehicles at the same time, but only if they traverse the block in the same direction.
 
-The direction in which a vehicle traverses a block is determined using the first allocation request containing resources that are part of the block -- see <<Default scheduler>>.
+NOTE: The direction in which a vehicle traverses a block is determined using the first allocation request containing resources that are part of the block -- see <<Default scheduler>>.
 For the requested resources (usually a point and a path) the path is checked for a property with the key `tcs:blockEntryDirection`.
 The property's value may be an arbitrary character string (including the empty string).
 If there is no such property the path's name is being used as the direction.

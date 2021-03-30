@@ -104,6 +104,14 @@ abstract class AllocatorCommand
     public Set<TCSResource<?>> getResources() {
       return resources;
     }
+
+    @Override
+    public String toString() {
+      return "AllocationsReleased{"
+          + "client=" + getClient()
+          + ", resources=" + resources
+          + '}';
+    }
   }
 
   /**
@@ -119,6 +127,13 @@ abstract class AllocatorCommand
      */
     public RetryAllocates(Client client) {
       super(3, client);
+    }
+
+    @Override
+    public String toString() {
+      return "RetryAllocates{"
+          + "client=" + getClient()
+          + '}';
     }
   }
 
@@ -153,6 +168,14 @@ abstract class AllocatorCommand
     public Set<TCSResource<?>> getResources() {
       return resources;
     }
+
+    @Override
+    public String toString() {
+      return "CheckAllocationsPrepared{"
+          + "client=" + getClient()
+          + ", resources=" + resources
+          + '}';
+    }
   }
 
   /**
@@ -184,6 +207,14 @@ abstract class AllocatorCommand
      */
     public Set<TCSResource<?>> getResources() {
       return resources;
+    }
+
+    @Override
+    public String toString() {
+      return "Allocate{"
+          + "client=" + getClient()
+          + ", resources=" + resources
+          + '}';
     }
   }
 
