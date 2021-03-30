@@ -10,13 +10,18 @@ package org.opentcs.data.model.visualization;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A layout element describing the way in which a model element is to be
  * displayed.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed in favor of dedicated layout classes in corresponding TCS data
+ * objects.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class ModelLayoutElement
     extends LayoutElement
     implements Serializable {

@@ -16,12 +16,16 @@ import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An aggregation of model elements.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class Group
     extends TCSObject<Group>
     implements Serializable {

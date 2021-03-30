@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.FloydWarshallShortestPaths;
+import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.strategies.basic.routing.PointRouter;
 
@@ -36,8 +37,8 @@ public class FloydWarshallPointRouterFactory
   }
 
   @Override
-  protected ShortestPathAlgorithm<String, ModelEdge> createShortestPathAlgorithm(
-      Graph<String, ModelEdge> graph) {
+  protected ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
+      Graph<String, Edge> graph) {
     return new FloydWarshallShortestPaths<>(graph);
   }
 

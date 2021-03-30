@@ -166,7 +166,7 @@ public interface ModelComponent
    */
   default StringProperty getPropertyName() {
     return (StringProperty) getProperty(NAME);
-  };
+  }
 
   /**
    * Fügt den übergebenen AttributesChangeListener hinzu und informiert diesen

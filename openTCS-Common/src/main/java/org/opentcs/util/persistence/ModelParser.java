@@ -18,12 +18,10 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Objects;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import org.opentcs.util.persistence.v002.V002PlantModelTO;
-import org.opentcs.util.persistence.v002.V002TOMapper;
-import org.opentcs.util.persistence.v003.V003PlantModelTO;
-import org.opentcs.util.persistence.v003.V003TOMapper;
+import org.opentcs.util.persistence.v004.V004ModelParser;
+import org.opentcs.util.persistence.v004.V004PlantModelTO;
+import org.opentcs.util.persistence.v004.V004TOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,17 +57,7 @@ public class ModelParser {
 
     try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                                                                   CHARSET))) {
-      if (Objects.equals(modelVersion, V003TOMapper.VERSION_STRING)) {
-        return new V003TOMapper().map(V003PlantModelTO.fromXml(reader));
-      }
-      else if (Objects.equals(modelVersion, V002TOMapper.VERSION_STRING)) {
-        return new V002TOMapper().map(V002PlantModelTO.fromXml(reader));
-      }
-      else {
-        throw new IllegalArgumentException(
-            String.format("There is no parser for a model file with version: %s.", modelVersion)
-        );
-      }
+      return new V004ModelParser().read(reader, modelVersion);
     }
   }
 
@@ -84,8 +72,8 @@ public class ModelParser {
       throws IOException {
     try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
                                                                    CHARSET))) {
-      V003TOMapper mapper = new V003TOMapper();
-      V003PlantModelTO mappedModel = mapper.map(model);
+      V004TOMapper mapper = new V004TOMapper();
+      V004PlantModelTO mappedModel = mapper.map(model);
       mappedModel.toXml(writer);
     }
   }

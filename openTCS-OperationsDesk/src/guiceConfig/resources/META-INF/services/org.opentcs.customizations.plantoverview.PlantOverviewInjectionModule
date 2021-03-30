@@ -1,0 +1,3 @@
+org.opentcs.guing.DefaultImportersExportersModule
+org.opentcs.guing.PropertySuggestionsModule
+org.opentcs.guing.transport.OrderTypeSuggestionsModule

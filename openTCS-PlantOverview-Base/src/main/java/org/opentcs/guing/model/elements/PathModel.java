@@ -8,17 +8,24 @@
 package org.opentcs.guing.model.elements;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
+import org.opentcs.guing.components.layer.NullLayerWrapper;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LinerTypeProperty;
+import org.opentcs.guing.components.properties.type.PeripheralOperationsProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
+import org.opentcs.guing.model.FigureDecorationDetails;
 
 /**
  * A connection between two points.
@@ -26,7 +33,8 @@ import org.opentcs.guing.components.properties.type.StringProperty;
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PathModel
-    extends AbstractConnection {
+    extends AbstractConnection
+    implements FigureDecorationDetails {
 
   /**
    * Key for the length.
@@ -45,9 +53,25 @@ public class PathModel
    */
   public static final String LOCKED = "locked";
   /**
+   * Key for the peripheral operations on this path.
+   */
+  public static final String PERIPHERAL_OPERATIONS = "peripheralOperations";
+  /**
    * This class's resource bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
+  /**
+   * The set of vehicle models for which this model component's figure is to be decorated to
+   * indicate that it is part of the route of the respective vehicles.
+   */
+  private Set<VehicleModel> vehicles
+      = new TreeSet<>((v1, v2) -> v1.getName().compareTo(v2.getName()));
+  /**
+   * The set of block models for which this model component's figure is to be decorated to indicate
+   * that it is part of the respective block.
+   */
+  private Set<BlockModel> blocks
+      = new TreeSet<>((b1, b2) -> b1.getName().compareTo(b2.getName()));
 
   /**
    * Creates a new instance.
@@ -88,6 +112,51 @@ public class PathModel
 
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
+  }
+
+  public PeripheralOperationsProperty getPropertyPeripheralOperations() {
+    return (PeripheralOperationsProperty) getProperty(PERIPHERAL_OPERATIONS);
+  }
+
+  @Override
+  public void addVehicleModel(VehicleModel model) {
+    vehicles.add(model);
+  }
+
+  @Override
+  public void removeVehicleModel(VehicleModel model) {
+    vehicles.remove(model);
+  }
+
+  @Override
+  public Set<VehicleModel> getVehicleModels() {
+    return vehicles;
+  }
+
+  @Override
+  public void addBlockModel(BlockModel model) {
+    blocks.add(model);
+  }
+
+  @Override
+  public void removeBlockModel(BlockModel model) {
+    blocks.remove(model);
+  }
+
+  @Override
+  public Set<BlockModel> getBlockModels() {
+    return blocks;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public AbstractConnection clone()
+      throws CloneNotSupportedException {
+    PathModel clone = (PathModel) super.clone();
+    clone.setVehicleModels((Set<VehicleModel>) ((TreeSet<VehicleModel>) vehicles).clone());
+    clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
+
+    return clone;
   }
 
   private void createProperties() {
@@ -135,6 +204,12 @@ public class PathModel
     endComponent.setOperatingEditable(false);
     setProperty(END_COMPONENT, endComponent);
 
+    LayerWrapperProperty pLayerWrapper = new LayerWrapperProperty(this, new NullLayerWrapper());
+    pLayerWrapper.setDescription(bundle.getString("pathModel.property_layerWrapper.description"));
+    pLayerWrapper.setHelptext(bundle.getString("pathModel.property_layerWrapper.helptext"));
+    pLayerWrapper.setModellingEditable(false);
+    setProperty(LAYER_WRAPPER, pLayerWrapper);
+
     BooleanProperty pLocked = new BooleanProperty(this);
     pLocked.setDescription(bundle.getString("pathModel.property_locked.description"));
     pLocked.setHelptext(bundle.getString("pathModel.property_locked.helptext"));
@@ -142,10 +217,24 @@ public class PathModel
     pLocked.setOperatingEditable(true);
     setProperty(LOCKED, pLocked);
 
+    PeripheralOperationsProperty pOperations = new PeripheralOperationsProperty(this, new LinkedList<>());
+    pOperations.setDescription(bundle.getString("pathModel.property_peripheralOperations.description"));
+    pOperations.setHelptext(bundle.getString("pathModel.property_peripheralOperations.helptext"));
+    setProperty(PERIPHERAL_OPERATIONS, pOperations);
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("pathModel.property_miscellaneous.description"));
     pMiscellaneous.setHelptext(bundle.getString("pathModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
+  }
+
+  private void setVehicleModels(Set<VehicleModel> vehicles) {
+    this.vehicles = vehicles;
+  }
+
+  private void setBlockModels(Set<BlockModel> blocks) {
+    this.blocks = blocks;
   }
 
   /**

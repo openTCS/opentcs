@@ -11,17 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.annotation.Nonnull;
 import org.opentcs.data.ObjectPropConstants;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.visualization.ElementPropKeys;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
+import org.opentcs.guing.components.layer.NullLayerWrapper;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
+import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
 import org.opentcs.guing.model.AbstractConnectableModelComponent;
+import org.opentcs.guing.model.AbstractModelComponent;
+import org.opentcs.guing.model.FigureDecorationDetails;
 import org.opentcs.guing.model.PositionableModelComponent;
 
 /**
@@ -32,20 +42,57 @@ import org.opentcs.guing.model.PositionableModelComponent;
 public class LocationModel
     extends AbstractConnectableModelComponent
     implements AttributesChangeListener,
-               PositionableModelComponent {
+               PositionableModelComponent,
+               FigureDecorationDetails {
 
   /**
    * The property key for the location's type.
    */
   public static final String TYPE = "Type";
   /**
+   * Key for the locked state.
+   */
+  public static final String LOCKED = "locked";
+  /**
+   * Key for the reservation token.
+   */
+  public static final String PERIPHERAL_RESERVATION_TOKEN = "peripheralReservationToken";
+  /**
+   * Key for the peripheral state.
+   */
+  public static final String PERIPHERAL_STATE = "peripheralState";
+  /**
+   * Key for the peripheral processing state.
+   */
+  public static final String PERIPHERAL_PROC_STATE = "peripheralProcState";
+  /**
+   * Key for the peripheral job.
+   */
+  public static final String PERIPHERAL_JOB = "peripheralJob";
+  /**
    * This class's resource bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
+   * The set of vehicle models for which this model component's figure is to be decorted to
+   * indicate that it is part of the route of the respective vehicles.
+   */
+  private Set<VehicleModel> vehicles
+      = new TreeSet<>((v1, v2) -> v1.getName().compareTo(v2.getName()));
+  /**
+   * The set of block models for which this model component's figure is to be decorated to indicate
+   * that it is part of the respective block.
+   */
+  private Set<BlockModel> blocks
+      = new TreeSet<>((b1, b2) -> b1.getName().compareTo(b2.getName()));
+  /**
    * The model of the type.
    */
   private transient LocationTypeModel fLocationType;
+  /**
+   * The location for this model.
+   */
+  private Location location;
 
   /**
    * Creates a new instance.
@@ -142,6 +189,10 @@ public class LocationModel
     return (LocationTypeProperty) getProperty(TYPE);
   }
 
+  public BooleanProperty getPropertyLocked() {
+    return (BooleanProperty) getProperty(LOCKED);
+  }
+
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
@@ -170,6 +221,63 @@ public class LocationModel
     return (StringProperty) getProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE);
   }
 
+  public StringProperty getPropertyPeripheralReservationToken() {
+    return (StringProperty) getProperty(PERIPHERAL_RESERVATION_TOKEN);
+  }
+
+  public StringProperty getPropertyPeripheralState() {
+    return (StringProperty) getProperty(PERIPHERAL_STATE);
+  }
+
+  public StringProperty getPropertyPeripheralProcState() {
+    return (StringProperty) getProperty(PERIPHERAL_PROC_STATE);
+  }
+
+  public StringProperty getPropertyPeripheralJob() {
+    return (StringProperty) getProperty(PERIPHERAL_JOB);
+  }
+
+  @Override
+  public void addVehicleModel(VehicleModel model) {
+    vehicles.add(model);
+  }
+
+  @Override
+  public void removeVehicleModel(VehicleModel model) {
+    vehicles.remove(model);
+  }
+
+  @Override
+  public Set<VehicleModel> getVehicleModels() {
+    return vehicles;
+  }
+
+  @Override
+  public void addBlockModel(BlockModel model) {
+    blocks.add(model);
+  }
+
+  @Override
+  public void removeBlockModel(BlockModel model) {
+    blocks.remove(model);
+  }
+
+  @Override
+  public Set<BlockModel> getBlockModels() {
+    return blocks;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public AbstractModelComponent clone()
+      throws CloneNotSupportedException {
+    LocationModel clone = (LocationModel) super.clone();
+    clone.setVehicleModels((Set<VehicleModel>) ((TreeSet<VehicleModel>) vehicles).clone());
+    clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
+
+    return clone;
+  }
+
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("locationModel.property_name.description"));
@@ -191,7 +299,15 @@ public class LocationModel
     pType.setHelptext(bundle.getString("locationModel.property_type.helptext"));
     setProperty(TYPE, pType);
 
+    BooleanProperty pLocked = new BooleanProperty(this);
+    pLocked.setDescription(bundle.getString("locationModel.property_locked.description"));
+    pLocked.setHelptext(bundle.getString("locationModel.property_locked.helptext"));
+    pLocked.setCollectiveEditable(true);
+    pLocked.setOperatingEditable(true);
+    setProperty(LOCKED, pLocked);
+
     SymbolProperty pSymbol = new SymbolProperty(this);
+    pSymbol.setLocationRepresentation(LocationRepresentation.DEFAULT);
     pSymbol.setDescription(bundle.getString("locationModel.property_symbol.description"));
     pSymbol.setHelptext(bundle.getString("locationModel.property_symbol.helptext"));
     pSymbol.setCollectiveEditable(true);
@@ -227,9 +343,60 @@ public class LocationModel
     pLocLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, pLocLabelOrientationAngle);
 
+    LayerWrapperProperty pLayerWrapper = new LayerWrapperProperty(this, new NullLayerWrapper());
+    pLayerWrapper.setDescription(bundle.getString("locationModel.property_layerWrapper.description"));
+    pLayerWrapper.setHelptext(bundle.getString("locationModel.property_layerWrapper.helptext"));
+    pLayerWrapper.setModellingEditable(false);
+    setProperty(LAYER_WRAPPER, pLayerWrapper);
+
+    StringProperty peripheralReservationTokenProperty = new StringProperty(this);
+    peripheralReservationTokenProperty.setDescription(bundle.getString("locationModel.property_peripheralReservationToken.description"));
+    peripheralReservationTokenProperty.setHelptext(bundle.getString("locationModel.property_peripheralReservationToken.helptext"));
+    peripheralReservationTokenProperty.setOperatingEditable(false);
+    peripheralReservationTokenProperty.setModellingEditable(false);
+    setProperty(PERIPHERAL_RESERVATION_TOKEN, peripheralReservationTokenProperty);
+
+    StringProperty peripheralStateProperty = new StringProperty(this);
+    peripheralStateProperty.setDescription(bundle.getString("locationModel.property_peripheralState.description"));
+    peripheralStateProperty.setHelptext(bundle.getString("locationModel.property_peripheralState.helptext"));
+    peripheralStateProperty.setOperatingEditable(false);
+    peripheralStateProperty.setModellingEditable(false);
+    setProperty(PERIPHERAL_STATE, peripheralStateProperty);
+
+    StringProperty peripheralProcState = new StringProperty(this);
+    peripheralProcState.setDescription(bundle.getString("locationModel.property_peripheralProcState.description"));
+    peripheralProcState.setHelptext(bundle.getString("locationModel.property_peripheralProcState.helptext"));
+    peripheralProcState.setOperatingEditable(false);
+    peripheralProcState.setModellingEditable(false);
+    setProperty(PERIPHERAL_PROC_STATE, peripheralProcState);
+
+    StringProperty peripheralJob = new StringProperty(this);
+    peripheralJob.setDescription(bundle.getString("locationModel.property_peripheralJob.description"));
+    peripheralJob.setHelptext(bundle.getString("locationModel.property_peripheralJob.helptext"));
+    peripheralJob.setOperatingEditable(false);
+    peripheralJob.setModellingEditable(false);
+    setProperty(PERIPHERAL_JOB, peripheralJob);
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("locationModel.property_miscellaneous.description"));
     pMiscellaneous.setHelptext(bundle.getString("locationModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
+  }
+
+  private void setVehicleModels(Set<VehicleModel> vehicles) {
+    this.vehicles = vehicles;
+  }
+
+  private void setBlockModels(Set<BlockModel> blocks) {
+    this.blocks = blocks;
+  }
+
+  public void setLocation(@Nonnull Location location) {
+    this.location = requireNonNull(location, "location");
+  }
+
+  public Location getLocation() {
+    return location;
   }
 }

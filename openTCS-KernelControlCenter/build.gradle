@@ -17,6 +17,7 @@ dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
   compile project(':openTCS-CommAdapter-Loopback')
+  compile project(':openTCS-PeripheralCommAdapter-Loopback')
   compile project(':openTCS-Impl-Configuration-cfg4j')
   
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'

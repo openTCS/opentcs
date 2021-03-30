@@ -8,6 +8,7 @@
 package org.opentcs.access.to.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,10 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.data.model.ModelConstants;
+import org.opentcs.data.model.visualization.Layer;
+import org.opentcs.data.model.visualization.LayerGroup;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a plant model.
@@ -48,6 +53,7 @@ public class PlantModelCreationTO
   /**
    * The plant model's groups.
    */
+  @Deprecated
   private List<GroupCreationTO> groups = new LinkedList<>();
   /**
    * The plant model's vehicles.
@@ -56,7 +62,8 @@ public class PlantModelCreationTO
   /**
    * The plant model's visual layouts.
    */
-  private List<VisualLayoutCreationTO> visualLayouts = new LinkedList<>();
+  private List<VisualLayoutCreationTO> visualLayouts
+      = new LinkedList<>(Arrays.asList(defaultVisualLayout()));
 
   /**
    * Creates a new instance.
@@ -67,6 +74,7 @@ public class PlantModelCreationTO
     super(name);
   }
 
+  @SuppressWarnings("deprecation")
   private PlantModelCreationTO(@Nonnull String name,
                                @Nonnull Map<String, String> properties,
                                @Nonnull List<PointCreationTO> points,
@@ -333,6 +341,8 @@ public class PlantModelCreationTO
    *
    * @return This plant model's groups.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public List<GroupCreationTO> getGroups() {
     return Collections.unmodifiableList(groups);
   }
@@ -343,6 +353,8 @@ public class PlantModelCreationTO
    * @param groups The new groups.
    * @return A copy of this model, differing in the given groups.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public PlantModelCreationTO withGroups(@Nonnull List<GroupCreationTO> groups) {
     return new PlantModelCreationTO(getName(),
                                     getModifiableProperties(),
@@ -362,6 +374,8 @@ public class PlantModelCreationTO
    * @param group the new group.
    * @return A copy of this model that also includes the given group.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public PlantModelCreationTO withGroup(@Nonnull GroupCreationTO group) {
     requireNonNull(group, "group");
     return new PlantModelCreationTO(getName(),
@@ -424,10 +438,22 @@ public class PlantModelCreationTO
   }
 
   /**
+   * Returns this plant model's visual layout.
+   *
+   * @return This plant model's visual layout.
+   */
+  public VisualLayoutCreationTO getVisualLayout() {
+    return visualLayouts.get(visualLayouts.size() - 1);
+  }
+
+  /**
    * Returns this plant model's visual layouts.
    *
    * @return This plant model's visual layouts.
+   * @deprecated Use{@link #getVisualLayout()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public List<VisualLayoutCreationTO> getVisualLayouts() {
     return Collections.unmodifiableList(visualLayouts);
   }
@@ -437,7 +463,11 @@ public class PlantModelCreationTO
    *
    * @param visualLayouts The new visual layouts.
    * @return A copy of this model, differing in the given visual layouts.
+   * @deprecated Use {@link #withVisualLayout(org.opentcs.access.to.model.VisualLayoutCreationTO)}
+   * instead
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public PlantModelCreationTO withVisualLayouts(@Nonnull List<VisualLayoutCreationTO> visualLayouts) {
     return new PlantModelCreationTO(getName(),
                                     getModifiableProperties(),
@@ -458,6 +488,8 @@ public class PlantModelCreationTO
    * @param visualLayout the new visual layout.
    * @return A copy of this model that also includes the given visual layout.
    */
+  @ScheduledApiChange(details = "A plant model will contain only a single visual layout.",
+                      when = "6.0")
   public PlantModelCreationTO withVisualLayout(@Nonnull VisualLayoutCreationTO visualLayout) {
     requireNonNull(visualLayout, "visualLayout");
     return new PlantModelCreationTO(getName(),
@@ -514,5 +546,33 @@ public class PlantModelCreationTO
                                     groups,
                                     vehicles,
                                     visualLayouts);
+  }
+
+  @Override
+  public String toString() {
+    return "PlantModelCreationTO{"
+        + "name=" + getName()
+        + ", points=" + points
+        + ", paths=" + paths
+        + ", locationTypes=" + locationTypes
+        + ", locations=" + locations
+        + ", blocks=" + blocks
+        + ", groups=" + groups
+        + ", vehicles=" + vehicles
+        + ", visualLayouts=" + visualLayouts
+        + ", properties=" + getProperties()
+        + '}';
+  }
+
+  private VisualLayoutCreationTO defaultVisualLayout() {
+    return new VisualLayoutCreationTO(ModelConstants.DEFAULT_VISUAL_LAYOUT_NAME)
+        .withLayer(new Layer(ModelConstants.DEFAULT_LAYER_ID,
+                             ModelConstants.DEFAULT_LAYER_ORDINAL,
+                             true,
+                             ModelConstants.DEFAULT_LAYER_NAME,
+                             ModelConstants.DEFAULT_LAYER_GROUP_ID))
+        .withLayerGroup(new LayerGroup(ModelConstants.DEFAULT_LAYER_GROUP_ID,
+                                       ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+                                       true));
   }
 }

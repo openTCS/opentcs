@@ -9,6 +9,8 @@ package org.opentcs.guing.model.elements;
 
 import java.util.ResourceBundle;
 import org.opentcs.data.ObjectPropConstants;
+import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeActionsProperty;
@@ -30,9 +32,17 @@ public class LocationTypeModel
    */
   public static final String ALLOWED_OPERATIONS = "AllowedOperations";
   /**
+   * The key fo the poissible peripheral actions on this type.
+   */
+  public static final String ALLOWED_PERIPHERAL_OPERATIONS = "AllowedPeripheralOperations";
+  /**
    * This class's resource bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
+  /**
+   * Reference to the LocationType object.
+   */
+  private LocationType locationType;
 
   /**
    * Creates a new instance.
@@ -57,6 +67,10 @@ public class LocationTypeModel
     return (StringSetProperty) getProperty(ALLOWED_OPERATIONS);
   }
 
+  public StringSetProperty getPropertyAllowedPeripheralOperations() {
+    return (StringSetProperty) getProperty(ALLOWED_PERIPHERAL_OPERATIONS);
+  }
+
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
@@ -76,7 +90,13 @@ public class LocationTypeModel
     pOperations.setHelptext(bundle.getString("locationTypeModel.property_allowedOperations.helptext"));
     setProperty(ALLOWED_OPERATIONS, pOperations);
 
+    StringSetProperty pPeripheralOperations = new LocationTypeActionsProperty(this);
+    pPeripheralOperations.setDescription(bundle.getString("locationTypeModel.property_allowedPeripheralOperations.description"));
+    pPeripheralOperations.setHelptext(bundle.getString("locationTypeModel.property_allowedPeripheralOperations.helptext"));
+    setProperty(ALLOWED_PERIPHERAL_OPERATIONS, pPeripheralOperations);
+
     SymbolProperty pSymbol = new SymbolProperty(this);
+    pSymbol.setLocationRepresentation(LocationRepresentation.NONE);
     pSymbol.setDescription(bundle.getString("locationTypeModel.property_symbol.description"));
     pSymbol.setHelptext(bundle.getString("locationTypeModel.property_symbol.helptext"));
     setProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, pSymbol);
@@ -84,6 +104,16 @@ public class LocationTypeModel
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("locationTypeModel.property_miscellaneous.description"));
     pMiscellaneous.setHelptext(bundle.getString("locationTypeModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
+
+  public LocationType getLocationType() {
+    return locationType;
+  }
+
+  public void setLocationType(LocationType locationType) {
+    this.locationType = locationType;
+  }
+
 }

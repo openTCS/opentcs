@@ -38,6 +38,7 @@ public class ModelSerializationTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldSerializeAndDeserializeGroup()
       throws Exception {
     Group originalObject = new Group("Group1");

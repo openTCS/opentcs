@@ -31,6 +31,12 @@ public interface KernelApplicationConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
+      description = "Whether to automatically enable peripheral drivers on startup.",
+      orderKey = "1_startup_1")
+  boolean autoEnablePeripheralDriversOnStartup();
+
+  @ConfigurationEntry(
+      type = "Boolean",
       description = "Whether to implicitly save the model when leaving modelling state.",
       orderKey = "2_autosave")
   boolean saveModelOnTerminateModelling();

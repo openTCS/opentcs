@@ -7,6 +7,7 @@
  */
 package org.opentcs.data.model;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,6 +133,10 @@ public class Vehicle
    * Set to <code>Double.NaN</code> if the vehicle hasn't provided an orientation angle.
    */
   private final double orientationAngle;
+  /**
+   * The information regarding the grahical representation of this vehicle.
+   */
+  private final Layout layout;
 
   /**
    * Creates a new vehicle.
@@ -161,6 +166,7 @@ public class Vehicle
     this.orientationAngle = Double.NaN;
     this.energyLevel = 100;
     this.loadHandlingDevices = new ArrayList<>();
+    this.layout = new Layout();
   }
 
   private Vehicle(String name,
@@ -186,7 +192,8 @@ public class Vehicle
                   Triple precisePosition,
                   double orientationAngle,
                   int energyLevel,
-                  List<LoadHandlingDevice> loadHandlingDevices) {
+                  List<LoadHandlingDevice> loadHandlingDevices,
+                  Layout layout) {
     super(name, properties, history);
     this.length = checkInRange(length, 1, Integer.MAX_VALUE, "length");
     this.energyLevelGood = checkInRange(energyLevelGood, 0, 100, "energyLevelGood");
@@ -223,6 +230,7 @@ public class Vehicle
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
     this.loadHandlingDevices = listWithoutNullValues(requireNonNull(loadHandlingDevices,
                                                                     "loadHandlingDevices"));
+    this.layout = requireNonNull(layout, "layout");
   }
 
   @Override
@@ -250,7 +258,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   @Override
@@ -278,7 +287,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   @Override
@@ -306,7 +316,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   @Override
@@ -334,7 +345,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -376,7 +388,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -471,7 +484,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -515,7 +529,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -557,7 +572,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -600,7 +616,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -644,7 +661,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -686,7 +704,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -728,7 +747,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -770,7 +790,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -823,7 +844,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -874,7 +896,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -919,7 +942,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -962,7 +986,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1007,7 +1032,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1052,7 +1078,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1094,7 +1121,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1138,7 +1166,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1182,7 +1211,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1226,7 +1256,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1270,7 +1301,8 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1314,7 +1346,51 @@ public class Vehicle
                        precisePosition,
                        orientationAngle,
                        energyLevel,
-                       loadHandlingDevices);
+                       loadHandlingDevices,
+                       layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this vehicle.
+   *
+   * @return The information regarding the grahical representation of this vehicle.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withLayout(Layout layout) {
+    return new Vehicle(getName(),
+                       getProperties(),
+                       getHistory(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       allowedOrderTypes,
+                       routeProgressIndex,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices,
+                       layout);
   }
 
   /**
@@ -1453,5 +1529,52 @@ public class Vehicle
      * Indicates that the vehicle's orientation is undefined/unknown.
      */
     UNDEFINED
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a vehicle.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The color in which vehicle routes are to be emphasized.
+     */
+    private final Color routeColor;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(Color.RED);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param routeColor The color in which vehicle routes are to be emphasized.
+     */
+    public Layout(Color routeColor) {
+      this.routeColor = requireNonNull(routeColor, "routeColor");
+    }
+
+    /**
+     * Returns the color in which vehicle routes are to be emphasized.
+     *
+     * @return The color in which vehicle routes are to be emphasized.
+     */
+    public Color getRouteColor() {
+      return routeColor;
+    }
+
+    /**
+     * Creates a copy of this object, with the given color.
+     *
+     * @param routeColor The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withRouteColor(Color routeColor) {
+      return new Layout(routeColor);
+    }
   }
 }

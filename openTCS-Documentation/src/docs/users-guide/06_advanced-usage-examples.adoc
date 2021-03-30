@@ -56,14 +56,18 @@ The loopback driver interprets properties with the following keys:
 
 === Running kernel and its clients on separate systems
 
-The kernel and its clients (plant overview client and kernel control center client) communicate via Java's Remote Method Invocation (RMI) mechanism.
-This makes it possible to run the kernel and the clients on separate systems, as long as a network connection between these systems exists and is usable.
+The kernel and its clients (the Model Editor, Operations Desk and Kernel Control Center applications) communicate via the Java Remote Method Invocation (RMI) mechanism.
+This makes it possible to run the kernel and the clients on separate hosts, as long as a usable network connection between these systems exists.
 
-By default, both, the plant overview client and the kernel control center client are configured to connect to a kernel running on the same system.
-To connect them to a kernel running on a remote system, e.g. on a host named myhost.example.com, set the plant overview application's configuration parameter `plantoverviewapp.connectionBookmarks` and the kernel control center's application configuration parameter `kernelcontrolcenter.connectionBookmarks` to `SomeDescription|myhost.example.com|1099`.
-The configuration value can be a comma-separated list of <description>|<host>|<port> sets.
-The plant overview client and kernel control center client will automatically try to connect to the first host in the list.
-If that fails, they will show a dialog to select an entry or enter a different address.
+By default, the Model Editor, the Operations Desk and the Kernel Control Center are configured to connect to a kernel running on the same host.
+To connect them to a kernel running on a remote host, e.g. on a host named myhost.example.com, do the following:
+
+* For the Model Editor and the Operations Desk, set the configuration parameter `plantoverviewapp.connectionBookmarks` to `SomeDescription|myhost.example.com|1099`.
+* For the Kernel Control Center, set the configuration parameter `kernelcontrolcenter.connectionBookmarks` to `SomeDescription|myhost.example.com|1099`.
+
+The configuration value can be a comma-separated list of `<description>|<host>|<port>` sets.
+The applications will automatically try to connect to the first host in the list.
+If that fails, they will show a dialog to select an entry or enter a different address to connect to.
 
 === Encrypting communication with the kernel
 

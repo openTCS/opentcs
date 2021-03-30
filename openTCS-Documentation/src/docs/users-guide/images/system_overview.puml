@@ -15,7 +15,8 @@ interface "Vehicle driver #1" as VehicleDriver1
 interface "Vehicle driver #2" as VehicleDriver2
 interface "Vehicle driver #n" as VehicleDriverN
 
-agent "Plant Overview" as PlantOverview
+agent "Model Editor" as ModelEditor
+agent "Operations Desk" as OperationsDesk
 agent "Kernel Control Center" as KernelControlCenter
 
 agent "Third-party client\n(ERP, WMS, ...)" as Client1
@@ -29,7 +30,8 @@ agent "Vehicle #n" as VehicleN
 RmiInterface -- Kernel : openTCS API
 WebApi -- Kernel : openTCS API
 
-PlantOverview .. RmiInterface : RMI
+ModelEditor .. RmiInterface : RMI
+OperationsDesk .. RmiInterface : RMI
 KernelControlCenter .. RmiInterface : RMI
 
 Client1 .. RmiInterface : RMI

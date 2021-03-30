@@ -8,14 +8,19 @@
 package org.opentcs.customizations.kernel;
 
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
+import org.opentcs.components.kernel.PeripheralJobDispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
+import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.customizations.ConfigurableInjectionModule;
+import org.opentcs.drivers.peripherals.PeripheralCommAdapterFactory;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
@@ -51,6 +56,15 @@ public abstract class KernelInjectionModule
    */
   protected void bindDispatcher(Class<? extends Dispatcher> clazz) {
     bind(Dispatcher.class).to(clazz).in(Singleton.class);
+  }
+
+  /**
+   * Sets the peripheral job dispatcher implementation to be used.
+   *
+   * @param clazz The implementation.
+   */
+  protected void bindPeripheralJobDispatcher(Class<? extends PeripheralJobDispatcher> clazz) {
+    bind(PeripheralJobDispatcher.class).to(clazz).in(Singleton.class);
   }
 
   /**
@@ -92,6 +106,15 @@ public abstract class KernelInjectionModule
   }
 
   /**
+   * Returns a multibinder that can be used to register peripheral communication adapter factories.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<PeripheralCommAdapterFactory> peripheralCommAdaptersBinder() {
+    return Multibinder.newSetBinder(binder(), PeripheralCommAdapterFactory.class);
+  }
+
+  /**
    * Returns a multibinder that can be used to register transport order cleanup approvals.
    *
    * @return The multibinder.
@@ -107,5 +130,25 @@ public abstract class KernelInjectionModule
    */
   protected Multibinder<OrderSequenceCleanupApproval> orderSequenceCleanupApprovalBinder() {
     return Multibinder.newSetBinder(binder(), OrderSequenceCleanupApproval.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register scheduler modules.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<Scheduler.Module> schedulerModuleBinder() {
+    return Multibinder.newSetBinder(binder(), Scheduler.Module.class);
+  }
+
+  /**
+   * Returns a mapbinder that can be used to register edge evaluators.
+   *
+   * @return The mapbinder.
+   */
+  protected MapBinder<String, EdgeEvaluator> edgeEvaluatorBinder() {
+    return MapBinder.newMapBinder(binder(),
+                                  TypeLiteral.get(String.class),
+                                  TypeLiteral.get(EdgeEvaluator.class));
   }
 }

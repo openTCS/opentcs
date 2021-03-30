@@ -18,10 +18,9 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
+import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -45,10 +44,6 @@ public class DefaultRouter
     implements Router {
 
   /**
-   * The default value of a vehicle's routing group.
-   */
-  private static final String DEFAULT_ROUTING_GROUP = "";
-  /**
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRouter.class);
@@ -65,6 +60,10 @@ public class DefaultRouter
    */
   private final PointRouterFactory pointRouterFactory;
   /**
+   * Used to map vehicles to their routing groups.
+   */
+  private final GroupMapper routingGroupMapper;
+  /**
    * The routes selected for each vehicle.
    */
   private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new ConcurrentHashMap<>();
@@ -72,10 +71,6 @@ public class DefaultRouter
    * The point routers by vehicle routing group.
    */
   private final Map<String, PointRouter> pointRoutersByVehicleGroup = new ConcurrentHashMap<>();
-  /**
-   * Prevents reading from the routing tables and planned routes while updating them.
-   */
-  private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
   /**
    * Indicates whether this component is enabled.
    */
@@ -86,14 +81,17 @@ public class DefaultRouter
    *
    * @param objectService The object service providing the model data.
    * @param pointRouterFactory A factory for point routers.
+   * @param routingGroupMapper Used to map vehicles to their routing groups.
    * @param configuration This class's configuration.
    */
   @Inject
   public DefaultRouter(TCSObjectService objectService,
                        PointRouterFactory pointRouterFactory,
+                       GroupMapper routingGroupMapper,
                        DefaultRouterConfiguration configuration) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.pointRouterFactory = requireNonNull(pointRouterFactory, "pointRouterFactory");
+    this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -102,14 +100,11 @@ public class DefaultRouter
     if (isInitialized()) {
       return;
     }
-    try {
-      rwLock.writeLock().lock();
+
+    synchronized (this) {
       routesByVehicle.clear();
       topologyChanged();
       initialized = true;
-    }
-    finally {
-      rwLock.writeLock().unlock();
     }
   }
 
@@ -123,33 +118,18 @@ public class DefaultRouter
     if (!isInitialized()) {
       return;
     }
-    try {
-      rwLock.writeLock().lock();
+
+    synchronized (this) {
       routesByVehicle.clear();
       pointRoutersByVehicleGroup.clear();
       initialized = false;
-    }
-    finally {
-      rwLock.writeLock().unlock();
     }
   }
 
   @Override
   public void topologyChanged() {
-    try {
-      rwLock.writeLock().lock();
+    synchronized (this) {
       pointRoutersByVehicleGroup.clear();
-      for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
-        String currentGroup = getRoutingGroupOfVehicle(curVehicle);
-        if (!pointRoutersByVehicleGroup.containsKey(currentGroup)) {
-          pointRoutersByVehicleGroup.put(currentGroup,
-                                         pointRouterFactory.createPointRouter(curVehicle));
-        }
-      }
-      LOG.debug("Number of point routers created: {}", pointRoutersByVehicleGroup.size());
-    }
-    finally {
-      rwLock.writeLock().unlock();
     }
   }
 
@@ -157,12 +137,16 @@ public class DefaultRouter
   public Set<Vehicle> checkRoutability(TransportOrder order) {
     requireNonNull(order, "order");
 
-    try {
-      rwLock.readLock().lock();
+    synchronized (this) {
       Set<Vehicle> result = new HashSet<>();
       List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
       DriveOrder[] driveOrders
           = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
+
+      // Since point routers get reset on topology changes, make sure there are point routers for 
+      // all routing groups.
+      createMissingPointRouters();
+
       for (Map.Entry<String, PointRouter> curEntry : pointRoutersByVehicleGroup.entrySet()) {
         // Get all points at the first location at which a vehicle of the current
         // type can execute the desired operation and check if an acceptable route
@@ -176,9 +160,6 @@ public class DefaultRouter
       }
       return result;
     }
-    finally {
-      rwLock.readLock().unlock();
-    }
   }
 
   @Override
@@ -189,20 +170,16 @@ public class DefaultRouter
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(transportOrder, "transportOrder");
 
-    try {
-      rwLock.readLock().lock();
+    synchronized (this) {
       List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
       DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      PointRouter pointRouter = pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle));
+      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
       OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
       OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
       computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
       return (resultStruct.bestCosts == Long.MAX_VALUE)
           ? Optional.empty()
           : Optional.of(Arrays.asList(resultStruct.bestRoute));
-    }
-    finally {
-      rwLock.readLock().unlock();
     }
   }
 
@@ -214,9 +191,8 @@ public class DefaultRouter
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(destinationPoint, "destinationPoint");
 
-    try {
-      rwLock.readLock().lock();
-      PointRouter pointRouter = pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle));
+    synchronized (this) {
+      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
       long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
       if (costs == INFINITE_COSTS) {
         return Optional.empty();
@@ -229,9 +205,6 @@ public class DefaultRouter
       }
       return Optional.of(new Route(steps, costs));
     }
-    finally {
-      rwLock.readLock().unlock();
-    }
   }
 
   @Override
@@ -242,13 +215,8 @@ public class DefaultRouter
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(destinationPoint, "destinationPoint");
 
-    try {
-      rwLock.readLock().lock();
-      return pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle))
-          .getCosts(sourcePoint, destinationPoint);
-    }
-    finally {
-      rwLock.readLock().unlock();
+    synchronized (this) {
+      return getPointRouterForVehicle(vehicle).getCosts(sourcePoint, destinationPoint);
     }
   }
 
@@ -260,13 +228,8 @@ public class DefaultRouter
     requireNonNull(srcPointRef, "srcPointRef");
     requireNonNull(dstPointRef, "dstPointRef");
 
-    try {
-      rwLock.readLock().lock();
-      return pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle))
-          .getCosts(srcPointRef, dstPointRef);
-    }
-    finally {
-      rwLock.readLock().unlock();
+    synchronized (this) {
+      return getPointRouterForVehicle(vehicle).getCosts(srcPointRef, dstPointRef);
     }
   }
 
@@ -274,8 +237,7 @@ public class DefaultRouter
   public void selectRoute(Vehicle vehicle, List<DriveOrder> driveOrders) {
     requireNonNull(vehicle, "vehicle");
 
-    try {
-      rwLock.writeLock().lock();
+    synchronized (this) {
       if (driveOrders == null) {
         // XXX Should we remember the vehicle's current position, maybe?
         routesByVehicle.remove(vehicle);
@@ -284,26 +246,18 @@ public class DefaultRouter
         routesByVehicle.put(vehicle, driveOrders);
       }
     }
-    finally {
-      rwLock.writeLock().unlock();
-    }
   }
 
   @Override
   public Map<Vehicle, List<DriveOrder>> getSelectedRoutes() {
-    try {
-      rwLock.readLock().lock();
+    synchronized (this) {
       return new HashMap<>(routesByVehicle);
-    }
-    finally {
-      rwLock.readLock().unlock();
     }
   }
 
   @Override
   public Set<Point> getTargetedPoints() {
-    try {
-      rwLock.readLock().lock();
+    synchronized (this) {
       Set<Point> result = new HashSet<>();
       for (List<DriveOrder> curOrderList : routesByVehicle.values()) {
         DriveOrder finalOrder = curOrderList.get(curOrderList.size() - 1);
@@ -311,9 +265,32 @@ public class DefaultRouter
       }
       return result;
     }
-    finally {
-      rwLock.readLock().unlock();
+  }
+
+  private void createMissingPointRouters() {
+    Map<String, Vehicle> distinctRoutingGroups = new HashMap<>();
+    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class)) {
+      distinctRoutingGroups.putIfAbsent(routingGroupMapper.apply(vehicle), vehicle);
     }
+
+    // Lazily create point routers if they don't exist.
+    distinctRoutingGroups.forEach((routingGroup, vehicle) -> getPointRouterForVehicle(vehicle));
+  }
+
+  /**
+   * Returns the {@link PointRouter} for the given vehicle considering the vehicle's routing group.
+   *
+   * @param vehicle The vehicle to get the point router for.
+   * @return The point router.
+   */
+  private PointRouter getPointRouterForVehicle(Vehicle vehicle) {
+    String routingGroup = routingGroupMapper.apply(vehicle);
+    if (!pointRoutersByVehicleGroup.containsKey(routingGroup)) {
+      pointRoutersByVehicleGroup.put(routingGroup,
+                                     pointRouterFactory.createPointRouter(vehicle));
+    }
+
+    return pointRoutersByVehicleGroup.get(routingGroup);
   }
 
   /**
@@ -496,24 +473,11 @@ public class DefaultRouter
   private Set<Vehicle> getVehiclesByRoutingGroup(String routingGroup) {
     Set<Vehicle> result = new HashSet<>();
     for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
-      if (Objects.equals(getRoutingGroupOfVehicle(curVehicle), routingGroup)) {
+      if (Objects.equals(routingGroupMapper.apply(curVehicle), routingGroup)) {
         result.add(curVehicle);
       }
     }
     return result;
-  }
-
-  /**
-   * Returns the routing group of the vehicle or {@link #DEFAULT_ROUTING_GROUP} if the property
-   * does not exist or is invalid.
-   *
-   * @param vehicle The vehicle
-   * @return The routing group of the vehicle
-   */
-  private String getRoutingGroupOfVehicle(Vehicle vehicle) {
-    String propVal = vehicle.getProperty(PROPKEY_ROUTING_GROUP);
-
-    return propVal == null ? DEFAULT_ROUTING_GROUP : propVal;
   }
 
   /**

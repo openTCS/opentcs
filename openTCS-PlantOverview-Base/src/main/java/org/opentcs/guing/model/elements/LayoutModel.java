@@ -7,9 +7,12 @@
  */
 package org.opentcs.guing.model.elements;
 
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.LayerGroupsProperty;
+import org.opentcs.guing.components.properties.type.LayerWrappersProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.CompositeModelComponent;
@@ -25,6 +28,8 @@ public class LayoutModel
 
   public static final String SCALE_X = "scaleX";
   public static final String SCALE_Y = "scaleY";
+  public static final String LAYERS_WRAPPERS = "layerWrappers";
+  public static final String LAYER_GROUPS = "layerGroups";
   /**
    * This class's resource bundle.
    */
@@ -55,6 +60,14 @@ public class LayoutModel
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
 
+  public LayerWrappersProperty getPropertyLayerWrappers() {
+    return (LayerWrappersProperty) getProperty(LAYERS_WRAPPERS);
+  }
+
+  public LayerGroupsProperty getPropertyLayerGroups() {
+    return (LayerGroupsProperty) getProperty(LAYER_GROUPS);
+  }
+
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("layoutModel.property_name.description"));
@@ -74,6 +87,19 @@ public class LayoutModel
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("layoutModel.property_miscellaneous.description"));
     pMiscellaneous.setHelptext(bundle.getString("layoutModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
+
+    LayerWrappersProperty pLayerWrappers = new LayerWrappersProperty(this, new HashMap<>());
+    pLayerWrappers.setDescription(bundle.getString("layoutModel.property_layerWrappers.description"));
+    pLayerWrappers.setHelptext(bundle.getString("layoutModel.property_layerWrappers.helptext"));
+    pLayerWrappers.setModellingEditable(false);
+    setProperty(LAYERS_WRAPPERS, pLayerWrappers);
+
+    LayerGroupsProperty pLayerGroups = new LayerGroupsProperty(this, new HashMap<>());
+    pLayerGroups.setDescription(bundle.getString("layoutModel.property_layerGroups.description"));
+    pLayerGroups.setHelptext(bundle.getString("layoutModel.property_layerGroups.helptext"));
+    pLayerGroups.setModellingEditable(false);
+    setProperty(LAYER_GROUPS, pLayerGroups);
   }
 }

@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * A location at which a {@link Vehicle} may perform an action.
@@ -50,9 +51,24 @@ public class Location
    * A set of links attached to this location.
    */
   private final Set<Link> attachedLinks;
+  /**
+   * A flag for marking this location as locked (i.e. to prevent transport orders leading to it
+   * from being assigned to vehicles).
+   */
+  private final boolean locked;
+  /**
+   * Details about the peripheral devices this location may represent.
+   */
+  private final PeripheralInformation peripheralInformation;
+  /**
+   * The information regarding the grahical representation of this location.
+   */
+  private final Layout layout;
 
   /**
    * Creates a new Location.
+   *
+   * this.locked = false;
    *
    * @param name The new location's name.
    * @param type The new location's type.
@@ -62,6 +78,9 @@ public class Location
     this.type = requireNonNull(type, "type");
     this.position = new Triple(0, 0, 0);
     this.attachedLinks = new HashSet<>();
+    this.locked = false;
+    this.peripheralInformation = new PeripheralInformation();
+    this.layout = new Layout();
   }
 
   private Location(String name,
@@ -69,11 +88,17 @@ public class Location
                    ObjectHistory history,
                    TCSObjectReference<LocationType> locationType,
                    Triple position,
-                   Set<Link> attachedLinks) {
+                   Set<Link> attachedLinks,
+                   boolean locked,
+                   PeripheralInformation peripheralInformation,
+                   Layout layout) {
     super(name, properties, history);
     this.type = requireNonNull(locationType, "locationType");
     this.position = requireNonNull(position, "position");
     this.attachedLinks = new HashSet<>(requireNonNull(attachedLinks, "attachedLinks"));
+    this.locked = locked;
+    this.peripheralInformation = requireNonNull(peripheralInformation, "peripheralInformation");
+    this.layout = requireNonNull(layout, "layout");
   }
 
   @Override
@@ -83,7 +108,10 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
   }
 
   @Override
@@ -93,7 +121,10 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
   }
 
   @Override
@@ -103,7 +134,10 @@ public class Location
                         getHistory().withEntryAppended(entry),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
   }
 
   @Override
@@ -113,7 +147,10 @@ public class Location
                         history,
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
   }
 
   /**
@@ -137,7 +174,10 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
   }
 
   /**
@@ -170,7 +210,93 @@ public class Location
                         getHistory(),
                         type,
                         position,
-                        attachedLinks);
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
+  }
+
+  /**
+   * Returns details about the peripheral devices this location may represent.
+   *
+   * @return Details about the peripheral devices this location may represent.
+   */
+  @Nonnull
+  public PeripheralInformation getPeripheralInformation() {
+    return peripheralInformation;
+  }
+
+  /**
+   * Creates a copy of this object, with the given peripheral information.
+   *
+   * @param peripheralInformation The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Location withPeripheralInformation(@Nonnull PeripheralInformation peripheralInformation) {
+    return new Location(getName(),
+                        getProperties(),
+                        getHistory(),
+                        type,
+                        position,
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
+  }
+
+  /**
+   * Returns the lock status of this location (i.e. whether it my be used by vehicles or not).
+   *
+   * @return {@code true} if this location is currently locked (i.e. it may not be used
+   * by vehicles), else {@code false}.
+   */
+  public boolean isLocked() {
+    return locked;
+  }
+
+  /**
+   * Creates a copy of this object, with the given locked flag.
+   *
+   * @param locked The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Location withLocked(boolean locked) {
+    return new Location(getName(),
+                        getProperties(),
+                        getHistory(),
+                        type,
+                        position,
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this location.
+   *
+   * @return The information regarding the grahical representation of this location.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Location withLayout(Layout layout) {
+    return new Location(getName(),
+                        getProperties(),
+                        getHistory(),
+                        type,
+                        position,
+                        attachedLinks,
+                        locked,
+                        peripheralInformation,
+                        layout);
   }
 
   /**
@@ -297,6 +423,144 @@ public class Location
     @Override
     public int hashCode() {
       return location.hashCode() ^ point.hashCode();
+    }
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a location.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The coordinates at which the location is to be drawn (in mm).
+     */
+    private final Couple position;
+    /**
+     * The offset of the label's position to the location's position (in lu).
+     */
+    private final Couple labelOffset;
+    /**
+     * The location representation to use.
+     */
+    private final LocationRepresentation locationRepresentation;
+    /**
+     * The ID of the layer on which the location is to be drawn.
+     */
+    private final int layerId;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(new Couple(0, 0), new Couple(0, 0), LocationRepresentation.DEFAULT, 0);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param position The coordinates at which the location is to be drawn (in mm).
+     * @param labelOffset The offset of the label's location to the point's position (in lu).
+     * @param locationRepresentation The location representation to use.
+     * @param layerId The ID of the layer on which the location is to be drawn.
+     */
+    public Layout(Couple position,
+                  Couple labelOffset,
+                  LocationRepresentation locationRepresentation,
+                  int layerId) {
+      this.position = requireNonNull(position, "position");
+      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
+      this.locationRepresentation = requireNonNull(locationRepresentation,
+                                                   "locationRepresentation");
+      this.layerId = layerId;
+    }
+
+    /**
+     * Returns the coordinates at which the location is to be drawn (in mm).
+     *
+     * @return The coordinates at which the location is to be drawn (in mm).
+     */
+    public Couple getPosition() {
+      return position;
+    }
+
+    /**
+     * Creates a copy of this object, with the given position.
+     *
+     * @param position The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withPosition(Couple position) {
+      return new Layout(position,
+                        labelOffset,
+                        locationRepresentation,
+                        layerId);
+    }
+
+    /**
+     * Returns the offset of the label's position to the location's position (in lu).
+     *
+     * @return The offset of the label's position to the location's position (in lu).
+     */
+    public Couple getLabelOffset() {
+      return labelOffset;
+    }
+
+    /**
+     * Creates a copy of this object, with the given X label offset.
+     *
+     * @param labelOffset The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLabelOffset(Couple labelOffset) {
+      return new Layout(position,
+                        labelOffset,
+                        locationRepresentation,
+                        layerId);
+    }
+
+    /**
+     * Returns the location representation to use.
+     *
+     * @return The location representation to use.
+     */
+    public LocationRepresentation getLocationRepresentation() {
+      return locationRepresentation;
+    }
+
+    /**
+     * Creates a copy of this object, with the given location representation.
+     *
+     * @param locationRepresentation The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLocationRepresentation(LocationRepresentation locationRepresentation) {
+      return new Layout(position,
+                        labelOffset,
+                        locationRepresentation,
+                        layerId);
+    }
+
+    /**
+     * Returns the ID of the layer on which the location is to be drawn.
+     *
+     * @return The layer ID.
+     */
+    public int getLayerId() {
+      return layerId;
+    }
+
+    /**
+     * Creates a copy of this object, with the given layer ID.
+     *
+     * @param layerId The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLayerId(int layerId) {
+      return new Layout(position,
+                        labelOffset,
+                        locationRepresentation,
+                        layerId);
     }
   }
 }

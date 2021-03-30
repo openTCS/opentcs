@@ -35,7 +35,10 @@ distributions {
       project(':openTCS-KernelControlCenter').ext.collectableDistDir
     }
     contents.from {
-      project(':openTCS-PlantOverview').ext.collectableDistDir
+      project(':openTCS-ModelEditor').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-OperationsDesk').ext.collectableDistDir
     }
     contents.from {
       project(':openTCS-Documentation').ext.collectableDistDir
@@ -50,7 +53,8 @@ task statsAggregate(type: org.kordamp.gradle.stats.AggregateStatsReportTask) {
 task subDists {
   dependsOn(':openTCS-Kernel:installDist')
   dependsOn(':openTCS-KernelControlCenter:installDist')
-  dependsOn(':openTCS-PlantOverview:installDist')
+  dependsOn(':openTCS-ModelEditor:installDist')
+  dependsOn(':openTCS-OperationsDesk:installDist')
   dependsOn(':openTCS-Documentation:installDist')
 }
 
@@ -85,6 +89,7 @@ task distSrcZip(type: Zip) {
   includes << 'gradlew.bat'
 
   excludes << '.gitlab'
+  excludes << '.gitlab-ci.yml'
   excludes << '.gradle'
   excludes << '**/build'
 }

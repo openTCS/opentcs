@@ -43,7 +43,7 @@ public interface ShortestPathConfiguration {
         "'EXPLICIT_PROPERTIES': A route's cost is the sum of the explicitly given costs extracted "
         + "from path properties."
       })
-  List<EvaluatorType> edgeEvaluators();
+  List<String> edgeEvaluators();
 
   enum Algorithm {
     DIJKSTRA(false),
@@ -59,12 +59,5 @@ public interface ShortestPathConfiguration {
     public boolean isHandlingNegativeCosts() {
       return handlingNegativeCosts;
     }
-  }
-
-  enum EvaluatorType {
-    DISTANCE,
-    TRAVELTIME,
-    HOPS,
-    EXPLICIT_PROPERTIES
   }
 }

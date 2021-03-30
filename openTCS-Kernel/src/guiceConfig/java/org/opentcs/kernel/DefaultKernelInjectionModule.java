@@ -20,11 +20,18 @@ import org.opentcs.access.SslParameterSet;
 import org.opentcs.common.LoggingScheduledThreadPoolExecutor;
 import org.opentcs.components.kernel.ObjectNameProvider;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.InternalPeripheralJobService;
+import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.components.kernel.services.InternalQueryService;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.NotificationService;
+import org.opentcs.components.kernel.services.PeripheralDispatcherService;
+import org.opentcs.components.kernel.services.PeripheralJobService;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -35,14 +42,25 @@ import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
+import org.opentcs.drivers.peripherals.PeripheralControllerPool;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
+import org.opentcs.kernel.peripherals.DefaultPeripheralControllerPool;
+import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
+import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
+import org.opentcs.kernel.peripherals.PeripheralCommAdapterRegistry;
+import org.opentcs.kernel.peripherals.PeripheralControllerFactory;
+import org.opentcs.kernel.peripherals.PeripheralEntryPool;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
 import org.opentcs.kernel.services.StandardDispatcherService;
 import org.opentcs.kernel.services.StandardNotificationService;
+import org.opentcs.kernel.services.StandardPeripheralDispatcherService;
+import org.opentcs.kernel.services.StandardPeripheralJobService;
+import org.opentcs.kernel.services.StandardPeripheralService;
 import org.opentcs.kernel.services.StandardPlantModelService;
+import org.opentcs.kernel.services.StandardQueryService;
 import org.opentcs.kernel.services.StandardRouterService;
 import org.opentcs.kernel.services.StandardSchedulerService;
 import org.opentcs.kernel.services.StandardTCSObjectService;
@@ -51,9 +69,11 @@ import org.opentcs.kernel.services.StandardVehicleService;
 import org.opentcs.kernel.vehicles.DefaultVehicleControllerPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
+import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.NotificationBuffer;
+import org.opentcs.kernel.workingset.PeripheralJobPool;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
@@ -91,6 +111,7 @@ public class DefaultKernelInjectionModule
     bind(TCSObjectPool.class).in(Singleton.class);
     bind(Model.class).in(Singleton.class);
     bind(TransportOrderPool.class).in(Singleton.class);
+    bind(PeripheralJobPool.class).in(Singleton.class);
     bind(NotificationBuffer.class).in(Singleton.class);
 
     bind(ObjectNameProvider.class)
@@ -109,6 +130,15 @@ public class DefaultKernelInjectionModule
     bind(VehicleEntryPool.class)
         .in(Singleton.class);
 
+    configurePeripheralControllers();
+
+    bind(PeripheralCommAdapterRegistry.class)
+        .in(Singleton.class);
+    bind(PeripheralAttachmentManager.class)
+        .in(Singleton.class);
+    bind(PeripheralEntryPool.class)
+        .in(Singleton.class);
+
     bind(StandardKernel.class)
         .in(Singleton.class);
     bind(LocalKernel.class)
@@ -124,6 +154,7 @@ public class DefaultKernelInjectionModule
     extensionsBinderModelling();
     extensionsBinderOperating();
     vehicleCommAdaptersBinder();
+    peripheralCommAdaptersBinder();
   }
 
   private void configureKernelServicesDependencies() {
@@ -153,10 +184,26 @@ public class DefaultKernelInjectionModule
 
     bind(StandardSchedulerService.class).in(Singleton.class);
     bind(SchedulerService.class).to(StandardSchedulerService.class);
+
+    bind(StandardQueryService.class).in(Singleton.class);
+    bind(QueryService.class).to(StandardQueryService.class);
+    bind(InternalQueryService.class).to(StandardQueryService.class);
+
+    bind(StandardPeripheralService.class).in(Singleton.class);
+    bind(PeripheralService.class).to(StandardPeripheralService.class);
+    bind(InternalPeripheralService.class).to(StandardPeripheralService.class);
+
+    bind(StandardPeripheralJobService.class).in(Singleton.class);
+    bind(PeripheralJobService.class).to(StandardPeripheralJobService.class);
+    bind(InternalPeripheralJobService.class).to(StandardPeripheralJobService.class);
+
+    bind(StandardPeripheralDispatcherService.class).in(Singleton.class);
+    bind(PeripheralDispatcherService.class).to(StandardPeripheralDispatcherService.class);
   }
 
   private void configureVehicleControllers() {
     install(new FactoryModuleBuilder().build(VehicleControllerFactory.class));
+    install(new FactoryModuleBuilder().build(VehicleControllerComponentsFactory.class));
 
     bind(DefaultVehicleControllerPool.class)
         .in(Singleton.class);
@@ -164,6 +211,17 @@ public class DefaultKernelInjectionModule
         .to(DefaultVehicleControllerPool.class);
     bind(LocalVehicleControllerPool.class)
         .to(DefaultVehicleControllerPool.class);
+  }
+
+  private void configurePeripheralControllers() {
+    install(new FactoryModuleBuilder().build(PeripheralControllerFactory.class));
+
+    bind(DefaultPeripheralControllerPool.class)
+        .in(Singleton.class);
+    bind(PeripheralControllerPool.class)
+        .to(DefaultPeripheralControllerPool.class);
+    bind(LocalPeripheralControllerPool.class)
+        .to(DefaultPeripheralControllerPool.class);
   }
 
   private void configurePersistence() {

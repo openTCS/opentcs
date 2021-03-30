@@ -9,7 +9,8 @@ evaluationDependsOn(':openTCS-API-Injection')
 evaluationDependsOn(':openTCS-Common')
 evaluationDependsOn(':openTCS-Kernel')
 evaluationDependsOn(':openTCS-KernelControlCenter')
-evaluationDependsOn(':openTCS-PlantOverview')
+evaluationDependsOn(':openTCS-ModelEditor')
+evaluationDependsOn(':openTCS-OperationsDesk')
 evaluationDependsOn(':openTCS-PlantOverview-Panel-LoadGenerator')
 
 apply from: "${rootDir}/gradle/java-project.gradle"
@@ -51,12 +52,14 @@ dependencies {
   compile project(':openTCS-Kernel')
   
   schemagen project(':openTCS-Kernel')
-  schemagen project(':openTCS-PlantOverview')
+  schemagen project(':openTCS-ModelEditor')
+  schemagen project(':openTCS-OperationsDesk')
   schemagen jar.outputs.files
   
   configdocgen project(':openTCS-Kernel')
   configdocgen project(':openTCS-KernelControlCenter')
-  configdocgen project(':openTCS-PlantOverview')
+  configdocgen project(':openTCS-ModelEditor')
+  configdocgen project(':openTCS-OperationsDesk')
   configdocgen jar.outputs.files
   
   swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '3.20.5'
@@ -351,9 +354,12 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
              'loadGeneratorPanel-javaSrc': project(':openTCS-PlantOverview-Panel-LoadGenerator').javaSrcDir,
              'loadGeneratorPanel-guiceSrc': project(':openTCS-PlantOverview-Panel-LoadGenerator').guiceSrcDir,
              'loadGeneratorPanel-testSrc': project(':openTCS-PlantOverview-Panel-LoadGenerator').testSrcDir,
-             'plantoverview-javaSrc': project(':openTCS-PlantOverview').javaSrcDir,
-             'plantoverview-guiceSrc': project(':openTCS-PlantOverview').guiceSrcDir,
-             'plantoverview-testSrc': project(':openTCS-PlantOverview').testSrcDir,
+             'modelEditor-javaSrc': project(':openTCS-ModelEditor').javaSrcDir,
+             'modelEditor-guiceSrc': project(':openTCS-ModelEditor').guiceSrcDir,
+             'modelEditor-testSrc': project(':openTCS-ModelEditor').testSrcDir,
+             'operationsDesk-javaSrc': project(':openTCS-OperationsDesk').javaSrcDir,
+             'operationsDesk-guiceSrc': project(':openTCS-OperationsDesk').guiceSrcDir,
+             'operationsDesk-testSrc': project(':openTCS-OperationsDesk').testSrcDir,
              'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
              'samples': samplesDir,
   // 'imagesdir': 'images',
@@ -484,7 +490,8 @@ task configdocgen {
   dependsOn 'jar'
   dependsOn ':openTCS-Kernel:jar'
   dependsOn ':openTCS-KernelControlCenter:jar'
-  dependsOn ':openTCS-PlantOverview:jar'
+  dependsOn ':openTCS-ModelEditor:jar'
+  dependsOn ':openTCS-OperationsDesk:jar'
   
   doLast {
     mkdir(configDocDir)
@@ -524,6 +531,20 @@ task configdocgen {
               "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration"]
     }
     
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/ExplicitPropertiesConfigurationEntries.adoc",
+              "org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration"]
+    }
+
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
+              "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration"]
+    }
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
@@ -569,6 +590,13 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
+              "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
               "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration"]
     }
@@ -597,8 +625,22 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/PlantOverviewModelingApplicationConfigurationEntries.adoc",
+              "org.opentcs.guing.util.PlantOverviewModelingApplicationConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
               "org.opentcs.guing.util.ElementNamingSchemeConfiguration"]
+    }
+    
+    javaexec {
+      classpath configurations.configdocgen
+      main = "org.opentcs.documentation.ConfigDocGenerator"
+      args = ["${configDocDir}/PlantOverviewOperatingApplicationConfigurationEntries.adoc",
+              "org.opentcs.guing.util.PlantOverviewOperatingApplicationConfiguration"]
     }
   }
 }

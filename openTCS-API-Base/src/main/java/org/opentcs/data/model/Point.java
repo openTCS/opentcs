@@ -58,6 +58,10 @@ public class Point
    * A reference to the vehicle occupying this point.
    */
   private final TCSObjectReference<Vehicle> occupyingVehicle;
+  /**
+   * The information regarding the grahical representation of this point.
+   */
+  private final Layout layout;
 
   /**
    * Creates a new point with the given name.
@@ -73,6 +77,7 @@ public class Point
     this.outgoingPaths = new HashSet<>();
     this.attachedLinks = new HashSet<>();
     this.occupyingVehicle = null;
+    this.layout = new Layout();
   }
 
   private Point(String name,
@@ -84,7 +89,8 @@ public class Point
                 Set<TCSObjectReference<Path>> incomingPaths,
                 Set<TCSObjectReference<Path>> outgoingPaths,
                 Set<Location.Link> attachedLinks,
-                TCSObjectReference<Vehicle> occupyingVehicle) {
+                TCSObjectReference<Vehicle> occupyingVehicle,
+                Layout layout) {
     super(name, properties, history);
     this.position = requireNonNull(position, "position");
     this.type = requireNonNull(type, "type");
@@ -97,6 +103,7 @@ public class Point
     this.outgoingPaths = setWithoutNullValues(requireNonNull(outgoingPaths, "outgoingPaths"));
     this.attachedLinks = setWithoutNullValues(requireNonNull(attachedLinks, "attachedLinks"));
     this.occupyingVehicle = occupyingVehicle;
+    this.layout = requireNonNull(layout, "layout");
   }
 
   @Override
@@ -110,7 +117,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   @Override
@@ -124,7 +132,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   @Override
@@ -138,7 +147,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   @Override
@@ -152,7 +162,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -180,7 +191,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -210,7 +222,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -238,7 +251,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -296,7 +310,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -324,7 +339,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -352,7 +368,8 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -380,7 +397,37 @@ public class Point
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
-                     occupyingVehicle);
+                     occupyingVehicle,
+                     layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this point.
+   *
+   * @return The information regarding the grahical representation of this point.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Point withLayout(Layout layout) {
+    return new Point(getName(),
+                     getProperties(),
+                     getHistory(),
+                     position,
+                     type,
+                     vehicleOrientationAngle,
+                     incomingPaths,
+                     outgoingPaths,
+                     attachedLinks,
+                     occupyingVehicle,
+                     layout);
   }
 
   /**
@@ -406,5 +453,110 @@ public class Point
      * The vehicle is also expected to report in when it arrives at such a position.
      */
     PARK_POSITION;
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a point.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The coordinates at which the point is to be drawn (in mm).
+     */
+    private final Couple position;
+    /**
+     * The offset of the label's position to the point's position (in lu).
+     */
+    private final Couple labelOffset;
+    /**
+     * The ID of the layer on which the point is to be drawn.
+     */
+    private final int layerId;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(new Couple(0, 0), new Couple(0, 0), 0);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param position The coordinates at which the point is to be drawn (in mm).
+     * @param labelOffset The offset of the label's position to the point's position (in lu).
+     * @param layerId The ID of the layer on which the point is to be drawn.
+     */
+    public Layout(Couple position,
+                  Couple labelOffset,
+                  int layerId) {
+      this.position = requireNonNull(position, "position");
+      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
+      this.layerId = layerId;
+    }
+
+    /**
+     * Returns the coordinates at which the point is to be drawn (in mm).
+     *
+     * @return The coordinates at which the point is to be drawn (in mm).
+     */
+    public Couple getPosition() {
+      return position;
+    }
+
+    /**
+     * Creates a copy of this object, with the given position.
+     *
+     * @param position The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withPosition(Couple position) {
+      return new Layout(position,
+                        labelOffset,
+                        layerId);
+    }
+
+    /**
+     * Returns the offset of the label's position to the point's position (in lu).
+     *
+     * @return The offset of the label's position to the point's position (in lu).
+     */
+    public Couple getLabelOffset() {
+      return labelOffset;
+    }
+
+    /**
+     * Creates a copy of this object, with the given X label offset.
+     *
+     * @param labelOffset The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLabelOffset(Couple labelOffset) {
+      return new Layout(position,
+                        labelOffset,
+                        layerId);
+    }
+
+    /**
+     * Returns the ID of the layer on which the point is to be drawn.
+     *
+     * @return The layer ID.
+     */
+    public int getLayerId() {
+      return layerId;
+    }
+
+    /**
+     * Creates a copy of this object, with the given layer ID.
+     *
+     * @param layerId The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLayerId(int layerId) {
+      return new Layout(position,
+                        labelOffset,
+                        layerId);
+    }
   }
 }

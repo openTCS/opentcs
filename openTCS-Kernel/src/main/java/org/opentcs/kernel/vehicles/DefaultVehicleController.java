@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +26,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -76,10 +76,6 @@ public class DefaultVehicleController
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultVehicleController.class);
   /**
-   * The local kernel.
-   */
-  private final LocalKernel localKernel;
-  /**
    * The kernel's vehicle service.
    */
   private final InternalVehicleService vehicleService;
@@ -125,6 +121,10 @@ public class DefaultVehicleController
    */
   private volatile Set<TCSResource<?>> pendingResources;
   /**
+   * A command for which the execution of peripheral operations is pending.
+   */
+  private volatile MovementCommand interactionsPendingCommand;
+  /**
    * A list of commands that have been sent to the communication adapter.
    */
   private final Queue<MovementCommand> commandsSent = new LinkedList<>();
@@ -135,7 +135,12 @@ public class DefaultVehicleController
   /**
    * The resources this controller has allocated for each command.
    */
-  private final Queue<Set<TCSResource<?>>> allocatedResources = new LinkedList<>();
+  private final Deque<Set<TCSResource<?>>> allocatedResources = new LinkedList<>();
+  /**
+   * Manages interactions with peripheral devices that are to be performed before or after the
+   * execution of movement commands.
+   */
+  private final PeripheralInteractor peripheralInteractor;
   /**
    * The drive order that the vehicle currently has to process.
    */
@@ -152,30 +157,32 @@ public class DefaultVehicleController
    *
    * @param vehicle The vehicle this vehicle controller will be associated with.
    * @param adapter The communication adapter of the associated vehicle.
-   * @param kernel The kernel instance maintaining the model.
    * @param vehicleService The kernel's vehicle service.
    * @param notificationService The kernel's notification service.
    * @param dispatcherService The kernel's dispatcher service.
    * @param scheduler The scheduler managing resource allocations.
    * @param eventBus The event bus this instance should register with and send events to.
+   * @param componentsFactory A factory for various components related to a vehicle controller.
    */
   @Inject
   public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
                                   @Assisted @Nonnull VehicleCommAdapter adapter,
-                                  @Nonnull LocalKernel kernel,
                                   @Nonnull InternalVehicleService vehicleService,
                                   @Nonnull NotificationService notificationService,
                                   @Nonnull DispatcherService dispatcherService,
                                   @Nonnull Scheduler scheduler,
-                                  @Nonnull @ApplicationEventBus EventBus eventBus) {
+                                  @Nonnull @ApplicationEventBus EventBus eventBus,
+                                  @Nonnull VehicleControllerComponentsFactory componentsFactory) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
-    this.localKernel = requireNonNull(kernel, "kernel");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.notificationService = requireNonNull(notificationService, "notificationService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.scheduler = requireNonNull(scheduler, "scheduler");
     this.eventBus = requireNonNull(eventBus, "eventBus");
+    requireNonNull(componentsFactory, "componentsFactory");
+    this.peripheralInteractor
+        = componentsFactory.createPeripheralInteractor(vehicle.getReference());
   }
 
   @Override
@@ -218,6 +225,8 @@ public class DefaultVehicleController
     // the command before the one executed there.
     allocatedResources.add(null);
 
+    peripheralInteractor.initialize();
+
     initialized = true;
   }
 
@@ -226,6 +235,8 @@ public class DefaultVehicleController
     if (!isInitialized()) {
       return;
     }
+
+    peripheralInteractor.terminate();
 
     commAdapter.getProcessModel().removePropertyChangeListener(this);
     // Reset the vehicle's position.
@@ -423,6 +434,8 @@ public class DefaultVehicleController
 
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
+
+      clearPeripheralInteractions();
     }
   }
 
@@ -434,7 +447,35 @@ public class DefaultVehicleController
         return;
       }
       futureCommands.clear();
+
+      clearPeripheralInteractions();
     }
+  }
+
+  private void clearPeripheralInteractions() {
+    if (peripheralInteractor.isWaitingForPreMovementInteractionsToFinish()) {
+      // We accepted resources that required peripheral interactions to be finished in order
+      // for a corresponding movement command to be sent to the comm adapter. Now, this movement
+      // command will never be sent to the comm adapter. We therefore need to let the scheduler
+      // know that we no longer need these resources.
+      Set<TCSResource<?>> resources = allocatedResources.removeLast();
+      LOG.debug("{}: Freeing most recent allocated resources: {}",
+                vehicle.getName(),
+                resources);
+      scheduler.free(this, resources);
+    }
+
+    // Forget about the peripheral interactions we were waiting for so that the completion of 
+    // ongoing peripheral operations is ignored in any case.
+    LOG.debug("{}: Clearing peripheral interactions...", vehicle.getName());
+    peripheralInteractor.clear();
+
+    // At this point, either at least one of the required interactions failed or the transport order
+    // was withdrawn. In case we were still waiting for some required interactions to finish
+    // (which we're now no longer doing), we need to make sure the withdrawal of the transport order
+    // is finished properly.
+    LOG.debug("{}: Checking if drive order is finished...", vehicle.getName());
+    checkForPendingCommands();
   }
 
   @Override
@@ -444,6 +485,7 @@ public class DefaultVehicleController
       commandsSent.clear();
       futureCommands.clear();
       pendingCommand = null;
+      interactionsPendingCommand = null;
       // Free all resource sets that were reserved for future commands, except the current one...
       Set<TCSResource<?>> neededResources = allocatedResources.poll();
       for (Set<TCSResource<?>> resSet : allocatedResources) {
@@ -535,16 +577,14 @@ public class DefaultVehicleController
 
       LOG.debug("{}: Accepting allocated resources: {}", vehicle.getName(), resources);
       allocatedResources.add(resources);
-      // Send the command to the communication adapter.
-      checkState(commAdapter.enqueueCommand(command),
-                 "Comm adapter did not accept command");
-      commandsSent.add(command);
-
-      // Check if the communication adapter has capacity for another command.
       waitingForAllocation = false;
-      if (canSendNextCommand()) {
-        allocateForNextCommand();
-      }
+
+      interactionsPendingCommand = command;
+
+      peripheralInteractor.prepareInteractions(command);
+      peripheralInteractor.startPreMovementInteractions(command,
+                                                        () -> sendCommand(command),
+                                                        this::onMovementInteractionFailed);
     }
     // Let the scheduler know we've accepted the resources given.
     return true;
@@ -559,6 +599,25 @@ public class DefaultVehicleController
   @Override
   public String toString() {
     return "DefaultVehicleController{" + "vehicleName=" + vehicle.getName() + '}';
+  }
+
+  private void sendCommand(MovementCommand command)
+      throws IllegalStateException {
+    // Send the command to the communication adapter.
+    checkState(commAdapter.enqueueCommand(command),
+               "Comm adapter did not accept command");
+    commandsSent.add(command);
+    interactionsPendingCommand = null;
+
+    // Check if the communication adapter has capacity for another command.
+    if (canSendNextCommand()) {
+      allocateForNextCommand();
+    }
+  }
+
+  private void onMovementInteractionFailed() {
+    LOG.debug("{}: Movement interaction failed, withdrawing current order...", vehicle.getName());
+    dispatcherService.withdrawByVehicle(vehicle.getReference(), false);
   }
 
   @SuppressWarnings("unchecked")
@@ -717,28 +776,37 @@ public class DefaultVehicleController
       else {
         LOG.debug("{}: Nothing to free.", vehicle.getName());
       }
-      // Check if there are more commands to be processed for the current drive order.
-      if (pendingCommand == null && futureCommands.isEmpty()) {
-        LOG.debug("{}: No more commands in current drive order", vehicle.getName());
-        // Check if there are still commands that have been sent to the communication adapter but
-        // not yet executed. If not, the whole order has been executed completely - let the kernel
-        // know about that so it can give us the next drive order.
-        if (commandsSent.isEmpty() && !waitingForAllocation) {
-          LOG.debug("{}: Current drive order processed", vehicle.getName());
-          currentDriveOrder = null;
-          // Let the kernel/dispatcher know that the drive order has been processed completely (by
-          // setting its state to AWAITING_ORDER).
-          vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
-                                                         Vehicle.ROUTE_INDEX_DEFAULT);
-          vehicleService.updateVehicleProcState(vehicle.getReference(),
-                                                Vehicle.ProcState.AWAITING_ORDER);
-        }
+
+      peripheralInteractor.startPostMovementInteractions(executedCommand,
+                                                         this::checkForPendingCommands,
+                                                         this::onMovementInteractionFailed);
+    }
+  }
+
+  private void checkForPendingCommands() {
+    // Check if there are more commands to be processed for the current drive order.
+    if (interactionsPendingCommand == null
+        && pendingCommand == null
+        && futureCommands.isEmpty()) {
+      LOG.debug("{}: No more commands in current drive order", vehicle.getName());
+      // Check if there are still commands that have been sent to the communication adapter but
+      // not yet executed. If not, the whole order has been executed completely - let the kernel
+      // know about that so it can give us the next drive order.
+      if (commandsSent.isEmpty() && !waitingForAllocation) {
+        LOG.debug("{}: Current drive order processed", vehicle.getName());
+        currentDriveOrder = null;
+        // Let the kernel/dispatcher know that the drive order has been processed completely (by
+        // setting its state to AWAITING_ORDER).
+        vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
+                                                       Vehicle.ROUTE_INDEX_DEFAULT);
+        vehicleService.updateVehicleProcState(vehicle.getReference(),
+                                              Vehicle.ProcState.AWAITING_ORDER);
       }
-      // There are more commands to be processed.
-      // Check if we can send another command to the comm adapter.
-      else if (canSendNextCommand()) {
-        allocateForNextCommand();
-      }
+    }
+    // There are more commands to be processed.
+    // Check if we can send another command to the comm adapter.
+    else if (canSendNextCommand()) {
+      allocateForNextCommand();
     }
   }
 
@@ -806,6 +874,12 @@ public class DefaultVehicleController
     }
     if (waitingForAllocation) {
       LOG.debug("{}: Cannot send, waiting for allocation", vehicle.getName());
+      return false;
+    }
+    if (peripheralInteractor.isWaitingForMovementInteractionsToFinish()) {
+      LOG.debug("{}: Cannot send, waiting for peripheral operations to be completed: {}",
+                vehicle.getName(),
+                peripheralInteractor.pendingRequiredInteractionsByDestination());
       return false;
     }
     return true;

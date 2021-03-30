@@ -92,6 +92,10 @@ public class DummyScheduler
   }
 
   @Override
+  public void reschedule() {
+  }
+
+  @Override
   public void preparationSuccessful(Module module, Client client, Set<TCSResource<?>> resources) {
   }
 

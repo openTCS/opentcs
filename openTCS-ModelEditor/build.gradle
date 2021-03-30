@@ -1,0 +1,55 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-artifacts.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-application.gradle"
+apply from: "${rootDir}/gradle/maven-publishing.gradle"
+apply plugin: 'org.kordamp.gradle.stats'
+
+if (!hasProperty('mainClass')) {
+  ext.mainClass = 'org.opentcs.guing.RunModelEditor'
+}
+mainClassName = ext.mainClass
+
+ext.collectableDistDir = new File(buildDir, 'install')
+
+dependencies {
+  compile project(':openTCS-Common')
+  compile project(':openTCS-Impl-Configuration-cfg4j')
+  compile project(':openTCS-PlantOverview-Common')
+  compile project(':openTCS-PlantOverview-Panel-Statistics')
+  compile project(':openTCS-PlantOverview-Themes-Default')
+  
+  runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
+}
+
+compileJava {
+  options.compilerArgs << "-Xlint:-rawtypes"
+}
+
+distributions {
+  main {
+    contents {
+      from "${sourceSets.main.resources.srcDirs[0]}/org/opentcs/modeleditor/distribution"
+    }
+  }
+}
+
+// For now, we're using hand-crafted start scripts, so disable the application
+// plugin's start script generation.
+startScripts.enabled = false
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+run {
+  systemProperties(['java.util.logging.config.file':'./config/logging.config',\
+                    'java.security.policy':'file:./config/java.policy',\
+                    'sun.java2d.d3d':'false',\
+                    'opentcs.base':'.',\
+                    'opentcs.home':'.',\
+                    'opentcs.cfg4j.reload.interval':'10000'])
+  jvmArgs('-XX:-OmitStackTraceInFastThrow',\
+          '-splash:bin/splash-image.gif')
+}

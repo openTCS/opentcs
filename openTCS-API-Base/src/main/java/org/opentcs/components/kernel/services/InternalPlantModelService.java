@@ -8,7 +8,11 @@
 package org.opentcs.components.kernel.services;
 
 import java.util.Set;
+import javax.annotation.Nullable;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 
@@ -50,4 +54,15 @@ public interface InternalPlantModelService
    */
   void savePlantModel()
       throws IllegalStateException;
+
+  /**
+   * Updates a location's reservation token.
+   *
+   * @param ref A reference to the location to be updated.
+   * @param token The location's new reservation token.
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  void updateLocationReservationToken(TCSObjectReference<Location> ref, @Nullable String token)
+      throws ObjectUnknownException, KernelRuntimeException;
 }

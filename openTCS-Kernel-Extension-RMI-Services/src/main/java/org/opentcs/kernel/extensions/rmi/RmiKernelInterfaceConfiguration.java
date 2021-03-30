@@ -84,6 +84,24 @@ public interface RmiKernelInterfaceConfiguration {
   int remoteDispatcherServicePort();
 
   @ConfigurationEntry(
+      type = "Integer",
+      description = "The TCP port of the remote query service.",
+      orderKey = "0_address_11")
+  int remoteQueryServicePort();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The TCP port of the remote peripheral service.",
+      orderKey = "0_address_12")
+  int remotePeripheralServicePort();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The TCP port of the remote peripheral job service.",
+      orderKey = "0_address_13")
+  int remotePeripheralJobServicePort();
+
+  @ConfigurationEntry(
       type = "Long",
       description = "The interval for cleaning out inactive clients (in ms).",
       orderKey = "2_sweeping")

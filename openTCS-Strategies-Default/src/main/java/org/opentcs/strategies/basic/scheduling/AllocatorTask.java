@@ -80,6 +80,8 @@ class AllocatorTask
 
   @Override
   public void run() {
+    LOG.debug("Processing AllocatorCommand: {}", command);
+
     if (command instanceof AllocatorCommand.Allocate) {
       processAllocate((AllocatorCommand.Allocate) command);
     }
@@ -143,19 +145,19 @@ class AllocatorTask
     Set<TCSResource<?>> resources = command.getResources();
 
     synchronized (globalSyncObject) {
-      LOG.debug("{}: Checking resource if all resources are available:", client.getId());
+      LOG.debug("{}: Checking resource availability: {}...", client.getId(), resources);
       if (!reservationPool.resourcesAvailableForUser(resources, client)) {
-        LOG.debug("{}: Resources unavailable: {}", client.getId(), resources);
+        LOG.debug("{}: Resources unavailable.", client.getId());
         return false;
       }
 
       LOG.debug("{}: Checking if resources may be allocated...", client.getId());
       if (!allocationAdvisor.mayAllocate(client, resources)) {
-        LOG.debug("{}: Resource allocation restricted by some modules.", client);
+        LOG.debug("{}: Resources may not be allocated.", client.getId());
         return false;
       }
 
-      LOG.debug("{}: Some resources need to be prepared for allocation.", client.getId());
+      LOG.debug("{}: Preparing resources for allocation...", client.getId());
       allocationAdvisor.prepareAllocation(client, resources);
 
       LOG.debug("{}: All resources available, allocating...", client.getId());

@@ -9,12 +9,16 @@ package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A layout element describing an image to be displayed.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class ImageLayoutElement
     extends LayoutElement
     implements Serializable {

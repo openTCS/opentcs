@@ -9,6 +9,7 @@ package org.opentcs.kernel.workingset;
 
 import de.huxhorn.sulky.ulid.ULID;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;
 
@@ -25,6 +26,10 @@ public class PrefixedUlidObjectNameProvider
    * Generates ULIDs for us.
    */
   private final ULID ulid = new ULID();
+  /**
+   * The previously generated ULID value.
+   */
+  private ULID.Value previousUlid = ulid.nextValue();
 
   /**
    * Creates a new instance.
@@ -36,6 +41,11 @@ public class PrefixedUlidObjectNameProvider
   public String apply(CreationTO to) {
     requireNonNull(to, "to");
 
-    return to.getName() + ulid.nextULID();
+    Optional<ULID.Value> newValue = ulid.nextStrictlyMonotonicValue(previousUlid);
+    while (newValue.isEmpty()) {
+      newValue = ulid.nextStrictlyMonotonicValue(previousUlid);
+    }
+    previousUlid = newValue.get();
+    return to.getName() + newValue.get().toString();
   }
 }

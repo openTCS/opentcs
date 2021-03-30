@@ -50,7 +50,12 @@ public interface KernelControlCenterConfiguration {
   @ConfigurationEntry(
       type = "Integer",
       description = "The maximum number of characters in the logging text area.",
-      orderKey = "9_misc")
+      orderKey = "9_misc_0")
   int loggingAreaCapacity();
 
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to enable and show the panel for peripheral drivers.",
+      orderKey = "9_misc_1")
+  boolean enablePeripheralsPanel();
 }

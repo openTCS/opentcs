@@ -23,14 +23,22 @@ import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_DISPATCHER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_KERNEL_CLIENT_PORTAL;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_NOTIFICATION_SERVICE;
+import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_PERIPHERAL_DISPATCHER_SERVICE;
+import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_PERIPHERAL_JOB_SERVICE;
+import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_PERIPHERAL_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_PLANT_MODEL_SERVICE;
+import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_QUERY_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_ROUTER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_SCHEDULER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_TRANSPORT_ORDER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_VEHICLE_SERVICE;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.NotificationService;
+import org.opentcs.components.kernel.services.PeripheralDispatcherService;
+import org.opentcs.components.kernel.services.PeripheralJobService;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
@@ -100,8 +108,25 @@ public class RemoteKernelServicePortalProxy
   /**
    * The scheduler service.
    */
-  private final RemoteSchedulerServiceProxy schedulerService
-      = new RemoteSchedulerServiceProxy();
+  private final RemoteSchedulerServiceProxy schedulerService = new RemoteSchedulerServiceProxy();
+  /**
+   * The query service.
+   */
+  private final RemoteQueryServiceProxy queryService = new RemoteQueryServiceProxy();
+  /**
+   * The peripheral service.
+   */
+  private final RemotePeripheralServiceProxy peripheralService = new RemotePeripheralServiceProxy();
+  /**
+   * The peripheral job service.
+   */
+  private final RemotePeripheralJobServiceProxy peripheralJobService
+      = new RemotePeripheralJobServiceProxy();
+  /**
+   * The peripheral dispatcher service.
+   */
+  private final RemotePeripheralDispatcherServiceProxy peripheralDispatcherService
+      = new RemotePeripheralDispatcherServiceProxy();
 
   /**
    * Creates a new instance.
@@ -160,7 +185,7 @@ public class RemoteKernelServicePortalProxy
     catch (RemoteException | NotBoundException exc) {
       resetServiceLogins();
       throw new ServiceUnavailableException("Exception logging in with remote kernel client portal",
-                                            exc.getCause());
+                                            exc);
     }
   }
 
@@ -258,8 +283,32 @@ public class RemoteKernelServicePortalProxy
 
   @Override
   @Nonnull
+  public QueryService getQueryService() {
+    return queryService;
+  }
+
+  @Override
+  @Nonnull
   public SchedulerService getSchedulerService() {
     return schedulerService;
+  }
+
+  @Override
+  @Nonnull
+  public PeripheralService getPeripheralService() {
+    return peripheralService;
+  }
+
+  @Override
+  @Nonnull
+  public PeripheralJobService getPeripheralJobService() {
+    return peripheralJobService;
+  }
+  
+  @Override
+  @Nonnull
+  public PeripheralDispatcherService getPeripheralDispatcherService() {
+    return peripheralDispatcherService;
   }
 
   private void updateServiceLogins(Registry registry)
@@ -298,6 +347,26 @@ public class RemoteKernelServicePortalProxy
         .setClientId(getClientId())
         .setRemoteService((RemoteSchedulerService) registry.lookup(REMOTE_SCHEDULER_SERVICE))
         .setServiceListener(this);
+
+    queryService
+        .setClientId(getClientId())
+        .setRemoteService((RemoteQueryService) registry.lookup(REMOTE_QUERY_SERVICE))
+        .setServiceListener(this);
+
+    peripheralService
+        .setClientId(getClientId())
+        .setRemoteService((RemotePeripheralService) registry.lookup(REMOTE_PERIPHERAL_SERVICE))
+        .setServiceListener(this);
+
+    peripheralJobService
+        .setClientId(getClientId())
+        .setRemoteService((RemotePeripheralJobService) registry.lookup(REMOTE_PERIPHERAL_JOB_SERVICE))
+        .setServiceListener(this);
+
+    peripheralDispatcherService
+        .setClientId(getClientId())
+        .setRemoteService((RemotePeripheralDispatcherService) registry.lookup(REMOTE_PERIPHERAL_DISPATCHER_SERVICE))
+        .setServiceListener(this);
   }
 
   private void resetServiceLogins() {
@@ -309,5 +378,9 @@ public class RemoteKernelServicePortalProxy
     dispatcherService.setClientId(null).setRemoteService(null).setServiceListener(null);
     routerService.setClientId(null).setRemoteService(null).setServiceListener(null);
     schedulerService.setClientId(null).setRemoteService(null).setServiceListener(null);
+    queryService.setClientId(null).setRemoteService(null).setServiceListener(null);
+    peripheralService.setClientId(null).setRemoteService(null).setServiceListener(null);
+    peripheralJobService.setClientId(null).setRemoteService(null).setServiceListener(null);
+    peripheralDispatcherService.setClientId(null).setRemoteService(null).setServiceListener(null);
   }
 }

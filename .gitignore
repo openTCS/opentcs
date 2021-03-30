@@ -17,8 +17,12 @@
 /openTCS-Kernel-Extension-TCP-Host-Interface/build/
 /openTCS-Kernel-Extension-HTTP-Services/build/
 /openTCS-Kernel-Extension-Statistics/build/
+/openTCS-PeripheralCommAdapter-Loopback/build/
 /openTCS-PlantOverview-Panel-LoadGenerator/build/
 /openTCS-PlantOverview-Panel-ResourceAllocation/build/
 /openTCS-PlantOverview-Panel-Statistics/build/
 /openTCS-PlantOverview-Themes-Default/build/
 /openTCS-PlantOverview-Base/build/
+/openTCS-PlantOverview-Common/build/
+/openTCS-ModelEditor/build/
+/openTCS-OperationsDesk/build/

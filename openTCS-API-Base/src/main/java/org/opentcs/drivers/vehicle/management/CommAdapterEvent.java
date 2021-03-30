@@ -8,6 +8,7 @@
 package org.opentcs.drivers.vehicle.management;
 
 import java.io.Serializable;
+import org.opentcs.drivers.LowLevelCommunicationEvent;
 
 /**
  * Instances of this class represent events emitted by/for comm adapter changes.
@@ -15,7 +16,8 @@ import java.io.Serializable;
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class CommAdapterEvent
-    implements Serializable {
+    implements LowLevelCommunicationEvent,
+               Serializable {
 
   /**
    * Creates an empty event.

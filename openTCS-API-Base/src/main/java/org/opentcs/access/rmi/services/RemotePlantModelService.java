@@ -13,6 +13,8 @@ import java.util.Map;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
 
 /**
  * Declares the methods provided by the {@link PlantModelService} via RMI.
@@ -41,5 +43,8 @@ public interface RemotePlantModelService
       throws RemoteException;
 
   Map<String, String> getModelProperties(ClientID clientId)
+      throws RemoteException;
+
+  void updateLocationLock(ClientID clientId, TCSObjectReference<Location> ref, boolean locked)
       throws RemoteException;
 }

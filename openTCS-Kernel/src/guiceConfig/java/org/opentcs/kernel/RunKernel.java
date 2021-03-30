@@ -20,6 +20,7 @@ import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.cfg4j.Cfg4jConfigurationBindingProvider;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherModule;
+import org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherModule;
 import org.opentcs.strategies.basic.routing.DefaultRouterModule;
 import org.opentcs.strategies.basic.scheduling.DefaultSchedulerModule;
 import org.opentcs.util.Environment;
@@ -74,7 +75,8 @@ public class RunKernel {
         = Arrays.asList(new DefaultKernelInjectionModule(),
                         new DefaultDispatcherModule(),
                         new DefaultRouterModule(),
-                        new DefaultSchedulerModule());
+                        new DefaultSchedulerModule(),
+                        new DefaultPeripheralJobDispatcherModule());
 
     ConfigurationBindingProvider bindingProvider = configurationBindingProvider();
     for (KernelInjectionModule defaultModule : defaultModules) {

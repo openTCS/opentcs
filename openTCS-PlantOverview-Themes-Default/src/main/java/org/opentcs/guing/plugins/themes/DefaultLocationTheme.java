@@ -13,12 +13,15 @@ import java.net.URL;
 import java.util.EnumMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import org.opentcs.components.plantoverview.LocationTheme;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
- * Default implementation of <code>LocationTheme</code>.
+ * Default location theme implementation.
  *
  * @author Philipp Seifert (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -29,8 +32,7 @@ public class DefaultLocationTheme
   /**
    * The path containing the images.
    */
-  private static final String path
-      = "/org/opentcs/guing/plugins/themes/symbols/location/";
+  private static final String PATH = "/org/opentcs/guing/plugins/themes/symbols/location/";
   /**
    * The available symbols.
    */
@@ -54,60 +56,75 @@ public class DefaultLocationTheme
   }
 
   @Override
-  public Image getImageFor(LocationRepresentation representation) {
+  @Nonnull
+  public Image getImageFor(@Nonnull LocationRepresentation representation) {
+    requireNonNull(representation, "representation");
+
     return symbolMap.get(representation);
+  }
+
+  @Override
+  @Nonnull
+  public Image getImageFor(@Nonnull Location location, @Nonnull LocationType locationType) {
+    requireNonNull(location, "location");
+    requireNonNull(locationType, "locationType");
+
+    LocationRepresentation representation = location.getLayout().getLocationRepresentation();
+    if (representation == null || representation == LocationRepresentation.DEFAULT) {
+      representation = locationType.getLayout().getLocationRepresentation();
+    }
+    return getImageFor(representation);
   }
 
   private void initSymbolMap() {
     // NONE: A location without further description
-    symbolMap.put(LocationRepresentation.NONE, loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[3]));
+    symbolMap.put(LocationRepresentation.NONE,
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[3]));
 
     // LOAD_TRANSFER_GENERIC: A generic location for vehicle load transfers.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_GENERIC,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[0]));
     // LOAD_TRANSFER_ALT_1: A location for vehicle load transfers, variant 1.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_ALT_1,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[0]));
     // LOAD_TRANSFER_ALT_2: A location for vehicle load transfers, variant 2.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_ALT_2,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[0]));
     // LOAD_TRANSFER_ALT_3: A location for vehicle load transfers, variant 3.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_ALT_3,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[0]));
     // LOAD_TRANSFER_ALT_4: A location for vehicle load transfers, variant 4.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_ALT_4,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[0]));
     // LOAD_TRANSFER_ALT_5: A location for vehicle load transfers, variant 5.
     symbolMap.put(LocationRepresentation.LOAD_TRANSFER_ALT_5,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[0]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[0]));
 
     // WORKING_GENERIC: A location for some generic processing, generic variant.
     symbolMap.put(LocationRepresentation.WORKING_GENERIC,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[1]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[1]));
     // WORKING_ALT_1: A location for some generic processing, variant 1.
     symbolMap.put(LocationRepresentation.WORKING_ALT_1,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[1]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[1]));
     // WORKING_ALT_2: A location for some generic processing, variant 2.
     symbolMap.put(LocationRepresentation.WORKING_ALT_2,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[1]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[1]));
 
     // RECHARGE_GENERIC: A location for recharging a vehicle, generic variant.
     symbolMap.put(LocationRepresentation.RECHARGE_GENERIC,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[2]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[2]));
     // RECHARGE_ALT_1: A location for recharging a vehicle, variant 1.
     symbolMap.put(LocationRepresentation.RECHARGE_ALT_1,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[2]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[2]));
     // RECHARGE_ALT_2: A location for recharging a vehicle, variant 2.
     symbolMap.put(LocationRepresentation.RECHARGE_ALT_2,
-                  loadImage(path + LOCTYPE_REPRESENTATION_SYMBOLS[2]));
+                  loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[2]));
   }
 
-  /**
-   * Loads an image from the file with the given name.
-   *
-   * @param fileName The name of the file from which to load the image.
-   * @return The image.
-   */
+  private Image loadImageFromPath(String fileName) {
+    return loadImage(PATH + fileName);
+  }
+
   private Image loadImage(String fileName) {
     requireNonNull(fileName, "fileName");
 

@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,40 +22,41 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.BlockCreationTO;
-import org.opentcs.access.to.model.GroupCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
-import org.opentcs.access.to.model.ModelLayoutElementCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
-import org.opentcs.access.to.model.ShapeLayoutElementCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
-import org.opentcs.data.model.Group;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.model.visualization.ImageLayoutElement;
-import org.opentcs.data.model.visualization.LayoutElement;
-import org.opentcs.data.model.visualization.ModelLayoutElement;
-import org.opentcs.data.model.visualization.ShapeLayoutElement;
+import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
+import static org.opentcs.util.Assertions.checkState;
+import org.opentcs.util.Colors;
 import org.opentcs.util.Comparators;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +153,7 @@ public class Model {
   /**
    * Removes all model objects from this model and the object pool by which it is backed.
    */
+  @SuppressWarnings("deprecation")
   public void clear() {
     LOG.debug("method entry");
     for (TCSObject<?> curObject : objectPool.getObjects((Pattern) null)) {
@@ -160,7 +163,7 @@ public class Model {
           || curObject instanceof LocationType
           || curObject instanceof Location
           || curObject instanceof Block
-          || curObject instanceof Group
+          || curObject instanceof org.opentcs.data.model.Group
           || curObject instanceof VisualLayout) {
         objectPool.removeObject(curObject.getReference());
         objectPool.emitObjectEvent(null,
@@ -178,6 +181,7 @@ public class Model {
    * @throws ObjectExistsException If an object with a new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public void createPlantModelObjects(PlantModelCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     clear();
@@ -187,27 +191,176 @@ public class Model {
     for (PointCreationTO point : to.getPoints()) {
       createPoint(point);
     }
-    for (PathCreationTO path : to.getPaths()) {
-      createPath(path);
-    }
     for (LocationTypeCreationTO locType : to.getLocationTypes()) {
       createLocationType(locType);
     }
     for (LocationCreationTO loc : to.getLocations()) {
       createLocation(loc);
     }
+    for (PathCreationTO path : to.getPaths()) {
+      createPath(path);
+    }
+
     for (BlockCreationTO block : to.getBlocks()) {
       createBlock(block);
     }
-    for (GroupCreationTO group : to.getGroups()) {
+    for (org.opentcs.access.to.model.GroupCreationTO group : to.getGroups()) {
       createGroup(group);
     }
     for (VehicleCreationTO vehicle : to.getVehicles()) {
       createVehicle(vehicle);
     }
-    for (VisualLayoutCreationTO layout : to.getVisualLayouts()) {
-      createVisualLayout(layout);
+
+    createVisualLayout(to.getVisualLayout());
+    overrideLayoutData(to.getVisualLayout());
+  }
+
+  /**
+   * Overrides the layout data in {@code TCSObject}s with the data stored in their respective
+   * model layout element.
+   *
+   * @param layout The visual layout to get the layout data from.
+   */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
+  private void overrideLayoutData(VisualLayoutCreationTO layout) {
+    for (org.opentcs.access.to.model.ModelLayoutElementCreationTO mleTO : layout.getModelElements()) {
+      TCSObject<?> object = objectPool.getObject(mleTO.getName());
+      Map<String, String> props = mleTO.getProperties();
+
+      if (object instanceof Point) {
+        overridePointLayoutData((Point) object, props);
+      }
+      else if (object instanceof Path) {
+        overridePathLayoutData((Path) object, props);
+      }
+      else if (object instanceof Location) {
+        overrideLocationLayoutData((Location) object, props);
+      }
+      else if (object instanceof Block) {
+        overrideBlockLayoutData((Block) object, props);
+      }
+      else if (object instanceof Vehicle) {
+        overrideVehicleLayoutData((Vehicle) object, props);
+      }
     }
+  }
+
+  private void overridePointLayoutData(Point oldPoint, Map<String, String> properties)
+      throws NumberFormatException {
+    long positionX = properties.get(ElementPropKeys.POINT_POS_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_X))
+        : oldPoint.getLayout().getPosition().getX();
+    long positionY = properties.get(ElementPropKeys.POINT_POS_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_Y))
+        : oldPoint.getLayout().getPosition().getY();
+    long labelOffsetX = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X))
+        : oldPoint.getLayout().getLabelOffset().getX();
+    long labelOffsetY = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y))
+        : oldPoint.getLayout().getLabelOffset().getY();
+    Point newPoint = oldPoint.withLayout(
+        new Point.Layout(new Couple(positionX, positionY),
+                         new Couple(labelOffsetX, labelOffsetY),
+                         oldPoint.getLayout().getLayerId())
+    );
+    objectPool.replaceObject(newPoint);
+    objectPool.emitObjectEvent(newPoint, oldPoint, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overridePathLayoutData(Path oldPath, Map<String, String> properties)
+      throws IllegalArgumentException {
+    String connectionTypeString
+        = properties.getOrDefault(ElementPropKeys.PATH_CONN_TYPE,
+                                  oldPath.getLayout().getConnectionType().name());
+    Path.Layout.ConnectionType connectionType;
+    switch (connectionTypeString) {
+      case "DIRECT":
+        connectionType = Path.Layout.ConnectionType.DIRECT;
+        break;
+      case "ELBOW":
+        connectionType = Path.Layout.ConnectionType.ELBOW;
+        break;
+      case "SLANTED":
+        connectionType = Path.Layout.ConnectionType.SLANTED;
+        break;
+      case "POLYPATH":
+        connectionType = Path.Layout.ConnectionType.POLYPATH;
+        break;
+      case "BEZIER":
+        connectionType = Path.Layout.ConnectionType.BEZIER;
+        break;
+      case "BEZIER_3":
+        connectionType = Path.Layout.ConnectionType.BEZIER_3;
+        break;
+      default:
+        throw new IllegalArgumentException("Unhandled connection type: " + connectionTypeString);
+    }
+
+    List<Couple> controlPoints = oldPath.getLayout().getControlPoints();
+    String controlPointsString = properties.get(ElementPropKeys.PATH_CONTROL_POINTS);
+    if (controlPointsString != null) {
+      controlPoints = Arrays.asList(controlPointsString.split(";")).stream()
+          .map(controlPointString -> {
+            String[] coordinateStrings = controlPointString.split(",");
+            return new Couple(Long.parseLong(coordinateStrings[0]),
+                              Long.parseLong(coordinateStrings[1]));
+          })
+          .collect(Collectors.toList());
+    }
+
+    Path newPath = oldPath.withLayout(new Path.Layout(connectionType,
+                                                      controlPoints,
+                                                      oldPath.getLayout().getLayerId()));
+
+    objectPool.replaceObject(newPath);
+    objectPool.emitObjectEvent(newPath, oldPath, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overrideLocationLayoutData(Location oldLocation, Map<String, String> properties)
+      throws NumberFormatException {
+    long positionX = properties.get(ElementPropKeys.LOC_POS_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_X))
+        : oldLocation.getLayout().getPosition().getX();
+    long positionY = properties.get(ElementPropKeys.LOC_POS_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_Y))
+        : oldLocation.getLayout().getPosition().getY();
+    long labelOffsetX = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X))
+        : oldLocation.getLayout().getLabelOffset().getX();
+    long labelOffsetY = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y))
+        : oldLocation.getLayout().getLabelOffset().getY();
+    Location newLocation = oldLocation.withLayout(
+        new Location.Layout(new Couple(positionX, positionY),
+                            new Couple(labelOffsetX, labelOffsetY),
+                            oldLocation.getLayout().getLocationRepresentation(),
+                            oldLocation.getLayout().getLayerId())
+    );
+    objectPool.replaceObject(newLocation);
+    objectPool.emitObjectEvent(newLocation, oldLocation, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overrideBlockLayoutData(Block oldBlock, Map<String, String> properties)
+      throws NumberFormatException {
+    Color color = properties.get(ElementPropKeys.BLOCK_COLOR) != null
+        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.BLOCK_COLOR))
+        : oldBlock.getLayout().getColor();
+    Block newBlock = oldBlock.withLayout(new Block.Layout(color));
+    objectPool.replaceObject(newBlock);
+    objectPool.emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overrideVehicleLayoutData(TCSObject<?> object, Map<String, String> properties)
+      throws NumberFormatException {
+    Vehicle oldVehicle = (Vehicle) object;
+    Color routeColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR) != null
+        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR))
+        : oldVehicle.getLayout().getRouteColor();
+    Vehicle newVehicle = oldVehicle.withLayout(new Vehicle.Layout(routeColor));
+    objectPool.replaceObject(newVehicle);
+    objectPool.emitObjectEvent(newVehicle, oldVehicle, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**
@@ -223,20 +376,10 @@ public class Model {
       throws ObjectUnknownException, ObjectExistsException {
     VisualLayout newLayout = new VisualLayout(to.getName())
         .withScaleX(to.getScaleX())
-        .withScaleY(to.getScaleY());
-    for (ModelLayoutElementCreationTO mleTO : to.getModelElements()) {
-      TCSObject<?> object = objectPool.getObject(mleTO.getName());
-      ModelLayoutElement mle = new ModelLayoutElement(object.getReference());
-      mle.setLayer(mleTO.getLayer());
-      mle.setProperties(mleTO.getProperties());
-      newLayout.getLayoutElements().add(mle);
-    }
-    for (ShapeLayoutElementCreationTO shapeTO : to.getShapeElements()) {
-      ShapeLayoutElement shape = new ShapeLayoutElement();
-      shape.setLayer(shapeTO.getLayer());
-      shape.setProperties(shapeTO.getProperties());
-      newLayout.getLayoutElements().add(shape);
-    }
+        .withScaleY(to.getScaleY())
+        .withLayers(to.getLayers())
+        .withLayerGroups(to.getLayerGroups());
+
     objectPool.addObject(newLayout);
     objectPool.emitObjectEvent(newLayout,
                                null,
@@ -260,7 +403,10 @@ public class Model {
         .withPosition(to.getPosition())
         .withType(to.getType())
         .withVehicleOrientationAngle(to.getVehicleOrientationAngle())
-        .withProperties(to.getProperties());
+        .withProperties(to.getProperties())
+        .withLayout(new Point.Layout(to.getLayout().getPosition(),
+                                     to.getLayout().getLabelOffset(),
+                                     to.getLayout().getLayerId()));
     objectPool.addObject(newPoint);
     objectPool.emitObjectEvent(newPoint, null, TCSObjectEvent.Type.OBJECT_CREATED);
     // Return the newly created point.
@@ -370,8 +516,12 @@ public class Model {
         .withLength(to.getLength())
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
+        .withPeripheralOperations(mapPeripheralOperationTOs(to.getPeripheralOperations()))
         .withProperties(to.getProperties())
-        .withLocked(to.isLocked());
+        .withLocked(to.isLocked())
+        .withLayout(new Path.Layout(to.getLayout().getConnectionType(),
+                                    to.getLayout().getControlPoints(),
+                                    to.getLayout().getLayerId()));
 
     // Store the instance in the global object pool.
     objectPool.addObject(newPath);
@@ -419,7 +569,9 @@ public class Model {
       throws ObjectExistsException {
     LocationType newType = new LocationType(to.getName())
         .withAllowedOperations(to.getAllowedOperations())
-        .withProperties(to.getProperties());
+        .withAllowedPeripheralOperations(to.getAllowedPeripheralOperations())
+        .withProperties(to.getProperties())
+        .withLayout(new LocationType.Layout(to.getLayout().getLocationRepresentation()));
     objectPool.addObject(newType);
     objectPool.emitObjectEvent(newType,
                                null,
@@ -441,7 +593,12 @@ public class Model {
     LocationType type = objectPool.getObject(LocationType.class, to.getTypeName());
     Location newLocation = new Location(to.getName(), type.getReference())
         .withPosition(to.getPosition())
-        .withProperties(to.getProperties());
+        .withLocked(to.isLocked())
+        .withProperties(to.getProperties())
+        .withLayout(new Location.Layout(to.getLayout().getPosition(),
+                                        to.getLayout().getLabelOffset(),
+                                        to.getLayout().getLocationRepresentation(),
+                                        to.getLayout().getLayerId()));
 
     Set<Location.Link> locationLinks = new HashSet<>();
     for (Map.Entry<String, Set<String>> linkEntry : to.getLinks().entrySet()) {
@@ -476,6 +633,113 @@ public class Model {
   }
 
   /**
+   * Locks/Unlocks a location.
+   *
+   * @param ref A reference to the location to be modified.
+   * @param newLocked If {@code true}, this path will be locked when the method call returns;
+   * if {@code false}, this path will be unlocked.
+   * @return The modified location.
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   */
+  public Location setLocationLocked(TCSObjectReference<Location> ref, boolean newLocked)
+      throws ObjectUnknownException {
+    Location location = objectPool.getObject(Location.class, ref);
+    Location previousState = location;
+    location = objectPool.replaceObject(location.withLocked(newLocked));
+    objectPool.emitObjectEvent(location,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return location;
+  }
+
+  /**
+   * Sets a location's reservation token.
+   *
+   * @param ref A reference to the location to be modified.
+   * @param newToken The new reservation token.
+   * @return The modified location.
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   */
+  public Location setLocationReservationToken(TCSObjectReference<Location> ref, String newToken)
+      throws ObjectUnknownException {
+    Location location = objectPool.getObject(Location.class, ref);
+    Location previousState = location;
+    location = objectPool.replaceObject(location.withPeripheralInformation(
+        location.getPeripheralInformation().withReservationToken(newToken)
+    ));
+    objectPool.emitObjectEvent(location,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return location;
+  }
+
+  /**
+   * Sets a location's processing state.
+   *
+   * @param ref A reference to the location to be modified.
+   * @param newState The new processing state.
+   * @return The modified location.
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   */
+  public Location setLocationProcState(TCSObjectReference<Location> ref,
+                                       PeripheralInformation.ProcState newState)
+      throws ObjectUnknownException {
+    Location location = objectPool.getObject(Location.class, ref);
+    Location previousState = location;
+    location = objectPool.replaceObject(location.withPeripheralInformation(
+        location.getPeripheralInformation().withProcState(newState)
+    ));
+    objectPool.emitObjectEvent(location,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return location;
+  }
+
+  /**
+   * Sets a location's state.
+   *
+   * @param ref A reference to the location to be modified.
+   * @param newState The new state.
+   * @return The modified location.
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   */
+  public Location setLocationState(TCSObjectReference<Location> ref,
+                                   PeripheralInformation.State newState)
+      throws ObjectUnknownException {
+    Location location = objectPool.getObject(Location.class, ref);
+    Location previousState = location;
+    location = objectPool.replaceObject(location.withPeripheralInformation(
+        location.getPeripheralInformation().withState(newState)
+    ));
+    objectPool.emitObjectEvent(location,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return location;
+  }
+
+  /**
+   * Sets a location's peripheral job.
+   *
+   * @param ref A reference to the location to be modified.
+   * @param newJob The new peripheral job.
+   * @return The modified location.
+   * @throws ObjectUnknownException If the referenced location does not exist.
+   */
+  public Location setLocationPeripheralJob(TCSObjectReference<Location> ref,
+                                           TCSObjectReference<PeripheralJob> newJob)
+      throws ObjectUnknownException {
+    Location location = objectPool.getObject(Location.class, ref);
+    Location previousState = location;
+    location = objectPool.replaceObject(location.withPeripheralInformation(
+        location.getPeripheralInformation().withPeripheralJob(newJob)
+    ));
+    objectPool.emitObjectEvent(location,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return location;
+  }
+
+  /**
    * Creates a new vehicle with a unique name and all other attributes set to
    * their default values.
    *
@@ -493,7 +757,8 @@ public class Model {
         .withEnergyLevelSufficientlyRecharged(to.getEnergyLevelSufficientlyRecharged())
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
-        .withProperties(to.getProperties());
+        .withProperties(to.getProperties())
+        .withLayout(new Vehicle.Layout(to.getLayout().getRouteColor()));
     objectPool.addObject(newVehicle);
     objectPool.emitObjectEvent(newVehicle,
                                null,
@@ -846,7 +1111,8 @@ public class Model {
     Block newBlock = new Block(to.getName())
         .withType(to.getType())
         .withMembers(members)
-        .withProperties(to.getProperties());
+        .withProperties(to.getProperties())
+        .withLayout(new Block.Layout(to.getLayout().getColor()));
     objectPool.addObject(newBlock);
     objectPool.emitObjectEvent(newBlock,
                                null,
@@ -864,7 +1130,8 @@ public class Model {
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
-  public Group createGroup(GroupCreationTO to)
+  @Deprecated
+  public org.opentcs.data.model.Group createGroup(org.opentcs.access.to.model.GroupCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     Set<TCSObjectReference<?>> members = new HashSet<>();
     for (String memberName : to.getMemberNames()) {
@@ -874,7 +1141,7 @@ public class Model {
       }
       members.add(object.getReference());
     }
-    Group newGroup = new Group(to.getName())
+    org.opentcs.data.model.Group newGroup = new org.opentcs.data.model.Group(to.getName())
         .withMembers(members)
         .withProperties(to.getProperties());
     objectPool.addObject(newGroup);
@@ -885,6 +1152,7 @@ public class Model {
     return newGroup;
   }
 
+  @SuppressWarnings("deprecation")
   public PlantModelCreationTO createPlantModelCreationTO() {
     return new PlantModelCreationTO(name)
         .withProperties(getProperties())
@@ -895,7 +1163,21 @@ public class Model {
         .withLocations(getLocations())
         .withBlocks(getBlocks())
         .withGroups(getGroups())
-        .withVisualLayouts(getVisualLayouts());
+        .withVisualLayout(getVisualLayout());
+  }
+
+  private List<PeripheralOperation> mapPeripheralOperationTOs(
+      List<PeripheralOperationCreationTO> creationTOs) {
+    return creationTOs.stream()
+        .map(
+            operationTO -> new PeripheralOperation(
+                objectPool.getObject(Location.class,
+                                     operationTO.getLocationName()).getReference(),
+                operationTO.getOperation(),
+                operationTO.getExecutionTrigger(),
+                operationTO.isCompletionRequired())
+        )
+        .collect(Collectors.toList());
   }
 
   /**
@@ -914,6 +1196,9 @@ public class Model {
               .withVehicleOrientationAngle(curPoint.getVehicleOrientationAngle())
               .withType(curPoint.getType())
               .withProperties(curPoint.getProperties())
+              .withLayout(new PointCreationTO.Layout(curPoint.getLayout().getPosition(),
+                                                     curPoint.getLayout().getLabelOffset(),
+                                                     curPoint.getLayout().getLayerId()))
       );
     }
 
@@ -940,11 +1225,25 @@ public class Model {
               .withMaxVelocity(curPath.getMaxVelocity())
               .withMaxReverseVelocity(curPath.getMaxReverseVelocity())
               .withLocked(curPath.isLocked())
+              .withPeripheralOperations(getPeripheralOperations(curPath))
               .withProperties(curPath.getProperties())
+              .withLayout(new PathCreationTO.Layout(curPath.getLayout().getConnectionType(),
+                                                    curPath.getLayout().getControlPoints(),
+                                                    curPath.getLayout().getLayerId()))
       );
     }
 
     return result;
+  }
+
+  private List<PeripheralOperationCreationTO> getPeripheralOperations(Path path) {
+    return path.getPeripheralOperations().stream()
+        .map(op
+            -> new PeripheralOperationCreationTO(op.getOperation(), op.getLocation().getName())
+            .withExecutionTrigger(op.getExecutionTrigger())
+            .withCompletionRequired(op.isCompletionRequired())
+        )
+        .collect(Collectors.toList());
   }
 
   /**
@@ -968,6 +1267,7 @@ public class Model {
               .withMaxVelocity(curVehicle.getMaxVelocity())
               .withMaxReverseVelocity(curVehicle.getMaxReverseVelocity())
               .withProperties(curVehicle.getProperties())
+              .withLayout(new VehicleCreationTO.Layout(curVehicle.getLayout().getRouteColor()))
       );
     }
 
@@ -990,7 +1290,11 @@ public class Model {
       result.add(
           new LocationTypeCreationTO(curType.getName())
               .withAllowedOperations(curType.getAllowedOperations())
+              .withAllowedPeripheralOperations(curType.getAllowedPeripheralOperations())
               .withProperties(curType.getProperties())
+              .withLayout(
+                  new LocationTypeCreationTO.Layout(curType.getLayout().getLocationRepresentation())
+              )
       );
     }
 
@@ -1015,7 +1319,14 @@ public class Model {
               .withLinks(curLoc.getAttachedLinks().stream()
                   .collect(Collectors.toMap(link -> link.getPoint().getName(),
                                             Location.Link::getAllowedOperations)))
+              .withLocked(curLoc.isLocked())
               .withProperties(curLoc.getProperties())
+              .withLayout(
+                  new LocationCreationTO.Layout(curLoc.getLayout().getPosition(),
+                                                curLoc.getLayout().getLabelOffset(),
+                                                curLoc.getLayout().getLocationRepresentation(),
+                                                curLoc.getLayout().getLayerId())
+              )
       );
     }
 
@@ -1040,6 +1351,7 @@ public class Model {
                   .collect(Collectors.toSet()))
               .withType(curBlock.getType())
               .withProperties(curBlock.getProperties())
+              .withLayout(new BlockCreationTO.Layout(curBlock.getLayout().getColor()))
       );
     }
 
@@ -1047,18 +1359,20 @@ public class Model {
   }
 
   /**
-   * Returns a list of {@link GroupCreationTO Groups} for all groups in a model.
+   * Returns a list of GroupCreationTOs for all groups in a model.
    *
    * @param model The model data.
-   * @return A list of {@link GroupCreationTO Groups} for all groups in a model.
+   * @return A list of GroupCreationTOs for all groups in a model.
    */
-  private List<GroupCreationTO> getGroups() {
-    Set<Group> groups = objectPool.getObjects(Group.class);
-    List<GroupCreationTO> result = new ArrayList<>();
+  @Deprecated
+  private List<org.opentcs.access.to.model.GroupCreationTO> getGroups() {
+    Set<org.opentcs.data.model.Group> groups
+        = objectPool.getObjects(org.opentcs.data.model.Group.class);
+    List<org.opentcs.access.to.model.GroupCreationTO> result = new ArrayList<>();
 
-    for (Group curGroup : groups) {
+    for (org.opentcs.data.model.Group curGroup : groups) {
       result.add(
-          new GroupCreationTO(curGroup.getName())
+          new org.opentcs.access.to.model.GroupCreationTO(curGroup.getName())
               .withMemberNames(curGroup.getMembers().stream()
                   .map(member -> member.getName())
                   .collect(Collectors.toSet()))
@@ -1070,78 +1384,24 @@ public class Model {
   }
 
   /**
-   * Returns a list of {@link VisualLayoutCreationTO VisualLayouts} for all visual layouts in a
-   * model.
+   * Returns a {@link VisualLayoutCreationTO} for the visual layouts in a model.
    *
    * @param model The model data.
-   * @return A list of {@link VisualLayoutCreationTO VisualLayouts} for all visual layouts in a
-   * model.
+   * @return A {@link VisualLayoutCreationTO} for the visual layouts in a model.
    */
-  private List<VisualLayoutCreationTO> getVisualLayouts() {
+  private VisualLayoutCreationTO getVisualLayout() {
     Set<VisualLayout> layouts = objectPool.getObjects(VisualLayout.class);
-    List<VisualLayoutCreationTO> result = new ArrayList<>();
+    checkState(layouts.size() == 1,
+               "There has to be one, and only one, visual layout. Number of visual layouts: %d",
+               layouts.size());
+    VisualLayout layout = layouts.iterator().next();
 
-    // Separate our various kinds of layout elements.
-    for (VisualLayout curLayout : layouts) {
-      List<ShapeLayoutElement> shapeLayoutElements = new LinkedList<>();
-      Map<TCSObject<?>, ModelLayoutElement> modelLayoutElements = new HashMap<>();
-
-      for (LayoutElement layoutElement : curLayout.getLayoutElements()) {
-        if (layoutElement instanceof ShapeLayoutElement) {
-          shapeLayoutElements.add((ShapeLayoutElement) layoutElement);
-        }
-        else if (layoutElement instanceof ImageLayoutElement) {
-          // XXX Do something with these elements?
-        }
-        else if (layoutElement instanceof ModelLayoutElement) {
-          // Map the result of getVisualizedObject() to the corresponding TCSObject, since the name
-          // of the TCSObject might change but won't be changed in the reference the 
-          // ModelLayoutElement holds.
-          ModelLayoutElement mle = (ModelLayoutElement) layoutElement;
-          TCSObject<?> vObj = objectPool.getObjectOrNull(mle.getVisualizedObject());
-          // Don't persist layout elements for model elements that don't exist, but leave a log 
-          // message in that case.
-          if (vObj == null) {
-            LOG.error("Visualized object {} does not exist (any more?), not persisting layout element",
-                      mle.getVisualizedObject());
-            continue;
-          }
-          modelLayoutElements.put(vObj, mle);
-        }
-        // XXX GroupLayoutElement is not implemented, yet.
-//        else if (layoutElement instanceof GroupLayout)
-      }
-
-      // Persist ShapeLayoutElements
-      List<ShapeLayoutElementCreationTO> slElements = new ArrayList<>();
-      for (ShapeLayoutElement curSLE : shapeLayoutElements) {
-        ShapeLayoutElementCreationTO slElement = new ShapeLayoutElementCreationTO("")
-            .withLayer(curSLE.getLayer())
-            .withProperties(curSLE.getProperties());
-
-        slElements.add(slElement);
-      }
-
-      // Persist ModelLayoutElements
-      List<ModelLayoutElementCreationTO> mlElements = new ArrayList<>();
-      for (Map.Entry<TCSObject<?>, ModelLayoutElement> curMLE : modelLayoutElements.entrySet()) {
-        ModelLayoutElementCreationTO mlElement = new ModelLayoutElementCreationTO(curMLE.getKey().getName())
-            .withLayer(curMLE.getValue().getLayer())
-            .withProperties(curMLE.getValue().getProperties());
-
-        mlElements.add(mlElement);
-      }
-
-      result.add(
-          new VisualLayoutCreationTO(curLayout.getName())
-              .withScaleX(curLayout.getScaleX())
-              .withScaleY(curLayout.getScaleY())
-              .withModelElements(mlElements)
-              .withShapeElements(slElements)
-              .withProperties(curLayout.getProperties())
-      );
-    }
-    return result;
+    return new VisualLayoutCreationTO(layout.getName())
+        .withScaleX(layout.getScaleX())
+        .withScaleY(layout.getScaleY())
+        .withProperties(layout.getProperties())
+        .withLayers(layout.getLayers())
+        .withLayerGroups(layout.getLayerGroups());
   }
 
   /**
@@ -1233,6 +1493,8 @@ public class Model {
       result.append("  Name: " + curType.getName() + "\n");
       result.append("  Operations: "
           + curType.getAllowedOperations().toString() + "\n");
+      result.append("  Peripheral Operations: "
+          + curType.getAllowedPeripheralOperations().toString() + "\n");
     }
     result.append("Locations:\n");
     for (Location curLocation : locations) {

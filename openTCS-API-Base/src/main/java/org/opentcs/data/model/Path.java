@@ -8,12 +8,17 @@
 package org.opentcs.data.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.peripherals.PeripheralOperation;
 import static org.opentcs.util.Assertions.checkInRange;
 
 /**
@@ -48,9 +53,17 @@ public class Path
    */
   private final int maxReverseVelocity;
   /**
+   * The peripheral operations to be performed when a vehicle travels along this path.
+   */
+  private final List<PeripheralOperation> peripheralOperations;
+  /**
    * A flag for marking this path as locked (i.e. to prevent vehicles from using it).
    */
   private final boolean locked;
+  /**
+   * The information regarding the grahical representation of this path.
+   */
+  private final Layout layout;
 
   /**
    * Creates a new Path.
@@ -68,7 +81,9 @@ public class Path
     this.length = 1;
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
+    this.peripheralOperations = new ArrayList<>();
     this.locked = false;
+    this.layout = new Layout();
   }
 
   private Path(String name,
@@ -79,7 +94,9 @@ public class Path
                long length,
                int maxVelocity,
                int maxReverseVelocity,
-               boolean locked) {
+               List<PeripheralOperation> peripheralOperations,
+               boolean locked,
+               Layout layout) {
     super(name, properties, history);
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
@@ -89,7 +106,10 @@ public class Path
                                            0,
                                            Integer.MAX_VALUE,
                                            "maxReverseVelocity");
+    this.peripheralOperations = new ArrayList<>(requireNonNull(peripheralOperations,
+                                                               "peripheralOperations"));
     this.locked = locked;
+    this.layout = requireNonNull(layout, "layout");
   }
 
   @Override
@@ -102,7 +122,9 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   @Override
@@ -115,7 +137,9 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   @Override
@@ -128,7 +152,9 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   @Override
@@ -141,7 +167,9 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   /**
@@ -168,7 +196,9 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   /**
@@ -214,7 +244,9 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   /**
@@ -242,7 +274,38 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
+  }
+
+  /**
+   * Returns the peripheral operations to be performed when a vehicle travels along this path.
+   *
+   * @return The peripheral operations to be performed when a vehicle travels along this path.
+   */
+  public List<PeripheralOperation> getPeripheralOperations() {
+    return Collections.unmodifiableList(peripheralOperations);
+  }
+
+  /**
+   * Creates a copy of this object, with the given peripheral operations.
+   *
+   * @param peripheralOperations The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withPeripheralOperations(@Nonnull List<PeripheralOperation> peripheralOperations) {
+    return new Path(getName(),
+                    getProperties(),
+                    getHistory(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   /**
@@ -271,7 +334,38 @@ public class Path
                     length,
                     maxVelocity,
                     maxReverseVelocity,
-                    locked);
+                    peripheralOperations,
+                    locked,
+                    layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this path.
+   *
+   * @return The information regarding the grahical representation of this path.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withLayout(Layout layout) {
+    return new Path(getName(),
+                    getProperties(),
+                    getHistory(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    peripheralOperations,
+                    locked,
+                    layout);
   }
 
   /**
@@ -314,6 +408,138 @@ public class Path
     }
     else {
       throw new IllegalArgumentException(navPoint + " is not an end point of " + this);
+    }
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a path.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The connection type the path is represented as.
+     */
+    private final ConnectionType connectionType;
+    /**
+     * Control points describing the way the path is drawn (if the connection type
+     * is {@link ConnectionType#BEZIER}, {@link ConnectionType#BEZIER_3}
+     * or {@link ConnectionType#POLYPATH}).
+     */
+    private final List<Couple> controlPoints;
+    /**
+     * The ID of the layer on which the path is to be drawn.
+     */
+    private final int layerId;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(ConnectionType.DIRECT, new ArrayList<>(), 0);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param connectionType The connection type a path is represented as.
+     * @param controlPoints Control points describing the way the path is drawn.
+     * @param layerId The ID of the layer on which the path is to be drawn.
+     */
+    public Layout(ConnectionType connectionType, List<Couple> controlPoints, int layerId) {
+      this.connectionType = connectionType;
+      this.controlPoints = requireNonNull(controlPoints, "controlPoints");
+      this.layerId = layerId;
+    }
+
+    /**
+     * Returns the connection type the path is represented as.
+     *
+     * @return The connection type the path is represented as.
+     */
+    public ConnectionType getConnectionType() {
+      return connectionType;
+    }
+
+    /**
+     * Creates a copy of this object, with the given connection type.
+     *
+     * @param connectionType The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withConnectionType(ConnectionType connectionType) {
+      return new Layout(connectionType, controlPoints, layerId);
+    }
+
+    /**
+     * Returns the control points describing the way the path is drawn.
+     * Returns an empty list if connection type is not {@link ConnectionType#BEZIER},
+     * {@link ConnectionType#BEZIER_3} or {@link ConnectionType#POLYPATH}.
+     *
+     * @return The control points describing the way the path is drawn.
+     */
+    public List<Couple> getControlPoints() {
+      return Collections.unmodifiableList(controlPoints);
+    }
+
+    /**
+     * Creates a copy of this object, with the given control points.
+     *
+     * @param controlPoints The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withControlPoints(List<Couple> controlPoints) {
+      return new Layout(connectionType, controlPoints, layerId);
+    }
+
+    /**
+     * Returns the ID of the layer on which the path is to be drawn.
+     *
+     * @return The layer ID.
+     */
+    public int getLayerId() {
+      return layerId;
+    }
+
+    /**
+     * Creates a copy of this object, with the given layer ID.
+     *
+     * @param layerId The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLayer(int layerId) {
+      return new Layout(connectionType, controlPoints, layerId);
+    }
+
+    /**
+     * The connection type a path is represented as.
+     */
+    public static enum ConnectionType {
+
+      /**
+       * A direct connection.
+       */
+      DIRECT,
+      /**
+       * An elbow connection.
+       */
+      ELBOW,
+      /**
+       * A slanted connection.
+       */
+      SLANTED,
+      /**
+       * A polygon path with any number of vertecies.
+       */
+      POLYPATH,
+      /**
+       * A bezier curve with 2 control points.
+       */
+      BEZIER,
+      /**
+       * A bezier curve with 3 control points.
+       */
+      BEZIER_3;
     }
   }
 }

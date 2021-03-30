@@ -49,6 +49,39 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Version 5.1 (2021-03-24)
+
+* Bugs fixed:
+** Made names generated for transport orders to be (really) lexicographically sortable.
+* New features:
+** Add a `QueryService` to the kernel that can be used to execute generic/custom queries via registered `QueryResponder` instances.
+** Add support for creating plant models with multiple layers.
+** Add experimental support for peripheral devices, with device interactions triggered by vehicles travelling along paths.
+   (Note that this is not really documented, yet, and that _experimental_ means that developers using any parts of it are on their own, for now.)
+** Add a new version of the XML Schema definition for the openTCS plant model.
+** Allow the scheduler to be triggered explicitly via `Scheduler.reschedule()`.
+** Show properties in model elements' tooltips.
+* Other changes:
+** Split the Plant Overview application in two separate applications:
+   The Model Editor provides model creation and manipulation functionality, while the Operations Desk is used for interacting with a plant while it is in operation.
+** Split the Operations Desk's pause button into a pause and a resume button.
+** Remove support for groups.
+   (Layers can now be used to group plant model components.)
+** Allow project-specific edge evaluators and routing group mappings to be used.
+
+=== Version 4.20 (2020-12-18)
+
+* Fixes:
+** Default `Scheduler`: Properly handle requests for _same-direction_ blocks for some edge cases.
+** Default `Scheduler`: Really free all resources when taking a vehicle out of the driving course.
+* Other changes:
+** Plant Overview: Improve performance for vehicle state updates.
+
+=== Version 4.19 (2020-07-02)
+
+* New features:
+** As with paths, locations can now be locked via the Plant Overview application to prevent them from being used by vehicles.
+
 === Version 5.0 (2020-06-05)
 
 * Remove deprecated code.
@@ -577,4 +610,4 @@ So far, the developers involved were/are (in alphabetical order by last name):
 * Mustafa Yalciner
 * Youssef Zaki
 
-If you have contributed to openTCS and we have missed you on this list, please accept our apologies and send us an e-mail via info@opentcs.org.
+If you have contributed to openTCS and we have missed you on this list, please accept our apologies and inform us about it.

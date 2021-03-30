@@ -31,8 +31,7 @@ public class DefaultSchedulerModule
   private void configureSchedulerDependencies() {
     bind(ReservationPool.class).in(Singleton.class);
 
-    Multibinder<Scheduler.Module> moduleBinder = Multibinder.newSetBinder(binder(),
-                                                                          Scheduler.Module.class);
+    Multibinder<Scheduler.Module> moduleBinder = schedulerModuleBinder();
     moduleBinder.addBinding().to(SingleVehicleBlockModule.class);
     moduleBinder.addBinding().to(SameDirectionBlockModule.class);
   }

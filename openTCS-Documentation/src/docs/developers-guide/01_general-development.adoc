@@ -38,7 +38,7 @@ This is what most developers probably want to use.
 
 |`opentcs-api-injection`
 |Yes
-|API interfaces and classes used for dependency injection within the kernel and plant overview applications.
+|API interfaces and classes used for dependency injection within the kernel and client applications.
 This is required in integration projects customizing these applications, e.g. adding components like vehicle driver implementations.
 
 |`opentcs-common`
@@ -61,21 +61,29 @@ This is required in integration projects customizing these applications, e.g. ad
 |No
 |A kernel extension providing the statistics collection implementation.
 
+|`opentcs-plantoverview-base`
+|No
+|The base data structures and components used by the Model Editor and the Operations Desk that don't require third-party libraries.
+
+|`opentcs-plantoverview-common`
+|No
+|A collection of classes and components commonly used by the Model Editor and the Operations Desk.
+
 |`opentcs-plantoverview-panel-loadgenerator`
 |No
-|The load generator panel implementation for the plant overview.
+|The load generator panel implementation for the Operations Desk.
 
 |`opentcs-plantoverview-panel-resourceallocation`
 |No
-|The resource allocation panel implemenation for the plant overview.
+|The resource allocation panel implemenation for the Operations Desk.
 
 |`opentcs-plantoverview-panel-statistics`
 |No
-|The statistics panel implementation for the plant overview.
+|The statistics panel implementation for the Operations Desk.
 
 |`opentcs-plantoverview-themes-default`
 |No
-|The default themes implementation for the plant overview.
+|The default themes implementation for the Operations Desk.
 
 |`opentcs-commadapter-loopback`
 |No
@@ -91,17 +99,21 @@ This is required in integration projects customizing these applications, e.g. ad
 
 |`opentcs-kernelcontrolcenter`
 |No
-|The kernel control center application.
+|The Kernel Control Center application.
 
-|`opentcs-plantoverview`
+|`opentcs-modeleditor`
 |No
-|The plant overview application.
+|The Model Editor application.
+
+|`opentcs-operationsdesk`
+|No
+|The Operations Desk application.
 
 |===
 
 Note that only the basic API libraries provide a documented API that the openTCS developers try to keep compatible between minor releases.
 (For these libraries, the rules of https://semver.org/[semantic versioning] are applied.)
-All other artifacts' contents can and will change regardless of any compatibility concerns, so if you use these and switch to a different version of openTCS, you may have to adjust and recompile your code.
+All other artifacts' contents can and will change regardless of any compatibility concerns, so if you explicitly use these as dependencies and switch to a different version of openTCS, you may have to adjust and recompile your code.
 
 === Third-party dependencies
 
@@ -125,7 +137,7 @@ The kernel application also depends on the following libraries:
 * Jackson (https://github.com/FasterXML/jackson):
   Provides JSON bindings for Java objects.
 
-The plant overview application has the following additional dependencies:
+The Model Editor and Operations Desk applications have the following additional dependencies:
 
 * JHotDraw (http://www.jhotdraw.org/):
   A framework for drawing graph structures (like driving course models).
@@ -153,7 +165,7 @@ For examples, see <<Customizing and extending the kernel application>>, <<Custom
 
 The code in the official openTCS distribution uses http://www.slf4j.org/[SLF4J] for logging.
 Thus, the actual logging implementation is easily interchangeable by replacing the SLF4J binding in the respective application's classpath.
-The kernel and plant overview client applications come with SLF4J's bindings for `java.util.logging` by default.
+The kernel and client applications come with SLF4J's bindings for `java.util.logging` by default.
 For more information on how to change the actual logging implementation, e.g. to use log4j, please see the SLF4J documentation.
 
 === Working with the openTCS source code
@@ -172,9 +184,6 @@ To work with the source code in your IDE, see the IDE's documentation for Gradle
 There is no general recommendation for any specific IDE.
 Note, however, that the openTCS source code contains GUI components that have been created with the NetBeans GUI builder.
 If you want to edit these, you may want to use the NetBeans IDE.
-
-In case you use NetBeans, install the link:http://plugins.netbeans.org/plugin/44510/gradle-support[Gradle Support] plugin from the NetBeans plugin portal.
-You should then be able to open the source distribution's root directory as a Gradle project and compile and run the components from within NetBeans.
 
 === openTCS kernel APIs
 

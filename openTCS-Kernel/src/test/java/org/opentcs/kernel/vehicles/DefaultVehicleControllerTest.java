@@ -23,7 +23,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import org.opentcs.DataObjectFactory;
-import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
@@ -78,10 +77,6 @@ public class DefaultVehicleControllerTest {
    */
   private VehicleCommAdapter commAdapter;
   /**
-   * The (mocked) kernel.
-   */
-  private LocalKernel localKernel;
-  /**
    * The (mocked) vehicle service.
    */
   private InternalVehicleService vehicleService;
@@ -89,6 +84,14 @@ public class DefaultVehicleControllerTest {
    * A dummy scheduler.
    */
   private Scheduler scheduler;
+  /**
+   * A (mocked) components factory.
+   */
+  private VehicleControllerComponentsFactory componentsFactory;
+  /**
+   * A (mocked) peripheral interactor.
+   */
+  private PeripheralInteractor peripheralInteractor;
   /**
    * The instance we're testing.
    */
@@ -100,8 +103,9 @@ public class DefaultVehicleControllerTest {
     vehicleModel = new VehicleProcessModel(vehicle);
     vehicleModelTO = new VehicleProcessModelTO();
     commAdapter = mock(VehicleCommAdapter.class);
-    localKernel = mock(LocalKernel.class);
     vehicleService = mock(InternalVehicleService.class);
+    componentsFactory = mock(VehicleControllerComponentsFactory.class);
+    peripheralInteractor = mock(PeripheralInteractor.class);
 
     doReturn(RECHARGE_OP).when(commAdapter).getRechargeOperation();
     doReturn(vehicleModel).when(commAdapter).getProcessModel();
@@ -110,16 +114,19 @@ public class DefaultVehicleControllerTest {
     doReturn(vehicle).when(vehicleService).fetchObject(Vehicle.class, vehicle.getReference());
     doReturn(vehicle).when(vehicleService).fetchObject(Vehicle.class, vehicle.getName());
 
+    doReturn(peripheralInteractor).when(componentsFactory)
+        .createPeripheralInteractor(vehicle.getReference());
+
     scheduler = new DummyScheduler();
     scheduler.initialize();
     stdVehicleController = new DefaultVehicleController(vehicle,
                                                         commAdapter,
-                                                        localKernel,
                                                         vehicleService,
                                                         mock(NotificationService.class),
                                                         mock(DispatcherService.class),
                                                         scheduler,
-                                                        eventBus);
+                                                        eventBus,
+                                                        componentsFactory);
     stdVehicleController.initialize();
   }
 

@@ -7,20 +7,21 @@
  */
 package org.opentcs.strategies.basic.routing;
 
+import javax.inject.Singleton;
+import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorDistance;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorExplicitProperties;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorHops;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorTravelTime;
+import org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration;
 import org.opentcs.strategies.basic.routing.jgrapht.BellmanFordPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.DefaultModelGraphMapper;
 import org.opentcs.strategies.basic.routing.jgrapht.DijkstraPointRouterFactory;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluator;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorComposite;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorDistance;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorExplicitProperties;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorHops;
-import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorTravelTime;
 import org.opentcs.strategies.basic.routing.jgrapht.FloydWarshallPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.ModelGraphMapper;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
-import static org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration.EvaluatorType.TRAVELTIME;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,34 +78,29 @@ public class DefaultRouterModule
             .to(DijkstraPointRouterFactory.class);
     }
 
-    bind(EdgeEvaluator.class)
-        .toProvider(() -> {
-          EdgeEvaluatorComposite result = new EdgeEvaluatorComposite();
-          for (ShortestPathConfiguration.EvaluatorType type : spConfiguration.edgeEvaluators()) {
-            result.getComponents().add(toEdgeEvaluator(type));
-          }
-          // Make sure at least one evaluator is used.
-          if (result.getComponents().isEmpty()) {
-            LOG.warn("No edge evaluator enabled, falling back to distance-based evaluation.");
-            result.getComponents().add(new EdgeEvaluatorDistance());
-          }
-          return result;
-        });
-  }
+    edgeEvaluatorBinder()
+        .addBinding(EdgeEvaluatorDistance.CONFIGURATION_KEY)
+        .to(EdgeEvaluatorDistance.class);
+    edgeEvaluatorBinder()
+        .addBinding(EdgeEvaluatorExplicitProperties.CONFIGURATION_KEY)
+        .to(EdgeEvaluatorExplicitProperties.class);
+    edgeEvaluatorBinder()
+        .addBinding(EdgeEvaluatorHops.CONFIGURATION_KEY)
+        .to(EdgeEvaluatorHops.class);
+    edgeEvaluatorBinder()
+        .addBinding(EdgeEvaluatorTravelTime.CONFIGURATION_KEY)
+        .to(EdgeEvaluatorTravelTime.class);
 
-  private EdgeEvaluator toEdgeEvaluator(ShortestPathConfiguration.EvaluatorType type) {
-    switch (type) {
-      case DISTANCE:
-        return new EdgeEvaluatorDistance();
-      case TRAVELTIME:
-        return new EdgeEvaluatorTravelTime();
-      case HOPS:
-        return new EdgeEvaluatorHops();
-      case EXPLICIT_PROPERTIES:
-        return new EdgeEvaluatorExplicitProperties();
-      default:
-        throw new IllegalArgumentException("Unhandled evaluator type: " + type);
-    }
-  }
+    bind(EdgeEvaluatorComposite.class)
+        .in(Singleton.class);
 
+    bind(ExplicitPropertiesConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(ExplicitPropertiesConfiguration.PREFIX,
+                                                   ExplicitPropertiesConfiguration.class));
+
+    bind(DefaultRoutingGroupMapper.class)
+        .in(Singleton.class);
+    bind(GroupMapper.class)
+        .to(DefaultRoutingGroupMapper.class);
+  }
 }

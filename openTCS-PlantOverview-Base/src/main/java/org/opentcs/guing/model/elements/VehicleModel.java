@@ -30,6 +30,7 @@ import org.opentcs.guing.components.properties.type.SpeedProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
 import org.opentcs.guing.model.AbstractModelComponent;
+import org.opentcs.guing.model.DrawnModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -39,7 +40,8 @@ import org.opentcs.guing.model.ModelComponent;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleModel
-    extends AbstractModelComponent {
+    extends AbstractModelComponent
+    implements DrawnModelComponent {
 
   public static final String LENGTH = "Length";
   public static final String ENERGY_LEVEL_CRITICAL = "EnergyLevelCritical";
@@ -382,7 +384,7 @@ public class VehicleModel
   public StringProperty getPropertyCurrentSequenceName() {
     return (StringProperty) getProperty(CURRENT_SEQUENCE_NAME);
   }
-  
+
   public OrderTypesProperty getPropertyAllowedOrderTypes() {
     return (OrderTypesProperty) getProperty(ALLOWED_ORDER_TYPES);
   }
@@ -557,6 +559,7 @@ public class VehicleModel
         bundle.getString("vehicleModel.property_miscellaneous.description")
     );
     pMiscellaneous.setHelptext(bundle.getString("vehicleModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
 
     StringProperty curTransportOrderName = new StringProperty(this);

@@ -18,6 +18,7 @@ import org.opentcs.guing.event.ConnectionChangeEvent;
 import org.opentcs.guing.event.ConnectionChangeListener;
 import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.model.AbstractModelComponent;
+import org.opentcs.guing.model.DrawnModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
@@ -34,7 +35,8 @@ import org.opentcs.guing.model.ModelComponent;
  */
 public abstract class AbstractConnection
     extends AbstractModelComponent
-    implements AttributesChangeListener {
+    implements DrawnModelComponent,
+               AttributesChangeListener {
 
   /**
    * Key for the start component.

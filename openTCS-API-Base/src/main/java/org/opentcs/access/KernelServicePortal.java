@@ -11,7 +11,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.NotificationService;
+import org.opentcs.components.kernel.services.PeripheralDispatcherService;
+import org.opentcs.components.kernel.services.PeripheralJobService;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.TransportOrderService;
@@ -128,4 +132,36 @@ public interface KernelServicePortal {
    */
   @Nonnull
   SchedulerService getSchedulerService();
+
+  /**
+   * Returns the service a client can use to access methods for generic queries.
+   *
+   * @return The service a client can use to access methods for generic queries.
+   */
+  @Nonnull
+  QueryService getQueryService();
+
+  /**
+   * Returns the service a client can use to access methods regarding peripherals.
+   *
+   * @return The service a client can use to access methods regarding peripherals.
+   */
+  @Nonnull
+  PeripheralService getPeripheralService();
+
+  /**
+   * Returns the service a client can use to access methods regarding peripheral jobs.
+   *
+   * @return The service a client can use to access methods regarding peripheral jobs.
+   */
+  @Nonnull
+  PeripheralJobService getPeripheralJobService();
+  
+  /**
+   * Returns the service a client can use to access methods regarding the peripheral dispatcher.
+   *
+   * @return The service a client can use to access methods regarding the peripheral dispatcher.
+   */
+  @Nonnull
+  PeripheralDispatcherService getPeripheralDispatcherService();
 }

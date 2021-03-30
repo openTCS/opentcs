@@ -15,9 +15,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;
 
 /**
  *
@@ -59,16 +61,16 @@ public class DefaultModelGraphMapperTest {
         .withMaxReverseVelocity(1000);
 
     configuration = mock(ShortestPathConfiguration.class);
-    mapper = new DefaultModelGraphMapper(new EdgeEvaluatorHops(), configuration);
+    mapper = new DefaultModelGraphMapper(mock(EdgeEvaluatorComposite.class), configuration);
   }
 
   @Test
   public void createEmptyGraph() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
-    Graph<String, ModelEdge> graph = mapper.translateModel(new HashSet<>(),
-                                                           new HashSet<>(),
-                                                           new Vehicle("someVehicle"));
+    Graph<String, Edge> graph = mapper.translateModel(new HashSet<>(),
+                                                      new HashSet<>(),
+                                                      new Vehicle("someVehicle"));
     assertEquals("Number of vertices", 0, graph.vertexSet().size());
     assertEquals("Number of edges", 0, graph.edgeSet().size());
   }
@@ -77,7 +79,7 @@ public class DefaultModelGraphMapperTest {
   public void createGraphWithFourPointsAndNoPath() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
-    Graph<String, ModelEdge> graph
+    Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(),
                                 new Vehicle("someVehicle"));
@@ -93,7 +95,7 @@ public class DefaultModelGraphMapperTest {
   public void createGraphWithFourPointsAndOneUnidirectionalPath() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
-    Graph<String, ModelEdge> graph
+    Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAB)),
                                 new Vehicle("someVehicle"));
@@ -106,7 +108,7 @@ public class DefaultModelGraphMapperTest {
     assertEquals("Forward edges for path " + pathAB.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathAB.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathAB.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
   }
@@ -115,7 +117,7 @@ public class DefaultModelGraphMapperTest {
   public void createGraphWithFourPointsAndOneBidirectionalPath() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
-    Graph<String, ModelEdge> graph
+    Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAD)),
                                 new Vehicle("someVehicle"));
@@ -128,13 +130,13 @@ public class DefaultModelGraphMapperTest {
     assertEquals("Forward edges for path " + pathAD.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathAD.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
     assertEquals("Reverse edges for path " + pathAD.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathAD.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> edge.isTravellingReverse())
                      .count());
   }
@@ -143,7 +145,7 @@ public class DefaultModelGraphMapperTest {
   public void createGraphWithFourPointsThreeUnidirectionalAndOneBidirectionalPaths() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
-    Graph<String, ModelEdge> graph
+    Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAB, pathBC, pathCD, pathAD)),
                                 new Vehicle("someVehicle"));
@@ -156,31 +158,31 @@ public class DefaultModelGraphMapperTest {
     assertEquals("Forward edges for path " + pathAB.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathAB.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathAB.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
     assertEquals("Forward edges for path " + pathBC.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathBC.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathBC.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
     assertEquals("Forward edges for path " + pathCD.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathCD.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathCD.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
     assertEquals("Forward edges for path " + pathAD.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathAD.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
     assertEquals("Reverse edges for path " + pathAD.getName(),
                  1,
                  graph.edgeSet().stream()
-                     .filter(edge -> edge.getModelPath().getName().equals(pathAD.getName()))
+                     .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> edge.isTravellingReverse())
                      .count());
   }

@@ -92,15 +92,15 @@ public class TransportOrderPool {
    */
   public void clear() {
     LOG.debug("method entry");
-    Set<TCSObject<?>> objects = objectPool.getObjects((Pattern) null);
-    Set<String> removableNames = new HashSet<>();
-    for (TCSObject<?> curObject : objects) {
+    for (TCSObject<?> curObject : objectPool.getObjects((Pattern) null)) {
       if (curObject instanceof TransportOrder
           || curObject instanceof OrderSequence) {
-        removableNames.add(curObject.getName());
+        objectPool.removeObject(curObject.getReference());
+        objectPool.emitObjectEvent(null,
+                                   curObject,
+                                   TCSObjectEvent.Type.OBJECT_REMOVED);
       }
     }
-    objectPool.removeObjects(removableNames);
   }
 
   /**
@@ -120,6 +120,7 @@ public class TransportOrderPool {
     TransportOrder newOrder = new TransportOrder(nameFor(to),
                                                  toDriveOrders(to.getDestinations()))
         .withCreationTime(Instant.now())
+        .withPeripheralReservationToken(to.getPeripheralReservationToken())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withType(to.getType())
         .withDeadline(to.getDeadline())

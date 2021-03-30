@@ -15,7 +15,7 @@ include::04_extending-kernel.adoc[]
 
 include::05_extending-control-center.adoc[]
 
-include::06_extending-plantoverview.adoc[]
+include::06_extending-model-editor-and-operations-desk.adoc[]
 
 include::07_supplement-configuration.adoc[]
 

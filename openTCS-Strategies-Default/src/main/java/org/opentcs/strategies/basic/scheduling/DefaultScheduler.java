@@ -258,8 +258,21 @@ public class DefaultScheduler
     requireNonNull(client, "client");
 
     synchronized (globalSyncObject) {
-      LOG.debug("{}: Releasing all resources", client.getId());
+      Set<TCSResource<?>> freedResources = reservationPool.allocatedResources(client);
+
+      LOG.debug("{}: Releasing all resources...", client.getId());
       reservationPool.freeAll(client);
+      LOG.debug("{}: Clearing pending allocation requests...", client.getId());
+      deferredAllocations.removeIf(allocate -> client.equals(allocate.getClient()));
+
+      kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                              reservationPool,
+                                              deferredAllocations,
+                                              allocationAdvisor,
+                                              kernelExecutor,
+                                              globalSyncObject,
+                                              new AllocationsReleased(client,
+                                                                      freedResources)));
     }
     kernelExecutor.submit(new AllocatorTask(plantModelService,
                                             reservationPool,
@@ -268,6 +281,17 @@ public class DefaultScheduler
                                             kernelExecutor,
                                             globalSyncObject,
                                             new RetryAllocates(client)));
+  }
+
+  @Override
+  public void reschedule() {
+    kernelExecutor.submit(new AllocatorTask(plantModelService,
+                                            reservationPool,
+                                            deferredAllocations,
+                                            allocationAdvisor,
+                                            kernelExecutor,
+                                            globalSyncObject,
+                                            new RetryAllocates(new DummyClient())));
   }
 
   @Override
@@ -292,5 +316,26 @@ public class DefaultScheduler
                                             kernelExecutor,
                                             globalSyncObject,
                                             new CheckAllocationsPrepared(client, resources)));
+  }
+
+  /**
+   * A dummy client for cases in which we need to provide a client but do not have a real one.
+   */
+  private static class DummyClient
+      implements Scheduler.Client {
+
+    @Override
+    public String getId() {
+      return "DefaultScheduler-DummyClient";
+    }
+
+    @Override
+    public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
+      return false;
+    }
+
+    @Override
+    public void allocationFailed(Set<TCSResource<?>> resources) {
+    }
   }
 }

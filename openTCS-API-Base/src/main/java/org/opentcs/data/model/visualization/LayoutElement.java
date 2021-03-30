@@ -11,12 +11,16 @@ import java.io.Serializable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.TreeMap;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A generic layout element that is to be displayed.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public abstract class LayoutElement
     implements Serializable {
 

@@ -7,8 +7,10 @@
  */
 package org.opentcs.access.to.model;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import static org.opentcs.util.Assertions.checkArgument;
@@ -51,6 +53,10 @@ public class VehicleCreationTO
    * The vehicle's maximum reverse velocity (in mm/s).
    */
   private int maxReverseVelocity = 1000;
+  /**
+   * The information regarding the grahical representation of this vehicle.
+   */
+  private Layout layout = new Layout();
 
   /**
    * Creates a new instance.
@@ -69,7 +75,8 @@ public class VehicleCreationTO
                             int energyLevelFullyRecharged,
                             int energyLevelSufficientlyRecharged,
                             int maxVelocity,
-                            int maxReverseVelocity) {
+                            int maxReverseVelocity,
+                            @Nonnull Layout layout) {
     super(name, properties);
     this.length = length;
     this.energyLevelCritical = energyLevelCritical;
@@ -78,6 +85,7 @@ public class VehicleCreationTO
     this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
     this.maxVelocity = maxVelocity;
     this.maxReverseVelocity = maxReverseVelocity;
+    this.layout = requireNonNull(layout, "layout");
   }
 
   /**
@@ -96,7 +104,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -115,7 +124,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -138,7 +148,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -166,7 +177,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -197,7 +209,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -230,7 +243,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -260,7 +274,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   /**
@@ -291,7 +306,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   public int getMaxVelocity() {
@@ -314,7 +330,8 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
   }
 
   public int getMaxReverseVelocity() {
@@ -337,6 +354,105 @@ public class VehicleCreationTO
                                  energyLevelFullyRecharged,
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
-                                 maxReverseVelocity);
+                                 maxReverseVelocity,
+                                 layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this vehicle.
+   *
+   * @return The information regarding the grahical representation of this vehicle.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withLayout(Layout layout) {
+    return new VehicleCreationTO(getName(),
+                                 getModifiableProperties(),
+                                 length,
+                                 energyLevelCritical,
+                                 energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
+                                 maxVelocity,
+                                 maxReverseVelocity,
+                                 layout);
+  }
+
+  @Override
+  public String toString() {
+    return "VehicleCreationTO{"
+        + "name=" + getName()
+        + ", length=" + length
+        + ", energyLevelCritical=" + energyLevelCritical
+        + ", energyLevelGood=" + energyLevelGood
+        + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
+        + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
+        + ", maxVelocity=" + maxVelocity
+        + ", maxReverseVelocity=" + maxReverseVelocity
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + '}';
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a vehicle.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The color in which vehicle routes are to be emphasized.
+     */
+    private final Color routeColor;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(Color.RED);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param routeColor The color in which vehicle routes are to be emphasized.
+     */
+    public Layout(Color routeColor) {
+      this.routeColor = requireNonNull(routeColor, "routeColor");
+    }
+
+    /**
+     * Returns the color in which vehicle routes are to be emphasized.
+     *
+     * @return The color in which vehicle routes are to be emphasized.
+     */
+    public Color getRouteColor() {
+      return routeColor;
+    }
+
+    /**
+     * Creates a copy of this object, with the given color.
+     *
+     * @param routeColor The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withRouteColor(Color routeColor) {
+      return new Layout(routeColor);
+    }
+
+    @Override
+    public String toString() {
+      return "Layout{"
+          + "routeColor=" + routeColor
+          + '}';
+    }
   }
 }

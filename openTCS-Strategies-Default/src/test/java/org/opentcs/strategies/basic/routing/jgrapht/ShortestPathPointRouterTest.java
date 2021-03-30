@@ -18,6 +18,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.Route.Step;
@@ -35,7 +36,7 @@ public class ShortestPathPointRouterTest {
 
   private Path pathAC;
 
-  private ModelEdge edgeAC;
+  private Edge edgeAC;
 
   private ShortestPathPointRouter pointRouter;
 
@@ -47,9 +48,9 @@ public class ShortestPathPointRouterTest {
 
     pathAC = new Path("A-->C", pointA.getReference(), pointC.getReference());
 
-    edgeAC = new ModelEdge(pathAC, false);
+    edgeAC = new Edge(pathAC, false);
 
-    Graph<String, ModelEdge> graph = new DirectedWeightedMultigraph<>(ModelEdge.class);
+    Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
 
     graph.addVertex(pointA.getName());
     graph.addVertex(pointB.getName());

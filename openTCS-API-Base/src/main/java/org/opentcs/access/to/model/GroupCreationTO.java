@@ -15,12 +15,16 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a group in the plant model.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class GroupCreationTO
     extends CreationTO
     implements Serializable {

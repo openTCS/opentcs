@@ -7,6 +7,7 @@
  */
 package org.opentcs.access.to.model;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +37,10 @@ public class BlockCreationTO
    */
   @Nonnull
   private Set<String> memberNames = new HashSet<>();
+  /**
+   * The information regarding the grahical representation of this block.
+   */
+  private Layout layout = new Layout();
 
   /**
    * Creates a new instance.
@@ -56,10 +61,12 @@ public class BlockCreationTO
   private BlockCreationTO(@Nonnull String name,
                           @Nonnull Map<String, String> properties,
                           @Nonnull Block.Type type,
-                          @Nonnull Set<String> memberNames) {
+                          @Nonnull Set<String> memberNames,
+                          @Nonnull Layout layout) {
     super(name, properties);
     this.type = requireNonNull(type, "type");
     this.memberNames = requireNonNull(memberNames, "memberNames");
+    this.layout = requireNonNull(layout, "layout");
   }
 
   /**
@@ -73,7 +80,8 @@ public class BlockCreationTO
     return new BlockCreationTO(name,
                                getModifiableProperties(),
                                type,
-                               memberNames);
+                               memberNames,
+                               layout);
   }
 
   /**
@@ -87,7 +95,8 @@ public class BlockCreationTO
     return new BlockCreationTO(getName(),
                                properties,
                                type,
-                               memberNames);
+                               memberNames,
+                               layout);
   }
 
   /**
@@ -105,9 +114,10 @@ public class BlockCreationTO
     return new BlockCreationTO(getName(),
                                propertiesWith(key, value),
                                type,
-                               memberNames);
+                               memberNames,
+                               layout);
   }
-  
+
   /**
    * Returns the type of this block.
    *
@@ -128,7 +138,8 @@ public class BlockCreationTO
     return new BlockCreationTO(getName(),
                                getModifiableProperties(),
                                type,
-                               memberNames);
+                               memberNames,
+                               layout);
   }
 
   /**
@@ -151,6 +162,95 @@ public class BlockCreationTO
     return new BlockCreationTO(getName(),
                                getModifiableProperties(),
                                type,
-                               memberNames);
+                               memberNames,
+                               layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this block.
+   *
+   * @return The information regarding the grahical representation of this block.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public BlockCreationTO withLayout(Layout layout) {
+    return new BlockCreationTO(getName(),
+                               getModifiableProperties(),
+                               type,
+                               memberNames,
+                               layout);
+  }
+
+  @Override
+  public String toString() {
+    return "BlockCreationTO{"
+        + "name=" + getName()
+        + ", type=" + type
+        + ", memberNames=" + memberNames
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + '}';
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a block.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The color in which block elements are to be emphasized.
+     */
+    private final Color color;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(Color.RED);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param color The color in which block elements are to be emphasized.
+     */
+    public Layout(Color color) {
+      this.color = requireNonNull(color, "color");
+    }
+
+    /**
+     * Returns the color in which block elements are to be emphasized.
+     *
+     * @return The color in which block elements are to be emphasized.
+     */
+    public Color getColor() {
+      return color;
+    }
+
+    /**
+     * Creates a copy of this object, with the given color.
+     *
+     * @param color The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withColor(Color color) {
+      return new Layout(color);
+    }
+
+    @Override
+    public String toString() {
+      return "Layout{"
+          + "color=" + color
+          + '}';
+    }
   }
 }

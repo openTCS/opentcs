@@ -61,6 +61,16 @@ The shortest path algorithm can be configured using the following configuration 
 
 include::{configdoc}/ShortestPathConfigurationEntries.adoc[]
 
+The edge evaluator `EXPLICIT_PROPERTIES` can be configured using the following configuration entries:
+
+include::{configdoc}/ExplicitPropertiesConfigurationEntries.adoc[]
+
+==== Default peripheral job dispatcher configuration entries
+
+The default peripheral job dispatcher can be configured using the following configuration entries:
+
+include::{configdoc}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc[]
+
 ==== Admin web API configuration entries
 
 The kernel's admin web API can be configured using the following configuration entries:
@@ -97,6 +107,12 @@ The virtual vehicle (loopback communication adapter) can be configured using the
 
 include::{configdoc}/VirtualVehicleConfigurationEntries.adoc[]
 
+==== Virtual peripheral configuration entries
+
+The virtual peripheral (peripheral loopback communication adapter) can be configured using the following configuration entries:
+
+include::{configdoc}/VirtualPeripheralConfigurationEntries.adoc[]
+
 === Kernel Control Center configuration
 
 The kernel control center application reads its configuration data from the following files:
@@ -120,31 +136,62 @@ The kernel control center application's SSL connections can be configured using 
 
 include::{configdoc}/KccSslConfigurationEntries.adoc[]
 
-=== Plant Overview configuration
+=== Model Editor configuration
 
-The plant overview application reads its configuration data from the following files:
+The model editor application reads its configuration data from the following files:
 
-. `config/opentcs-plantoverview-defaults-baseline.properties`,
-. `config/opentcs-plantoverview-defaults-custom.properties`,
-. `config/opentcs-plantoverview.properties`.
+. `config/opentcs-modeleditor-defaults-baseline.properties`,
+. `config/opentcs-modeleditor-defaults-custom.properties`,
+. `config/opentcs-modeleditor.properties`.
 
 The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
-For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-plantoverview.properties` only.
+For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-modeleditor.properties` only.
 
-==== Plant Overview application configuration entries
+NOTE: Some of the following configuration entries still use the prefix 'plantoverviewapp', which is reminiscent of the old plant overview application.
+With openTCS 6.0, the prefix 'plantoverviewapp' will be replaced with one more suitable for the new model editor application.
 
-The plant overview application itself can be configured using the following configuration entries:
+==== Model Editor application configuration entries
+
+The model editor application itself can be configured using the following configuration entries:
 
 include::{configdoc}/PlantOverviewApplicationConfigurationEntries.adoc[]
+include::{configdoc}/PlantOverviewModelingApplicationConfigurationEntries.adoc[]
 
-==== SSL PO-side application configuration entries
+==== SSL model editor-side application configuration entries
 
-The plant overview application's SSL connections can be configured using the following configuration entries:
+The model editor application's SSL connections can be configured using the following configuration entries:
 
 include::{configdoc}/PoSslConfigurationEntries.adoc[]
 
-==== Plant Overview element naming scheme configuration entries
+==== Model Editor element naming scheme configuration entries
 
-The plant overview application's element naming schemes can be configured using the following configuration entries:
+The model editor application's element naming schemes can be configured using the following configuration entries:
 
 include::{configdoc}/PO_ElementNamingSchemeConfigurationEntries.adoc[]
+
+=== Operations Desk configuration
+
+The operations desk application reads its configuration data from the following files:
+
+. `config/opentcs-operationsdesk-defaults-baseline.properties`,
+. `config/opentcs-operationsdesk-defaults-custom.properties`,
+. `config/opentcs-operationsdesk.properties`.
+
+The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
+For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-operationsdesk.properties` only.
+
+NOTE: Some of the following configuration entries still use the prefix 'plantoverviewapp', which is reminiscent of the old plant overview application.
+With openTCS 6.0, the prefix 'plantoverviewapp' will be replaced with one more suitable for the new operations desk application.
+
+==== Operations Desk application configuration entries
+
+The operations desk application itself can be configured using the following configuration entries:
+
+include::{configdoc}/PlantOverviewApplicationConfigurationEntries.adoc[]
+include::{configdoc}/PlantOverviewOperatingApplicationConfigurationEntries.adoc[]
+
+==== SSL operation desk-side application configuration entries
+
+The operation desk application's SSL connections can be configured using the following configuration entries:
+
+include::{configdoc}/PoSslConfigurationEntries.adoc[]

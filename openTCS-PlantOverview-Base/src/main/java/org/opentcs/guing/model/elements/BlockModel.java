@@ -222,6 +222,7 @@ public class BlockModel
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("blockModel.property_miscellaneous.description"));
     pMiscellaneous.setHelptext(bundle.getString("blockModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 

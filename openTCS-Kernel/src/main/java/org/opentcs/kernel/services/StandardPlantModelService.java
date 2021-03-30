@@ -25,6 +25,8 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.notification.UserNotification;
@@ -185,6 +187,22 @@ public class StandardPlantModelService
       throws KernelRuntimeException {
     synchronized (globalSyncObject) {
       return model.getProperties();
+    }
+  }
+
+  @Override
+  public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      model.setLocationLocked(ref, locked);
+    }
+  }
+
+  @Override
+  public void updateLocationReservationToken(TCSObjectReference<Location> ref, String token)
+      throws ObjectUnknownException, KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      model.setLocationReservationToken(ref, token);
     }
   }
 

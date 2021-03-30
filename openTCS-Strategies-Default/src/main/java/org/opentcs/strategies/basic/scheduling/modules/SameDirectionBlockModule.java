@@ -126,31 +126,35 @@ public class SameDirectionBlockModule
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
+      // Other modules may prevented the last allocation, discard any previous requests.
+      discardPreviousRequests();
+
       Set<Block> blocks = filterBlocksContainingResources(resources,
                                                           Block.Type.SAME_DIRECTION_ONLY);
       if (blocks.isEmpty()) {
+        LOG.debug("{}: No blocks to be checked, allocation allowed.", client.getId());
         return true;
       }
 
       Path path = selectPath(resources);
       if (path == null) {
         // If there's no path in the requested resources the vehicle won't move and already has
-        // permission to be in the block(s)
+        // permission to be in the block(s).
+        LOG.debug("{}: No path in resources, allocation allowed.", client.getId());
         return true;
       }
 
-      // Other modules may prevented the last allocation. Therefore discard any previous requests.
-      discardPreviousRequests();
-
-      String entryDirectionProperty = path.getProperties()
-          .getOrDefault(PROPKEY_BLOCK_ENTRY_DIRECTION, path.getName());
-
-      boolean mayAllocate = true;
-      for (Block block : blocks) {
-        mayAllocate &= permissions.get(block).enqueueRequest(client, entryDirectionProperty);
+      LOG.debug("{}: Checking resource availability: {}", client.getId(), resources);
+      if (!checkBlockEntryPermissions(client,
+                                      blocks,
+                                      path.getProperties().getOrDefault(PROPKEY_BLOCK_ENTRY_DIRECTION,
+                                                                        path.getName()))) {
+        LOG.debug("{}: Resources unavailable.", client.getId());
+        return false;
       }
 
-      return mayAllocate;
+      LOG.debug("{}: Resources available, allocation allowed.", client.getId());
+      return true;
     }
   }
 
@@ -193,6 +197,7 @@ public class SameDirectionBlockModule
   }
 
   private void discardPreviousRequests() {
+    LOG.debug("Discarding all pending requests...");
     permissions.values().forEach(permission -> permission.clearPendingRequests());
   }
 
@@ -220,6 +225,20 @@ public class SameDirectionBlockModule
     }
 
     return null;
+  }
+
+  private boolean checkBlockEntryPermissions(Scheduler.Client client,
+                                             Set<Block> blocks,
+                                             String entryDirection) {
+    LOG.debug("{}: Checking entry permissions for blocks '{}' with entry direction '{}'.",
+              client.getId(),
+              entryDirection);
+    boolean entryPermissible = true;
+    for (Block block : blocks) {
+      entryPermissible &= permissions.get(block).enqueueRequest(client, entryDirection);
+    }
+
+    return entryPermissible;
   }
 
   private boolean blockResourcesAllocatedByClient(Block block, Scheduler.Client client) {
@@ -262,14 +281,14 @@ public class SameDirectionBlockModule
         PermissionRequest request = pendingRequests.poll();
 
         if (clientAlreadyInBlock(request.getClient())) {
-          LOG.debug("{}: Permission for {} already granted",
+          LOG.debug("Permission for block {} already granted to {}.",
                     block.getName(),
                     request.getClient().getId());
         }
         else if (entryPermissible(request.getEntryDirection())) {
           clients.add(request.getClient());
           this.entryDirection = request.getEntryDirection();
-          LOG.debug("{}: Permission granted for {} (entryDirection={})",
+          LOG.debug("Permission for block {} granted to {} (entryDirection={}).",
                     block.getName(),
                     request.getClient().getId(),
                     request.getEntryDirection());
@@ -280,13 +299,17 @@ public class SameDirectionBlockModule
     public boolean enqueueRequest(Scheduler.Client client, String entryDirection) {
       if (clientAlreadyInBlock(client)
           || entryPermissible(entryDirection)) {
+        LOG.debug("Enqueuing permission request for block {} to {} with entry direction '{}'.",
+                  block.getName(),
+                  client.getId(),
+                  entryDirection);
         pendingRequests.add(new PermissionRequest(client, entryDirection));
         return true;
       }
 
-      LOG.debug("{}: Client '{}' with entry direction '{}' (!= '{}') not permissible. ",
-                block.getName(),
+      LOG.debug("Client {} not permissible to block {} with entry direction '{}' (!= '{}').",
                 client.getId(),
+                block.getName(),
                 entryDirection,
                 this.entryDirection);
       return false;

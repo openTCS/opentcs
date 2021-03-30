@@ -96,6 +96,9 @@ public class DefaultServiceCallWrapper
           portalManager.disconnect();
           retry = showRetryDialog();
         }
+        else {
+          retry = false;
+        }
       }
     }
 

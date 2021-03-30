@@ -9,6 +9,8 @@ package org.opentcs.guing.model.elements;
 
 import java.util.ResourceBundle;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
+import org.opentcs.guing.components.layer.NullLayerWrapper;
+import org.opentcs.guing.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.StringSetProperty;
@@ -104,5 +106,11 @@ public class LinkModel
     endComponent.setModellingEditable(false);
     endComponent.setOperatingEditable(false);
     setProperty(END_COMPONENT, endComponent);
+    
+    LayerWrapperProperty pLayerWrapper = new LayerWrapperProperty(this, new NullLayerWrapper());
+    pLayerWrapper.setDescription(bundle.getString("linkModel.property_layerWrapper.description"));
+    pLayerWrapper.setHelptext(bundle.getString("linkModel.property_layerWrapper.helptext"));
+    pLayerWrapper.setModellingEditable(false);
+    setProperty(LAYER_WRAPPER, pLayerWrapper);
   }
 }

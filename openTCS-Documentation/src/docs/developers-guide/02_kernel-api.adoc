@@ -4,15 +4,23 @@
 
 The interfaces and classes required to use the kernel API are part of the `opentcs-api-base` JAR file, so you should add that to your classpath/declare a dependency on it.
 (See <<Available artifacts and API compatibility>>.)
-The basic data structures for plant model components and transport orders you will encounter often are:
+The basic data structures for plant model components and transport orders you will encounter often are the following:
 
 .Basic data structures
 image::tcsobject_classes.png[]
 
-The service interfaces that are most often interacted with to fetch and manipulate such objects are:
+The service interfaces that are most often interacted with to fetch and manipulate such data structures are these:
 
-.Service interfaces
-image::service_interfaces.png[]
+.TCSObject-related service interfaces
+image::service_interfaces_tcsobjects.png[]
+
+A few more interfaces are available to interact with various parts of the kernel, as shown in the following diagram:
+
+.Additional service interfaces
+image::service_interfaces_others.png[]
+
+NOTE: _Peripheral*_ are classes/interfaces related to experimental integration of peripheral devices.
+These features are not documented in detail, yet, and developers using any of them are on their own, for now.
 
 === Acquiring service objects
 

@@ -10,6 +10,7 @@ package org.opentcs.customizations.controlcenter;
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ConfigurableInjectionModule;
+import org.opentcs.drivers.peripherals.management.PeripheralCommAdapterPanelFactory;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanelFactory;
 
 /**
@@ -53,5 +54,15 @@ public abstract class ControlCenterInjectionModule
    */
   protected Multibinder<VehicleCommAdapterPanelFactory> commAdapterPanelFactoryBinder() {
     return Multibinder.newSetBinder(binder(), VehicleCommAdapterPanelFactory.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register {@link PeripheralCommAdapterPanelFactory}
+   * implementations.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<PeripheralCommAdapterPanelFactory> peripheralCommAdapterPanelFactoryBinder() {
+    return Multibinder.newSetBinder(binder(), PeripheralCommAdapterPanelFactory.class);
   }
 }

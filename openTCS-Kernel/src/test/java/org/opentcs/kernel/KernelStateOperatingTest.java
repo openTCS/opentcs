@@ -23,14 +23,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.components.kernel.PeripheralJobDispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
+import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
+import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.PeripheralJobPool;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
@@ -57,6 +61,8 @@ public class KernelStateOperatingTest {
 
   private Dispatcher dispatcher;
 
+  private PeripheralJobDispatcher peripheralJobDispatcher;
+
   private LocalVehicleControllerPool controllerPool;
 
   private AttachmentManager attachmentManager;
@@ -71,6 +77,7 @@ public class KernelStateOperatingTest {
     router = mock(Router.class);
     scheduler = mock(Scheduler.class);
     dispatcher = mock(Dispatcher.class);
+    peripheralJobDispatcher = mock(PeripheralJobDispatcher.class);
     controllerPool = mock(LocalVehicleControllerPool.class);
     attachmentManager = mock(AttachmentManager.class);
     vehicleService = mock(InternalVehicleService.class);
@@ -92,6 +99,7 @@ public class KernelStateOperatingTest {
     verify(router, times(1)).initialize();
     verify(scheduler, times(1)).initialize();
     verify(dispatcher, times(1)).initialize();
+    verify(peripheralJobDispatcher, times(1)).initialize();
     verify(controllerPool, times(1)).initialize();
     verify(extension, times(1)).initialize();
   }
@@ -105,6 +113,7 @@ public class KernelStateOperatingTest {
     verify(router, times(1)).terminate();
     verify(scheduler, times(1)).terminate();
     verify(dispatcher, times(1)).terminate();
+    verify(peripheralJobDispatcher, times(1)).terminate();
     verify(controllerPool, times(1)).terminate();
     verify(extension, times(1)).terminate();
   }
@@ -155,16 +164,21 @@ public class KernelStateOperatingTest {
                                         mock(Model.class),
                                         new TransportOrderPool(objectPool,
                                                                new PrefixedUlidObjectNameProvider()),
+                                        new PeripheralJobPool(objectPool,
+                                                              new PrefixedUlidObjectNameProvider()),
                                         mock(ModelPersister.class),
                                         configuration,
                                         router,
                                         scheduler,
                                         dispatcher,
+                                        peripheralJobDispatcher,
                                         controllerPool,
+                                        mock(LocalPeripheralControllerPool.class),
                                         executorMock,
                                         mock(OrderCleanerTask.class),
                                         extensions,
                                         attachmentManager,
+                                        mock(PeripheralAttachmentManager.class),
                                         vehicleService));
   }
 }

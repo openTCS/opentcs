@@ -15,6 +15,9 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.data.model.visualization.Layer;
+import org.opentcs.data.model.visualization.LayerGroup;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a visual layout in the plant model.
@@ -36,11 +39,21 @@ public class VisualLayoutCreationTO
   /**
    * This layout's model layout elements.
    */
+  @Deprecated
   private List<ModelLayoutElementCreationTO> modelElements = new LinkedList<>();
   /**
    * This layout's shape layout elements.
    */
+  @Deprecated
   private List<ShapeLayoutElementCreationTO> shapeElements = new LinkedList<>();
+  /**
+   * This layout's layers.
+   */
+  private List<Layer> layers = new LinkedList<>();
+  /**
+   * The layout's layer groups.
+   */
+  private List<LayerGroup> layerGroups = new LinkedList<>();
 
   /**
    * Creates a new instance.
@@ -51,17 +64,22 @@ public class VisualLayoutCreationTO
     super(name);
   }
 
+  @SuppressWarnings("deprecation")
   private VisualLayoutCreationTO(@Nonnull String name,
-                                @Nonnull Map<String, String> properties,
-                                double scaleX,
-                                double scaleY,
-                                @Nonnull List<ModelLayoutElementCreationTO> modelElements,
-                                @Nonnull List<ShapeLayoutElementCreationTO> shapeElements) {
+                                 @Nonnull Map<String, String> properties,
+                                 double scaleX,
+                                 double scaleY,
+                                 @Nonnull List<ModelLayoutElementCreationTO> modelElements,
+                                 @Nonnull List<ShapeLayoutElementCreationTO> shapeElements,
+                                 @Nonnull List<Layer> layers,
+                                 @Nonnull List<LayerGroup> layerGroups) {
     super(name, properties);
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.modelElements = requireNonNull(modelElements, "modelElements");
     this.shapeElements = requireNonNull(shapeElements, "shapeElements");
+    this.layers = requireNonNull(layers, "layers");
+    this.layerGroups = requireNonNull(layerGroups, "layerGroups");
   }
 
   /**
@@ -77,7 +95,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -93,7 +113,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -113,7 +135,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -137,7 +161,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -161,7 +187,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -169,6 +197,8 @@ public class VisualLayoutCreationTO
    *
    * @return The model layout elements of this visual layout.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   @Nonnull
   public List<ModelLayoutElementCreationTO> getModelElements() {
     return Collections.unmodifiableList(modelElements);
@@ -180,6 +210,8 @@ public class VisualLayoutCreationTO
    * @param modelElements The new model layout elements.
    * @return A copy of this object, differing in the layout elements of this visual layout.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public VisualLayoutCreationTO withModelElements(
       @Nonnull List<ModelLayoutElementCreationTO> modelElements) {
     return new VisualLayoutCreationTO(getName(),
@@ -187,7 +219,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -196,6 +230,8 @@ public class VisualLayoutCreationTO
    * @param modelElement The new model layout elements.
    * @return A copy of this object, differing in the layout elements of this visual layout.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public VisualLayoutCreationTO withModelElement(
       @Nonnull ModelLayoutElementCreationTO modelElement) {
     return new VisualLayoutCreationTO(getName(),
@@ -203,7 +239,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       listWithAppendix(modelElements, modelElement),
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -211,6 +249,8 @@ public class VisualLayoutCreationTO
    *
    * @return The shape layout elements of this visual layout.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   @Nonnull
   public List<ShapeLayoutElementCreationTO> getShapeElements() {
     return Collections.unmodifiableList(shapeElements);
@@ -222,6 +262,8 @@ public class VisualLayoutCreationTO
    * @param shapeElements the new shape layout elements.
    * @return A copy of this object, differing in the shape layout elements of this visual layout.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public VisualLayoutCreationTO withShapeElements(
       @Nonnull List<ShapeLayoutElementCreationTO> shapeElements) {
     return new VisualLayoutCreationTO(getName(),
@@ -229,7 +271,9 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      shapeElements);
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
   }
 
   /**
@@ -238,6 +282,8 @@ public class VisualLayoutCreationTO
    * @param shapeElement the new shape layout element.
    * @return A copy of this object, differing in the shape layout elements of this visual layout.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public VisualLayoutCreationTO withShapeElement(
       @Nonnull ShapeLayoutElementCreationTO shapeElement) {
     return new VisualLayoutCreationTO(getName(),
@@ -245,6 +291,111 @@ public class VisualLayoutCreationTO
                                       scaleX,
                                       scaleY,
                                       modelElements,
-                                      listWithAppendix(shapeElements, shapeElement));
+                                      listWithAppendix(shapeElements, shapeElement),
+                                      layers,
+                                      layerGroups);
   }
+
+  /**
+   * Returns the layers of this visual layout.
+   *
+   * @return The layers of this visual layout.
+   */
+  @Nonnull
+  public List<Layer> getLayers() {
+    return Collections.unmodifiableList(layers);
+  }
+
+  /**
+   * Creates a copy of this object, with the given layers.
+   *
+   * @param layers The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VisualLayoutCreationTO withLayers(@Nonnull List<Layer> layers) {
+    return new VisualLayoutCreationTO(getName(),
+                                      getModifiableProperties(),
+                                      scaleX,
+                                      scaleY,
+                                      modelElements,
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
+  }
+
+  /**
+   * Creates a copy of this object, with the given layer.
+   *
+   * @param layer The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VisualLayoutCreationTO withLayer(@Nonnull Layer layer) {
+    return new VisualLayoutCreationTO(getName(),
+                                      getModifiableProperties(),
+                                      scaleX,
+                                      scaleY,
+                                      modelElements,
+                                      shapeElements,
+                                      listWithAppendix(layers, layer),
+                                      layerGroups);
+  }
+
+  /**
+   * Returns the layer groups of this visual layout.
+   *
+   * @return The layer groups of this visual layout.
+   */
+  @Nonnull
+  public List<LayerGroup> getLayerGroups() {
+    return Collections.unmodifiableList(layerGroups);
+  }
+
+  /**
+   * Creates a copy of this object, with the given layer groups.
+   *
+   * @param layerGroups The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VisualLayoutCreationTO withLayerGroups(@Nonnull List<LayerGroup> layerGroups) {
+    return new VisualLayoutCreationTO(getName(),
+                                      getModifiableProperties(),
+                                      scaleX,
+                                      scaleY,
+                                      modelElements,
+                                      shapeElements,
+                                      layers,
+                                      layerGroups);
+  }
+
+  /**
+   * Creates a copy of this object, with the given layer group.
+   *
+   * @param layerGroup The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VisualLayoutCreationTO withLayerGroup(@Nonnull LayerGroup layerGroup) {
+    return new VisualLayoutCreationTO(getName(),
+                                      getModifiableProperties(),
+                                      scaleX,
+                                      scaleY,
+                                      modelElements,
+                                      shapeElements,
+                                      layers,
+                                      listWithAppendix(layerGroups, layerGroup));
+  }
+
+  @Override
+  public String toString() {
+    return "VisualLayoutCreationTO{"
+        + "name=" + getName()
+        + ", scaleX=" + scaleX
+        + ", scaleY=" + scaleY
+        + ", modelElements=" + modelElements
+        + ", shapeElements=" + shapeElements
+        + ", layers=" + layers
+        + ", layerGroups=" + layerGroups
+        + ", properties=" + getProperties()
+        + '}';
+  }
+
 }

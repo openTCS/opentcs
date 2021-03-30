@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A <code>Scheduler</code> manages resources used by vehicles, preventing
@@ -109,6 +110,14 @@ public interface Scheduler
    * @param client The client.
    */
   void freeAll(@Nonnull Client client);
+
+  /**
+   * Explicitly triggers a rescheduling run during which the scheduler tries to allocate resources
+   * for all waiting clients.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void reschedule() {
+  }
 
   /**
    * Returns all resource allocations as a map of client IDs to resources.

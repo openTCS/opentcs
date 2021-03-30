@@ -8,6 +8,7 @@
 package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A layout element describing a geometrical shape to be displayed.
@@ -18,7 +19,10 @@ import java.io.Serializable;
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class ShapeLayoutElement
     extends LayoutElement
     implements Serializable {

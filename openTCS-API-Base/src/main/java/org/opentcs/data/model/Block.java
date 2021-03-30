@@ -7,6 +7,7 @@
  */
 package org.opentcs.data.model;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +35,10 @@ public class Block
    * The resources aggregated in this block.
    */
   private final Set<TCSResourceReference<?>> members;
+  /**
+   * The information regarding the grahical representation of this block.
+   */
+  private final Layout layout;
 
   /**
    * Creates an empty block.
@@ -44,16 +49,19 @@ public class Block
     super(name);
     this.type = Type.SINGLE_VEHICLE_ONLY;
     this.members = new HashSet<>();
+    this.layout = new Layout();
   }
 
   private Block(String name,
                 Map<String, String> properties,
                 ObjectHistory history,
                 Type type,
-                Set<TCSResourceReference<?>> members) {
+                Set<TCSResourceReference<?>> members,
+                Layout layout) {
     super(name, properties, history);
     this.type = type;
     this.members = new HashSet<>(requireNonNull(members, "members"));
+    this.layout = requireNonNull(layout, "layout");
   }
 
   @Override
@@ -62,7 +70,8 @@ public class Block
                      propertiesWith(key, value),
                      getHistory(),
                      type,
-                     members);
+                     members,
+                     layout);
   }
 
   @Override
@@ -71,7 +80,8 @@ public class Block
                      properties,
                      getHistory(),
                      type,
-                     members);
+                     members,
+                     layout);
   }
 
   @Override
@@ -80,7 +90,8 @@ public class Block
                      getProperties(),
                      getHistory().withEntryAppended(entry),
                      type,
-                     members);
+                     members,
+                     layout);
   }
 
   @Override
@@ -89,7 +100,8 @@ public class Block
                      getProperties(),
                      history,
                      type,
-                     members);
+                     members,
+                     layout);
   }
 
   /**
@@ -112,7 +124,8 @@ public class Block
                      getProperties(),
                      getHistory(),
                      type,
-                     members);
+                     members,
+                     layout);
   }
 
   /**
@@ -135,7 +148,32 @@ public class Block
                      getProperties(),
                      getHistory(),
                      type,
-                     members);
+                     members,
+                     layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this block.
+   *
+   * @return The information regarding the grahical representation of this block.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Block withLayout(Layout layout) {
+    return new Block(getName(),
+                     getProperties(),
+                     getHistory(),
+                     type,
+                     members,
+                     layout);
   }
 
   /**
@@ -152,5 +190,52 @@ public class Block
      * enter the block in the same direction.
      */
     SAME_DIRECTION_ONLY;
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a block.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The color in which block elements are to be emphasized.
+     */
+    private final Color color;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(Color.RED);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param color The color in which block elements are to be emphasized.
+     */
+    public Layout(Color color) {
+      this.color = requireNonNull(color, "color");
+    }
+
+    /**
+     * Returns the color in which block elements are to be emphasized.
+     *
+     * @return The color in which block elements are to be emphasized.
+     */
+    public Color getColor() {
+      return color;
+    }
+
+    /**
+     * Creates a copy of this object, with the given color.
+     *
+     * @param color The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withColor(Color color) {
+      return new Layout(color);
+    }
   }
 }

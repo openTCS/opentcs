@@ -22,7 +22,8 @@ import javax.xml.bind.annotation.XmlType;
  * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "id", "xPosition", "yPosition", "zPosition", "links", "properties"})
+@XmlType(propOrder = {"name", "id", "xPosition", "yPosition", "zPosition", "links", "locked",
+                      "properties"})
 public class LocationTO
     extends PlantModelElementTO {
 
@@ -31,7 +32,8 @@ public class LocationTO
   private Long zPosition = 0L;
   private String type = "";
   private List<Link> links = new ArrayList<>();
-  
+  private Boolean locked = false;
+
   @XmlAttribute
   public Long getxPosition() {
     return xPosition;
@@ -84,6 +86,16 @@ public class LocationTO
   public LocationTO setLinks(@Nonnull List<Link> links) {
     requireNonNull(links, "links");
     this.links = links;
+    return this;
+  }
+
+  @XmlAttribute
+  public Boolean isLocked() {
+    return locked;
+  }
+
+  public LocationTO setLocked(Boolean locked) {
+    this.locked = locked;
     return this;
   }
 

@@ -52,6 +52,14 @@ public enum UserPermission {
    */
   MODIFY_ORDER,
   /**
+   * Indicates the client may modify peripheral states.
+   */
+  MODIFY_PERIPHERALS,
+  /**
+   * Indicates the client may create/modify peripheral jobs.
+   */
+  MODIFY_PERIPHERAL_JOBS,
+  /**
    * Indicates the client may publish messages via the kernel.
    */
   PUBLISH_MESSAGES

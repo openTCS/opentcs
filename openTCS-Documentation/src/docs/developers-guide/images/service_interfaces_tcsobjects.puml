@@ -1,0 +1,33 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+'left to right direction
+hide empty members
+
+interface TCSObjectService
+
+interface PlantModelService
+interface TransportOrderService
+interface VehicleService
+interface PeripheralJobService
+interface PeripheralService
+
+interface InternalPlantModelService
+interface InternalTransportOrderService
+interface InternalVehicleService
+interface InternalPeripheralJobService
+interface InternalPeripheralService
+
+TCSObjectService <|-down- PlantModelService
+TCSObjectService <|-down- TransportOrderService
+TCSObjectService <|-down- VehicleService
+TCSObjectService <|-down- PeripheralJobService
+TCSObjectService <|-down- PeripheralService
+
+PlantModelService <|-down- InternalPlantModelService
+TransportOrderService <|-down- InternalTransportOrderService
+VehicleService <|-down- InternalVehicleService
+PeripheralJobService <|-down- InternalPeripheralJobService
+PeripheralService <|-down- InternalPeripheralService
+
+@enduml

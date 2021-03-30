@@ -13,9 +13,11 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ public class DefaultModelGraphMapper
   /**
    * Computes the weight of single edges in the graph.
    */
-  private final EdgeEvaluator edgeEvaluator;
+  private final EdgeEvaluatorComposite edgeEvaluator;
   /**
    * The configuration.
    */
@@ -47,21 +49,21 @@ public class DefaultModelGraphMapper
    * @param configuration The configuration.
    */
   @Inject
-  public DefaultModelGraphMapper(@Nonnull EdgeEvaluator edgeEvaluator,
+  public DefaultModelGraphMapper(@Nonnull EdgeEvaluatorComposite edgeEvaluator,
                                  @Nonnull ShortestPathConfiguration configuration) {
     this.edgeEvaluator = requireNonNull(edgeEvaluator, "edgeEvaluator");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
-  public Graph<String, ModelEdge> translateModel(Collection<Point> points,
-                                                 Collection<Path> paths,
-                                                 Vehicle vehicle) {
+  public Graph<String, Edge> translateModel(Collection<Point> points,
+                                            Collection<Path> paths,
+                                            Vehicle vehicle) {
     requireNonNull(points, "points");
     requireNonNull(paths, "paths");
     requireNonNull(vehicle, "vehicle");
 
-    Graph<String, ModelEdge> graph = new DirectedWeightedMultigraph<>(ModelEdge.class);
+    Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
 
     for (Point point : points) {
       graph.addVertex(point.getName());
@@ -72,7 +74,7 @@ public class DefaultModelGraphMapper
     for (Path path : paths) {
 
       if (shouldAddForwardEdge(path, vehicle)) {
-        ModelEdge edge = new ModelEdge(path, false);
+        Edge edge = new Edge(path, false);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
         if (weight < 0 && !allowNegativeEdgeWeights) {
@@ -80,6 +82,9 @@ public class DefaultModelGraphMapper
                    edge,
                    weight,
                    configuration.algorithm().name());
+        }
+        else if (weight == Double.POSITIVE_INFINITY) {
+          LOG.debug("Edge {} with infinite weight ignored.", edge);
         }
         else {
           graph.addEdge(path.getSourcePoint().getName(),
@@ -90,7 +95,7 @@ public class DefaultModelGraphMapper
       }
 
       if (shouldAddReverseEdge(path, vehicle)) {
-        ModelEdge edge = new ModelEdge(path, true);
+        Edge edge = new Edge(path, true);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
         if (weight < 0 && !allowNegativeEdgeWeights) {
@@ -98,6 +103,9 @@ public class DefaultModelGraphMapper
                    edge,
                    weight,
                    configuration.algorithm().name());
+        }
+        else if (weight == Double.POSITIVE_INFINITY) {
+          LOG.debug("Edge {} with infinite weight ignored.", edge);
         }
         else {
           graph.addEdge(path.getDestinationPoint().getName(),

@@ -10,16 +10,22 @@ package org.opentcs.guing.model.elements;
 import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
+import org.opentcs.guing.components.layer.NullLayerWrapper;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.PointTypeProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.AbstractConnectableModelComponent;
+import org.opentcs.guing.model.AbstractModelComponent;
+import org.opentcs.guing.model.FigureDecorationDetails;
 import org.opentcs.guing.model.PositionableModelComponent;
 
 /**
@@ -29,7 +35,8 @@ import org.opentcs.guing.model.PositionableModelComponent;
  */
 public class PointModel
     extends AbstractConnectableModelComponent
-    implements PositionableModelComponent {
+    implements PositionableModelComponent,
+               FigureDecorationDetails {
 
   /**
    * Key for the prefered angle of a vehicle on this point.
@@ -47,6 +54,18 @@ public class PointModel
    * The point's default position for both axes.
    */
   private static final int DEFAULT_XY_POSITION = 0;
+  /**
+   * The set of vehicle models for which this model component's figure is to be decorted to
+   * indicate that it is part of the route of the respective vehicles.
+   */
+  private Set<VehicleModel> vehicles
+      = new TreeSet<>((v1, v2) -> v1.getName().compareTo(v2.getName()));
+  /**
+   * The set of block models for which this model component's figure is to be decorated to indicate
+   * that it is part of the respective block.
+   */
+  private Set<BlockModel> blocks
+      = new TreeSet<>((b1, b2) -> b1.getName().compareTo(b2.getName()));
 
   /**
    * Creates a new instance.
@@ -101,6 +120,47 @@ public class PointModel
     return (StringProperty) getProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
   }
 
+  @Override
+  public void addVehicleModel(VehicleModel model) {
+    vehicles.add(model);
+  }
+
+  @Override
+  public void removeVehicleModel(VehicleModel model) {
+    vehicles.remove(model);
+  }
+
+  @Override
+  public Set<VehicleModel> getVehicleModels() {
+    return vehicles;
+  }
+
+  @Override
+  public void addBlockModel(BlockModel model) {
+    blocks.add(model);
+  }
+
+  @Override
+  public void removeBlockModel(BlockModel model) {
+    blocks.remove(model);
+  }
+
+  @Override
+  public Set<BlockModel> getBlockModels() {
+    return blocks;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public AbstractModelComponent clone()
+      throws CloneNotSupportedException {
+    PointModel clone = (PointModel) super.clone();
+    clone.setVehicleModels((Set<VehicleModel>) ((TreeSet<VehicleModel>) vehicles).clone());
+    clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
+
+    return clone;
+  }
+
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
     pName.setDescription(bundle.getString("pointModel.property_name.description"));
@@ -137,6 +197,7 @@ public class PointModel
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("pointModel.property_miscellaneous.description"));
     pMiscellaneous.setHelptext(bundle.getString("pointModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
 
     StringProperty pPointPosX = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
@@ -172,6 +233,20 @@ public class PointModel
         bundle.getString("pointModel.property_labelOrientationAngle.helptext"));
     pPointLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, pPointLabelOrientationAngle);
+
+    LayerWrapperProperty pLayerWrapper = new LayerWrapperProperty(this, new NullLayerWrapper());
+    pLayerWrapper.setDescription(bundle.getString("pointModel.property_layerWrapper.description"));
+    pLayerWrapper.setHelptext(bundle.getString("pointModel.property_layerWrapper.helptext"));
+    pLayerWrapper.setModellingEditable(false);
+    setProperty(LAYER_WRAPPER, pLayerWrapper);
+  }
+
+  private void setVehicleModels(Set<VehicleModel> vehicles) {
+    this.vehicles = vehicles;
+  }
+  
+  private void setBlockModels(Set<BlockModel> blocks) {
+    this.blocks = blocks;
   }
 
   /**

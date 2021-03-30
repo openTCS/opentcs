@@ -12,6 +12,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import static org.opentcs.util.Assertions.checkArgument;
@@ -40,6 +41,10 @@ public class PointCreationTO
    */
   @Nonnull
   private Point.Type type = Point.Type.HALT_POSITION;
+  /**
+   * The information regarding the grahical representation of this point.
+   */
+  private Layout layout = new Layout();
 
   /**
    * Creates a new instance.
@@ -54,11 +59,13 @@ public class PointCreationTO
                           @Nonnull Map<String, String> properties,
                           @Nonnull Triple position,
                           double vehicleOrientationAngle,
-                          @Nonnull Point.Type type) {
+                          @Nonnull Point.Type type,
+                          @Nonnull Layout layout) {
     super(name, properties);
     this.position = requireNonNull(position, "position");
     this.vehicleOrientationAngle = vehicleOrientationAngle;
     this.type = requireNonNull(type, "type");
+    this.layout = requireNonNull(layout, "layout");
   }
 
   /**
@@ -73,7 +80,8 @@ public class PointCreationTO
                                getModifiableProperties(),
                                position,
                                vehicleOrientationAngle,
-                               type);
+                               type,
+                               layout);
   }
 
   /**
@@ -97,7 +105,8 @@ public class PointCreationTO
                                getModifiableProperties(),
                                position,
                                vehicleOrientationAngle,
-                               type);
+                               type,
+                               layout);
   }
 
   /**
@@ -126,7 +135,8 @@ public class PointCreationTO
                                getModifiableProperties(),
                                position,
                                vehicleOrientationAngle,
-                               type);
+                               type,
+                               layout);
   }
 
   /**
@@ -150,7 +160,8 @@ public class PointCreationTO
                                getProperties(),
                                position,
                                vehicleOrientationAngle,
-                               type);
+                               type,
+                               layout);
   }
 
   /**
@@ -161,7 +172,12 @@ public class PointCreationTO
    */
   @Override
   public PointCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new PointCreationTO(getName(), properties, position, vehicleOrientationAngle, type);
+    return new PointCreationTO(getName(),
+                               properties,
+                               position,
+                               vehicleOrientationAngle,
+                               type,
+                               layout);
   }
 
   /**
@@ -180,6 +196,157 @@ public class PointCreationTO
                                propertiesWith(key, value),
                                position,
                                vehicleOrientationAngle,
-                               type);
+                               type,
+                               layout);
+  }
+
+  /**
+   * Returns the information regarding the grahical representation of this point.
+   *
+   * @return The information regarding the grahical representation of this point.
+   */
+  public Layout getLayout() {
+    return layout;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layout.
+   *
+   * @param layout The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public PointCreationTO withLayout(Layout layout) {
+    return new PointCreationTO(getName(),
+                               getModifiableProperties(),
+                               position,
+                               vehicleOrientationAngle,
+                               type,
+                               layout);
+  }
+
+  @Override
+  public String toString() {
+    return "PointCreationTO{"
+        + "name=" + getName()
+        + ", position=" + position
+        + ", vehicleOrientationAngle=" + vehicleOrientationAngle
+        + ", type=" + type
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + '}';
+  }
+
+  /**
+   * Contains information regarding the grahical representation of a point.
+   */
+  public static class Layout
+      implements Serializable {
+
+    /**
+     * The coordinates at which the point is to be drawn (in mm).
+     */
+    private final Couple position;
+    /**
+     * The offset of the label's position to the point's position (in lu).
+     */
+    private final Couple labelOffset;
+    /**
+     * The ID of the layer on which the point is to be drawn.
+     */
+    private final int layerId;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layout() {
+      this(new Couple(0, 0), new Couple(0, 0), 0);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param position The coordinates at which the point is to be drawn (in mm).
+     * @param labelOffset The offset of the label's position to the point's position (in lu).
+     * @param layerId The ID of the layer on which the point is to be drawn.
+     */
+    public Layout(Couple position,
+                  Couple labelOffset,
+                  int layerId) {
+      this.position = requireNonNull(position, "position");
+      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
+      this.layerId = layerId;
+    }
+
+    /**
+     * Returns the coordinates at which the point is to be drawn (in mm).
+     *
+     * @return The coordinates at which the point is to be drawn (in mm).
+     */
+    public Couple getPosition() {
+      return position;
+    }
+
+    /**
+     * Creates a copy of this object, with the given position.
+     *
+     * @param position The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withPosition(Couple position) {
+      return new Layout(position,
+                        labelOffset,
+                        layerId);
+    }
+
+    /**
+     * Returns the offset of the label's position to the point's position (in lu).
+     *
+     * @return The offset of the label's position to the point's position (in lu).
+     */
+    public Couple getLabelOffset() {
+      return labelOffset;
+    }
+
+    /**
+     * Creates a copy of this object, with the given X label offset.
+     *
+     * @param labelOffset The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLabelOffset(Couple labelOffset) {
+      return new Layout(position,
+                        labelOffset,
+                        layerId);
+    }
+
+    /**
+     * Returns the ID of the layer on which the point is to be drawn.
+     *
+     * @return The layer ID.
+     */
+    public int getLayerId() {
+      return layerId;
+    }
+
+    /**
+     * Creates a copy of this object, with the given layer ID.
+     *
+     * @param layerId The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Layout withLayerId(int layerId) {
+      return new Layout(position,
+                        labelOffset,
+                        layerId);
+    }
+
+    @Override
+    public String toString() {
+      return "Layout{"
+          + "position=" + position
+          + ", labelOffset=" + labelOffset
+          + ", layerId=" + layerId
+          + '}';
+    }
   }
 }

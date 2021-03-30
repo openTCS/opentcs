@@ -10,8 +10,9 @@ package org.opentcs.util;
 import java.util.Comparator;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Some commonly used comparator implementations.
@@ -66,10 +67,27 @@ public final class Comparators {
         }
       };
   /**
+   * A comparator for sorting peripheral jobs by their age, with the oldest ones coming first.
+   */
+  private static final Comparator<PeripheralJob> JOBS_BY_AGE
+      = (PeripheralJob o1, PeripheralJob o2) -> {
+        if (o1.getCreationTime().isBefore(o2.getCreationTime())) {
+          return -1;
+        }
+        else if (o1.getCreationTime().isAfter(o2.getCreationTime())) {
+          return 1;
+        }
+        else {
+          return OBJECTS_BY_NAME.compare(o1, o2);
+        }
+      };
+  /**
    * Compares ModelLayoutElements by the names of their visualized objects.
    */
-  private static final Comparator<ModelLayoutElement> LAYOUT_ELEMS_BY_NAME
-      = (ModelLayoutElement o1, ModelLayoutElement o2)
+  @Deprecated
+  private static final Comparator<org.opentcs.data.model.visualization.ModelLayoutElement> LAYOUT_ELEMS_BY_NAME
+      = (org.opentcs.data.model.visualization.ModelLayoutElement o1,
+          org.opentcs.data.model.visualization.ModelLayoutElement o2)
       -> o1.getVisualizedObject().getName().compareTo(
           o2.getVisualizedObject().getName());
 
@@ -125,13 +143,24 @@ public final class Comparators {
   }
 
   /**
+   * A comparator for sorting peripheral jobs by their age, with the oldest ones coming first.
+   *
+   * @return A comparator for sorting peripheral jobs by their age.
+   */
+  public static Comparator<PeripheralJob> jobsByAge() {
+    return JOBS_BY_AGE;
+  }
+
+  /**
    * A comparator for ordering ModelLayoutElements by the names of their
    * visualized objects.
    *
    * @return A comparator for ordering ModelLayoutElements by the names of their
    * visualized objects.
    */
-  public static Comparator<ModelLayoutElement> modelLayoutElementsByName() {
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
+  public static Comparator<org.opentcs.data.model.visualization.ModelLayoutElement> modelLayoutElementsByName() {
     return LAYOUT_ELEMS_BY_NAME;
   }
 }

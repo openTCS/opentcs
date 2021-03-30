@@ -9,12 +9,16 @@ package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Generic image data that can be stored along with a layout.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Will be removed.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class ImageData
     implements Serializable {
 

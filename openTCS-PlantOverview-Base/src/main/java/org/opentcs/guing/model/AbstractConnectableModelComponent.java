@@ -19,7 +19,8 @@ import org.opentcs.guing.model.elements.AbstractConnection;
  */
 public abstract class AbstractConnectableModelComponent
     extends AbstractModelComponent
-    implements ConnectableModelComponent {
+    implements DrawnModelComponent,
+               ConnectableModelComponent {
 
   /**
    * The Links and Paths connected with this model component (Location or Point).

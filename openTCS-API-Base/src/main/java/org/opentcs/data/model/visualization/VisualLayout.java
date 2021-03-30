@@ -9,11 +9,14 @@ package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes the visual attributes of a model.
@@ -36,7 +39,16 @@ public class VisualLayout
    * VisualLayout elements describing the visualization of a model and additional
    * elements that need to be displayed.
    */
+  @Deprecated
   private final Set<LayoutElement> layoutElements;
+  /**
+   * The layers in this model.
+   */
+  private final List<Layer> layers;
+  /**
+   * The layer groups in this model.
+   */
+  private final List<LayerGroup> layerGroups;
 
   /**
    * Creates a new VisualLayout.
@@ -48,6 +60,8 @@ public class VisualLayout
     this.scaleX = 50.0;
     this.scaleY = 50.0;
     this.layoutElements = new HashSet<>();
+    this.layers = new LinkedList<>();
+    this.layerGroups = new LinkedList<>();
   }
 
   /**
@@ -55,16 +69,21 @@ public class VisualLayout
    *
    * @param name This visual layout's name.
    */
+  @SuppressWarnings("deprecation")
   private VisualLayout(String name,
                        Map<String, String> properties,
                        ObjectHistory history,
                        double scaleX,
                        double scaleY,
-                       Set<LayoutElement> layoutElements) {
+                       Set<LayoutElement> layoutElements,
+                       List<Layer> layers,
+                       List<LayerGroup> layerGroups) {
     super(name, properties, history);
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.layoutElements = new HashSet<>(requireNonNull(layoutElements, "layoutElements"));
+    this.layers = new LinkedList<>(requireNonNull(layers, "layers"));
+    this.layerGroups = new LinkedList<>(requireNonNull(layerGroups, "layerGroups"));
   }
 
   @Override
@@ -74,7 +93,9 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 
   @Override
@@ -84,7 +105,9 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 
   @Override
@@ -94,7 +117,9 @@ public class VisualLayout
                             getHistory().withEntryAppended(entry),
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 
   @Override
@@ -104,7 +129,9 @@ public class VisualLayout
                             history,
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 
   /**
@@ -128,7 +155,9 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 
   /**
@@ -152,7 +181,9 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 
   /**
@@ -160,6 +191,8 @@ public class VisualLayout
    *
    * @return The layout elements describing the visualization of a model.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public Set<LayoutElement> getLayoutElements() {
     return layoutElements;
   }
@@ -170,12 +203,68 @@ public class VisualLayout
    * @param layoutElements The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   public VisualLayout withLayoutElements(Set<LayoutElement> layoutElements) {
     return new VisualLayout(getName(),
                             getProperties(),
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements);
+                            layoutElements,
+                            layers,
+                            layerGroups);
+  }
+
+  /**
+   * Returns the layers of this layout.
+   *
+   * @return The layers of this layout.
+   */
+  public List<Layer> getLayers() {
+    return layers;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layers.
+   *
+   * @param layers The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VisualLayout withLayers(List<Layer> layers) {
+    return new VisualLayout(getName(),
+                            getProperties(),
+                            getHistory(),
+                            scaleX,
+                            scaleY,
+                            layoutElements,
+                            layers,
+                            layerGroups);
+  }
+
+  /**
+   * Returns the layer groups of this layout.
+   *
+   * @return The layer groups of this layout.
+   */
+  public List<LayerGroup> getLayerGroups() {
+    return layerGroups;
+  }
+
+  /**
+   * Creates a copy of this object, with the given layer groups.
+   *
+   * @param layerGroups The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VisualLayout withLayerGroups(List<LayerGroup> layerGroups) {
+    return new VisualLayout(getName(),
+                            getProperties(),
+                            getHistory(),
+                            scaleX,
+                            scaleY,
+                            layoutElements,
+                            layers,
+                            layerGroups);
   }
 }

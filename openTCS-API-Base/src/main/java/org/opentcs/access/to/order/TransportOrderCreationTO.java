@@ -41,6 +41,11 @@ public class TransportOrderCreationTO
   @Nonnull
   private List<DestinationCreationTO> destinations;
   /**
+   * An optional token for reserving peripheral devices while processing this transport order.
+   */
+  @Nullable
+  private String peripheralReservationToken;
+  /**
    * The (optional) name of the order sequence the transport order belongs to.
    */
   @Nullable
@@ -87,6 +92,7 @@ public class TransportOrderCreationTO
                                    @Nonnull Map<String, String> properties,
                                    boolean incompleteName,
                                    @Nonnull List<DestinationCreationTO> destinations,
+                                   @Nullable String peripheralReservationToken,
                                    @Nullable String wrappingSequence,
                                    @Nonnull Set<String> dependencyNames,
                                    @Nullable String intendedVehicleName,
@@ -96,6 +102,7 @@ public class TransportOrderCreationTO
     super(name, properties);
     this.incompleteName = incompleteName;
     this.destinations = requireNonNull(destinations, "destinations");
+    this.peripheralReservationToken = peripheralReservationToken;
     this.wrappingSequence = wrappingSequence;
     this.dependencyNames = requireNonNull(dependencyNames, "dependencyNames");
     this.intendedVehicleName = intendedVehicleName;
@@ -116,6 +123,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -136,6 +144,7 @@ public class TransportOrderCreationTO
                                         properties,
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -160,6 +169,7 @@ public class TransportOrderCreationTO
                                         propertiesWith(key, value),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -193,6 +203,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -222,6 +233,40 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
+                                        wrappingSequence,
+                                        dependencyNames,
+                                        intendedVehicleName,
+                                        type,
+                                        deadline,
+                                        dispensable);
+  }
+
+  /**
+   * Returns an optional token for reserving peripheral devices while processing this transport
+   * order.
+   *
+   * @return An optional token for reserving peripheral devices while processing this transport
+   * order.
+   */
+  @Nullable
+  public String getPeripheralReservationToken() {
+    return peripheralReservationToken;
+  }
+
+  /**
+   * Creates a copy of this object with the given (optional) peripheral reservation token.
+   *
+   * @param peripheralReservationToken The token.
+   * @return A copy of this object, differing in the given peripheral reservation token.
+   */
+  public TransportOrderCreationTO withPeripheralReservationToken(
+      @Nullable String peripheralReservationToken) {
+    return new TransportOrderCreationTO(getName(),
+                                        getModifiableProperties(),
+                                        incompleteName,
+                                        destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -252,6 +297,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -282,6 +328,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -312,6 +359,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -341,6 +389,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -371,6 +420,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,
@@ -400,6 +450,7 @@ public class TransportOrderCreationTO
                                         getModifiableProperties(),
                                         incompleteName,
                                         destinations,
+                                        peripheralReservationToken,
                                         wrappingSequence,
                                         dependencyNames,
                                         intendedVehicleName,

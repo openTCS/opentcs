@@ -11,12 +11,15 @@ import java.io.Serializable;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a shape layout element in the visual layout.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class ShapeLayoutElementCreationTO
     extends CreationTO
     implements Serializable {
@@ -93,7 +96,7 @@ public class ShapeLayoutElementCreationTO
   }
 
   /**
-   * Creates a copy of this object with the given layer 
+   * Creates a copy of this object with the given layer
    * on which this shape layout element is to be displayed.
    *
    * @param layer the new layer.

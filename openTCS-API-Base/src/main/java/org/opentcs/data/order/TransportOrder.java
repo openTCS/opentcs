@@ -27,8 +27,6 @@ import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_CREATED;
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED;
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED;
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a sequence of movements and operations that are to be executed by a {@link Vehicle}.
@@ -47,10 +45,6 @@ public class TransportOrder
     implements Serializable {
 
   /**
-   * This class's Logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(TransportOrder.class);
-  /**
    * The type of this transport order.
    */
   @Nonnull
@@ -66,6 +60,11 @@ public class TransportOrder
    */
   @Nonnull
   private final List<DriveOrder> driveOrders;
+  /**
+   * An optional token for reserving peripheral devices while processing this transport order.
+   */
+  @Nullable
+  private final String peripheralReservationToken;
   /**
    * The index of the currently processed drive order.
    */
@@ -125,6 +124,7 @@ public class TransportOrder
           new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED)));
     this.type = OrderConstants.TYPE_NONE;
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
+    this.peripheralReservationToken = null;
     this.currentDriveOrderIndex = -1;
     this.state = State.RAW;
     this.creationTime = Instant.EPOCH;
@@ -151,6 +151,7 @@ public class TransportOrder
                          ObjectHistory history,
                          String type,
                          List<DriveOrder> driveOrders,
+                         String peripheralReservationToken,
                          int currentDriveOrderIndex,
                          Instant creationTime,
                          TCSObjectReference<Vehicle> intendedVehicle,
@@ -169,6 +170,7 @@ public class TransportOrder
       this.driveOrders.add(driveOrder.withTransportOrder(this.getReference()));
     }
 
+    this.peripheralReservationToken = peripheralReservationToken;
     this.currentDriveOrderIndex = currentDriveOrderIndex;
     this.creationTime = requireNonNull(creationTime, "creationTime");
     this.intendedVehicle = intendedVehicle;
@@ -188,6 +190,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -207,6 +210,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -226,6 +230,7 @@ public class TransportOrder
                               getHistory().withEntryAppended(entry),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -245,6 +250,7 @@ public class TransportOrder
                               history,
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -278,6 +284,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -324,6 +331,7 @@ public class TransportOrder
                               historyForNewState(state),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -357,6 +365,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -373,7 +382,7 @@ public class TransportOrder
    * Returns this transport order's deadline. If the value of transport order's
    * deadline was not changed, the initial value {@link Instant#MAX} is returned.
    *
-   * @return This transport order's deadline or the initial deadline value.{@link Instant#MAX}, if 
+   * @return This transport order's deadline or the initial deadline value.{@link Instant#MAX}, if
    * the deadline was not changed.
    */
   public Instant getDeadline() {
@@ -392,6 +401,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -427,6 +437,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -464,6 +475,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -502,6 +514,7 @@ public class TransportOrder
                               historyForNewProcessingVehicle(processingVehicle),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -536,6 +549,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -589,6 +603,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -627,6 +642,49 @@ public class TransportOrder
     return new ArrayList<>(driveOrders);
   }
 
+  /**
+   * Returns an optional token for reserving peripheral devices while processing this transport
+   * order.
+   *
+   * @return An optional token for reserving peripheral devices while processing this transport
+   * order.
+   */
+  @Nullable
+  public String getPeripheralReservationToken() {
+    return peripheralReservationToken;
+  }
+
+  /**
+   * Creates a copy of this object, with the given reservation token.
+   *
+   * @param peripheralReservationToken The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withPeripheralReservationToken(
+      @Nullable String peripheralReservationToken) {
+    return new TransportOrder(getName(),
+                              getProperties(),
+                              getHistory(),
+                              type,
+                              driveOrders,
+                              peripheralReservationToken,
+                              currentDriveOrderIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  /**
+   * Returns the index of the currently processed drive order.
+   *
+   * @return The index of the currently processed drive order.
+   */
   public int getCurrentDriveOrderIndex() {
     return currentDriveOrderIndex;
   }
@@ -643,6 +701,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -673,6 +732,7 @@ public class TransportOrder
                               historyForNewDriveOrderState(driveOrderState),
                               type,
                               newDriveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -710,6 +770,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -743,6 +804,7 @@ public class TransportOrder
                               getHistory(),
                               type,
                               driveOrders,
+                              peripheralReservationToken,
                               currentDriveOrderIndex,
                               creationTime,
                               intendedVehicle,
@@ -768,6 +830,7 @@ public class TransportOrder
         + ", wrappingSequence=" + wrappingSequence
         + ", dispensable=" + dispensable
         + ", type=" + type
+        + ", peripheralReservationToken=" + peripheralReservationToken
         + ", dependencies=" + dependencies
         + ", driveOrders=" + driveOrders
         + ", currentDriveOrderIndex=" + currentDriveOrderIndex
@@ -796,7 +859,7 @@ public class TransportOrder
   /**
    * This enumeration defines the various states a transport order may be in.
    */
-  public enum State {
+  public static enum State {
 
     /**
      * A transport order's initial state.

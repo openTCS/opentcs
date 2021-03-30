@@ -16,6 +16,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -40,11 +41,11 @@ public class ShortestPathPointRouter
    */
   private static final Logger LOG = LoggerFactory.getLogger(ShortestPathPointRouter.class);
 
-  private final ShortestPathAlgorithm<String, ModelEdge> algo;
+  private final ShortestPathAlgorithm<String, Edge> algo;
 
   private final Map<String, Point> points = new HashMap<>();
 
-  public ShortestPathPointRouter(ShortestPathAlgorithm<String, ModelEdge> algo,
+  public ShortestPathPointRouter(ShortestPathAlgorithm<String, Edge> algo,
                                  Collection<Point> points) {
     this.algo = requireNonNull(algo, "algo");
     requireNonNull(points, "points");
@@ -65,7 +66,7 @@ public class ShortestPathPointRouter
       return new ArrayList<>();
     }
 
-    GraphPath<String, ModelEdge> graphPath = algo.getPath(srcPoint.getName(), destPoint.getName());
+    GraphPath<String, Edge> graphPath = algo.getPath(srcPoint.getName(), destPoint.getName());
     if (graphPath == null) {
       return null;
     }
@@ -90,7 +91,7 @@ public class ShortestPathPointRouter
       return 0;
     }
 
-    GraphPath<String, ModelEdge> graphPath = algo.getPath(srcPointRef.getName(),
+    GraphPath<String, Edge> graphPath = algo.getPath(srcPointRef.getName(),
                                                           destPointRef.getName());
     if (graphPath == null) {
       return INFINITE_COSTS;
@@ -99,16 +100,16 @@ public class ShortestPathPointRouter
     return (long) graphPath.getWeight();
   }
 
-  private List<Route.Step> translateToSteps(GraphPath<String, ModelEdge> graphPath) {
-    List<ModelEdge> edges = graphPath.getEdgeList();
+  private List<Route.Step> translateToSteps(GraphPath<String, Edge> graphPath) {
+    List<Edge> edges = graphPath.getEdgeList();
     List<Route.Step> result = new ArrayList<>(edges.size());
 
     int routeIndex = 0;
-    for (ModelEdge edge : edges) {
+    for (Edge edge : edges) {
       Point sourcePoint = points.get(graphPath.getGraph().getEdgeSource(edge));
       Point destPoint = points.get(graphPath.getGraph().getEdgeTarget(edge));
 
-      result.add(new Route.Step(edge.getModelPath(),
+      result.add(new Route.Step(edge.getPath(),
                                 sourcePoint,
                                 destPoint,
                                 orientation(edge, sourcePoint),
@@ -119,8 +120,8 @@ public class ShortestPathPointRouter
     return result;
   }
 
-  private Vehicle.Orientation orientation(ModelEdge edge, Point graphSourcePoint) {
-    return Objects.equals(edge.getModelPath().getSourcePoint(), graphSourcePoint.getReference())
+  private Vehicle.Orientation orientation(Edge edge, Point graphSourcePoint) {
+    return Objects.equals(edge.getPath().getSourcePoint(), graphSourcePoint.getReference())
         ? Vehicle.Orientation.FORWARD
         : Vehicle.Orientation.BACKWARD;
   }

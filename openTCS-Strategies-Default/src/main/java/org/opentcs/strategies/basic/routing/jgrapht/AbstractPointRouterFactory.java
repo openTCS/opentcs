@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -62,7 +63,7 @@ public abstract class AbstractPointRouterFactory
     long timeStampBefore = System.currentTimeMillis();
 
     Set<Point> points = objectService.fetchObjects(Point.class);
-    Graph<String, ModelEdge> graph = mapper.translateModel(points,
+    Graph<String, Edge> graph = mapper.translateModel(points,
                                                            objectService.fetchObjects(Path.class),
                                                            vehicle);
 
@@ -87,6 +88,6 @@ public abstract class AbstractPointRouterFactory
    * @param graph The graph.
    * @return A shortest path algorithm implementation working on the given graph.
    */
-  protected abstract ShortestPathAlgorithm<String, ModelEdge> createShortestPathAlgorithm(
-      Graph<String, ModelEdge> graph);
+  protected abstract ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
+      Graph<String, Edge> graph);
 }

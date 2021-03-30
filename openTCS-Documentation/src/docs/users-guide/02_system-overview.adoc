@@ -6,7 +6,8 @@ openTCS consists of the following components running as separate processes and w
 
 * Kernel (server process), running vehicle-independent strategies and drivers for controlled vehicles
 * Clients
-** Plant overview for modelling and visualizing the plant model
+** Model editor for modelling the plant model
+** Operations desk for visualizing the plant model during plant operation
 ** Kernel control center for controlling and monitoring the kernel, e.g. providing a detailed view of vehicles/their associated drivers
 ** Arbitrary clients for comunicating with other systems, e.g. for process control or warehouse management
 
@@ -31,9 +32,10 @@ A vehicle driver is an adapter between kernel and vehicle and translates each ve
 Furthermore, a driver may offer low-level functionality to the user via the kernel control center client, e.g. manually sending telegrams to the associated vehicle.
 By using suitable vehicle drivers, vehicles of different types can be managed simultaneously by a single openTCS instance.
 
-The plant overview client that is part of the openTCS distribution allows editing of plant models, which can be loaded into the kernel.
+The model editor client that is part of the openTCS distribution allows editing of plant models, which can be loaded into the kernel.
 This includes, for instance, the definition of load-change stations, driving tracks and vehicles.
-In the kernel's plant operation mode, the plant overview client is used to display the transportation system's general state and any active transport processes, and to create new transport orders interactively.
+
+The operations desk client that is part of the openTCS distribution is used to display the transportation system's general state and any active transport processes, and to create new transport orders interactively.
 
 The kernel control center client that is part of the openTCS distribution allows controlling and monitoring the kernel.
 Part of that is assigning vehicle drivers to vehicles and controlling them by enabling the communication and monitoring them by displaying vehicle state information, for instance.
@@ -45,7 +47,7 @@ Additionally, openTCS provides a web API for creating and withdrawing transport 
 === Plant model elements
 
 In openTCS, a plant model consists of a set of the following elements.
-The attributes of these elements that are relevant for the plant model, e.g. the coordinates of a point or the length of a path, can be edited using the plant overview client (in modelling mode).
+The attributes of these elements that are relevant for the plant model, e.g. the coordinates of a point or the length of a path, can be edited using the model editor client.
 
 ==== Point
 
@@ -58,7 +60,7 @@ A point carries the following attributes:
    Indicates a position at which a vehicle may halt temporarily while processing an order, e.g. for executing an operation.
    The vehicle is expected to report in when it arrives at such a position.
    It may not remain here for longer than necessary, though.
-   Halt position is the default type for points when modelling with the plant overview client.
+   Halt position is the default type for points when modelling with the model editor client.
 ** _Reporting position_:
    Indicates a position at which a vehicle is expected to report in _only_.
    Vehicles will not be ordered to a reporting position, and halting or even parking at such a position is not allowed.
@@ -69,10 +71,12 @@ A point carries the following attributes:
 * A _position_, i.e. the point's coordinates in the plant's coordinate system.
 * A _vehicle orientation angle_, which expresses the vehicle's assumed/expected orientation while it occupies the point.
 
+NOTE: In openTCS, an angle of 0 degrees is at the 3 o'clock position, and a positive value indicates a counter-clockwise rotation.
+
 ===== Layout coordinates vs model coordinates
 
 A point has two sets of coordinates: layout coordinates and model coordinates.
-The layout coordinates are merely intended for the graphical presentation in the plant overview client, while the model coordinates are data that a vehicle driver could potentially use or send to the vehicle it communicates with (e.g. if the vehicle needs the exact coordinates of a destination point for navigation).
+The layout coordinates are merely intended for the graphical presentation in the model editor and operations desk clients, while the model coordinates are data that a vehicle driver could potentially use or send to the vehicle it communicates with (e.g. if the vehicle needs the exact coordinates of a destination point for navigation).
 Both coordinate sets are not tied to each other per se, i.e. they may differ.
 This is to allow coordinates that the system works with internally to be different from the presentation; for example, you may want to provide a distorted view on the driving course simply because some paths in your plant are very long and you mainly want to view all points/locations closely
 together.
@@ -126,16 +130,17 @@ A vehicle provides the following attributes:
 * A _maximum velocity_ and _maximum reverse velocity_.
   Depending on the router configuration, it may be used for computing routing costs/finding an optimal route to a destination point.
 * An _integration level_, indicating how far the vehicle is currently allowed to be integrated into the system.
+  A vehicle's integration level can only be adjusted with the operations desk client, not with the model editor client.
   A vehicle can be
   ** ..._ignored_:
-      The vehicle and its reported position will be ignored completely, thus the vehicle will not be displayed in the plant overview.
-      The vehicle is not available for transport orders.
+     The vehicle and its reported position will be ignored completely, thus the vehicle will not be displayed in the operatiosn desk.
+     The vehicle is not available for transport orders.
   ** ..._noticed_:
-      The vehicle will be displayed at its reported position in the plant overview, but no resources will be allocated in the system for that position.
-      The vehicle is not available for transport orders.
+     The vehicle will be displayed at its reported position in the operations desk, but no resources will be allocated in the system for that position.
+     The vehicle is not available for transport orders.
   ** ..._respected_:
-      The resources for the vehicle's reported position will be allocated.
-      The vehicle is not available for transport orders. 
+     The resources for the vehicle's reported position will be allocated.
+     The vehicle is not available for transport orders. 
   ** ..._utilized_:
      The vehicle is available for transport orders and will be utilized by the openTCS.
 * A set of _allowed transport order types_, which are strings used for filtering transport orders (by their type) that are allowed to be assigned to the vehicle.
@@ -152,14 +157,44 @@ A block has two relevant attributes:
 * A _type_, which determines the rules for entering a block:
 ** _Single vehicle only_:
    The resources aggregated in this block can only be used by a single vehicle at the same time.
-   This is the default type for blocks when modelling with the plant overview client.
+   This is the default type for blocks when modelling with the model editor client.
 ** _Same direction only_:
    The resources aggregated in this block can be used by multiple vehicles at the same time, but only if they traverse the block in the same direction.
 
-The direction in which a vehicle traverses a block is determined using the first allocation request containing resources that are part of the block -- see <<Default scheduler>>.
+NOTE: The direction in which a vehicle traverses a block is determined using the first allocation request containing resources that are part of the block -- see <<Default scheduler>>.
 For the requested resources (usually a point and a path) the path is checked for a property with the key `tcs:blockEntryDirection`.
 The property's value may be an arbitrary character string (including the empty string).
 If there is no such property the path's name is being used as the direction.
+
+==== Layer
+
+Layers are abstract elements that group points, paths, locations and links.
+They can be useful for modelling complex plants and dividing plant sections into logical groups (e.g. floors in a multi-floor plant).
+A layer has the following properties:
+
+* An _active_ flag, which indicates whether a layer is currently set as the active (drawing) layer.
+  There can only be one active layer at a time.
+  This property is shown only in the model editor client.
+* A _visible_ flag, which indicates whether a layer is shown or hidden.
+  When a layer is hidden, the model elements it contains are not displayed.
+* A descriptive _name_.
+* A _group_, that the layer is assigned to -- see <<Layer group>>.
+  A layer can only be assigned to one layer group at a time.
+* A _group visible_ flag, which indicates whether the layer group the layer is assigned to is shown or hidden -- see <<Layer group>>.
+
+In addition to the properties listed above, layers also have an ordinal number (which is not displayed) that defines the order of the layers in relation to each other.
+The order of the layers is represented by the order of the entries in the "Layers" table in the Model Editor and the Operations Desk clients.
+The topmost entry corresponds to the topmost layer (which is displayed above all other layers) and the bottommost entry corresponds to the bottommost layer (which is displayed below all other layers).
+
+==== Layer group
+
+Layer groups are abstract elements that group layers.
+A layer group has the following properties:
+
+* A descriptive _name_.
+* A _visible_ flag, which indicates whether the layer group is shown or hidden.
+  When a layer group is hidden, the model elements contained in all layers assigned to it are not displayed.
+  The visibility state of a layer group doesn't affect the visibility state of the layers assigned to it.
 
 === Plant operation elements
 
@@ -190,7 +225,7 @@ image::transportorder_dependencies_example.png[]
 
 ==== Order sequence
 
-NOTE: The plant overview application currently does not provide a way to create order sequences.
+NOTE: The operations desk application currently does not provide a way to create order sequences.
 They can only be created programmatically, using dedicated clients that are not part of the openTCS distribution.
 
 An order sequence describes a process spanning multiple transport orders which are to be executed subsequently -- in the exact order defined by the sequence -- by a single vehicle.
@@ -228,5 +263,4 @@ In addition to the listed attributes, it is possible to define arbitrary propert
 Both the key and the value can be arbitrary character strings.
 For example, a key-value pair `"IP address"`:``"192.168.23.42"`` could be defined for a vehicle in the model, stating which IP address is to be used to communicate with the vehicle; a vehicle driver could now check during runtime whether a value for the key `"IP address"` was defined, and if yes, use it to automatically configure the communication channel to the vehicle.
 Another use for these generic attributes can be vehicle-specific actions to be executed on certain paths in the model.
-If a vehicle should, for instance, issue an acoustic warning and/or turn on the right-hand direction indicator when currently on a certain path,
-attributes with the keys `"acoustic warning"` and/or `"right-hand direction indicator"` could be defined for this path and evaluated by the respective vehicle driver.
+If a vehicle should, for instance, issue an acoustic warning and/or turn on the right-hand direction indicator when currently on a certain path, attributes with the keys `"acoustic warning"` and/or `"right-hand direction indicator"` could be defined for this path and evaluated by the respective vehicle driver.
