@@ -85,16 +85,6 @@ public class ModelSerializationTest {
   }
 
   @Test
-  @Deprecated
-  public void shouldSerializeAndDeserializeStaticRoute()
-      throws Exception {
-    StaticRoute originalObject = new StaticRoute("StaticRoute1");
-    StaticRoute deserializedObject = (StaticRoute) deserializeTCSObject(serializeTCSObject(originalObject));
-
-    assertEquals(originalObject, deserializedObject);
-  }
-
-  @Test
   public void shouldSerializeAndDeserializeVehicle()
       throws Exception {
     Vehicle originalObject = new Vehicle("Vehicle1");

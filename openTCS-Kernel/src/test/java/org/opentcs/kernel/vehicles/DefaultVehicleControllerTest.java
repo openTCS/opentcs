@@ -95,7 +95,6 @@ public class DefaultVehicleControllerTest {
   private DefaultVehicleController stdVehicleController;
 
   @Before
-  @SuppressWarnings("unchecked")
   public void setUp() {
     vehicle = dataObjectFactory.createVehicle();
     vehicleModel = new VehicleProcessModel(vehicle);
@@ -184,15 +183,6 @@ public class DefaultVehicleControllerTest {
 
     verify(vehicleService).updateVehicleState(vehicle.getReference(),
                                               Vehicle.State.EXECUTING);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldForwardAdapterStateChangeToKernel() {
-    vehicleModel.setVehicleAdapterState(VehicleCommAdapter.State.UNKNOWN);
-
-    verify(localKernel).setVehicleAdapterState(vehicle.getReference(),
-                                               VehicleCommAdapter.State.UNKNOWN);
   }
 
   @Test

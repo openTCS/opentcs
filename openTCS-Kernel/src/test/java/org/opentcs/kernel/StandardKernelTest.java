@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
@@ -44,10 +45,6 @@ public class StandardKernelTest {
 
   @Before
   public void setUp() {
-    @SuppressWarnings({"unchecked", "deprecation"})
-    org.opentcs.util.eventsystem.EventHub<org.opentcs.util.eventsystem.TCSEvent> eventHub
-        = mock(org.opentcs.util.eventsystem.EventHub.class);
-
     // Build a map of providers for our mocked state objects.
     Map<Kernel.State, Provider<KernelState>> stateMap = new HashMap<>();
     kernelStateShutdown = mock(KernelState.class);
@@ -65,10 +62,10 @@ public class StandardKernelTest {
     stateMap.put(Kernel.State.OPERATING,
                  new KernelStateProvider(kernelStateOperating));
 
-    kernel = new StandardKernel(eventHub,
-                                new SimpleEventBus(),
+    kernel = new StandardKernel(new SimpleEventBus(),
                                 mock(ScheduledExecutorService.class),
-                                stateMap);
+                                stateMap,
+                                mock(NotificationService.class));
   }
 
   @Test

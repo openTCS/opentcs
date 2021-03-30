@@ -100,7 +100,6 @@ public class TransportOrdersDocument {
    * @param xmlData The XML data
    * @return The list of data
    */
-  @SuppressWarnings("unchecked")
   public static TransportOrdersDocument fromXml(String xmlData) {
     requireNonNull(xmlData, "xmlData");
 

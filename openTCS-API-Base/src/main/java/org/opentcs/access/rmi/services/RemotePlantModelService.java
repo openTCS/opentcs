@@ -37,17 +37,9 @@ public interface RemotePlantModelService
   void createPlantModel(ClientID clientId, PlantModelCreationTO to)
       throws RemoteException;
 
-  @Deprecated
-  String getLoadedModelName(ClientID clientId)
-      throws RemoteException;
-
   String getModelName(ClientID clientId)
       throws RemoteException;
 
   Map<String, String> getModelProperties(ClientID clientId)
-      throws RemoteException;
-
-  @Deprecated
-  String getPersistentModelName(ClientID clientId)
       throws RemoteException;
 }

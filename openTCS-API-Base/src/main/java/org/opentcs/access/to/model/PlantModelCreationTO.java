@@ -15,7 +15,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a plant model.
@@ -51,11 +50,6 @@ public class PlantModelCreationTO
    */
   private List<GroupCreationTO> groups = new LinkedList<>();
   /**
-   * The plant model's static routes.
-   */
-  @SuppressWarnings("deprecation")
-  private List<StaticRouteCreationTO> staticRoutes = new LinkedList<>();
-  /**
    * The plant model's vehicles.
    */
   private List<VehicleCreationTO> vehicles = new LinkedList<>();
@@ -73,7 +67,6 @@ public class PlantModelCreationTO
     super(name);
   }
 
-  @SuppressWarnings("deprecation")
   private PlantModelCreationTO(@Nonnull String name,
                                @Nonnull Map<String, String> properties,
                                @Nonnull List<PointCreationTO> points,
@@ -82,7 +75,6 @@ public class PlantModelCreationTO
                                @Nonnull List<LocationCreationTO> locations,
                                @Nonnull List<BlockCreationTO> blocks,
                                @Nonnull List<GroupCreationTO> groups,
-                               @Nonnull List<StaticRouteCreationTO> staticRoutes,
                                @Nonnull List<VehicleCreationTO> vehicles,
                                @Nonnull List<VisualLayoutCreationTO> visualLayouts) {
     super(name, properties);
@@ -92,7 +84,6 @@ public class PlantModelCreationTO
     this.locations = requireNonNull(locations, "locations");
     this.blocks = requireNonNull(blocks, "blocks");
     this.groups = requireNonNull(groups, "groups");
-    this.staticRoutes = requireNonNull(staticRoutes, "staticRoutes");
     this.vehicles = requireNonNull(vehicles, "vehicles");
     this.visualLayouts = requireNonNull(visualLayouts, "visualLayouts");
   }
@@ -104,20 +95,6 @@ public class PlantModelCreationTO
    */
   public List<PointCreationTO> getPoints() {
     return Collections.unmodifiableList(points);
-  }
-
-  /**
-   * Sets this plant model's points.
-   *
-   * @param points The new points.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setPoints(@Nonnull List<PointCreationTO> points) {
-    this.points = requireNonNull(points, "points");
-    return this;
   }
 
   /**
@@ -135,7 +112,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -156,7 +132,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -168,20 +143,6 @@ public class PlantModelCreationTO
    */
   public List<PathCreationTO> getPaths() {
     return Collections.unmodifiableList(paths);
-  }
-
-  /**
-   * Sets this plant model's paths.
-   *
-   * @param paths The new paths.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setPaths(@Nonnull List<PathCreationTO> paths) {
-    this.paths = requireNonNull(paths, "paths");
-    return this;
   }
 
   /**
@@ -199,7 +160,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -220,7 +180,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -232,20 +191,6 @@ public class PlantModelCreationTO
    */
   public List<LocationTypeCreationTO> getLocationTypes() {
     return Collections.unmodifiableList(locationTypes);
-  }
-
-  /**
-   * Sets this plant model's location types.
-   *
-   * @param locationTypes The new location types.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setLocationTypes(@Nonnull List<LocationTypeCreationTO> locationTypes) {
-    this.locationTypes = requireNonNull(locationTypes, "locationTypes");
-    return this;
   }
 
   /**
@@ -263,7 +208,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -284,7 +228,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -296,20 +239,6 @@ public class PlantModelCreationTO
    */
   public List<LocationCreationTO> getLocations() {
     return Collections.unmodifiableList(locations);
-  }
-
-  /**
-   * Sets this plant model's locations.
-   *
-   * @param locations The new locations.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setLocations(@Nonnull List<LocationCreationTO> locations) {
-    this.locations = requireNonNull(locations, "locations");
-    return this;
   }
 
   /**
@@ -327,7 +256,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -348,7 +276,6 @@ public class PlantModelCreationTO
                                     listWithAppendix(locations, location),
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -360,20 +287,6 @@ public class PlantModelCreationTO
    */
   public List<BlockCreationTO> getBlocks() {
     return Collections.unmodifiableList(blocks);
-  }
-
-  /**
-   * Sets this plant model's blocks.
-   *
-   * @param blocks The new blocks.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setBlocks(@Nonnull List<BlockCreationTO> blocks) {
-    this.blocks = requireNonNull(blocks, "blocks");
-    return this;
   }
 
   /**
@@ -391,7 +304,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -412,7 +324,6 @@ public class PlantModelCreationTO
                                     locations,
                                     CreationTO.listWithAppendix(blocks, block),
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -424,20 +335,6 @@ public class PlantModelCreationTO
    */
   public List<GroupCreationTO> getGroups() {
     return Collections.unmodifiableList(groups);
-  }
-
-  /**
-   * Sets this plant model's groups.
-   *
-   * @param groups The new groups.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setGroups(@Nonnull List<GroupCreationTO> groups) {
-    this.groups = requireNonNull(groups, "groups");
-    return this;
   }
 
   /**
@@ -455,7 +352,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -475,76 +371,6 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations, blocks,
                                     listWithAppendix(groups, group),
-                                    staticRoutes,
-                                    vehicles,
-                                    visualLayouts);
-  }
-
-  /**
-   * Returns this plant model's static routes.
-   *
-   * @return This plant model's static routes.
-   */
-  @Deprecated
-  public List<StaticRouteCreationTO> getStaticRoutes() {
-    return Collections.unmodifiableList(staticRoutes);
-  }
-
-  /**
-   * Sets this plant model's static routes.
-   *
-   * @param staticRoutes The new static routes.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setStaticRoutes(@Nonnull List<StaticRouteCreationTO> staticRoutes) {
-    this.staticRoutes = requireNonNull(staticRoutes, "staticRoutes");
-    return this;
-  }
-
-  /**
-   * Creates a copy of this object with the given static routes.
-   *
-   * @param staticRoutes The new static routes.
-   * @return A copy of this model, differing in the given static routes.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public PlantModelCreationTO withStaticRoutes(@Nonnull List<StaticRouteCreationTO> staticRoutes) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    groups,
-                                    staticRoutes,
-                                    vehicles,
-                                    visualLayouts);
-  }
-
-  /**
-   * Creates a copy of this object that includes the given route in the list of routes.
-   *
-   * @param staticRoute the new route.
-   * @return A copy of this model that also includes the given route.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public PlantModelCreationTO withStaticRoute(@Nonnull StaticRouteCreationTO staticRoute) {
-    requireNonNull(staticRoute, "staticRoute");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    groups,
-                                    listWithAppendix(staticRoutes, staticRoute),
                                     vehicles,
                                     visualLayouts);
   }
@@ -556,20 +382,6 @@ public class PlantModelCreationTO
    */
   public List<VehicleCreationTO> getVehicles() {
     return Collections.unmodifiableList(vehicles);
-  }
-
-  /**
-   * Sets this plant model's vehicles.
-   *
-   * @param vehicles The new vehicles.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setVehicles(@Nonnull List<VehicleCreationTO> vehicles) {
-    this.vehicles = requireNonNull(vehicles, "vehicles");
-    return this;
   }
 
   /**
@@ -587,7 +399,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -608,7 +419,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     listWithAppendix(vehicles, vehicle),
                                     visualLayouts);
   }
@@ -620,20 +430,6 @@ public class PlantModelCreationTO
    */
   public List<VisualLayoutCreationTO> getVisualLayouts() {
     return Collections.unmodifiableList(visualLayouts);
-  }
-
-  /**
-   * Sets this plant model's visual layouts.
-   *
-   * @param visualLayouts The new visual layouts.
-   * @return The modified plant model.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PlantModelCreationTO setVisualLayouts(@Nonnull List<VisualLayoutCreationTO> visualLayouts) {
-    this.visualLayouts = requireNonNull(visualLayouts, "visualLayouts");
-    return this;
   }
 
   /**
@@ -651,7 +447,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -673,7 +468,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     listWithAppendix(visualLayouts, visualLayout));
   }
@@ -694,7 +488,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }
@@ -719,7 +512,6 @@ public class PlantModelCreationTO
                                     locations,
                                     blocks,
                                     groups,
-                                    staticRoutes,
                                     vehicles,
                                     visualLayouts);
   }

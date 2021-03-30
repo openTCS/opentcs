@@ -135,7 +135,6 @@ public class DefaultRouterTest {
    *
    * @return The router
    */
-  @SuppressWarnings("unchecked")
   private Router createRouter() {
     when(builder.createPointRouter(any())).thenReturn(mock(PointRouter.class));
 

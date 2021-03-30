@@ -158,8 +158,7 @@ public class TreeMouseAdapter
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent event) {
-        @SuppressWarnings("unchecked")
-        Enumeration<TreeNode> eTreeNodes = ((TreeNode) objectTree.getModel().getRoot()).children();
+        Enumeration<? extends TreeNode> eTreeNodes = ((TreeNode) objectTree.getModel().getRoot()).children();
 
         while (eTreeNodes.hasMoreElements()) {
           TreeNode node = eTreeNodes.nextElement();

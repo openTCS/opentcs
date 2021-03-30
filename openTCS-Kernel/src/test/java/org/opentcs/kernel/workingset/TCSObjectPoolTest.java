@@ -201,20 +201,4 @@ public class TCSObjectPoolTest {
     // A misnamed/duplicate object
     pool.addObject(new Point("Path-00002"));
   }
-
-  /**
-   * Verify that the pool generates unique object names.
-   */
-  @Test(expected = ObjectExistsException.class)
-  @SuppressWarnings("deprecation")
-  public void testUniqueNameGenerator() {
-    String prefix = "ABC";
-    String suffixPattern = "000";
-    for (int i = 1; i <= 100; i++) {
-      String curName = pool.getUniqueObjectName(prefix, suffixPattern);
-      pool.addObject(new Point(curName));
-    }
-    // Add a name that should already exist in the pool, and expect an exception.
-    pool.addObject(new Point("ABC050"));
-  }
 }

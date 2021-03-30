@@ -86,7 +86,6 @@ public class ModelImportAdapter {
    * @throws IllegalArgumentException If the given plant model data was inconsistent in some way.
    */
   @Nonnull
-  @SuppressWarnings("deprecation")
   public SystemModel convert(PlantModelCreationTO model)
       throws IllegalArgumentException {
     requireNonNull(model, "model");

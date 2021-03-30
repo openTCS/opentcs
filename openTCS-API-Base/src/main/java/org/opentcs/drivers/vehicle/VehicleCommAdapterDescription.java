@@ -8,7 +8,6 @@
 package org.opentcs.drivers.vehicle;
 
 import java.io.Serializable;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides the description for a vehicle comm adapter.
@@ -30,10 +29,7 @@ public abstract class VehicleCommAdapterDescription
    *
    * @return <code>true</code> if, and only if, the vehicle is a simulating one.
    */
-  @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
-  public boolean isSimVehicleCommAdapter() {
-    return false;
-  }
+  public abstract boolean isSimVehicleCommAdapter();
 
   @Override
   public boolean equals(Object obj) {

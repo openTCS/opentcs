@@ -38,7 +38,7 @@ public class TransportOrderComparatorByAge
    */
   @Override
   public int compare(TransportOrder order1, TransportOrder order2) {
-    return Long.compare(order1.getCreationTime(), order2.getCreationTime());
+    return order1.getCreationTime().compareTo(order2.getCreationTime());
   }
 
 }

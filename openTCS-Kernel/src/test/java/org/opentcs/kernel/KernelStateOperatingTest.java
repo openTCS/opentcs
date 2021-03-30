@@ -25,18 +25,15 @@ import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
-import org.opentcs.components.kernel.services.VehicleService;
+import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
-import org.opentcs.kernel.extensions.xmlhost.orders.ScriptFileManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
-import org.opentcs.util.event.SimpleEventBus;
 
 /**
  *
@@ -64,6 +61,8 @@ public class KernelStateOperatingTest {
 
   private AttachmentManager attachmentManager;
 
+  private InternalVehicleService vehicleService;
+
   @Before
   public void setUp() {
     objectID = 0;
@@ -74,7 +73,8 @@ public class KernelStateOperatingTest {
     dispatcher = mock(Dispatcher.class);
     controllerPool = mock(LocalVehicleControllerPool.class);
     attachmentManager = mock(AttachmentManager.class);
-    when(objectPool.getObjects(Vehicle.class)).thenReturn(vehicles);
+    vehicleService = mock(InternalVehicleService.class);
+    when(vehicleService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
   }
 
   @After
@@ -110,38 +110,32 @@ public class KernelStateOperatingTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   public void initializeKernelWithVehiclesAsUnavailable() {
     Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());
     operating.initialize();
-    verify(operating, times(1)).setVehicleProcState(vehicle.getReference(),
-                                                    Vehicle.ProcState.UNAVAILABLE);
-    verify(operating, times(1)).setVehicleState(vehicle.getReference(),
-                                                Vehicle.State.UNKNOWN);
-    verify(operating, times(1)).setVehicleTransportOrder(vehicle.getReference(),
-                                                         null);
-    verify(operating, times(1)).setVehicleOrderSequence(vehicle.getReference(),
-                                                        null);
+    verify(vehicleService, times(1)).updateVehicleProcState(vehicle.getReference(),
+                                                            Vehicle.ProcState.IDLE);
+    verify(vehicleService, times(1)).updateVehicleState(vehicle.getReference(),
+                                                        Vehicle.State.UNKNOWN);
+    verify(vehicleService, times(1)).updateVehicleTransportOrder(vehicle.getReference(), null);
+    verify(vehicleService, times(1)).updateVehicleOrderSequence(vehicle.getReference(), null);
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   public void terminateKernelWithVehiclesAsUnavailable() {
     Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());
     operating.initialize();
     operating.terminate();
-    verify(operating, times(2)).setVehicleProcState(vehicle.getReference(),
-                                                    Vehicle.ProcState.UNAVAILABLE);
-    verify(operating, times(2)).setVehicleState(vehicle.getReference(),
-                                                Vehicle.State.UNKNOWN);
-    verify(operating, times(2)).setVehicleTransportOrder(vehicle.getReference(),
-                                                         null);
-    verify(operating, times(2)).setVehicleOrderSequence(vehicle.getReference(),
-                                                        null);
+    verify(vehicleService, times(2)).updateVehicleProcState(vehicle.getReference(),
+                                                            Vehicle.ProcState.IDLE);
+    verify(vehicleService, times(2)).updateVehicleState(vehicle.getReference(),
+                                                        Vehicle.State.UNKNOWN);
+    verify(vehicleService, times(2)).updateVehicleTransportOrder(vehicle.getReference(), null);
+    verify(vehicleService, times(2)).updateVehicleOrderSequence(vehicle.getReference(), null);
   }
 
   /**
@@ -150,7 +144,7 @@ public class KernelStateOperatingTest {
    * @param extensions The kernel extensions
    * @return The kernel to test
    */
-  @SuppressWarnings({"unchecked", "deprecation"})
+  @SuppressWarnings("unchecked")
   private KernelStateOperating createKernel(@Nonnull Set<KernelExtension> extensions) {
     ScheduledExecutorService executorMock = mock(ScheduledExecutorService.class);
     when(executorMock.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
@@ -161,19 +155,16 @@ public class KernelStateOperatingTest {
                                         mock(Model.class),
                                         new TransportOrderPool(objectPool,
                                                                new PrefixedUlidObjectNameProvider()),
-                                        new NotificationBuffer(new SimpleEventBus()),
                                         mock(ModelPersister.class),
                                         configuration,
-                                        mock(org.opentcs.components.kernel.RecoveryEvaluator.class),
                                         router,
                                         scheduler,
                                         dispatcher,
                                         controllerPool,
-                                        mock(ScriptFileManager.class),
                                         executorMock,
                                         mock(OrderCleanerTask.class),
                                         extensions,
                                         attachmentManager,
-                                        mock(VehicleService.class)));
+                                        vehicleService));
   }
 }

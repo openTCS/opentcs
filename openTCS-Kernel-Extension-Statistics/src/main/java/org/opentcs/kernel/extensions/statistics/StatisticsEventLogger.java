@@ -162,7 +162,7 @@ public class StatisticsEventLogger
         && !orderOld.hasState(TransportOrder.State.FINISHED)) {
       writeEvent(StatisticsEvent.ORDER_FINISHED_SUCC, orderNow.getName());
       // Check the order's deadline. Has it been crossed?
-      if (orderNow.getFinishedTime() > orderNow.getDeadline()) {
+      if (orderNow.getFinishedTime().isAfter(orderNow.getDeadline())) {
         writeEvent(StatisticsEvent.ORDER_CROSSED_DEADLINE, orderNow.getName());
       }
     }

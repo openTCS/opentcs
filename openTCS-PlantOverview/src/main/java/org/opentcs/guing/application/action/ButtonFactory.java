@@ -370,7 +370,7 @@ public class ButtonFactory {
                                                  BasicStroke.CAP_BUTT,
                                                  BasicStroke.JOIN_BEVEL));
       AttributeAction action = new AttributeAction(
-          editor, AttributeKeys.STROKE_WIDTH, new Double(widths[i]), label, icon);
+          editor, AttributeKeys.STROKE_WIDTH, widths[i], label, icon);
       action.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY,
                       BUNDLE.getString("buttonFactory.action_strokeWidth.undo.presentationName"));
       AbstractButton btn = strokeWidthPopupButton.add(action);

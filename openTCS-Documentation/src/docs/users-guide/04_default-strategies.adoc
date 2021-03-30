@@ -93,8 +93,6 @@ The following cost functions/configuration options are available:
   Routing costs are equal to the paths' lengths.
 * `TRAVELTIME`:
   Routing costs are computed as the expected time to travel on the paths, i.e. as path length divided by maximum allowed vehicle speed.
-* `EXPLICIT`:
-  Routing costs are read from the paths' _routing cost_ attributes.
 * `EXPLICIT_PROPERTIES`:
   Routing costs for a vehicle on a path are taken from path properties with keys `tcs:routingCostForward<GROUP>` and `tcs:routingCostReverse<GROUP>`.
   The `<GROUP>` to be used is the vehicle's routing group (see below).

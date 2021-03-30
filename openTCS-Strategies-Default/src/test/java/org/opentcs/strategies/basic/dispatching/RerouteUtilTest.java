@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import org.junit.*;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -147,18 +149,55 @@ public class RerouteUtilTest {
 
   @SuppressWarnings("deprecation")
   private MovementCommand createMovementCommand(DriveOrder order, int stepIndex) {
-    return new MovementCommand(order.getRoute().getSteps().get(stepIndex),
-                               "NOP",
-                               null,
-                               false,
-                               null,
-                               order.getRoute().getFinalDestinationPoint(),
-                               "NOP",
-                               new HashMap<>()) {
-
+    return new MovementCommand() {
       @Override
       public Route getRoute() {
         return order.getRoute();
+      }
+
+      @Override
+      public Step getStep() {
+        return order.getRoute().getSteps().get(stepIndex);
+      }
+
+      @Override
+      public String getOperation() {
+        return MovementCommand.NO_OPERATION;
+      }
+
+      @Override
+      public boolean isWithoutOperation() {
+        return true;
+      }
+
+      @Override
+      public Location getOpLocation() {
+        return null;
+      }
+
+      @Override
+      public boolean isFinalMovement() {
+        return false;
+      }
+
+      @Override
+      public Point getFinalDestination() {
+        return order.getRoute().getFinalDestinationPoint();
+      }
+
+      @Override
+      public Location getFinalDestinationLocation() {
+        return null;
+      }
+
+      @Override
+      public String getFinalOperation() {
+        return MovementCommand.NO_OPERATION;
+      }
+
+      @Override
+      public Map<String, String> getProperties() {
+        return new HashMap<>();
       }
     };
   }

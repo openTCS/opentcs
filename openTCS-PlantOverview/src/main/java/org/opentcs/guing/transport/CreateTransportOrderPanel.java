@@ -11,7 +11,6 @@ package org.opentcs.guing.transport;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -199,8 +198,7 @@ public class CreateTransportOrderPanel
     timeTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("HH:mm")));
 
     if (fPattern != null) {
-      newDeadline = ZonedDateTime.ofInstant(Instant.ofEpochMilli(fPattern.getDeadline()),
-                                            ZoneId.systemDefault());
+      newDeadline = ZonedDateTime.ofInstant(fPattern.getDeadline(), ZoneId.systemDefault());
       dateTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
       timeTextField.setText(newDeadline.format(DateTimeFormatter.ofPattern("HH:mm")));
 

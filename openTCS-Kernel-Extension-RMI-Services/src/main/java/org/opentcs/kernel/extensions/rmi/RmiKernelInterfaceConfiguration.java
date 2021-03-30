@@ -37,12 +37,6 @@ public interface RmiKernelInterfaceConfiguration {
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The TCP port of the remote kernel.",
-      orderKey = "0_address_2")
-  int remoteKernelPort();
-
-  @ConfigurationEntry(
-      type = "Integer",
       description = "The TCP port of the remote kernel service portal.",
       orderKey = "0_address_3")
   int remoteKernelServicePortalPort();

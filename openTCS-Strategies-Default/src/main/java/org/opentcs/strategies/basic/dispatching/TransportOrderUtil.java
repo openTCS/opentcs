@@ -288,14 +288,11 @@ public class TransportOrderUtil
     // Check if we're supposed to disable the vehicle and set its proc
     // state accordingly.
     if (disableVehicle) {
-      vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.UNAVAILABLE);
       vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
                                                    Vehicle.IntegrationLevel.TO_BE_RESPECTED);
       vehiclesToDisable.remove(vehicle.getReference());
     }
-    else {
-      vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
-    }
+    vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
     vehicleService.updateVehicleTransportOrder(vehicle.getReference(), null);
     // Let the router know that the vehicle doesn't have a route any more.
     router.selectRoute(vehicle, null);
@@ -320,7 +317,6 @@ public class TransportOrderUtil
     // If the vehicle does NOT have an order, update its processing state now.
     if (orderRef == null) {
       if (disableVehicle) {
-        vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.UNAVAILABLE);
         vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
                                                      Vehicle.IntegrationLevel.TO_BE_RESPECTED);
         // Since the vehicle is now disabled, release any order reservations
@@ -328,9 +324,7 @@ public class TransportOrderUtil
         // this is a good fallback trigger to get rid of them in general.
         orderReservationPool.removeReservations(vehicle.getReference());
       }
-      else {
-        vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
-      }
+      vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
     }
     else {
       abortAssignedOrder(transportOrderService.fetchObject(TransportOrder.class, orderRef),

@@ -46,7 +46,6 @@ public class PathAdapter
   private static final Logger LOG = LoggerFactory.getLogger(PathAdapter.class);
 
   @Override
-  @SuppressWarnings("deprecation")
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,
                                     SystemModel systemModel,
@@ -59,7 +58,6 @@ public class PathAdapter
     model.getPropertyStartComponent().setText(path.getSourcePoint().getName());
     model.getPropertyEndComponent().setText(path.getDestinationPoint().getName());
     model.getPropertyLength().setValueAndUnit(path.getLength(), LengthProperty.Unit.MM);
-    model.getPropertyRoutingCost().setValue((int) path.getRoutingCost());
     model.getPropertyMaxVelocity().setValueAndUnit(path.getMaxVelocity(),
                                                    SpeedProperty.Unit.MM_S);
     model.getPropertyMaxReverseVelocity().setValueAndUnit(path.getMaxReverseVelocity(),
@@ -73,7 +71,6 @@ public class PathAdapter
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
                                                 SystemModel systemModel,
                                                 PlantModelCreationTO plantModel) {
@@ -92,7 +89,6 @@ public class PathAdapter
                 .withLength(getLength(pathModel))
                 .withMaxVelocity(getMaxVelocity(pathModel))
                 .withMaxReverseVelocity(getMaxReverseVelocity(pathModel))
-                .withRoutingCost(getRoutingCost(pathModel))
                 .withProperties(getKernelProperties(pathModel))
                 .withLocked(getLocked(pathModel))
         )
@@ -135,10 +131,6 @@ public class PathAdapter
   private int getMaxReverseVelocity(PathModel model) {
     return (int) Math.abs(model.getPropertyMaxReverseVelocity()
         .getValueByUnit(SpeedProperty.Unit.MM_S));
-  }
-
-  private int getRoutingCost(PathModel model) {
-    return (int) model.getPropertyRoutingCost().getValue();
   }
 
   private String getSourcePoint(PathModel model) {

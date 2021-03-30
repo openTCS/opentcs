@@ -16,7 +16,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Triple;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a location in a plant model.
@@ -45,18 +44,6 @@ public class LocationCreationTO
   private Map<String, Set<String>> links = new HashMap<>();
 
   /**
-   * Creates a new isntance.
-   *
-   * @param name The name of this location.
-   * @param typeName The name of this location's type.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public LocationCreationTO(@Nonnull String name, @Nonnull String typeName) {
-    this(name, typeName, new Triple(0, 0, 0));
-  }
-
-  /**
    * Creates a new instance
    * @param name The name of this location.
    * @param typeName The name of this location's type.
@@ -82,20 +69,6 @@ public class LocationCreationTO
   }
 
   /**
-   * Sets the name of this location.
-   *
-   * @param name The new name.
-   * @return The mocdified location.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public LocationCreationTO setName(@Nonnull String name) {
-    return (LocationCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name The new name.
@@ -114,20 +87,6 @@ public class LocationCreationTO
   @Nonnull
   public String getTypeName() {
     return typeName;
-  }
-
-  /**
-   * Sets the name of this location's type.
-   *
-   * @param typeName The new location type.
-   * @return The modified location.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public LocationCreationTO setTypeName(@Nonnull String typeName) {
-    this.typeName = requireNonNull(typeName, "typeName");
-    return this;
   }
 
   /**
@@ -151,20 +110,6 @@ public class LocationCreationTO
   }
 
   /**
-   * Sets the position of this location (in mm).
-   *
-   * @param position The position of this location (in mm).
-   * @return The modified location.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public LocationCreationTO setPosition(@Nonnull Triple position) {
-    this.position = requireNonNull(position, "position");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given position (in mm).
    *
    * @param position the new position of this location (in mm).
@@ -183,20 +128,6 @@ public class LocationCreationTO
   @Nonnull
   public Map<String, Set<String>> getLinks() {
     return Collections.unmodifiableMap(links);
-  }
-
-  /**
-   * Sets the links attaching points to this location.
-   *
-   * @param links The new links. This is supposed to be a map of point names to allowed operations.
-   * @return The modified location.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public LocationCreationTO setLinks(@Nonnull Map<String, Set<String>> links) {
-    this.links = requireNonNull(links, "links");
-    return this;
   }
 
   /**
@@ -226,20 +157,6 @@ public class LocationCreationTO
   }
 
   /**
-   * Sets the properties of this location.
-   *
-   * @param properties The new properties.
-   * @return The modified location.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public LocationCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (LocationCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -248,21 +165,6 @@ public class LocationCreationTO
   @Override
   public LocationCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new LocationCreationTO(getName(), properties, typeName, position, links);
-  }
-
-  /**
-   * Sets a single property of this location.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified location.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public LocationCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (LocationCreationTO) super.setProperty(key, value);
   }
 
   /**

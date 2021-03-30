@@ -95,8 +95,7 @@ public abstract class TreeViewManager
    * Sorts the items of the <code>TreeView</code>.
    */
   public void sortItems() {
-    @SuppressWarnings("unchecked")
-    Enumeration<TreeNode> eTreeNodes
+    Enumeration<? extends TreeNode> eTreeNodes
         = ((TreeNode) getTreeView().getTree().getModel().getRoot()).children();
 
     while (eTreeNodes.hasMoreElements()) {

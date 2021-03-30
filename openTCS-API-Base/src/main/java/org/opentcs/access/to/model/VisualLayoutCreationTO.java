@@ -15,7 +15,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a visual layout in the plant model.
@@ -66,20 +65,6 @@ public class VisualLayoutCreationTO
   }
 
   /**
-   * Sets the name of this visual layout.
-   *
-   * @param name The new name.
-   * @return The modified visual layout.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public VisualLayoutCreationTO setName(@Nonnull String name) {
-    return (VisualLayoutCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name the new name of the instance.
@@ -96,20 +81,6 @@ public class VisualLayoutCreationTO
   }
 
   /**
-   * Sets the properties of this visual layout.
-   *
-   * @param properties The new properties.
-   * @return The modified visual layout.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public VisualLayoutCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (VisualLayoutCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -123,21 +94,6 @@ public class VisualLayoutCreationTO
                                       scaleY,
                                       modelElements,
                                       shapeElements);
-  }
-
-  /**
-   * Sets a single property of this visual layout.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified visual layout.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public VisualLayoutCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (VisualLayoutCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -170,20 +126,6 @@ public class VisualLayoutCreationTO
   }
 
   /**
-   * Sets this layout's scale on the X axis (in mm/pixel).
-   *
-   * @param scaleX The new scale.
-   * @return The modified visual layout
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VisualLayoutCreationTO setScaleX(double scaleX) {
-    this.scaleX = scaleX;
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the layout's scale on the X axis (in mm/pixel).
    *
    * @param scaleX The new scale.
@@ -205,20 +147,6 @@ public class VisualLayoutCreationTO
    */
   public double getScaleY() {
     return scaleY;
-  }
-
-  /**
-   * Sets this layout's scale on the Y axis (in mm/pixel).
-   *
-   * @param scaleY The new scale.
-   * @return The modified visual layout
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VisualLayoutCreationTO setScaleY(double scaleY) {
-    this.scaleY = scaleY;
-    return this;
   }
 
   /**
@@ -244,21 +172,6 @@ public class VisualLayoutCreationTO
   @Nonnull
   public List<ModelLayoutElementCreationTO> getModelElements() {
     return Collections.unmodifiableList(modelElements);
-  }
-
-  /**
-   * Sets the model layout elements of this visual layout.
-   *
-   * @param modelElements The new model layout elements.
-   * @return The modified visual layout.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VisualLayoutCreationTO setModelElements(
-      @Nonnull List<ModelLayoutElementCreationTO> modelElements) {
-    this.modelElements = requireNonNull(modelElements, "modelElements");
-    return this;
   }
 
   /**
@@ -301,21 +214,6 @@ public class VisualLayoutCreationTO
   @Nonnull
   public List<ShapeLayoutElementCreationTO> getShapeElements() {
     return Collections.unmodifiableList(shapeElements);
-  }
-
-  /**
-   * Sets the shape layout elements of this visual layout.
-   *
-   * @param shapeElements The new shape layout elements.
-   * @return The modified visual layout.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VisualLayoutCreationTO setShapeElements(
-      @Nonnull List<ShapeLayoutElementCreationTO> shapeElements) {
-    this.shapeElements = requireNonNull(shapeElements, "shapeElements");
-    return this;
   }
 
   /**

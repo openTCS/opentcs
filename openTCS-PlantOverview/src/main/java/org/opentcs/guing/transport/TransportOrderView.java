@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
@@ -81,15 +82,15 @@ public class TransportOrderView
   public final void initFields() {
     nameTextField.setText(fTransportOrder.getName());
 
-    createdTextField.setText(TIMESTAMP_FORMAT.format(new Date(fTransportOrder.getCreationTime())));
+    createdTextField.setText(TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getCreationTime())));
 
-    finishedTextField.setText(fTransportOrder.getFinishedTime() != Long.MAX_VALUE
-        ? TIMESTAMP_FORMAT.format(new Date(fTransportOrder.getFinishedTime()))
+    finishedTextField.setText(!fTransportOrder.getFinishedTime().equals(Instant.MAX)
+        ? TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getFinishedTime()))
         : "-"
     );
 
-    deadlineTextField.setText(fTransportOrder.getDeadline() != Long.MAX_VALUE
-        ? TIMESTAMP_FORMAT.format(new Date(fTransportOrder.getDeadline()))
+    deadlineTextField.setText(!fTransportOrder.getDeadline().equals(Instant.MAX)
+        ? TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getDeadline()))
         : "-"
     );
 

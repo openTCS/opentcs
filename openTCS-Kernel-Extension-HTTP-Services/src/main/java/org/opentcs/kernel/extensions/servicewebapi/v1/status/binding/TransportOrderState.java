@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  *
@@ -52,18 +51,6 @@ public class TransportOrderState {
 
   public void setName(String name) {
     this.name = requireNonNull(name, "name");
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of order types.")
-  public String getCategory() {
-    return type;
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of order types.")
-  public void setCategory(String category) {
-    this.type = requireNonNull(category, "category");
   }
 
   public String getType() {

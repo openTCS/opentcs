@@ -9,6 +9,7 @@ package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
@@ -25,9 +26,8 @@ public class NullVehicleCommAdapterFactory
   }
 
   @Override
-  @Deprecated
-  public String getAdapterDescription() {
-    return "-";
+  public VehicleCommAdapterDescription getDescription() {
+    return new NullVehicleCommAdapterDescription();
   }
 
   @Override

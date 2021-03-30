@@ -12,7 +12,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a destination of a drive order.
@@ -56,14 +55,6 @@ public class DestinationCreationTO
     this.destOperation = requireNonNull(destOperation, "destOperation");
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public DestinationCreationTO setName(@Nonnull String name) {
-    return (DestinationCreationTO) super.setName(name);
-  }
-
   /**
    * Creates a copy of this object with the given name.
    *
@@ -75,14 +66,6 @@ public class DestinationCreationTO
     return new DestinationCreationTO(destLocationName, destOperation, name, getModifiableProperties());
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public DestinationCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (DestinationCreationTO) super.setProperties(properties);
-  }
-
   /**
    * Creates a copy of this object with the given properties.
    *
@@ -92,14 +75,6 @@ public class DestinationCreationTO
   @Override
   public DestinationCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new DestinationCreationTO(destLocationName, destOperation, getName(), properties);
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public DestinationCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (DestinationCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -131,20 +106,6 @@ public class DestinationCreationTO
   }
 
   /**
-   * Sets the destination location (or point) name.
-   *
-   * @param destLocationName The destination location (or point) name.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public DestinationCreationTO setDestLocationName(@Nonnull String destLocationName) {
-    this.destLocationName = requireNonNull(destLocationName, "destLocationName");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given destination location (or point) name.
    *
    * @param desLocationName The destination location (or point) name.
@@ -163,20 +124,6 @@ public class DestinationCreationTO
   public String getDestOperation() {
     return destOperation;
   }
-
-  /**
-   * Sets the operation to be performed at the destination.
-   *
-   * @param destOperation The operation.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when="5.0")
-  @Nonnull
-  public DestinationCreationTO setDestOperation(@Nonnull String destOperation) {
-    this.destOperation = requireNonNull(destOperation, "destOperation");
-    return this;
-  }
   
   /**
    * Creates a copy of this object with the given operation to be performed at the destination.
@@ -187,5 +134,4 @@ public class DestinationCreationTO
   public DestinationCreationTO withDestOperation(@Nonnull String destOperation) {
     return new DestinationCreationTO(destLocationName, destOperation, getName(), getModifiableProperties());
   }
-
 }

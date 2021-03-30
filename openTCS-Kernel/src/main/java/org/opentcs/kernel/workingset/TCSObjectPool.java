@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,7 +28,6 @@ import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.UniqueStringGenerator;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +49,6 @@ public class TCSObjectPool {
    * The objects contained in this pool, mapped by their names.
    */
   private final Map<String, TCSObject<?>> objectsByName = new ConcurrentHashMap<>();
-  /**
-   * A set of bits representing the IDs used in this object pool. Each bit in
-   * the set represents the ID equivalent to the bit's index.
-   */
-  private final BitSet idBits = new BitSet();
   /**
    * The generator providing unique names for objects in this pool.
    */
@@ -90,7 +83,6 @@ public class TCSObjectPool {
       throw new ObjectExistsException("Object name " + newObject.getName() + " already exists.");
     }
     objectsByName.put(newObject.getName(), newObject);
-    idBits.set(extractId(newObject.getReference()));
     objectNameGenerator.addString(newObject.getName());
   }
 
@@ -337,48 +329,6 @@ public class TCSObjectPool {
   }
 
   /**
-   * Renames an object.
-   *
-   * @param ref A reference to the object to be renamed.
-   * @param newName The object's new/future name.
-   * @throws ObjectUnknownException If the referenced object does not exist.
-   * @throws ObjectExistsException If the object cannot be renamed because
-   * there is already an object named <code>newName</code>.
-   * @deprecated Set an object name when creating the object, instead.
-   */
-  @Deprecated
-  public void renameObject(TCSObjectReference<?> ref, String newName)
-      throws ObjectUnknownException, ObjectExistsException {
-    requireNonNull(ref, "ref");
-    requireNonNull(newName, "newName");
-
-    TCSObject<?> object = objectsByName.get(ref.getName());
-    if (object == null) {
-      throw new ObjectUnknownException("No such object in this pool.");
-    }
-    // Remember the previous state.
-    TCSObject<?> previousState = object.clone();
-    // Check if there is not already an object with the given name. Make an
-    // exception for objects being reassigned their current names.
-    if (!object.getName().equals(newName)
-        && objectsByName.containsKey(newName)) {
-      throw new ObjectExistsException("old name: '" + object.getName()
-          + "', new name: '" + newName + "'");
-    }
-    // Perform the renaming.
-    objectsByName.remove(object.getName());
-    objectNameGenerator.removeString(object.getName());
-    object.setName(newName);
-    objectsByName.put(newName, object);
-    objectNameGenerator.addString(newName);
-
-    // Emit an event for the modified object.
-    emitObjectEvent(object.clone(),
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  /**
    * Checks if this pool contains an object with the given name.
    *
    * @param objectName The name of the object whose existence in this pool is to
@@ -407,7 +357,6 @@ public class TCSObjectPool {
     if (rmObject == null) {
       throw new ObjectUnknownException(ref);
     }
-    idBits.clear(extractId(ref));
     objectNameGenerator.removeString(rmObject.getName());
     return rmObject;
   }
@@ -427,7 +376,6 @@ public class TCSObjectPool {
       TCSObject<?> removedObject = objectsByName.remove(curName);
       if (removedObject != null) {
         result.add(removedObject);
-        idBits.clear(extractId(removedObject.getReference()));
         objectNameGenerator.removeString(removedObject.getName());
       }
     }
@@ -443,7 +391,6 @@ public class TCSObjectPool {
    * property from the object.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
-  @SuppressWarnings("deprecation")
   public void setObjectProperty(TCSObjectReference<?> ref, String key, String value)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
@@ -452,16 +399,14 @@ public class TCSObjectPool {
     if (object == null) {
       throw new ObjectUnknownException("No object with name " + ref.getName());
     }
-    TCSObject<?> previousState = object.clone();
+    TCSObject<?> previousState = object;
     LOG.debug("Setting property on object named '{}': key='{}', value='{}'",
               ref.getName(),
               key,
               value);
     object = object.withProperty(key, value);
     objectsByName.put(object.getName(), object);
-    emitObjectEvent(object.clone(),
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(object, previousState, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**
@@ -471,7 +416,6 @@ public class TCSObjectPool {
    * @param entry The history entry to be appended.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
-  @SuppressWarnings("deprecation")
   public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
@@ -480,11 +424,11 @@ public class TCSObjectPool {
     if (object == null) {
       throw new ObjectUnknownException("No object with name " + ref.getName());
     }
-    TCSObject<?> previousState = object.clone();
+    TCSObject<?> previousState = object;
     LOG.debug("Appending history entry to object named '{}': {}", ref.getName(), entry);
     object = object.withHistoryEntry(entry);
     objectsByName.put(object.getName(), object);
-    emitObjectEvent(object.clone(), previousState, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(object, previousState, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**
@@ -493,7 +437,6 @@ public class TCSObjectPool {
    * @param ref A reference to the object to be modified.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
-  @SuppressWarnings("deprecation")
   public void clearObjectProperties(TCSObjectReference<?> ref)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
@@ -502,12 +445,10 @@ public class TCSObjectPool {
     if (object == null) {
       throw new ObjectUnknownException("No object with name " + ref.getName());
     }
-    TCSObject<?> previousState = object.clone();
+    TCSObject<?> previousState = object;
     object = object.withProperties(new HashMap<>());
     objectsByName.put(object.getName(), object);
-    emitObjectEvent(object.clone(),
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(object, previousState, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**
@@ -530,37 +471,6 @@ public class TCSObjectPool {
   }
 
   /**
-   * Returns a name that is unique among all known objects in this object pool.
-   * The returned name will consist of the given prefix followed by an integer
-   * formatted according to the given pattern. The pattern has to be of the form
-   * understood by <code>java.text.DecimalFormat</code>.
-   *
-   * @param prefix The prefix of the name to be generated.
-   * @param suffixPattern A pattern describing the suffix of the generated name.
-   * Must be of the form understood by <code>java.text.DecimalFormat</code>.
-   * @return A name that is unique among all known objects.
-   * @deprecated Suggesting object names is not within this class's responsibility.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public String getUniqueObjectName(String prefix, String suffixPattern) {
-    return objectNameGenerator.getUniqueString(prefix, suffixPattern);
-  }
-
-  /**
-   * Returns an object ID that is unique among all known objects in this object
-   * pool.
-   *
-   * @return An object ID that is unique among all known objects in this pool.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public int getUniqueObjectId() {
-    return idBits.nextClearBit(0);
-  }
-
-  /**
    * Emits an event for the given object with the given type.
    *
    * @param currentObjectState The current state of the object to emit an event
@@ -573,10 +483,5 @@ public class TCSObjectPool {
                               TCSObject<?> previousObjectState,
                               TCSObjectEvent.Type evtType) {
     eventHandler.onEvent(new TCSObjectEvent(currentObjectState, previousObjectState, evtType));
-  }
-
-  @SuppressWarnings("deprecation")
-  private int extractId(TCSObjectReference<?> ref) {
-    return ref.getId();
   }
 }

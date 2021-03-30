@@ -15,13 +15,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a router module for the openTCS
@@ -63,19 +61,7 @@ public interface Router
   /**
    * Notifies the router of changes in the topology.
    */
-  @ScheduledApiChange(when = "5.0", details = "Default implementation will be removed.")
-  default void topologyChanged() {
-    updateRoutingTables();
-  }
-
-  /**
-   * Notifies the router of changes in the topology and triggers an update of its routing tables.
-   *
-   * @deprecated Implement and use {@link #topologyChanged()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  void updateRoutingTables();
+  void topologyChanged();
 
   /**
    * Checks the general routability of a given transport order.
@@ -150,24 +136,6 @@ public interface Router
                           @Nonnull TCSObjectReference<Point> dstPointRef);
 
   /**
-   * Returns the costs for travelling a route from one location to another with
-   * a given vehicle.
-   *
-   * @param vehicle The vehicle the costs shall be calculated for.
-   * @param srcRef A reference to the source location
-   * @param destRef A reference to the destination location
-   * @return The costs of the route, or
-   * <code>Long.MAX_VALUE</code>, if no such route exists.
-   * @deprecated Use {@link #getCosts(org.opentcs.data.model.Vehicle, org.opentcs.data.model.Point,
-   * org.opentcs.data.model.Point)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  long getCosts(@Nonnull Vehicle vehicle,
-                @Nonnull TCSObjectReference<Location> srcRef,
-                @Nonnull TCSObjectReference<Location> destRef);
-
-  /**
    * Notifies the router of a route being selected for a vehicle.
    *
    * @param vehicle The vehicle for which a route is being selected.
@@ -194,17 +162,4 @@ public interface Router
    */
   @Nonnull
   Set<Point> getTargetedPoints();
-
-  /**
-   * Returns a human readable text describing this router's internal state.
-   *
-   * @return A human readable text describing this router's internal state.
-   * @deprecated Does not serve any real purpose and will be removed.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  default String getInfo() {
-    return "";
-  }
 }

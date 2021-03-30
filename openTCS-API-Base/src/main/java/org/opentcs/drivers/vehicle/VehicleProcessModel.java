@@ -19,8 +19,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An observable model of a vehicle's and its comm adapter's attributes.
@@ -79,21 +77,9 @@ public class VehicleProcessModel {
    */
   private List<LoadHandlingDevice> loadHandlingDevices = new LinkedList<>();
   /**
-   * The vehicle's maximum forward velocity.
-   */
-  private int maxVelocity;
-  /**
-   * The vehicle's maximum reverse velocity.
-   */
-  private int maxReverseVelocity;
-  /**
    * The vehicle's current state.
    */
   private Vehicle.State state = Vehicle.State.UNKNOWN;
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  private VehicleCommAdapter.State adapterState = VehicleCommAdapter.State.UNKNOWN;
 
   /**
    * Creates a new instance.
@@ -121,19 +107,6 @@ public class VehicleProcessModel {
    */
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     pcs.removePropertyChangeListener(listener);
-  }
-
-  /**
-   * Returns a copy of the kernel's Vehicle instance.
-   *
-   * @return A copy of the kernel's Vehicle instance.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public Vehicle getVehicle() {
-    return vehicle;
   }
 
   /**
@@ -307,7 +280,6 @@ public class VehicleProcessModel {
    * Sets the vehicle's current orientation angle.
    *
    * @param angle The new angle
-   * @see Vehicle#setOrientationAngle(double)
    */
   public void setVehicleOrientationAngle(double angle) {
     double oldValue = this.orientationAngle;
@@ -370,69 +342,10 @@ public class VehicleProcessModel {
   }
 
   /**
-   * Returns the vehicle's maximum velocity.
-   *
-   * @return The vehicle's maximum velocity.
-   * @deprecated The maximum velocity is not a dynamic vehicle attribute.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public int getVehicleMaxVelocity() {
-    return maxVelocity;
-  }
-
-  /**
-   * Sets the vehicle's maximum velocity.
-   *
-   * @param newVelocity The new maximum velocity.
-   * @deprecated The maximum velocity is not a dynamic vehicle attribute.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setVehicleMaxVelocity(int newVelocity) {
-    int oldValue = this.maxVelocity;
-    this.maxVelocity = newVelocity;
-
-    getPropertyChangeSupport().firePropertyChange(Attribute.MAX_VELOCITY.name(),
-                                                  oldValue,
-                                                  newVelocity);
-  }
-
-  /**
-   * Returns the vehicle's maximum reverse velocity.
-   *
-   * @return The vehicle's maximum reverse velocity.
-   * @deprecated The maximum reverse velocity is not a dynamic vehicle attribute.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public int getVehicleMaxReverseVelocity() {
-    return maxReverseVelocity;
-  }
-
-  /**
-   * Sets the vehicle's maximum reverse velocity.
-   *
-   * @param newVelocity The new maximum reverse velocity.
-   * @deprecated The maximum reverse velocity is not a dynamic vehicle attribute.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setVehicleMaxReverseVelocity(int newVelocity) {
-    int oldValue = this.maxReverseVelocity;
-    this.maxReverseVelocity = newVelocity;
-
-    getPropertyChangeSupport().firePropertyChange(Attribute.MAX_REVERSE_VELOCITY.name(),
-                                                  oldValue,
-                                                  newVelocity);
-  }
-
-  /**
    * Sets a property of the vehicle.
    *
    * @param key The property's key.
    * @param value The property's new value.
-   * @see Vehicle#setProperty(java.lang.String, java.lang.String)
    */
   public void setVehicleProperty(@Nonnull String key, @Nullable String value) {
     getPropertyChangeSupport().firePropertyChange(Attribute.VEHICLE_PROPERTY.name(),
@@ -474,41 +387,10 @@ public class VehicleProcessModel {
   }
 
   /**
-   * Returns the comm adapter's current state.
-   *
-   * @return The comm adapter's current state.
-   * @deprecated VehicleCommAdapter.State is deprecated.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VehicleCommAdapter.State getVehicleAdapterState() {
-    return adapterState;
-  }
-
-  /**
-   * Sets the comm adapter's current state.
-   *
-   * @param newState The new state.
-   * @deprecated VehicleCommAdapter.State is deprecated.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setVehicleAdapterState(@Nonnull VehicleCommAdapter.State newState) {
-    VehicleCommAdapter.State oldValue = this.adapterState;
-    this.adapterState = newState;
-
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMM_ADAPTER_STATE.name(),
-                                                  oldValue,
-                                                  newState);
-  }
-
-  /**
    * Sets a property of the transport order the vehicle is currently processing.
    *
    * @param key The property's key.
    * @param value The property's new value.
-   * @see TransportOrder#setProperty(java.lang.String, java.lang.String)
    */
   public void setTransportOrderProperty(@Nonnull String key, @Nullable String value) {
     // XXX Should check if property already has the new value.
@@ -676,33 +558,9 @@ public class VehicleProcessModel {
      */
     LOAD_HANDLING_DEVICES,
     /**
-     * Indicates a change of the vehicle's maximum velocity.
-     *
-     * @deprecated The maximum velocity is not a dynamic vehicle attribute.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "5.0")
-    MAX_VELOCITY,
-    /**
-     * Indicates a change of the vehicle's maximum reverse velocity.
-     *
-     * @deprecated The maximum velocity is not a dynamic vehicle attribute.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "5.0")
-    MAX_REVERSE_VELOCITY,
-    /**
      * Indicates a change of the vehicle's state.
      */
     STATE,
-    /**
-     * Indicates a change of the comm adapter's state.
-     *
-     * @deprecated VehicleCommAdapter.State is deprecated.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "5.0")
-    COMM_ADAPTER_STATE,
     /**
      * Indicates a new user notification was published.
      */

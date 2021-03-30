@@ -282,17 +282,14 @@ public class VehicleModel
   }
 
   /**
-   * Checks whether the last reported processing state of the vehicle would
-   * allow it to be assigned an order.
+   * Checks whether the last reported processing state of the vehicle would allow it to be assigned
+   * an order.
    *
-   * @return <code>true</code> if, and only if, the vehicle's processing state
-   * is not UNAVAILABLE.
+   * @return {@code true} if, and only if, the vehicle's integration level is TO_BE_UTILIZED.
    */
-  @SuppressWarnings("deprecation")
   public boolean isAvailableForOrder() {
     return vehicle != null
-        && vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
-        && !vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE);
+        && vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED;
   }
 
   @Override // AbstractModelComponent
@@ -502,7 +499,7 @@ public class VehicleModel
     SelectionProperty<Vehicle.ProcState> pProcState
         = new SelectionProperty<>(this,
                                   Arrays.asList(Vehicle.ProcState.values()),
-                                  Vehicle.ProcState.UNAVAILABLE);
+                                  Vehicle.ProcState.IDLE);
     pProcState.setDescription(
         bundle.getString("vehicleModel.property_processingState.description")
     );

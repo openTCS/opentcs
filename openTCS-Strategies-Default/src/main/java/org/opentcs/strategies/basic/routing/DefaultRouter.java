@@ -25,7 +25,6 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Location.Link;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -106,7 +105,7 @@ public class DefaultRouter
     try {
       rwLock.writeLock().lock();
       routesByVehicle.clear();
-      updateRoutingTables();
+      topologyChanged();
       initialized = true;
     }
     finally {
@@ -136,8 +135,7 @@ public class DefaultRouter
   }
 
   @Override
-  @Deprecated
-  public void updateRoutingTables() {
+  public void topologyChanged() {
     try {
       rwLock.writeLock().lock();
       pointRoutersByVehicleGroup.clear();
@@ -266,38 +264,6 @@ public class DefaultRouter
       rwLock.readLock().lock();
       return pointRoutersByVehicleGroup.get(getRoutingGroupOfVehicle(vehicle))
           .getCosts(srcPointRef, dstPointRef);
-    }
-    finally {
-      rwLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  @Deprecated
-  public long getCosts(Vehicle vehicle,
-                       TCSObjectReference<Location> srcRef,
-                       TCSObjectReference<Location> destRef) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(srcRef, "srcRef");
-    requireNonNull(destRef, "destRef");
-
-    try {
-      rwLock.readLock().lock();
-      // Get all attached links for source and destination
-      Set<Link> srcLinks = objectService.fetchObject(Location.class, srcRef).getAttachedLinks();
-      Set<Link> destLinks = objectService.fetchObject(Location.class, destRef).getAttachedLinks();
-
-      // Find the cheapest destination link to be used
-      long costs = Long.MAX_VALUE;
-      for (Link srcLink : srcLinks) {
-        for (Link destLink : destLinks) {
-          long linkCosts = getCosts(vehicle,
-                                    objectService.fetchObject(Point.class, srcLink.getPoint()),
-                                    objectService.fetchObject(Point.class, destLink.getPoint()));
-          costs = Math.min(costs, linkCosts);
-        }
-      }
-      return costs;
     }
     finally {
       rwLock.readLock().unlock();
@@ -546,7 +512,7 @@ public class DefaultRouter
    */
   private String getRoutingGroupOfVehicle(Vehicle vehicle) {
     String propVal = vehicle.getProperty(PROPKEY_ROUTING_GROUP);
-    
+
     return propVal == null ? DEFAULT_ROUTING_GROUP : propVal;
   }
 

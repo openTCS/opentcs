@@ -165,12 +165,6 @@ public class StandardRemotePlantModelService
   }
 
   @Override
-  @Deprecated
-  public String getLoadedModelName(ClientID clientId) {
-    return getModelName(clientId);
-  }
-
-  @Override
   public String getModelName(ClientID clientId) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
@@ -182,13 +176,5 @@ public class StandardRemotePlantModelService
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return plantModelService.getModelProperties();
-  }
-
-  @Override
-  @Deprecated
-  public String getPersistentModelName(ClientID clientId) {
-    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
-
-    return plantModelService.getPersistentModelName();
   }
 }

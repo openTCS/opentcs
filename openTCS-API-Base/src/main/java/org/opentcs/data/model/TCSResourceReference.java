@@ -9,7 +9,6 @@ package org.opentcs.data.model;
 
 import java.io.Serializable;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transient reference to a {@link TCSResource}.
@@ -17,11 +16,9 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual resource class.
  */
-@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class TCSResourceReference<E extends TCSResource<E>>
     extends TCSObjectReference<E>
-    implements Serializable,
-               Cloneable {
+    implements Serializable {
 
   /**
    * Creates a new TCSResourceReference.
@@ -30,11 +27,5 @@ public class TCSResourceReference<E extends TCSResource<E>>
    */
   protected TCSResourceReference(TCSResource<E> newReferent) {
     super(newReferent);
-  }
-
-  @Override
-  public TCSResourceReference<E> clone() {
-    TCSResourceReference<E> clone = (TCSResourceReference<E>) super.clone();
-    return clone;
   }
 }

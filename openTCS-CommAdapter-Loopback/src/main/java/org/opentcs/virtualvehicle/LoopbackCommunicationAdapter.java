@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.customizations.kernel.KernelExecutor;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.Orientation;
 import org.opentcs.data.order.Route.Step;
@@ -119,7 +118,8 @@ public class LoopbackCommunicationAdapter
     super(new LoopbackVehicleModel(vehicle),
           configuration.commandQueueCapacity(),
           1,
-          configuration.rechargeOperation());
+          configuration.rechargeOperation(),
+          kernelExecutor);
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
@@ -135,12 +135,6 @@ public class LoopbackCommunicationAdapter
 
     String initialPos
         = vehicle.getProperties().get(LoopbackAdapterConstants.PROPKEY_INITIAL_POSITION);
-    if (initialPos == null) {
-      @SuppressWarnings("deprecation")
-      String deprecatedInitialPos
-          = vehicle.getProperties().get(ObjectPropConstants.VEHICLE_INITIAL_POSITION);
-      initialPos = deprecatedInitialPos;
-    }
     if (initialPos != null) {
       initVehiclePosition(initialPos);
     }
@@ -209,12 +203,6 @@ public class LoopbackCommunicationAdapter
   @Override
   public LoopbackVehicleModel getProcessModel() {
     return (LoopbackVehicleModel) super.getProcessModel();
-  }
-
-  @Override
-  @Deprecated
-  protected List<org.opentcs.drivers.vehicle.VehicleCommAdapterPanel> createAdapterPanels() {
-    return Arrays.asList(componentsFactory.createPanel(this));
   }
 
   @Override

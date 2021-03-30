@@ -16,7 +16,9 @@ import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.phase.parking.DefaultParkingPositionSupplier;
+import org.opentcs.strategies.basic.dispatching.phase.parking.ParkingPositionSupplier;
 import org.opentcs.strategies.basic.dispatching.phase.recharging.DefaultRechargePositionSupplier;
+import org.opentcs.strategies.basic.dispatching.phase.recharging.RechargePositionSupplier;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCandidateComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderComparator;
 import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCandidateComparator;
@@ -66,7 +68,6 @@ public class DefaultDispatcherModule
     bindDispatcher(DefaultDispatcher.class);
   }
 
-  @SuppressWarnings("deprecation")
   private void configureDispatcherDependencies() {
     Multibinder.newSetBinder(binder(), VehicleSelectionFilter.class);
     Multibinder.newSetBinder(binder(), TransportOrderSelectionFilter.class);
@@ -99,10 +100,10 @@ public class DefaultDispatcherModule
     bind(OrderReservationPool.class)
         .in(Singleton.class);
 
-    bind(org.opentcs.components.kernel.ParkingPositionSupplier.class)
+    bind(ParkingPositionSupplier.class)
         .to(DefaultParkingPositionSupplier.class)
         .in(Singleton.class);
-    bind(org.opentcs.components.kernel.RechargePositionSupplier.class)
+    bind(RechargePositionSupplier.class)
         .to(DefaultRechargePositionSupplier.class)
         .in(Singleton.class);
 

@@ -15,7 +15,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a group in the plant model.
@@ -49,20 +48,6 @@ public class GroupCreationTO
   }
 
   /**
-   * Sets the name of this group.
-   *
-   * @param name The new name.
-   * @return The modified group.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public GroupCreationTO setName(@Nonnull String name) {
-    return (GroupCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name The new name.
@@ -74,20 +59,6 @@ public class GroupCreationTO
   }
 
   /**
-   * Sets the properties of this group.
-   *
-   * @param properties The new properties.
-   * @return The modified group.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public GroupCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (GroupCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties the new properties.
@@ -96,21 +67,6 @@ public class GroupCreationTO
   @Override
   public GroupCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new GroupCreationTO(getName(), properties, memberNames);
-  }
-
-  /**
-   * Sets a single property of this group.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified group.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public GroupCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (GroupCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -136,20 +92,6 @@ public class GroupCreationTO
   @Nonnull
   public Set<String> getMemberNames() {
     return Collections.unmodifiableSet(memberNames);
-  }
-
-  /**
-   * Sets the names of this group's members.
-   *
-   * @param memberNames The names of this group's members.
-   * @return The modified group.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public GroupCreationTO setMemberNames(@Nonnull Set<String> memberNames) {
-    this.memberNames = requireNonNull(memberNames, "memberNames");
-    return this;
   }
 
   /**

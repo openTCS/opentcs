@@ -20,7 +20,6 @@ import org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorTravelTime;
 import org.opentcs.strategies.basic.routing.jgrapht.FloydWarshallPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.ModelGraphMapper;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
-import static org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration.EvaluatorType.EXPLICIT;
 import static org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration.EvaluatorType.TRAVELTIME;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +92,6 @@ public class DefaultRouterModule
         });
   }
 
-  @SuppressWarnings("deprecation")
   private EdgeEvaluator toEdgeEvaluator(ShortestPathConfiguration.EvaluatorType type) {
     switch (type) {
       case DISTANCE:
@@ -102,8 +100,6 @@ public class DefaultRouterModule
         return new EdgeEvaluatorTravelTime();
       case HOPS:
         return new EdgeEvaluatorHops();
-      case EXPLICIT:
-        return new org.opentcs.strategies.basic.routing.jgrapht.EdgeEvaluatorExplicit();
       case EXPLICIT_PROPERTIES:
         return new EdgeEvaluatorExplicitProperties();
       default:

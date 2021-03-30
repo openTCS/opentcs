@@ -9,7 +9,6 @@ package org.opentcs.components.plantoverview;
 
 import java.awt.Image;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides a location theme.
@@ -26,16 +25,4 @@ public interface LocationTheme {
    * @return The image for the given location representation.
    */
   Image getImageFor(LocationRepresentation representation);
-
-  /**
-   * Returns a name/short description of this theme.
-   *
-   * @return A name/short description of this theme.
-   * @deprecated Unused. Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  default String getName() {
-    return getClass().getName();
-  }
 }

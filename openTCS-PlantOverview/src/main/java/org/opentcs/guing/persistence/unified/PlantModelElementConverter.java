@@ -107,13 +107,11 @@ public class PlantModelElementConverter {
     return model;
   }
 
-  @SuppressWarnings("deprecation")
   public PathModel importPath(PathCreationTO pathTO, VisualLayoutCreationTO layoutTO) {
     PathModel model = new PathModel();
 
     model.setName(pathTO.getName());
     model.getPropertyLength().setValueAndUnit(pathTO.getLength(), LengthProperty.Unit.MM);
-    model.getPropertyRoutingCost().setValue((int) pathTO.getRoutingCost());
     model.getPropertyMaxVelocity().setValueAndUnit(pathTO.getMaxVelocity(),
                                                    SpeedProperty.Unit.MM_S);
     model.getPropertyMaxReverseVelocity().setValueAndUnit(pathTO.getMaxReverseVelocity(),

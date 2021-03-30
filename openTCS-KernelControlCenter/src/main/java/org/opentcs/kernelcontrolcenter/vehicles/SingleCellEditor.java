@@ -62,7 +62,7 @@ final class SingleCellEditor
    * @param rowEditor table cell editor
    */
   public void setEditorAt(int row, TableCellEditor rowEditor) {
-    editors.put(new Integer(row), rowEditor);
+    editors.put(row, rowEditor);
   }
 
   @Override
@@ -131,7 +131,7 @@ final class SingleCellEditor
     else {
       row = table.rowAtPoint(e.getPoint());
     }
-    editor = editors.get(new Integer(row));
+    editor = editors.get(row);
     if (editor == null) {
       editor = defaultEditor;
     }

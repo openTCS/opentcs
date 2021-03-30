@@ -8,8 +8,6 @@
 package org.opentcs.kernel.extensions.rmi;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,7 +21,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.rmi.ClientID;
-import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ApplicationHome;
@@ -61,9 +58,9 @@ public class UserManager
    */
   private final RmiKernelInterfaceConfiguration configuration;
   /**
-   * The persister loading and storing account data.
+   * Provides user account data.
    */
-  private final UserAccountPersister accountPersister;
+  private final UserAccountProvider userAccountProvider;
   /**
    * The directory of users allowed to connect/operate with the kernel.
    */
@@ -89,21 +86,22 @@ public class UserManager
    * @param eventSource Where this instance registers for application events.
    * @param kernelExecutor The kernel's executor.
    * @param configuration This class' configuration.
+   * @param userAccountProvider Provides user account data.
    */
   @Inject
   public UserManager(@ApplicationHome File homeDirectory,
                      @ApplicationEventBus EventSource eventSource,
                      @KernelExecutor ScheduledExecutorService kernelExecutor,
-                     RmiKernelInterfaceConfiguration configuration) {
+                     RmiKernelInterfaceConfiguration configuration,
+                     UserAccountProvider userAccountProvider) {
     requireNonNull(homeDirectory, "homeDirectory");
     this.eventSource = requireNonNull(eventSource, "eventSource");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.configuration = requireNonNull(configuration, "configuration");
-    this.accountPersister = new XMLFileUserAccountPersister(new File(homeDirectory, "data"));
+    this.userAccountProvider = requireNonNull(userAccountProvider, "userAccountProvider");
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void initialize() {
     if (isInitialized()) {
       LOG.debug("Already initialized.");
@@ -114,23 +112,9 @@ public class UserManager
     // and pass them to known clients polling events.
     eventSource.subscribe(this);
 
-    try {
-      knownUsers.clear();
-
-      Set<UserAccount> accounts = accountPersister.loadUserAccounts();
-      if (accounts.isEmpty()) {
-        accounts.add(new UserAccount(RemoteKernelServicePortal.GUEST_USER,
-                                     RemoteKernelServicePortal.GUEST_PASSWORD,
-                                     EnumSet.allOf(UserPermission.class)));
-        accountPersister.saveUserAccounts(accounts);
-
-      }
-      for (UserAccount curAccount : accounts) {
-        knownUsers.put(curAccount.getUserName(), curAccount);
-      }
-    }
-    catch (IOException exc) {
-      throw new IllegalStateException("IOException initializing user account data", exc);
+    knownUsers.clear();
+    for (UserAccount curAccount : userAccountProvider.getUserAccounts()) {
+      knownUsers.put(curAccount.getUserName(), curAccount);
     }
 
     // Start the thread that periodically cleans up the list of known clients and event buffers.

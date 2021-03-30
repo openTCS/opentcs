@@ -217,10 +217,6 @@ public class NotificationBuffer {
    * @param message The message to emit an event for.
    */
   public void emitMessageEvent(UserNotification message) {
-    @SuppressWarnings("deprecation")
-    org.opentcs.access.TCSNotificationEvent event
-        = new org.opentcs.access.TCSNotificationEvent(message);
-    messageEventListener.onEvent(event);
     messageEventListener.onEvent(new NotificationPublicationEvent(message));
   }
 }

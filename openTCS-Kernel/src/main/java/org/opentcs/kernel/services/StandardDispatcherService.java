@@ -63,41 +63,6 @@ public class StandardDispatcherService
   }
 
   @Override
-  @Deprecated
-  public void releaseVehicle(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      dispatcher.releaseVehicle(globalObjectPool.getObject(Vehicle.class, ref));
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawByVehicle(TCSObjectReference<Vehicle> ref,
-                                boolean immediateAbort,
-                                boolean disableVehicle)
-      throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      dispatcher.withdrawOrder(globalObjectPool.getObject(Vehicle.class, ref),
-                               immediateAbort,
-                               disableVehicle);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
-                                       boolean immediateAbort,
-                                       boolean disableVehicle)
-      throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      dispatcher.withdrawOrder(globalObjectPool.getObject(TransportOrder.class, ref),
-                               immediateAbort,
-                               disableVehicle);
-    }
-  }
-
-  @Override
   public void withdrawByVehicle(TCSObjectReference<Vehicle> ref, boolean immediateAbort)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {

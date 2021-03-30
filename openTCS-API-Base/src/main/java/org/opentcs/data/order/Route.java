@@ -19,7 +19,6 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.util.Assertions.checkArgument;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A route for a {@link Vehicle}, consisting of a sequence of steps (pairs of {@link Path}s and
@@ -174,24 +173,6 @@ public class Route
                 @Nonnull Vehicle.Orientation orientation,
                 int routeIndex) {
       this(path, srcPoint, destPoint, orientation, routeIndex, true);
-    }
-
-    /**
-     * Creates a new instance.
-     *
-     * @param path The path to travel.
-     * @param destPoint The point that is reached by travelling the path.
-     * @param orientation The vehicle's orientation on this step.
-     * @param routeIndex This step's index in the vehicle's route.
-     * @deprecated Use other constructor instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "5.0")
-    public Step(@Nullable Path path,
-                @Nonnull Point destPoint,
-                @Nonnull Vehicle.Orientation orientation,
-                int routeIndex) {
-      this(path, null, destPoint, orientation, routeIndex);
     }
 
     /**

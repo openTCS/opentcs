@@ -15,7 +15,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.validation.constraints.Size;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A {@link org.opentcs.data.order.DriveOrder DriveOrder}'s destination.
@@ -76,32 +75,29 @@ public class Destination {
     this.properties = properties;
   }
 
-  public static Destination fromDriveOrder(DriveOrder driveOrder){
-    if(driveOrder == null){
+  public static Destination fromDriveOrder(DriveOrder driveOrder) {
+    if (driveOrder == null) {
       return null;
     }
     Destination destination = new Destination();
     destination.setLocationName(driveOrder.getDestination().getDestination().getName());
     destination.setOperation(driveOrder.getDestination().getOperation());
     destination.setState(mapDriveOrderState(driveOrder.getState()));
-    
+
     for (Map.Entry<String, String> mapEntry
-               : driveOrder.getDestination().getProperties().entrySet()) {
-        Property prop = new Property();
-        prop.setKey(mapEntry.getKey());
-        prop.setValue(mapEntry.getValue());
-        destination.getProperties().add(prop);
-      }
+             : driveOrder.getDestination().getProperties().entrySet()) {
+      Property prop = new Property();
+      prop.setKey(mapEntry.getKey());
+      prop.setValue(mapEntry.getValue());
+      destination.getProperties().add(prop);
+    }
     return destination;
   }
-  
-    @SuppressWarnings("deprecation")
+
   private static Destination.State mapDriveOrderState(DriveOrder.State driveOrderState) {
     switch (driveOrderState) {
       case PRISTINE:
         return Destination.State.PRISTINE;
-      case ACTIVE:
-        return Destination.State.ACTIVE;
       case TRAVELLING:
         return Destination.State.TRAVELLING;
       case OPERATING:
@@ -114,6 +110,7 @@ public class Destination {
         throw new IllegalArgumentException("Unhandled drive order state: " + driveOrderState);
     }
   }
+
   /**
    * This enumeration defines the various states a DriveOrder may be in.
    */
@@ -124,14 +121,6 @@ public class Destination {
      * being processed.
      */
     PRISTINE,
-    /**
-     * Indicates a DriveOrder is part of a TransportOrder.
-     *
-     * @deprecated Unused. Will be removed.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "5.0")
-    ACTIVE,
     /**
      * Indicates this drive order being processed at the moment.
      */

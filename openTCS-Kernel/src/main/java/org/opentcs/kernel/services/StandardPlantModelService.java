@@ -117,7 +117,7 @@ public class StandardPlantModelService
         return;
       }
 
-      final String oldModelName = getLoadedModelName();
+      final String oldModelName = getModelName();
       // Load the new model
       PlantModelCreationTO modelCreationTO = modelPersister.readModel();
       final String newModelName = isNullOrEmpty(modelCreationTO.getName())
@@ -152,7 +152,7 @@ public class StandardPlantModelService
       kernel.setState(Kernel.State.MODELLING);
     }
 
-    String oldModelName = getLoadedModelName();
+    String oldModelName = getModelName();
     emitModelEvent(oldModelName, to.getName(), true, false);
 
     // Create the plant model
@@ -174,12 +174,6 @@ public class StandardPlantModelService
   }
 
   @Override
-  @Deprecated
-  public String getLoadedModelName() {
-    return getModelName();
-  }
-
-  @Override
   public String getModelName() {
     synchronized (globalSyncObject) {
       return model.getName();
@@ -192,13 +186,6 @@ public class StandardPlantModelService
     synchronized (globalSyncObject) {
       return model.getProperties();
     }
-  }
-
-  @Override
-  @Deprecated
-  public String getPersistentModelName()
-      throws IllegalStateException {
-    return modelPersister.getPersistentModelName().orElse("");
   }
 
   /**
@@ -214,15 +201,7 @@ public class StandardPlantModelService
                               boolean modelContentChanged,
                               boolean transitionFinished) {
     requireNonNull(newModelName, "newModelName");
-    // Keep on emitting the old TCSKernelStateEvent until it is actually removed.
-    @SuppressWarnings("deprecation")
-    org.opentcs.access.TCSModelTransitionEvent event
-        = new org.opentcs.access.TCSModelTransitionEvent(oldModelName,
-                                                         newModelName,
-                                                         modelContentChanged,
-                                                         transitionFinished);
-    LOG.debug("Emitting model transition event: {}", event);
-    eventHandler.onEvent(event);
+
     eventHandler.onEvent(new ModelTransitionEvent(oldModelName,
                                                   newModelName,
                                                   modelContentChanged,

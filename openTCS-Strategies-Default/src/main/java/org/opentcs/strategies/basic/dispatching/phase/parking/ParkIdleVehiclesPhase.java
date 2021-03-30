@@ -39,10 +39,9 @@ public class ParkIdleVehiclesPhase
   private final CompositeParkVehicleSelectionFilter vehicleSelectionFilter;
 
   @Inject
-  @SuppressWarnings("deprecation")
   public ParkIdleVehiclesPhase(
       InternalTransportOrderService orderService,
-      org.opentcs.components.kernel.ParkingPositionSupplier parkingPosSupplier,
+      ParkingPositionSupplier parkingPosSupplier,
       Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,

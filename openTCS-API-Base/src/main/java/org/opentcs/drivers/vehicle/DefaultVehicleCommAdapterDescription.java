@@ -22,18 +22,30 @@ public class DefaultVehicleCommAdapterDescription
    * The description.
    */
   private final String description;
+  /**
+   * Whether the comm adapter is a simulating one.
+   */
+  private final boolean isSimVehicleCommAdapter;
 
   /**
    * Creates a new instance.
    *
    * @param description The description.
+   * @param isSimVehicleCommAdapter Whether the comm adapter is a simulating one.
    */
-  public DefaultVehicleCommAdapterDescription(@Nonnull String description) {
+  public DefaultVehicleCommAdapterDescription(@Nonnull String description,
+                                              boolean isSimVehicleCommAdapter) {
     this.description = requireNonNull(description, "description");
+    this.isSimVehicleCommAdapter = isSimVehicleCommAdapter;
   }
 
   @Override
   public String getDescription() {
     return description;
+  }
+
+  @Override
+  public boolean isSimVehicleCommAdapter() {
+    return isSimVehicleCommAdapter;
   }
 }

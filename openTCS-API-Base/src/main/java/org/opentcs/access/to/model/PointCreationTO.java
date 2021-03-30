@@ -15,7 +15,6 @@ import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import static org.opentcs.util.Assertions.checkArgument;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a point in the plant model.
@@ -63,20 +62,6 @@ public class PointCreationTO
   }
 
   /**
-   * Sets the name of this point.
-   *
-   * @param name The new name.
-   * @return The modified point.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public PointCreationTO setName(@Nonnull String name) {
-    return (PointCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name The new name.
@@ -102,20 +87,6 @@ public class PointCreationTO
   }
 
   /**
-   * Sets the position of this point (in mm).
-   *
-   * @param position The new position.
-   * @return The modified point.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PointCreationTO setPosition(@Nonnull Triple position) {
-    this.position = requireNonNull(position, "position");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given position (in mm).
    *
    * @param position The new position.
@@ -137,25 +108,6 @@ public class PointCreationTO
    */
   public double getVehicleOrientationAngle() {
     return vehicleOrientationAngle;
-  }
-
-  /**
-   * Sets the vehicle's (assumed) orientation angle when it's at this position.
-   * Allowed value range: [-360..360], or {@code Double.NaN} to indicate that there is no specific
-   * orientation angle for this point.
-   *
-   * @param vehicleOrientationAngle The new angle.
-   * @return The modified point.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PointCreationTO setVehicleOrientationAngle(double vehicleOrientationAngle) {
-    checkArgument(Double.isNaN(vehicleOrientationAngle)
-        || (vehicleOrientationAngle >= -360.0 || vehicleOrientationAngle <= 360.0),
-                  "vehicleOrientationAngle not in [-360..360]: " + vehicleOrientationAngle);
-    this.vehicleOrientationAngle = vehicleOrientationAngle;
-    return this;
   }
 
   /**
@@ -188,20 +140,6 @@ public class PointCreationTO
   }
 
   /**
-   * Sets the type of this point.
-   *
-   * @param type The new type.
-   * @return The modified point.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public PointCreationTO setType(@Nonnull Point.Type type) {
-    this.type = requireNonNull(type, "type");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given type.
    *
    * @param type The new type.
@@ -216,20 +154,6 @@ public class PointCreationTO
   }
 
   /**
-   * Sets the properties of this point.
-   *
-   * @param properties The new properties.
-   * @return The modified point.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public PointCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (PointCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -238,21 +162,6 @@ public class PointCreationTO
   @Override
   public PointCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new PointCreationTO(getName(), properties, position, vehicleOrientationAngle, type);
-  }
-
-  /**
-   * Sets a single property of this point.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified point.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public PointCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (PointCreationTO) super.setProperty(key, value);
   }
 
   /**

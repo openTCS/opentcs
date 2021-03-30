@@ -27,10 +27,9 @@ public abstract class ControlCenterInjectionModule
    *
    * @return The multibinder.
    */
-  @SuppressWarnings("deprecation")
-  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderModelling() {
+  protected Multibinder<ControlCenterPanel> controlCenterPanelBinderModelling() {
     return Multibinder.newSetBinder(binder(),
-                                    org.opentcs.components.kernel.ControlCenterPanel.class,
+                                    ControlCenterPanel.class,
                                     ActiveInModellingMode.class);
   }
 
@@ -40,10 +39,9 @@ public abstract class ControlCenterInjectionModule
    *
    * @return The multibinder.
    */
-  @SuppressWarnings("deprecation")
-  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderOperating() {
+  protected Multibinder<ControlCenterPanel> controlCenterPanelBinderOperating() {
     return Multibinder.newSetBinder(binder(),
-                                    org.opentcs.components.kernel.ControlCenterPanel.class,
+                                    ControlCenterPanel.class,
                                     ActiveInOperatingMode.class);
   }
 

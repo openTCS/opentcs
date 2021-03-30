@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.dispatching.priorization.transportorder;
 
+import java.time.Instant;
 import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -69,7 +70,7 @@ public class TransportOrderComparatorDeadlineAtRiskFirst
   }
 
   private boolean deadlineAtRisk(TransportOrder order) {
-    return order.getDeadline() - deadlineAtRiskPeriod < System.currentTimeMillis();
+    return order.getDeadline().minusMillis(deadlineAtRiskPeriod).isBefore(Instant.now());
   }
 
 }

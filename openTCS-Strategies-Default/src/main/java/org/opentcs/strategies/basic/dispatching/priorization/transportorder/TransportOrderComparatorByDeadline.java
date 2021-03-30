@@ -38,7 +38,7 @@ public class TransportOrderComparatorByDeadline
    */
   @Override
   public int compare(TransportOrder order1, TransportOrder order2) {
-    return Long.compare(order1.getDeadline(), order2.getDeadline());
+    return order1.getDeadline().compareTo(order2.getDeadline());
   }
 
 }

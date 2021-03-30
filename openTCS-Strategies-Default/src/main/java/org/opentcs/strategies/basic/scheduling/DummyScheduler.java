@@ -92,6 +92,10 @@ public class DummyScheduler
   }
 
   @Override
+  public void preparationSuccessful(Module module, Client client, Set<TCSResource<?>> resources) {
+  }
+
+  @Override
   public Map<String, Set<TCSResource<?>>> getAllocations() {
     return new HashMap<>();
   }

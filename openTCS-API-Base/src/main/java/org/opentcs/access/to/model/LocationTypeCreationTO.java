@@ -15,7 +15,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a location type in the plant model.
@@ -59,20 +58,6 @@ public class LocationTypeCreationTO
   }
 
   /**
-   * Sets the allowed operations for this location type.
-   *
-   * @param allowedOperations The new allowed operations.
-   * @return The modified location type.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public LocationTypeCreationTO setAllowedOperations(@Nonnull List<String> allowedOperations) {
-    this.allowedOperations = requireNonNull(allowedOperations, "allowedOperations");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given allowed operations.
    *
    * @param allowedOperations the new allowed operations.
@@ -80,20 +65,6 @@ public class LocationTypeCreationTO
    */
   public LocationTypeCreationTO withAllowedOperations(@Nonnull List<String> allowedOperations) {
     return new LocationTypeCreationTO(getName(), getModifiableProperties(), allowedOperations);
-  }
-
-  /**
-   * Sets the name of this location type.
-   *
-   * @param name The new name.
-   * @return The modified location type.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public LocationTypeCreationTO setName(@Nonnull String name) {
-    return (LocationTypeCreationTO) super.setName(name);
   }
 
   /**
@@ -108,20 +79,6 @@ public class LocationTypeCreationTO
   }
 
   /**
-   * Sets the properties of this location type.
-   *
-   * @param properties The new properties.
-   * @return The modified location type.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public LocationTypeCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (LocationTypeCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -130,21 +87,6 @@ public class LocationTypeCreationTO
   @Override
   public LocationTypeCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new LocationTypeCreationTO(getName(), properties, allowedOperations);
-  }
-
-  /**
-   * Sets a single property of this location type.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified location type.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public LocationTypeCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (LocationTypeCreationTO) super.setProperty(key, value);
   }
 
   /**

@@ -7,16 +7,14 @@
  */
 package org.opentcs.drivers.vehicle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentcs.access.Kernel;
 import org.opentcs.components.Lifecycle;
+import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and
@@ -63,10 +61,7 @@ public interface VehicleCommAdapter
    * @return A transferable/serializable model of the vehicle's and its comm adapter's attributes.
    */
   @Nonnull
-  @ScheduledApiChange(details = "Default implementation will be removed", when = "5.0")
-  default VehicleProcessModelTO createTransferableProcessModel() {
-    return new VehicleProcessModelTO();
-  }
+  VehicleProcessModelTO createTransferableProcessModel();
 
   /**
    * Indicates how many commands this comm adapter's command queue accepts.
@@ -128,20 +123,6 @@ public interface VehicleCommAdapter
   void clearCommandQueue();
 
   /**
-   * Returns a list of panels that this communication adapter offers for displaying or manipulating
-   * its custom properties.
-   *
-   * @return A list of panels.
-   * @deprecated {@code VehicleCommAdapterPanel} is deprecated.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  default List<VehicleCommAdapterPanel> getAdapterPanels() {
-    return new ArrayList<>();
-  }
-
-  /**
    * Checks if the vehicle would be able to process the given sequence of operations, taking into
    * account its current state.
    *
@@ -157,7 +138,7 @@ public interface VehicleCommAdapter
    * Processes a generic message to the communication adapter.
    * This method provides a generic one-way communication channel to the comm adapter. The message
    * can be anything, including <code>null</code>, and since
-   * {@link Kernel#sendCommAdapterMessage(org.opentcs.data.TCSObjectReference, java.lang.Object)}
+   * {@link VehicleService#sendCommAdapterMessage(org.opentcs.data.TCSObjectReference, java.lang.Object)}
    * provides a way to send a message from outside the kernel, it can basically originate from any
    * source. The message thus does not necessarily have to be meaningful to the concrete comm
    * adapter implementation at all.
@@ -180,33 +161,5 @@ public interface VehicleCommAdapter
    *
    * @param command The command to execute.
    */
-  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
-  default void execute(@Nonnull AdapterCommand command) {
-    command.execute(this);
-  }
-
-  /**
-   * Defines the possible states of a communication adapter.
-   *
-   * @deprecated Does not serve any useful purpose.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public enum State {
-
-    /**
-     * Indicates the state of this communication adapter is currently not known.
-     */
-    UNKNOWN,
-    /**
-     * Indicates this communication adapter is not currently connected to the
-     * vehicle it controls.
-     */
-    CONNECTING,
-    /**
-     * Indicates this communication adapter is connected to the vehicle it
-     * controls.
-     */
-    CONNECTED
-  }
+  void execute(@Nonnull AdapterCommand command);
 }

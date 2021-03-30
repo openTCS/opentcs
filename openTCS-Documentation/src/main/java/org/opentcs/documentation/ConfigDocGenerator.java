@@ -14,6 +14,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.opentcs.configuration.ConfigurationEntry;
+import org.opentcs.configuration.ConfigurationPrefix;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,33 +65,27 @@ public class ConfigDocGenerator {
     }
   }
 
-  @SuppressWarnings("deprecation")
   private static String extractPrefix(Class<?> clazz) {
-    org.opentcs.configuration.ConfigurationPrefix newAnnotation
-        = clazz.getAnnotation(org.opentcs.configuration.ConfigurationPrefix.class);
+    ConfigurationPrefix newAnnotation = clazz.getAnnotation(ConfigurationPrefix.class);
     if (newAnnotation != null) {
       return newAnnotation.value();
     }
-    org.opentcs.util.configuration.ConfigurationPrefix oldAnnotation
-        = clazz.getAnnotation(org.opentcs.util.configuration.ConfigurationPrefix.class);
+    ConfigurationPrefix oldAnnotation = clazz.getAnnotation(ConfigurationPrefix.class);
     if (oldAnnotation != null) {
       return oldAnnotation.value();
     }
     throw new IllegalArgumentException("Missing prefix annotation at class " + clazz.getName());
   }
 
-  @SuppressWarnings("deprecation")
   private static Entry extractEntry(Method method) {
-    org.opentcs.configuration.ConfigurationEntry newAnnotation
-        = method.getAnnotation(org.opentcs.configuration.ConfigurationEntry.class);
+    ConfigurationEntry newAnnotation = method.getAnnotation(ConfigurationEntry.class);
     if (newAnnotation != null) {
       return new Entry(method.getName(),
                        newAnnotation.type(),
                        newAnnotation.description(),
                        newAnnotation.orderKey());
     }
-    org.opentcs.util.configuration.ConfigurationEntry oldAnnotation
-        = method.getAnnotation(org.opentcs.util.configuration.ConfigurationEntry.class);
+    ConfigurationEntry oldAnnotation = method.getAnnotation(ConfigurationEntry.class);
     if (oldAnnotation != null) {
       return new Entry(method.getName(),
                        oldAnnotation.type(),

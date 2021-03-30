@@ -12,7 +12,6 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Some commonly used comparator implementations.
@@ -20,17 +19,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public final class Comparators {
-
-  /**
-   * A <code>Comparator</code> for ordering <code>TCSObject</code>s ascendingly
-   * by their IDs.
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  private static final Comparator<TCSObject<?>> OBJECTS_BY_ID
-      = (TCSObject<?> o1, TCSObject<?> o2) -> o1.getId() - o2.getId();
 
   /**
    * A <code>Comparator</code> for ordering <code>TCSObject</code>s ascendingly
@@ -49,10 +37,10 @@ public final class Comparators {
    */
   private static final Comparator<TransportOrder> ORDERS_BY_AGE
       = (TransportOrder o1, TransportOrder o2) -> {
-        if (o1.getCreationTime() < o2.getCreationTime()) {
+        if (o1.getCreationTime().isBefore(o2.getCreationTime())) {
           return -1;
         }
-        else if (o1.getCreationTime() > o2.getCreationTime()) {
+        else if (o1.getCreationTime().isAfter(o2.getCreationTime())) {
           return 1;
         }
         else {
@@ -67,10 +55,10 @@ public final class Comparators {
    */
   private static final Comparator<TransportOrder> ORDERS_BY_DEADLINE
       = (TransportOrder o1, TransportOrder o2) -> {
-        if (o1.getDeadline() < o2.getDeadline()) {
+        if (o1.getDeadline().isBefore(o2.getDeadline())) {
           return -1;
         }
-        else if (o1.getDeadline() > o2.getDeadline()) {
+        else if (o1.getDeadline().isAfter(o2.getDeadline())) {
           return 1;
         }
         else {
@@ -84,44 +72,11 @@ public final class Comparators {
       = (ModelLayoutElement o1, ModelLayoutElement o2)
       -> o1.getVisualizedObject().getName().compareTo(
           o2.getVisualizedObject().getName());
-  /**
-   * Compares TravelCosts by their costs.
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  private static final Comparator<org.opentcs.access.TravelCosts> TRAVEL_COSTS_BY_COSTS
-      = (org.opentcs.access.TravelCosts t1, org.opentcs.access.TravelCosts t2) -> {
-        if (t1.getCosts() < t2.getCosts()) {
-          return -1;
-        }
-        else if (t1.getCosts() > t2.getCosts()) {
-          return 1;
-        }
-        else {
-          return 0;
-        }
-      };
 
   /**
    * Prevents undesired instantiation.
    */
   private Comparators() {
-  }
-
-  /**
-   * Returns a comparator for ordering <code>TCSObject</code>s ascendingly
-   * by their IDs.
-   *
-   * @return A comparator for ordering <code>TCSObject</code>s ascendingly
-   * by their IDs.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public static Comparator<TCSObject<?>> objectsById() {
-    return OBJECTS_BY_ID;
   }
 
   /**
@@ -178,18 +133,5 @@ public final class Comparators {
    */
   public static Comparator<ModelLayoutElement> modelLayoutElementsByName() {
     return LAYOUT_ELEMS_BY_NAME;
-  }
-
-  /**
-   * A comparator for ordering {@link org.opentcs.access.TravelCosts} by their respective costs.
-   *
-   * @return The comparator.
-   * @deprecated Providing travel costs to external clients will not be part of the standard kernel
-   * API any more.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public static Comparator<org.opentcs.access.TravelCosts> travelCostsByCosts() {
-    return TRAVEL_COSTS_BY_COSTS;
   }
 }

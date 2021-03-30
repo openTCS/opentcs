@@ -24,7 +24,6 @@ apply plugin: 'distribution'
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
 def webApiDir = file("$buildDir/swagger-ui-webapi")
-def schemasDir = file("$buildDir/schemagen")
 def samplesDir = file("$buildDir/samples")
 def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
@@ -48,6 +47,7 @@ swaggerSources {
 }
 
 dependencies {
+  compile project(':openTCS-Common')
   compile project(':openTCS-Kernel')
   
   schemagen project(':openTCS-Kernel')
@@ -76,9 +76,6 @@ distributions {
     contents.from(webApiDir) {
       into('developer/web-api')
     }
-    contents.from(schemasDir) {
-      into('developer/xml-schemas')
-    }
     contents.from(devManualDir) {
       into('developer/developers-guide')
     }
@@ -94,7 +91,6 @@ distributions {
 task renderDocs {
   dependsOn 'apiBase'
   dependsOn 'apiInjection'
-  dependsOn 'schemagenXml'
   dependsOn 'asciidoctor'
   dependsOn 'generateSwaggerUI'
 }
@@ -445,104 +441,11 @@ task asciidoctorFaq(type: org.asciidoctor.gradle.AsciidoctorTask) {
   experimental: true
 }
 
-task schemagenXml {
-  dependsOn 'jar'
-  dependsOn ':openTCS-Kernel:jar'
-  dependsOn ':openTCS-PlantOverview:jar'
-
-  File schemagenDir = schemasDir
-
-  project(':openTCS-Kernel').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
-    if (srcDir.isDirectory()) {
-      inputs.dir srcDir
-    }
-  }
-  project(':openTCS-PlantOverview').sourceSets*.allSource*.srcDirs*.each { File srcDir ->
-    if (srcDir.isDirectory()) {
-      inputs.dir srcDir
-    }
-  }
-  outputs.dir schemagenDir
-
-  doLast {
-    mkdir(schemagenDir)
-    
-    javaexec {
-      classpath configurations.schemagen
-      main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/opentcs-host-order.xsd",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TCSOrderSet",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.Transport",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TransportScript" ]
-    }
-    javaexec {
-      classpath configurations.schemagen
-      main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/opentcs-host-orderscript.xsd",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TCSScriptFile",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.Transport",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TransportScript" ]
-    }
-    javaexec {
-      classpath configurations.schemagen
-      main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/opentcs-host-response.xsd",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TCSResponseSet",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.TransportResponse",
-             "org.opentcs.kernel.extensions.xmlhost.orders.binding.ScriptResponse" ]
-    }
-    javaexec {
-      classpath configurations.schemagen
-      main = "org.opentcs.documentation.JAXBSchemaGenerator"
-      args = [ "${schemagenDir}/opentcs-host-statuschannel.xsd",
-             "org.opentcs.kernel.extensions.xmlhost.status.binding.TCSStatusMessageSet",
-             "org.opentcs.kernel.extensions.xmlhost.status.binding.OrderStatusMessage",
-             "org.opentcs.kernel.extensions.xmlhost.status.binding.VehicleStatusMessage" ]
-    }
-  }
-}
-
 task samplesgen {
   dependsOn 'jar'
   doLast {
     mkdir(samplesDir)
     //Args contains a tupel of (task-name, outputFile)
-    javaexec {
-      classpath configurations.runtime, jar.outputs.files
-      main = "org.opentcs.documentation.SamplesGenerator"
-      args "TELEGRAM_TO_TWO_ORDERS", "${samplesDir}/xml-telegram-to-two-orders.xml"
-    }
-    
-    javaexec {
-      classpath configurations.runtime, jar.outputs.files
-      main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_TO_STATUS", "${samplesDir}/xml-telegram-to-status.xml"
-    }
-    
-    javaexec {
-      classpath configurations.runtime, jar.outputs.files
-      main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_TO_RECEIPT_ORDERS", "${samplesDir}/xml-telegram-to-receipt-orders.xml"
-    }
-    
-    javaexec {
-      classpath configurations.runtime, jar.outputs.files
-      main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_TO_RECEIPT_BATCH", "${samplesDir}/xml-telegram-to-receipt-batch.xml"
-    }
-    
-    javaexec {
-      classpath configurations.runtime, jar.outputs.files
-      main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_TO_BATCH", "${samplesDir}/xml-telegram-to-batch.xml"
-    }
-    
-    javaexec {
-      classpath configurations.runtime, jar.outputs.files
-      main = 'org.opentcs.documentation.SamplesGenerator'
-      args "TELEGRAM_VEHICLE_STATUS", "${samplesDir}/xml-telegram-vehicle-status.xml"
-    }
-    
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
@@ -592,14 +495,7 @@ task configdocgen {
       args = ["${configDocDir}/KernelApplicationConfigurationEntries.adoc",
               "org.opentcs.kernel.KernelApplicationConfiguration"]
     }
-    
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/ControlCenterConfigurationEntries.adoc",
-              "org.opentcs.kernel.extensions.controlcenter.ControlCenterConfiguration"]
-    }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
@@ -647,13 +543,6 @@ task configdocgen {
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
               "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration"]
-    }
-
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/XMLHostInterfaceConfigurationEntries.adoc",
-              "org.opentcs.kernel.extensions.xmlhost.XMLHostInterfaceConfiguration"]
     }
     
     javaexec {

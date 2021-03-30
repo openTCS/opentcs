@@ -165,57 +165,6 @@ public class StandardRemoteDispatcherService
   }
 
   @Override
-  @Deprecated
-  public void releaseVehicle(ClientID clientId, TCSObjectReference<Vehicle> ref) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
-
-    try {
-      kernelExecutor.submit(() -> dispatcherService.releaseVehicle(ref)).get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawByVehicle(ClientID clientId,
-                                TCSObjectReference<Vehicle> ref,
-                                boolean immediateAbort,
-                                boolean disableVehicle) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
-
-    try {
-      kernelExecutor.submit(() -> dispatcherService.withdrawByVehicle(ref,
-                                                                      immediateAbort,
-                                                                      disableVehicle))
-          .get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawByTransportOrder(ClientID clientId,
-                                       TCSObjectReference<TransportOrder> ref,
-                                       boolean immediateAbort,
-                                       boolean disableVehicle) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
-
-    try {
-      kernelExecutor.submit(() -> dispatcherService.withdrawByTransportOrder(ref,
-                                                                             immediateAbort,
-                                                                             disableVehicle))
-          .get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
   public void withdrawByVehicle(ClientID clientId,
                                 TCSObjectReference<Vehicle> ref,
                                 boolean immediateAbort) {

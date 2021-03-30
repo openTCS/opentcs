@@ -175,47 +175,6 @@ public class DefaultDispatcher
   }
 
   @Override
-  @Deprecated
-  public void dispatch(Vehicle incomingVehicle) {
-    requireNonNull(incomingVehicle, "incomingVehicle");
-    checkState(isInitialized(), "Not initialized");
-
-    LOG.debug("Processing incoming vehicle '{}'...", incomingVehicle.getName());
-    // Get an up-to-date copy of the kernel's object first.
-    Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, incomingVehicle.getReference());
-    // Check if this vehicle is interesting for the dispatcher at all.
-    if (!vehicleDispatchable(vehicle)) {
-      LOG.debug("Vehicle '{}' not dispatchable, ignoring.", vehicle.getName());
-      return;
-    }
-
-    LOG.debug("Scheduling dispatch task for vehicle {}...", vehicle);
-    dispatch();
-  }
-
-  @Override
-  @Deprecated
-  public void dispatch(TransportOrder incomingOrder) {
-    requireNonNull(incomingOrder, "incomingOrder");
-    checkState(isInitialized(), "Not initialized");
-
-    LOG.debug("Processing incoming transport order '{}'...", incomingOrder.getName());
-    // Get an up-to-date copy of the kernel's object first.
-    TransportOrder order = transportOrderService.fetchObject(TransportOrder.class,
-                                                             incomingOrder.getReference());
-    if (order.getState().isFinalState()) {
-      LOG.warn("Transport order '{}' already in final state '{}', not dispatching it.",
-               order.getName(),
-               order.getState());
-      return;
-    }
-
-    LOG.debug("Scheduling dispatch task for transport order {}...", order);
-    // Schedule this to be executed by the kernel executor.
-    dispatch();
-  }
-
-  @Override
   public void withdrawOrder(TransportOrder order, boolean immediateAbort) {
     requireNonNull(order, "order");
     checkState(isInitialized(), "Not initialized");
@@ -240,51 +199,6 @@ public class DefaultDispatcher
                 vehicle.getName(),
                 immediateAbort);
       transportOrderUtil.abortOrder(vehicle, immediateAbort, false, false);
-    });
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawOrder(TransportOrder order, boolean immediateAbort, boolean disableVehicle) {
-    requireNonNull(order, "order");
-    checkState(isInitialized(), "Not initialized");
-
-    // Schedule this to be executed by the kernel executor.
-    kernelExecutor.submit(() -> {
-      LOG.debug("Scheduling withdrawal for transport order '{}' (immediate={}, disable={})...",
-                order.getName(),
-                immediateAbort,
-                disableVehicle);
-      transportOrderUtil.abortOrder(order, immediateAbort, disableVehicle);
-    });
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawOrder(Vehicle vehicle, boolean immediateAbort, boolean disableVehicle) {
-    requireNonNull(vehicle, "vehicle");
-    checkState(isInitialized(), "Not initialized");
-
-    // Schedule this to be executed by the kernel executor.
-    kernelExecutor.submit(() -> {
-      LOG.debug("Scheduling withdrawal for vehicle '{}' (immediate={}, disable={})...",
-                vehicle.getName(),
-                immediateAbort,
-                disableVehicle);
-      transportOrderUtil.abortOrder(vehicle, immediateAbort, disableVehicle, false);
-    });
-  }
-
-  @Override
-  @Deprecated
-  public void releaseVehicle(Vehicle vehicle) {
-    requireNonNull(vehicle, "vehicle");
-    checkState(isInitialized(), "Not initialized");
-
-    // Schedule this to be executed by the kernel executor.
-    kernelExecutor.submit(() -> {
-      LOG.debug("Scheduling release for vehicle '{}'...", vehicle.getName());
-      transportOrderUtil.abortOrder(vehicle, true, true, true);
     });
   }
 

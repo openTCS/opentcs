@@ -9,18 +9,16 @@ package org.opentcs.drivers.vehicle;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_ENQUEUED;
+import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.CyclicTask;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +61,9 @@ public abstract class BasicVehicleCommAdapter
    */
   private final String rechargeOperation;
   /**
-   * This adapter's panels.
+   * The executor to run tasks on.
    */
-  @SuppressWarnings("deprecation")
-  private final List<VehicleCommAdapterPanel> adapterPanels = new LinkedList<>();
+  private final Executor executor;
   /**
    * Indicates whether this adapter is initialized.
    */
@@ -78,7 +75,7 @@ public abstract class BasicVehicleCommAdapter
   /**
    * This adapter's current command dispatcher task.
    */
-  private CyclicTask commandDispatcherTask;
+  private final Runnable commandDispatcherTask = new CommandDispatcherTask();
   /**
    * This adapter's command queue.
    */
@@ -97,11 +94,13 @@ public abstract class BasicVehicleCommAdapter
    * Must be at least 1.
    * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
    * @param rechargeOperation The string to recognize as a recharge operation.
+   * @param executor The executor to run tasks on.
    */
   public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
                                  int commandQueueCapacity,
                                  int sentQueueCapacity,
-                                 String rechargeOperation) {
+                                 String rechargeOperation,
+                                 Executor executor) {
     this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
     this.commandQueueCapacity = checkInRange(commandQueueCapacity,
                                              0,
@@ -112,6 +111,7 @@ public abstract class BasicVehicleCommAdapter
                                           Integer.MAX_VALUE,
                                           "sentQueueCapacity");
     this.rechargeOperation = requireNonNull(rechargeOperation, "rechargeOperation");
+    this.executor = requireNonNull(executor, "executor");
   }
 
   /**
@@ -121,17 +121,13 @@ public abstract class BasicVehicleCommAdapter
    * </p>
    */
   @Override
-  @SuppressWarnings("deprecation")
   public void initialize() {
     if (initialized) {
       LOG.debug("{}: Already initialized.", getName());
       return;
     }
+
     getProcessModel().addPropertyChangeListener(this);
-    for (VehicleCommAdapterPanel panel : createAdapterPanels()) {
-      adapterPanels.add(panel);
-      getProcessModel().addPropertyChangeListener(panel);
-    }
     this.initialized = true;
   }
 
@@ -142,16 +138,12 @@ public abstract class BasicVehicleCommAdapter
    * </p>
    */
   @Override
-  @SuppressWarnings("deprecation")
   public void terminate() {
     if (!initialized) {
       LOG.debug("{}: Not initialized.", getName());
       return;
     }
-    for (VehicleCommAdapterPanel panel : adapterPanels) {
-      getProcessModel().removePropertyChangeListener(panel);
-    }
-    adapterPanels.clear();
+
     getProcessModel().removePropertyChangeListener(this);
     this.initialized = false;
   }
@@ -173,10 +165,6 @@ public abstract class BasicVehicleCommAdapter
       return;
     }
     connectVehicle();
-    commandDispatcherTask = new CommandDispatcherTask();
-    Thread commandDispatcherThread = new Thread(commandDispatcherTask,
-                                                getName() + "-commandDispatcher");
-    commandDispatcherThread.start();
     enabled = true;
     getProcessModel().setCommAdapterEnabled(true);
   }
@@ -193,8 +181,6 @@ public abstract class BasicVehicleCommAdapter
       return;
     }
     disconnectVehicle();
-    commandDispatcherTask.terminate();
-    commandDispatcherTask = null;
     enabled = false;
     // Update the vehicle's state for the rest of the system.
     getProcessModel().setCommAdapterEnabled(false);
@@ -252,12 +238,6 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
-  @Deprecated
-  public List<VehicleCommAdapterPanel> getAdapterPanels() {
-    return adapterPanels;
-  }
-
-  @Override
   public synchronized boolean enqueueCommand(MovementCommand newCommand) {
     requireNonNull(newCommand, "newCommand");
 
@@ -269,7 +249,6 @@ public abstract class BasicVehicleCommAdapter
     }
     if (commandAdded) {
       getProcessModel().commandEnqueued(newCommand);
-      triggerCommandDispatcherTask();
     }
     return commandAdded;
   }
@@ -278,7 +257,6 @@ public abstract class BasicVehicleCommAdapter
   public synchronized void clearCommandQueue() {
     if (!getCommandQueue().isEmpty()) {
       getCommandQueue().clear();
-//      triggerCommandDispatcherTask();
     }
     getSentQueue().clear();
   }
@@ -299,11 +277,9 @@ public abstract class BasicVehicleCommAdapter
    */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-    // If a command was executed by this comm adapter, wake up the command dispatcher task to see if
-    // we should send another command to the vehicle.
-    if (Objects.equals(evt.getPropertyName(),
-                       VehicleProcessModel.Attribute.COMMAND_EXECUTED.name())) {
-      triggerCommandDispatcherTask();
+    if (Objects.equals(evt.getPropertyName(), COMMAND_ENQUEUED.name())
+        || Objects.equals(evt.getPropertyName(), COMMAND_EXECUTED.name())) {
+      executor.execute(commandDispatcherTask);
     }
   }
 
@@ -317,8 +293,11 @@ public abstract class BasicVehicleCommAdapter
   }
 
   /**
-   * Converts the given command to something the vehicle can understand and
-   * sends the resulting data to the vehicle.
+   * Converts the given command to something the vehicle can understand and sends the resulting data
+   * to the vehicle.
+   * <p>
+   * Note that this method is called from the kernel executor and thus should not block.
+   * </p>
    *
    * @param cmd The command to be sent.
    * @throws IllegalArgumentException If there was a problem with interpreting the command or
@@ -341,22 +320,6 @@ public abstract class BasicVehicleCommAdapter
   }
 
   // Abstract methods start here.
-  /**
-   * Creates and returns a list of panels this comm adapter provides for interacting with it.
-   * <p>
-   * The panels are implicitly registered as observers of this comm adapter's {@link VehicleProcessModel}
-   * in {@link #initialize()} and unregistered in {@link #terminate()}.
-   * </p>
-   *
-   * @return The list of panels.
-   * @deprecated {@link VehicleCommAdapterPanel} is deprecated.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected List<VehicleCommAdapterPanel> createAdapterPanels() {
-    return new ArrayList<>();
-  }
-
   /**
    * Initiates a communication channel to the vehicle.
    * This method should not block, i.e. it should not wait for the actual
@@ -385,10 +348,6 @@ public abstract class BasicVehicleCommAdapter
    */
   protected abstract boolean isVehicleConnected();
 
-  private synchronized void triggerCommandDispatcherTask() {
-    this.notifyAll();
-  }
-
   /**
    * Creates a transferable process model with the specific attributes of this comm adapter's
    * process model set.
@@ -406,47 +365,39 @@ public abstract class BasicVehicleCommAdapter
    * The task processing the command queue.
    */
   private class CommandDispatcherTask
-      extends CyclicTask {
+      implements Runnable {
 
-    /**
-     * Creates a new CommandDispatcherTask.
-     */
-    private CommandDispatcherTask() {
-      super(0);
+    public CommandDispatcherTask() {
     }
 
     @Override
-    protected void runActualTask() {
-      MovementCommand curCmd;
+    public void run() {
       synchronized (BasicVehicleCommAdapter.this) {
-        // Wait until we're terminated or we can send the next command.
-        while (!isTerminated() && !canSendNextCommand()) {
-          try {
-            // Wait at most one second so we can still periodically check if this task has been
-            // terminated.
-            BasicVehicleCommAdapter.this.wait(1000);
-          }
-          catch (InterruptedException exc) {
-            LOG.warn("{}: Unexpectedly interrupted", getName(), exc);
-          }
+        if (!isEnabled()) {
+          LOG.debug("{}: Not enabled, skipping.", getName());
+          return;
         }
-        if (!isTerminated()) {
-          curCmd = getCommandQueue().poll();
-          if (curCmd != null) {
-            try {
-              LOG.debug("{}: Sending command: {}", getName(), curCmd);
-              sendCommand(curCmd);
-              // Remember that we sent this command to the vehicle.
-              getSentQueue().add(curCmd);
-              // Notify listeners that this command was sent.
-              getProcessModel().commandSent(curCmd);
-            }
-            catch (IllegalArgumentException exc) {
-              // Notify listeners that this command failed.
-              LOG.warn("{}: Failed sending command {}", getName(), curCmd, exc);
-              getProcessModel().commandFailed(curCmd);
-            }
-          }
+        if (!canSendNextCommand()) {
+          LOG.debug("{}: Cannot send another command, skipping.", getName());
+          return;
+        }
+        MovementCommand curCmd = getCommandQueue().poll();
+        if (curCmd == null) {
+          LOG.debug("{}: Nothing to send, skipping.", getName());
+          return;
+        }
+        try {
+          LOG.debug("{}: Sending command: {}", getName(), curCmd);
+          sendCommand(curCmd);
+          // Remember that we sent this command to the vehicle.
+          getSentQueue().add(curCmd);
+          // Notify listeners that this command was sent.
+          getProcessModel().commandSent(curCmd);
+        }
+        catch (IllegalArgumentException exc) {
+          // Notify listeners that this command failed.
+          LOG.warn("{}: Failed sending command {}", getName(), curCmd, exc);
+          getProcessModel().commandFailed(curCmd);
         }
       }
     }

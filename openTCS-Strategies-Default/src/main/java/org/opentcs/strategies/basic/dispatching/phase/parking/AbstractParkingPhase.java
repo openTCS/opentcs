@@ -47,8 +47,7 @@ public abstract class AbstractParkingPhase
   /**
    * The strategy used for finding suitable parking positions.
    */
-  @SuppressWarnings("deprecation")
-  private final org.opentcs.components.kernel.ParkingPositionSupplier parkingPosSupplier;
+  private final ParkingPositionSupplier parkingPosSupplier;
   /**
    * The Router instance calculating route costs.
    */
@@ -70,10 +69,9 @@ public abstract class AbstractParkingPhase
    */
   private boolean initialized;
 
-  @SuppressWarnings("deprecation")
   public AbstractParkingPhase(
       InternalTransportOrderService orderService,
-      org.opentcs.components.kernel.ParkingPositionSupplier parkingPosSupplier,
+      ParkingPositionSupplier parkingPosSupplier,
       Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,

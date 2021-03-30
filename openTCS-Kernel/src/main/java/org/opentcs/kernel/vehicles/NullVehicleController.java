@@ -7,14 +7,17 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
+import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.util.ExplainedBoolean;
 import org.slf4j.Logger;
@@ -81,12 +84,6 @@ public class NullVehicleController
   }
 
   @Override
-  @Deprecated
-  public void resetVehiclePosition() {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
   public ExplainedBoolean canProcess(List<String> operations) {
     return new ExplainedBoolean(false, "NullVehicleController");
   }
@@ -115,5 +112,17 @@ public class NullVehicleController
   @Override
   public void allocationFailed(Set<TCSResource<?>> resources) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+  }
+
+  @Override
+  public void updateDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties)
+      throws IllegalStateException {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+  }
+
+  @Override
+  public Queue<MovementCommand> getCommandsSent() {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+    return new LinkedList<>();
   }
 }

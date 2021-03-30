@@ -67,7 +67,7 @@ public class TripleProperty
 
     try {
       Triple foreignTriple = tripleProperty.getValue();
-      setValue(foreignTriple.clone());
+      setValue(foreignTriple);
     }
     catch (Exception e) {
       LoggerFactory.getLogger(TripleProperty.class).error("Exception", e);

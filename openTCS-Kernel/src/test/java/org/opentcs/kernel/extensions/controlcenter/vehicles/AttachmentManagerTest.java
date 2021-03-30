@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import static org.hamcrest.Matchers.is;
 import org.junit.*;
 import static org.junit.Assert.assertNotNull;
@@ -24,8 +25,10 @@ import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
+import org.opentcs.drivers.vehicle.DefaultVehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.kernel.KernelApplicationConfiguration;
@@ -102,12 +105,10 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   public void shouldAttachAdapterToVehicle() {
     VehicleCommAdapter commAdapter = new SimpleCommAdapter(vehicle1);
     when(commAdapterFactory.getAdapterFor(vehicle1)).thenReturn(commAdapter);
-    when(commAdapterFactory.getAdapterDescription()).thenReturn("");
-    when(commAdapterFactory.getDescription()).thenCallRealMethod();
+    when(commAdapterFactory.getDescription()).thenReturn(new SimpleVehicleCommAdapterDescription());
 
     attachmentManager.attachAdapterToVehicle(VEHICLE_1_NAME, commAdapterFactory);
 
@@ -123,7 +124,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  public void shoudAutoAttachAdapterToVehicle() {
+  public void shouldAutoAttachAdapterToVehicle() {
     List<VehicleCommAdapterFactory> factories = Arrays.asList(new NullVehicleCommAdapterFactory(),
                                                               new SimpleCommAdapterFactory());
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
@@ -134,7 +135,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  public void shouldAoutoAttachToFirstAvailableAdapter() {
+  public void shouldAutoAttachToFirstAvailableAdapter() {
     List<VehicleCommAdapterFactory> factories = Arrays.asList(new SimpleCommAdapterFactory(),
                                                               new NullVehicleCommAdapterFactory());
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
@@ -149,7 +150,7 @@ public class AttachmentManagerTest {
       extends BasicVehicleCommAdapter {
 
     public SimpleCommAdapter(Vehicle vehicle) {
-      super(new VehicleProcessModel(vehicle), 0, 0, "");
+      super(new VehicleProcessModel(vehicle), 0, 0, "", Executors.newSingleThreadExecutor());
     }
 
     @Override
@@ -199,6 +200,11 @@ public class AttachmentManagerTest {
     }
 
     @Override
+    public VehicleCommAdapterDescription getDescription() {
+      return new DefaultVehicleCommAdapterDescription("simpleCommAdapter", false);
+    }
+
+    @Override
     public void initialize() {
     }
 
@@ -209,6 +215,20 @@ public class AttachmentManagerTest {
 
     @Override
     public void terminate() {
+    }
+  }
+
+  private class SimpleVehicleCommAdapterDescription
+      extends VehicleCommAdapterDescription {
+
+    @Override
+    public String getDescription() {
+      return getClass().getName();
+    }
+
+    @Override
+    public boolean isSimVehicleCommAdapter() {
+      return false;
     }
   }
 }

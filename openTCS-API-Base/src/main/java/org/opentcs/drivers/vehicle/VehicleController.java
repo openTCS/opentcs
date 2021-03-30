@@ -7,7 +7,6 @@
  */
 package org.opentcs.drivers.vehicle;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -17,7 +16,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the system to control a vehicle.
@@ -54,11 +52,9 @@ public interface VehicleController
    * @throws IllegalStateException If the {@code newOrder} would not guarantee the current drive
    * order's continuity.
    */
-  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
-  default void updateDriveOrder(@Nonnull DriveOrder newOrder,
-                                @Nonnull Map<String, String> orderProperties)
-      throws IllegalStateException {
-  }
+  void updateDriveOrder(@Nonnull DriveOrder newOrder,
+                        @Nonnull Map<String, String> orderProperties)
+      throws IllegalStateException;
 
   /**
    * Resets the current drive order for the vehicle associated with this controller.
@@ -77,16 +73,6 @@ public interface VehicleController
    * commands/movements.
    */
   void clearCommandQueue();
-
-  /**
-   * Resets the vehicle's position and precise position to <code>null</code> and frees all resources
-   * held by the vehicle.
-   *
-   * @deprecated Should be done via setting the vehicle's integration level.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  void resetVehiclePosition();
 
   /**
    * Checks if the vehicle would be able to process the given sequence of
@@ -112,18 +98,13 @@ public interface VehicleController
    *
    * @param command The adapter command to be sent.
    */
-  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
-  default void sendCommAdapterCommand(@Nonnull AdapterCommand command) {
-  }
+  void sendCommAdapterCommand(@Nonnull AdapterCommand command);
 
   /**
    * Returns a list of {@link MovementCommand}s that have been sent to the communication adapter.
    *
    * @return A list of {@link MovementCommand}s that have been sent to the communication adapter.
    */
-  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
   @Nonnull
-  default Queue<MovementCommand> getCommandsSent() {
-    return new LinkedList<>();
-  }
+  Queue<MovementCommand> getCommandsSent();
 }

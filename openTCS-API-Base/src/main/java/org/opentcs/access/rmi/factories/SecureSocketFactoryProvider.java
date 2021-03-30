@@ -7,7 +7,6 @@
  */
 package org.opentcs.access.rmi.factories;
 
-import java.io.File;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import static java.util.Objects.requireNonNull;
@@ -42,30 +41,6 @@ public class SecureSocketFactoryProvider
   public SecureSocketFactoryProvider(SslParameterSet sslParameterSet) {
     requireNonNull(sslParameterSet, "sslParameterSet");
     this.secureSslContextFactory = new SecureSslContextFactory(sslParameterSet);
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param keystoreFile The file url of the keystore.
-   * @param truststoreFile The file url of the truststore.
-   * @param keystoreType The expected type of the keystore.
-   * @param keystorePassword The password for the keystore.
-   * @param truststorePassword The password for the truststore.
-   * @deprecated Use {@link #SecureSocketFactoryProvider(org.opentcs.access.SslParameterSet)}
-   * instead.
-   */
-  @Deprecated
-  public SecureSocketFactoryProvider(String keystoreType,
-                                     File keystoreFile,
-                                     String keystorePassword,
-                                     File truststoreFile,
-                                     String truststorePassword) {
-    this(new SslParameterSet(keystoreType,
-                             keystoreFile,
-                             keystorePassword,
-                             truststoreFile,
-                             truststorePassword));
   }
 
   @Override

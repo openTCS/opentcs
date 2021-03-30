@@ -71,7 +71,7 @@ public class IntegerPropertyCellEditor
     setValue(value);
 
     if (property().getValue() instanceof Integer) {
-      textField.setValue(new Integer((int) property().getValue()));
+      textField.setValue(property().getValue());
     }
 
     return fComponent;

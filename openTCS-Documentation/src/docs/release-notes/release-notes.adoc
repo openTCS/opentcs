@@ -9,7 +9,7 @@ openTCS (short for "open Transportation Control System") is a free platform for 
 It should generally be possible to control any track-guided vehicle with it, even if the tracks are only virtual, but AGVSs are the main target.
 It is being maintained at the Fraunhofer Institute for Material Flow and Logistics in Dortmund, Germany.
 
-The software runs on the Java platform (version 1.8).
+The software runs on the Java platform (version 13).
 All libraries required for compiling and/or using it are freely available, too.
 
 openTCS itself is not a complete product you can use "out-of-the-box" to control an AGVS with.
@@ -48,6 +48,18 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 == Change log
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
+
+=== Version 5.0 (2020-06-05)
+
+* Remove deprecated code.
+** Remove the TCP host interface kernel extension.
+** Remove the kernel application's GUI.
+* `TCSObject` and its subclasses are now immutable and do no longer implement the `Cloneable` interface.
+* Remove the JDOM dependency.
+* In `BasicCommunicationAdapter`, use an injected `ExecutorService` (e.g. the kernel executor) instead of starting a separate thread for every vehicle driver instance.
+* Add a new and cleaned up version of the XML Schema definition for the openTCS plant model and add new bindings.
+* Update project to Java 13.
+* Update Mockito to 2.28.2.
 
 === Version 4.18 (2020-04-09)
 

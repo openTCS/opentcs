@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel;
 
-import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import java.io.File;
@@ -171,7 +170,6 @@ public class DefaultKernelInjectionModule
     bind(ModelPersister.class).to(XMLFileModelPersister.class);
   }
 
-  @SuppressWarnings("deprecation")
   private void configureEventHub() {
     EventBus newEventBus = new SimpleEventBus();
     bind(EventHandler.class)
@@ -183,23 +181,6 @@ public class DefaultKernelInjectionModule
     bind(EventBus.class)
         .annotatedWith(ApplicationEventBus.class)
         .toInstance(newEventBus);
-
-    // A binding for the kernel's one and only central event hub.
-    BusBackedEventHub<org.opentcs.util.eventsystem.TCSEvent> busBackedHub
-        = new BusBackedEventHub<>(newEventBus, org.opentcs.util.eventsystem.TCSEvent.class);
-    busBackedHub.initialize();
-    bind(new TypeLiteral<org.opentcs.util.eventsystem.EventListener<org.opentcs.util.eventsystem.TCSEvent>>() {
-    })
-        .annotatedWith(org.opentcs.customizations.kernel.CentralEventHub.class)
-        .toInstance(busBackedHub);
-    bind(new TypeLiteral<org.opentcs.util.eventsystem.EventSource<org.opentcs.util.eventsystem.TCSEvent>>() {
-    })
-        .annotatedWith(org.opentcs.customizations.kernel.CentralEventHub.class)
-        .toInstance(busBackedHub);
-    bind(new TypeLiteral<org.opentcs.util.eventsystem.EventHub<org.opentcs.util.eventsystem.TCSEvent>>() {
-    })
-        .annotatedWith(org.opentcs.customizations.kernel.CentralEventHub.class)
-        .toInstance(busBackedHub);
   }
 
   private void configureKernelStatesDependencies() {

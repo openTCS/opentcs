@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides communication adapter instances for vehicles to be controlled.
@@ -22,29 +21,11 @@ public interface VehicleCommAdapterFactory
     extends Lifecycle {
 
   /**
-   * Returns a string describing the factory/the adapters provided.
-   * This should be a short string that can be displayed e.g. as a menu item for
-   * choosing between multiple factories/adapter types for a vehicle.
-   *
-   * @return A string describing the factory/the adapters created.
-   * @deprecated Implement and use {@link #getDescription()} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  default String getAdapterDescription() {
-    return getClass().getName();
-  }
-
-  /**
    * Returns a {@link VehicleCommAdapterDescription} for the factory/the adapters provided.
    *
    * @return A {@link VehicleCommAdapterDescription} for the factory/the adapters provided.
    */
-  @ScheduledApiChange(details = "Default implementation will be removed.", when = "5.0")
-  default VehicleCommAdapterDescription getDescription() {
-    return new DefaultVehicleCommAdapterDescription(getAdapterDescription());
-  }
+  VehicleCommAdapterDescription getDescription();
 
   /**
    * Checks whether this factory can provide a communication adapter for the

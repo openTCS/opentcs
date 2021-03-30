@@ -9,8 +9,6 @@ package org.opentcs.access.to.order;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.order.OrderConstants;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a transport order.
@@ -67,7 +64,7 @@ public class TransportOrderCreationTO
    * The point of time at which execution of the transport order is supposed to be finished.
    */
   @Nonnull
-  private Instant deadline = Instant.ofEpochMilli(Long.MAX_VALUE);
+  private Instant deadline = Instant.MAX;
   /**
    * Whether the transport order is dispensable or not.
    */
@@ -107,14 +104,6 @@ public class TransportOrderCreationTO
     this.dispensable = dispensable;
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public TransportOrderCreationTO setName(@Nonnull String name) {
-    return (TransportOrderCreationTO) super.setName(name);
-  }
-
   /**
    * Creates a copy of this object with the given name.
    *
@@ -135,14 +124,6 @@ public class TransportOrderCreationTO
                                         dispensable);
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public TransportOrderCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (TransportOrderCreationTO) super.setProperties(properties);
-  }
-
   /**
    * Creates a copy of this object with the given properties.
    *
@@ -161,14 +142,6 @@ public class TransportOrderCreationTO
                                         type,
                                         deadline,
                                         dispensable);
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public TransportOrderCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (TransportOrderCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -239,20 +212,6 @@ public class TransportOrderCreationTO
   }
 
   /**
-   * Sets the destinations that need to be travelled to.
-   *
-   * @param destinations The destinations.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setDestinations(@Nonnull List<DestinationCreationTO> destinations) {
-    this.destinations = requireNonNull(destinations, "destinations");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given destinations that need to be travelled to.
    *
    * @param destinations The destinations.
@@ -279,20 +238,6 @@ public class TransportOrderCreationTO
   @Nullable
   public String getWrappingSequence() {
     return wrappingSequence;
-  }
-
-  /**
-   * Sets the (optional) name of the order sequence the transport order belongs to.
-   *
-   * @param wrappingSequence The name of the sequence.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setWrappingSequence(@Nullable String wrappingSequence) {
-    this.wrappingSequence = wrappingSequence;
-    return this;
   }
 
   /**
@@ -326,20 +271,6 @@ public class TransportOrderCreationTO
   }
 
   /**
-   * Sets the (optional) names of transport orders the transport order depends on.
-   *
-   * @param dependencyNames The dependency names.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setDependencyNames(@Nonnull Set<String> dependencyNames) {
-    this.dependencyNames = requireNonNull(dependencyNames, "dependencyNames");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given
    * (optional) names of transport orders the transport order depends on.
    *
@@ -370,20 +301,6 @@ public class TransportOrderCreationTO
   }
 
   /**
-   * Sets the (optional) name of the vehicle that is supposed to execute the transport order.
-   *
-   * @param intendedVehicleName The vehicle name.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setIntendedVehicleName(@Nullable String intendedVehicleName) {
-    this.intendedVehicleName = intendedVehicleName;
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given
    * (optional) name of the vehicle that is supposed to execute the transport order.
    *
@@ -399,55 +316,6 @@ public class TransportOrderCreationTO
                                         dependencyNames,
                                         intendedVehicleName,
                                         type,
-                                        deadline,
-                                        dispensable);
-  }
-
-  /**
-   * Returns the (optional) category of the transport order.
-   *
-   * @return The (optional) category of the transport order.
-   * @deprecated Use {@link #getType()} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public String getCategory() {
-    return type;
-  }
-
-  /**
-   * Sets the (optional) category of the transport order.
-   *
-   * @param category The category.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setCategory(@Nonnull String category) {
-    this.type = requireNonNull(category, "category");
-    return this;
-  }
-
-  /**
-   * Creates a copy of this object with the given (optional) category of the transport order.
-   *
-   * @param category The category.
-   * @return A copy of this object, differing in the given category.
-   * @deprecated Use {@link #withType(java.lang.String)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public TransportOrderCreationTO withCategory(@Nonnull String category) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        category,
                                         deadline,
                                         dispensable);
   }
@@ -487,47 +355,8 @@ public class TransportOrderCreationTO
    * @return The point of time at which execution of the transport order is supposed to be finished.
    */
   @Nonnull
-  @ScheduledApiChange(when = "5.0", details = "Will return an Instant instead.")
-  public ZonedDateTime getDeadline() {
-    return ZonedDateTime.ofInstant(deadline, ZoneId.systemDefault());
-  }
-
-  /**
-   * Sets the point of time at which execution of the transport order is supposed to be finished.
-   *
-   * @param deadline The deadline.
-   * @return This instance.
-   * @deprecated Use {@link #withDeadline(java.time.Instant)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setDeadline(@Nonnull ZonedDateTime deadline) {
-    this.deadline = requireNonNull(deadline, "deadline").toInstant();
-    return this;
-  }
-
-  /**
-   * Creates a copy of this object with the given
-   * point of time at which execution of the transport order is supposed to be finished.
-   *
-   * @param deadline The deadline.
-   * @return A copy of this object, differing in the given deadline.
-   * @deprecated Use {@link #withDeadline(java.time.Instant)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public TransportOrderCreationTO withDeadline(@Nonnull ZonedDateTime deadline) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline.toInstant(),
-                                        dispensable);
+  public Instant getDeadline() {
+    return deadline;
   }
 
   /**
@@ -557,20 +386,6 @@ public class TransportOrderCreationTO
    */
   public boolean isDispensable() {
     return dispensable;
-  }
-
-  /**
-   * Sets whether the transport order is dispensable or not.
-   *
-   * @param dispensable The dispensable flag.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public TransportOrderCreationTO setDispensable(boolean dispensable) {
-    this.dispensable = dispensable;
-    return this;
   }
 
   /**

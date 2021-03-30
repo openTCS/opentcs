@@ -22,6 +22,7 @@ import org.opentcs.access.rmi.KernelServicePortalBuilder;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
+import org.opentcs.common.GuestUserCredentials;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ApplicationHome;
@@ -102,7 +103,6 @@ public class DefaultPlantOverviewInjectionModule
         .toInstance(configuration);
   }
 
-  @SuppressWarnings("deprecation")
   private void configureSocketConnections() {
     SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
                                                                        SslConfiguration.class);
@@ -126,7 +126,8 @@ public class DefaultPlantOverviewInjectionModule
 
     //Bind socket provider to the kernel portal
     bind(KernelServicePortal.class)
-        .toInstance(new KernelServicePortalBuilder()
+        .toInstance(new KernelServicePortalBuilder(GuestUserCredentials.USER,
+                                                   GuestUserCredentials.PASSWORD)
             .setSocketFactoryProvider(socketFactoryProvider)
             .setEventFilter(new ClassMatcher(CommAdapterEvent.class).negate())
             .build());

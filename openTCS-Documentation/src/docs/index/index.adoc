@@ -21,12 +21,3 @@ openTCS {project-version}
   link:./developer/api-injection/index.html[JavaDoc documentation]
 * Web API:
   link:./developer/web-api/index.html[OpenAPI documentation]
-* XML schemas for the (deprecated) TCP/IP-based host interface:
-** Transport orders (sent from host to openTCS):
-   link:./developer/xml-schemas/opentcs-host-order.xsd[XSD]
-** Responses to transport orders (sent from openTCS to host):
-   link:./developer/xml-schemas/opentcs-host-response.xsd[XSD]
-** Transport order scripts (files in openTCS file system):
-   link:./developer/xml-schemas/opentcs-host-orderscript.xsd[XSD]
-** Status channel (sent from openTCS to host):
-   link:./developer/xml-schemas/opentcs-host-statuschannel.xsd[XSD]

@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import static org.opentcs.util.Assertions.checkArgument;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 
 /**
@@ -107,24 +106,6 @@ public class EventBuffer
   public boolean hasWaitingClient() {
     synchronized (events) {
       return waitingClient;
-    }
-  }
-
-  /**
-   * Sets this buffer's event filter.
-   *
-   * @param eventFilter This buffer's new event filter.
-   * @deprecated Use {@link #setEventFilter(java.util.function.Predicate)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public void setFilter(
-      @Nonnull org.opentcs.util.eventsystem.EventFilter<org.opentcs.util.eventsystem.TCSEvent> eventFilter) {
-    synchronized (events) {
-      requireNonNull(eventFilter, "eventFilter");
-      this.eventFilter = event
-          -> event instanceof org.opentcs.util.eventsystem.TCSEvent
-          && eventFilter.accept((org.opentcs.util.eventsystem.TCSEvent) event);
     }
   }
 

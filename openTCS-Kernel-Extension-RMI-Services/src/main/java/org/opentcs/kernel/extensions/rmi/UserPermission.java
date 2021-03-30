@@ -7,8 +7,6 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
-import org.opentcs.util.annotations.ScheduledApiChange;
-
 /**
  * Defines the possible permission flags of kernel clients.
  *
@@ -28,14 +26,6 @@ public enum UserPermission {
    * Indicates the client may change the kernel's configuration items.
    */
   CHANGE_CONFIGURATION,
-  /**
-   * Indicates the client may create, modify and remove user accounts.
-   *
-   * @deprecated User management via kernel interaction will not be supported in the future.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  MANAGE_USERS,
   /**
    * Indicates the client may load another model.
    */

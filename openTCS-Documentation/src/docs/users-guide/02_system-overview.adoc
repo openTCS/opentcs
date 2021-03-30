@@ -15,11 +15,6 @@ image::system_overview.png[]
 
 The purpose of the openTCS kernel is to provide an abstract driving model of a transportation system/plant, to manage transport orders and to compute routes for the vehicles.
 Clients can communicate with this server process to, for instance, modify the plant model, to visualize the driving course and the processing of transport orders and to create new transport orders.
-For user interaction, the kernel provides a graphical user interface titled Kernel Control Center.
-Additionally there's also a standalone/remote version of the Kernel Control Center.
-
-IMPORTANT: The Kernel Control Center GUI provided by the kernel application is deprecated and scheduled for removal with version 5.0. 
-A separate Kernel Control Center application is available and should be used instead.
 
 Three major strategy modules within the kernel implement processing of transport orders:
 
@@ -33,7 +28,7 @@ These implementations can be easily replaced by a developer to adapt to environm
 
 The driver framework that is part of the openTCS kernel manages communication channels and associates vehicle drivers with vehicles.
 A vehicle driver is an adapter between kernel and vehicle and translates each vehicle-specific communication protocol to the kernel's internal communication schemes and vice versa.
-Furthermore, a driver may offer low-level functionality to the user via the kernel's graphical user interface, e.g. manually sending telegrams to the associated vehicle.
+Furthermore, a driver may offer low-level functionality to the user via the kernel control center client, e.g. manually sending telegrams to the associated vehicle.
 By using suitable vehicle drivers, vehicles of different types can be managed simultaneously by a single openTCS instance.
 
 The plant overview client that is part of the openTCS distribution allows editing of plant models, which can be loaded into the kernel.
@@ -45,7 +40,6 @@ Part of that is assigning vehicle drivers to vehicles and controlling them by en
 
 Other clients, e.g. to control higher-level plant processes, can be implemented and attached.
 For Java clients, the openTCS kernel provides an interface based on Java RMI (Remote Method Invocation).
-A host interface for creating transport orders using XML telegrams sent via TCP/IP connections is also available.
 Additionally, openTCS provides a web API for creating and withdrawing transport orders and retrieving transport order status updates.
 
 === Plant model elements
@@ -98,8 +92,6 @@ A path's main attributes, next to its source and destination point, are:
   Depending on the router configuration, it may also be used for computing routing costs/finding an optimal route to a destination point.
 * A _maximum velocity_ and _maximum reverse velocity_, which may be a relevant information for a vehicle in plant operation mode.
   Depending on the router configuration, it may also be used for computing routing costs/finding an optimal route to a destination point.
-* A _routing cost_, which is an explicit, unitless value.
-  Depending on the router configuration, it may be used for computing routing costs/finding an optimal route to a destination point.
 * A _locked_ flag, which, when set, tells the router that the path may not be used when computing routes for vehicles.
 
 ==== Location

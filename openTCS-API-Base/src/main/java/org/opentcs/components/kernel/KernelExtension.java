@@ -8,7 +8,6 @@
 package org.opentcs.components.kernel;
 
 import org.opentcs.components.Lifecycle;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods that a generic kernel extension must implement.
@@ -17,16 +16,4 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  */
 public interface KernelExtension
     extends Lifecycle {
-  
-  /**
-   * Returns a name/brief human-readable description for this extension.
-   *
-   * @return The name/brief description.
-   * @deprecated Unused. Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  default String getName() {
-    return getClass().getName();
-  };
 }

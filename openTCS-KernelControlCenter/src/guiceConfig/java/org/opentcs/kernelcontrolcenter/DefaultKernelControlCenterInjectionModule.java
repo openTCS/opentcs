@@ -42,6 +42,7 @@ import org.opentcs.util.gui.dialog.ConnectionParamSet;
 import org.opentcs.virtualvehicle.AdapterPanelComponentsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentcs.common.GuestUserCredentials;
 
 /**
  * A Guice module for the openTCS kernel control center application.
@@ -115,7 +116,6 @@ public class DefaultKernelControlCenterInjectionModule
         .toInstance(configuration.connectionBookmarks());
   }
 
-  @SuppressWarnings("deprecation")
   private void configureSocketConnections() {
     SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
                                                                        SslConfiguration.class);
@@ -139,7 +139,8 @@ public class DefaultKernelControlCenterInjectionModule
 
     //Bind socket provider to the kernel portal
     bind(KernelServicePortal.class)
-        .toInstance(new KernelServicePortalBuilder()
+        .toInstance(new KernelServicePortalBuilder(GuestUserCredentials.USER,
+                                                   GuestUserCredentials.PASSWORD)
             .setSocketFactoryProvider(socketFactoryProvider)
             .build());
   }

@@ -136,23 +136,6 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  @Deprecated
-  public void updateVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
-                                                 Set<String> processableCategories)
-      throws ObjectUnknownException, KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().updateVehicleProcessableCategories(getClientId(),
-                                                            ref,
-                                                            processableCategories);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
   public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException, KernelRuntimeException {

@@ -39,12 +39,6 @@ The kernel application itself can be configured using the following configuratio
 
 include::{configdoc}/KernelApplicationConfigurationEntries.adoc[]
 
-==== Control center configuration entries
-
-The kernel's control center GUI can be configured using the following configuration entries:
-
-include::{configdoc}/ControlCenterConfigurationEntries.adoc[]
-
 ==== Order pool configuration entries
 
 The kernel's transport order pool can be configured using the following configuration entries:
@@ -84,12 +78,6 @@ include::{configdoc}/ServiceWebApiConfigurationEntries.adoc[]
 The kernel's RMI interface can be configured using the following configuration entries:
 
 include::{configdoc}/RmiKernelInterfaceConfigurationEntries.adoc[]
-
-==== XML host interface configuration entries
-
-The kernel's XML-based host interface can be configured using the following configuration entries:
-
-include::{configdoc}/XMLHostInterfaceConfigurationEntries.adoc[]
 
 ==== SSL server-side encryption configuration entries
 

@@ -62,12 +62,6 @@ public class LoopbackCommunicationAdapterFactory
   }
 
   @Override
-  @Deprecated
-  public String getAdapterDescription() {
-    return getDescription().getDescription();
-  }
-
-  @Override
   public VehicleCommAdapterDescription getDescription() {
     return new LoopbackCommunicationAdapterDescription();
   }

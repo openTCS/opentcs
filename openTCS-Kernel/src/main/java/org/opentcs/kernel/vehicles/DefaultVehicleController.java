@@ -55,7 +55,6 @@ import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -142,11 +141,6 @@ public class DefaultVehicleController
    */
   private volatile DriveOrder currentDriveOrder;
   /**
-   * The communication adapter's last known state.
-   */
-  @SuppressWarnings("deprecation")
-  private volatile VehicleCommAdapter.State commAdapterState = VehicleCommAdapter.State.UNKNOWN;
-  /**
    * Flag indicating that we're currently waiting for resources to be allocated
    * by the scheduler, ensuring that we do not allocate more than one set of
    * resources at a time (which can cause deadlocks).
@@ -190,7 +184,6 @@ public class DefaultVehicleController
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void initialize() {
     if (isInitialized()) {
       return;
@@ -219,7 +212,6 @@ public class DefaultVehicleController
         commAdapter.getProcessModel().getVehicleLoadHandlingDevices()
     );
     updateVehicleState(commAdapter.getProcessModel().getVehicleState());
-    updateCommAdapterState(commAdapter.getProcessModel().getVehicleAdapterState());
 
     // Add a first entry into allocatedResources to shift freeing of resources
     // in commandExecuted() by one - we need to free the resources allocated for
@@ -230,7 +222,6 @@ public class DefaultVehicleController
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void terminate() {
     if (!isInitialized()) {
       return;
@@ -243,7 +234,6 @@ public class DefaultVehicleController
     // Free all allocated resources.
     freeAllResources();
 
-    updateCommAdapterState(VehicleCommAdapter.State.UNKNOWN);
     updateVehicleState(Vehicle.State.UNKNOWN);
 
     eventBus.unsubscribe(this);
@@ -468,19 +458,6 @@ public class DefaultVehicleController
   }
 
   @Override
-  @Deprecated
-  public void resetVehiclePosition() {
-    synchronized (commAdapter) {
-      checkState(currentDriveOrder == null, "%s: Vehicle has a drive order", vehicle.getName());
-      checkState(!waitingForAllocation,
-                 "%s: Vehicle is waiting for resource allocation",
-                 vehicle.getName());
-
-      setVehiclePosition(null);
-    }
-  }
-
-  @Override
   @Nonnull
   public ExplainedBoolean canProcess(@Nonnull List<String> operations) {
     requireNonNull(operations, "operations");
@@ -584,7 +561,7 @@ public class DefaultVehicleController
     return "DefaultVehicleController{" + "vehicleName=" + vehicle.getName() + '}';
   }
 
-  @SuppressWarnings({"unchecked", "deprecation"})
+  @SuppressWarnings("unchecked")
   private void handleProcessModelEvent(PropertyChangeEvent evt) {
     eventBus.onEvent(new ProcessModelEvent(evt.getPropertyName(),
                                            commAdapter.createTransferableProcessModel()));
@@ -614,16 +591,12 @@ public class DefaultVehicleController
       updateVehicleState((Vehicle.State) evt.getNewValue());
     }
     else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.COMM_ADAPTER_STATE.name())) {
-      updateCommAdapterState((VehicleCommAdapter.State) evt.getNewValue());
-    }
-    else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.COMMAND_EXECUTED.name())) {
       commandExecuted((MovementCommand) evt.getNewValue());
     }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.COMMAND_FAILED.name())) {
-      dispatcherService.withdrawByVehicle(vehicle.getReference(), true, false);
+      dispatcherService.withdrawByVehicle(vehicle.getReference(), true);
     }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.USER_NOTIFICATION.name())) {
@@ -803,22 +776,8 @@ public class DefaultVehicleController
     }
   }
 
-  @SuppressWarnings("deprecation")
-  private void updateCommAdapterState(VehicleCommAdapter.State newState) {
-    commAdapterState = requireNonNull(newState, "newState");
-    localKernel.setVehicleAdapterState(vehicle.getReference(), newState);
-  }
-
-  @SuppressWarnings("deprecation")
   private void updateVehicleState(Vehicle.State newState) {
     requireNonNull(newState, "newState");
-    // If the communication adapter knows the state of the vehicle and is not
-    // marked as connected with us, mark it as connected now. - It knows the
-    // vehicle's state, so it must be connected to it.
-    if (!Vehicle.State.UNKNOWN.equals(newState)
-        && !VehicleCommAdapter.State.CONNECTED.equals(commAdapterState)) {
-      updateCommAdapterState(VehicleCommAdapter.State.CONNECTED);
-    }
     vehicleService.updateVehicleState(vehicle.getReference(), newState);
   }
 
@@ -1005,20 +964,17 @@ public class DefaultVehicleController
         // Allocate the vehicle's current position and implicitly update its model's position
         allocateVehiclePosition();
       }
-
-      updateVehicleProcState(currIntegrationLevel, currVehicleState);
     }
   }
 
-  @SuppressWarnings("deprecation")
-  @ScheduledApiChange(when = "5.0",
-                      details = "Integration level won't implicitly affect the proc state, anymore")
-  private void updateVehicleProcState(Vehicle.IntegrationLevel currIntegrationLevel,
-                                      Vehicle vehicle) {
-    if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED) {
-      if (vehicle.hasProcState(Vehicle.ProcState.UNAVAILABLE)) {
-        vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
-      }
+  private void resetVehiclePosition() {
+    synchronized (commAdapter) {
+      checkState(currentDriveOrder == null, "%s: Vehicle has a drive order", vehicle.getName());
+      checkState(!waitingForAllocation,
+                 "%s: Vehicle is waiting for resource allocation",
+                 vehicle.getName());
+
+      setVehiclePosition(null);
     }
   }
 

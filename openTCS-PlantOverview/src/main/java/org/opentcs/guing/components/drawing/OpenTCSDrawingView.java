@@ -411,7 +411,7 @@ public class OpenTCSDrawingView
 
   @Override
   public void processKeyEvent(KeyEvent e) {
-    if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+    if ((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
       // Cut, copy, paste and duplicate
       if (e.getKeyCode() == KeyEvent.VK_X
           || e.getKeyCode() == KeyEvent.VK_C

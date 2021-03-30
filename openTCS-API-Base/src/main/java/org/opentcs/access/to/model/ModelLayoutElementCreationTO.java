@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a model layout element in the visual layout.
@@ -44,20 +43,6 @@ public class ModelLayoutElementCreationTO
   }
 
   /**
-   * Sets the name of this model layout element.
-   *
-   * @param name The new name.
-   * @return The modified model layout element.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public ModelLayoutElementCreationTO setName(@Nonnull String name) {
-    return (ModelLayoutElementCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name The new name.
@@ -69,20 +54,6 @@ public class ModelLayoutElementCreationTO
   }
 
   /**
-   * Sets the properties of this model layout element.
-   *
-   * @param properties The new properties.
-   * @return The modified model layout element.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public ModelLayoutElementCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (ModelLayoutElementCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -91,21 +62,6 @@ public class ModelLayoutElementCreationTO
   @Override
   public ModelLayoutElementCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new ModelLayoutElementCreationTO(getName(), properties, layer);
-  }
-
-  /**
-   * Sets a single property of this model layout element.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified model layout element.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public ModelLayoutElementCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (ModelLayoutElementCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -130,20 +86,6 @@ public class ModelLayoutElementCreationTO
    */
   public int getLayer() {
     return layer;
-  }
-
-  /**
-   * Sets the layer on which this model layout element is to be displayed.
-   *
-   * @param layer The new layer.
-   * @return The modified model layout element.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public ModelLayoutElementCreationTO setLayer(int layer) {
-    this.layer = layer;
-    return this;
   }
 
   /**

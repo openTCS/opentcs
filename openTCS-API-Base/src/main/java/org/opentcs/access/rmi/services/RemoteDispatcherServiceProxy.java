@@ -39,58 +39,6 @@ class RemoteDispatcherServiceProxy
   }
 
   @Override
-  @Deprecated
-  public void releaseVehicle(TCSObjectReference<Vehicle> vehicleRef)
-      throws ObjectUnknownException, KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().releaseVehicle(getClientId(), vehicleRef);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawByVehicle(TCSObjectReference<Vehicle> vehicleRef,
-                                boolean immediateAbort,
-                                boolean disableVehicle)
-      throws ObjectUnknownException, KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().withdrawByVehicle(getClientId(),
-                                           vehicleRef,
-                                           immediateAbort,
-                                           disableVehicle);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
-                                       boolean immediateAbort,
-                                       boolean disableVehicle)
-      throws ObjectUnknownException, KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().withdrawByTransportOrder(getClientId(),
-                                                  ref,
-                                                  immediateAbort,
-                                                  disableVehicle);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
   public void withdrawByVehicle(TCSObjectReference<Vehicle> vehicleRef,
                                 boolean immediateAbort)
       throws ObjectUnknownException, KernelRuntimeException {

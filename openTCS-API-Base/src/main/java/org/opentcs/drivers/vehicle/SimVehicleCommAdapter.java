@@ -8,7 +8,6 @@
 package org.opentcs.drivers.vehicle;
 
 import javax.annotation.Nullable;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares methods that a vehicle driver intended for simulation
@@ -18,23 +17,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  */
 public interface SimVehicleCommAdapter
     extends VehicleCommAdapter {
-
-  /**
-   * Sets a time factor for the simulation.
-   * Note that 1.0 is considered to be normal/real time, values lower than 1.0
-   * slow motion and values higher than 1.0 accelerated motion. Values of 0.0 or
-   * smaller are not allowed.
-   *
-   * @param factor The time factor.
-   * @throws IllegalArgumentException If the given value is 0.0 or smaller.
-   * @deprecated Simulation is out of scope for the openTCS project. Simulation-related components
-   * should be configured individually.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  default void setSimTimeFactor(double factor)
-      throws IllegalArgumentException {
-  }
 
   /**
    * Sets an initial vehicle position.

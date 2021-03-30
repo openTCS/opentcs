@@ -49,12 +49,9 @@ public class RunPlantOverview {
    *
    * @param args the command line arguments
    */
-  @SuppressWarnings("deprecation")
   public static void main(final String[] args) {
     System.setSecurityManager(new SecurityManager());
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
-    System.setProperty(org.opentcs.util.configuration.Configuration.PROPKEY_IMPL_CLASS,
-                       org.opentcs.util.configuration.XMLConfiguration.class.getName());
 
     Environment.logSystemInfo();
 

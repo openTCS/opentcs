@@ -16,7 +16,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Block;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a block in the plant model.
@@ -64,21 +63,6 @@ public class BlockCreationTO
   }
 
   /**
-   * Sets the name of this block.
-   *
-   * @param name The new name.
-   * @return The modified block.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public BlockCreationTO setName(@Nonnull String name) {
-    return (BlockCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name The new name.
@@ -93,20 +77,6 @@ public class BlockCreationTO
   }
 
   /**
-   * Sets the properties of this block.
-   *
-   * @param properties The new properties.
-   * @return The modified block.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public BlockCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (BlockCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -118,21 +88,6 @@ public class BlockCreationTO
                                properties,
                                type,
                                memberNames);
-  }
-
-  /**
-   * Sets a single property of this block.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified block.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public BlockCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (BlockCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -184,20 +139,6 @@ public class BlockCreationTO
   @Nonnull
   public Set<String> getMemberNames() {
     return Collections.unmodifiableSet(memberNames);
-  }
-
-  /**
-   * Sets the names of this block's members.
-   *
-   * @param memberNames The names of this block's members.
-   * @return The modified block.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public BlockCreationTO setMemberNames(@Nonnull Set<String> memberNames) {
-    this.memberNames = requireNonNull(memberNames, "memberNames");
-    return this;
   }
 
   /**

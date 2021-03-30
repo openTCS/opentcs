@@ -14,7 +14,6 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.slf4j.Logger;
@@ -46,10 +45,6 @@ public final class DefaultVehicleControllerPool
    * corresponding vehicles.
    */
   private final Map<String, PoolEntry> poolEntries = new HashMap<>();
-  /**
-   * The current time factor for simulation mode.
-   */
-  private double simulationTimeFactor = 1.0;
   /**
    * Indicates whether this components is initialized.
    */
@@ -99,7 +94,6 @@ public final class DefaultVehicleControllerPool
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public synchronized void attachVehicleController(String vehicleName,
                                                    VehicleCommAdapter commAdapter) {
     requireNonNull(vehicleName, "vehicleName");
@@ -118,14 +112,6 @@ public final class DefaultVehicleControllerPool
     PoolEntry poolEntry = new PoolEntry(vehicleName, controller, commAdapter);
     poolEntries.put(vehicleName, poolEntry);
     controller.initialize();
-    // If the communication adapter is intended to simulate a vehicle, set
-    // our current simulation time factor.
-    if (commAdapter instanceof SimVehicleCommAdapter) {
-      SimVehicleCommAdapter simCommAdapter = (SimVehicleCommAdapter) commAdapter;
-
-      // Set the system's simulation time factor.
-      simCommAdapter.setSimTimeFactor(simulationTimeFactor);
-    }
   }
 
   @Override
@@ -148,28 +134,6 @@ public final class DefaultVehicleControllerPool
 
     PoolEntry poolEntry = poolEntries.get(vehicleName);
     return poolEntry == null ? new NullVehicleController(vehicleName) : poolEntry.vehicleController;
-  }
-
-  @Override
-  @Deprecated
-  public double getSimulationTimeFactor() {
-    return simulationTimeFactor;
-  }
-
-  @Override
-  @Deprecated
-  public void setSimulationTimeFactor(double factor)
-      throws IllegalArgumentException {
-    if (factor <= 0.0) {
-      throw new IllegalArgumentException("Illegal factor value: " + factor);
-    }
-    simulationTimeFactor = factor;
-    // Update time factor with all vehicle drivers intended for simulation.
-    for (PoolEntry poolEntry : poolEntries.values()) {
-      if (poolEntry.commAdapter instanceof SimVehicleCommAdapter) {
-        ((SimVehicleCommAdapter) poolEntry.commAdapter).setSimTimeFactor(factor);
-      }
-    }
   }
 
   /**

@@ -20,7 +20,6 @@ import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.cfg4j.Cfg4jConfigurationBindingProvider;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherModule;
-import org.opentcs.strategies.basic.recovery.DefaultRecoveryEvaluatorModule;
 import org.opentcs.strategies.basic.routing.DefaultRouterModule;
 import org.opentcs.strategies.basic.scheduling.DefaultSchedulerModule;
 import org.opentcs.util.Environment;
@@ -52,13 +51,10 @@ public class RunKernel {
    * @param args The command line arguments.
    * @throws Exception If there was a problem starting the kernel.
    */
-  @SuppressWarnings("deprecation")
   public static void main(String[] args)
       throws Exception {
     System.setSecurityManager(new SecurityManager());
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
-    System.setProperty(org.opentcs.util.configuration.Configuration.PROPKEY_IMPL_CLASS,
-                       org.opentcs.util.configuration.XMLConfiguration.class.getName());
 
     Environment.logSystemInfo();
 
@@ -78,8 +74,7 @@ public class RunKernel {
         = Arrays.asList(new DefaultKernelInjectionModule(),
                         new DefaultDispatcherModule(),
                         new DefaultRouterModule(),
-                        new DefaultSchedulerModule(),
-                        new DefaultRecoveryEvaluatorModule());
+                        new DefaultSchedulerModule());
 
     ConfigurationBindingProvider bindingProvider = configurationBindingProvider();
     for (KernelInjectionModule defaultModule : defaultModules) {

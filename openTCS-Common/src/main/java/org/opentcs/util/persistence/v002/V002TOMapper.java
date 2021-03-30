@@ -129,7 +129,6 @@ public class V002TOMapper {
     return result;
   }
 
-  @SuppressWarnings("deprecation")
   private List<PathCreationTO> toPathCreationTO(List<PathTO> paths) {
     List<PathCreationTO> result = new ArrayList<>();
 
@@ -139,7 +138,6 @@ public class V002TOMapper {
                              path.getSourcePoint(),
                              path.getDestinationPoint())
               .withLength(path.getLength())
-              .withRoutingCost(path.getRoutingCost())
               .withLocked(path.isLocked())
               .withMaxVelocity(path.getMaxVelocity().intValue())
               .withMaxReverseVelocity(path.getMaxReverseVelocity().intValue())
@@ -335,7 +333,6 @@ public class V002TOMapper {
     return result;
   }
 
-  @SuppressWarnings("deprecation")
   private List<PathTO> toPathTO(List<PathCreationTO> paths) {
     List<PathTO> result = new ArrayList<>();
 
@@ -345,7 +342,6 @@ public class V002TOMapper {
       pathTO.setSourcePoint(path.getSrcPointName())
           .setDestinationPoint(path.getDestPointName())
           .setLength(path.getLength())
-          .setRoutingCost(path.getRoutingCost())
           .setMaxVelocity((long) path.getMaxVelocity())
           .setMaxReverseVelocity((long) path.getMaxReverseVelocity())
           .setLocked(path.isLocked())

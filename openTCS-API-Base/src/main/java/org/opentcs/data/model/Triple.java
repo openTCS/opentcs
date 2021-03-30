@@ -8,17 +8,14 @@
 package org.opentcs.data.model;
 
 import java.io.Serializable;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A generic 3-tuple of long integer values, usable for 3D coordinates and vectors, for instance.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Triple
-    implements Serializable,
-               Cloneable {
+    implements Serializable {
 
   /**
    * The X coordinate.
@@ -34,16 +31,6 @@ public class Triple
   private long z;
 
   /**
-   * Creates a new Triple with all values set to 0.
-   *
-   * @deprecated Use {@link #Triple(long, long, long)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Triple() {
-  }
-
-  /**
    * Creates a new Triple with the given values.
    *
    * @param x The X coordinate.
@@ -57,38 +44,12 @@ public class Triple
   }
 
   /**
-   * Creates a new Triple with values copied from the given one.
-   *
-   * @param original The Triple from which to copy the values.
-   * @deprecated Not useful with immutable instances. Use {@link #Triple(long, long, long)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Triple(Triple original) {
-    this(original.x, original.y, original.z);
-  }
-
-  /**
    * Returns the x coordinate.
    *
    * @return x
    */
   public long getX() {
     return x;
-  }
-
-  /**
-   * Sets the new x coordinate.
-   *
-   * @param x The new x coordinate.
-   * @return This instance.
-   * @deprecated Instances should be immutable. Use {@link #Triple(long, long, long)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Triple setX(long x) {
-    this.x = x;
-    return this;
   }
 
   /**
@@ -101,51 +62,12 @@ public class Triple
   }
 
   /**
-   * Sets the new y coordinate.
-   *
-   * @param y The new y coordinate.
-   * @return This instance.
-   * @deprecated Instances should be immutable. Use {@link #Triple(long, long, long)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Triple setY(long y) {
-    this.y = y;
-    return this;
-  }
-
-  /**
    * Returns the z coordinate.
    *
    * @return z
    */
   public long getZ() {
     return z;
-  }
-
-  /**
-   * Sets the new z coordinate.
-   *
-   * @param z The new z coordinate.
-   * @return This instance.
-   * @deprecated Instances should be immutable. Use {@link #Triple(long, long, long)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Triple setZ(long z) {
-    this.z = z;
-    return this;
-  }
-
-  @Override
-  public Triple clone() {
-    try {
-      Triple clone = (Triple) super.clone();
-      return clone;
-    }
-    catch (CloneNotSupportedException exc) {
-      throw new IllegalStateException("Unexpected exception", exc);
-    }
   }
 
   @Override

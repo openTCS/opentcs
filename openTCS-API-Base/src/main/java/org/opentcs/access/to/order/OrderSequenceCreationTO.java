@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.order.OrderConstants;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a transport order.
@@ -68,14 +67,6 @@ public class OrderSequenceCreationTO
     this.failureFatal = failureFatal;
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public OrderSequenceCreationTO setName(@Nonnull String name) {
-    return (OrderSequenceCreationTO) super.setName(name);
-  }
-
   /**
    * Creates a copy of this object with the given name.
    *
@@ -92,14 +83,6 @@ public class OrderSequenceCreationTO
                                        failureFatal);
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public OrderSequenceCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (OrderSequenceCreationTO) super.setProperties(properties);
-  }
-
   /**
    * Creates a copy of this object with the given properties.
    *
@@ -114,14 +97,6 @@ public class OrderSequenceCreationTO
                                        type,
                                        intendedVehicleName,
                                        failureFatal);
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public OrderSequenceCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (OrderSequenceCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -174,50 +149,6 @@ public class OrderSequenceCreationTO
   }
 
   /**
-   * Returns the (optional) category of the order sequence.
-   *
-   * @return The (optional) category of the order sequence.
-   * @deprecated Use {@link #getType()} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public String getCategory() {
-    return type;
-  }
-
-  /**
-   * Sets the (optional) category of the order sequence.
-   *
-   * @param category The category.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public OrderSequenceCreationTO setCategory(@Nonnull String category) {
-    this.type = requireNonNull(category, "category");
-    return this;
-  }
-
-  /**
-   * Creates a copy of this object with the given category.
-   *
-   * @param category The category.
-   * @return A copy of this object, differing in the given category.
-   * @deprecated Use {@link #withType(java.lang.String)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public OrderSequenceCreationTO withCategory(@Nonnull String category) {
-    return new OrderSequenceCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       category,
-                                       intendedVehicleName,
-                                       failureFatal);
-  }
-
-  /**
    * Returns the (optional) type of the order sequence.
    *
    * @return The (optional) type of the order sequence.
@@ -253,20 +184,6 @@ public class OrderSequenceCreationTO
   }
 
   /**
-   * Sets the (optional) name of the vehicle that is supposed to execute the transport order.
-   *
-   * @param intendedVehicleName The vehicle name.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public OrderSequenceCreationTO setIntendedVehicleName(@Nullable String intendedVehicleName) {
-    this.intendedVehicleName = intendedVehicleName;
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given
    * (optional) name of the vehicle that is supposed to execute the transport order.
    *
@@ -289,20 +206,6 @@ public class OrderSequenceCreationTO
    */
   public boolean isFailureFatal() {
     return failureFatal;
-  }
-
-  /**
-   * Sets whether failure of one transport order in the sequence makes subsequent ones fail, too.
-   *
-   * @param failureFatal The failure-fatal flag.
-   * @return This instance.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public OrderSequenceCreationTO setFailureFatal(boolean failureFatal) {
-    this.failureFatal = failureFatal;
-    return this;
   }
 
   public OrderSequenceCreationTO withFailureFatal(boolean failureFatal) {

@@ -21,7 +21,6 @@ import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.AngleProperty;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
@@ -44,7 +43,6 @@ import org.opentcs.guing.model.elements.VehicleModel;
  *
  * @author Mats Wilhelm (Fraunhofer IML)
  */
-@SuppressWarnings("unchecked")
 public class ModelValidatorTest {
 
   private static final String LAYOUT_NAME = "VLayout-001";
@@ -304,7 +302,6 @@ public class ModelValidatorTest {
   private PathModel createPathModel(String name, String pointName1, String pointName2) {
     PathModel path = createComponentWithName(PathModel.class, name);
     addProperty(path, LengthProperty.class, PathModel.LENGTH, 0d);
-    addProperty(path, IntegerProperty.class, PathModel.ROUTING_COST, 0);
     addProperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, 0d);
     addProperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, 0d);
     addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.Type.DIRECT);

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
@@ -23,21 +22,17 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
-import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a vehicle's current state.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Vehicle
     extends TCSObject<Vehicle>
-    implements Serializable,
-               Cloneable {
+    implements Serializable {
 
   /**
    * A value indicating that no route steps have been travelled for the current drive order, yet.
@@ -51,15 +46,15 @@ public class Vehicle
   /**
    * This vehicle's length (in mm).
    */
-  private int length;
+  private final int length;
   /**
    * The value at/above which the vehicle's energy level is considered "good".
    */
-  private int energyLevelGood;
+  private final int energyLevelGood;
   /**
    * The value at/below which the vehicle's energy level is considered "critical".
    */
-  private int energyLevelCritical;
+  private final int energyLevelCritical;
   /**
    * The value at/above which the vehicle's energy level is considered fully recharged.
    */
@@ -71,118 +66,78 @@ public class Vehicle
   /**
    * This vehicle's remaining energy (in percent of the maximum).
    */
-  private int energyLevel;
+  private final int energyLevel;
   /**
    * This vehicle's maximum velocity (in mm/s).
    */
-  private int maxVelocity;
+  private final int maxVelocity;
   /**
    * This vehicle's maximum reverse velocity (in mm/s).
    */
-  private int maxReverseVelocity;
+  private final int maxReverseVelocity;
   /**
    * The operation the vehicle's current communication adapter accepts as a command to recharge the
    * vehicle.
    */
-  private String rechargeOperation;
+  private final String rechargeOperation;
   /**
    * The current (state of the) load handling devices of this vehicle.
    */
-  private List<LoadHandlingDevice> loadHandlingDevices;
+  private final List<LoadHandlingDevice> loadHandlingDevices;
   /**
    * This vehicle's current state.
    */
-  private State state;
+  private final State state;
   /**
    * This vehicle's current processing state.
    */
-  private ProcState procState;
+  private final ProcState procState;
   /**
    * This vehicle's integration level.
    */
   private final IntegrationLevel integrationLevel;
   /**
-   * The current state of the communication adapter controlling the physical vehicle.
-   */
-  @SuppressWarnings("deprecation")
-  private VehicleCommAdapter.State adapterState;
-  /**
    * A reference to the transport order this vehicle is currently processing.
    */
-  private TCSObjectReference<TransportOrder> transportOrder;
+  private final TCSObjectReference<TransportOrder> transportOrder;
   /**
    * A reference to the order sequence this vehicle is currently processing.
    */
-  private TCSObjectReference<OrderSequence> orderSequence;
+  private final TCSObjectReference<OrderSequence> orderSequence;
   /**
    * The set of transport order types this vehicle is allowed to process.
    */
-  private Set<String> allowedOrderTypes = new HashSet<>(Arrays.asList(OrderConstants.TYPE_ANY));
+  private final Set<String> allowedOrderTypes;
   /**
    * The index of the last route step travelled for the current drive order of the current transport
    * order.
    */
-  private int routeProgressIndex = ROUTE_INDEX_DEFAULT;
+  private final int routeProgressIndex;
   /**
    * A reference to the point which this vehicle currently occupies.
    */
-  private TCSObjectReference<Point> currentPosition;
+  private final TCSObjectReference<Point> currentPosition;
   /**
    * A reference to the point which this vehicle is expected to be seen at next.
    */
-  private TCSObjectReference<Point> nextPosition;
+  private final TCSObjectReference<Point> nextPosition;
   /**
    * The vehicle's precise position in world coordinates [mm], independent from logical
    * positions/point names.
    * Set to <code>null</code> if the vehicle hasn't provided a precise position.
    */
-  private Triple precisePosition;
+  private final Triple precisePosition;
   /**
    * The vehicle's current orientation angle (-360..360).
    * Set to <code>Double.NaN</code> if the vehicle hasn't provided an orientation angle.
    */
-  private double orientationAngle;
-
-  /**
-   * Creates a new vehicle.
-   *
-   * @param objectID The new vehicle's object ID.
-   * @param name The new vehicle's name.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Vehicle(int objectID, String name) {
-    super(objectID, name);
-    this.length = 1000;
-    this.energyLevelGood = 90;
-    this.energyLevelCritical = 30;
-    this.energyLevelFullyRecharged = 90;
-    this.energyLevelSufficientlyRecharged = 30;
-    this.maxVelocity = 1000;
-    this.maxReverseVelocity = 1000;
-    this.rechargeOperation = "CHARGE";
-    this.procState = ProcState.UNAVAILABLE;
-    this.transportOrder = null;
-    this.orderSequence = null;
-    this.routeProgressIndex = ROUTE_INDEX_DEFAULT;
-    this.adapterState = VehicleCommAdapter.State.UNKNOWN;
-    this.state = State.UNKNOWN;
-    this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
-    this.currentPosition = null;
-    this.nextPosition = null;
-    this.precisePosition = null;
-    this.orientationAngle = Double.NaN;
-    this.energyLevel = 100;
-    this.loadHandlingDevices = new ArrayList<>();
-  }
+  private final double orientationAngle;
 
   /**
    * Creates a new vehicle.
    *
    * @param name The new vehicle's name.
    */
-  @SuppressWarnings("deprecation")
   public Vehicle(String name) {
     super(name);
     this.length = 1000;
@@ -193,11 +148,11 @@ public class Vehicle
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
     this.rechargeOperation = "CHARGE";
-    this.procState = ProcState.UNAVAILABLE;
+    this.procState = ProcState.IDLE;
     this.transportOrder = null;
     this.orderSequence = null;
+    this.allowedOrderTypes = new HashSet<>(Arrays.asList(OrderConstants.TYPE_ANY));
     this.routeProgressIndex = ROUTE_INDEX_DEFAULT;
-    this.adapterState = VehicleCommAdapter.State.UNKNOWN;
     this.state = State.UNKNOWN;
     this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
     this.currentPosition = null;
@@ -208,9 +163,7 @@ public class Vehicle
     this.loadHandlingDevices = new ArrayList<>();
   }
 
-  @SuppressWarnings("deprecation")
-  private Vehicle(int objectID,
-                  String name,
+  private Vehicle(String name,
                   Map<String, String> properties,
                   ObjectHistory history,
                   int length,
@@ -226,7 +179,6 @@ public class Vehicle
                   TCSObjectReference<OrderSequence> orderSequence,
                   Set<String> allowedOrderTypes,
                   int routeProgressIndex,
-                  VehicleCommAdapter.State adapterState,
                   State state,
                   IntegrationLevel integrationLevel,
                   TCSObjectReference<Point> currentPosition,
@@ -235,7 +187,7 @@ public class Vehicle
                   double orientationAngle,
                   int energyLevel,
                   List<LoadHandlingDevice> loadHandlingDevices) {
-    super(objectID, name, properties, history);
+    super(name, properties, history);
     this.length = checkInRange(length, 1, Integer.MAX_VALUE, "length");
     this.energyLevelGood = checkInRange(energyLevelGood, 0, 100, "energyLevelGood");
     this.energyLevelCritical = checkInRange(energyLevelCritical, 0, 100, "energyLevelCritical");
@@ -258,7 +210,6 @@ public class Vehicle
     this.orderSequence = orderSequence;
     this.allowedOrderTypes = requireNonNull(allowedOrderTypes, "allowedOrderTypes");
     this.routeProgressIndex = routeProgressIndex;
-    this.adapterState = requireNonNull(adapterState, "adapterState");
     this.state = requireNonNull(state, "state");
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     this.currentPosition = currentPosition;
@@ -276,8 +227,7 @@ public class Vehicle
 
   @Override
   public Vehicle withProperty(String key, String value) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        propertiesWith(key, value),
                        getHistory(),
                        length,
@@ -293,7 +243,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -306,8 +255,7 @@ public class Vehicle
 
   @Override
   public Vehicle withProperties(Map<String, String> properties) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        properties,
                        getHistory(),
                        length,
@@ -323,7 +271,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -336,8 +283,7 @@ public class Vehicle
 
   @Override
   public TCSObject<Vehicle> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory().withEntryAppended(entry),
                        length,
@@ -353,7 +299,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -366,8 +311,7 @@ public class Vehicle
 
   @Override
   public TCSObject<Vehicle> withHistory(ObjectHistory history) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        history,
                        length,
@@ -383,7 +327,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -404,31 +347,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's remaining energy (in percent of the maximum).
-   *
-   * @param newEnergyLevel The new energy level. Must not be smaller than 0 or
-   * greater than 100.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setEnergyLevel(int newEnergyLevel) {
-    if (newEnergyLevel < 0 || newEnergyLevel > 100) {
-      throw new IllegalArgumentException("newEnergyLevel not in [0..100]: "
-          + newEnergyLevel);
-    }
-    energyLevel = newEnergyLevel;
-  }
-
-  /**
    * Creates a copy of this object, with the given energy level.
    *
    * @param energyLevel The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withEnergyLevel(int energyLevel) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -444,7 +369,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -518,33 +442,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's critical energy level (in percent of the maximum).
-   * The critical energy level is the one at/below which the vehicle should be
-   * recharged.
-   *
-   * @param newEnergyLevel The new critical energy level. Must not be smaller
-   * than 0 or greater than 100.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setEnergyLevelCritical(int newEnergyLevel) {
-    if (newEnergyLevel < 0 || newEnergyLevel > 100) {
-      throw new IllegalArgumentException("newEnergyLevel not in [0..100]: "
-          + newEnergyLevel);
-    }
-    energyLevelCritical = newEnergyLevel;
-  }
-
-  /**
    * Creates a copy of this object, with the given critical energy level.
    *
    * @param energyLevelCritical The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withEnergyLevelCritical(int energyLevelCritical) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -560,7 +464,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -583,33 +486,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's good energy level (in percent of the maximum).
-   * The good energy level is the one at/above which the vehicle can be
-   * dispatched again when charging.
-   *
-   * @param newEnergyLevel The new good energy level. Must not be smaller than 0
-   * or greater than 100.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setEnergyLevelGood(int newEnergyLevel) {
-    if (newEnergyLevel < 0 || newEnergyLevel > 100) {
-      throw new IllegalArgumentException("newEnergyLevel not in [0..100]: "
-          + newEnergyLevel);
-    }
-    energyLevelGood = newEnergyLevel;
-  }
-
-  /**
    * Creates a copy of this object, with the given good energy level.
    *
    * @param energyLevelGood The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withEnergyLevelGood(int energyLevelGood) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -625,7 +508,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -652,8 +534,7 @@ public class Vehicle
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -669,7 +550,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -697,8 +577,7 @@ public class Vehicle
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withEnergyLevelSufficientlyRecharged(int energyLevelSufficientlyRecharged) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -714,7 +593,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -737,28 +615,13 @@ public class Vehicle
   }
 
   /**
-   * Sets the operation that the vehicle's current communication adapter accepts
-   * as a command to recharge the vehicle.
-   *
-   * @param rechargeOperation The recharge operation.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setRechargeOperation(String rechargeOperation) {
-    this.rechargeOperation = Objects.requireNonNull(rechargeOperation,
-                                                    "rechargeOperation is null");
-  }
-
-  /**
    * Creates a copy of this object, with the given recharge operation.
    *
    * @param rechargeOperation The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withRechargeOperation(String rechargeOperation) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -774,7 +637,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -795,27 +657,13 @@ public class Vehicle
   }
 
   /**
-   * Sets the current (state of the) load handling devices of this vehicle.
-   *
-   * @param newDevices The (state of the) load handling devices.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setLoadHandlingDevices(List<LoadHandlingDevice> newDevices) {
-    loadHandlingDevices = Objects.requireNonNull(newDevices,
-                                                 "newDevices is null");
-  }
-
-  /**
    * Creates a copy of this object, with the given load handling devices.
    *
    * @param loadHandlingDevices The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withLoadHandlingDevices(List<LoadHandlingDevice> loadHandlingDevices) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -831,7 +679,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -852,29 +699,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's maximum velocity (in mm/s).
-   *
-   * @param newVelocity The new velocity.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setMaxVelocity(int newVelocity) {
-    if (newVelocity < 0) {
-      throw new IllegalArgumentException("newVelocity < 0: " + newVelocity);
-    }
-    maxVelocity = newVelocity;
-  }
-
-  /**
    * Creates a copy of this object, with the given maximum velocity.
    *
    * @param maxVelocity The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withMaxVelocity(int maxVelocity) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -890,7 +721,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -911,29 +741,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's maximum reverse velocity (in mm/s).
-   *
-   * @param newVelocity The new velocity.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setMaxReverseVelocity(int newVelocity) {
-    if (newVelocity < 0) {
-      throw new IllegalArgumentException("newVelocity < 0: " + newVelocity);
-    }
-    maxReverseVelocity = newVelocity;
-  }
-
-  /**
    * Creates a copy of this object, with the given maximum reverse velocity.
    *
    * @param maxReverseVelocity The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withMaxReverseVelocity(int maxReverseVelocity) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -949,7 +763,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -981,26 +794,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's new state.
-   *
-   * @param newState This vehicle's new state.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setState(State newState) {
-    state = Objects.requireNonNull(newState, "newState is null");
-  }
-
-  /**
    * Creates a copy of this object, with the given state.
    *
    * @param state The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withState(State state) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1016,7 +816,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1052,8 +851,7 @@ public class Vehicle
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withIntegrationLevel(IntegrationLevel integrationLevel) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1069,7 +867,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1093,26 +890,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's new processing state.
-   *
-   * @param newState This vehicle's new processing state.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setProcState(ProcState newState) {
-    procState = Objects.requireNonNull(newState, "newState is null");
-  }
-
-  /**
    * Creates a copy of this object, with the given processing state.
    *
    * @param procState The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withProcState(ProcState procState) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1128,71 +912,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
-                       state,
-                       integrationLevel,
-                       currentPosition,
-                       nextPosition,
-                       precisePosition,
-                       orientationAngle,
-                       energyLevel,
-                       loadHandlingDevices);
-  }
-
-  /**
-   * Returns the current state of the communication adapter controlling the
-   * physical vehicle represented by this <code>Vehicle</code> instance.
-   *
-   * @return The current state of this vehicle's communication adapter.
-   * @deprecated VehicleCommAdapter.State is deprecated.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public VehicleCommAdapter.State getAdapterState() {
-    return adapterState;
-  }
-
-  /**
-   * Sets the state of the communication adapter controlling the physical
-   * vehicle represented by this <code>Vehicle</code> instance.
-   *
-   * @param newState The communication adapter new state.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setAdapterState(VehicleCommAdapter.State newState) {
-    adapterState = Objects.requireNonNull(newState, "newState is null");
-  }
-
-  /**
-   * Creates a copy of this object, with the given adapter state.
-   *
-   * @param adapterState The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated VehicleCommAdapter.State is deprecated.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Vehicle withAdapterState(VehicleCommAdapter.State adapterState) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
-                       getProperties(),
-                       getHistory(),
-                       length,
-                       energyLevelGood,
-                       energyLevelCritical,
-                       energyLevelFullyRecharged,
-                       energyLevelSufficientlyRecharged,
-                       maxVelocity,
-                       maxReverseVelocity,
-                       rechargeOperation,
-                       procState,
-                       transportOrder,
-                       orderSequence,
-                       allowedOrderTypes,
-                       routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1213,22 +932,6 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's current length.
-   *
-   * @param newLength This vehicle's current length. Must be at least 1.
-   * @throws IllegalArgumentException If <code>newLength</code> is less than 1.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setLength(int newLength) {
-    if (length < 1) {
-      throw new IllegalArgumentException("newLength is less than 1");
-    }
-    length = newLength;
-  }
-
-  /**
    * Creates a copy of this object, with the given length.
    *
    * @param length The value to be set in the copy.
@@ -1236,8 +939,7 @@ public class Vehicle
    */
   public Vehicle withLength(int length) {
     checkInRange(length, 1, Integer.MAX_VALUE, "length");
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1253,7 +955,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1277,28 +978,13 @@ public class Vehicle
   }
 
   /**
-   * Assigns a transport order to this vehicle.
-   *
-   * @param newOrder A reference to the transport order this vehicle will be
-   * processing from now on. If <code>null</code>, this vehicle will not be
-   * processing any transport order.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setTransportOrder(TCSObjectReference<TransportOrder> newOrder) {
-    transportOrder = newOrder;
-  }
-
-  /**
    * Creates a copy of this object, with the given transport order.
    *
    * @param transportOrder The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withTransportOrder(TCSObjectReference<TransportOrder> transportOrder) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1314,7 +1000,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1338,28 +1023,13 @@ public class Vehicle
   }
 
   /**
-   * Assigns an order sequence to this vehicle.
-   *
-   * @param newSeq A reference to the order sequence this vehicle will be
-   * processing from now on. If <code>null</code>, this vehicle will not be
-   * processing any order sequence.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setOrderSequence(TCSObjectReference<OrderSequence> newSeq) {
-    orderSequence = newSeq;
-  }
-
-  /**
    * Creates a copy of this object, with the given order sequence.
    *
    * @param orderSequence The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withOrderSequence(TCSObjectReference<OrderSequence> orderSequence) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1375,57 +1045,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
-                       state,
-                       integrationLevel,
-                       currentPosition,
-                       nextPosition,
-                       precisePosition,
-                       orientationAngle,
-                       energyLevel,
-                       loadHandlingDevices);
-  }
-
-  /**
-   * Returns the set of categories this vehicle can process.
-   *
-   * @return The set of categories this vehicle can process.
-   * @deprecated Use {@link #getAllowedOrderTypes()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Set<String> getProcessableCategories() {
-    return allowedOrderTypes;
-  }
-
-  /**
-   * Creates a copy of this object, with the given set of processable categories.
-   *
-   * @param processableCategories The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withAllowedOrderTypes(java.util.Set)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public Vehicle withProcessableCategories(Set<String> processableCategories) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
-                       getProperties(),
-                       getHistory(),
-                       length,
-                       energyLevelGood,
-                       energyLevelCritical,
-                       energyLevelFullyRecharged,
-                       energyLevelSufficientlyRecharged,
-                       maxVelocity,
-                       maxReverseVelocity,
-                       rechargeOperation,
-                       procState,
-                       transportOrder,
-                       orderSequence,
-                       processableCategories,
-                       routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1452,8 +1071,7 @@ public class Vehicle
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withAllowedOrderTypes(Set<String> allowedOrderTypes) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1469,7 +1087,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1492,27 +1109,13 @@ public class Vehicle
   }
 
   /**
-   * Sets the index of the last route step travelled for the current drive order
-   * of the current transport order.
-   *
-   * @param newIndex The new index.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setRouteProgressIndex(int newIndex) {
-    routeProgressIndex = newIndex;
-  }
-
-  /**
    * Creates a copy of this object, with the given route progress index.
    *
    * @param routeProgressIndex The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withRouteProgressIndex(int routeProgressIndex) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1528,7 +1131,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1551,26 +1153,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's current position.
-   *
-   * @param newPosition A reference to the new position.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setCurrentPosition(TCSObjectReference<Point> newPosition) {
-    currentPosition = newPosition;
-  }
-
-  /**
    * Creates a copy of this object, with the given current position.
    *
    * @param currentPosition The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withCurrentPosition(TCSObjectReference<Point> currentPosition) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1586,7 +1175,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1609,26 +1197,13 @@ public class Vehicle
   }
 
   /**
-   * Sets this vehicle's next position.
-   *
-   * @param newPosition A reference to the new position.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setNextPosition(TCSObjectReference<Point> newPosition) {
-    nextPosition = newPosition;
-  }
-
-  /**
    * Creates a copy of this object, with the given next position.
    *
    * @param nextPosition The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withNextPosition(TCSObjectReference<Point> nextPosition) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1644,7 +1219,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1667,29 +1241,13 @@ public class Vehicle
   }
 
   /**
-   * Sets the vehicle's position in world coordinates [mm], independent from
-   * logical positions/point names.
-   *
-   * @param precisePosition The vehicle's precise position in mm. May be
-   * <code>null</code> to indicate that the vehicle hasn't provided a precise
-   * position.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setPrecisePosition(Triple precisePosition) {
-    this.precisePosition = precisePosition;
-  }
-
-  /**
    * Creates a copy of this object, with the given precise position.
    *
    * @param precisePosition The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withPrecisePosition(Triple precisePosition) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1705,7 +1263,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1728,34 +1285,13 @@ public class Vehicle
   }
 
   /**
-   * Sets the vehicle's current orientation angle, which may a value be between
-   * -360 and 360, or <code>Double.NaN</code> to indicate that the vehicle
-   * hasn't provided an orientation angle.
-   *
-   * @param orientationAngle The vehicle's orientation angle, or
-   * <code>Double.NaN</code>.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setOrientationAngle(double orientationAngle) {
-    if (!Double.isNaN(orientationAngle)
-        && (orientationAngle < -360.0
-            || orientationAngle > 360.0)) {
-      throw new IllegalArgumentException("Illegal angle: " + orientationAngle);
-    }
-    this.orientationAngle = orientationAngle;
-  }
-
-  /**
    * Creates a copy of this object, with the given orientation angle.
    *
    * @param orientationAngle The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withOrientationAngle(double orientationAngle) {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
+    return new Vehicle(getName(),
                        getProperties(),
                        getHistory(),
                        length,
@@ -1771,7 +1307,6 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       adapterState,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1792,54 +1327,6 @@ public class Vehicle
     return transportOrder != null;
   }
 
-  /**
-   * Clears all of this vehicle's communication adapter properties.
-   *
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void clearCommAdapterProperties() {
-    clearProperties();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @deprecated Will become immutable and not implement Cloneable any more.
-   */
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Vehicle clone() {
-    return new Vehicle(getIdWithoutDeprecationWarning(),
-                       getName(),
-                       getProperties(),
-                       getHistory(),
-                       length,
-                       energyLevelGood,
-                       energyLevelCritical,
-                       energyLevelFullyRecharged,
-                       energyLevelSufficientlyRecharged,
-                       maxVelocity,
-                       maxReverseVelocity,
-                       rechargeOperation,
-                       procState,
-                       transportOrder,
-                       orderSequence,
-                       allowedOrderTypes,
-                       routeProgressIndex,
-                       adapterState,
-                       state,
-                       integrationLevel,
-                       currentPosition,
-                       nextPosition,
-                       precisePosition,
-                       orientationAngle,
-                       energyLevel,
-                       loadHandlingDevices);
-  }
-
   @Override
   public String toString() {
     return "Vehicle{"
@@ -1854,7 +1341,6 @@ public class Vehicle
         + ", nextPosition=" + nextPosition
         + ", loadHandlingDevices=" + loadHandlingDevices
         + ", length=" + length
-        + ", adapterState=" + adapterState
         + ", transportOrder=" + transportOrder
         + ", routeProgressIndex=" + routeProgressIndex
         + ", orderSequence=" + orderSequence
@@ -1867,11 +1353,6 @@ public class Vehicle
         + ", rechargeOperation=" + rechargeOperation
         + ", allowedOrderTypes=" + allowedOrderTypes
         + '}';
-  }
-
-  @SuppressWarnings("deprecation")
-  private int getIdWithoutDeprecationWarning() {
-    return getId();
   }
 
   /**
@@ -1937,15 +1418,6 @@ public class Vehicle
    */
   public enum ProcState {
 
-    /**
-     * The vehicle is currently unavailable for order processing and cannot be
-     * dispatched. This is a vehicle's initial state.
-     *
-     * @deprecated {@link #IDLE} will be the default processing state in the future.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-    UNAVAILABLE,
     /**
      * The vehicle is currently not processing a transport order.
      */

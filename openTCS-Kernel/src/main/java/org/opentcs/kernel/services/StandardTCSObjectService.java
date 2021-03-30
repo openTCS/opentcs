@@ -11,7 +11,6 @@ import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -54,44 +53,36 @@ public class StandardTCSObjectService
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref) {
     synchronized (getGlobalSyncObject()) {
-      T result = getGlobalObjectPool().getObjectOrNull(clazz, ref);
-      return result == null ? null : clazz.cast(result.clone());
+      return getGlobalObjectPool().getObjectOrNull(clazz, ref);
     }
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name) {
     synchronized (getGlobalSyncObject()) {
-      T result = getGlobalObjectPool().getObjectOrNull(clazz, name);
-      return result == null ? null : clazz.cast(result.clone());
+      return getGlobalObjectPool().getObjectOrNull(clazz, name);
     }
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz) {
     synchronized (getGlobalSyncObject()) {
       Set<T> objects = getGlobalObjectPool().getObjects(clazz);
       Set<T> copies = new HashSet<>();
       for (T object : objects) {
-        copies.add(clazz.cast(object.clone()));
+        copies.add(object);
       }
       return copies;
     }
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
                                                       @Nonnull Predicate<? super T> predicate) {
     synchronized (getGlobalSyncObject()) {
-      return getGlobalObjectPool().getObjects(clazz, predicate).stream()
-          .map(obj -> clazz.cast(obj.clone()))
-          .collect(Collectors.toSet());
+      return getGlobalObjectPool().getObjects(clazz, predicate);
     }
   }
 

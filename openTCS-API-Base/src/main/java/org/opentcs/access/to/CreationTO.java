@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * The base class for all creation transfer objects.
@@ -62,20 +61,6 @@ public class CreationTO
   }
 
   /**
-   * Sets the name of this transfer object.
-   *
-   * @param name The new name.
-   * @return The modified transfer object.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public CreationTO setName(@Nonnull String name) {
-    this.name = requireNonNull(name, "name");
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name the new name
@@ -105,39 +90,8 @@ public class CreationTO
     return properties;
   }
 
-  /**
-   * Sets the properties of this transfer object.
-   *
-   * @param properties The new properties.
-   * @return The modified transfer object.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public CreationTO setProperties(@Nonnull Map<String, String> properties) {
-    this.properties = requireNonNull(properties, "properties");
-    return this;
-  }
-
   public CreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new CreationTO(name, properties);
-  }
-
-  /**
-   * Sets a single property of this transfer object.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified transfer object.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public CreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    requireNonNull(key, "key");
-    requireNonNull(value, "value");
-    properties.put(key, value);
-    return this;
   }
 
   /**

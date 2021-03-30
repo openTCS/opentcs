@@ -21,7 +21,6 @@ public class VehicleFilterTest {
   private Vehicle vehicle1;
   private Vehicle vehicle2;
   private Vehicle vehicle3;
-  private Vehicle vehicle4;
 
   public VehicleFilterTest() {
   }
@@ -37,9 +36,6 @@ public class VehicleFilterTest {
 
     vehicle3 = new Vehicle("Vehicle-003")
         .withProcState(Vehicle.ProcState.AWAITING_ORDER);
-
-    vehicle4 = new Vehicle("Vehicle-004")
-        .withProcState(Vehicle.ProcState.UNAVAILABLE);
   }
 
   @Test
@@ -48,7 +44,6 @@ public class VehicleFilterTest {
     assertTrue(emptyFilter.test(vehicle1));
     assertTrue(emptyFilter.test(vehicle2));
     assertTrue(emptyFilter.test(vehicle3));
-    assertTrue(emptyFilter.test(vehicle4));
   }
 
   @Test
@@ -57,6 +52,5 @@ public class VehicleFilterTest {
     assertTrue(idleVehiclesFilter.test(vehicle1));
     assertFalse(idleVehiclesFilter.test(vehicle2));
     assertFalse(idleVehiclesFilter.test(vehicle3));
-    assertFalse(idleVehiclesFilter.test(vehicle4));
   }
 }

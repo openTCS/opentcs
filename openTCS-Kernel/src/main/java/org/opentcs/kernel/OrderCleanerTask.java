@@ -8,6 +8,7 @@
 package org.opentcs.kernel;
 
 import com.google.common.collect.Iterables;
+import java.time.Instant;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -85,7 +86,7 @@ class OrderCleanerTask
     synchronized (globalSyncObject) {
       LOG.debug("Sweeping order pool...");
       // Candidates that are created before this point of time should be removed.
-      long creationTimeThreshold = System.currentTimeMillis() - configuration.sweepAge();
+      Instant creationTimeThreshold = Instant.now().minusMillis(configuration.sweepAge());
 
       // Remove all transport orders in a final state that do NOT belong to a sequence and that are
       // older than the threshold.
@@ -111,9 +112,9 @@ class OrderCleanerTask
   private class OrderApproval
       implements Predicate<TransportOrder> {
 
-    private final long creationTimeThreshold;
+    private final Instant creationTimeThreshold;
 
-    public OrderApproval(long creationTimeThreshold) {
+    public OrderApproval(Instant creationTimeThreshold) {
       this.creationTimeThreshold = creationTimeThreshold;
     }
 
@@ -125,7 +126,7 @@ class OrderCleanerTask
       if (order.getWrappingSequence() != null) {
         return false;
       }
-      if (order.getCreationTime() >= creationTimeThreshold) {
+      if (order.getCreationTime().isAfter(creationTimeThreshold)) {
         return false;
       }
       for (TransportOrderCleanupApproval approval : orderCleanupApprovals) {
@@ -143,9 +144,9 @@ class OrderCleanerTask
   private class SequenceApproval
       implements Predicate<OrderSequence> {
 
-    private final long creationTimeThreshold;
+    private final Instant creationTimeThreshold;
 
-    public SequenceApproval(long creationTimeThreshold) {
+    public SequenceApproval(Instant creationTimeThreshold) {
       this.creationTimeThreshold = creationTimeThreshold;
     }
 
@@ -159,7 +160,7 @@ class OrderCleanerTask
         TransportOrder lastOrder
             = orderPool.getObjectPool().getObject(TransportOrder.class,
                                                   Iterables.getLast(orderRefs));
-        if (lastOrder.getCreationTime() >= creationTimeThreshold) {
+        if (lastOrder.getCreationTime().isAfter(creationTimeThreshold)) {
           return false;
         }
       }

@@ -44,7 +44,6 @@ public class ApplicationKernelProviderTest {
   private SharedKernelServicePortalProvider portalProvider;
 
   @Before
-  @SuppressWarnings("unchecked")
   public void setUp() {
     portalManager = mock(PortalManager.class);
     dialog = mock(ConnectToServerDialog.class);

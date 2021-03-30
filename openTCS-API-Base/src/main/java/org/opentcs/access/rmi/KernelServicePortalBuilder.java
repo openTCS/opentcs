@@ -14,11 +14,9 @@ import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
-import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.access.rmi.services.RemoteKernelServicePortalProxy;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.util.ClassMatcher;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Builds {@link KernelServicePortal} instances for connections to remote portals.
@@ -34,27 +32,15 @@ public class KernelServicePortalBuilder {
   /**
    * The user name for logging in.
    */
-  private String userName;
+  private final String userName;
   /**
    * The password for logging in.
    */
-  private String password;
+  private final String password;
   /**
    * The event filter to be applied for the built portal.
    */
   private Predicate<Object> eventFilter = new ClassMatcher(Object.class);
-
-  /**
-   * Creates a new instance.
-   *
-   * @deprecated Use {@link #KernelServicePortalBuilder(java.lang.String, java.lang.String)}
-   * instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public KernelServicePortalBuilder() {
-    this(RemoteKernelServicePortal.GUEST_USER, RemoteKernelServicePortal.GUEST_PASSWORD);
-  }
 
   /**
    * Creates a new instance.
@@ -90,7 +76,6 @@ public class KernelServicePortalBuilder {
 
   /**
    * Returns the user name used for logging in.
-   * The default value is {@link RemoteKernelServicePortal#GUEST_USER}.
    *
    * @return The user name used for logging in.
    */
@@ -99,43 +84,12 @@ public class KernelServicePortalBuilder {
   }
 
   /**
-   * Sets the user name used for logging in.
-   *
-   * @param userName The user name.
-   * @return This instance.
-   * @deprecated Use {@link #KernelServicePortalBuilder(java.lang.String, java.lang.String)}
-   * instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public KernelServicePortalBuilder setUserName(@Nonnull String userName) {
-    this.userName = requireNonNull(userName, "userName");
-    return this;
-  }
-
-  /**
    * Returns the password used for logging in.
-   * The default value is {@link RemoteKernelServicePortal#GUEST_PASSWORD}.
    *
    * @return The password used for logging in.
    */
   public String getPassword() {
     return password;
-  }
-
-  /**
-   * Sets the password used for logging in.
-   *
-   * @param password The password.
-   * @return This instance.
-   * @deprecated Use {@link #KernelServicePortalBuilder(java.lang.String, java.lang.String)}
-   * instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  public KernelServicePortalBuilder setPassword(@Nonnull String password) {
-    this.password = requireNonNull(password, "password");
-    return this;
   }
 
   /**
@@ -162,7 +116,7 @@ public class KernelServicePortalBuilder {
    * Builds and returns a {@link KernelServicePortal} with the configured parameters.
    *
    * @return A {@link KernelServicePortal} instance.
-   * @throws KernelUnavailableException If the remote portal is not reachable for some reason.
+   * @throws ServiceUnavailableException If the remote portal is not reachable for some reason.
    * @throws CredentialsException If the client login with the remote portal failed, e.g. because of
    * incorrect login data.
    */

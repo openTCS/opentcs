@@ -15,18 +15,15 @@ import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a connection between two {@link Point}s which a {@link Vehicle} may traverse.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Path
     extends TCSResource<Path>
-    implements Serializable,
-               Cloneable {
+    implements Serializable {
 
   /**
    * A reference to the point which this point originates in.
@@ -39,50 +36,21 @@ public class Path
   /**
    * The length of this path (in mm).
    */
-  private long length = 1;
-  /**
-   * An explicit (unitless) weight that can be used to influence routing.
-   * The higher the value, the more travelling this path costs.
-   */
-  private long routingCost = 1;
+  private final long length;
   /**
    * The absolute maximum allowed forward velocity on this path (in mm/s).
    * A value of 0 (default) means forward movement is not allowed on this path.
    */
-  private int maxVelocity;
+  private final int maxVelocity;
   /**
    * The absolute maximum allowed reverse velocity on this path (in mm/s).
    * A value of 0 (default) means reverse movement is not allowed on this path.
    */
-  private int maxReverseVelocity;
+  private final int maxReverseVelocity;
   /**
    * A flag for marking this path as locked (i.e. to prevent vehicles from using it).
    */
-  private boolean locked;
-
-  /**
-   * Creates a new Path.
-   *
-   * @param objectID The new path's object ID.
-   * @param name The new path's name.
-   * @param sourcePoint A reference to this path's starting point.
-   * @param destinationPoint A reference to this path's destination point.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Path(int objectID,
-              String name,
-              TCSObjectReference<Point> sourcePoint,
-              TCSObjectReference<Point> destinationPoint) {
-    super(objectID, name);
-    this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
-    this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
-    this.length = 1;
-    this.routingCost = 1;
-    this.maxVelocity = 1000;
-    this.maxReverseVelocity = 1000;
-  }
+  private final boolean locked;
 
   /**
    * Creates a new Path.
@@ -98,28 +66,24 @@ public class Path
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
     this.length = 1;
-    this.routingCost = 1;
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
+    this.locked = false;
   }
 
-  @SuppressWarnings("deprecation")
-  private Path(int objectID,
-               String name,
+  private Path(String name,
                Map<String, String> properties,
                ObjectHistory history,
                TCSObjectReference<Point> sourcePoint,
                TCSObjectReference<Point> destinationPoint,
                long length,
-               long routingCost,
                int maxVelocity,
                int maxReverseVelocity,
                boolean locked) {
-    super(objectID, name, properties, history);
+    super(name, properties, history);
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
     this.length = checkInRange(length, 1, Long.MAX_VALUE, "length");
-    this.routingCost = routingCost;
     this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE, "maxVelocity");
     this.maxReverseVelocity = checkInRange(maxReverseVelocity,
                                            0,
@@ -130,14 +94,12 @@ public class Path
 
   @Override
   public Path withProperty(String key, String value) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     propertiesWith(key, value),
                     getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -145,14 +107,12 @@ public class Path
 
   @Override
   public Path withProperties(Map<String, String> properties) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     properties,
                     getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -160,14 +120,12 @@ public class Path
 
   @Override
   public TCSObject<Path> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     getProperties(),
                     getHistory().withEntryAppended(entry),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -175,14 +133,12 @@ public class Path
 
   @Override
   public TCSObject<Path> withHistory(ObjectHistory history) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     getProperties(),
                     history,
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -198,84 +154,18 @@ public class Path
   }
 
   /**
-   * Set the length of this path (in mm).
-   *
-   * @param newLength The new length of this path (in mm). Must be a positive
-   * value.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setLength(long newLength) {
-    if (newLength <= 0) {
-      throw new IllegalArgumentException("newLength is not a positive value");
-    }
-    length = newLength;
-  }
-
-  /**
    * Creates a copy of this object, with the given length.
    *
    * @param length The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withLength(long length) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     getProperties(),
                     getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    locked);
-  }
-
-  /**
-   * Returns the routing cost of this path (unitless). The higher the value, the
-   * more travelling this path costs.
-   *
-   * @return The routing cost of this path (unitless).
-   * @deprecated Use property-based routing costs, instead.
-   */
-  @Deprecated
-  public long getRoutingCost() {
-    return routingCost;
-  }
-
-  /**
-   * Sets the routing cost of this path (unitless), an explicit weight that can
-   * be used to influence routing. The higher the value, the more travelling
-   * this path costs.
-   *
-   * @param newCost The new routing cost (unitless).
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setRoutingCost(long newCost) {
-    routingCost = newCost;
-  }
-
-  /**
-   * Creates a copy of this object, with the given routing cost.
-   *
-   * @param routingCost The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use property-based routing costs, instead.
-   */
-  @Deprecated
-  public Path withRoutingCost(long routingCost) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -310,37 +200,18 @@ public class Path
   }
 
   /**
-   * Set the maximum allowed forward velocity (in mm/s).
-   *
-   * @param newVelocity The new maximum allowed velocity for this path
-   * (in mm/s). May not be a negative value.
-   * @throws IllegalArgumentException If <code>newVelocity</code> is negative.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setMaxVelocity(int newVelocity) {
-    if (newVelocity < 0) {
-      throw new IllegalArgumentException("newVelocity is negative");
-    }
-    maxVelocity = newVelocity;
-  }
-
-  /**
    * Creates a copy of this object, with the given maximum velocity.
    *
    * @param maxVelocity The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withMaxVelocity(int maxVelocity) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     getProperties(),
                     getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -357,37 +228,18 @@ public class Path
   }
 
   /**
-   * Set the maximum allowed reverse velocity (in mm/s).
-   *
-   * @param newVelocity The new maximum allowed reverse velocity for this path
-   * (in mm/s). May not be a negative value.
-   * @throws IllegalArgumentException If <code>newVelocity</code> is negative.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setMaxReverseVelocity(int newVelocity) {
-    if (newVelocity < 0) {
-      throw new IllegalArgumentException("newVelocity is negative");
-    }
-    maxReverseVelocity = newVelocity;
-  }
-
-  /**
    * Creates a copy of this object, with the given maximum reverse velocity.
    *
    * @param maxReverseVelocity The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withMaxReverseVelocity(int maxReverseVelocity) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     getProperties(),
                     getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -405,33 +257,18 @@ public class Path
   }
 
   /**
-   * Lock or unlock this path.
-   *
-   * @param newLocked If <code>true</code>, this path will be locked when the
-   * method call returns; if <code>false</code>, this path will be unlocked.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setLocked(boolean newLocked) {
-    locked = newLocked;
-  }
-
-  /**
    * Creates a copy of this object, with the given locked flag.
    *
    * @param locked The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Path withLocked(boolean locked) {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
+    return new Path(getName(),
                     getProperties(),
                     getHistory(),
                     sourcePoint,
                     destinationPoint,
                     length,
-                    routingCost,
                     maxVelocity,
                     maxReverseVelocity,
                     locked);
@@ -479,32 +316,4 @@ public class Path
       throw new IllegalArgumentException(navPoint + " is not an end point of " + this);
     }
   }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @deprecated Will become immutable and not implement Cloneable any more.
-   */
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Path clone() {
-    return new Path(getIdWithoutDeprecationWarning(),
-                    getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    routingCost,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    locked);
-  }
-
-  @SuppressWarnings("deprecation")
-  private int getIdWithoutDeprecationWarning() {
-    return getId();
-  }
-
 }

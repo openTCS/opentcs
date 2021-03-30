@@ -16,9 +16,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.customizations.ConfigurableInjectionModule;
-import org.opentcs.customizations.controlcenter.ControlCenterInjectionModule;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A base class for Guice modules adding or customizing bindings for the kernel application.
@@ -47,52 +45,12 @@ public abstract class KernelInjectionModule
   }
 
   /**
-   * Sets the parking position supplier implementation to be used.
-   *
-   * @param clazz The implementation.
-   * @deprecated Will be removed along with the deprecated supplier interface.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected void bindParkingPositionSupplier(
-      Class<? extends org.opentcs.components.kernel.ParkingPositionSupplier> clazz) {
-    bind(org.opentcs.components.kernel.ParkingPositionSupplier.class).to(clazz).in(Singleton.class);
-  }
-
-  /**
-   * Sets the recharge position supplier implementation to be used.
-   *
-   * @param clazz The implementation.
-   * @deprecated Will be removed along with the deprecated supplier interface.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected void bindRechargePositionSupplier(
-      Class<? extends org.opentcs.components.kernel.RechargePositionSupplier> clazz) {
-    bind(org.opentcs.components.kernel.RechargePositionSupplier.class).to(clazz).in(Singleton.class);
-  }
-
-  /**
    * Sets the dispatcher implementation to be used.
    *
    * @param clazz The implementation.
    */
   protected void bindDispatcher(Class<? extends Dispatcher> clazz) {
     bind(Dispatcher.class).to(clazz).in(Singleton.class);
-  }
-
-  /**
-   * Sets the recovery evaluator implementation to be used.
-   *
-   * @param clazz The implementation.
-   * @deprecated The definition of <em>recovered</em> is unclear. Unless it is clearly specified,
-   * evaluation of a state of recovery should not be part of the API.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected void bindRecoveryEvaluator(
-      Class<? extends org.opentcs.components.kernel.RecoveryEvaluator> clazz) {
-    bind(org.opentcs.components.kernel.RecoveryEvaluator.class).to(clazz).in(Singleton.class);
   }
 
   /**
@@ -122,40 +80,6 @@ public abstract class KernelInjectionModule
    */
   protected Multibinder<KernelExtension> extensionsBinderOperating() {
     return Multibinder.newSetBinder(binder(), KernelExtension.class, ActiveInOperatingMode.class);
-  }
-
-  /**
-   * Returns a multibinder that can be used to register 
-   * {@link org.opentcs.components.kernel.ControlCenterPanel} implementations for the kernel's 
-   * modelling mode.
-   *
-   * @return The multibinder.
-   * @deprecated Use {@link ControlCenterInjectionModule#controlCenterPanelBinderModelling()}
-   * instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderModelling() {
-    return Multibinder.newSetBinder(binder(),
-                                    org.opentcs.components.kernel.ControlCenterPanel.class,
-                                    ActiveInModellingMode.class);
-  }
-
-  /**
-   * Returns a multibinder that can be used to register 
-   * {@link org.opentcs.components.kernel.ControlCenterPanel} implementations for the kernel's 
-   * operating mode.
-   *
-   * @return The multibinder.
-   * @deprecated Use {@link ControlCenterInjectionModule#controlCenterPanelBinderOperating()}
-   * instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected Multibinder<org.opentcs.components.kernel.ControlCenterPanel> controlCenterPanelBinderOperating() {
-    return Multibinder.newSetBinder(binder(),
-                                    org.opentcs.components.kernel.ControlCenterPanel.class,
-                                    ActiveInOperatingMode.class);
   }
 
   /**

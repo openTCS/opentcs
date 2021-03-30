@@ -12,7 +12,6 @@ import org.opentcs.access.Kernel;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 
 /**
@@ -32,19 +31,16 @@ final class KernelStateShutdown
    * Creates a new StandardKernelShutdownState.
    *
    * @param objectPool The object pool to be used.
-   * @param messageBuffer The message buffer to be used.
    * @param modelPersister The model persister to be used.
    */
   @Inject
   public KernelStateShutdown(@GlobalSyncObject Object globalSyncObject,
                              TCSObjectPool objectPool,
                              Model model,
-                             NotificationBuffer messageBuffer,
                              ModelPersister modelPersister) {
     super(globalSyncObject,
           objectPool,
           model,
-          messageBuffer,
           modelPersister);
   }
 

@@ -22,6 +22,8 @@ import java.util.Objects;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.util.persistence.v002.V002PlantModelTO;
 import org.opentcs.util.persistence.v002.V002TOMapper;
+import org.opentcs.util.persistence.v003.V003PlantModelTO;
+import org.opentcs.util.persistence.v003.V003TOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +59,10 @@ public class ModelParser {
 
     try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                                                                   CHARSET))) {
-      if (Objects.equals(modelVersion, V002TOMapper.VERSION_STRING)) {
+      if (Objects.equals(modelVersion, V003TOMapper.VERSION_STRING)) {
+        return new V003TOMapper().map(V003PlantModelTO.fromXml(reader));
+      }
+      else if (Objects.equals(modelVersion, V002TOMapper.VERSION_STRING)) {
         return new V002TOMapper().map(V002PlantModelTO.fromXml(reader));
       }
       else {
@@ -79,8 +84,8 @@ public class ModelParser {
       throws IOException {
     try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
                                                                    CHARSET))) {
-      V002TOMapper mapper = new V002TOMapper();
-      V002PlantModelTO mappedModel = mapper.map(model);
+      V003TOMapper mapper = new V003TOMapper();
+      V003PlantModelTO mappedModel = mapper.map(model);
       mappedModel.toXml(writer);
     }
   }

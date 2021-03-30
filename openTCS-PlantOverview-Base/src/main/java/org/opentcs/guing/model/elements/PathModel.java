@@ -13,7 +13,6 @@ import java.util.ResourceBundle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.components.properties.type.BooleanProperty;
-import org.opentcs.guing.components.properties.type.IntegerProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
 import org.opentcs.guing.components.properties.type.LinerTypeProperty;
@@ -33,10 +32,6 @@ public class PathModel
    * Key for the length.
    */
   public static final String LENGTH = "length";
-  /**
-   * Key for routing costs.
-   */
-  public static final String ROUTING_COST = "cost";
   /**
    * Key for maximum forward velocity.
    */
@@ -68,10 +63,6 @@ public class PathModel
 
   public LengthProperty getPropertyLength() {
     return (LengthProperty) getProperty(LENGTH);
-  }
-
-  public IntegerProperty getPropertyRoutingCost() {
-    return (IntegerProperty) getProperty(ROUTING_COST);
   }
 
   public SpeedProperty getPropertyMaxVelocity() {
@@ -109,11 +100,6 @@ public class PathModel
     pLength.setDescription(bundle.getString("pathModel.property_length.description"));
     pLength.setHelptext(bundle.getString("pathModel.property_length.helptext"));
     setProperty(LENGTH, pLength);
-
-    IntegerProperty pCost = new IntegerProperty(this, 1);
-    pCost.setDescription(bundle.getString("pathModel.property_routingCost.descritpion"));
-    pCost.setHelptext(bundle.getString("pathModel.property_routingCost.helptext"));
-    setProperty(ROUTING_COST, pCost);
 
     SpeedProperty pMaxVelocity = new SpeedProperty(this, 1.0, SpeedProperty.Unit.M_S);
     pMaxVelocity.setDescription(bundle.getString("pathModel.property_maximumVelocity.description"));

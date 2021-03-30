@@ -117,7 +117,6 @@ class PropertyTableModel
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     if (rowIndex < 0 || rowIndex >= data.size()) {

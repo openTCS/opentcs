@@ -21,7 +21,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.vehicle.DefaultVehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
@@ -271,7 +270,7 @@ public class AttachmentManager
       attachmentPool.put(vehicleName,
                          new AttachmentInformation(entry.getVehicle().getReference(),
                                                    availableCommAdapters,
-                                                   new DefaultVehicleCommAdapterDescription("-")));
+                                                   new NullVehicleCommAdapterDescription()));
     });
   }
 

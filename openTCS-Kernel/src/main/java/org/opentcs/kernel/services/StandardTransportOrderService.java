@@ -76,16 +76,6 @@ public class StandardTransportOrderService
   }
 
   @Override
-  @Deprecated
-  public void registerTransportOrderRejection(TCSObjectReference<TransportOrder> ref,
-                                              org.opentcs.data.order.Rejection rejection)
-      throws ObjectUnknownException {
-    synchronized (globalSyncObject) {
-      orderPool.addTransportOrderRejection(ref, rejection);
-    }
-  }
-
-  @Override
   public void markOrderSequenceFinished(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
@@ -161,19 +151,17 @@ public class StandardTransportOrderService
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
     synchronized (globalSyncObject) {
-      return orderPool.createOrderSequence(to).clone();
+      return orderPool.createOrderSequence(to);
     }
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
     synchronized (globalSyncObject) {
-      return orderPool.createTransportOrder(to).clone();
+      return orderPool.createTransportOrder(to);
     }
   }
 

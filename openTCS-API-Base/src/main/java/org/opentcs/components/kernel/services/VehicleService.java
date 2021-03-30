@@ -17,7 +17,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning {@link Vehicle}s.
@@ -123,23 +122,6 @@ public interface VehicleService
   void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                      Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException, KernelRuntimeException, IllegalArgumentException;
-
-  /**
-   * Updates the categories of transport orders a vehicle can process.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param processableCategories A set of transport order categories.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @throws KernelRuntimeException In case there is an exception executing this method.
-   * @deprecated Use
-   * {@link #updateVehicleAllowedOrderTypes(org.opentcs.data.TCSObjectReference, java.util.Set)}
-   * instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed in favor of allowed order types.")
-  void updateVehicleProcessableCategories(TCSObjectReference<Vehicle> ref,
-                                          Set<String> processableCategories)
-      throws ObjectUnknownException, KernelRuntimeException;
 
   /**
    * Updates the types of transport orders a vehicle is allowed to process.

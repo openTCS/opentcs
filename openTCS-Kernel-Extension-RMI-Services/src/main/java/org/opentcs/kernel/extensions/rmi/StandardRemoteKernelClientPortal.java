@@ -177,7 +177,6 @@ public class StandardRemoteKernelClientPortal
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public ClientID login(String userName, String password, Predicate<Object> eventFilter)
       throws CredentialsException {
     requireNonNull(userName, "userName");

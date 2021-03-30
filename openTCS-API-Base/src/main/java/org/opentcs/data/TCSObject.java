@@ -14,12 +14,9 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import static org.opentcs.util.Assertions.checkArgument;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes the base behaviour of TCS data objects.
@@ -27,15 +24,9 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual object class.
  */
-@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public abstract class TCSObject<E extends TCSObject<E>>
-    implements Serializable,
-               Cloneable {
+    implements Serializable {
 
-  /**
-   * Holds the next ID.
-   */
-  private static AtomicInteger nextId = new AtomicInteger();
   /**
    * A transient reference to this business object.
    */
@@ -43,7 +34,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
   /**
    * A set of properties (key-value pairs) associated with this object.
    */
-  private Map<String, String> properties = new HashMap<>();
+  private final Map<String, String> properties;
   /**
    * An unmodifiable view on this object's properties.
    * This mainly exists for {@link #getProperties()}, as the alternative of
@@ -51,15 +42,11 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * related to garbage collection in situations where {@link #getProperties()}
    * is called often.
    */
-  private Map<String, String> propertiesReadOnly = Collections.unmodifiableMap(properties);
-  /**
-   * This object's ID.
-   */
-  private final int id;
+  private final Map<String, String> propertiesReadOnly;
   /**
    * The name of the business object.
    */
-  private String name;
+  private final String name;
   /**
    * A history of events related to this object.
    */
@@ -68,67 +55,10 @@ public abstract class TCSObject<E extends TCSObject<E>>
   /**
    * Creates a new TCSObject.
    *
-   * @param objectID The new object's ID.
-   * @param objectName The new object's name.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected TCSObject(int objectID, @Nonnull String objectName) {
-    requireNonNull(objectName, "objectName");
-
-    id = objectID;
-    name = objectName;
-    reference = new TCSObjectReference<>(this);
-    history = new ObjectHistory();
-  }
-
-  /**
-   * Creates a new TCSObject.
-   *
    * @param objectName The new object's name.
    */
   protected TCSObject(@Nonnull String objectName) {
-    this(objectName, new HashMap<>());
-  }
-
-  /**
-   * Creates a new TCSObject.
-   *
-   * @param objectID The new object's ID.
-   * @param objectName The new object's name.
-   * @param properties A set of properties (key-value pairs) associated with this object.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected TCSObject(int objectID,
-                      @Nonnull String objectName,
-                      @Nonnull Map<String, String> properties) {
-    this(objectID, objectName, properties, new ObjectHistory());
-  }
-
-  /**
-   * Creates a new TCSObject.
-   *
-   * @param objectID The new object's ID.
-   * @param objectName The new object's name.
-   * @param properties A set of properties (key-value pairs) associated with this object.
-   * @param history A history of events related to this object.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected TCSObject(int objectID,
-                      @Nonnull String objectName,
-                      @Nonnull Map<String, String> properties,
-                      @Nonnull ObjectHistory history) {
-    this.id = objectID;
-    this.name = requireNonNull(objectName, "objectName");
-    this.properties = mapWithoutNullValues(properties);
-    this.propertiesReadOnly = Collections.unmodifiableMap(this.properties);
-    this.reference = new TCSObjectReference<>(this);
-    this.history = requireNonNull(history, "history");
+    this(objectName, new HashMap<>(), new ObjectHistory());
   }
 
   /**
@@ -144,34 +74,8 @@ public abstract class TCSObject<E extends TCSObject<E>>
     this.name = requireNonNull(objectName, "objectName");
     this.properties = mapWithoutNullValues(properties);
     this.propertiesReadOnly = Collections.unmodifiableMap(this.properties);
-    this.id = nextId.getAndIncrement();
     this.reference = new TCSObjectReference<>(this);
     this.history = requireNonNull(history, "history");
-  }
-
-  /**
-   * Creates a new TCSObject.
-   *
-   * @param objectName The new object's name.
-   * @param properties A set of properties (key-value pairs) associated with this object.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  protected TCSObject(@Nonnull String objectName, @Nonnull Map<String, String> properties) {
-    this(objectName, properties, new ObjectHistory());
-  }
-
-  /**
-   * Returns this object's ID.
-   *
-   * @return This object's ID.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public int getId() {
-    return id;
   }
 
   /**
@@ -182,21 +86,6 @@ public abstract class TCSObject<E extends TCSObject<E>>
   @Nonnull
   public String getName() {
     return name;
-  }
-
-  /**
-   * Sets this object's name.
-   *
-   * @param newName This object's new name.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setName(@Nonnull String newName) {
-    requireNonNull(newName, "newName");
-    checkArgument(!newName.isEmpty(), "newName is empty string");
-    name = newName;
-    reference.setName(newName);
   }
 
   /**
@@ -228,36 +117,6 @@ public abstract class TCSObject<E extends TCSObject<E>>
   @Nullable
   public String getProperty(String key) {
     return properties.get(key);
-  }
-
-  /**
-   * Sets a property for this object.
-   *
-   * @param key The new property's key.
-   * @param value The new property's value. If <code>null</code>, removes the
-   * property from this object.
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void setProperty(String key, String value) {
-    if (value == null) {
-      properties.remove(key);
-    }
-    else {
-      properties.put(key, value);
-    }
-  }
-
-  /**
-   * Clears all of this object's properties.
-   *
-   * @deprecated Will become immutable.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void clearProperties() {
-    properties.clear();
   }
 
   /**
@@ -300,7 +159,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "{id=" + id + ", name=" + name + '}';
+    return getClass().getSimpleName() + "{name=" + name + '}';
   }
 
   /**
@@ -335,32 +194,6 @@ public abstract class TCSObject<E extends TCSObject<E>>
   public int hashCode() {
     return getName().hashCode()
         ^ this.getClass().getName().hashCode();
-  }
-
-  /**
-   * Returns a distinct copy of this object.
-   *
-   * @return A distinct copy of this object.
-   * @deprecated Will become immutable and not implement Cloneable any more.
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public TCSObject<E> clone() {
-    TCSObject<E> clone;
-    try {
-      clone = (TCSObject<E>) super.clone();
-    }
-    catch (CloneNotSupportedException exc) {
-      throw new RuntimeException("Unexpected exception", exc);
-    }
-    // Clone the reference, too, to prevent leakage of this object outside the
-    // kernel.
-    clone.reference = reference.clone();
-    clone.properties = new HashMap<>(properties);
-    clone.propertiesReadOnly = Collections.unmodifiableMap(clone.properties);
-    return clone;
   }
 
   /**

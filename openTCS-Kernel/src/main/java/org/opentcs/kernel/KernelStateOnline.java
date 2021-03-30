@@ -7,14 +7,8 @@
  */
 package org.opentcs.kernel;
 
-import java.io.IOException;
-import java.util.List;
-import org.opentcs.data.ObjectUnknownException;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +36,15 @@ abstract class KernelStateOnline
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param objectPool The object pool to be used.
    * @param model The model to be used.
-   * @param messageBuffer The message buffer to be used.
    * @param modelPersister The model persister to be used.
    * @param saveModelOnTerminate Whether to save the model when this state is terminated.
    */
   public KernelStateOnline(Object globalSyncObject,
                            TCSObjectPool objectPool,
                            Model model,
-                           NotificationBuffer messageBuffer,
                            ModelPersister modelPersister,
                            boolean saveModelOnTerminate) {
-    super(globalSyncObject, objectPool, model, messageBuffer, modelPersister);
+    super(globalSyncObject, objectPool, model, modelPersister);
     this.saveModelOnTerminate = saveModelOnTerminate;
   }
 
@@ -63,33 +55,10 @@ abstract class KernelStateOnline
     }
   }
 
-  @Override
-  @Deprecated
-  public void savePlantModel()
+  private void savePlantModel()
       throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {
       getModelPersister().saveModel(getModel().createPlantModelCreationTO());
     }
   }
-
-  @Override
-  @Deprecated
-  public void saveModel(String modelName)
-      throws IOException {
-    synchronized (getGlobalSyncObject()) {
-      getModelPersister().saveModel(getModel().createPlantModelCreationTO());
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void setVisualLayoutViewBookmarks(
-      TCSObjectReference<VisualLayout> ref,
-      List<org.opentcs.data.model.visualization.ViewBookmark> bookmarks)
-      throws ObjectUnknownException {
-    synchronized (getGlobalSyncObject()) {
-      getModel().setVisualLayoutViewBookmarks(ref, bookmarks);
-    }
-  }
-
 }

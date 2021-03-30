@@ -46,6 +46,8 @@ public class RmiServicesModule
         .in(Singleton.class);
     bind(UserManager.class)
         .in(Singleton.class);
+    bind(UserAccountProvider.class)
+        .to(DefaultUserAccountProvider.class);
 
     if (configuration.useSsl()) {
       bind(SocketFactoryProvider.class)
@@ -71,9 +73,6 @@ public class RmiServicesModule
 
     extensionsBinderAllModes().addBinding()
         .to(StandardRemoteKernelClientPortal.class)
-        .in(Singleton.class);
-    extensionsBinderAllModes().addBinding()
-        .to(StandardRemoteKernel.class)
         .in(Singleton.class);
   }
 }

@@ -12,6 +12,7 @@ package org.opentcs.guing.components.tree;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -229,16 +231,16 @@ public abstract class AbstractTreeViewPanel
   public DefaultMutableTreeNode findFirst(Object dataObject) {
     DefaultMutableTreeNode searchNode = null;
 
-    @SuppressWarnings("unchecked")
-    Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
+    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
+        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+        .collect(Collectors.toList());
 
-    while (e.hasMoreElements()) {
-      DefaultMutableTreeNode node = e.nextElement();
-      UserObject userObject = (UserObject) node.getUserObject();
+    for (DefaultMutableTreeNode child : children) {
+      UserObject userObject = (UserObject) child.getUserObject();
 
       // Select point and path "directly", not the entries in a block area.
       if (dataObject != null && dataObject.equals(userObject.getModelComponent())) {
-        searchNode = node;
+        searchNode = child;
         break;
       }
     }
@@ -264,12 +266,12 @@ public abstract class AbstractTreeViewPanel
 
   @Override
   public void sortChildren() {
-    @SuppressWarnings("unchecked")
-    Enumeration<TreeNode> eTreeNodes = ((TreeNode) objectTree.getModel().getRoot()).children();
+    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
+        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+        .collect(Collectors.toList());
 
-    while (eTreeNodes.hasMoreElements()) {
-      TreeNode node = eTreeNodes.nextElement();
-      sortItems(node);
+    for (DefaultMutableTreeNode child : children) {
+      sortItems(child);
     }
   }
 
@@ -493,15 +495,15 @@ public abstract class AbstractTreeViewPanel
   private List<DefaultMutableTreeNode> findAll(Object dataObject) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
 
-    @SuppressWarnings("unchecked")
-    Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
+    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
+        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+        .collect(Collectors.toList());
 
-    while (e.hasMoreElements()) {
-      DefaultMutableTreeNode node = e.nextElement();
-      UserObject userObject = (UserObject) node.getUserObject();
+    for (DefaultMutableTreeNode child : children) {
+      UserObject userObject = (UserObject) child.getUserObject();
 
       if (dataObject.equals(userObject.getModelComponent())) {
-        searchNodes.add(node);
+        searchNodes.add(child);
       }
     }
 
@@ -517,15 +519,15 @@ public abstract class AbstractTreeViewPanel
   private List<DefaultMutableTreeNode> findAll(UserObject o) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
 
-    @SuppressWarnings("unchecked")
-    Enumeration<DefaultMutableTreeNode> e = fRootNode.preorderEnumeration();
+    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
+        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+        .collect(Collectors.toList());
 
-    while (e.hasMoreElements()) {
-      DefaultMutableTreeNode node = e.nextElement();
-      UserObject userObject = (UserObject) node.getUserObject();
+    for (DefaultMutableTreeNode child : children) {
+      UserObject userObject = (UserObject) child.getUserObject();
 
       if (userObject == o) {
-        searchNodes.add(node);
+        searchNodes.add(child);
       }
     }
 

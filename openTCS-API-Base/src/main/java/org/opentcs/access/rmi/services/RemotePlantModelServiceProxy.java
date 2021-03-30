@@ -40,13 +40,6 @@ class RemotePlantModelServiceProxy
   }
 
   @Override
-  @Deprecated
-  public String getLoadedModelName()
-      throws KernelRuntimeException {
-    return getModelName();
-  }
-
-  @Override
   public String getModelName()
       throws KernelRuntimeException {
     checkServiceAvailability();
@@ -66,20 +59,6 @@ class RemotePlantModelServiceProxy
 
     try {
       return getRemoteService().getModelProperties(getClientId());
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public String getPersistentModelName()
-      throws KernelRuntimeException, IllegalStateException {
-    checkServiceAvailability();
-
-    try {
-      return getRemoteService().getPersistentModelName(getClientId());
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

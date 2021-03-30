@@ -13,10 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An aggregation of resources with distinct usage rules depending on the block's type.
@@ -24,11 +22,9 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * @see TCSResource
  * @author Stefan Walter (Fraunhofer IML)
  */
-@ScheduledApiChange(when = "5.0", details = "Will not implement Cloneable any more")
 public class Block
     extends TCSResource<Block>
-    implements Serializable,
-               Cloneable {
+    implements Serializable {
 
   /**
    * This block's type.
@@ -50,37 +46,19 @@ public class Block
     this.members = new HashSet<>();
   }
 
-  /**
-   * Creates an empty block.
-   *
-   * @param objectID This block's ID.
-   * @param name This block's name.
-   * @deprecated Will be removed.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Block(int objectID, String name) {
-    super(objectID, name);
-    this.type = Type.SINGLE_VEHICLE_ONLY;
-    this.members = new HashSet<>();
-  }
-
-  @SuppressWarnings("deprecation")
-  private Block(int objectID,
-                String name,
+  private Block(String name,
                 Map<String, String> properties,
                 ObjectHistory history,
                 Type type,
                 Set<TCSResourceReference<?>> members) {
-    super(objectID, name, properties, history);
+    super(name, properties, history);
     this.type = type;
     this.members = new HashSet<>(requireNonNull(members, "members"));
   }
 
   @Override
   public Block withProperty(String key, String value) {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
+    return new Block(getName(),
                      propertiesWith(key, value),
                      getHistory(),
                      type,
@@ -89,8 +67,7 @@ public class Block
 
   @Override
   public Block withProperties(Map<String, String> properties) {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
+    return new Block(getName(),
                      properties,
                      getHistory(),
                      type,
@@ -99,8 +76,7 @@ public class Block
 
   @Override
   public TCSObject<Block> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
+    return new Block(getName(),
                      getProperties(),
                      getHistory().withEntryAppended(entry),
                      type,
@@ -109,8 +85,7 @@ public class Block
 
   @Override
   public TCSObject<Block> withHistory(ObjectHistory history) {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
+    return new Block(getName(),
                      getProperties(),
                      history,
                      type,
@@ -133,8 +108,7 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withType(Type type) {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
+    return new Block(getName(),
                      getProperties(),
                      getHistory(),
                      type,
@@ -151,75 +125,13 @@ public class Block
   }
 
   /**
-   * Adds a new member to this block.
-   *
-   * @param newMember The new member to be added to this block.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void addMember(@Nonnull TCSResourceReference<?> newMember) {
-    requireNonNull(newMember, "newMember");
-    members.add(newMember);
-  }
-
-  /**
-   * Removes a member from this block.
-   *
-   * @param rmMember The member to be removed from this block.
-   * @deprecated Set via constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public void removeMember(TCSResourceReference<?> rmMember) {
-    members.remove(rmMember);
-  }
-
-  /**
    * Creates a copy of this object, with the given members.
    *
    * @param members The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public Block withMembers(Set<TCSResourceReference<?>> members) {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
-                     getProperties(),
-                     getHistory(),
-                     type,
-                     members);
-  }
-
-  /**
-   * Checks if this block contains a given object.
-   *
-   * @param chkMember The object to be checked for membership.
-   * @return <code>true</code> if, and only if, the given object is a member of
-   * this block.
-   * @deprecated Use getMembers().contains() instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public boolean containsMember(TCSResourceReference<?> chkMember) {
-    return members.contains(chkMember);
-  }
-
-  @SuppressWarnings("deprecation")
-  private int getIdWithoutDeprecationWarning() {
-    return getId();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @deprecated Will become immutable and not implement Cloneable any more.
-   */
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public Block clone() {
-    return new Block(getIdWithoutDeprecationWarning(),
-                     getName(),
+    return new Block(getName(),
                      getProperties(),
                      getHistory(),
                      type,

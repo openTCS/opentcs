@@ -13,7 +13,6 @@ import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a block in the plant model.
@@ -82,20 +81,6 @@ public class VehicleCreationTO
   }
 
   /**
-   * Sets the name of this vehicle.
-   *
-   * @param name The new name.
-   * @return The modified vehicle.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public VehicleCreationTO setName(@Nonnull String name) {
-    return (VehicleCreationTO) super.setName(name);
-  }
-
-  /**
    * Creates a copy of this object with the given name.
    *
    * @param name The new instance.
@@ -115,20 +100,6 @@ public class VehicleCreationTO
   }
 
   /**
-   * Sets the properties of this vehicle.
-   *
-   * @param properties The new properties.
-   * @return The modified vehicle.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public VehicleCreationTO setProperties(@Nonnull Map<String, String> properties) {
-    return (VehicleCreationTO) super.setProperties(properties);
-  }
-
-  /**
    * Creates a copy of this object with the given properties.
    *
    * @param properties The new properties.
@@ -145,21 +116,6 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity);
-  }
-
-  /**
-   * Sets a single property of this vehicle.
-   *
-   * @param key The property key.
-   * @param value The property value.
-   * @return The modified vehicle.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  @Override
-  public VehicleCreationTO setProperty(@Nonnull String key, @Nonnull String value) {
-    return (VehicleCreationTO) super.setProperty(key, value);
   }
 
   /**
@@ -195,22 +151,6 @@ public class VehicleCreationTO
   }
 
   /**
-   * Sets the vehicle's length (in mm).
-   *
-   * @param length The new length. Must be at least 1.
-   * @throws IllegalArgumentException If {@code newLength} is less than 1.
-   * @return The modified vehicle.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VehicleCreationTO setLength(int length) {
-    checkArgument(length >= 1, "length must be at least 1: " + length);
-    this.length = length;
-    return this;
-  }
-
-  /**
    * Creates a copy of this object with the vehicle's given length (in mm).
    *
    * @param length The new length. Must be at least 1.
@@ -237,23 +177,6 @@ public class VehicleCreationTO
    */
   public int getEnergyLevelCritical() {
     return energyLevelCritical;
-  }
-
-  /**
-   * Sets this vehicle's critical energy level (in percent of the maximum).
-   * The critical energy level is the one at/below which the vehicle should be recharged.
-   *
-   * @param energyLevelCritical The new critical energy level. Must not be smaller than 0 or
-   * greater than 100.
-   * @return The modified vehicle.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VehicleCreationTO setEnergyLevelCritical(int energyLevelCritical) {
-    checkInRange(energyLevelCritical, 0, 100);
-    this.energyLevelCritical = energyLevelCritical;
-    return this;
   }
 
   /**
@@ -286,24 +209,6 @@ public class VehicleCreationTO
    */
   public int getEnergyLevelGood() {
     return energyLevelGood;
-  }
-
-  /**
-   * Sets this vehicle's good energy level (in percent of the maximum).
-   * The good energy level is the one at/above which the vehicle can be dispatched again when
-   * charging.
-   *
-   * @param energyLevelGood The new good energy level. Must not be smaller than 0 or greater than
-   * 100.
-   * @return The modified vehicle.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  @Nonnull
-  public VehicleCreationTO setEnergyLevelGood(int energyLevelGood) {
-    checkInRange(energyLevelGood, 0, 100);
-    this.energyLevelGood = energyLevelGood;
-    return this;
   }
 
   /**
@@ -393,13 +298,6 @@ public class VehicleCreationTO
     return maxVelocity;
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public VehicleCreationTO setMaxVelocity(int maxVelocity) {
-    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
-    return this;
-  }
-
   /**
    * Creates a copy of this object with the given maximum velocity (in mm/s).
    *
@@ -421,13 +319,6 @@ public class VehicleCreationTO
 
   public int getMaxReverseVelocity() {
     return maxReverseVelocity;
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "5.0")
-  public VehicleCreationTO setMaxReverseVelocity(int maxReverseVelocity) {
-    this.maxReverseVelocity = checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
-    return this;
   }
 
   /**

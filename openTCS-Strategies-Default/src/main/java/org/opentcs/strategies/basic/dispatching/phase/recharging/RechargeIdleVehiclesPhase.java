@@ -48,8 +48,7 @@ public class RechargeIdleVehiclesPhase
   /**
    * The strategy used for finding suitable recharge locations.
    */
-  @SuppressWarnings("deprecation")
-  private final org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier;
+  private final RechargePositionSupplier rechargePosSupplier;
   /**
    * The Router instance calculating route costs.
    */
@@ -72,10 +71,9 @@ public class RechargeIdleVehiclesPhase
   private boolean initialized;
 
   @Inject
-  @SuppressWarnings("deprecation")
   public RechargeIdleVehiclesPhase(
       InternalTransportOrderService orderService,
-      org.opentcs.components.kernel.RechargePositionSupplier rechargePosSupplier,
+      RechargePositionSupplier rechargePosSupplier,
       Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter,

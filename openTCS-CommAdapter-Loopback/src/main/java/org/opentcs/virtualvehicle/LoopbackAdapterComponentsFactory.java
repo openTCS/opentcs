@@ -23,13 +23,4 @@ public interface LoopbackAdapterComponentsFactory {
    * @return A new LoopbackCommunicationAdapter for the given vehicle.
    */
   LoopbackCommunicationAdapter createLoopbackCommAdapter(Vehicle vehicle);
-
-  /**
-   * Creates a new panel for the given comm adapter.
-   *
-   * @param commAdapter The comm adapter to create a panel for.
-   * @return A new panel for the given comm adapter.
-   */
-  @Deprecated
-  LoopbackCommunicationAdapterPanel createPanel(LoopbackCommunicationAdapter commAdapter);
 }

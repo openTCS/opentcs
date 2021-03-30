@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -89,8 +90,9 @@ public class AllocationTreeModel
       vehicleNode = createNewVehicleNode(vehicleName);
     }
     //Remove all children that are not in the new allocation
-    @SuppressWarnings("unchecked")
-    List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children());
+    List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children()).stream()
+        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+        .collect(Collectors.toList());
     for (DefaultMutableTreeNode current : vehicleChildren) {
       if (!resources.contains((TCSResource<?>) current.getUserObject())) {
         vehicleNode.remove(current);
@@ -132,12 +134,13 @@ public class AllocationTreeModel
    * @return The index of the node containing the resource or -1 if not found
    */
   private int getChildIndexOf(TCSResource<?> resource, DefaultMutableTreeNode vehicleNode) {
-    @SuppressWarnings("unchecked")
-    Enumeration<DefaultMutableTreeNode> enumeration = vehicleNode.children();
-
     int index = 0;
-    while (enumeration.hasMoreElements()) {
-      DefaultMutableTreeNode child = enumeration.nextElement();
+
+    List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children()).stream()
+        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+        .collect(Collectors.toList());
+
+    for (DefaultMutableTreeNode child : vehicleChildren) {
       if (child.getUserObject().equals(resource)) {
         return index;
       }

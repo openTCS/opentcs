@@ -8,7 +8,6 @@
 package org.opentcs.drivers.vehicle;
 
 import javax.annotation.Nonnull;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Maintains associations between vehicles and vehicle controllers.
@@ -28,28 +27,4 @@ public interface VehicleControllerPool {
    */
   @Nonnull
   VehicleController getVehicleController(String vehicleName);
-
-  /**
-   * Returns the current time factor for simulation.
-   *
-   * @return The current time factor for simulation.
-   * @deprecated Simulation is out of scope for the openTCS project. Simulation-related components
-   * should be configured individually.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  double getSimulationTimeFactor();
-
-  /**
-   * Sets a time factor for simulation.
-   *
-   * @param factor The time factor.
-   * @throws IllegalArgumentException If the given value is 0.0 or smaller.
-   * @deprecated Simulation is out of scope for the openTCS project. Simulation-related components
-   * should be configured individually.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "5.0", details = "Will be removed.")
-  void setSimulationTimeFactor(double factor)
-      throws IllegalArgumentException;
 }

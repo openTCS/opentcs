@@ -72,7 +72,6 @@ public class TransportOrderUtil {
    * kernel determine one.
    * @param category The category.
    */
-  @SuppressWarnings("unchecked")
   public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
                                    List<String> actions,
                                    long deadline,
@@ -92,7 +91,6 @@ public class TransportOrderUtil {
    * kernel determine one.
    * @param type The type.
    */
-  @SuppressWarnings("unchecked")
   public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
                                    List<String> actions,
                                    List<Map<String, String>> propertiesList,
@@ -159,7 +157,7 @@ public class TransportOrderUtil {
       sharedPortal.getPortal().getTransportOrderService().createTransportOrder(
           new TransportOrderCreationTO("TOrder-", copyDestinations(pattern))
               .withIncompleteName(true)
-              .withDeadline(Instant.ofEpochMilli(pattern.getDeadline()))
+              .withDeadline(pattern.getDeadline())
               .withIntendedVehicleName(pattern.getIntendedVehicle() == null
                   ? null
                   : pattern.getIntendedVehicle().getName())
@@ -179,7 +177,6 @@ public class TransportOrderUtil {
    * @param pointModel The point that shall be driven to.
    * @param vModel The vehicle to execute this order.
    */
-  @SuppressWarnings("unchecked")
   public void createTransportOrder(PointModel pointModel, VehicleModel vModel) {
     requireNonNull(pointModel, "point");
     requireNonNull(vModel, "vehicle");
