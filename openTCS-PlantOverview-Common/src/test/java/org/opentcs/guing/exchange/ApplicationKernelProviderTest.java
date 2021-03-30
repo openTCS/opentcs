@@ -1,4 +1,4 @@
-/*
+/**
  * openTCS copyright information:
  * Copyright (c) 2014 Fraunhofer IML
  *

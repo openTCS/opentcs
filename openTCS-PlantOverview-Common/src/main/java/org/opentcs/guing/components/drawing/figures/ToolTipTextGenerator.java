@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.model.ModelComponent;
 import static org.opentcs.guing.model.ModelComponent.MISCELLANEOUS;
@@ -118,6 +117,18 @@ public class ToolTipTextGenerator {
     }
   }
 
+  private String stateColorString(Vehicle vehicle) {
+    switch (vehicle.getState()) {
+      case ERROR:
+        return "red";
+      case UNAVAILABLE:
+      case UNKNOWN:
+        return "orange";
+      default:
+        return "black";
+    }
+  }
+
   private void appendBlockInfo(StringBuilder sb, ModelComponent component) {
     sb.append(blocksToToolTipContent(getBlocksWith(component)));
   }
@@ -146,9 +157,13 @@ public class ToolTipTextGenerator {
     sb.append("<hr>");
     sb.append(miscProps.getDescription()).append(": ");
     sb.append("<ul>");
-    for (KeyValueProperty kvp : miscProps.getItems()) {
-      sb.append("<li>").append(kvp.getKey()).append(": ").append(kvp.getValue()).append("</li>");
-    }
+    miscProps.getItems().stream()
+        .sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
+        .forEach(kvp -> {
+          sb.append("<li>")
+              .append(kvp.getKey()).append(": ").append(kvp.getValue())
+              .append("</li>");
+        });
     sb.append("</ul>");
   }
 
@@ -157,8 +172,12 @@ public class ToolTipTextGenerator {
         .append(model.getPoint() != null ? model.getPoint().getName() : "?");
     sb.append("<br>").append(model.getPropertyNextPoint().getDescription()).append(": ")
         .append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
-    sb.append("<br>").append(model.getPropertyState().getDescription()).append(": ")
-        .append(model.getPropertyState().getValue());
+
+    sb.append("<br>").append(model.getPropertyState().getDescription())
+        .append(": <font color=").append(stateColorString(model.getVehicle())).append(">")
+        .append(model.getPropertyState().getValue())
+        .append("</font>");
+
     sb.append("<br>").append(model.getPropertyProcState().getDescription()).append(": ")
         .append(model.getPropertyProcState().getValue());
     sb.append("<br>").append(model.getPropertyIntegrationLevel().getDescription()).append(": ")
