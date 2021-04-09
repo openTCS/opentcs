@@ -1,4 +1,4 @@
-image: adoptopenjdk:13-jdk-hotspot
+image: adoptopenjdk:8-jdk
 
 include:
   - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
