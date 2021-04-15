@@ -105,11 +105,20 @@ public interface Scheduler
   void free(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
 
   /**
-   * Releases all resources allocation by the given client.
+   * Releases all resources allocated by the given client.
    *
    * @param client The client.
    */
   void freeAll(@Nonnull Client client);
+
+  /**
+   * Releases all pending resource allocations for the given client.
+   *
+   * @param client The client.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void clearPendingAllocations(@Nonnull Client client) {
+  }
 
   /**
    * Explicitly triggers a rescheduling run during which the scheduler tries to allocate resources

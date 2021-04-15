@@ -8,6 +8,7 @@
 package org.opentcs.strategies.basic.scheduling;
 
 import static com.google.common.base.Preconditions.checkPositionIndex;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
@@ -76,6 +78,10 @@ public class DefaultScheduler
    * A global object to be used for synchronization within the kernel.
    */
   private final Object globalSyncObject;
+  /**
+   * Allocations that are scheduled for execution on the kernel executor.
+   */
+  private final Map<Client, List<Future<?>>> allocateFutures = new HashMap<>();
   /**
    * Indicates whether this component is enabled.
    */
@@ -183,13 +189,25 @@ public class DefaultScheduler
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    kernelExecutor.submit(new AllocatorTask(plantModelService,
-                                            reservationPool,
-                                            deferredAllocations,
-                                            allocationAdvisor,
-                                            kernelExecutor,
-                                            globalSyncObject,
-                                            new Allocate(client, resources)));
+    synchronized (globalSyncObject) {
+      Future<?> allocateFuture = kernelExecutor.submit(
+          new AllocatorTask(plantModelService,
+                            reservationPool,
+                            deferredAllocations,
+                            allocationAdvisor,
+                            kernelExecutor,
+                            globalSyncObject,
+                            new Allocate(client, resources))
+      );
+
+      // Remember the allocate future in case we need to cancel it.
+      addAllocateFuture(client, allocateFuture);
+
+      // Clean up the collection of allocate futures and remove futures that have already been 
+      // completed. This could also be done in other places, but doing it for every new allocation 
+      // should be sufficient.
+      removeCompletedAllocateFutures(client);
+    }
   }
 
   @Override
@@ -262,8 +280,7 @@ public class DefaultScheduler
 
       LOG.debug("{}: Releasing all resources...", client.getId());
       reservationPool.freeAll(client);
-      LOG.debug("{}: Clearing pending allocation requests...", client.getId());
-      deferredAllocations.removeIf(allocate -> client.equals(allocate.getClient()));
+      clearPendingAllocations(client);
 
       kernelExecutor.submit(new AllocatorTask(plantModelService,
                                               reservationPool,
@@ -281,6 +298,16 @@ public class DefaultScheduler
                                             kernelExecutor,
                                             globalSyncObject,
                                             new RetryAllocates(client)));
+  }
+
+  @Override
+  public void clearPendingAllocations(Client client) {
+    requireNonNull(client, "client");
+    synchronized (globalSyncObject) {
+      LOG.debug("{}: Clearing pending allocation requests...", client.getId());
+      deferredAllocations.removeIf(allocate -> client.equals(allocate.getClient()));
+      cancelPendingAllocateFutures(client);
+    }
   }
 
   @Override
@@ -316,6 +343,36 @@ public class DefaultScheduler
                                             kernelExecutor,
                                             globalSyncObject,
                                             new CheckAllocationsPrepared(client, resources)));
+  }
+
+  private void addAllocateFuture(Client client, Future<?> allocateFuture) {
+    if (!allocateFutures.containsKey(client)) {
+      allocateFutures.put(client, new ArrayList<>());
+    }
+
+    allocateFutures.get(client).add(allocateFuture);
+  }
+
+  private void removeCompletedAllocateFutures(Client client) {
+    if (!allocateFutures.containsKey(client)) {
+      return;
+    }
+
+    allocateFutures.get(client).removeAll(
+        allocateFutures.get(client).stream()
+            .filter(future -> future.isDone())
+            .collect(Collectors.toList())
+    );
+  }
+
+  private void cancelPendingAllocateFutures(Client client) {
+    if (!allocateFutures.containsKey(client)) {
+      return;
+    }
+
+    allocateFutures.get(client).stream()
+        .filter(future -> !future.isDone())
+        .forEach(future -> future.cancel(false));
   }
 
   /**

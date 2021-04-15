@@ -9,6 +9,7 @@ package org.opentcs.drivers.vehicle;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,6 +17,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the system to control a vehicle.
@@ -107,4 +109,18 @@ public interface VehicleController
    */
   @Nonnull
   Queue<MovementCommand> getCommandsSent();
+
+  /**
+   * Returns the command for which the execution of peripheral operations must be completed before
+   * it can be sent to the communication adapter. 
+   * For this command, allocated resources have already been accepted.
+   *
+   * @return The command for which the execution of peripheral operations is pending or 
+   * {@link Optional#empty()} if there's no such command.
+   */
+  @Nonnull
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default Optional<MovementCommand> getInteractionsPendingCommand() {
+    return Optional.empty();
+  }
 }

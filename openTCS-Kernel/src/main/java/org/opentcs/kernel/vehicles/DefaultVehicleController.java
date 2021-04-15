@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -389,11 +390,8 @@ public class DefaultVehicleController
 
   private void discardFutureCommands() {
     futureCommands.clear();
-    if (waitingForAllocation) {
-      LOG.debug("{}: Discarding pending command but still waiting for allocation: {}",
-                vehicle.getName(),
-                pendingCommand);
-    }
+    scheduler.clearPendingAllocations(this);
+    waitingForAllocation = false;
     pendingCommand = null;
   }
 
@@ -526,6 +524,11 @@ public class DefaultVehicleController
   @Override
   public Queue<MovementCommand> getCommandsSent() {
     return new LinkedList<>(commandsSent);
+  }
+
+  @Override
+  public Optional<MovementCommand> getInteractionsPendingCommand() {
+    return Optional.ofNullable(interactionsPendingCommand);
   }
 
   @Override

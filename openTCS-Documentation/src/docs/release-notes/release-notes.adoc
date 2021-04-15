@@ -49,6 +49,13 @@ It does not impose any duty on Fraunhofer IML to disclose any information nor to
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+=== Unreleased
+
+* Other changes:
+** When a vehicle is waiting for resources to be allocated (e.g. because resources are occupied/blocked by another vehicle), allow it to be rerouted from its current position.
+   (Previously, rerouting was done from the point for which the vehicle was waiting, which could lead to unnecessary waiting times.)
+** When a vehicle is rerouted while it is waiting for peripheral interactions to be finished, properly reroute the vehicle from the peripheral's position.
+
 === Version 5.2 (2021-03-29)
 
 * New features:

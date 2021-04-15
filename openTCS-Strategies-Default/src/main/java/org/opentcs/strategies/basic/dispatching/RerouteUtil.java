@@ -99,6 +99,7 @@ public class RerouteUtil {
     TransportOrder originalOrder = transportOrderService.fetchObject(TransportOrder.class,
                                                                      vehicle.getTransportOrder());
 
+    LOG.debug("{}: Determining the reroute source...", vehicle.getName());
     Point rerouteSource = getFutureOrCurrentPosition(vehicle);
 
     // Get all unfinished drive order of the transport order the vehicle is processing
@@ -119,7 +120,7 @@ public class RerouteUtil {
                 newDriveOrders);
     }
     else {
-      LOG.debug("Couldn't find a new route for {}. Updating the current one...", 
+      LOG.debug("Couldn't find a new route for {}. Updating the current one...",
                 vehicle.getName());
       unfinishedOrders = updatePathLocks(unfinishedOrders);
       unfinishedOrders
@@ -291,21 +292,36 @@ public class RerouteUtil {
 
   /**
    * Returns the point the given vehicle will be at after processing all commands that have been
-   * currently sent to its comm adapter or its current position, if its sent queue is empty.
+   * or are to be sent to its comm adapter or its current position, if there are no such commands.
    *
    * @param vehicle The vehicle to get the point for.
    * @return The point.
    */
-  public Point getFutureOrCurrentPosition(Vehicle vehicle) {
+  private Point getFutureOrCurrentPosition(Vehicle vehicle) {
     VehicleController controller = vehicleControllerPool.getVehicleController(vehicle.getName());
-    if (controller.getCommandsSent().isEmpty()) {
+    if (controller.getCommandsSent().isEmpty()
+        && controller.getInteractionsPendingCommand().isEmpty()) {
+      LOG.debug("{}: No commands expected to be executed. Using current position: {}",
+                vehicle.getName(),
+                vehicle.getCurrentPosition());
       return transportOrderService.fetchObject(Point.class, vehicle.getCurrentPosition());
     }
 
+    if (controller.getInteractionsPendingCommand().isPresent()) {
+      LOG.debug(
+          "{}: Command with pending peripheral operations present. Using its destination point: {}",
+          vehicle.getName(),
+          controller.getInteractionsPendingCommand().get().getStep().getDestinationPoint()
+      );
+      return controller.getInteractionsPendingCommand().get().getStep().getDestinationPoint();
+    }
+
     List<MovementCommand> commandsSent = new ArrayList<>(controller.getCommandsSent());
-    LOG.debug("Commands sent: {}", commandsSent);
-    MovementCommand lastCommandSend = commandsSent.get(commandsSent.size() - 1);
-    return lastCommandSend.getStep().getDestinationPoint();
+    MovementCommand lastCommandSent = commandsSent.get(commandsSent.size() - 1);
+    LOG.debug("{}: Using the last command sent to the communication adapter: {}",
+              vehicle.getName(),
+              lastCommandSent);
+    return lastCommandSent.getStep().getDestinationPoint();
   }
 
   /**
