@@ -7,7 +7,6 @@
  */
 package org.opentcs.virtualvehicle;
 
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
@@ -16,12 +15,12 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.model.Vehicle.Orientation;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
@@ -31,7 +30,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
-import org.opentcs.util.CyclicTask;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.virtualvehicle.VelocityController.WayEntry;
 import org.slf4j.Logger;
@@ -74,18 +72,6 @@ public class LoopbackCommunicationAdapter
    */
   private final VirtualVehicleConfiguration configuration;
   /**
-   * The adapter components factory.
-   */
-  private final LoopbackAdapterComponentsFactory componentsFactory;
-  /**
-   * The kernel's executor.
-   */
-  private final ExecutorService kernelExecutor;
-  /**
-   * The task simulating the virtual vehicle's behaviour.
-   */
-  private CyclicTask vehicleSimulationTask;
-  /**
    * The boolean flag to check if execution of the next command is allowed.
    */
   private boolean singleStepExecutionAllowed;
@@ -101,20 +87,22 @@ public class LoopbackCommunicationAdapter
    * Whether the loopback adapter is initialized or not.
    */
   private boolean initialized;
+  /**
+   * The amount of time that passed during the simulation of an operation.
+   */
+  private int operationSimulationTimePassed;
 
   /**
    * Creates a new instance.
    *
-   * @param componentsFactory The factory providing additional components for this adapter.
    * @param configuration This class's configuration.
    * @param vehicle The vehicle this adapter is associated with.
    * @param kernelExecutor The kernel's executor.
    */
   @Inject
-  public LoopbackCommunicationAdapter(LoopbackAdapterComponentsFactory componentsFactory,
-                                      VirtualVehicleConfiguration configuration,
+  public LoopbackCommunicationAdapter(VirtualVehicleConfiguration configuration,
                                       @Assisted Vehicle vehicle,
-                                      @KernelExecutor ExecutorService kernelExecutor) {
+                                      @KernelExecutor ScheduledExecutorService kernelExecutor) {
     super(new LoopbackVehicleModel(vehicle),
           configuration.commandQueueCapacity(),
           1,
@@ -122,8 +110,6 @@ public class LoopbackCommunicationAdapter
           kernelExecutor);
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
-    this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
-    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
   @Override
@@ -181,10 +167,6 @@ public class LoopbackCommunicationAdapter
       return;
     }
     getProcessModel().getVelocityController().addVelocityListener(getProcessModel());
-    // Create task for vehicle simulation.
-    vehicleSimulationTask = new VehicleSimulationTask();
-    Thread simThread = new Thread(vehicleSimulationTask, getName() + "-simulationTask");
-    simThread.start();
     super.enable();
   }
 
@@ -193,9 +175,6 @@ public class LoopbackCommunicationAdapter
     if (!isEnabled()) {
       return;
     }
-    // Disable vehicle simulation.
-    vehicleSimulationTask.terminate();
-    vehicleSimulationTask = null;
     getProcessModel().getVelocityController().removeVelocityListener(getProcessModel());
     super.disable();
   }
@@ -211,13 +190,13 @@ public class LoopbackCommunicationAdapter
 
     // Reset the execution flag for single-step mode.
     singleStepExecutionAllowed = false;
-    // Don't do anything else - the command will be put into the sentQueue
-    // automatically, where it will be picked up by the simulation task.
+    // Start the simulation task
+    ((ExecutorService) getExecutor()).submit(() -> startVehicleSimulation());
   }
 
   @Override
   public void processMessage(Object message) {
-    // Process LimitSpeeed message which might pause the vehicle.
+    // Process speed multiplier message which might pause the vehicle.
     if (message instanceof SetSpeedMultiplier) {
       SetSpeedMultiplier lsMessage = (SetSpeedMultiplier) message;
       int multiplier = lsMessage.getMultiplier();
@@ -227,9 +206,7 @@ public class LoopbackCommunicationAdapter
 
   @Override
   public synchronized void initVehiclePosition(String newPos) {
-    kernelExecutor.submit(() -> {
-      getProcessModel().setVehiclePosition(newPos);
-    });
+    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setVehiclePosition(newPos));
   }
 
   @Override
@@ -312,149 +289,106 @@ public class LoopbackCommunicationAdapter
     singleStepExecutionAllowed = true;
   }
 
-  /**
-   * A task simulating a vehicle's behaviour.
-   */
-  private class VehicleSimulationTask
-      extends CyclicTask {
-
-    /**
-     * The time that has passed for the velocity controller whenever
-     * <em>advanceTime</em> has passed for real.
-     */
-    private int simAdvanceTime;
-
-    /**
-     * Creates a new VehicleSimluationTask.
-     */
-    private VehicleSimulationTask() {
-      super(0);
+  private void startVehicleSimulation() {
+    LOG.debug("Starting vehicle simulation...");
+    Step step = getSentQueue().peek().getStep();
+    if (step.getPath() == null) {
+      return;
     }
 
-    @Override
-    protected void runActualTask() {
-      final MovementCommand curCommand;
-      synchronized (LoopbackCommunicationAdapter.this) {
-        curCommand = getSentQueue().peek();
-      }
-      simAdvanceTime = (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
-      if (curCommand == null) {
-        Uninterruptibles.sleepUninterruptibly(ADVANCE_TIME, TimeUnit.MILLISECONDS);
-        getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
+    long pathLength = step.getPath().getLength();
+    int maxVelocity;
+    switch (step.getVehicleOrientation()) {
+      case BACKWARD:
+        maxVelocity = step.getPath().getMaxReverseVelocity();
+        break;
+      default:
+        maxVelocity = step.getPath().getMaxVelocity();
+        break;
+    }
+    String pointName = step.getDestinationPoint().getName();
+
+    getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
+    getProcessModel().getVelocityController().addWayEntry(
+        new WayEntry(pathLength, maxVelocity, pointName, step.getVehicleOrientation())
+    );
+
+    operationSimulationTimePassed = 0;
+    ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(),
+                                                        getSimulationTimeStep(),
+                                                        TimeUnit.MILLISECONDS);
+  }
+
+  private void movementSimulation() {
+    if (!getProcessModel().getVelocityController().hasWayEntries()) {
+      return;
+    }
+
+    WayEntry prevWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
+    getProcessModel().getVelocityController().advanceTime(getSimulationTimeStep());
+    WayEntry currentWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
+    //if we are still on the same way entry then reschedule to do it again
+    if (prevWayEntry == currentWayEntry) {
+      ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(),
+                                                          getSimulationTimeStep(),
+                                                          TimeUnit.MILLISECONDS);
+    }
+    else {
+      //if the way enties are different then we have finished this step
+      //and we can move on.
+      getProcessModel().setVehiclePosition(prevWayEntry.getDestPointName());
+      LOG.debug("Movement simulation finished.");
+      if (!getSentQueue().peek().isWithoutOperation()) {
+        LOG.debug("Now simulating vehicle operation...");
+        ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(),
+                                                            getSimulationTimeStep(),
+                                                            TimeUnit.MILLISECONDS);
       }
       else {
-        // If we were told to move somewhere, simulate the journey.
-        LOG.debug("Processing MovementCommand...");
-        final Step curStep = curCommand.getStep();
-        // Simulate the movement.
-        simulateMovement(curStep);
-        // Simulate processing of an operation.
-        if (!curCommand.isWithoutOperation()) {
-          simulateOperation(curCommand.getOperation());
-        }
-        LOG.debug("Processed MovementCommand.");
-        if (!isTerminated()) {
-          // Set the vehicle's state back to IDLE, but only if there aren't 
-          // any more movements to be processed.
-          if (getSentQueue().size() <= 1 && getCommandQueue().isEmpty()) {
-            getProcessModel().setVehicleState(Vehicle.State.IDLE);
-          }
-          // Update GUI.
-          synchronized (LoopbackCommunicationAdapter.this) {
-            MovementCommand sentCmd = getSentQueue().poll();
-            // If the command queue was cleared in the meantime, the kernel
-            // might be surprised to hear we executed a command we shouldn't
-            // have, so we only peek() at the beginning of this method and
-            // poll() here. If sentCmd is null, the queue was probably cleared
-            // and we shouldn't report anything back.
-            if (sentCmd != null && sentCmd.equals(curCommand)) {
-              // Let the vehicle manager know we've finished this command.
-              getProcessModel().commandExecuted(curCommand);
-              LoopbackCommunicationAdapter.this.notify();
-            }
-          }
-        }
+        finishVehicleSimulation();
       }
     }
 
-    /**
-     * Simulates the vehicle's movement. If the method parameter is null,
-     * then the vehicle's state is failure and some false movement
-     * must be simulated. In the other case normal step
-     * movement will be simulated.
-     *
-     * @param step A step
-     * @throws InterruptedException If an exception occured while sumulating
-     */
-    private void simulateMovement(Step step) {
-      if (step.getPath() == null) {
-        return;
-      }
+  }
 
-      Orientation orientation = step.getVehicleOrientation();
-      long pathLength = step.getPath().getLength();
-      int maxVelocity;
-      switch (orientation) {
-        case BACKWARD:
-          maxVelocity = step.getPath().getMaxReverseVelocity();
-          break;
-        default:
-          maxVelocity = step.getPath().getMaxVelocity();
-          break;
-      }
-      String pointName = step.getDestinationPoint().getName();
+  private void operationSimulation() {
+    operationSimulationTimePassed += getSimulationTimeStep();
 
-      getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
-      getProcessModel().getVelocityController().addWayEntry(new WayEntry(pathLength,
-                                                                         maxVelocity,
-                                                                         pointName,
-                                                                         orientation));
-      // Advance the velocity controller by small steps until the
-      // controller has processed all way entries.
-      while (getProcessModel().getVelocityController().hasWayEntries() && !isTerminated()) {
-        WayEntry wayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
-        Uninterruptibles.sleepUninterruptibly(ADVANCE_TIME, TimeUnit.MILLISECONDS);
-        getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
-        WayEntry nextWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
-        if (wayEntry != nextWayEntry) {
-          // Let the vehicle manager know that the vehicle has reached
-          // the way entry's destination point.
-          getProcessModel().setVehiclePosition(wayEntry.getDestPointName());
-        }
-      }
+    if (operationSimulationTimePassed < getProcessModel().getOperatingTime()) {
+      getProcessModel().getVelocityController().advanceTime(getSimulationTimeStep());
+      ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(),
+                                                          getSimulationTimeStep(),
+                                                          TimeUnit.MILLISECONDS);
     }
-
-    /**
-     * Simulates an operation.
-     *
-     * @param operation A operation
-     * @throws InterruptedException If an exception occured while simulating
-     */
-    private void simulateOperation(String operation) {
-      requireNonNull(operation, "operation");
-
-      if (isTerminated()) {
-        return;
-      }
-
-      LOG.debug("Operating...");
-      final int operatingTime = getProcessModel().getOperatingTime();
-      getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
-      for (int timePassed = 0; timePassed < operatingTime && !isTerminated();
-           timePassed += simAdvanceTime) {
-        Uninterruptibles.sleepUninterruptibly(ADVANCE_TIME, TimeUnit.MILLISECONDS);
-        getProcessModel().getVelocityController().advanceTime(simAdvanceTime);
-      }
+    else {
+      LOG.debug("Operation simulation finished.");
+      String operation = getSentQueue().peek().getOperation();
       if (operation.equals(getProcessModel().getLoadOperation())) {
         // Update load handling devices as defined by this operation
         getProcessModel().setVehicleLoadHandlingDevices(
-            Arrays.asList(new LoadHandlingDevice(LHD_NAME, true)));
+            Arrays.asList(new LoadHandlingDevice(LHD_NAME, true))
+        );
       }
       else if (operation.equals(getProcessModel().getUnloadOperation())) {
         getProcessModel().setVehicleLoadHandlingDevices(
-            Arrays.asList(new LoadHandlingDevice(LHD_NAME, false)));
+            Arrays.asList(new LoadHandlingDevice(LHD_NAME, false))
+        );
       }
+      finishVehicleSimulation();
     }
+  }
+
+  private void finishVehicleSimulation() {
+    //Set the vehicle state to idle
+    if (getSentQueue().size() <= 1 && getCommandQueue().isEmpty()) {
+      getProcessModel().setVehicleState(Vehicle.State.IDLE);
+    }
+    // Let the comm adapter know we have finished this command.
+    getProcessModel().commandExecuted(getSentQueue().poll());
+  }
+
+  private int getSimulationTimeStep() {
+    return (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
   }
 
   /**

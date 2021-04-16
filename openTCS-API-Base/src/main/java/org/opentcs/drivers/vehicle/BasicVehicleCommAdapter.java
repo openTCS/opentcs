@@ -14,11 +14,13 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_ENQUEUED;
 import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.util.Assertions.checkInRange;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +97,10 @@ public abstract class BasicVehicleCommAdapter
    * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
    * @param rechargeOperation The string to recognize as a recharge operation.
    * @param executor The executor to run tasks on.
+   * @deprecated Use more specific constructor instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed")
   public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
                                  int commandQueueCapacity,
                                  int sentQueueCapacity,
@@ -112,6 +117,28 @@ public abstract class BasicVehicleCommAdapter
                                           "sentQueueCapacity");
     this.rechargeOperation = requireNonNull(rechargeOperation, "rechargeOperation");
     this.executor = requireNonNull(executor, "executor");
+  }
+
+  /**
+   * Creates a new instance.
+   *
+   * @param vehicleModel An observable model of the vehicle's and its comm adapter's attributes.
+   * @param commandQueueCapacity The number of commands this comm adapter's command queue accepts.
+   * Must be at least 1.
+   * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
+   * @param rechargeOperation The string to recognize as a recharge operation.
+   * @param executor The executor to run tasks on.
+   */
+  public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
+                                 int commandQueueCapacity,
+                                 int sentQueueCapacity,
+                                 String rechargeOperation,
+                                 ScheduledExecutorService executor) {
+    this(vehicleModel,
+         commandQueueCapacity,
+         sentQueueCapacity,
+         rechargeOperation,
+         (Executor) executor);
   }
 
   /**
@@ -290,6 +317,16 @@ public abstract class BasicVehicleCommAdapter
    */
   public String getName() {
     return getProcessModel().getName();
+  }
+
+  /**
+   * Returns the executor to run tasks on.
+   *
+   * @return The executor to run tasks on.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Will return ScheduledExectorService instead")
+  public Executor getExecutor() {
+    return executor;
   }
 
   /**

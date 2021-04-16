@@ -51,6 +51,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 === Unreleased
 
+* Bugs fixed:
+** Execute virtual vehicle simulation using the kernel executor to avoid potential deadlocks.
 * Other changes:
 ** When a vehicle is waiting for resources to be allocated (e.g. because resources are occupied/blocked by another vehicle), allow it to be rerouted from its current position.
    (Previously, rerouting was done from the point for which the vehicle was waiting, which could lead to unnecessary waiting times.)
