@@ -292,31 +292,32 @@ public class LoopbackCommunicationAdapter
   private void startVehicleSimulation() {
     LOG.debug("Starting vehicle simulation...");
     Step step = getSentQueue().peek().getStep();
-    if (step.getPath() == null) {
-      return;
-    }
-
-    long pathLength = step.getPath().getLength();
-    int maxVelocity;
-    switch (step.getVehicleOrientation()) {
-      case BACKWARD:
-        maxVelocity = step.getPath().getMaxReverseVelocity();
-        break;
-      default:
-        maxVelocity = step.getPath().getMaxVelocity();
-        break;
-    }
-    String pointName = step.getDestinationPoint().getName();
-
     getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
-    getProcessModel().getVelocityController().addWayEntry(
-        new WayEntry(pathLength, maxVelocity, pointName, step.getVehicleOrientation())
-    );
-
     operationSimulationTimePassed = 0;
-    ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(),
-                                                        getSimulationTimeStep(),
-                                                        TimeUnit.MILLISECONDS);
+
+    if (step.getPath() == null) {
+      ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(),
+                                                          getSimulationTimeStep(),
+                                                          TimeUnit.MILLISECONDS);
+    }
+    else {
+      getProcessModel().getVelocityController().addWayEntry(
+          new WayEntry(step.getPath().getLength(),
+                       maxVelocity(step),
+                       step.getDestinationPoint().getName(),
+                       step.getVehicleOrientation())
+      );
+
+      ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(),
+                                                          getSimulationTimeStep(),
+                                                          TimeUnit.MILLISECONDS);
+    }
+  }
+
+  private int maxVelocity(Step step) {
+    return (step.getVehicleOrientation() == Vehicle.Orientation.BACKWARD)
+        ? step.getPath().getMaxReverseVelocity()
+        : step.getPath().getMaxVelocity();
   }
 
   private void movementSimulation() {
@@ -348,7 +349,6 @@ public class LoopbackCommunicationAdapter
         finishVehicleSimulation();
       }
     }
-
   }
 
   private void operationSimulation() {
