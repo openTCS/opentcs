@@ -33,9 +33,11 @@ import org.opentcs.data.model.Path;
 public interface RemoteRouterService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   public void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked)
       throws RemoteException;
 
   public void updateRoutingTopology(ClientID clientId)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

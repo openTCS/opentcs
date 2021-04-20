@@ -37,6 +37,7 @@ public interface RemoteTransportOrderService
     extends RemoteTCSObjectService,
             Remote {
 
+  // CHECKSTYLE:OFF
   OrderSequence createOrderSequence(ClientID clientId, OrderSequenceCreationTO to)
       throws RemoteException;
 
@@ -45,4 +46,5 @@ public interface RemoteTransportOrderService
 
   void markOrderSequenceComplete(ClientID clientId, TCSObjectReference<OrderSequence> ref)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

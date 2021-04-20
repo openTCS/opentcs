@@ -38,6 +38,7 @@ public interface RemotePeripheralService
     extends RemoteTCSObjectService,
             Remote {
 
+  // CHECKSTYLE:OFF
   void attachCommAdapter(ClientID clientId,
                          TCSResourceReference<Location> ref,
                          PeripheralCommAdapterDescription description)
@@ -60,4 +61,5 @@ public interface RemotePeripheralService
                               TCSResourceReference<Location> ref,
                               PeripheralAdapterCommand command)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

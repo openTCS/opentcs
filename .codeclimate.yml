@@ -4,9 +4,8 @@ plugins:
   # Enable the Checkstyle plugin - see https://docs.codeclimate.com/docs/checkstyle
   checkstyle:
     enabled: true
-  config:
-    file:
-      "config/checkstyle/checkstyle.xml"
+    config:
+      file: "config/checkstyle/checkstyle.xml"
 
 # Note: The default checks configuration is documented at https://docs.codeclimate.com/docs/advanced-configuration#default-checks.
 #checks:

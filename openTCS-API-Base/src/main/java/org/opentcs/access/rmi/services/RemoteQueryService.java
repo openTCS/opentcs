@@ -32,6 +32,8 @@ import org.opentcs.components.kernel.services.QueryService;
 public interface RemoteQueryService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   <T> T query(ClientID clientId, Query<T> query)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

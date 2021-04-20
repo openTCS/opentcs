@@ -39,6 +39,7 @@ public interface RemoteVehicleService
     extends RemoteTCSObjectService,
             Remote {
 
+  // CHECKSTYLE:OFF
   void attachCommAdapter(ClientID clientId, TCSObjectReference<Vehicle> ref,
                          VehicleCommAdapterDescription description)
       throws RemoteException;
@@ -75,4 +76,5 @@ public interface RemoteVehicleService
                                       TCSObjectReference<Vehicle> ref,
                                       Set<String> allowedOrderTypes)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

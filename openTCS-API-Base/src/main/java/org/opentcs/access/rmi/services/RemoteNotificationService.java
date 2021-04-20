@@ -34,10 +34,12 @@ import org.opentcs.data.notification.UserNotification;
 public interface RemoteNotificationService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   List<UserNotification> fetchUserNotifications(ClientID clientId,
                                                 Predicate<UserNotification> predicate)
       throws RemoteException;
 
   void publishUserNotification(ClientID clientId, UserNotification notification)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

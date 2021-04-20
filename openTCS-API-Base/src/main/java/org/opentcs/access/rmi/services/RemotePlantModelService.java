@@ -36,6 +36,7 @@ public interface RemotePlantModelService
     extends RemoteTCSObjectService,
             Remote {
 
+  // CHECKSTYLE:OFF
   void createPlantModel(ClientID clientId, PlantModelCreationTO to)
       throws RemoteException;
 
@@ -47,4 +48,5 @@ public interface RemotePlantModelService
 
   void updateLocationLock(ClientID clientId, TCSObjectReference<Location> ref, boolean locked)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

@@ -1,9 +1,8 @@
 apply plugin: 'checkstyle'
 
 checkstyle {
-  toolVersion = '8.16'
+  toolVersion = '8.39'
   configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-  configProperties = [suppressions_file:rootDir.absolutePath + "/config/checkstyle/suppressions.xml"]
   showViolations = false
 }
 

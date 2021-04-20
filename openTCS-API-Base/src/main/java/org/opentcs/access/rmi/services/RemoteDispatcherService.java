@@ -34,6 +34,7 @@ import org.opentcs.data.order.TransportOrder;
 public interface RemoteDispatcherService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   void dispatch(ClientID clientId)
       throws RemoteException;
 
@@ -46,4 +47,5 @@ public interface RemoteDispatcherService
                                 TCSObjectReference<TransportOrder> ref,
                                 boolean immediateAbort)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

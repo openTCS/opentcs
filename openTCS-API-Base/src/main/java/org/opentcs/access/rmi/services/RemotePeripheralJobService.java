@@ -34,6 +34,8 @@ public interface RemotePeripheralJobService
     extends RemoteTCSObjectService,
             Remote {
 
+  // CHECKSTYLE:OFF
   PeripheralJob createPeripheralJob(ClientID clientId, PeripheralJobCreationTO to)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

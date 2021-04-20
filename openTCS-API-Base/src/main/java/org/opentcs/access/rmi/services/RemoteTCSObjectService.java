@@ -36,6 +36,7 @@ import org.opentcs.data.TCSObjectReference;
 public interface RemoteTCSObjectService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   <T extends TCSObject<T>> T fetchObject(ClientID clientId,
                                          Class<T> clazz,
                                          TCSObjectReference<T> ref)
@@ -62,4 +63,5 @@ public interface RemoteTCSObjectService
                                 TCSObjectReference<?> ref,
                                 ObjectHistory.Entry entry)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

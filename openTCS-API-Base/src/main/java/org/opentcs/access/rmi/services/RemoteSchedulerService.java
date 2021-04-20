@@ -32,6 +32,8 @@ import org.opentcs.components.kernel.services.SchedulerService;
 public interface RemoteSchedulerService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   public SchedulerAllocationState fetchSchedulerAllocations(ClientID clientId)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

@@ -33,9 +33,11 @@ import org.opentcs.data.model.TCSResourceReference;
 public interface RemotePeripheralDispatcherService
     extends Remote {
 
+  // CHECKSTYLE:OFF
   void dispatch(ClientID clientId)
       throws RemoteException;
 
   void withdrawByLocation(ClientID clientId, TCSResourceReference<Location> ref)
       throws RemoteException;
+  // CHECKSTYLE:ON
 }

@@ -5,15 +5,10 @@
 
 <!-- See http://checkstyle.sourceforge.net/checks.html for all checks + descriptions. -->
 <module name="Checker">
-  <module name="SuppressionFilter">
-    <property name="file" value="${suppressions_file}"/>
-  </module>
+
+  <property name="severity" value="warning"/>
   
-  <!-- CHECKS WITH SEVERITY ERROR START HERE. -->
-  
-  <module name="FileTabCharacter">
-    <property name="severity" value="error"/>
-  </module>
+  <property name="fileExtensions" value="java, properties"/>
 
   <!-- CHECKS WITH SEVERITY WARNING START HERE. -->
   
@@ -22,14 +17,18 @@
     <property name="severity" value="warning"/>
   </module>
   
-  <!-- CHECKS WITH SEVERITY INFO START HERE. -->
-  
-  <!-- Checks that a package-info.java file exists for each package. -->
-  <module name="JavadocPackage">
-    <property name="allowLegacy" value="false"/>
-    <property name="severity" value="info"/>
+  <module name="FileTabCharacter">
+    <property name="severity" value="warning"/>
   </module>
 
+  <module name="LineLength">
+    <property name="max" value="100"/>
+    <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
+    <property name="severity" value="warning"/>
+  </module>
+  
+  <!-- CHECKS WITH SEVERITY INFO START HERE. -->
+  
   <!-- Checks whether files end with a new line. -->
   <module name="NewlineAtEndOfFile">
     <property name="severity" value="info"/>
@@ -37,6 +36,12 @@
   
   <!-- CHECKS CURRENTLY UNUSED START HERE. -->
   
+  <!-- Checks that a package-info.java file exists for each package. -->
+  <module name="JavadocPackage">
+    <property name="allowLegacy" value="false"/>
+    <property name="severity" value="ignore"/>
+  </module>
+
   <!-- Checks that property files contain the same keys. -->
   <module name="Translation">
     <property name="fileExtensions" value="properties"/>
@@ -45,159 +50,151 @@
   </module>
   
   <module name="TreeWalker">
-
+  
     <module name="SuppressionCommentFilter"/>
-    
-    <!-- CHECKS WITH SEVERITY ERROR START HERE. -->
-    
+	
+    <!-- CHECKS WITH SEVERITY WARNING START HERE. -->
+
     <!-- Checks for undesired imports. Defaults to sun.* packages. -->
     <module name="IllegalImport">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="UnusedImports">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="RedundantImport">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
 
     <!-- Checks for Naming Conventions. -->
     <module name="LocalVariableName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     <module name="MemberName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     <module name="MethodName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     <module name="PackageName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     <module name="ParameterName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     <module name="StaticVariableName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     <module name="TypeName">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="HiddenField">
       <property name="tokens" value="VARIABLE_DEF, LAMBDA"/>
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="NeedBraces">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="LeftCurly">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="RightCurly">
       <property name="option" value="alone"/>
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="CovariantEquals">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="EmptyStatement">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="IllegalInstantiation">
       <property name="classes" value="java.lang.Boolean"/>
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="InnerAssignment">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="MissingSwitchDefault">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="ModifiedControlVariable">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="SimplifyBooleanExpression">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="SimplifyBooleanReturn">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="StringLiteralEquality">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="NestedTryDepth">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="PackageDeclaration">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="ParameterAssignment">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="DefaultComesLast">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="FallThrough">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="MultipleVariableDeclarations">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="HideUtilityClassConstructor">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="MutableException">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="InnerTypeLast">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="UpperEll">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
     <module name="ArrayTypeStyle">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
     </module>
     
-    <!-- CHECKS WITH SEVERITY WARNING START HERE. -->
-
     <module name="AvoidStarImport">
       <property name="excludes" value="org.junit,org.junit.Assert,org.junit.jupiter.params,org.junit.jupiter.params.provider"/>
       <property name="severity" value="warning"/>
     </module>
 
-    <module name="LineLength">
-      <property name="max" value="100"/>
-      <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
-      <property name="severity" value="warning"/>
-    </module>
-    
     <module name="MethodLength">
       <property name="severity" value="warning"/>
     </module>
@@ -265,10 +262,6 @@
     
     <module name="JavadocMethod">
       <property name="scope" value="package"/>
-      <property name="allowMissingJavadoc" value="true"/>
-      <property name="allowMissingPropertyJavadoc" value="true"/>
-      <property name="allowUndeclaredRTE" value="true"/>
-      <property name="allowThrowsTagsForSubclasses" value="true"/>
       <property name="severity" value="info"/>
     </module>
     
@@ -281,6 +274,12 @@
       <property name="severity" value="info"/>
     </module>
 
+    <module name="MissingJavadocMethod">
+      <property name="scope" value="package"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
+      <property name="severity" value="info"/>
+    </module>
+    
     <module name="ModifierOrder">
       <property name="severity" value="info"/>
     </module>
@@ -320,10 +319,6 @@
       <property name="severity" value="info"/>
     </module>
     
-    <module name="AvoidInlineConditionals">
-      <property name="severity" value="info"/>
-    </module>
-    
     <module name="SuperClone">
       <property name="severity" value="info"/>
     </module>
@@ -336,6 +331,10 @@
     
     <!-- CHECKS CURRENTLY UNUSED START HERE. -->
 
+    <module name="AvoidInlineConditionals">
+      <property name="severity" value="ignore"/>
+    </module>
+	
     <!-- Mainly reports unit tests and Guice modules, where we don't really need constructors. -->
     <module name="MissingCtor">
       <property name="severity" value="ignore"/>
