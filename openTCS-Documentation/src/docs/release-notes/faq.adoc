@@ -1,7 +1,16 @@
 = openTCS: Frequently Asked Questions
 The openTCS developers
 openTCS {project-version}
+:doctype: article
+:toc: left
+:toclevels: 3
+:sectnums: all
+:sectnumlevels: 3
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
 :last-update-label!:
+:experimental:
 
 == General questions about the software
 

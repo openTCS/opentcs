@@ -130,25 +130,25 @@ The kernel and the client applications depend on the following external framewor
 
 The kernel application also depends on the following libraries:
 
-* JGraphT (http://jgrapht.org/):
+* JGraphT (https://jgrapht.org/):
   A library for working with graphs and using algorithms on them.
-* Spark (http://sparkjava.com/):
+* Spark (https://sparkjava.com/):
   A framework for creating web applications.
 * Jackson (https://github.com/FasterXML/jackson):
   Provides JSON bindings for Java objects.
 
 The Model Editor and Operations Desk applications have the following additional dependencies:
 
-* JHotDraw (http://www.jhotdraw.org/):
+* JHotDraw (https://github.com/wrandelshofer/jhotdraw):
   A framework for drawing graph structures (like driving course models).
-* Docking Frames (http://www.docking-frames.org/):
+* Docking Frames (https://www.docking-frames.org/):
   A framework for docking and undocking of GUI panels
 
 For automatic tests, the following dependencies are used:
 
 * JUnit (https://junit.org/):
   A simple unit-testing framework.
-* Mockito (http://mockito.org/):
+* Mockito (https://site.mockito.org/):
   A framework for creating mock objects.
 * Hamcrest (http://hamcrest.org/):
   A framework for assertion matchers that can be used in tests.
@@ -163,7 +163,7 @@ For examples, see <<Customizing and extending the kernel application>>, <<Custom
 
 === Logging
 
-The code in the official openTCS distribution uses http://www.slf4j.org/[SLF4J] for logging.
+The code in the official openTCS distribution uses https://www.slf4j.org/[SLF4J] for logging.
 Thus, the actual logging implementation is easily interchangeable by replacing the SLF4J binding in the respective application's classpath.
 The kernel and client applications come with SLF4J's bindings for `java.util.logging` by default.
 For more information on how to change the actual logging implementation, e.g. to use log4j, please see the SLF4J documentation.

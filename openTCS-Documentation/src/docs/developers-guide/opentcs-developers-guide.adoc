@@ -1,7 +1,17 @@
 = openTCS: Developer's Guide
 The openTCS developers
 openTCS {project-version}
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums: all
+:sectnumlevels: 6
+:imagesdir: images
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
 :last-update-label!:
+:experimental:
 ifdef::backend-pdf[:imagesdir: {imagesoutdir}]
 ifdef::backend-html5[:imagesdir: images]
 

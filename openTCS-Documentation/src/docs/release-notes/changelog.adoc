@@ -1,69 +1,35 @@
-= openTCS: Release Notes
+= openTCS: Change Log
 The openTCS developers
 openTCS {project-version}
+:doctype: article
+:toc: left
+:toclevels: 3
+:sectnums!:
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
 :last-update-label!:
-
-== Introduction
-
-openTCS (short for "open Transportation Control System") is a free platform for controlling vehicles in an Automated Guided Vehicle System (AGVS).
-It should generally be possible to control any track-guided vehicle with it, even if the tracks are only virtual, but AGVSs are the main target.
-It is being maintained at the Fraunhofer Institute for Material Flow and Logistics in Dortmund, Germany.
-
-The software runs on the Java platform (version 13).
-All libraries required for compiling and/or using it are freely available, too.
-
-openTCS itself is not a complete product you can use "out-of-the-box" to control an AGVS with.
-Primarily, It is a framework/an implementation of the basic data structures and algorithms (routing, dispatching, scheduling) needed for running an AGVS with more than one vehicle.
-It tries to be as generic as possible to allow interoperation with track-guided vehicles of practically any vendor.
-Thus it is usually necessary to at least create and integrate a vehicle driver (called "communication adapter" in openTCS-speak) that translates between the abstract interface of the openTCS kernel and the communication protocol your vehicle understands.
-Depending on your needs, it might also be necessary to adapt algorithms or add project-specific strategies.
-
-The openTCS source code is licensed partly under the terms of the MIT License and partly under the terms of the GNU Lesser General Public License.
-A copy of the licenses is included in the distribution.
-For details on the licensing, see the file `LICENSE.txt`.
-
-Please note that openTCS is distributed without any warranty - without even the implied warranty of merchantibility or fitness for a particular purpose.
-Please refer to the license for details.
-
-We are grateful to any developers that have contributed to openTCS.
-A list of all contributors known by name can be found at the end of this document.
-
-To download the latest version and/or read news about openTCS, please see its web site at http://www.opentcs.org/ or the project homepage at http://sourceforge.net/projects/opentcs/.
-
-== Getting started
-
-To get started with openTCS, please refer to the user's guide, the developer's guide and the JavaDoc API documentation that are included in the distribution.
-
-== Support
-
-Please note that, while we are happy to be able to release openTCS to the public as free software and would like to see it used and improved continuously, the development team cannot provide unlimited free support for it.
-
-If you have technical/support questions, please post them on the project's mailing list, where the community and the developers involved will respond as time permits.
-You can subscribe to the mailing list on the project homepage at http://sourceforge.net/projects/opentcs/.
-
-Legal notice:
-This announcement of possible supporting services is not intended to create any binding or legal obligations or an obligation on entering any contract.
-It does not impose any duty on Fraunhofer IML to disclose any information nor to enter into any individual agreement or obligation.
-
-== Change log
+:experimental:
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
-=== Unreleased
+== Unreleased
 
 * Bugs fixed:
 ** Execute virtual vehicle simulation using the kernel executor to avoid potential deadlocks.
 * Other changes:
+** Update the license information:
+   All components, including the Model Editor and Operations Desk applications, are now licensed under the terms of the MIT license.
 ** When a vehicle is waiting for resources to be allocated (e.g. because resources are occupied/blocked by another vehicle), allow it to be rerouted from its current position.
    (Previously, rerouting was done from the point for which the vehicle was waiting, which could lead to unnecessary waiting times.)
 ** When a vehicle is rerouted while it is waiting for peripheral interactions to be finished, properly reroute the vehicle from the peripheral's position.
 
-=== Version 5.2 (2021-03-29)
+== Version 5.2 (2021-03-29)
 
 * New features:
 ** For plant model elements' tooltip texts in the Operations Desk, sort properties lexicographically and colorize vehicles' states.
 
-=== Version 5.1 (2021-03-24)
+== Version 5.1 (2021-03-24)
 
 * Bugs fixed:
 ** Made names generated for transport orders to be (really) lexicographically sortable.
@@ -83,7 +49,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    (Layers can now be used to group plant model components.)
 ** Allow project-specific edge evaluators and routing group mappings to be used.
 
-=== Version 4.20 (2020-12-18)
+== Version 4.20 (2020-12-18)
 
 * Fixes:
 ** Default `Scheduler`: Properly handle requests for _same-direction_ blocks for some edge cases.
@@ -91,12 +57,12 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** Plant Overview: Improve performance for vehicle state updates.
 
-=== Version 4.19 (2020-07-02)
+== Version 4.19 (2020-07-02)
 
 * New features:
 ** As with paths, locations can now be locked via the Plant Overview application to prevent them from being used by vehicles.
 
-=== Version 5.0 (2020-06-05)
+== Version 5.0 (2020-06-05)
 
 * Remove deprecated code.
 ** Remove the TCP host interface kernel extension.
@@ -108,7 +74,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Update project to Java 13.
 * Update Mockito to 2.28.2.
 
-=== Version 4.18 (2020-04-09)
+== Version 4.18 (2020-04-09)
 
 * New features:
 ** Provide the route to be travelled to vehicle drivers with every movement order, for cases in which vehicles require some information about it.
@@ -119,7 +85,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Rename transport order category to transport order type.
 ** Update Spark to 2.9.1.
 
-=== Version 4.17 (2019-12-10)
+== Version 4.17 (2019-12-10)
 
 * Bugs fixed:
 ** In the Plant Overview application's "Continuous load" plugin panel, it is now possible to properly remove/delete entries in the drive order and property tables.
@@ -127,12 +93,12 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** When using the Kernel's RMI interface with SSL enabled, avoid side effects on other components using SSL.
 
-=== Version 4.16.1 (2019-10-30)
+== Version 4.16.1 (2019-10-30)
 
 * Bugs fixed:
 ** Fix creating links between points and locations in the Plant Overview application.
 
-=== Version 4.16 (2019-10-22)
+== Version 4.16 (2019-10-22)
 
 * New features:
 ** Optionally have names for transport orders and order sequences generated by the kernel.
@@ -147,7 +113,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    As a result, transport order definition files from old versions of openTCS cannot be restored.)
 ** Make using the "try it out" buttons in the OpenAPI documentation possible by setting CORS headers in the web API's responses.
 
-=== Version 4.15 (2019-05-02)
+== Version 4.15 (2019-05-02)
 
 * New features:
 ** Add history entries for transport orders being deferred or resumed as well as assigned to or reserved for vehicles in the dispatching process.
@@ -170,7 +136,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Remove the menu item to trigger the kernel's dispatching process from the Plant Overview's main menu.
    The dispatcher is triggered automatically (and, for special cases in integration projects, periodically), so manual triggering does not need to be involved.
 
-=== Version 4.14 (2019-03-22)
+== Version 4.14 (2019-03-22)
 
 * Bugs fixed:
 ** With the `defaultdispatcher.reparkVehiclesToHigherPriorityPositions` configuration enabled:
@@ -180,12 +146,12 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** The Kernel application does no longer persist `Color` and `ViewBookmark` elements of the visual layout.
    (For some time now, these elements could no longer be created with the PlantOverview application and were ignored when a model was loaded, anyway.)
 
-=== Version 4.13.1 (2019-02-25)
+== Version 4.13.1 (2019-02-25)
 
 * Bugs fixed:
 ** Fix a bug with the loopback communication adapter that prevents resources from being properly released when the "loopback:initialPosition" property is set on vehicles.
 
-=== Version 4.13 (2019-02-18)
+== Version 4.13 (2019-02-18)
 
 * New features:
 ** Introduce an event history for transport orders that can be filled with arbitrary event data.
@@ -202,7 +168,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update JUnit to 5.3.2.
 ** Update Guice to 4.2.2.
 
-=== Version 4.12 (2018-12-20)
+== Version 4.12 (2018-12-20)
 
 * New features:
 ** Introduce optional priorities for parking positions.
@@ -214,7 +180,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** Prevent a movement order from being sent to a vehicle a second time after the vehicle got rerouted while waiting for resource allocation.
 
-=== Version 4.11 (2018-12-04)
+== Version 4.11 (2018-12-04)
 
 * New features:
 ** Introduce a _type_ property for blocks.
@@ -235,7 +201,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Mark all `AdapterCommand` implementations in the base API as deprecated.
    These commands' functionality is specific to the respective communication adapter and should be implemented and used there.
 
-=== Version 4.10 (2018-08-07)
+== Version 4.10 (2018-08-07)
 
 * New features:
 ** Introduce an explicit _integration level_ property for vehicles that expresses to what degree a vehicle should be integrated into the system.
@@ -254,14 +220,14 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Adjust the default docking frames layout in the Plant Overview for mode OPERATING a bit to make better use of wide-screen displays.
 ** Include web API documentation generated by Swagger in the distribution.
 
-=== Version 4.9.1 (2018-04-26)
+== Version 4.9.1 (2018-04-26)
 
 * Bugs fixed:
 ** Include the `buildSrc/` directory in the source distribution.
 ** Properly display vehicle routes after adding driving course views in the Plant Overview.
 ** Properly disconnect the plant overview from the kernel when switching to modelling mode.
 
-=== Version 4.9 (2018-04-16)
+== Version 4.9 (2018-04-16)
 
 * Bugs fixed:
 ** Fix jumping mouse cursor when dragging/moving model elements in the Plant Overview in some cases.
@@ -280,28 +246,28 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Improve API and deprecate classes and methods in lots of places.
 ** Improve default formatting of log output for better readability.
 
-=== Version 4.8.4 (2018-02-12)
+== Version 4.8.4 (2018-02-12)
 
 * Bugs fixed:
 ** Fix erroneous behaviour for renaming of points when points are block members in the plant model.
 
-=== Version 4.8.3 (2018-01-24)
+== Version 4.8.3 (2018-01-24)
 
 * Bugs fixed:
 ** Fix processing of XML messages received via the TCP-based host interface.
 
-=== Version 4.8.2 (2017-12-15)
+== Version 4.8.2 (2017-12-15)
 
 * Bugs fixed:
 ** Properly store links between locations and points in the unified XML file format when the link was drawn from the location instead of from the point.
 
-=== Version 4.8.1 (2017-12-05)
+== Version 4.8.1 (2017-12-05)
 
 * Bugs fixed:
 ** Ensure that marshalling and unmarshalling of XML data always uses UTF-8.
    This fixes problems with plant models containing special characters (like German umlauts) e.g. in element names.
 
-=== Version 4.8 (2017-11-28)
+== Version 4.8 (2017-11-28)
 
 * Bugs fixed:
 ** Properly copy model coordinates to layout coordinates in the plant overview without invalidating the model.
@@ -315,7 +281,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    Support for the old format will eventually be removed in a future version, though, so users are advised to switch to the new format.)
 ** Remove some unmaintained features from the loopback adapter and its GUI.
 
-=== Version 4.7 (2017-10-11)
+== Version 4.7 (2017-10-11)
 
 * Bugs fixed:
 ** Ensure that scheduler modules are properly terminated.
@@ -324,7 +290,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Have the default dispatcher periodically check for idle vehicles that could be dispatched.
    This picks up vehicles that have not been in a dispatchable state when dispatching them was previously tried.
 
-=== Version 4.6 (2017-09-25)
+== Version 4.6 (2017-09-25)
 
 * Bugs fixed:
 ** Don't mark a drive order as finished if the transport order it belongs to was withdrawn.
@@ -340,7 +306,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** Deprecate `VehicleCommAdapter.State`. It's not really used anywhere, and the enum elements are fuzzy/incomplete, anyway.
 
-=== Version 4.5 (2017-08-10)
+== Version 4.5 (2017-08-10)
 
 * Switched to a plain JGraphT-based implementation of Dijkstra's algorithm for routing.
 * Deprecated static routes.
@@ -353,7 +319,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Made JHotDraw and Docking Frames libraries available as Maven artifacts so they do not have to be kept in the sources distribution.
 * Updated Mockito to 2.8.47.
 
-=== Version 4.4 (2017-07-17)
+== Version 4.4 (2017-07-17)
 
 * Fixed a performance issue with building routing tables in the default router caused by excessive calling of methods on a configuration binding interface.
 * Introduced a method to explicitly trigger routing topology updates via the `Kernel` interface instead of explicitly updating it whenever a path was locked/unlocked to avoid redundant computations.
@@ -363,7 +329,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Deprecated explicit event filters, which make the code more verbose without adding any value.
 * Some small bugfixes and improvements.
 
-=== Version 4.3 (2017-06-30)
+== Version 4.3 (2017-06-30)
 
 * Introduced configuration based on binding interfaces and cfg4j to provide implementations for these, and deprecated the previously used configuration classes.
   Implications and side effects:
@@ -374,7 +340,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Updated Gradle wrapper to 3.5.
 * Many small bugfixes and improvements.
 
-=== Version 4.2 (2017-05-29)
+== Version 4.2 (2017-05-29)
 
 * Simplify the kernel API by using transfer objects to create plant models and transport orders. 
   Expect plant models to be transferred as a whole instead of updating existing model elements with multiple calls.
@@ -382,7 +348,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * A location type's (default) symbol can now be overwritten by a location to display an empty symbol.
 * Fix a bug where a large plant model could be loaded multiple times when loaded from the kernel into the plant overview.
 
-=== Version 4.1 (2017-04-20)
+== Version 4.1 (2017-04-20)
 
 * Added functionality for reading and writing the kernel's plant model file format to the plant overview client.
 * Added bezier paths with three control points to the plant overview client.
@@ -394,11 +360,11 @@ This change log lists the most relevant changes for past releases in reverse chr
   (Computation of separate tables for vehicles is optionally possible.)
 * Many small bugfixes and improvements to code and documentation.
 
-=== Version 4.0.1 (2017-02-25)
+== Version 4.0.1 (2017-02-25)
 
 * Fix a potential deadlock in the default scheduler.
 
-=== Version 4.0 (2017-02-11)
+== Version 4.0 (2017-02-11)
 
 * Split the base library into a base API, an injection API and a library with commonly used utility classes to reduce the load of transitive dependencies for API users.
 * Heavily cleaned up the APIs, including some backwards-incompatible changes (mainly renaming and removing previously deprecated elements).
@@ -418,7 +384,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Updated Gradle to 2.13.
 * Many small bugfixes and improvements.
 
-=== Version 3.2 (2016-01-19)
+== Version 3.2 (2016-01-19)
 
 * Switched to Gradle as the build management system for improved dependency management and release process.
 This introduces cleanly separate subprojects for base library, basic strategies library, kernel application, plant overview application and documentation.
@@ -432,11 +398,11 @@ Also add method `publishEvent()` to `BasicCommunicationAdapter` to allow communi
 * Updated library Guava to 18.0.
 * Many small fixes and improvements.
 
-=== Version 3.1.1 (2015-05-06)
+== Version 3.1.1 (2015-05-06)
 
 * Fix a crash in the plant overview client that occured when the user tried to add a drive order to a transport order.
 
-=== Version 3.1 (2015-03-23)
+== Version 3.1 (2015-03-23)
 
 * Fix the encoding of model files written by the plant overview client.
 * Fix a problem with renaming points that resulted in broken model files.
@@ -446,7 +412,7 @@ Also add method `publishEvent()` to `BasicCommunicationAdapter` to allow communi
 * Fix direction indicators of paths not being displayed properly after loading a model from a file.
 * Fix outdated documentation in a couple of places.
 
-=== Version 3.0 (2014-11-25)
+== Version 3.0 (2014-11-25)
 
 * The plant overview client can now be used for offline modelling, i.e. without requiring a permanent connection to the kernel.
 * To further reflect these changes, the plant overview client now maintains its operating mode independently from the kernel's state.
@@ -467,11 +433,11 @@ To migrate all of your existing models to this new version, please refer to the 
 * Updated library JAXB to 2.2.7.
 * Updated project to Java 8.
 
-=== Version 2.7.1 (2014-06-30)
+== Version 2.7.1 (2014-06-30)
 
 * Fixed a potential crash with switching to plant operation mode when the model contained static routes.
 
-=== Version 2.7 (2014-06-25)
+== Version 2.7 (2014-06-25)
 
 * Updated library Docking Frames to 1.1.2p11.
 * Added library Google Guava 16.0.1 for better code readability via small utility methods.
@@ -485,14 +451,14 @@ To migrate all of your existing models to this new version, please refer to the 
 * Made more wide-spread use of dependency injection via Guice and refactored, cleaned up and simplified source code in many places, primarily in the plant overview client.
 * Many small bugfixes and improvements.
 
-=== Version 2.6.1 (2014-03-14)
+== Version 2.6.1 (2014-03-14)
 
 * Properly color the route for vehicles that have just been created and not loaded from an existing plant model.
 * Fix loading plant models created by older versions of openTCS that contained certain path liner types.
 * Properly set point types as read from the plant model in the plant overview client.
 * Do not provide a clickable graphical figure in the plant overview client for vehicles that should actually be invisible.
 
-=== Version 2.6 (2014-02-28)
+== Version 2.6 (2014-02-28)
 
 * Updated library Docking Frames to 1.1.2p10e.
 * Updated library JDOM to 2.0.5.
@@ -514,7 +480,7 @@ To migrate all of your existing models to this new version, please refer to the 
 * Fixed/improved GUI layout in multiple places of the kernel control center.
 * Many bugfixes and improvements to code and documentation.
 
-=== Version 2.5 (2013-12-18)
+== Version 2.5 (2013-12-18)
 
 * Added library Docking Frames 1.1.2-P8c.
 * Made some panels in the plant overview client (un)dockable.
@@ -525,18 +491,18 @@ To migrate all of your existing models to this new version, please refer to the 
 * Translated the user manual to English.
 * Many small bugfixes and improvements to both the code and the documentation.
 
-=== Version 2.4.2 (2013-07-29)
+== Version 2.4.2 (2013-07-29)
 
 * Updated the XML Schema definitions for the host interface.
 
-=== Version 2.4.1 (2013-05-30)
+== Version 2.4.1 (2013-05-30)
 
 * Updated the visualization client, including many bug fixes, usability improvements and internationalization (English and German language).
 * Properly included a vehicle's length when persisting/materializing a course model.
 * Removed an erroneous JAXB annotation that led to an exception when trying to persist load generator input data in the generic client.
 * Changed the startup scripts/batch files to look for extension JARs in `lib/openTCS-extensions/` instead of `lib/`.
 
-=== Version 2.4 (2013-02-07)
+== Version 2.4 (2013-02-07)
 
 * Updated JDOM to 2.0.4.
 * Updated JHotDraw to 7.6.
@@ -567,7 +533,7 @@ All information about the vehicles themselves is stored in Vehicle, now, simplif
 * Properly propagate exceptions to clients connected via the RMI proxy.
 * Small bug fixes and improvements to code and documentation.
 
-=== Version 2.3 (2012-09-17)
+== Version 2.3 (2012-09-17)
 
 * Moved sources of the generic client into the main project's source tree.
 * Updated JFreeChart to 1.0.14.
@@ -589,7 +555,7 @@ Use our own references to the transport order, not the one we received as a para
 (This effectively means the API provided by the base JAR changed.
 Fixing any resulting broken imports should be the only thing required to use the new version.)
 
-=== Version 2.2 (2012-07-10)
+== Version 2.2 (2012-07-10)
 
 * Published as free open source software (license: the MIT license, see `LICENSE.txt`) - Requires Java 1.7
 * Update JDOM to 2.0.2.
@@ -601,27 +567,3 @@ Fixing any resulting broken imports should be the only thing required to use the
 * Switched from properties to XML for configuration files
 * Simplified and more consistent kernel API
 * Many small bug fixes and adjustments of the included strategies
-
-== Contributors
-
-We are grateful for anyone helping us to improve openTCS by contributing code or documentation.
-So far, the developers involved were/are (in alphabetical order by last name):
-
-* Hubert Buechter
-* Iryna Felko
-* Martin Grzenia
-* Preity Gupta
-* Heinz Huber
-* Olaf Krause
-* Tobias Marquardt
-* Sebastian Naumann
-* Volkmar Pontow
-* Leonard Schüngel
-* Philipp Seifert
-* Andreas Trautmann
-* Stefan Walter
-* Mats Wilhelm
-* Mustafa Yalciner
-* Youssef Zaki
-
-If you have contributed to openTCS and we have missed you on this list, please accept our apologies and inform us about it.
