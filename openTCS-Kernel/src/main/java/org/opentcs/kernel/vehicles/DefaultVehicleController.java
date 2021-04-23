@@ -434,6 +434,7 @@ public class DefaultVehicleController
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
 
       clearPeripheralInteractions();
+      clearCommandQueue();
     }
   }
 
@@ -877,6 +878,12 @@ public class DefaultVehicleController
     }
     if (waitingForAllocation) {
       LOG.debug("{}: Cannot send, waiting for allocation", vehicle.getName());
+      return false;
+    }
+    if (pendingCommand != null) {
+      LOG.debug("{}: Cannot send, resource allocation is pending for: {}",
+                vehicle.getName(),
+                pendingCommand);
       return false;
     }
     if (peripheralInteractor.isWaitingForMovementInteractionsToFinish()) {

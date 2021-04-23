@@ -60,6 +60,7 @@ public interface VehicleController
 
   /**
    * Resets the current drive order for the vehicle associated with this controller.
+   * At the end of this method, {@link #clearCommandQueue()} is called implicitly.
    */
   void clearDriveOrder();
 
@@ -112,10 +113,10 @@ public interface VehicleController
 
   /**
    * Returns the command for which the execution of peripheral operations must be completed before
-   * it can be sent to the communication adapter. 
+   * it can be sent to the communication adapter.
    * For this command, allocated resources have already been accepted.
    *
-   * @return The command for which the execution of peripheral operations is pending or 
+   * @return The command for which the execution of peripheral operations is pending or
    * {@link Optional#empty()} if there's no such command.
    */
   @Nonnull

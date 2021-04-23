@@ -17,6 +17,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * Bugs fixed:
 ** Execute virtual vehicle simulation using the kernel executor to avoid potential deadlocks.
+** Fix immediate withdrawal of transport orders.
 * Other changes:
 ** Update the license information:
    All components, including the Model Editor and Operations Desk applications, are now licensed under the terms of the MIT license.

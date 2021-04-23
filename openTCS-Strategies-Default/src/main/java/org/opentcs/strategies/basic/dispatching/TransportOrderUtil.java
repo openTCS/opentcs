@@ -396,7 +396,6 @@ public class TransportOrderUtil
                vehicle.getName(),
                order.getName());
       vehicleController.clearDriveOrder();
-      vehicleController.clearCommandQueue();
       finishAbortion(order.getReference(), vehicle, disableVehicle);
     }
     else {
