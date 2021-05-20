@@ -13,7 +13,7 @@ import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.order.TransportOrderHistoryCodes;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A formatter for standard object history events/entries.

@@ -19,7 +19,7 @@ import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.I18nPlantOverview;
 import static org.opentcs.guing.util.I18nPlantOverview.MENU_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Shows a message window with some of the currently loaded model's properties.

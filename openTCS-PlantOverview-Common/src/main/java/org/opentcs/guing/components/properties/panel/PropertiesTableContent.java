@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -75,8 +73,8 @@ import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.util.I18nPlantOverview;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.gui.StringListCellRenderer;
 import org.slf4j.Logger;

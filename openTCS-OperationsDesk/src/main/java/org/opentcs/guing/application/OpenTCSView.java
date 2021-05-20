@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -68,14 +66,10 @@ import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.application.action.ToolBarManager;
 import org.opentcs.guing.application.action.ViewActionMap;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
-import org.opentcs.guing.application.action.file.CloseFileAction;
-import org.opentcs.guing.application.toolbar.PaletteToolBarBorder;
 import org.opentcs.guing.components.dialogs.VehiclesPanel;
 import org.opentcs.guing.components.dockable.DockableHandlerFactory;
 import org.opentcs.guing.components.dockable.DockingManagerOperating;
 import org.opentcs.guing.components.dockable.DrawingViewFocusHandler;
-import org.opentcs.guing.components.drawing.AbstractOpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.DrawingViewFactory;
 import org.opentcs.guing.components.drawing.DrawingViewScrollPane;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditorOperating;
@@ -126,8 +120,12 @@ import org.opentcs.guing.util.Cursors;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.PanelRegistry;
 import org.opentcs.guing.util.PlantOverviewOperatingApplicationConfiguration;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
+import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
+import org.opentcs.thirdparty.jhotdraw.application.toolbar.PaletteToolBarBorder;
+import org.opentcs.thirdparty.jhotdraw.components.drawing.AbstractOpenTCSDrawingView;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,

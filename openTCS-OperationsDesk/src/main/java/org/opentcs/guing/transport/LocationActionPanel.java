@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -23,7 +21,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.LocationTypeModel;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Eine Benutzerschnittstelle zum Auswählen einer Station oder eines

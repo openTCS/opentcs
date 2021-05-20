@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -16,15 +15,6 @@ import org.opentcs.guing.application.action.actions.CreateBlockAction;
 import org.opentcs.guing.application.action.actions.CreateLocationTypeAction;
 import org.opentcs.guing.application.action.actions.CreateVehicleAction;
 import org.opentcs.guing.application.action.app.AboutAction;
-import org.opentcs.guing.application.action.edit.ClearSelectionAction;
-import org.opentcs.guing.application.action.edit.CopyAction;
-import org.opentcs.guing.application.action.edit.CutAction;
-import org.opentcs.guing.application.action.edit.DeleteAction;
-import org.opentcs.guing.application.action.edit.DuplicateAction;
-import org.opentcs.guing.application.action.edit.PasteAction;
-import org.opentcs.guing.application.action.edit.SelectAllAction;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
-import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.action.file.LoadModelAction;
 import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.NewModelAction;
@@ -34,6 +24,15 @@ import org.opentcs.guing.application.action.synchronize.LoadModelFromKernelActio
 import org.opentcs.guing.application.action.synchronize.PersistInKernelAction;
 import org.opentcs.guing.application.action.view.AddBitmapAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.ClearSelectionAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.CopyAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.CutAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DeleteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DuplicateAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.PasteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.SelectAllAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
+import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
 
 /**
  * A custom ActionMap for the plant overview application.

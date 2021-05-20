@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -15,9 +14,10 @@ import javax.swing.JFrame;
 import org.jhotdraw.app.Application;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.application.action.ActionInjectionModule;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.application.menus.MenusInjectionModule;
 import org.opentcs.guing.application.toolbar.ToolBarInjectionModule;
+import org.opentcs.thirdparty.jhotdraw.application.OpenTCSSDIApplication;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
  * An injection module for this package.

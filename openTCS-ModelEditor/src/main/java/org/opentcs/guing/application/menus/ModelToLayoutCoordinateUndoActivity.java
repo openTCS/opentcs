@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
@@ -21,7 +21,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -22,7 +22,7 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.transport.PointPanel;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  *

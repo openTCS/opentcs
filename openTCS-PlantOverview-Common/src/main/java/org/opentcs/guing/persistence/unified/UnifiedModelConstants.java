@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2017 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -11,7 +10,7 @@ package org.opentcs.guing.persistence.unified;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opentcs.guing.util.I18nPlantOverview;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Constants related to reading and writing the kernel's model file format.

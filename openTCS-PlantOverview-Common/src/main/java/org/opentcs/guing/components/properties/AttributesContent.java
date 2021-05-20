@@ -1,18 +1,15 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-
 package org.opentcs.guing.components.properties;
 
 import javax.swing.JComponent;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
  * Ein Inhalt für eine Swing-Komponente, der über Eigenschaften eines

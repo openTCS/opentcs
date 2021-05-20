@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -17,12 +16,12 @@ import javax.swing.undo.CannotUndoException;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Undoes or redoes a "paste" action.
  */
-class PasteEdit
+public class PasteEdit
     extends AbstractUndoableEdit {
 
   /**
@@ -40,7 +39,7 @@ class PasteEdit
    * @param drawingView The drawing view the paste happened in.
    * @param figures The pasted figures.
    */
-  PasteEdit(DrawingView drawingView, List<Figure> figures) {
+  public PasteEdit(DrawingView drawingView, List<Figure> figures) {
     this.drawingView = requireNonNull(drawingView, "drawingView");
     this.figures.addAll(figures);
   }

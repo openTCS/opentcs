@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -8,12 +7,12 @@
  */
 package org.opentcs.guing.components.properties;
 
-import org.opentcs.guing.application.menus.MenuItemComponentsFactory;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import javax.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
+import org.opentcs.guing.application.menus.MenuItemComponentsFactory;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValueSetPropertyEditorPanel;

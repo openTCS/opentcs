@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2013 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -15,7 +14,7 @@ import javax.swing.JMenuItem;
 import org.opentcs.guing.application.action.ViewActionMap;
 import org.opentcs.guing.application.action.app.AboutAction;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's "Help" menu.

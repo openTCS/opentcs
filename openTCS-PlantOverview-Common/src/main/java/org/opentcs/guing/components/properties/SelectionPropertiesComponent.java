@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -9,9 +8,9 @@
 package org.opentcs.guing.components.properties;
 
 import javax.inject.Inject;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 import org.opentcs.util.event.EventHandler;
 
 /**

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2013 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -12,7 +11,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.opentcs.guing.application.OpenTCSView;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.MENU_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action for adding new transport order sequence views.

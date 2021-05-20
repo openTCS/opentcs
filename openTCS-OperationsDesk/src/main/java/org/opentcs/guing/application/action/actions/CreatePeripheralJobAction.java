@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
@@ -23,7 +23,7 @@ import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.transport.CreatePeripheralJobPanel;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.MENU_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -16,7 +16,7 @@ import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.guing.application.GuiManager;
 import org.opentcs.guing.application.action.file.ExportPlantModelAction;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  *

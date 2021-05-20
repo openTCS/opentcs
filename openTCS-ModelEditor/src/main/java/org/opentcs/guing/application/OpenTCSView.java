@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -9,7 +7,6 @@
  */
 package org.opentcs.guing.application;
 
-import org.opentcs.guing.components.layer.LayerEditorEventHandler;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.event.CVetoClosingEvent;
@@ -66,12 +63,8 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.application.action.ToolBarManager;
 import org.opentcs.guing.application.action.ViewActionMap;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
-import org.opentcs.guing.application.action.file.CloseFileAction;
-import org.opentcs.guing.application.toolbar.PaletteToolBarBorder;
 import org.opentcs.guing.components.dockable.DockingManagerModeling;
 import org.opentcs.guing.components.dockable.DrawingViewFocusHandler;
-import org.opentcs.guing.components.drawing.AbstractOpenTCSDrawingView;
 import org.opentcs.guing.components.drawing.DrawingViewFactory;
 import org.opentcs.guing.components.drawing.DrawingViewScrollPane;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
@@ -82,6 +75,8 @@ import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.components.drawing.figures.TCSFigure;
+import org.opentcs.guing.components.layer.LayerEditorEventHandler;
+import org.opentcs.guing.components.layer.LayerManager;
 import org.opentcs.guing.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
@@ -121,14 +116,17 @@ import org.opentcs.guing.util.Colors;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
 import org.opentcs.guing.util.ModelComponentFactory;
 import org.opentcs.guing.util.PanelRegistry;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.UniqueNameGenerator;
 import org.opentcs.guing.util.UserMessageHelper;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
+import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
+import org.opentcs.thirdparty.jhotdraw.application.toolbar.PaletteToolBarBorder;
+import org.opentcs.thirdparty.jhotdraw.components.drawing.AbstractOpenTCSDrawingView;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opentcs.guing.components.layer.LayerManager;
 
 /**
  * Visualizes the driving course and other kernel objects as well as messages

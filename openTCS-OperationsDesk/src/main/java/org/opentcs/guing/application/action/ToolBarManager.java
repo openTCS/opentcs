@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2013 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -28,7 +27,6 @@ import org.opentcs.guing.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.guing.application.action.actions.FindVehicleAction;
 import org.opentcs.guing.application.action.actions.PauseAllVehiclesAction;
 import org.opentcs.guing.application.action.actions.ResumeAllVehiclesAction;
-import org.opentcs.guing.application.action.draw.SelectSameAction;
 import org.opentcs.guing.application.toolbar.DragTool;
 import org.opentcs.guing.application.toolbar.MultipleSelectionTool;
 import org.opentcs.guing.application.toolbar.SelectionToolFactory;
@@ -37,7 +35,8 @@ import org.opentcs.guing.event.ResetInteractionToolCommand;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.ImageDirectory;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.application.action.draw.SelectSameAction;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
 
 /**

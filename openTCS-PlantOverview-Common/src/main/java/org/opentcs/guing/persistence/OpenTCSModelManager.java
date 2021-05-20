@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -69,8 +67,8 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.util.CourseObjectFactory;
 import static org.opentcs.guing.util.I18nPlantOverview.STATUS_PATH;
 import org.opentcs.guing.util.ModelComponentFactory;
-import org.opentcs.guing.util.ResourceBundleUtil;
 import org.opentcs.guing.util.SynchronizedFileChooser;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import static org.opentcs.util.Assertions.checkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

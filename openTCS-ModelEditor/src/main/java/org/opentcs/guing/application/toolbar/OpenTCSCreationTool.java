@@ -14,11 +14,11 @@ import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.CreationTool;
-import org.opentcs.guing.components.layer.ActiveLayerProvider;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.ModelBasedFigure;
+import org.opentcs.guing.components.layer.ActiveLayerProvider;
 import static org.opentcs.guing.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A custom tool used to create {@code PointFigure}s and {@code LocationFigure}s.

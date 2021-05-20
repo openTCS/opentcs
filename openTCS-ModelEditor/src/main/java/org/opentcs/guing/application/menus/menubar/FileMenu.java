@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2013 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -13,7 +12,6 @@ import javax.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.application.action.ViewActionMap;
-import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.action.file.LoadModelAction;
 import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.NewModelAction;
@@ -22,7 +20,8 @@ import org.opentcs.guing.application.action.file.SaveModelAsAction;
 import org.opentcs.guing.application.action.synchronize.LoadModelFromKernelAction;
 import org.opentcs.guing.application.action.synchronize.PersistInKernelAction;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's "File" menu.

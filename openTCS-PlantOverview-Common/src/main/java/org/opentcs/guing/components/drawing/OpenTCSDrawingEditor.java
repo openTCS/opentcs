@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -30,9 +28,6 @@ import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.IncreaseHandleDetailLevelAction;
 import org.jhotdraw.draw.event.CompositeFigureEvent;
 import org.jhotdraw.draw.event.CompositeFigureListener;
-import org.opentcs.guing.application.action.draw.MoveAction;
-import org.opentcs.guing.application.action.edit.DeleteAction;
-import org.opentcs.guing.application.action.edit.SelectAllAction;
 import org.opentcs.guing.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.components.drawing.figures.OffsetFigure;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
@@ -40,6 +35,9 @@ import org.opentcs.guing.event.DrawingEditorEvent;
 import org.opentcs.guing.event.DrawingEditorListener;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.util.CourseObjectFactory;
+import org.opentcs.thirdparty.jhotdraw.application.action.draw.MoveAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DeleteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.SelectAllAction;
 import org.opentcs.util.event.EventHandler;
 
 /**

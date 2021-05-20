@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -13,6 +12,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import javax.inject.Singleton;
 import org.jhotdraw.draw.DrawingEditor;
 import org.opentcs.guing.components.drawing.figures.FigureFactory;
+import org.opentcs.thirdparty.jhotdraw.components.drawing.OpenTCSDrawingViewModeling;
 
 /**
  * A Guice module for this package.

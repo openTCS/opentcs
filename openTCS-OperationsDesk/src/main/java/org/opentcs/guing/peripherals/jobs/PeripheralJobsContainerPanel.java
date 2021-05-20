@@ -21,7 +21,7 @@ import javax.swing.table.TableCellRenderer;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.PERIPHERALJOB_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.gui.StringTableCellRenderer;
 
 /**

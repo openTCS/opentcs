@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -15,6 +14,7 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.opentcs.guing.components.drawing.figures.VehicleFigureFactory;
 import org.opentcs.guing.util.CourseObjectFactory;
 import org.opentcs.guing.util.VehicleCourseObjectFactory;
+import org.opentcs.thirdparty.components.drawing.OpenTCSDrawingViewOperating;
 
 /**
  * A Guice module for this package.

@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -18,10 +17,6 @@ import org.opentcs.guing.application.action.actions.FindVehicleAction;
 import org.opentcs.guing.application.action.actions.PauseAllVehiclesAction;
 import org.opentcs.guing.application.action.actions.ResumeAllVehiclesAction;
 import org.opentcs.guing.application.action.app.AboutAction;
-import org.opentcs.guing.application.action.edit.DeleteAction;
-import org.opentcs.guing.application.action.edit.SelectAllAction;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
-import org.opentcs.guing.application.action.file.CloseFileAction;
 import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.SaveModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAsAction;
@@ -29,6 +24,10 @@ import org.opentcs.guing.application.action.view.AddDrawingViewAction;
 import org.opentcs.guing.application.action.view.AddTransportOrderSequenceViewAction;
 import org.opentcs.guing.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DeleteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.SelectAllAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
+import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
 
 /**
  * A custom ActionMap for the plant overview application.

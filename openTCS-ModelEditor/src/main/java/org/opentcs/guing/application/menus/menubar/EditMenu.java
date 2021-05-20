@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2013 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -12,16 +11,16 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.JMenu;
 import org.opentcs.guing.application.action.ViewActionMap;
-import org.opentcs.guing.application.action.edit.ClearSelectionAction;
-import org.opentcs.guing.application.action.edit.CopyAction;
-import org.opentcs.guing.application.action.edit.CutAction;
-import org.opentcs.guing.application.action.edit.DeleteAction;
-import org.opentcs.guing.application.action.edit.DuplicateAction;
-import org.opentcs.guing.application.action.edit.PasteAction;
-import org.opentcs.guing.application.action.edit.SelectAllAction;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.ClearSelectionAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.CopyAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.CutAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DeleteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DuplicateAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.PasteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.SelectAllAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's "Edit" menu.

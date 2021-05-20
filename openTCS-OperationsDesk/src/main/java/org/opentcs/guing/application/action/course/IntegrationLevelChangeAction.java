@@ -19,7 +19,7 @@ import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.model.elements.VehicleModel;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

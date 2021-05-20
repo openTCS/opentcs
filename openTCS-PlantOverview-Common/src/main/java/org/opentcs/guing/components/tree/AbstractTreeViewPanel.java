@@ -1,7 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2005-2011 ifak e.V.
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -36,8 +34,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.application.ComponentsManager;
-import org.opentcs.guing.application.action.edit.DeleteAction;
-import org.opentcs.guing.application.action.edit.UndoRedoManager;
 import org.opentcs.guing.components.EditableComponent;
 import org.opentcs.guing.components.tree.elements.LayoutUserObject;
 import org.opentcs.guing.components.tree.elements.SimpleFolderUserObject;
@@ -54,7 +50,9 @@ import static org.opentcs.guing.model.SystemModel.FolderKey.POINTS;
 import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.I18nPlantOverview;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.DeleteAction;
+import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Standardimplementierung einer Baumansicht zur Darstellung der Modellelemente

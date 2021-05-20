@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -17,7 +16,7 @@ import static javax.swing.Action.MNEMONIC_KEY;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.application.OpenTCSView;
 import static org.opentcs.guing.util.I18nPlantOverviewModeling.MENU_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to load the current kernel model in the plant overview.

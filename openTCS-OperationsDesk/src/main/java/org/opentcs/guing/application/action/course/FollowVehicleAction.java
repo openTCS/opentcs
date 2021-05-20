@@ -17,7 +17,7 @@ import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.model.elements.VehicleModel;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
-import org.opentcs.guing.util.ResourceBundleUtil;
+import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
  *

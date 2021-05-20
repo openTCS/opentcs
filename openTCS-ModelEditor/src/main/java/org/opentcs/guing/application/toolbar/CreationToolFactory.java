@@ -9,6 +9,7 @@ package org.opentcs.guing.application.toolbar;
 
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.Figure;
+import org.opentcs.thirdparty.jhotdraw.application.toolbar.OpenTCSConnectionTool;
 
 /**
  * A factory for tools concerned with the creation of figures/model elements.

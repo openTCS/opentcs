@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2012 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -17,7 +16,7 @@ import java.awt.event.ComponentListener;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class OffsetListener
+public class OffsetListener
     implements ComponentListener {
 
   /**
@@ -38,7 +37,7 @@ class OffsetListener
    * @param drawingEditor The drawing editor to call for (re-)initialization of its
    * offset figures.
    */
-  OffsetListener(OpenTCSDrawingEditor drawingEditor) {
+  public OffsetListener(OpenTCSDrawingEditor drawingEditor) {
     this.drawingEditor = drawingEditor;
   }
 

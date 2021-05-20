@@ -1,6 +1,5 @@
-/*
- * openTCS copyright information:
- * Copyright (c) 2014 Fraunhofer IML
+/**
+ * Copyright (c) The openTCS Authors.
  *
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
@@ -14,6 +13,8 @@ import javax.inject.Singleton;
 import org.jhotdraw.draw.tool.DragTracker;
 import org.jhotdraw.draw.tool.SelectAreaTracker;
 import org.opentcs.guing.application.action.ToolBarManager;
+import org.opentcs.thirdparty.jhotdraw.application.toolbar.OpenTCSDragTracker;
+import org.opentcs.thirdparty.jhotdraw.application.toolbar.OpenTCSSelectAreaTracker;
 
 /**
  *
