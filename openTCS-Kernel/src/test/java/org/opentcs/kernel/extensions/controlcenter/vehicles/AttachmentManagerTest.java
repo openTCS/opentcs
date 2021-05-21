@@ -150,7 +150,7 @@ public class AttachmentManagerTest {
       extends BasicVehicleCommAdapter {
 
     public SimpleCommAdapter(Vehicle vehicle) {
-      super(new VehicleProcessModel(vehicle), 0, 0, "", Executors.newSingleThreadExecutor());
+      super(new VehicleProcessModel(vehicle), 0, 0, "", Executors.newSingleThreadScheduledExecutor());
     }
 
     @Override

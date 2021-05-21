@@ -92,7 +92,7 @@ public class RerouteUtil {
     LOG.debug("Trying to reroute vehicle '{}'...", vehicle.getName());
 
     if (!vehicle.isProcessingOrder()) {
-      LOG.warn("{} can't be rerouted without processing a transport order.", vehicle.getName());
+      LOG.debug("{} can't be rerouted without processing a transport order.", vehicle.getName());
       return;
     }
 

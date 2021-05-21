@@ -10,12 +10,14 @@ package org.opentcs.kernel;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.kernel.ActiveInAllModes;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,10 @@ public class KernelStarter {
    * The kernel extensions to be registered.
    */
   private final Set<KernelExtension> extensions;
+  /**
+   * The kernel's executor service.
+   */
+  private final ScheduledExecutorService kernelExecutor;
 
   /**
    * Creates a new instance.
@@ -49,14 +55,17 @@ public class KernelStarter {
    * @param kernel The kernel we're working with.
    * @param plantModelService The plant model service.
    * @param extensions The kernel extensions to be registered.
+   * @param kernelExecutor The kernel's executor service.
    */
   @Inject
   protected KernelStarter(LocalKernel kernel,
                           InternalPlantModelService plantModelService,
-                          @ActiveInAllModes Set<KernelExtension> extensions) {
+                          @ActiveInAllModes Set<KernelExtension> extensions,
+                          @KernelExecutor ScheduledExecutorService kernelExecutor) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.extensions = requireNonNull(extensions, "extensions");
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
   /**
@@ -66,18 +75,20 @@ public class KernelStarter {
    */
   public void startKernel()
       throws IOException {
-    // Register kernel extensions.
-    for (KernelExtension extension : extensions) {
-      kernel.addKernelExtension(extension);
-    }
+    kernelExecutor.submit(() -> {
+      // Register kernel extensions.
+      for (KernelExtension extension : extensions) {
+        kernel.addKernelExtension(extension);
+      }
 
-    // Start local kernel.
-    kernel.initialize();
-    LOG.debug("Kernel initialized.");
+      // Start local kernel.
+      kernel.initialize();
+      LOG.debug("Kernel initialized.");
 
-    plantModelService.loadPlantModel();
-    LOG.info("Loaded model named '{}'.", plantModelService.getModelName());
+      plantModelService.loadPlantModel();
+      LOG.info("Loaded model named '{}'.", plantModelService.getModelName());
 
-    kernel.setState(Kernel.State.OPERATING);
+      kernel.setState(Kernel.State.OPERATING);
+    });
   }
 }
