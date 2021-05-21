@@ -122,6 +122,7 @@ import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
 import org.opentcs.thirdparty.jhotdraw.application.toolbar.PaletteToolBarBorder;
 import org.opentcs.thirdparty.jhotdraw.components.drawing.AbstractOpenTCSDrawingView;
+import org.opentcs.thirdparty.jhotdraw.components.drawing.OpenTCSDrawingViewModeling;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -1222,7 +1223,7 @@ public class OpenTCSView
       blockModel.addBlockChangeListener(blockEventHandler);
 
       for (DrawingView drawView : fDrawingEditor.getDrawingViews()) {
-        ((AbstractOpenTCSDrawingView) drawView).blockAdded(blockModel);
+        ((OpenTCSDrawingViewModeling) drawView).blockAdded(blockModel);
       }
     }
     else if (modelComponent instanceof VehicleModel) {

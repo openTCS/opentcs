@@ -146,6 +146,10 @@ public class OpenTCSDrawingViewOperating
   }
 
   @Override
+  public void setBlocks(ModelComponent blocks) {
+  }
+ 
+  @Override
   protected void drawTool(Graphics2D g2d) {
     super.drawTool(g2d);
 

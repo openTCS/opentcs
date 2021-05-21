@@ -86,7 +86,6 @@ public class DrawingViewFactory {
     for (VehicleModel vehicle : systemModel.getVehicleModels()) {
       drawingView.displayDriveOrders(vehicle, vehicle.getDisplayDriveOrders());
     }
-    drawingView.setBlocks(systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
 
     DrawingViewPlacardPanel placardPanel = new DrawingViewPlacardPanel(drawingView, drawingOptions);
 

@@ -38,14 +38,9 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.AbstractFigure;
@@ -71,11 +66,7 @@ import org.opentcs.guing.components.drawing.figures.OriginFigure;
 import org.opentcs.guing.components.drawing.figures.PathConnection;
 import org.opentcs.guing.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.components.drawing.figures.TCSLabelFigure;
-import org.opentcs.guing.event.BlockChangeEvent;
-import org.opentcs.guing.event.BlockChangeListener;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
-import org.opentcs.guing.model.FigureDecorationDetails;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.persistence.ModelManager;
@@ -112,10 +103,6 @@ public abstract class AbstractOpenTCSDrawingView
    */
   private ComponentListener offsetListener;
   /**
-   * The block areas.
-   */
-  private ModelComponent fBlocks;
-  /**
    * Flag whether the labels shall be drawn.
    */
   private boolean labelsVisible = true;
@@ -135,10 +122,6 @@ public abstract class AbstractOpenTCSDrawingView
    * Handles edits of bezier liners.
    */
   private final BezierLinerEditHandler bezierLinerEditHandler = new BezierLinerEditHandler();
-  /**
-   * Handles events for blocks.
-   */
-  private final BlockChangeHandler blockChangeHandler = new BlockChangeHandler();
 
   /**
    * Creates new instance.
@@ -383,27 +366,6 @@ public abstract class AbstractOpenTCSDrawingView
     scrollRectToVisible(computeVisibleRectangleForFigure(figure));
 
     repaint();
-  }
-
-  @Override
-  public void setBlocks(ModelComponent blocks) {
-    fBlocks = blocks;
-
-    synchronized (fBlocks) {
-      for (ModelComponent blockComp : fBlocks.getChildComponents()) {
-        BlockModel block = (BlockModel) blockComp;
-        block.addBlockChangeListener(blockChangeHandler);
-      }
-    }
-  }
-
-  /**
-   * Message of the application that a block area was created.
-   *
-   * @param block The newly created block.
-   */
-  public void blockAdded(BlockModel block) {
-    block.addBlockChangeListener(blockChangeHandler);
   }
 
   @Override
@@ -711,104 +673,6 @@ public abstract class AbstractOpenTCSDrawingView
     symbols.setDecimalSeparator('.');
     DecimalFormat twoDForm = new DecimalFormat("#.##", symbols);
     return Double.parseDouble(twoDForm.format(value));
-  }
-
-  /**
-   * XXX This implementation is presumably specific to the model editor application and should be
-   * XXX moved to its OpenTCSDrawingView implementation.
-   */
-  private class BlockChangeHandler
-      implements BlockChangeListener {
-
-    /**
-     * The members/elements of a block mapped to the block model.
-     */
-    private final Map<BlockModel, Set<FigureDecorationDetails>> blockElementsHistory
-        = new HashMap<>();
-
-    /**
-     * Creates a new instance.
-     */
-    public BlockChangeHandler() {
-    }
-
-    @Override // BlockChangeListener
-    public void courseElementsChanged(BlockChangeEvent e) {
-      BlockModel block = (BlockModel) e.getSource();
-
-      // Let the block's elements know the block they are now part of.
-      Set<FigureDecorationDetails> blockElements = block.getPropertyElements().getItems().stream()
-          .map(elementName -> modelManager.getModel().getModelComponent(elementName))
-          .filter(modelComponent -> modelComponent instanceof FigureDecorationDetails)
-          .map(modelComponent -> (FigureDecorationDetails) modelComponent)
-          .collect(Collectors.toSet());
-      for (FigureDecorationDetails component : blockElements) {
-        component.addBlockModel(block);
-      }
-
-      // The elements that are no longer part of the block should also know this.
-      Set<FigureDecorationDetails> removedBlockElements = updateBlockElementHistory(block,
-                                                                                    blockElements);
-      for (FigureDecorationDetails component : removedBlockElements) {
-        component.removeBlockModel(block);
-        // Update the figure so that it no longer appears as being part of the block.
-        Figure figure = modelManager.getModel().getFigure(((ModelComponent) component));
-        ((AbstractFigure) figure).fireFigureChanged();
-      }
-
-      updateBlock(block);
-    }
-
-    @Override // BlockChangeListener
-    public void colorChanged(BlockChangeEvent e) {
-      updateBlock((BlockModel) e.getSource());
-    }
-
-    @Override // BlockChangeListener
-    public void blockRemoved(BlockChangeEvent e) {
-      BlockModel block = (BlockModel) e.getSource();
-
-      // Let the block's elements know they are no longer part of the block.
-      Set<FigureDecorationDetails> removedBlockElements
-          = updateBlockElementHistory(block, new HashSet<>());
-      for (FigureDecorationDetails component : removedBlockElements) {
-        component.removeBlockModel(block);
-      }
-
-      block.removeBlockChangeListener(this);
-      updateBlock(block);
-    }
-
-    /**
-     * Remembers the given set of components as the new block elements for the given
-     * block model and returns the set difference of the old and the new block elements
-     * (e.g. the elements that are no longer part of the block).
-     *
-     * @param block The block model.
-     * @param newBlockElements The new block elements.
-     * @return The set difference of the old and the new block elements.
-     */
-    private Set<FigureDecorationDetails> updateBlockElementHistory(
-        BlockModel block,
-        Set<FigureDecorationDetails> newBlockElements) {
-      Set<FigureDecorationDetails> oldBlockElements = getBlockElements(block);
-      Set<FigureDecorationDetails> removedBlockElements = new HashSet<>(oldBlockElements);
-
-      removedBlockElements.removeAll(newBlockElements);
-
-      oldBlockElements.clear();
-      oldBlockElements.addAll(newBlockElements);
-
-      return removedBlockElements;
-    }
-
-    private Set<FigureDecorationDetails> getBlockElements(BlockModel block) {
-      if (!blockElementsHistory.containsKey(block)) {
-        blockElementsHistory.put(block, new HashSet<>());
-      }
-
-      return blockElementsHistory.get(block);
-    }
   }
 
   public abstract class AbstractExtendedEventHandler

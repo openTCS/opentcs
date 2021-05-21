@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.jhotdraw.draw.DefaultDrawingView;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.application.ApplicationState;
+import org.opentcs.guing.components.drawing.BlockChangeHandler;
 import org.opentcs.guing.components.drawing.DeleteEdit;
 import org.opentcs.guing.components.drawing.PasteEdit;
 import org.opentcs.guing.components.drawing.course.Origin;
@@ -37,6 +38,7 @@ import org.opentcs.guing.components.drawing.figures.ModelBasedFigure;
 import org.opentcs.guing.components.drawing.figures.OriginFigure;
 import org.opentcs.guing.components.layer.ActiveLayerProvider;
 import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.elements.BlockModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.FigureCloner;
@@ -66,6 +68,10 @@ public class OpenTCSDrawingViewModeling
    * Contains figures currently in the buffer (eg when copying or cutting figures).
    */
   private List<Figure> bufferedFigures = new ArrayList<>();
+  /**
+   * Handles events for blocks.
+   */
+  private final BlockChangeHandler blockChangeHandler;
 
   /**
    * Creates new instance.
@@ -74,15 +80,18 @@ public class OpenTCSDrawingViewModeling
    * @param modelManager Provides the current system model.
    * @param figureCloner A helper for cloning figures.
    * @param activeLayerProvider The active layer provider.
+   * @param blockChangeHandler The handler for block changes.
    */
   @Inject
   public OpenTCSDrawingViewModeling(ApplicationState appState,
                                     ModelManager modelManager,
                                     FigureCloner figureCloner,
-                                    ActiveLayerProvider activeLayerProvider) {
+                                    ActiveLayerProvider activeLayerProvider,
+                                    BlockChangeHandler blockChangeHandler) {
     super(appState, modelManager);
     this.figureCloner = requireNonNull(figureCloner, "figureCloner");
     this.activeLayerProvider = requireNonNull(activeLayerProvider, "activeLayerProvider");
+    this.blockChangeHandler = requireNonNull(blockChangeHandler, "blockChangeHandler");
   }
 
   @Override
@@ -169,6 +178,25 @@ public class OpenTCSDrawingViewModeling
         .map(component -> getModelManager().getModel().getFigure(component))
         .collect(Collectors.toList());
     deleteFigures(figuresToDelete);
+  }
+
+  @Override
+  public void setBlocks(ModelComponent blocks) {
+    synchronized (this) {
+      for (ModelComponent blockComp : blocks.getChildComponents()) {
+        BlockModel block = (BlockModel) blockComp;
+        block.addBlockChangeListener(blockChangeHandler);
+      }
+    }
+  }
+
+  /**
+   * Message of the application that a block area was created.
+   *
+   * @param block The newly created block.
+   */
+  public void blockAdded(BlockModel block) {
+    block.addBlockChangeListener(blockChangeHandler);
   }
 
   /**
