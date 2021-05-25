@@ -86,21 +86,31 @@ As a result, it does not route around slower or stopped vehicles blocking the wa
 
 ==== Cost functions
 
-The cost function used for evaluating the paths in the driving course can be selected via configuration -- see <<Default router configuration entries>>.
+The cost function used for evaluating the paths in the driving course can be selected via configuration.
+(See <<Default router configuration entries>>, the relevant configuration entry is `defaultrouter.shortestpath.edgeEvaluators`.)
 The following cost functions/configuration options are available:
 
-* `DISTANCE`:
+* `DISTANCE` (default):
   Routing costs are equal to the paths' lengths.
 * `TRAVELTIME`:
-  Routing costs are computed as the expected time to travel on the paths, i.e. as path length divided by maximum allowed vehicle speed.
+  Routing costs are computed as the expected time to travel on the paths (in seconds), i.e. as path length divided by maximum allowed vehicle speed.
 * `EXPLICIT_PROPERTIES`:
   Routing costs for a vehicle on a path are taken from path properties with keys `tcs:routingCostForward<GROUP>` and `tcs:routingCostReverse<GROUP>`.
-  The `<GROUP>` to be used is the vehicle's routing group (see below).
-  As an example, if a vehicle's routing group is "Example", routing costs for this vehicle would be taken from path properties with keys `tcs:routingCostForwardExample` and `tcs:routingCostReverseExample`.
+  The `<GROUP>` to be used is the vehicle's routing group (see <<Routing groups>>).
+  As an example, if a vehicle's routing group is set to "Example", routing costs for this vehicle would be taken from path properties with keys `tcs:routingCostForwardExample` and `tcs:routingCostReverseExample`.
   This way, different routing costs can be assigned to a path, e.g. for different types of vehicles. +
   Note that, for this cost function to work properly, the values of the routing cost properties should be decimal integers.
+* `HOPS`:
+  The routing costs for every path in the model is 1, which results in the route with the least paths/points being chosen.
 
-The default cost function for a path simply evaluates to the path's length, so the cheapest route by default is the shortest one.
+Developers can integrate additional custom cost functions using the openTCS API.
+
+More than one cost function can be selected in the configuration by listing them separated by commas.
+The costs computed by the respective functions are then added up.
+For example, when using `"DISTANCE, TRAVELTIME"`, costs for routes are computed as the sum of the paths' lengths and the time a vehicle needs to pass it.
+
+NOTE: Adding distances to durations obviously does not make sense.
+It is the user's responsibility to choose a configuration that is usable and appropriate for the respective use case.
 
 ==== Routing groups
 

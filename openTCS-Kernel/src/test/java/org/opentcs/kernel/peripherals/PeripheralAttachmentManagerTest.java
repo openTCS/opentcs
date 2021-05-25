@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel.peripherals;
 
-import org.opentcs.common.peripherals.NullPeripheralCommAdapterDescription;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import org.opentcs.common.peripherals.NullPeripheralCommAdapterDescription;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;

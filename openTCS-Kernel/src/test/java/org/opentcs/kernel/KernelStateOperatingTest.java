@@ -35,9 +35,9 @@ import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.PeripheralJobPool;
+import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
-import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 
 /**
  *

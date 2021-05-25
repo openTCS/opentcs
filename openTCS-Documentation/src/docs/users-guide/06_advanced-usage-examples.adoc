@@ -98,23 +98,6 @@ You can change this in the kernel's configuration file:
 * To order vehicles to parking positions automatically, set the configuration parameter `defaultdispatcher.parkIdleVehicles` to `true`.
   The default dispatcher will then look for unoccupied parking positions and create orders to send the idle vehicle there.
 
-=== Selecting the cost factors used for routing
-
-The default router can evaluate the costs for routes based on different factors.
-You can select which factors should be taken into account by setting the configuration parameter `defaultrouter.shortestpath.edgeEvaluators` in the kernel's configuration file to one or more of the following key words (separated by commas):
-
-* `HOPS`: Routing costs are measured by the number of hops/paths travelled along the route.
-* `DISTANCE`: Routing costs are measured by the sum of the lengths of paths travelled.
-* `TRAVELTIME`: Routing costs are measured by the sum of the times required for travelling each path on a route.
-The travel times are computed using the length of the respective path and the maximum speed with which a vehicle may move on it.
-* `EXPLICIT`: Routing costs are measured by the sum of the costs explicitly specified by the modelling user.
-  Explicit costs can be specified for every single path in the model using the plant overview client.
-  (Select a path and set its btn:[Costs] property to an arbitrary integer value.)
-
-NOTE: When specifying more than one of these key words, the respective costs computed are added up.
-For example, when set to `"DISTANCE, TRAVELTIME"`, costs for routes are computed as the sum of the paths' lengths and the time a vehicle needs to pass it.
-If none of these entries is set, costs for routes are computed by the paths' lengths by default (`DISTANCE`).
-
 === Configuring order pool cleanup
 
 By default, openTCS checks every minute for finished or failed transport orders that are older than 24 hours.

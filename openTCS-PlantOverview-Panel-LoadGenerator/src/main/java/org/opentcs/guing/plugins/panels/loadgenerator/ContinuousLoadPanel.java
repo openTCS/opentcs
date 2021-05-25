@@ -7,9 +7,6 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
-import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.ExplicitOrderBatchGenerator;
-import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.OrderBatchCreator;
-import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.RandomOrderBatchCreator;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +42,9 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
+import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.ExplicitOrderBatchGenerator;
+import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.OrderBatchCreator;
+import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.RandomOrderBatchCreator;
 import org.opentcs.guing.plugins.panels.loadgenerator.trigger.OrderGenerationTrigger;
 import org.opentcs.guing.plugins.panels.loadgenerator.trigger.SingleOrderGenTrigger;
 import org.opentcs.guing.plugins.panels.loadgenerator.trigger.ThresholdOrderGenTrigger;

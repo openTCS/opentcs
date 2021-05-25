@@ -7,7 +7,6 @@
  */
 package org.opentcs.util.persistence.v004;
 
-import org.opentcs.util.persistence.BasePlantModelTO;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -29,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.opentcs.util.persistence.BasePlantModelTO;
 import org.xml.sax.SAXException;
 
 /**

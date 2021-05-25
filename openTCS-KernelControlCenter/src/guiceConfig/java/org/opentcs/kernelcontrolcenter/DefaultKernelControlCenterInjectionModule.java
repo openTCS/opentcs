@@ -23,6 +23,7 @@ import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.common.DefaultPortalManager;
+import org.opentcs.common.GuestUserCredentials;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
 import org.opentcs.customizations.ApplicationEventBus;
@@ -42,7 +43,6 @@ import org.opentcs.util.gui.dialog.ConnectionParamSet;
 import org.opentcs.virtualvehicle.AdapterPanelComponentsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opentcs.common.GuestUserCredentials;
 
 /**
  * A Guice module for the openTCS kernel control center application.

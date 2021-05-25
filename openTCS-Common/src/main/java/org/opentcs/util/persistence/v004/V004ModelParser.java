@@ -8,7 +8,6 @@
 package org.opentcs.util.persistence.v004;
 
 import java.awt.Color;
-import org.opentcs.util.persistence.v003.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -25,6 +24,8 @@ import org.opentcs.data.model.ModelConstants;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.util.Colors;
+import org.opentcs.util.persistence.v003.V003ModelParser;
+import org.opentcs.util.persistence.v003.V003PlantModelTO;
 import org.opentcs.util.persistence.v003.VisualLayoutTO.ModelLayoutElement;
 
 /**

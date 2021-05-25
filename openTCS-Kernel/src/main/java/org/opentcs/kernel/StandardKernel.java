@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,7 +21,6 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.Kernel.State;
 import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.access.ModelTransitionEvent;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.customizations.ApplicationEventBus;
@@ -34,14 +32,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the standard openTCS kernel.
- * <hr>
- * <h4>Configuration entries</h4>
- * <dl>
- * <dt><b>messageBufferCapacity:</b></dt>
- * <dd>An integer defining the maximum number of messages to be kept in the
- * kernel's message buffer (default: 500).</dd>
- * </dl>
- * <hr>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -53,11 +43,6 @@ final class StandardKernel
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(StandardKernel.class);
-  /**
-   * Message for UnsupportedKernelOpExceptions thrown in user management
-   * methods.
-   */
-  private static final String MSG_NO_USER_MANAGEMENT = "No user management in local kernel";
   /**
    * A map to state providers used when switching kernel states.
    */
@@ -165,14 +150,14 @@ final class StandardKernel
 
   @Override
   public State getState() {
-    LOG.debug("method entry");
     return kernelState.getState();
   }
 
   @Override
   public void setState(State newState)
       throws IllegalArgumentException {
-    Objects.requireNonNull(newState, "newState is null");
+    requireNonNull(newState, "newState");
+
     final Kernel.State oldState;
     if (kernelState != null) {
       oldState = kernelState.getState();
@@ -208,21 +193,23 @@ final class StandardKernel
         throw new IllegalArgumentException("Unexpected state: " + newState);
     }
     emitStateEvent(oldState, newState, true);
-    notificationService.publishUserNotification(new UserNotification("Kernel is now in state " + newState,
-                                                                     UserNotification.Level.INFORMATIONAL));
+    notificationService.publishUserNotification(
+        new UserNotification("Kernel is now in state " + newState,
+                             UserNotification.Level.INFORMATIONAL)
+    );
   }
 
   @Override
   public void addKernelExtension(final KernelExtension newExtension) {
-    LOG.debug("method entry");
-    Objects.requireNonNull(newExtension, "newExtension is null");
+    requireNonNull(newExtension, "newExtension");
+
     kernelExtensions.add(newExtension);
   }
 
   @Override
   public void removeKernelExtension(final KernelExtension rmExtension) {
-    LOG.debug("method entry");
-    Objects.requireNonNull(rmExtension, "rmExtension is null");
+    requireNonNull(rmExtension, "rmExtension");
+
     kernelExtensions.remove(rmExtension);
   }
 
@@ -234,31 +221,7 @@ final class StandardKernel
    * @param enteredState The state entered.
    * @param transitionFinished Whether the transition is finished or not.
    */
-  private void emitStateEvent(State leftState,
-                              State enteredState,
-                              boolean transitionFinished) {
-    assert enteredState != null;
-
+  private void emitStateEvent(State leftState, State enteredState, boolean transitionFinished) {
     eventBus.onEvent(new KernelStateTransitionEvent(leftState, enteredState, transitionFinished));
-  }
-
-  /**
-   * Generates an event for a Model change.
-   *
-   * @param oldModelName The state left.
-   * @param enteredModelName The state entered.
-   * @param modelContentChanged Whether the model's content actually changed.
-   * @param transitionFinished Whether the transition is finished or not.
-   */
-  private void emitModelEvent(String oldModelName,
-                              String enteredModelName,
-                              boolean modelContentChanged,
-                              boolean transitionFinished) {
-    assert enteredModelName != null;
-
-    eventBus.onEvent(new ModelTransitionEvent(oldModelName,
-                                              enteredModelName,
-                                              modelContentChanged,
-                                              transitionFinished));
   }
 }

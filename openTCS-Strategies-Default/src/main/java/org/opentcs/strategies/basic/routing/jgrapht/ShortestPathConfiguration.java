@@ -38,10 +38,11 @@ public interface ShortestPathConfiguration {
       description = {
         "The types of route evaluators/cost factors to be used.",
         "Results of multiple evaluators are added up. Valid values:",
-        "'DISTANCE': A route's cost is the sum of the lengths of its paths.",
-        "'TRAVELTIME': A route's cost is the vehicle's expected driving time to the destination.",
-        "'EXPLICIT_PROPERTIES': A route's cost is the sum of the explicitly given costs extracted "
-        + "from path properties."
+        "'DISTANCE': A route's cost equals the sum of the lengths of its paths.",
+        "'TRAVELTIME': A route's cost equals the vehicle's expected travel time.",
+        "'EXPLICIT_PROPERTIES': A route's cost equals the sum of the explicitly given costs "
+        + "extracted from path properties.",
+        "'HOPS': A route's cost equals the number of paths it consists of."
       })
   List<String> edgeEvaluators();
 

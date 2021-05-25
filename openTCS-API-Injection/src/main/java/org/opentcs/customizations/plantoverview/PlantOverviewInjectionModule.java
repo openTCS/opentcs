@@ -9,12 +9,12 @@ package org.opentcs.customizations.plantoverview;
 
 import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
+import org.opentcs.components.plantoverview.OrderTypeSuggestions;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.components.plantoverview.PropertySuggestions;
 import org.opentcs.customizations.ConfigurableInjectionModule;
-import org.opentcs.components.plantoverview.OrderTypeSuggestions;
 
 /**
  * A base class for Guice modules adding or customizing bindings for the plant overview application.
