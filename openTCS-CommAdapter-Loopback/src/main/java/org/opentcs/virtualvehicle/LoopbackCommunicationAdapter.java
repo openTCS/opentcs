@@ -68,6 +68,10 @@ public class LoopbackCommunicationAdapter
    */
   private static final int ADVANCE_TIME = 100;
   /**
+   * The delay to use for scheduling the various simulation tasks (in ms).
+   */
+  private static final int SIMULATION_TASKS_DELAY = 100;
+  /**
    * This instance's configuration.
    */
   private final VirtualVehicleConfiguration configuration;
@@ -290,14 +294,15 @@ public class LoopbackCommunicationAdapter
   }
 
   private void startVehicleSimulation(MovementCommand command) {
-    LOG.debug("Starting vehicle simulation...");
+    LOG.debug("Starting vehicle simulation for command: {}", command);
     Step step = command.getStep();
     getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
     operationSimulationTimePassed = 0;
 
     if (step.getPath() == null) {
+      LOG.debug("Starting operation simulation...");
       ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
-                                                          getSimulationTimeStep(),
+                                                          SIMULATION_TASKS_DELAY,
                                                           TimeUnit.MILLISECONDS);
     }
     else {
@@ -308,8 +313,9 @@ public class LoopbackCommunicationAdapter
                        step.getVehicleOrientation())
       );
 
+      LOG.debug("Starting movement simulation...");
       ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(command),
-                                                          getSimulationTimeStep(),
+                                                          SIMULATION_TASKS_DELAY,
                                                           TimeUnit.MILLISECONDS);
     }
   }
@@ -331,7 +337,7 @@ public class LoopbackCommunicationAdapter
     //if we are still on the same way entry then reschedule to do it again
     if (prevWayEntry == currentWayEntry) {
       ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(command),
-                                                          getSimulationTimeStep(),
+                                                          SIMULATION_TASKS_DELAY,
                                                           TimeUnit.MILLISECONDS);
     }
     else {
@@ -340,9 +346,9 @@ public class LoopbackCommunicationAdapter
       getProcessModel().setVehiclePosition(prevWayEntry.getDestPointName());
       LOG.debug("Movement simulation finished.");
       if (!command.isWithoutOperation()) {
-        LOG.debug("Now simulating vehicle operation...");
+        LOG.debug("Starting operation simulation...");
         ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
-                                                            getSimulationTimeStep(),
+                                                            SIMULATION_TASKS_DELAY,
                                                             TimeUnit.MILLISECONDS);
       }
       else {
@@ -357,7 +363,7 @@ public class LoopbackCommunicationAdapter
     if (operationSimulationTimePassed < getProcessModel().getOperatingTime()) {
       getProcessModel().getVelocityController().advanceTime(getSimulationTimeStep());
       ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
-                                                          getSimulationTimeStep(),
+                                                          SIMULATION_TASKS_DELAY,
                                                           TimeUnit.MILLISECONDS);
     }
     else {
