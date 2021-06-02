@@ -1,7 +1,6 @@
 # openTCS
 
 * Homepage: https://www.opentcs.org/
-* License: MIT License
 * Changelog: [changelog.adoc](./openTCS-Documentation/src/docs/release-notes/changelog.adoc)
 
 openTCS (short for _open Transportation Control System_) is a free platform for controlling fleets of [automated guided vehicles (AGVs)](https://en.wikipedia.org/wiki/Automated_guided_vehicle) and mobile robots.
@@ -22,3 +21,13 @@ Depending on your needs, it might also be necessary to adapt algorithms or add p
 
 To get started with openTCS, please refer to the user's guide, the developer's guide and the API documentation.
 These documents are included in the binary distribution and can also be read online on the [openTCS homepage](https://www.opentcs.org/).
+
+## Licensing
+
+### Code
+
+All of this software project's source code, including scripts and configuration files, is distributed under the [MIT License](LICENSE.txt).
+
+### Assets
+
+Unless stated otherwise, all of this software project's graphics files are distributed under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE.assets.txt) license.

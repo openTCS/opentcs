@@ -43,7 +43,6 @@ public class AboutDialog
 
     logoPanel = new javax.swing.JPanel();
     opentcsLogoLbl = new javax.swing.JLabel();
-    imlLogoLbl = new javax.swing.JLabel();
     contactPanel = new javax.swing.JPanel();
     opentcsContactPanel = new javax.swing.JPanel();
     opentcsLbl = new javax.swing.JLabel();
@@ -70,21 +69,11 @@ public class AboutDialog
     getContentPane().setLayout(new java.awt.GridBagLayout());
 
     logoPanel.setBackground(new java.awt.Color(255, 255, 255));
-    logoPanel.setLayout(new java.awt.GridBagLayout());
+    logoPanel.setLayout(new java.awt.BorderLayout());
 
     opentcsLogoLbl.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     opentcsLogoLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/opentcs/kernelcontrolcenter/res/logos/opentcs.gif"))); // NOI18N
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    logoPanel.add(opentcsLogoLbl, gridBagConstraints);
-
-    imlLogoLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/opentcs/kernelcontrolcenter/res/logos/fraunhofer-iml-logo.png"))); // NOI18N
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-    logoPanel.add(imlLogoLbl, gridBagConstraints);
+    logoPanel.add(opentcsLogoLbl, java.awt.BorderLayout.CENTER);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -250,7 +239,6 @@ public class AboutDialog
   private javax.swing.JLabel homepageImlTxtLbl;
   private javax.swing.JLabel homepageLbl;
   private javax.swing.JLabel homepageTxtLbl;
-  private javax.swing.JLabel imlLogoLbl;
   private javax.swing.JPanel imlPanel;
   private javax.swing.JPanel logoPanel;
   private javax.swing.JPanel opentcsContactPanel;
