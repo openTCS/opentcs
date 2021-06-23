@@ -36,7 +36,7 @@ public interface ModelManager {
    * @return Whether the model was actually saved.
    */
   boolean persistModel(boolean chooseName);
-  
+
   /**
    * Creates figures and process adapters for all model components in the current system model.
    */

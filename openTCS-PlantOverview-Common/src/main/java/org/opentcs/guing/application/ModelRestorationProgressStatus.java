@@ -19,7 +19,12 @@ public enum ModelRestorationProgressStatus
     implements ProgressStatus {
 
   CLEANUP(0, "modelRestorationProgressStatus.description.cleanup"),
-  START_LOADING_MODEL(50, "modelRestorationProgressStatus.description.startLoadingModel"),
+  START_LOADING_MODEL(10, "modelRestorationProgressStatus.description.startLoadingModel"),
+  LOADING_POINTS(20, "modelRestorationProgressStatus.description.startLoadingPoints"),
+  LOADING_PATHS(30, "modelRestorationProgressStatus.description.startLoadingPaths"),
+  LOADING_LOCATIONS(40, "modelRestorationProgressStatus.description.startLoadingLocations"),
+  LOADING_VEHICLES(50, "modelRestorationProgressStatus.description.startLoadingVehicles"),
+  LOADING_BLOCKS(60, "modelRestorationProgressStatus.description.startLoadingBlocks"),
   SET_UP_MODEL_VIEW(70, "modelRestorationProgressStatus.description.setUpModelView"),
   SET_UP_DIRECTORY_TREE(80, "modelRestorationProgressStatus.description.setUpDirectoryTree"),
   SET_UP_WORKING_AREA(90, "modelRestorationProgressStatus.description.setUpWorkingArea");

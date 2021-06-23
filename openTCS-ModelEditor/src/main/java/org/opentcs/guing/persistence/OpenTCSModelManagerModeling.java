@@ -23,6 +23,7 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.customizations.ApplicationHome;
+import org.opentcs.guing.application.ProgressIndicator;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.model.SystemModel;
@@ -83,6 +84,7 @@ public class OpenTCSModelManagerModeling
    * @param modelPersistor The model persistor.
    * @param modelImportAdapter Converts model data on import.
    * @param modelExportAdapter Converts model data on export.
+   * @param progressIndicator The progress indicator to be used.
    */
   @Inject
   public OpenTCSModelManagerModeling(CourseObjectFactory crsObjFactory,
@@ -95,7 +97,8 @@ public class OpenTCSModelManagerModeling
                                      ModelFileReader modelReader,
                                      ModelFilePersistor modelPersistor,
                                      ModelImportAdapter modelImportAdapter,
-                                     ModelExportAdapter modelExportAdapter) {
+                                     ModelExportAdapter modelExportAdapter,
+                                     ProgressIndicator progressIndicator) {
     super(crsObjFactory,
           modelComponentFactory,
           procAdapterUtil,
@@ -103,7 +106,8 @@ public class OpenTCSModelManagerModeling
           statusPanel,
           homeDir,
           modelPersistor,
-          modelExportAdapter);
+          modelExportAdapter,
+          progressIndicator);
     this.kernelPersistor = requireNonNull(kernelPersistor, "kernelPersistor");
 
     this.modelReader = requireNonNull(modelReader, "modelReader");

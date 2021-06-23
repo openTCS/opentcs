@@ -38,6 +38,8 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.guing.application.ModelRestorationProgressStatus;
+import org.opentcs.guing.application.ProgressIndicator;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.components.drawing.course.OriginChangeListener;
@@ -127,6 +129,10 @@ public class OpenTCSModelManager
    */
   private final ModelExportAdapter modelExportAdapter;
   /**
+   * The progress indicator to be used.
+   */
+  private final ProgressIndicator progressIndicator;
+  /**
    * The model currently loaded.
    */
   private SystemModel systemModel;
@@ -150,6 +156,7 @@ public class OpenTCSModelManager
    * @param homeDir The application's home directory.
    * @param modelPersistor The model persistor.
    * @param modelExportAdapter Converts model data on export.
+   * @param progressIndicator The progress indicator to be used.
    */
   @Inject
   public OpenTCSModelManager(CourseObjectFactory crsObjFactory,
@@ -159,7 +166,8 @@ public class OpenTCSModelManager
                              StatusPanel statusPanel,
                              @ApplicationHome File homeDir,
                              ModelFilePersistor modelPersistor,
-                             ModelExportAdapter modelExportAdapter) {
+                             ModelExportAdapter modelExportAdapter,
+                             ProgressIndicator progressIndicator) {
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.modelComponentFactory = requireNonNull(modelComponentFactory, "modelComponentFactory");
     this.procAdapterUtil = requireNonNull(procAdapterUtil, "procAdapterUtil");
@@ -173,6 +181,7 @@ public class OpenTCSModelManager
     this.modelPersistorFileChooser.setFileFilter(modelPersistor.getDialogFileFilter());
 
     this.modelExportAdapter = requireNonNull(modelExportAdapter, "modelExportAdapter");
+    this.progressIndicator = progressIndicator;
 
     this.systemModel = systemModelProvider.get();
     initializeSystemModel(systemModel);
@@ -259,35 +268,43 @@ public class OpenTCSModelManager
   @Override
   public void restoreModel() {
     fModelName = systemModel.getName();
-    List<Figure> restoredFigures = new ArrayList<>();
 
     LayoutModel layoutModel = (LayoutModel) systemModel.getMainFolder(SystemModel.FolderKey.LAYOUT);
     double scaleX = layoutModel.getPropertyScaleX().getValueByUnit(LengthProperty.Unit.MM);
     double scaleY = layoutModel.getPropertyScaleY().getValueByUnit(LengthProperty.Unit.MM);
 
-    // Create figures and process adapters
-    restoredFigures.addAll(restorePointsInModel(systemModel.getPointModels(), scaleX, scaleY));
-    restoredFigures.addAll(restorePathsInModel(systemModel.getPathModels(), systemModel));
-    restoredFigures.addAll(restoreLocationsInModel(systemModel.getLocationModels(),
-                                                   scaleX,
-                                                   scaleY,
-                                                   systemModel));
-    restoredFigures.addAll(restoreBlocksInModel(systemModel.getBlockModels(), systemModel));
-
-    restoreBlockComponentDecorationDetails(systemModel);
-
-    // Associate all created figures with the origin.
     Origin origin = systemModel.getDrawingMethod().getOrigin();
-    for (Figure figure : restoredFigures) {
+
+    // Create figures and process adapters
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_POINTS);
+    List<Figure> points = restorePointsInModel(systemModel.getPointModels(), scaleX, scaleY);
+    systemModel.getDrawing().addAll(associateFiguresWithOrigin(points, origin));
+
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_PATHS);
+    List<Figure> paths = restorePathsInModel(systemModel.getPathModels(), systemModel);
+    systemModel.getDrawing().addAll(associateFiguresWithOrigin(paths, origin));
+
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_LOCATIONS);
+    List<Figure> locations = restoreLocationsInModel(systemModel.getLocationModels(),
+                                                     scaleX,
+                                                     scaleY,
+                                                     systemModel);
+    systemModel.getDrawing().addAll(associateFiguresWithOrigin(locations, origin));
+
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_BLOCKS);
+    List<Figure> blocks = restoreBlocksInModel(systemModel.getBlockModels(), systemModel);
+    systemModel.getDrawing().addAll(associateFiguresWithOrigin(blocks, origin));
+    restoreBlockComponentDecorationDetails(systemModel);
+  }
+
+  private List<Figure> associateFiguresWithOrigin(List<Figure> figures, Origin origin) {
+    for (Figure figure : figures) {
       if (figure instanceof OriginChangeListener) {
         origin.addListener((OriginChangeListener) figure);
         figure.set(FigureConstants.ORIGIN, origin);
       }
     }
-
-    long timeBefore = System.currentTimeMillis();
-    systemModel.getDrawing().addAll(restoredFigures);
-    LOG.debug("Adding figures to drawing took {} ms.", System.currentTimeMillis() - timeBefore);
+    return figures;
   }
 
   @Override
@@ -333,13 +350,17 @@ public class OpenTCSModelManager
 
     prepareLayout(layoutModel, systemModel, origin, objectService, visualLayout);
 
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_POINTS);
     restoreModelPoints(allPoints, systemModel, origin, restoredFigures, objectService);
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_PATHS);
     restoreModelPaths(allPaths, systemModel, origin, restoredFigures, objectService);
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_LOCATIONS);
     restoreModelLocationTypes(allLocationTypes, systemModel, objectService);
     restoreModelLocations(allLocations, systemModel, origin, restoredFigures, objectService);
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_VEHICLES);
     restoreModelVehicles(allVehicles, systemModel, objectService);
+    progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_BLOCKS);
     restoreModelBlocks(allBlocks, systemModel, objectService);
-
     restoreBlockComponentDecorationDetails(systemModel);
 
     systemModel.getDrawing().addAll(restoredFigures);
