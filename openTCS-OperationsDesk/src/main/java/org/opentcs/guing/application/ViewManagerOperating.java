@@ -24,8 +24,8 @@ import org.opentcs.guing.components.dockable.DockableTitleComparator;
 import org.opentcs.guing.components.dockable.DockingManagerOperating;
 import org.opentcs.guing.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.peripherals.jobs.PeripheralJobsContainerPanel;
-import org.opentcs.guing.transport.OrderSequencesContainerPanel;
-import org.opentcs.guing.transport.TransportOrdersContainerPanel;
+import org.opentcs.guing.transport.sequences.OrderSequencesContainerPanel;
+import org.opentcs.guing.transport.orders.TransportOrdersContainerPanel;
 import org.opentcs.util.event.EventSource;
 
 /**

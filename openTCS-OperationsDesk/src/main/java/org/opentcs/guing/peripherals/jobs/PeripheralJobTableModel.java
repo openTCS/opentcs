@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.peripherals.jobs;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +44,7 @@ class PeripheralJobTableModel
   public static final int COLUMN_RELATED_VEHICLE = 3;
   public static final int COLUMN_RELATED_ORDER = 4;
   public static final int COLUMN_STATE = 5;
+  public static final int COLUMN_CREATION_TIME = 6;
   /**
    * The column names.
    */
@@ -52,7 +54,8 @@ class PeripheralJobTableModel
     BUNDLE.getString("peripheralJobTableModel.column_operation.headerText"),
     BUNDLE.getString("peripheralJobTableModel.column_relatedVehicle.headerText"),
     BUNDLE.getString("peripheralJobTableModel.column_relatedTransportOrder.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_state.headerText")
+    BUNDLE.getString("peripheralJobTableModel.column_state.headerText"),
+    BUNDLE.getString("peripheralJobTableModel.column_creationTime.headerText")
   };
   /**
    * The column classes.
@@ -63,7 +66,8 @@ class PeripheralJobTableModel
     String.class,
     TCSObjectReference.class,
     TCSObjectReference.class,
-    String.class
+    String.class,
+    Instant.class
   };
   /**
    * The entries in the table.
@@ -106,6 +110,8 @@ class PeripheralJobTableModel
         return entry.getRelatedTransportOrder();
       case COLUMN_STATE:
         return entry.getState().name();
+      case COLUMN_CREATION_TIME:
+        return entry.getCreationTime();
       default:
         throw new IllegalArgumentException("Invalid column index: " + columnIndex);
     }
@@ -123,43 +129,58 @@ class PeripheralJobTableModel
 
   @Override
   public void containerInitialized(Collection<PeripheralJob> jobs) {
-    entries.clear();
-    for (PeripheralJob job : jobs) {
-      entries.add(job);
-    }
-    SwingUtilities.invokeLater(() -> fireTableDataChanged());
+    requireNonNull(jobs, "jobs");
+
+    SwingUtilities.invokeLater(() -> {
+      // Notifiations of any change listeners must happen at the same time/in the same thread the 
+      // data behind the model is updated. Otherwise, there is a risk that listeners work with/
+      // refer to outdated data, which can lead to runtime exceptions.
+      entries.clear();
+      entries.addAll(jobs);
+      fireTableDataChanged();
+    });
   }
 
   @Override
   public void peripheralJobAdded(PeripheralJob job) {
     requireNonNull(job, "job");
-    entries.add(job);
-    SwingUtilities.invokeLater(() -> fireTableRowsInserted(entries.size() - 1, entries.size() - 1));
+
+    SwingUtilities.invokeLater(() -> {
+      entries.add(job);
+      fireTableRowsInserted(entries.size() - 1, entries.size() - 1);
+    });
   }
 
   @Override
   public void peripheralJobUpdated(PeripheralJob job) {
     requireNonNull(job, "job");
-    int jobIndex = entries.indexOf(job);
-    if (jobIndex == -1) {
-      LOG.warn("Unknown job: {}. Ignoring job update.", job.getName());
-      return;
-    }
 
-    entries.set(jobIndex, job);
-    SwingUtilities.invokeLater(() -> fireTableRowsUpdated(jobIndex, jobIndex));
+    SwingUtilities.invokeLater(() -> {
+      int jobIndex = entries.indexOf(job);
+      if (jobIndex == -1) {
+        LOG.warn("Unknown job: {}. Ignoring job update.", job.getName());
+        return;
+      }
+
+      entries.set(jobIndex, job);
+      fireTableRowsUpdated(jobIndex, jobIndex);
+    });
   }
 
   @Override
   public void peripheralJobRemoved(PeripheralJob job) {
-    int jobIndex = entries.indexOf(job);
-    if (jobIndex == -1) {
-      LOG.warn("Unknown job: {}. Ignoring job removal.", job.getName());
-      return;
-    }
+    requireNonNull(job, "job");
 
-    entries.remove(jobIndex);
-    SwingUtilities.invokeLater(() -> fireTableRowsDeleted(jobIndex, jobIndex));
+    SwingUtilities.invokeLater(() -> {
+      int jobIndex = entries.indexOf(job);
+      if (jobIndex == -1) {
+        LOG.warn("Unknown job: {}. Ignoring job removal.", job.getName());
+        return;
+      }
+
+      entries.remove(jobIndex);
+      fireTableRowsDeleted(jobIndex, jobIndex);
+    });
   }
 
   public PeripheralJob getEntryAt(int index) {

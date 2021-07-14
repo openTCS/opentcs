@@ -10,6 +10,7 @@ package org.opentcs.guing.peripherals.jobs;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.JMenuItem;
@@ -17,7 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
 import static org.opentcs.guing.util.I18nPlantOverviewOperating.PERIPHERALJOB_PATH;
@@ -65,7 +69,7 @@ public class PeripheralJobsContainerPanel
   public void initView() {
     tableModel.containerInitialized(peripheralJobsContainer.getPeripheralJobs());
   }
-  
+
   private void initComponents() {
     setLayout(new BorderLayout());
     initPeripheralJobTable();
@@ -76,6 +80,22 @@ public class PeripheralJobsContainerPanel
     tableModel = new PeripheralJobTableModel();
     peripheralJobsContainer.addListener(tableModel);
     table = new JTable(tableModel);
+
+    TableRowSorter<PeripheralJobTableModel> sorter = new TableRowSorter<>(tableModel);
+    // Sort the table by the creation instant.
+    sorter.setSortKeys(Arrays.asList(
+        new RowSorter.SortKey(PeripheralJobTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING)
+    ));
+    // ...but prevent manual sorting.
+    for (int i = 0; i < table.getColumnCount(); i++) {
+      sorter.setSortable(i, false);
+    }
+    sorter.setSortsOnUpdates(true);
+    table.setRowSorter(sorter);
+
+    // Hide the column that shows the creation time.
+    table.removeColumn(table.getColumnModel()
+        .getColumn(table.convertColumnIndexToView(PeripheralJobTableModel.COLUMN_CREATION_TIME)));
 
     TableCellRenderer renderer = new StringTableCellRenderer<TCSObjectReference>(reference -> {
       if (reference == null) {

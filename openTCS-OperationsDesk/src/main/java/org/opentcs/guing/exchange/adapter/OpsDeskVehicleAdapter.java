@@ -33,7 +33,7 @@ import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
-import org.opentcs.guing.transport.TransportOrdersContainer;
+import org.opentcs.guing.transport.orders.TransportOrdersContainer;
 
 /**
  * An adapter for vehicles specific to the Operations Desk application.

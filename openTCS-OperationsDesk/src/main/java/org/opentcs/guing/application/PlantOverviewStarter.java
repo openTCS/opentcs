@@ -15,7 +15,7 @@ import org.opentcs.guing.exchange.AttributeAdapterRegistry;
 import org.opentcs.guing.exchange.KernelEventFetcher;
 import org.opentcs.guing.exchange.OpenTCSEventDispatcher;
 import org.opentcs.guing.peripherals.jobs.PeripheralJobsContainer;
-import org.opentcs.guing.transport.TransportOrdersContainer;
+import org.opentcs.guing.transport.orders.TransportOrdersContainer;
 
 /**
  * The plant overview application's entry point.

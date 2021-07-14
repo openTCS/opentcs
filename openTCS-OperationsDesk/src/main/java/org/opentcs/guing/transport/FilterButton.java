@@ -10,38 +10,42 @@ package org.opentcs.guing.transport;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
+import javax.swing.RowFilter;
+import javax.swing.table.TableModel;
 
 /**
- * A button for filtering transport orders..
+ * A button for filtering table entries.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
+ * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class FilterButton
     extends JToggleButton {
 
   /**
-   * Das TableModel, das die Filterung vornimmt.
+   * The sorter to apply the filter to.
    */
-  private final FilterTableModel fTableModel;
+  private final FilteredRowSorter<? extends TableModel> sorter;
   /**
-   * Der Filter.
+   * The filter to apply.
    */
-  private final Object fFilter;
+  private final RowFilter<Object, Object> filter;
 
   /**
    * Creates a new instance.
    *
    * @param icon The image that the button should display
-   * @param tableModel The table model to be filtered
-   * @param filter The actual filter
+   * @param filter The Filter to apply.
+   * @param sorter The row sorter to apply the filter to.
    */
-  public FilterButton(ImageIcon icon, FilterTableModel tableModel, Object filter) {
+  public FilterButton(ImageIcon icon,
+                      RowFilter<Object, Object> filter,
+                      FilteredRowSorter<? extends TableModel> sorter) {
     super(icon);
-    fTableModel = tableModel;
-    fFilter = filter;
+    this.sorter = sorter;
+    this.filter = filter;
 
     addActionListener((ActionEvent e) -> changed());
-
     setSelected(true);
   }
 
@@ -50,10 +54,10 @@ public class FilterButton
    */
   private void changed() {
     if (isSelected()) {
-      fTableModel.removeFilter(fFilter);
+      sorter.removeRowFilter(filter);
     }
     else {
-      fTableModel.addFilter(fFilter);
+      sorter.addRowFilter(filter);
     }
   }
 }

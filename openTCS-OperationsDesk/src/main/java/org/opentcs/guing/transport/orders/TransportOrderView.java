@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.guing.transport;
+package org.opentcs.guing.transport.orders;
 
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Component;
@@ -30,6 +30,8 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.components.dialogs.DialogContent;
+import org.opentcs.guing.transport.CompositeObjectHistoryEntryFormatter;
+import org.opentcs.guing.transport.UneditableTableModel;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 

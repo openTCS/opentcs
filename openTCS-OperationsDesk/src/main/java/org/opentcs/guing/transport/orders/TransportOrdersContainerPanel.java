@@ -5,19 +5,20 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.guing.transport;
+package org.opentcs.guing.transport.orders;
 
+import org.opentcs.guing.transport.FilteredRowSorter;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JButton;
@@ -28,22 +29,32 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectEvent;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import static org.opentcs.data.order.TransportOrder.State.BEING_PROCESSED;
+import static org.opentcs.data.order.TransportOrder.State.DISPATCHABLE;
+import static org.opentcs.data.order.TransportOrder.State.FAILED;
+import static org.opentcs.data.order.TransportOrder.State.FINISHED;
+import static org.opentcs.data.order.TransportOrder.State.RAW;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
+import org.opentcs.guing.transport.CreateTransportOrderPanel;
+import org.opentcs.guing.transport.FilterButton;
+import org.opentcs.guing.transport.OrdersTable;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
@@ -93,11 +104,15 @@ public class TransportOrdersContainerPanel
   /**
    * The table's model.
    */
-  private FilterTableModel fTableModel;
+  private TransportOrderTableModel tableModel;
   /**
-   * All known transport orders (unfiltered).
+   * List of Transport Order listeners.
    */
-  private final List<TransportOrder> fTransportOrders = new ArrayList<>();
+  private final Set<TransportOrderContainerListener> listeners = new HashSet<>();
+  /**
+   * The sorter for the table.
+   */
+  private FilteredRowSorter<TransportOrderTableModel> sorter;
 
   /**
    * Creates a new instance.
@@ -136,30 +151,45 @@ public class TransportOrdersContainerPanel
     }
   }
 
+  public void addListener(TransportOrderContainerListener listener) {
+    listeners.add(listener);
+  }
+
+  public void removeListener(TransportOrderContainerListener listener) {
+    listeners.remove(listener);
+  }
+
   /**
    * Initializes this panel's contents.
    */
   public void initView() {
-    setTransportOrders(fetchOrdersIfOnline());
+    listeners.forEach(listener -> listener.containerInitialized(fetchOrdersIfOnline()));
   }
 
   private void initComponents() {
     setLayout(new BorderLayout());
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
-    String[] columns = {
-      "Name",
-      bundle.getString("transportOrdersContainerPanel.table_orders.column_source.headerText"),
-      bundle.getString("transportOrdersContainerPanel.table_orders.column_destination.headerText"),
-      bundle.getString("transportOrdersContainerPanel.table_orders.column_intendedVehicle.headerText"),
-      bundle.getString("transportOrdersContainerPanel.table_orders.column_executingVehicle.headerText"),
-      "Status",
-      bundle.getString("transportOrdersContainerPanel.table_orders.column_orderSequence.headerText")
-    };
-    fTableModel = new FilterTableModel(new DefaultTableModel(columns, 0));
-    fTableModel.setColumnIndexToFilter(5); // Column "Status"
-    fTable = new OrdersTable(fTableModel);
+    tableModel = new TransportOrderTableModel();
+    addListener(tableModel);
+    fTable = new OrdersTable(tableModel);
     fTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+    sorter = new FilteredRowSorter<>(tableModel);
+    // Sort the table by the creation instant.
+    sorter.setSortKeys(Arrays.asList(
+        new RowSorter.SortKey(TransportOrderTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING)
+    ));
+    // ...but prevent manual sorting.
+    for (int i = 0; i < fTable.getColumnCount(); i++) {
+      sorter.setSortable(i, false);
+    }
+    sorter.setSortsOnUpdates(true);
+    fTable.setRowSorter(sorter);
+
+    // Hide the column that shows the creation time.
+    fTable.removeColumn(fTable.getColumnModel()
+        .getColumn(fTable.convertColumnIndexToView(TransportOrderTableModel.COLUMN_CREATION_TIME)));
+
     JScrollPane scrollPane = new JScrollPane(fTable);
     add(scrollPane, BorderLayout.CENTER);
 
@@ -277,13 +307,12 @@ public class TransportOrdersContainerPanel
   }
 
   private Optional<TransportOrder> getSelectedTransportOrder() {
-    int row = fTable.getSelectedRow();
-
+    int row = fTable.convertRowIndexToModel(fTable.getSelectedRow());
     if (row == -1) {
       return Optional.empty();
     }
 
-    return Optional.of(fTransportOrders.get(fTableModel.realRowIndex(row)));
+    return Optional.of(tableModel.getEntryAt(row));
   }
 
   private void handleObjectEvent(TCSObjectEvent evt) {
@@ -304,139 +333,85 @@ public class TransportOrdersContainerPanel
     }
   }
 
-  private void setTransportOrders(Set<TransportOrder> transportOrders) {
-    SwingUtilities.invokeLater(() -> {
-      fTransportOrders.clear();
-      fTableModel.setRowCount(0);
-
-      for (TransportOrder order : transportOrders) {
-        fTransportOrders.add(order);
-        fTableModel.addRow(toTableRow(order));
-      }
-    });
-  }
-
   private void transportOrderAdded(TransportOrder order) {
     SwingUtilities.invokeLater(() -> {
-      fTransportOrders.add(0, order);
-      fTableModel.insertRow(0, toTableRow(order));
+      listeners.forEach(listener -> listener.transportOrderAdded(order));
     });
   }
 
   private void transportOrderChanged(TransportOrder order) {
     SwingUtilities.invokeLater(() -> {
-      int rowIndex = fTransportOrders.indexOf(order);
-      Vector<String> values = toTableRow(order);
-
-      for (int i = 0; i < values.size(); i++) {
-        fTableModel.setValueAt(values.elementAt(i), rowIndex, i);
-      }
-      fTransportOrders.set(rowIndex, order);
+      listeners.forEach(listener -> listener.transportOrderUpdated(order));
     });
   }
 
   private void transportOrderRemoved(TransportOrder order) {
     SwingUtilities.invokeLater(() -> {
-      int i = fTransportOrders.indexOf(order);
-      fTableModel.removeRow(i);
-      fTransportOrders.remove(i);
+      listeners.forEach(listener -> listener.transportOrderRemoved(order));
     });
   }
 
-  private List<FilterButton> createFilterButtons() {
+  private List<JToggleButton> createFilterButtons() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
-    FilterButton button;
-    List<FilterButton> buttons = new ArrayList<>();
+    JToggleButton button;
+    List<JToggleButton> buttons = new ArrayList<>();
     IconToolkit iconkit = IconToolkit.instance();
 
     button = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterRaw.16x16.gif"),
-                              fTableModel, "RAW");
+                              createFilterForState(RAW),
+                              sorter);
+
     button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterRawOrders.tooltipText"));
     buttons.add(button);
 
     button
         = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterActivated.16x16.gif"),
-                           fTableModel, "DISPATCHABLE");
+                           createFilterForState(DISPATCHABLE),
+                           sorter);
     button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterDispatchableOrders.tooltipText"));
     buttons.add(button);
 
     button
         = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterProcessing.16x16.gif"),
-                           fTableModel, "BEING_PROCESSED");
+                           createFilterForState(BEING_PROCESSED),
+                           sorter);
     button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterProcessedOrders.tooltipText"));
     buttons.add(button);
 
     button
         = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
-                           fTableModel, "FINISHED");
+                           createFilterForState(FINISHED),
+                           sorter);
     button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterFinishedOrders.tooltipText"));
     buttons.add(button);
 
     button = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFailed.16x16.gif"),
-                              fTableModel, "FAILED");
+                              createFilterForState(FAILED),
+                              sorter);
     button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterFailedOrders.tooltipText"));
     buttons.add(button);
 
     return buttons;
   }
 
-  private JToolBar createToolBar(List<FilterButton> filterButtons) {
+  private RowFilter<Object, Object> createFilterForState(TransportOrder.State state) {
+    return new RowFilter<Object, Object>() {
+      @Override
+      public boolean include(Entry<? extends Object, ? extends Object> entry) {
+        TransportOrder order = ((TransportOrderTableModel) entry.getModel()).getEntryAt((int) entry.getIdentifier());
+        return order.getState() != state;
+      }
+    };
+  }
+
+  private JToolBar createToolBar(List<JToggleButton> filterButtons) {
     JToolBar toolBar = new JToolBar();
 
-    for (FilterButton button : filterButtons) {
+    for (JToggleButton button : filterButtons) {
       toolBar.add(button);
     }
 
     return toolBar;
-  }
-
-  /**
-   * Transforms the content of a transport order to a table row.
-   *
-   * @param transportOrder The transport order.
-   * @return The table row contents.
-   */
-  private Vector<String> toTableRow(TransportOrder transportOrder) {
-    Vector<String> row = new Vector<>();
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
-
-    row.addElement(transportOrder.getName());
-
-    Vector<DriveOrder> driveOrders = new Vector<>(transportOrder.getAllDriveOrders());
-
-    if (driveOrders.size() == 1) {
-      row.addElement("");
-    }
-    else {
-      row.addElement(driveOrders.firstElement().getDestination().getDestination().getName());
-    }
-
-    row.addElement(driveOrders.lastElement().getDestination().getDestination().getName());
-
-    if (transportOrder.getIntendedVehicle() != null) {
-      row.addElement(transportOrder.getIntendedVehicle().getName());
-    }
-    else {
-      row.addElement(bundle.getString("transportOrdersContainerPanel.table_orders.column_intendedVehicle.determinedAutomatic.text"));
-    }
-
-    if (transportOrder.getProcessingVehicle() != null) {
-      row.addElement(transportOrder.getProcessingVehicle().getName());
-    }
-    else {
-      row.addElement("?");
-    }
-
-    row.addElement(transportOrder.getState().toString());
-
-    if (transportOrder.getWrappingSequence() != null) {
-      row.addElement(transportOrder.getWrappingSequence().getName());
-    }
-    else {
-      row.addElement("-");
-    }
-
-    return row;
   }
 
   private void withdrawTransportOrder() {
@@ -444,8 +419,8 @@ public class TransportOrdersContainerPanel
     List<TransportOrder> toWithdraw = new ArrayList<>();
 
     for (int i = 0; i < indices.length; i++) {
-      int realIndex = fTableModel.realRowIndex(indices[i]);
-      TransportOrder order = fTransportOrders.get(realIndex);
+      int modelIndex = fTable.convertRowIndexToModel(indices[i]);
+      TransportOrder order = tableModel.getEntryAt(modelIndex);
       toWithdraw.add(order);
     }
 

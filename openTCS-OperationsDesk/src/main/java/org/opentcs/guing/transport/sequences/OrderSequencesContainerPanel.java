@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.guing.transport;
+package org.opentcs.guing.transport.sequences;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -13,14 +13,12 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
 import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -28,8 +26,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
@@ -41,6 +39,10 @@ import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.event.KernelStateChangeEvent;
 import org.opentcs.guing.event.OperationModeChangeEvent;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
+import org.opentcs.guing.transport.FilterButton;
+import org.opentcs.guing.transport.FilteredRowSorter;
+import org.opentcs.guing.transport.OrdersTable;
+import org.opentcs.guing.transport.orders.TransportViewFactory;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
@@ -85,11 +87,15 @@ public class OrderSequencesContainerPanel
   /**
    * The table's model.
    */
-  private FilterTableModel fTableModel;
+  private OrderSequenceTableModel tableModel;
   /**
-   * All known order sequences (unfiltered).
+   * Listeners for changes in order sequences.
    */
-  private final List<OrderSequence> fOrderSequences = new ArrayList<>();
+  private Set<OrderSequenceContainerListener> listeners = new HashSet<>();
+  /**
+   * The sorter for the table.
+   */
+  private FilteredRowSorter<OrderSequenceTableModel> sorter;
 
   /**
    * Creates a new instance.
@@ -125,11 +131,19 @@ public class OrderSequencesContainerPanel
     }
   }
 
+  public void addListener(OrderSequenceContainerListener listener) {
+    listeners.add(listener);
+  }
+
+  public void removeListener(OrderSequenceContainerListener listener) {
+    listeners.remove(listener);
+  }
+
   /**
    * Initializes this panel's contents.
    */
   public void initView() {
-    setOrderSequences(fetchSequencesIfOnline());
+    listeners.forEach(listener -> listener.containerInitialized(fetchSequencesIfOnline()));
   }
 
   private Set<OrderSequence> fetchSequencesIfOnline() {
@@ -148,20 +162,18 @@ public class OrderSequencesContainerPanel
 
   private void initComponents() {
     setLayout(new BorderLayout());
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH);
 
-    String[] columns = {
-      "Name",
-      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.headerText"),
-      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_executingVehicle.headerText"),
-      "Index",
-      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_complete.headerText"),
-      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_finished.headerText"),
-      bundle.getString("orderSequencesContainerPanel.table_orderSequences.column_failureFatal.headerText")
-    };
-    fTableModel = new FilterTableModel(new DefaultTableModel(columns, 0));
-    fTableModel.setColumnIndexToFilter(5);  // Column "Finished"
-    fTable = new OrdersTable(fTableModel);
+    tableModel = new OrderSequenceTableModel();
+    addListener(tableModel);
+    fTable = new OrdersTable(tableModel);
+
+    sorter = new FilteredRowSorter<>(tableModel);
+    // Prevent manual sorting.
+    for (int i = 0; i < fTable.getColumnCount(); i++) {
+      sorter.setSortable(i, false);
+    }
+    sorter.setSortsOnUpdates(true);
+    fTable.setRowSorter(sorter);
 
     JScrollPane scrollPane = new JScrollPane(fTable);
     add(scrollPane, BorderLayout.CENTER);
@@ -200,7 +212,7 @@ public class OrderSequencesContainerPanel
     fTable.setRowSelectionInterval(row, row);
 
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = menu.add(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH)
+    JMenuItem item = menu.add(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
         .getString("orderSequencesContainerPanel.table_sequences.popupMenuItem_showDetails.text"));
     item.addActionListener((ActionEvent evt) -> showOrderSequence());
 
@@ -214,7 +226,7 @@ public class OrderSequencesContainerPanel
       return Optional.empty();
     }
 
-    return Optional.of(fOrderSequences.get(fTableModel.realRowIndex(row)));
+    return Optional.of(tableModel.getEntryAt(fTable.convertRowIndexToModel(row)));
   }
 
   private void handleObjectEvent(TCSObjectEvent evt) {
@@ -235,57 +247,48 @@ public class OrderSequencesContainerPanel
     }
   }
 
-  private void setOrderSequences(Set<OrderSequence> orderSequences) {
-    SwingUtilities.invokeLater(() -> {
-      fOrderSequences.clear();
-      fTableModel.setRowCount(0);
-
-      for (OrderSequence sequence : orderSequences) {
-        fOrderSequences.add(sequence);
-        fTableModel.addRow(toTableRow(sequence));
-      }
-    });
-  }
-
   private void orderSequenceAdded(OrderSequence os) {
     SwingUtilities.invokeLater(() -> {
-      fOrderSequences.add(0, os);
-      fTableModel.insertRow(0, toTableRow(os));
+      listeners.forEach(listener -> listener.orderSequenceAdded(os));
     });
   }
 
   private void orderSequenceChanged(OrderSequence os) {
     SwingUtilities.invokeLater(() -> {
-      int rowIndex = fOrderSequences.indexOf(os);
-      Vector<Object> values = toTableRow(os);
-
-      for (int i = 0; i < values.size(); i++) {
-        fTableModel.setValueAt(values.elementAt(i), rowIndex, i);
-      }
+      listeners.forEach(listener -> listener.orderSequenceUpdated(os));
     });
   }
 
   private void orderSequenceRemoved(OrderSequence os) {
     SwingUtilities.invokeLater(() -> {
-      int i = fOrderSequences.indexOf(os);
-      fTableModel.removeRow(i);
-      fOrderSequences.remove(i);
+      listeners.forEach(listener -> listener.orderSequenceRemoved(os));
     });
   }
 
   private List<FilterButton> createFilterButtons() {
+
     List<FilterButton> buttons = new LinkedList<>();
 
     FilterButton b1 = new FilterButton(
         IconToolkit.instance().getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
-        fTableModel,
-        Boolean.FALSE
+        createFilter(),
+        sorter
     );
     buttons.add(b1);
     b1.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
         .getString("orderSequencesContainerPanel.button_filterFinishedOrderSequences.tooltipText"));
 
     return buttons;
+  }
+
+  private RowFilter<Object, Object> createFilter() {
+    return new RowFilter<Object, Object>() {
+      @Override
+      public boolean include(Entry<? extends Object, ? extends Object> entry) {
+        OrderSequence os = ((OrderSequenceTableModel) entry.getModel()).getEntryAt((int) entry.getIdentifier());
+        return os.isComplete();
+      }
+    };
   }
 
   private JToolBar createToolBar(List<FilterButton> filterButtons) {
@@ -296,43 +299,5 @@ public class OrderSequencesContainerPanel
     }
 
     return toolBar;
-  }
-
-  /**
-   * Transforms the content of an order sequence to a table row.
-   *
-   * @param os The order sequence.
-   * @return The table row contents.
-   */
-  private Vector<Object> toTableRow(OrderSequence os) {
-    Vector<Object> row = new Vector<>();
-
-    row.addElement(os.getName());
-
-    if (os.getIntendedVehicle() != null) {
-      row.addElement(os.getIntendedVehicle().getName());
-    }
-    else {
-      row.addElement(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH)
-          .getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.determinedAutomatic.text"));
-    }
-
-    if (os.getProcessingVehicle() != null) {
-      row.addElement(os.getProcessingVehicle().getName());
-    }
-    else {
-      row.addElement(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH)
-          .getString("orderSequencesContainerPanel.table_orderSequences.column_intendedVehicle.determinedAutomatic.text"));
-    }
-
-    row.addElement(os.getFinishedIndex());
-
-    row.addElement(os.isComplete());
-
-    row.addElement(os.isFinished());
-
-    row.addElement(os.isFailureFatal());
-
-    return row;
   }
 }
