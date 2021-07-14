@@ -85,7 +85,7 @@
                   <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.label_finishedIndex.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/orderSequences.properties" key="orderSequenceView.label_finishedIndex.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.label_finishedIndex.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -226,7 +226,7 @@
                   <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.checkBox_complete.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/orderSequences.properties" key="orderSequenceView.checkBox_complete.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.checkBox_complete.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -244,7 +244,7 @@
                   <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.checkBox_finished.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/orderSequences.properties" key="orderSequenceView.checkBox_finished.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.checkBox_finished.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
@@ -260,7 +260,7 @@
                   <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.checkBox_failureFatal.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="i18n/org/opentcs/plantoverview/panels/orderSequences.properties" key="orderSequenceView.checkBox_failureFatal.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/panels/orderSequences.properties" key="orderSequenceView.checkBox_failureFatal.tooltipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>

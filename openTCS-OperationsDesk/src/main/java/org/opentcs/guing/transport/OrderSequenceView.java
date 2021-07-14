@@ -186,8 +186,7 @@ public class OrderSequenceView
 
     labelFinishedIndex.setFont(labelFinishedIndex.getFont());
     labelFinishedIndex.setText(bundle.getString("orderSequenceView.label_finishedIndex.text")); // NOI18N
-    java.util.ResourceBundle bundle1 = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/orderSequences"); // NOI18N
-    labelFinishedIndex.setToolTipText(bundle1.getString("orderSequenceView.label_finishedIndex.tooltipText")); // NOI18N
+    labelFinishedIndex.setToolTipText(bundle.getString("orderSequenceView.label_finishedIndex.tooltipText")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -275,7 +274,7 @@ public class OrderSequenceView
     jPanel2.setLayout(new java.awt.GridBagLayout());
 
     checkBoxComplete.setText(bundle.getString("orderSequenceView.checkBox_complete.text")); // NOI18N
-    checkBoxComplete.setToolTipText(bundle1.getString("orderSequenceView.checkBox_complete.tooltipText")); // NOI18N
+    checkBoxComplete.setToolTipText(bundle.getString("orderSequenceView.checkBox_complete.tooltipText")); // NOI18N
     checkBoxComplete.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         checkBoxCompleteActionPerformed(evt);
@@ -288,7 +287,7 @@ public class OrderSequenceView
     jPanel2.add(checkBoxComplete, gridBagConstraints);
 
     checkBoxFinished.setText(bundle.getString("orderSequenceView.checkBox_finished.text")); // NOI18N
-    checkBoxFinished.setToolTipText(bundle1.getString("orderSequenceView.checkBox_finished.tooltipText")); // NOI18N
+    checkBoxFinished.setToolTipText(bundle.getString("orderSequenceView.checkBox_finished.tooltipText")); // NOI18N
     checkBoxFinished.setEnabled(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
@@ -297,7 +296,7 @@ public class OrderSequenceView
     jPanel2.add(checkBoxFinished, gridBagConstraints);
 
     checkBoxFailureFatal.setText(bundle.getString("orderSequenceView.checkBox_failureFatal.text")); // NOI18N
-    checkBoxFailureFatal.setToolTipText(bundle1.getString("orderSequenceView.checkBox_failureFatal.tooltipText")); // NOI18N
+    checkBoxFailureFatal.setToolTipText(bundle.getString("orderSequenceView.checkBox_failureFatal.tooltipText")); // NOI18N
     checkBoxFailureFatal.setEnabled(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
