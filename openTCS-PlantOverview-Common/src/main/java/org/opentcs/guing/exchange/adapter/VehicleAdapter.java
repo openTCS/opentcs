@@ -133,7 +133,8 @@ public class VehicleAdapter
                                        VehicleModel vehicleModel,
                                        SystemModel systemModel)
       throws CredentialsException {
-    vehicleModel.setDriveOrderComponents(null);
+    vehicleModel.setDriveOrderDestination(null);
+    vehicleModel.setCurrentDriveOrderPath(null);
   }
 
   private void updateModelNextPoint(VehicleModel vehicleModel,

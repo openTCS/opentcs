@@ -29,6 +29,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** When a vehicle is rerouted while it is waiting for peripheral interactions to be finished, properly reroute the vehicle from the peripheral's position.
 ** When loading plant models with the Model Editor and Operations Desk applications, show more fine-grained steps in the corresponding progress bars.
 ** In the Operations Desk, sort transport orders and peripheral jobs in the respective tables in descending order according to their creation time.
+** Reduce the time it takes the Operations Desk to process vehicle updates.
 
 == Version 5.2 (2021-03-29)
 

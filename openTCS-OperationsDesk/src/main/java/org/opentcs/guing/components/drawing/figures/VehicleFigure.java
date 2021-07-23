@@ -327,15 +327,7 @@ public class VehicleFigure
 
     AbstractConnection connection;
     if (model.getDriveOrderState() == TransportOrder.State.BEING_PROCESSED) {
-      if (model.getDriveOrderComponents() == null) {
-        connection = null;
-      }
-      else {
-        connection = (PathModel) model.getDriveOrderComponents().stream()
-            .filter(component -> component instanceof PathModel)
-            .findFirst()
-            .orElse(null);
-      }
+      connection = model.getCurrentDriveOrderPath();
     }
     else {
       if (nextPoint != null) {

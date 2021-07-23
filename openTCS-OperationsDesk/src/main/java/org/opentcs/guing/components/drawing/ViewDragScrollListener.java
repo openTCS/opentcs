@@ -24,6 +24,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.StatusPanel;
 import org.opentcs.guing.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.components.drawing.figures.LabeledLocationFigure;
@@ -376,7 +377,7 @@ public class ViewDragScrollListener
       LOG.warn("Selected VehicleFigure does not have a model, skipping.");
       return;
     }
-    if (vehicleModel.getDriveOrderComponents() != null) {
+    if ((Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue() != Vehicle.ProcState.IDLE) {
       LOG.debug("Selected vehicle already has an order, skipping.");
       return;
     }

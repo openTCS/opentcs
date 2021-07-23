@@ -19,7 +19,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.inject.Inject;
@@ -35,7 +34,7 @@ import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.components.tree.ComponentsTreeViewManager;
 import org.opentcs.guing.components.tree.TreeViewManager;
-import org.opentcs.guing.model.ModelComponent;
+import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
@@ -173,9 +172,9 @@ public class SingleVehicleView
   }
 
   private void updateVehicleDestination() {
-    List<ModelComponent> components = getVehicleModel().getDriveOrderComponents();
-    if (components != null && !components.isEmpty()) {
-      destinationValueLabel.setText(components.get(components.size() - 1).getName());
+    PointModel destinationPoint = getVehicleModel().getDriveOrderDestination();
+    if (destinationPoint != null) {
+      destinationValueLabel.setText(destinationPoint.getName());
     }
     else {
       destinationValueLabel.setText("-");

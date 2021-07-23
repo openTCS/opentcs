@@ -9,7 +9,6 @@ package org.opentcs.guing.model.elements;
 
 import java.awt.Color;
 import java.util.Arrays;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
@@ -31,7 +30,6 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.components.properties.type.TripleProperty;
 import org.opentcs.guing.model.AbstractModelComponent;
 import org.opentcs.guing.model.DrawnModelComponent;
-import org.opentcs.guing.model.ModelComponent;
 
 /**
  * Basic implementation of a vehicle. A vehicle has an unique number.
@@ -84,10 +82,6 @@ public class VehicleModel
    */
   private double fOrientationAngle;
   /**
-   * The current drive order.
-   */
-  private List<ModelComponent> fDriveOrderComponents;
-  /**
    * The state of the drive order.
    */
   private TransportOrder.State fDriveOrderState;
@@ -103,6 +97,14 @@ public class VehicleModel
    * A reference to the vehicle.
    */
   private Vehicle vehicle = new Vehicle("Dummy");
+  /**
+   * The current or next path in a drive order.
+   */
+  private PathModel currentDriveOrderPath;
+  /**
+   * The destination for the current drive order.
+   */
+  private PointModel driveOrderDestination;
 
   /**
    * Creates a new instance.
@@ -181,24 +183,6 @@ public class VehicleModel
    */
   public void setOrientationAngle(double angle) {
     fOrientationAngle = angle;
-  }
-
-  /**
-   * Returns a list with all drive order components.
-   *
-   * @return The drive order components.
-   */
-  public List<ModelComponent> getDriveOrderComponents() {
-    return fDriveOrderComponents;
-  }
-
-  /**
-   * Sets the drive order components.
-   *
-   * @param driveOrderComponents A list with the components.
-   */
-  public void setDriveOrderComponents(List<ModelComponent> driveOrderComponents) {
-    fDriveOrderComponents = driveOrderComponents;
   }
 
   /**
@@ -281,6 +265,42 @@ public class VehicleModel
    */
   public void setVehicle(@Nonnull Vehicle vehicle) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
+  }
+
+  /**
+   * Returns the current path for the drive order.
+   *
+   * @return Path for the drive order.
+   */
+  public PathModel getCurrentDriveOrderPath() {
+    return currentDriveOrderPath;
+  }
+
+  /**
+   * Sets the current drive order path.
+   *
+   * @param path the current drive order path.
+   */
+  public void setCurrentDriveOrderPath(PathModel path) {
+    currentDriveOrderPath = path;
+  }
+
+  /**
+   * Returns the destination for the current drive order.
+   *
+   * @return the destination for the current drive order.
+   */
+  public PointModel getDriveOrderDestination() {
+    return driveOrderDestination;
+  }
+
+  /**
+   * Sets the destination for the current drive order.
+   *
+   * @param driveOrderDestination destination for the current drive order.
+   */
+  public void setDriveOrderDestination(PointModel driveOrderDestination) {
+    this.driveOrderDestination = driveOrderDestination;
   }
 
   /**

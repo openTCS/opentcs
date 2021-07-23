@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,6 +35,8 @@ import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.transport.orders.TransportOrdersContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for vehicles specific to the Operations Desk application.
@@ -42,6 +45,11 @@ import org.opentcs.guing.transport.orders.TransportOrdersContainer;
  */
 public class OpsDeskVehicleAdapter
     extends VehicleAdapter {
+
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(OpsDeskVehicleAdapter.class);
 
   /**
    * Keeps track of the drive order components of vehicles.
@@ -84,10 +92,12 @@ public class OpsDeskVehicleAdapter
         component.removeVehicleModel(vehicleModel);
       }
 
-      List<ModelComponent> c = composeDriveOrderComponents(transportOrder.getCurrentDriveOrder(),
-                                                           vehicle.getRouteProgressIndex(),
-                                                           systemModel);
-      vehicleModel.setDriveOrderComponents(c);
+      vehicleModel.setCurrentDriveOrderPath(getCurrentDriveOrderPath(transportOrder.getCurrentDriveOrder(),
+                                                                     vehicle.getRouteProgressIndex(),
+                                                                     systemModel));
+      vehicleModel.setDriveOrderDestination(getCurrentDriveOrderDestination(transportOrder.getCurrentDriveOrder(),
+                                                                            systemModel));
+
       vehicleModel.setDriveOrderState(transportOrder.getState());
     }
     else {
@@ -96,8 +106,8 @@ public class OpsDeskVehicleAdapter
       for (FigureDecorationDetails component : finishedComponents) {
         component.removeVehicleModel(vehicleModel);
       }
-
-      vehicleModel.setDriveOrderComponents(null);
+      vehicleModel.setCurrentDriveOrderPath(null);
+      vehicleModel.setDriveOrderDestination(null);
     }
   }
 
@@ -108,53 +118,30 @@ public class OpsDeskVehicleAdapter
     if (ref == null) {
       return null;
     }
-//    return objectService.fetchObject(TransportOrder.class, ref);
     return transportOrdersContainer.getTransportOrder(ref.getName()).orElse(null);
   }
 
-  /**
-   * Extracts the left over course elements from a drive order and progress.
-   *
-   * @param driveOrder The <code>DriveOrder</code>.
-   * @param routeProgressIndex Index of the current position in the drive order.
-   * @return List containing the left over course elements or <code>null</code>
-   * if driveOrder is <code>null</code>.
-   */
-  private List<ModelComponent> composeDriveOrderComponents(@Nullable DriveOrder driveOrder,
-                                                           int routeProgressIndex,
-                                                           SystemModel systemModel) {
+  private PathModel getCurrentDriveOrderPath(@Nullable DriveOrder driveOrder,
+                                             int routeProgressIndex,
+                                             SystemModel systemModel) {
     if (driveOrder == null) {
       return null;
     }
+    return driveOrder.getRoute().getSteps().stream()
+        .skip(Math.max(0, routeProgressIndex))
+        .map(step -> step.getPath())
+        .filter(path -> path != null)
+        .findFirst()
+        .map(path -> systemModel.getPathModel(path.getName()))
+        .orElse(null);
+  }
 
-    List<ModelComponent> result = new LinkedList<>();
-    List<Route.Step> lSteps = driveOrder.getRoute().getSteps();
-
-    ProcessAdapter adapter;
-    for (int i = lSteps.size() - 1; i >= 0; i--) {
-      if (i == routeProgressIndex) {
-        break;
-      }
-
-      Route.Step step = lSteps.get(i);
-      Path path = step.getPath();
-      Point point = step.getDestinationPoint();
-      PointModel pointModel = systemModel.getPointModel(point.getName());
-      result.add(0, pointModel);
-
-      if (path != null) {
-        PathModel pathModel = systemModel.getPathModel(path.getName());
-        result.add(0, pathModel);
-      }
+  private PointModel getCurrentDriveOrderDestination(@Nullable DriveOrder driveOrder,
+                                                     SystemModel systemModel) {
+    if (driveOrder == null) {
+      return null;
     }
-
-    TCSObjectReference<?> ref = driveOrder.getDestination().getDestination();
-    ModelComponent pointOrLocationModel = systemModel.getModelComponent(ref.getName());
-    if (pointOrLocationModel != null) {
-      result.add(pointOrLocationModel);
-    }
-
-    return result;
+    return systemModel.getPointModel(driveOrder.getDestination().getDestination().getName());
   }
 
   private Set<FigureDecorationDetails> getDriveOrderComponents(@Nullable DriveOrder driveOrder,

@@ -63,6 +63,7 @@ import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.application.action.ToolBarManager;
 import org.opentcs.guing.application.action.ViewActionMap;
@@ -1715,7 +1716,7 @@ public class OpenTCSView
       setCursor(Cursor.getDefaultCursor());
       vehicleModel = null;
 
-      if (vehicleModel != null && vehicleModel.getDriveOrderComponents() == null) {
+      if (vehicleModel != null && (Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue() == Vehicle.ProcState.IDLE) {
         createOrderToPointOnScreen(event.getLocationOnScreen());
       }
     }
