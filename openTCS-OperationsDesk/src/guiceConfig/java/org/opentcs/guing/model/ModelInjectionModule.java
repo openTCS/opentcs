@@ -20,7 +20,7 @@ public class ModelInjectionModule
 
   @Override
   protected void configure() {
-    bind(SystemModel.class).to(StandardSystemModel.class);
+    bind(SystemModel.class).to(CachedSystemModel.class);
   }
 
 }

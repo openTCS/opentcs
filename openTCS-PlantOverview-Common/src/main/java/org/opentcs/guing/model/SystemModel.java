@@ -81,6 +81,11 @@ public interface SystemModel
   List<ModelComponent> getAll();
 
   /**
+   * Notifies the model that all elements have been restored.
+   */
+  void onRestorationComplete();
+
+  /**
    * Registers the given figure and associates it with the given model component.
    *
    * @param component The model component.
@@ -142,7 +147,6 @@ public interface SystemModel
    * @return The layout model.
    */
   LayoutModel getLayoutModel();
-
 
   /**
    * Liefert eine Liste aller Knoten.

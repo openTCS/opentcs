@@ -154,6 +154,10 @@ class StandardSystemModel
     }
     return items;
   }
+  
+  @Override
+  public void onRestorationComplete(){
+  }
 
   @Override
   public void registerFigure(ModelComponent component, Figure figure) {

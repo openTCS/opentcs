@@ -364,6 +364,7 @@ public class OpenTCSModelManager
     restoreBlockComponentDecorationDetails(systemModel);
 
     systemModel.getDrawing().addAll(restoredFigures);
+    systemModel.onRestorationComplete();
   }
 
   private void restoreBlockComponentDecorationDetails(SystemModel systemModel) {

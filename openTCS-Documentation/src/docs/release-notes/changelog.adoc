@@ -21,6 +21,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Fix immediate withdrawal of transport orders.
 ** When the kernel application is started, initialize its components (e.g. dispatcher, router, scheduler) using the kernel executor, especially to avoid scheduling issues with plant models that are loaded with application start up.
 ** Fix the order sequence details panel which would not load due to some wrong paths to a resource bundle.
+** Fix an issue where the Operations Desk was not in sync with the Kernel when using very large models.
 * Other changes:
 ** Update the license information:
    All components, including the Model Editor and Operations Desk applications, are now licensed under the terms of the MIT license.
