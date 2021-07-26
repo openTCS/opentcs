@@ -30,4 +30,9 @@ All of this software project's source code, including scripts and configuration 
 
 ### Assets
 
-Unless stated otherwise, all of this software project's graphics files are distributed under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE.assets.txt) license.
+Unless stated otherwise, all of this software project's documentation, resource bundles and media files are distributed under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE.assets.txt) license.
+
+## Contributing
+
+You are very welcome to contribute to this project.
+Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for a few guidelines related to this.
