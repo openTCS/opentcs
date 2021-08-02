@@ -61,6 +61,7 @@ public class ThresholdOrderGenTrigger
    * Creates a new instance.
    *
    * @param eventSource Where this instance registers for events.
+   * @param objectService The object service.
    * @param threshold The threshold when new order are being created
    * @param orderBatchCreator The order batch creator
    */

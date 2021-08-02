@@ -13,8 +13,7 @@ package org.opentcs.guing.components.properties.event;
  * über diese Änderung benachrichtigt.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @see PropertiesModel
- * @see PropertiesModelChangeEvent
+ * @see AttributesChangeEvent
  */
 public interface AttributesChangeListener {
 
@@ -22,7 +21,7 @@ public interface AttributesChangeListener {
    * Information für den View, dass sich die Eigenschaften des Models geändert
    * haben. Der View ist nun selbst dafür zuständig, sich zu aktualisieren.
    *
-   * @param e
+   * @param e The event.
    */
   void propertiesChanged(AttributesChangeEvent e);
 }

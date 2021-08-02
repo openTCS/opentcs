@@ -16,10 +16,10 @@ package org.opentcs.virtualvehicle.inputcomponents;
  * </ul>
  * The input of the text field can be validated 
  * (see {@link Builder#enableValidation enableValidation}).
- * <br />
+ * <br>
  * For instanciation the contained 
  * {@link SingleTextInputPanel.Builder Builder}-class must be used.
- * <br />
+ * <br>
  * The <code>Object</code> that is returned by {@link InputPanel#getInput} is
  * a <code>String</code> (the text in the text field).
  *

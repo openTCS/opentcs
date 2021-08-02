@@ -26,9 +26,9 @@ public abstract class AbstractProperty
   protected Object fValue;
 
   /**
-   * Creates a new instance of AbstractProperty
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public AbstractProperty(ModelComponent model) {
     super(model);

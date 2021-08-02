@@ -33,19 +33,18 @@ public class SelectionProperty<E extends Enum<E>>
   /**
    * Standardkonstruktor.
    *
-   * @param model
+   * @param model The model component.
    */
   public SelectionProperty(ModelComponent model) {
     this(model, new ArrayList<>(), "");
   }
 
   /**
-   * Creates a new instance of SelectionProperty
+   * Creates a new instance.
    *
-   * @param model
-   *
-   * @param possibleValues
-   * @param value
+   * @param model The model Component.
+   * @param possibleValues The possible values.
+   * @param value The value.
    */
   public SelectionProperty(ModelComponent model, List<E> possibleValues,
                            Object value) {

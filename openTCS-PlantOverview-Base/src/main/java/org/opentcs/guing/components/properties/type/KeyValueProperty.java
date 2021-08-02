@@ -24,20 +24,20 @@ public class KeyValueProperty
   private String fKey;
 
   /**
-   * Creates a new instance of KeyValueProperty
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public KeyValueProperty(ModelComponent model) {
     this(model, "", "");
   }
 
   /**
-   * Creates a new instance of KeyValueProperty.
+   * Creates a new instance.
    *
-   * @param model
-   * @param key der Schlüssel
-   * @param value der Wert
+   * @param model The model component.
+   * @param key The key.
+   * @param value The value.
    */
   public KeyValueProperty(ModelComponent model, String key, String value) {
     super(model);

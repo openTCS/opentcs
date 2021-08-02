@@ -23,7 +23,7 @@ public class PercentProperty
   /**
    * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public PercentProperty(ModelComponent model) {
     this(model, false);
@@ -32,7 +32,7 @@ public class PercentProperty
   /**
    * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    * @param isInteger Whether only the integer part of the value is relevant.
    */
   public PercentProperty(ModelComponent model, boolean isInteger) {
@@ -42,7 +42,7 @@ public class PercentProperty
   /**
    * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    * @param value The property's value.
    * @param unit The unit in which the value is measured.
    * @param isInteger Whether only the integer part of the value is relevant.

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemotePeripheralJobService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared by {@link RegistrationName#REMOTE_PERIPHERAL_JOB_SERVICE}.
+ * {@link RegistrationName#REMOTE_PERIPHERAL_JOB_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

@@ -180,7 +180,7 @@ public final class TextListInputPanel
 
     /**
      * Set the initial selected list entry.
-     * @param index must be > 0, will have no effect otherwise
+     * @param index must be &gt; 0, will have no effect otherwise
      * @return the instance of this <code>Builder</code>
      */
     public Builder setInitialSelection(int index) {

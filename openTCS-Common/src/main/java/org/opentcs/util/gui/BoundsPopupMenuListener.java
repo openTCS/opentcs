@@ -28,7 +28,7 @@ import javax.swing.plaf.basic.BasicComboPopup;
  * <p>
  * This class will only work for a JComboBox that uses a BasicComboPop.
  * </p>
- * 
+ *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class BoundsPopupMenuListener
@@ -93,6 +93,8 @@ public class BoundsPopupMenuListener
 
   /**
    * Adjusts the width of the scrollpane used by the popup.
+   *
+   * @param popup The popup.
    */
   protected void popupWider(BasicComboPopup popup) {
     JList<?> list = popup.getList();
@@ -115,6 +117,9 @@ public class BoundsPopupMenuListener
 
   /**
    * Returns the scroll pane used by the popup so its bounds can be adjusted.
+   *
+   * @param popup The popup.
+   * @return The scroll pane used by the popup .
    */
   protected JScrollPane getScrollPane(BasicComboPopup popup) {
     JList<?> list = popup.getList();

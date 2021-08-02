@@ -90,6 +90,10 @@ public class DefaultDispatcher
    * @param vehicleService The vehicle service.
    * @param eventSource Where this instance registers for application events.
    * @param kernelExecutor Executes dispatching tasks.
+   * @param fullDispatchTask The full dispatch task.
+   * @param periodicDispatchTaskProvider Provides the periodic vehicle redospatching task.
+   * @param configuration The dispatcher configuration.
+   * @param rerouteUtil The reroute util.
    */
   @Inject
   public DefaultDispatcher(OrderReservationPool orderReservationPool,

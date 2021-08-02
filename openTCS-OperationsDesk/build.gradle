@@ -1,5 +1,4 @@
 apply from: "${rootDir}/gradle/java-project.gradle"
-apply from: "${rootDir}/gradle/java-artifacts.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
 apply from: "${rootDir}/gradle/guice-application.gradle"
 apply from: "${rootDir}/gradle/maven-publishing.gradle"

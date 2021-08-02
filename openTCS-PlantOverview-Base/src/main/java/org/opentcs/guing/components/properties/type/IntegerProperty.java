@@ -20,7 +20,7 @@ public class IntegerProperty
   /**
    * Creates a new instance of BooleanProperty
    *
-   * @param model
+   * @param model The model component.
    */
   public IntegerProperty(ModelComponent model) {
     this(model, 0);
@@ -29,8 +29,8 @@ public class IntegerProperty
   /**
    * Konstruktor mit ganzzahligen Wert.
    *
-   * @param model
-   * @param value
+   * @param model The model component.
+   * @param value The value.
    */
   public IntegerProperty(ModelComponent model, int value) {
     super(model);

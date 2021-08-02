@@ -141,12 +141,11 @@ public class ButtonFactory {
   /**
    * Creates toolbar buttons and adds them to the specified JToolBar
    *
-   * @param toolBar
-   * @param editor
+   * @param toolBar The toolbar.
+   * @param editor The drawing editor.
    */
-  public static void addAttributesButtonsTo(
-      JToolBar toolBar,
-      DrawingEditor editor) {
+  public static void addAttributesButtonsTo(JToolBar toolBar,
+                                            DrawingEditor editor) {
 
     JButton button;
 
@@ -362,7 +361,7 @@ public class ButtonFactory {
       ((DecimalFormat) formatter).setMinimumFractionDigits(0);
     }
 
-    double[] widths = new double[] {0.5d, 1d, 2d, 3d, 5d, 9d, 13d};
+    double[] widths = new double[]{0.5d, 1d, 2d, 3d, 5d, 9d, 13d};
 
     for (int i = 0; i < widths.length; i++) {
       String label = Double.toString(widths[i]);
@@ -387,7 +386,7 @@ public class ButtonFactory {
     strokeDashesPopupButton.setToolTipText(BUNDLE.getString("buttonFactory.button_strokeDashes.tooltipText"));
     strokeDashesPopupButton.setFocusable(false);
 
-    double[][] dashes = new double[][] {
+    double[][] dashes = new double[][]{
       null,
       {4d, 4d},
       {2d, 2d},
@@ -730,8 +729,8 @@ public class ButtonFactory {
   /**
    * Creates toolbar buttons and adds them to the specified JToolBar
    *
-   * @param bar
-   * @param editor
+   * @param bar The toolbar.
+   * @param editor The drawing editor.
    */
   public static void addAlignmentButtonsTo(JToolBar bar, final DrawingEditor editor) {
     bar.add(new AlignAction.West(editor)).setFocusable(false);

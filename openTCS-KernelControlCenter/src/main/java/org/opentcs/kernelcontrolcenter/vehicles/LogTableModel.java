@@ -25,8 +25,7 @@ import org.opentcs.data.notification.UserNotification;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 
 /**
- * A table model for holding {@link org.opentcs.drivers.vehicle.VehicleNotification} instances in
- * rows.
+ * A table model for holding {@link UserNotification} instances in rows.
  *
  * @author Iryna Felko (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)

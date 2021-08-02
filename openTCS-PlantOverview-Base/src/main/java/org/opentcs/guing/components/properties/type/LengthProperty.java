@@ -22,9 +22,9 @@ public class LengthProperty
     extends AbstractQuantity<LengthProperty.Unit> {
 
   /**
-   * Creates a new instance of LengthProperty
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public LengthProperty(ModelComponent model) {
     this(model, 0, Unit.MM);
@@ -33,9 +33,9 @@ public class LengthProperty
   /**
    * Konstruktor mit Wert und Maßeinheit.
    *
-   * @param model
-   * @param value
-   * @param unit
+   * @param model The model component.
+   * @param value The value.
+   * @param unit The unit.
    */
   public LengthProperty(ModelComponent model, double value, Unit unit) {
     super(model, value, unit, Unit.class, relations());

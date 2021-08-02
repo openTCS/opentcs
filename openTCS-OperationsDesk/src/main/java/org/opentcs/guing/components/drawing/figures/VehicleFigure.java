@@ -36,6 +36,7 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.menus.MenuFactory;
 import org.opentcs.guing.application.menus.VehiclePopupMenu;
+import org.opentcs.guing.components.dialogs.SingleVehicleView;
 import org.opentcs.guing.components.drawing.ZoomPoint;
 import org.opentcs.guing.components.drawing.figures.decoration.VehicleOutlineHandle;
 import org.opentcs.guing.components.drawing.figures.liner.TripleBezierLiner;
@@ -379,9 +380,9 @@ public class VehicleFigure
   }
 
   /**
-   * Beim Aufruf des Dialogs SingleVehicleView Fahrzeug unbedingt zeichnen.
+   * Forces the vehicle figure to be drawn. (Used primarily for {@link SingleVehicleView}.)
    *
-   * @param g2d
+   * @param g2d The graphics context.
    */
   public void forcedDraw(Graphics2D g2d) {
     drawFill(g2d);

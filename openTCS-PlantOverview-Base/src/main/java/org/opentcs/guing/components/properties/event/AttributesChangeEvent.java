@@ -26,10 +26,10 @@ public class AttributesChangeEvent
   protected ModelComponent fModelComponent;
 
   /**
-   * Creates a new instance of ModelComponentChangeEvent
+   * Creates a new instance.
    *
-   * @param listener
-   * @param model
+   * @param listener The listener.
+   * @param model The model component.
    */
   public AttributesChangeEvent(AttributesChangeListener listener, ModelComponent model) {
     super(listener);

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteKernelServicePortal} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteKernelServicePortal#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_KERNEL_CLIENT_PORTAL}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

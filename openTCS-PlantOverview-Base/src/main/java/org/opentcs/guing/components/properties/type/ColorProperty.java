@@ -26,9 +26,8 @@ public final class ColorProperty
   /**
    * Konstruktor mit Übergabe einer Farbe.
    *
-   * @param model
-   *
-   * @param color
+   * @param model The model component.
+   * @param color The color.
    */
   public ColorProperty(ModelComponent model, Color color) {
     super(model);
@@ -38,7 +37,7 @@ public final class ColorProperty
   /**
    * Setzt die Farbe.
    *
-   * @param color
+   * @param color The color
    */
   public void setColor(Color color) {
     fColor = color;
@@ -47,7 +46,7 @@ public final class ColorProperty
   /**
    * Liefert die Farbe.
    *
-   * @return
+   * @return The color.
    */
   public Color getColor() {
     return fColor;

@@ -66,10 +66,12 @@ public class PlantOverviewStarter {
    * @param progressIndicator The progress indicator to be used.
    * @param application The application to be used.
    * @param opentcsView The view to be used.
+   * @param eventLogger The event logger.
    * @param kernelEventFetcher Fetches events from the kernel, if connected, and publishes them via
    * the local event bus.
    * @param eventDispatcher Dispatches openTCS event from kernel objects to corresponding model
    * components.
+   * @param attributeAdapterRegistry Handles registering of model attribute adapters.
    * @param transportOrdersContainer Maintains a set of all transport orders existing on the kernel
    * side.
    * @param peripheralJobsContainer Maintains a set of all peripheral jobs existing on the kernel

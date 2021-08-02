@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * If a service method is called using this implementation and the corresponding service is no
  * longer available, this implementation will ask to retry the service method call:
+ * </p>
  * <ul>
  * <li>
  * If 'Retry - Yes' is selected, this implementation will handle reestablishment of the kernel
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * connected to the kernel.
  * </li>
  * </ul>
- * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */

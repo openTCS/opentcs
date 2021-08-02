@@ -306,6 +306,7 @@ public class TransportOrderUtil
    * just withdrawing it for a smooth abortion.
    * @param disableVehicle Whether to disable the vehicle, i.e. set its
    * procState to UNAVAILABLE.
+   * @param resetVehiclePosition Whether to reset the vehicle position.
    */
   @SuppressWarnings("deprecation")
   public void abortOrder(Vehicle vehicle,

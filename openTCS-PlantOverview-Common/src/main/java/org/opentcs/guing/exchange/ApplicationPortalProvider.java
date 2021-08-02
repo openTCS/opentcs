@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides a {@link KernelClientPortal} for clients in the kernel control center application.
+ * Provides an {@link ApplicationPortal} for clients in the kernel control center application.
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @author Martin Grzenia (Fraunhofer IML)

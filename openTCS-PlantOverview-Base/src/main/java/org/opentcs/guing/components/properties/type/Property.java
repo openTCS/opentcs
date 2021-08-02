@@ -27,7 +27,7 @@ public interface Property
    * Übernimmt die Werte von dem übergebenen Attribut. Die Eigenschaften
    * Visibility, Editable usw. werden jedoch nicht übernommen.
    *
-   * @param property
+   * @param property The property.
    */
   void copyFrom(Property property);
 
@@ -41,7 +41,7 @@ public interface Property
   /**
    * Klont das Property.
    *
-   * @return
+   * @return The cloned property.
    */
   Object clone();
 }

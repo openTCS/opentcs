@@ -34,9 +34,9 @@ public class Relation<U>
   /**
    * Creates a new instance.
    *
-   * @param unitFrom
-   * @param unitTo
-   * @param relationValue
+   * @param unitFrom The unit from which to convert.
+   * @param unitTo The unit to which to convert.
+   * @param relationValue The relation value between the two units.
    */
   public Relation(U unitFrom, U unitTo, double relationValue) {
     fUnitFrom = unitFrom;
@@ -48,9 +48,10 @@ public class Relation<U>
    * Prüft, ob das Umwandlungsverhältnis für die beiden übergebenen Einheiten
    * passend ist. Liefert <code>true</code> zurück, falls ja.
    *
-   * @param unitA
-   * @param unitB
-   * @return
+   * @param unitA The first unit.
+   * @param unitB The second unit.
+   * @return {@code true}, if the two given units are covered by this relation, otherwise
+   * {@code false}.
    */
   public boolean fits(U unitA, U unitB) {
     if (fUnitFrom.equals(unitA) && fUnitTo.equals(unitB)) {
@@ -67,7 +68,7 @@ public class Relation<U>
   /**
    * Liefert das Umwandlungsverhältnis als eine Zahl.
    *
-   * @return
+   * @return The relation value between the two units. 
    */
   public double relationValue() {
     return fRelationValue;
@@ -80,9 +81,9 @@ public class Relation<U>
    * im eigentlichen Sinne, sondern nur ein beschreibender Text aus der Menge
    * {"multiplication", "division"}.
    *
-   * @param unitFrom
-   * @param unitTo
-   * @return
+   * @param unitFrom The unit from which to convert.
+   * @param unitTo The unit to which to convert.
+   * @return The operation that is to be used for the conversion.
    */
   public Operation getOperation(U unitFrom, U unitTo) {
     if (unitFrom.equals(fUnitFrom)) {

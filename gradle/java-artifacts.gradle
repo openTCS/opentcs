@@ -1,4 +1,0 @@
-artifacts {
-  archives jar
-  archives sourcesJar
-}

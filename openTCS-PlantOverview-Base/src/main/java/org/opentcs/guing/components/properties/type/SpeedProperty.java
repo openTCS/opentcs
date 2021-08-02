@@ -22,9 +22,9 @@ public class SpeedProperty
     extends AbstractQuantity<SpeedProperty.Unit> {
 
   /**
-   * Creates a new instance of SpeedProperty
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public SpeedProperty(ModelComponent model) {
     this(model, 0, Unit.M_S);
@@ -33,9 +33,9 @@ public class SpeedProperty
   /**
    * Konstruktor mit Wert und Maßeinheit.
    *
-   * @param model
-   * @param value
-   * @param unit
+   * @param model The model component.
+   * @param value The value.
+   * @param unit The unit.
    */
   public SpeedProperty(ModelComponent model, double value, Unit unit) {
     super(model, value, unit, Unit.class, relations());

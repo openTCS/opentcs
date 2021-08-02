@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteSchedulerService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteSchedulerService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_SCHEDULER_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

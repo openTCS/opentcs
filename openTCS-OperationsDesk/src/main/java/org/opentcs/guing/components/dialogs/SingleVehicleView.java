@@ -41,7 +41,7 @@ import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.VehicleCourseObjectFactory;
 
 /**
- * Ein Fahrzeug im {@link AllVehiclesPanel}.
+ * A single vehicle in the {@link VehiclesPanel}.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -112,6 +112,7 @@ public class SingleVehicleView
    * drawing view).
    * @param crsObjFactory A factory to create vehicle figures.
    * @param menuFactory A factory for popup menus.
+   * @param modelManager The model manager.
    */
   @Inject
   public SingleVehicleView(@Assisted VehicleModel vehicle,
@@ -142,9 +143,9 @@ public class SingleVehicleView
   }
 
   /**
-   * Zeichnet das Fahrzeug in den Dialog
+   * Draws the vehicle figure into the dialog.
    *
-   * @param g2d der Grafikkontext
+   * @param g2d The graphics context.
    */
   private void drawVehicle(Graphics2D g2d) {
     figure = crsObjFactory.createVehicleFigure(fVehicleModel);

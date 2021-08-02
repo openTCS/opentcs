@@ -36,7 +36,7 @@ public class BlockChangeHandler
    */
   private final Map<BlockModel, Set<FigureDecorationDetails>> blockElementsHistory
       = new HashMap<>();
-  
+
   /**
    * The manager keeping/providing the currently loaded model.
    */
@@ -44,6 +44,8 @@ public class BlockChangeHandler
 
   /**
    * Creates a new instance.
+   *
+   * @param modelManager The model manager.
    */
   @Inject
   public BlockChangeHandler(ModelManager modelManager) {
@@ -127,8 +129,7 @@ public class BlockChangeHandler
 
     return blockElementsHistory.get(block);
   }
-  
-  
+
   private void updateBlock(BlockModel block) {
     for (Figure figure : ModelComponentUtil.getChildFigures(block, modelManager.getModel())) {
       ((AbstractFigure) figure).fireFigureChanged();

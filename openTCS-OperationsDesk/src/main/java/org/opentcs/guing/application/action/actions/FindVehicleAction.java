@@ -69,6 +69,7 @@ public class FindVehicleAction
    * @param modelManager Provides the current system model.
    * @param drawingEditor The drawing editor.
    * @param dialogParent The parent component for dialogs shown by this action.
+   * @param panelFactory The panel factory.
    */
   @Inject
   public FindVehicleAction(ModelManager modelManager,

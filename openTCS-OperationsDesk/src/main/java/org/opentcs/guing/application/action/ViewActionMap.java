@@ -49,6 +49,7 @@ public class ViewActionMap
    * @param resumeAllVehiclesAction The action to resume all vehicles
    * @param aboutAction The action to show the about window
    * @param modelPropertiesAction The action to show some model properties.
+   * @param createPeripheralJobAction The action to create peripheral jobs.
    */
   @Inject
   public ViewActionMap(OpenTCSView view,

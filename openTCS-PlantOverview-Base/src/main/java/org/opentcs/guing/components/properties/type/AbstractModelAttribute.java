@@ -48,9 +48,9 @@ public abstract class AbstractModelAttribute
   private boolean fOperatingEditable;
 
   /**
-   * Creates a new instance of AbstractModelAttribute
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public AbstractModelAttribute(ModelComponent model) {
     fModel = model;
@@ -83,7 +83,7 @@ public abstract class AbstractModelAttribute
 
   /**
    *
-   * @return
+   * @return The change state.
    */
   public ChangeState getChangeState() {
     return fChangeState;

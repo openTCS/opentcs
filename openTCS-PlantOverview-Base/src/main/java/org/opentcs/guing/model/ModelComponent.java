@@ -41,91 +41,89 @@ public interface ModelComponent
   String MISCELLANEOUS = "Miscellaneous";
 
   /**
-   * Fügt ein Kindobjekt hinzu.
+   * Adds a child component.
    *
-   * @param component
+   * @param component The model component to add.
    */
   void add(ModelComponent component);
 
   /**
-   * Entfernt ein Kindobjekt.
+   * Removes a child component.
    *
-   * @param component
+   * @param component The model component to remove.
    */
   void remove(ModelComponent component);
 
   /**
-   * Liefert die Kindobjekte.
+   * Returns all child components.
    *
-   * @return
+   * @return A list of all child components.
    */
   List<ModelComponent> getChildComponents();
 
   /**
-   * Liefert einen String, der in der Baumansicht angezeigt wird.
+   * Retruns this model component's name that is displayed in the tree view.
    *
-   * @return
+   * @return The name that is displayed in the tree view.
    */
   String getTreeViewName();
 
   /**
-   * Gibt an, ob die übergebene Komponente eine direkte Komponente ist.
+   * Returns whether the given component is a child of this model component.
    *
-   * @param component
-   * @return
+   * @param component The component.
+   * @return {@code true}, if the given component is a child of this model component, otherwise
+   * {@code false}.
    */
   boolean contains(ModelComponent component);
 
   /**
-   * Liefert die direkte Elternkomponente.
+   * Returns this model component's parent component.
    *
-   * @return die direkte Elternkomponente
+   * @return The parent component.
    */
   ModelComponent getParent();
 
   /**
-   * Returns the actual parent of this component. PropertiesCollection e.g.
-   * overwrites it. May be null.
+   * Returns the actual parent of this model component.
+   * PropertiesCollection e.g. overwrites it. May be null.
    *
    * @return The actual parent.
    */
   ModelComponent getActualParent();
 
   /**
-   * Setzt die direkte Elternkomponente.
+   * Set this model component's parent component.
    *
-   * @param parent die direkte Elternkomponente
+   * @param parent The new parent component.
    */
   void setParent(ModelComponent parent);
 
   /**
-   * Liefert true zurück, wenn die Komponente im TreeView dargestellt werden
-   * soll, ansonsten false.
+   * Returns whether this model component is to be shown in the tree view.
    *
-   * @return
+   * @return {@code true}, if the model component is to be shown in the tree view, otherwise {@code false}.
    */
   boolean isTreeViewVisible();
 
   /**
-   * Setzt die TreeView-Sichtbarkeit der Komponente.
+   * Sets this model component's visibility in the tree view.
    *
-   * @param visibility true, wenn die Komponente im TreeView angezeigt werden
-   * soll; false, wenn die Komponente nicht angezeigt werden soll
+   * @param visibility Whether the model component is to be shown in the tree view or not.
    */
   void setTreeViewVisibility(boolean visibility);
 
   /**
-   * Liefert eine ganz kurze Beschreibung, um was für ein Objekt es sich
-   * handelt.
+   * Returns a description for the model component.
    *
-   * @return
+   * @return A description for the model component.
    */
   String getDescription();
 
   /**
-   * Liefert den Namen des Objekts.
+   * Returns the name of the component.
    *
-   * @return
+   * @return The name of the component.
    */
   String getName();
 
@@ -137,25 +135,25 @@ public interface ModelComponent
   void setName(String name);
 
   /**
-   * Liefert zum aktuellen Schlüssel das Attribut mit dem übergebenen Namen.
+   * Returns the property with the given name.
    *
-   * @param name
-   * @return
+   * @param name The name of the property.
+   * @return The property with the given name.
    */
   Property getProperty(String name);
 
   /**
-   * Liefert eine Hashtable mit den Attributen des aktuell gesetzten Schlüssels.
+   * Returns all properties.
    *
-   * @return
+   * @return A map containing all properties.
    */
   Map<String, Property> getProperties();
 
   /**
-   * Fügt unter dem übergebenen Namen einen Beutel mit Attributen hinzu.
+   * Sets the property with the given name.
    *
-   * @param name
-   * @param property
+   * @param name The name of the property.
+   * @param property The property.
    */
   void setProperty(String name, Property property);
 
@@ -169,37 +167,36 @@ public interface ModelComponent
   }
 
   /**
-   * Fügt den übergebenen AttributesChangeListener hinzu und informiert diesen
-   * fortan, wenn sich die Eigenschaften oder Zustände des ModelComponent
-   * geändert haben.
+   * Adds the given {@link AttributesChangeListener}.
+   * The {@link AttributesChangeListener} is notified when properties of the model component
+   * have changed.
    *
-   * @param l der hinzuzufügende AttributesChangeListener
+   * @param l The listener.
    */
   void addAttributesChangeListener(AttributesChangeListener l);
 
   /**
-   * Entfernt den übergebenen AttributesChangeListener und informiert diesen
-   * fortan nicht mehr, wenn sich die Eigenschaften oder Zustände des
-   * ModelComponent geändert haben.
+   * Removes the given {@link AttributesChangeListener}.
    *
-   * @param l der zu entfernende AttributesChangeListener
+   * @param l The listener.
    */
   void removeAttributesChangeListener(AttributesChangeListener l);
 
   /**
-   * Prüft, ob ein bestimmter AttributesChangeListener vorhanden ist.
+   * Returns whether the given {@link AttributesChangeListener} is already registered with the model
+   * component.
    *
-   * @param l der zu prüfende AttributesChangeListener
-   * @return
-   * <code> true </code>, wenn der AttributesChangeListener vorhanden ist
+   * @param l The listener.
+   * @return {@code true}, if the given {@link AttributesChangeListener} is already registered with the model
+   * component, otherwise {@code false}.
    */
   boolean containsAttributesChangeListener(AttributesChangeListener l);
 
   /**
-   * Benachrichtigt alle registrierten AttributesChangeListener, dass sich die
-   * Eigenschaften des Models geändert haben.
+   * Notifies all registered {@link AttributesChangeListener}s that properties of the model
+   * component have changed.
    *
-   * @param l Der Initiator der Änderung.
+   * @param l The initiator of the change.
    */
   void propertiesChanged(AttributesChangeListener l);
 
@@ -207,7 +204,8 @@ public interface ModelComponent
    * Clones this ModelComponent.
    *
    * @return A clone of this ModelComponent.
-   * @throws java.lang.CloneNotSupportedException
+   * @throws java.lang.CloneNotSupportedException If the model component doesn't implement the
+   * {@link Cloneable} interface.
    */
   ModelComponent clone()
       throws CloneNotSupportedException;

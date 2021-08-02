@@ -47,7 +47,7 @@ public abstract class TextInputPanel
    * panel. 
    * </p>
    * <p>
-   * <b>Note</b>:<br/>
+   * <b>Note</b>:<br>
    * The default implementation just forwards the call to
    * {@link InputPanel#setInputValid(boolean)} without respect to the 
    * <code>Document</code>. Therefore subclasses with multiple Documents
@@ -76,7 +76,7 @@ public abstract class TextInputPanel
    * javax.swing.text.Document)} is called.
    * </p>
    * <p>
-   * <b>Note:</b><br/>
+   * <b>Note:</b><br>
    * The, for convenience, provided regular expressions do
    * NOT check whether the given number really fits into the range of the 
    * corresponding data type (e.g. <code>int</code> for <code>REGEX_INT</code>).
@@ -92,13 +92,13 @@ public abstract class TextInputPanel
      * The decimal point and positions after it can be omitted.
      * <p>
      * Examples:
+     * </p>
      * <ul>
      * <li>3.0 is valid</li>
      * <li>-3 is valid</li>
      * <li>3. is invalid</li>
      * <li>.3 is invalid</li>
      * </ul>
-     * </p>
      */
     public static final String REGEX_FLOAT = "[-+]?[0-9]+(\\.[0-9]+)?";
     /**

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteRouterService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteRouterService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_ROUTER_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

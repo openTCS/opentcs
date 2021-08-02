@@ -53,6 +53,7 @@ public class ExplicitOrderBatchGenerator
    * Creates a new ExplicitOrderBatchGenerator.
    *
    * @param transportOrderService The portal.
+   * @param dispatcherService The dispatcher service.
    * @param data The transport order data.
    */
   public ExplicitOrderBatchGenerator(TransportOrderService transportOrderService,

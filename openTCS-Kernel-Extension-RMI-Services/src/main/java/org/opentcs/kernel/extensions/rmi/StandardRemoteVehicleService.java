@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteVehicleService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteVehicleService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_VEHICLE_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

@@ -156,18 +156,19 @@ public abstract class InputPanel
    * <p>
    * An interface that can be used to implement the builder-pattern
    * (see Joshua Bloch's <i>Effective Java</i>).
-   * <br />
+   * <br>
    * As an <code>InputPanel</code> might have many required and/or optional
    * parameters it can be more convinient to use a Builder class instead of
    * public constructors.
    * A builder should implement a public constructor with required parameters
    * for the panel and public setters for optional parameters.
    * The <code>InputPanel</code> is created by the {@link #build} method.
-   * <br />
+   * <br>
    * For an example implementation see {@link SingleTextInputPanel.Builder}.
    * </p>
    * <p>
    * <b>Usage</b>:
+   * </p>
    * <ol>
    * <li>Instanciate the builder, passing required parameters to the 
    * constructor.</li>
@@ -175,7 +176,6 @@ public abstract class InputPanel
    * <li>Actually build the panel according to the previously specified 
    * parameters using the build() method.</li>
    * </ol>
-   * </p>
    * <p>
    * <b>Note</b>: 
    * The parameter methods should always return the builder itself, so the 

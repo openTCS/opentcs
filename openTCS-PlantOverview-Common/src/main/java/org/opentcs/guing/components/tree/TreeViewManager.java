@@ -31,7 +31,6 @@ import org.opentcs.util.event.EventHandler;
  * Umgekehrt gibt es jedoch keinen Kommunikationsweg.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @see ModelingApplication
  * @see TreeView
  */
 public abstract class TreeViewManager

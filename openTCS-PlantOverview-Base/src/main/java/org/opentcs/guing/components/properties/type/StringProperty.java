@@ -24,9 +24,9 @@ public class StringProperty
   private String fText;
 
   /**
-   * Creates a new instance of StringProperty
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public StringProperty(ModelComponent model) {
     this(model, "");
@@ -35,8 +35,8 @@ public class StringProperty
   /**
    * Konstruktor, dem der String übergeben wird.
    *
-   * @param model
-   * @param text
+   * @param model The model component.
+   * @param text The text.
    */
   public StringProperty(ModelComponent model, String text) {
     super(model);
@@ -51,7 +51,7 @@ public class StringProperty
   /**
    * Setzt den String.
    *
-   * @param text
+   * @param text The text.
    */
   public void setText(String text) {
     fText = text;
@@ -60,7 +60,7 @@ public class StringProperty
   /**
    * Liefert den String.
    *
-   * @return
+   * @return The text.
    */
   public String getText() {
     return fText;

@@ -34,7 +34,7 @@ public class PropertiesCollection
   /**
    * Creates a new instance.
    *
-   * @param models
+   * @param models The model components.
    */
   public PropertiesCollection(Collection<ModelComponent> models) {
     Objects.requireNonNull(models, "models is null");
@@ -123,7 +123,7 @@ public class PropertiesCollection
    * der Daten. Der Controller/View, der die Änderung verursacht hat, ruft diese
    * Methode auf und übergibt sich dabei selbst.
    *
-   * @param listener
+   * @param listener The listener that initiated the property change.
    */
   @Override // AbstractModelComponent
   public void propertiesChanged(AttributesChangeListener listener) {
@@ -138,7 +138,7 @@ public class PropertiesCollection
   /**
    * Übernimmt alle Werte der hiesigen Attribute für das übergebene Modell.
    *
-   * @param model
+   * @param model The model component to copy properties to.
    */
   protected void copyPropertiesToModel(ModelComponent model) {
     for (String name : getProperties().keySet()) {

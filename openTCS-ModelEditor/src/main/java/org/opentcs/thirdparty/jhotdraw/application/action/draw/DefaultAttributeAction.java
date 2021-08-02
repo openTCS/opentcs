@@ -44,7 +44,7 @@ public class DefaultAttributeAction
    * Creates a new instance.
    *
    * @param editor The drawing editor
-   * @param key The attribute kez
+   * @param key The attribute key
    */
   public DefaultAttributeAction(
       DrawingEditor editor,
@@ -58,7 +58,7 @@ public class DefaultAttributeAction
       AttributeKey key,
       Map<AttributeKey, Object> fixedAttributes) {
 
-    this(editor, new AttributeKey[] {key}, null, null, fixedAttributes);
+    this(editor, new AttributeKey[]{key}, null, null, fixedAttributes);
   }
 
   public DefaultAttributeAction(
@@ -70,33 +70,28 @@ public class DefaultAttributeAction
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The drawing editor.
+   * @param key The attribute key.
+   * @param icon The icon.
    */
-  public DefaultAttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      Icon icon) {
-
+  public DefaultAttributeAction(DrawingEditor editor, AttributeKey key, Icon icon) {
     this(editor, key, null, icon);
   }
 
   /**
    * Creates a new instance.
+   *
+   * @param editor The drawing editor.
+   * @param key The attribute key.
+   * @param name The name.
    */
-  public DefaultAttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      String name) {
-
+  public DefaultAttributeAction(DrawingEditor editor, AttributeKey key, String name) {
     this(editor, key, name, null);
   }
 
-  public DefaultAttributeAction(
-      DrawingEditor editor,
-      AttributeKey key,
-      String name,
-      Icon icon) {
-
-    this(editor, new AttributeKey[] {key}, name, icon);
+  public DefaultAttributeAction(DrawingEditor editor, AttributeKey key, String name, Icon icon) {
+    this(editor, new AttributeKey[]{key}, name, icon);
   }
 
   public DefaultAttributeAction(

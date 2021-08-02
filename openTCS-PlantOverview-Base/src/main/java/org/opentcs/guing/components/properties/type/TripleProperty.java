@@ -26,9 +26,9 @@ public class TripleProperty
   private Triple fTriple;
 
   /**
-   * Creates a new instance of PointProperty.
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public TripleProperty(ModelComponent model) {
     super(model);
@@ -44,7 +44,7 @@ public class TripleProperty
    * Ausnahme wird ausgelï¿½st, wenn es sich bei der Maï¿½einheit um keine mï¿½gliche
    * Einheit handelt.
    *
-   * @param triple
+   * @param triple The triple.
    */
   public void setValue(Triple triple) {
     fTriple = triple;

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteDispatcherService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteDispatcherService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_DISPATCHER_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

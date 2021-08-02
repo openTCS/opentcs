@@ -18,7 +18,6 @@ import javax.inject.Inject;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.access.rmi.services.RegistrationName;
-import org.opentcs.access.rmi.services.RemoteDispatcherService;
 import org.opentcs.access.rmi.services.RemoteQueryService;
 import org.opentcs.components.kernel.Query;
 import org.opentcs.components.kernel.services.QueryService;
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteQueryService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteDispatcherService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_QUERY_SERVICE}.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)

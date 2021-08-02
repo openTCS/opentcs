@@ -26,6 +26,8 @@ subprojects {
 }
 evaluationDependsOnChildren()
 
+apply from: "${rootDir}/gradle/publishing.gradle"
+
 distributions {
   main {
     contents.from {
@@ -110,4 +112,8 @@ task release {
   dependsOn subprojects*.release
   dependsOn distZip
   dependsOn distSrcZip
+}
+
+task publishSubprojects {
+    dependsOn subprojects*.publish
 }

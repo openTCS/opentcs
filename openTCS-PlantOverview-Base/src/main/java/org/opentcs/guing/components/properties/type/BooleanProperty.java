@@ -18,9 +18,9 @@ public class BooleanProperty
     extends AbstractProperty {
 
   /**
-   * Creates a new instance of BooleanProperty.
+   * Creates a new instance.
    *
-   * @param model
+   * @param model The model component.
    */
   public BooleanProperty(ModelComponent model) {
     this(model, false);
@@ -29,8 +29,8 @@ public class BooleanProperty
   /**
    * Konstruktor mit booleschem Wert.
    *
-   * @param model
-   * @param value
+   * @param model The model component.
+   * @param value The value.
    */
   public BooleanProperty(ModelComponent model, boolean value) {
     super(model);

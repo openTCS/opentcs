@@ -23,7 +23,7 @@ public class AboutDialog
    * Creates new AboutDialog.
    *
    * @param parent The parent frame.
-   * @param modal
+   * @param modal Whether the dialog blocks user input to other top-level windows when shown.
    */
   public AboutDialog(Frame parent, boolean modal) {
     super(parent, modal);

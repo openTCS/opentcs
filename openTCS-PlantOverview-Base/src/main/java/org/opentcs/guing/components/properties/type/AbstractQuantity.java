@@ -63,11 +63,13 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   protected ValidRangePair validRange = new ValidRangePair();
 
   /**
-   * Konstruktor mit Wert und Maï¿½einheit.
+   * Creates a new instance.
    *
-   * @param model
-   * @param value
-   * @param unit
+   * @param model The model component.
+   * @param value The value.
+   * @param unit The unit.
+   * @param unitClass The unit class.
+   * @param relations The relations.
    */
   public AbstractQuantity(ModelComponent model, double value, U unit, Class<U> unitClass,
                           List<Relation<U>> relations) {
@@ -108,7 +110,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   /**
    * Setzt den Wert auf ganzzahlig oder gebrochen.
    *
-   * @param isInteger
+   * @param isInteger Whether the value is an integer.
    */
   public void setInteger(boolean isInteger) {
     fIsInteger = isInteger;
@@ -117,7 +119,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   /**
    * Zeigt an, ob eine ganzzahlige Darstellung erfolgen soll.
    *
-   * @return
+   * @return Whether the value is an integer.
    */
   public boolean isInteger() {
     return fIsInteger;
@@ -126,7 +128,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   /**
    * Setzt den Wert auf vorzeichenbehaftet oder vorzeichenlos.
    *
-   * @param isUnsigned
+   * @param isUnsigned Whether the value is unsigned.
    */
   public void setUnsigned(boolean isUnsigned) {
     this.fIsUnsigned = isUnsigned;
@@ -134,7 +136,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
 
   /**
    *
-   * @return
+   * @return Whether the value is unsigned.
    */
   public boolean isUnsigned() {
     return fIsUnsigned;
@@ -162,8 +164,8 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * Liefert den Wert, der der ï¿½bergebenen Einheit entspricht, ohne eine feste
    * Umwandlung vorzunehmen.
    *
-   * @param unit
-   * @return
+   * @param unit The unit.
+   * @return The value by the given unit.
    */
   public double getValueByUnit(U unit) {
     try {
@@ -260,7 +262,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   /**
    * Liefert die Maï¿½einheit.
    *
-   * @return
+   * @return The unit.
    */
   public U getUnit() {
     return fUnit;
@@ -272,8 +274,8 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * <code>true
    * </code> zurï¿½ck.
    *
-   * @param unit
-   * @return
+   * @param unit The unit.
+   * @return {@code true}, if the given unit is a valid/possible one, otherwise {@code false}.
    */
   public boolean isPossibleUnit(U unit) {
     return fPossibleUnits.contains(unit);
@@ -299,8 +301,8 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * Ausnahme wird ausgelï¿½st, wenn es sich bei der Maï¿½einheit um keine mï¿½gliche
    * Einheit handelt.
    *
-   * @param value
-   * @param unit
+   * @param value The value.
+   * @param unit The unit.
    * @throws IllegalArgumentException If the given unit is not usable.
    */
   public void setValueAndUnit(double value, U unit)
@@ -358,7 +360,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   /**
    * Liefert die mï¿½glichen Maï¿½einheiten.
    *
-   * @return
+   * @return A list of possible units.
    */
   public List<U> getPossibleUnits() {
     return fPossibleUnits;

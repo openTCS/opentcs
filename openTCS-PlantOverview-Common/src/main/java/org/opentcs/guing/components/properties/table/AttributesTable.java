@@ -21,6 +21,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OperationMode;
+import org.opentcs.guing.components.properties.AttributesComponent;
 import org.opentcs.guing.components.properties.event.TableChangeListener;
 import org.opentcs.guing.components.properties.event.TableSelectionChangeEvent;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
@@ -30,15 +31,11 @@ import org.opentcs.guing.components.properties.type.ModelAttribute;
  * besteht aus zwei Spalten: die erste enthält die Namen der Attribute, die
  * zweite die Werte der Attribute.
  * <p>
- * Die Tabelle ist Teil der {
- *
- * @see PropertiesComponent}. Diese besitzt unterhalb der Tabelle einen Bereich
- * für attributspezifische Hilfetexte. PropertiesComponent muss deshalb wissen,
+ * Die Tabelle ist Teil der {@link AttributesComponent}. Diese besitzt unterhalb der Tabelle einen 
+ * Bereich für attributspezifische Hilfetexte. AttributesComponent muss deshalb wissen,
  * welche Tabellenzeile der Benutzer gerade selektiert, um den entsprechenden
- * Hilfetext anzeigen zu können. Daher registriert sich PropertiesComponent als
- * {
- * @see TableSelectionChangeListener} bei der Tabelle und wird dann über jede
- * Veränderung informiert.
+ * Hilfetext anzeigen zu können. Daher registriert sich AttributesComponent als
+ * {@link TableChangeListener} bei der Tabelle und wird dann über jede Veränderung informiert.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)

@@ -33,7 +33,7 @@ public class PlantOverviewStarter {
    */
   private final OpenTCSView opentcsView;
   /**
-   *
+   * Provides logging for events published on the application event bus.
    */
   private final EventLogger eventLogger;
 
@@ -43,6 +43,7 @@ public class PlantOverviewStarter {
    * @param progressIndicator The progress indicator to be used.
    * @param application The application to be used.
    * @param opentcsView The view to be used.
+   * @param eventLogger Provides logging for events published on the application event bus.
    */
   @Inject
   public PlantOverviewStarter(ProgressIndicator progressIndicator,

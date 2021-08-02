@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared by {@link RegistrationName#REMOTE_PERIPHERAL_DISPATCHER_SERVICE}.
+ * {@link RegistrationName#REMOTE_PERIPHERAL_DISPATCHER_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

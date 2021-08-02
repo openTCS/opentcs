@@ -1,5 +1,4 @@
 apply from: "${rootDir}/gradle/java-project.gradle"
-apply from: "${rootDir}/gradle/java-artifacts.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
 apply from: "${rootDir}/gradle/maven-publishing.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
@@ -9,7 +8,6 @@ dependencies {
   compile project(':openTCS-API-Base')
   
   compile group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
-  compileOnly group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0', classifier: 'sources'
 }
 
 task release {

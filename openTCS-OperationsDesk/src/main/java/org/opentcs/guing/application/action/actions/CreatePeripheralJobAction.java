@@ -64,6 +64,8 @@ public class CreatePeripheralJobAction
    * Creates a new instance.
    *
    * @param dialogParent The parent for dialogs shown by this action.
+   * @param peripheralJobPanel Provides panels for entering new peripheral jobs.
+   * @param portalProvider Provides access to the kernel service portal.
    */
   @Inject
   public CreatePeripheralJobAction(@ApplicationFrame Component dialogParent,

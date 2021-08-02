@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemotePlantModelService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemotePlantModelService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_PLANT_MODEL_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)

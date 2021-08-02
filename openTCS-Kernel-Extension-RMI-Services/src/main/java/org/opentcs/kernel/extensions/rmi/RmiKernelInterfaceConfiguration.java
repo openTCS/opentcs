@@ -7,11 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import org.opentcs.access.rmi.services.RemoteKernelServicePortal;
 import org.opentcs.configuration.ConfigurationEntry;
 import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
- * Provides methods to configure the {@link StandardRemoteKernel}.
+ * Provides methods to configure the {@link RemoteKernelServicePortal} and the
+ * {@link KernelRemoteService}s.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */

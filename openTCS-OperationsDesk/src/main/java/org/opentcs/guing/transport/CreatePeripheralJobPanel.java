@@ -41,7 +41,9 @@ public class CreatePeripheralJobPanel
   private final List<LocationModel> locations;
 
   /**
-   * Creates new form CreatePeripheralJobPanel
+   * Creates a new instance.
+   *
+   * @param modelManager The model manager.
    */
   @Inject
   public CreatePeripheralJobPanel(ModelManager modelManager) {

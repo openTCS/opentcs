@@ -30,7 +30,7 @@ public interface MenuFactory {
    * @param copyAll Indicates whether the values of ALL points and locations
    * shall be copied when the menu item is clicked. If false only the selected
    * figures will be considered.
-   * @return
+   * @return The created menu item.
    */
   ModelToLayoutMenuItem createModelToLayoutMenuItem(boolean copyAll);
 }

@@ -28,13 +28,13 @@ public interface ModelAttribute
   /**
    * Liefert das Model, zu dem dieses Attribut gehört.
    *
-   * @return
+   * @return The model component.
    */
   public ModelComponent getModel();
 
   /**
    *
-   * @param model
+   * @param model The model component.
    */
   public void setModel(ModelComponent model);
 
@@ -52,7 +52,7 @@ public interface ModelAttribute
 
   /**
    *
-   * @param changeState
+   * @param changeState The change state.
    */
   void setChangeState(AbstractModelAttribute.ChangeState changeState);
 
@@ -61,35 +61,36 @@ public interface ModelAttribute
    * Views und Fahrkurselemente von Fahrzeugtypen, ob überhaupt eine
    * übernehmenswerte Änderung vorliegt.
    *
-   * @return
+   * @return {@code true}, if the state of the model attribute has changed, otherwiese
+   * {@code false}.
    */
   boolean hasChanged();
 
   /**
    * Setzt die Bezeichnung dieser Zustandsrepräsentation.
    *
-   * @param description
+   * @param description The description.
    */
   void setDescription(String description);
 
   /**
    * Liefert die Bezeichnung eines Zustands.
    *
-   * @return
+   * @return The description.
    */
   String getDescription();
 
   /**
    * Setzt den Hilfetext für einen Zustand.
    *
-   * @param helptext
+   * @param helptext The helptext.
    */
   void setHelptext(String helptext);
 
   /**
    * Liefert den Hilfetext für diesen Zustand.
    *
-   * @return
+   * @return The helptext.
    */
   String getHelptext();
 
@@ -97,7 +98,8 @@ public interface ModelAttribute
    * Sagt, ob das Attribut gleichzeitig mit den gleichnamigen Attributen anderer
    * Fahrkurselemente bearbeitet werden kann.
    *
-   * @param collectiveEditable
+   * @param collectiveEditable Whether the attribute is collectively editable with attributes
+   * of the same name of other model components.
    */
   void setCollectiveEditable(boolean collectiveEditable);
 
@@ -105,7 +107,8 @@ public interface ModelAttribute
    * Zeigt an, ob das Attribut gleichzeitig mit den gleichnamigen Attributen
    * anderer Fahrkurselemente desselben Fahrzeugtyps bearbeitet werden kann.
    *
-   * @return
+   * @return Whether the attribute is collectively editable with attributes of the same name
+   * of other model components.
    */
   boolean isCollectiveEditable();
 

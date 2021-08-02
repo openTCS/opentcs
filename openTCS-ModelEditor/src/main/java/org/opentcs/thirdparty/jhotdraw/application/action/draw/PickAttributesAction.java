@@ -45,7 +45,7 @@ public class PickAttributesAction
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
 
   private Set<AttributeKey> excludedAttributes = new HashSet<>(
-      Arrays.asList(new AttributeKey[] {TRANSFORM, TEXT}));
+      Arrays.asList(new AttributeKey[]{TRANSFORM, TEXT}));
 
   /**
    * Creates a new instance.
@@ -65,8 +65,10 @@ public class PickAttributesAction
   }
 
   /**
-   * Set of attributes that is excluded when applying default attributes. By
-   * default, the TRANSFORM attribute is excluded.
+   * Set of attributes that is excluded when applying default attributes.
+   * By default, the TRANSFORM attribute is excluded.
+   *
+   * @param a The attributes to exclude.
    */
   public void setExcludedAttributes(Set<AttributeKey> a) {
     this.excludedAttributes = a;

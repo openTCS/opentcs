@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link RemoteTransportOrderService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
- * declared as {@link RemoteTransportOrderService#getRegistrationName()}.
+ * {@link RegistrationName#REMOTE_TRANSPORT_ORDER_SERVICE}.
  * </p>
  *
  * @author Martin Grzenia (Fraunhofer IML)
