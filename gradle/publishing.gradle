@@ -9,7 +9,7 @@ configure(subprojects) {
 
   publishing {
     publications {
-      opentcsArtifacts(MavenPublication) {
+      mavenJava(MavenPublication) {
         from(components.java)
 
         pom {

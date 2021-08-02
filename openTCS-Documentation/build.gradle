@@ -15,7 +15,6 @@ evaluationDependsOn(':openTCS-PlantOverview-Panel-LoadGenerator')
 
 apply from: "${rootDir}/gradle/java-project.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
-apply from: "${rootDir}/gradle/maven-publishing.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 

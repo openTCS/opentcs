@@ -60,10 +60,6 @@ task subDists {
   dependsOn(':openTCS-Documentation:installDist')
 }
 
-task install {
-  dependsOn subprojects*.install
-}
-
 installDist.dependsOn subDists
 
 distZip {
