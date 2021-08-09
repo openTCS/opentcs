@@ -1,5 +1,7 @@
 # openTCS
 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+
 * Homepage: https://www.opentcs.org/
 * Changelog: [changelog.adoc](./openTCS-Documentation/src/docs/release-notes/changelog.adoc)
 
