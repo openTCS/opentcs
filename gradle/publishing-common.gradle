@@ -1,0 +1,14 @@
+apply plugin: 'maven-publish'
+
+publishing {
+  repositories {
+    maven {
+      name = "deploy-repo"
+      url = project.hasProperty('DEPLOY_REPO_URL') ? project.property('DEPLOY_REPO_URL') : ''
+      credentials {
+        username project.hasProperty('DEPLOY_REPO_USERNAME') ? project.property('DEPLOY_REPO_USERNAME') : ''
+        password project.hasProperty('DEPLOY_REPO_PASSWORD') ? project.property('DEPLOY_REPO_PASSWORD') : ''
+      }
+    }
+  }
+}

@@ -1,8 +1,20 @@
+# The following variables are expected to be set:
+# DO_DEPLOY: Whether or not to deploy.
+# NO_BUILD_NUMBER: Whether to include the build number in the artifacts' version numbers.
+# DEPLOY_REPO_URL: URL of the repository to deploy artifacts to.
+# DEPLOY_REPO_USERNAME: User name for logging in with the repository.
+# DEPLOY_REPO_PASSWORD: Password for logging in with the repository.
 image: adoptopenjdk:13-jdk-hotspot
 
 include:
-  - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
   - template: Code-Quality.gitlab-ci.yml
+
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -24,7 +36,18 @@ build:
   tags:
     - opentcs-runner
   script:
-    - ./gradlew build
+    - echo "DO_DEPLOY is $DO_DEPLOY"
+    - echo "NO_BUILD_NUMBER is $NO_BUILD_NUMBER"
+    - echo "DEPLOY_REPO_URL is $DEPLOY_REPO_URL"
+    - echo "DEPLOY_REPO_USERNAME is $DEPLOY_REPO_USERNAME"
+    - echo "DEPLOY_REPO_PASSWORD is $DEPLOY_REPO_PASSWORD"
+    - 'if [ "$DO_DEPLOY" = "true" ]; then
+        echo "Executing build with deployment...";
+        ./gradlew clean build publish -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER" -PDEPLOY_REPO_URL="$DEPLOY_REPO_URL" -PDEPLOY_REPO_USERNAME="$DEPLOY_REPO_USERNAME" -PDEPLOY_REPO_PASSWORD="$DEPLOY_REPO_PASSWORD";
+      else
+        echo "Executing build without deployment...";
+        ./gradlew clean build -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER";
+      fi'
   artifacts:
     paths:
       - build/distributions/*.zip

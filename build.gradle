@@ -20,13 +20,14 @@ apply plugin: 'distribution'
 apply plugin: 'com.github.ben-manes.versions'
 
 apply from: "${rootDir}/gradle/common.gradle"
+apply from: "${rootDir}/gradle/publishing-common.gradle"
+
+evaluationDependsOnChildren()
 
 subprojects {
   apply from: rootProject.file('gradle/common.gradle')
+  apply from: rootProject.file('gradle/publishing-java.gradle')
 }
-evaluationDependsOnChildren()
-
-apply from: "${rootDir}/gradle/publishing.gradle"
 
 distributions {
   main {
@@ -110,6 +111,43 @@ task release {
   dependsOn distSrcZip
 }
 
-task publishSubprojects {
-    dependsOn subprojects*.publish
+publish.dependsOn subprojects*.publish
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifact distZip
+      artifact distSrcZip
+
+      pom {
+        artifactId = 'distribution'
+
+        name = project.name
+        description = project.name
+        url = "https://www.opentcs.org"
+
+        licenses {
+          license {
+            name = "MIT License"
+            url = "http://www.opensource.org/licenses/mit-license.php"
+          }
+        }
+
+        developers {
+          developer {
+            name = "The openTCS Authors"
+            email = "info@opentcs.org"
+            organization = "The open Transportation Control System"
+            organizationUrl = "https://www.opentcs.org/"
+          }
+        }
+
+        scm {
+          connection = "scm:git:git://github.com/opentcs/opentcs.git"
+          developerConnection = "scm:git:ssh://github.com:opentcs/opentcs.git"
+          url = "https://github.com/opentcs/opentcs"
+        }
+      }
+    }
+  }
 }
