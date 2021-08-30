@@ -86,6 +86,9 @@ public class CachedSystemModel
 
   @Override
   public ModelComponent getModelComponent(String name) {
+    if (components.isEmpty()) {
+      return super.getModelComponent(name);
+    }
     return components.get(name);
   }
 
