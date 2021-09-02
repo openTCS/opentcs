@@ -180,7 +180,6 @@ public class ViewManagerOperating
     requireNonNull(dockable, "dockable");
     requireNonNull(panel, "panel");
 
-    eventSource.subscribe(panel);
     transportOrderViews.put(dockable, panel);
   }
 
@@ -196,7 +195,6 @@ public class ViewManagerOperating
     requireNonNull(dockable, "dockable");
     requireNonNull(panel, "panel");
 
-    eventSource.subscribe(panel);
     orderSequenceViews.put(dockable, panel);
   }
 
@@ -224,16 +222,8 @@ public class ViewManagerOperating
   public void removeDockable(DefaultSingleCDockable dockable) {
     super.removeDockable(dockable);
 
-    TransportOrdersContainerPanel ordersPanel = transportOrderViews.remove(dockable);
-    if (ordersPanel != null) {
-      eventSource.unsubscribe(ordersPanel);
-    }
-
-    OrderSequencesContainerPanel sequencePanel = orderSequenceViews.remove(dockable);
-    if (sequencePanel != null) {
-      eventSource.unsubscribe(sequencePanel);
-    }
-
+    transportOrderViews.remove(dockable);
+    orderSequenceViews.remove(dockable);
     peripheralJobViews.remove(dockable);
   }
 

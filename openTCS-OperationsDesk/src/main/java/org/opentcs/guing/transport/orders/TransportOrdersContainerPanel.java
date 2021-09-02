@@ -14,11 +14,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JButton;
@@ -35,11 +33,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
-import javax.swing.SwingUtilities;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
-import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.data.order.TransportOrder.State.BEING_PROCESSED;
 import static org.opentcs.data.order.TransportOrder.State.DISPATCHABLE;
@@ -48,9 +44,6 @@ import static org.opentcs.data.order.TransportOrder.State.FINISHED;
 import static org.opentcs.data.order.TransportOrder.State.RAW;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
-import org.opentcs.guing.event.KernelStateChangeEvent;
-import org.opentcs.guing.event.OperationModeChangeEvent;
-import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.transport.CreateTransportOrderPanel;
 import org.opentcs.guing.transport.FilterButton;
@@ -58,7 +51,6 @@ import org.opentcs.guing.transport.OrdersTable;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
-import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +62,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrdersContainerPanel
-    extends JPanel
-    implements EventHandler {
+    extends JPanel {
 
   /**
    * This class's logger.
@@ -106,13 +97,13 @@ public class TransportOrdersContainerPanel
    */
   private TransportOrderTableModel tableModel;
   /**
-   * List of Transport Order listeners.
-   */
-  private final Set<TransportOrderContainerListener> listeners = new HashSet<>();
-  /**
    * The sorter for the table.
    */
   private FilteredRowSorter<TransportOrderTableModel> sorter;
+  /**
+   * Holds the transport orders.
+   */
+  private final TransportOrdersContainer transportOrdersContainer;
 
   /**
    * Creates a new instance.
@@ -121,56 +112,35 @@ public class TransportOrdersContainerPanel
    * @param orderUtil A helper for creating transport orders with the kernel.
    * @param orderPanelProvider Provides panels for entering new transport orders.
    * @param transportViewFactory A factory for creating transport order views.
+   * @param transportOrderContainer Maintains a set of transport order on the kernel side.
    */
   @Inject
   public TransportOrdersContainerPanel(SharedKernelServicePortalProvider portalProvider,
                                        TransportOrderUtil orderUtil,
                                        Provider<CreateTransportOrderPanel> orderPanelProvider,
-                                       TransportViewFactory transportViewFactory) {
+                                       TransportViewFactory transportViewFactory,
+                                       TransportOrdersContainer transportOrderContainer) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.orderPanelProvider = requireNonNull(orderPanelProvider, "orderPanelProvider");
     this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
+    this.transportOrdersContainer = requireNonNull(transportOrderContainer, "transportOrderContainer");
 
     initComponents();
-  }
-
-  @Override
-  public void onEvent(Object event) {
-    if (event instanceof TCSObjectEvent) {
-      handleObjectEvent((TCSObjectEvent) event);
-    }
-    else if (event instanceof OperationModeChangeEvent) {
-      initView();
-    }
-    else if (event instanceof SystemModelTransitionEvent) {
-      initView();
-    }
-    else if (event instanceof KernelStateChangeEvent) {
-      initView();
-    }
-  }
-
-  public void addListener(TransportOrderContainerListener listener) {
-    listeners.add(listener);
-  }
-
-  public void removeListener(TransportOrderContainerListener listener) {
-    listeners.remove(listener);
   }
 
   /**
    * Initializes this panel's contents.
    */
   public void initView() {
-    listeners.forEach(listener -> listener.containerInitialized(fetchOrdersIfOnline()));
+    tableModel.containerInitialized(transportOrdersContainer.getTransportOrders());
   }
 
   private void initComponents() {
     setLayout(new BorderLayout());
 
     tableModel = new TransportOrderTableModel();
-    addListener(tableModel);
+    transportOrdersContainer.addListener(tableModel);
     fTable = new OrdersTable(tableModel);
     fTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -214,20 +184,6 @@ public class TransportOrdersContainerPanel
         }
       }
     });
-  }
-
-  private Set<TransportOrder> fetchOrdersIfOnline() {
-    if (portalProvider.portalShared()) {
-      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-        return sharedPortal.getPortal().getTransportOrderService()
-            .fetchObjects(TransportOrder.class);
-      }
-      catch (KernelRuntimeException exc) {
-        LOG.warn("Exception fetching transport orders", exc);
-      }
-    }
-
-    return new HashSet<>();
   }
 
   private void showSelectedTransportOrder() {
@@ -313,42 +269,6 @@ public class TransportOrdersContainerPanel
     }
 
     return Optional.of(tableModel.getEntryAt(row));
-  }
-
-  private void handleObjectEvent(TCSObjectEvent evt) {
-    if (evt.getCurrentOrPreviousObjectState() instanceof TransportOrder) {
-      switch (evt.getType()) {
-        case OBJECT_CREATED:
-          transportOrderAdded((TransportOrder) evt.getCurrentOrPreviousObjectState());
-          break;
-        case OBJECT_MODIFIED:
-          transportOrderChanged((TransportOrder) evt.getCurrentOrPreviousObjectState());
-          break;
-        case OBJECT_REMOVED:
-          transportOrderRemoved((TransportOrder) evt.getCurrentOrPreviousObjectState());
-          break;
-        default:
-          LOG.warn("Unhandled event type: {}", evt.getType());
-      }
-    }
-  }
-
-  private void transportOrderAdded(TransportOrder order) {
-    SwingUtilities.invokeLater(() -> {
-      listeners.forEach(listener -> listener.transportOrderAdded(order));
-    });
-  }
-
-  private void transportOrderChanged(TransportOrder order) {
-    SwingUtilities.invokeLater(() -> {
-      listeners.forEach(listener -> listener.transportOrderUpdated(order));
-    });
-  }
-
-  private void transportOrderRemoved(TransportOrder order) {
-    SwingUtilities.invokeLater(() -> {
-      listeners.forEach(listener -> listener.transportOrderRemoved(order));
-    });
   }
 
   private List<JToggleButton> createFilterButtons() {

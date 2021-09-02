@@ -13,12 +13,10 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -27,18 +25,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
-import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
-import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.components.dialogs.StandardContentDialog;
-import org.opentcs.guing.event.KernelStateChangeEvent;
-import org.opentcs.guing.event.OperationModeChangeEvent;
-import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.transport.FilterButton;
 import org.opentcs.guing.transport.FilteredRowSorter;
 import org.opentcs.guing.transport.OrdersTable;
@@ -46,7 +37,6 @@ import org.opentcs.guing.transport.orders.TransportViewFactory;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.IconToolkit;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
-import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequencesContainerPanel
-    extends JPanel
-    implements EventHandler {
+    extends JPanel {
 
   /**
    * The path to the icons.
@@ -68,10 +57,6 @@ public class OrderSequencesContainerPanel
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(OrderSequencesContainerPanel.class);
-  /**
-   * Provides access to a portal.
-   */
-  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * A factory for order sequence views.
    */
@@ -89,82 +74,45 @@ public class OrderSequencesContainerPanel
    */
   private OrderSequenceTableModel tableModel;
   /**
-   * Listeners for changes in order sequences.
-   */
-  private Set<OrderSequenceContainerListener> listeners = new HashSet<>();
-  /**
    * The sorter for the table.
    */
   private FilteredRowSorter<OrderSequenceTableModel> sorter;
+  /**
+   * Holds the order sequences.
+   */
+  private final OrderSequencesContainer orderSequencesContainer;
 
   /**
    * Creates a new instance.
    *
-   * @param portalProvider Provides a access to a portal.
    * @param transportViewFactory A factory for order sequence views.
    * @param dialogParent The parent component for dialogs shown by this instance.
+   * @param orderSequencesContainer Maintains a set of order sequences on the kernel side.
    */
   @Inject
-  public OrderSequencesContainerPanel(SharedKernelServicePortalProvider portalProvider,
-                                      TransportViewFactory transportViewFactory,
-                                      @ApplicationFrame Component dialogParent) {
-    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+  public OrderSequencesContainerPanel(TransportViewFactory transportViewFactory,
+                                      @ApplicationFrame Component dialogParent,
+                                      OrderSequencesContainer orderSequencesContainer) {
     this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
+    this.orderSequencesContainer = requireNonNull(orderSequencesContainer,
+                                                  "orderSequencesContainer");
 
     initComponents();
-  }
-
-  @Override
-  public void onEvent(Object event) {
-    if (event instanceof TCSObjectEvent) {
-      handleObjectEvent((TCSObjectEvent) event);
-    }
-    else if (event instanceof OperationModeChangeEvent) {
-      initView();
-    }
-    else if (event instanceof SystemModelTransitionEvent) {
-      initView();
-    }
-    else if (event instanceof KernelStateChangeEvent) {
-      initView();
-    }
-  }
-
-  public void addListener(OrderSequenceContainerListener listener) {
-    listeners.add(listener);
-  }
-
-  public void removeListener(OrderSequenceContainerListener listener) {
-    listeners.remove(listener);
   }
 
   /**
    * Initializes this panel's contents.
    */
   public void initView() {
-    listeners.forEach(listener -> listener.containerInitialized(fetchSequencesIfOnline()));
-  }
-
-  private Set<OrderSequence> fetchSequencesIfOnline() {
-    if (portalProvider.portalShared()) {
-      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-        return sharedPortal.getPortal().getTransportOrderService()
-            .fetchObjects(OrderSequence.class);
-      }
-      catch (KernelRuntimeException exc) {
-        LOG.warn("Exception fetching sequences from kernel", exc);
-      }
-    }
-
-    return new HashSet<>();
+    tableModel.containerInitialized(orderSequencesContainer.getOrderSequences());
   }
 
   private void initComponents() {
     setLayout(new BorderLayout());
 
     tableModel = new OrderSequenceTableModel();
-    addListener(tableModel);
+    orderSequencesContainer.addListener(tableModel);
     fTable = new OrdersTable(tableModel);
 
     sorter = new FilteredRowSorter<>(tableModel);
@@ -227,42 +175,6 @@ public class OrderSequencesContainerPanel
     }
 
     return Optional.of(tableModel.getEntryAt(fTable.convertRowIndexToModel(row)));
-  }
-
-  private void handleObjectEvent(TCSObjectEvent evt) {
-    if (evt.getCurrentOrPreviousObjectState() instanceof OrderSequence) {
-      switch (evt.getType()) {
-        case OBJECT_CREATED:
-          orderSequenceAdded((OrderSequence) evt.getCurrentOrPreviousObjectState());
-          break;
-        case OBJECT_MODIFIED:
-          orderSequenceChanged((OrderSequence) evt.getCurrentOrPreviousObjectState());
-          break;
-        case OBJECT_REMOVED:
-          orderSequenceRemoved((OrderSequence) evt.getCurrentOrPreviousObjectState());
-          break;
-        default:
-          LOG.warn("Unhandled event type: {}", evt.getType());
-      }
-    }
-  }
-
-  private void orderSequenceAdded(OrderSequence os) {
-    SwingUtilities.invokeLater(() -> {
-      listeners.forEach(listener -> listener.orderSequenceAdded(os));
-    });
-  }
-
-  private void orderSequenceChanged(OrderSequence os) {
-    SwingUtilities.invokeLater(() -> {
-      listeners.forEach(listener -> listener.orderSequenceUpdated(os));
-    });
-  }
-
-  private void orderSequenceRemoved(OrderSequence os) {
-    SwingUtilities.invokeLater(() -> {
-      listeners.forEach(listener -> listener.orderSequenceRemoved(os));
-    });
   }
 
   private List<FilterButton> createFilterButtons() {

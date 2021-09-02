@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.transport.orders;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,6 +57,10 @@ public class TransportOrdersContainer
    */
   private final Map<String, TransportOrder> transportOrders = new HashMap<>();
   /**
+   * This container's listeners.
+   */
+  private final Set<TransportOrderContainerListener> listeners = new HashSet<>();
+  /**
    * Whether this component is initialized.
    */
   private boolean initialized;
@@ -83,7 +88,7 @@ public class TransportOrdersContainer
     if (isInitialized()) {
       return;
     }
-    
+
     eventBus.subscribe(this);
 
     initialized = true;
@@ -94,7 +99,7 @@ public class TransportOrdersContainer
     if (!isInitialized()) {
       return;
     }
-    
+
     eventBus.unsubscribe(this);
 
     initialized = false;
@@ -116,6 +121,14 @@ public class TransportOrdersContainer
     }
   }
 
+  public void addListener(TransportOrderContainerListener listener) {
+    listeners.add(listener);
+  }
+
+  public void removeListener(TransportOrderContainerListener listener) {
+    listeners.remove(listener);
+  }
+
   /**
    * Returns the transport order with the given name, if it exists.
    *
@@ -128,8 +141,18 @@ public class TransportOrdersContainer
     return Optional.ofNullable(transportOrders.get(name));
   }
 
+  /**
+   * Returns all currently stored transport orders.
+   *
+   * @return The collection of transport orders.
+   */
+  public Collection<TransportOrder> getTransportOrders() {
+    return transportOrders.values();
+  }
+
   private void initOrders() {
     setTransportOrders(fetchOrdersIfOnline());
+    listeners.forEach(listener -> listener.containerInitialized(transportOrders.values()));
   }
 
   private void handleObjectEvent(TCSObjectEvent evt) {
@@ -152,14 +175,17 @@ public class TransportOrdersContainer
 
   private void transportOrderAdded(TransportOrder order) {
     transportOrders.put(order.getName(), order);
+    listeners.forEach(listener -> listener.transportOrderAdded(order));
   }
 
   private void transportOrderChanged(TransportOrder order) {
     transportOrders.put(order.getName(), order);
+    listeners.forEach(listener -> listener.transportOrderUpdated(order));
   }
 
   private void transportOrderRemoved(TransportOrder order) {
     transportOrders.remove(order.getName());
+    listeners.forEach(listener -> listener.transportOrderRemoved(order));
   }
 
   private void setTransportOrders(Set<TransportOrder> newOrders) {

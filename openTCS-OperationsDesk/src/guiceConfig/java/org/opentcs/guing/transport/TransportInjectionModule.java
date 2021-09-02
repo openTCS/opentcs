@@ -12,6 +12,7 @@ import org.opentcs.guing.transport.orders.TransportViewFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import javax.inject.Singleton;
+import org.opentcs.guing.transport.sequences.OrderSequencesContainer;
 
 /**
  * A Guice module for this package.
@@ -26,6 +27,9 @@ public class TransportInjectionModule
     install(new FactoryModuleBuilder().build(TransportViewFactory.class));
     
     bind(TransportOrdersContainer.class)
+        .in(Singleton.class);
+    
+    bind(OrderSequencesContainer.class)
         .in(Singleton.class);
   }
 }
