@@ -7,9 +7,9 @@
  */
 package org.opentcs.guing.transport.orders;
 
-import org.opentcs.guing.transport.sequences.OrderSequenceView;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.guing.transport.sequences.OrderSequenceView;
 
 /**
  * Creates transport order-related GUI components.

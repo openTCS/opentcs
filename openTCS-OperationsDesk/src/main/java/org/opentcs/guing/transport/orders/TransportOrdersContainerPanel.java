@@ -7,7 +7,6 @@
  */
 package org.opentcs.guing.transport.orders;
 
-import org.opentcs.guing.transport.FilteredRowSorter;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -47,6 +46,7 @@ import org.opentcs.guing.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.exchange.TransportOrderUtil;
 import org.opentcs.guing.transport.CreateTransportOrderPanel;
 import org.opentcs.guing.transport.FilterButton;
+import org.opentcs.guing.transport.FilteredRowSorter;
 import org.opentcs.guing.transport.OrdersTable;
 import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.guing.util.IconToolkit;

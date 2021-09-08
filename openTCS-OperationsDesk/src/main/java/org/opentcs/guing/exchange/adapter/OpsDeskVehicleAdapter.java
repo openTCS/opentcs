@@ -8,11 +8,8 @@
 package org.opentcs.guing.exchange.adapter;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,11 +22,9 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.exchange.DriveOrderHistory;
 import org.opentcs.guing.model.FigureDecorationDetails;
-import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.PathModel;
 import org.opentcs.guing.model.elements.PointModel;

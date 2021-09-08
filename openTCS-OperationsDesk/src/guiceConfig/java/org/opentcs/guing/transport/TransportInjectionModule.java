@@ -7,11 +7,11 @@
  */
 package org.opentcs.guing.transport;
 
-import org.opentcs.guing.transport.orders.TransportOrdersContainer;
-import org.opentcs.guing.transport.orders.TransportViewFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import javax.inject.Singleton;
+import org.opentcs.guing.transport.orders.TransportOrdersContainer;
+import org.opentcs.guing.transport.orders.TransportViewFactory;
 import org.opentcs.guing.transport.sequences.OrderSequencesContainer;
 
 /**

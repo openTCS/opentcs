@@ -25,7 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
-import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.guing.components.dialogs.DialogContent;
