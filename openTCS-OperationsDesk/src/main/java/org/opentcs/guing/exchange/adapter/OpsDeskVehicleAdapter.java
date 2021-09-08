@@ -128,7 +128,7 @@ public class OpsDeskVehicleAdapter
       return null;
     }
     return driveOrder.getRoute().getSteps().stream()
-        .skip(Math.max(0, routeProgressIndex))
+        .skip(Math.max(0, routeProgressIndex + 1))
         .map(step -> step.getPath())
         .filter(path -> path != null)
         .findFirst()
