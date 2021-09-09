@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.junit.*;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Router;

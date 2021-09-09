@@ -10,10 +10,10 @@ package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
 

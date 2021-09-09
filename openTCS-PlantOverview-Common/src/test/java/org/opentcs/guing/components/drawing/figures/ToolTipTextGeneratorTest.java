@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.components.drawing.figures;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import org.junit.*;
-import static org.junit.Assert.assertThat;
 import org.mockito.Mockito;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.model.elements.VehicleModel;

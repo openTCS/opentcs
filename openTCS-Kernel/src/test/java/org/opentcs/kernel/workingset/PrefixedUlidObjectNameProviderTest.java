@@ -10,12 +10,12 @@ package org.opentcs.kernel.workingset;
 import com.google.common.collect.Ordering;
 import java.util.ArrayList;
 import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.opentcs.access.to.CreationTO;
 
 /**

@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.data.model.Point;
 

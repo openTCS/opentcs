@@ -31,6 +31,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** When loading plant models with the Model Editor and Operations Desk applications, show more fine-grained steps in the corresponding progress bars.
 ** In the Operations Desk, sort transport orders and peripheral jobs in the respective tables in descending order according to their creation time.
 ** Reduce the time it takes the Operations Desk to process vehicle updates.
+** Update JUnit 4 to 4.13.2.
+** Update JUnit 5 to 5.7.2.
+** Update Hamcrest to 2.2.
 
 == Version 5.2 (2021-03-29)
 

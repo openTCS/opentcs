@@ -8,10 +8,10 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.status;
 
 import java.util.ArrayList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import org.junit.*;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.data.TCSObjectEvent;
