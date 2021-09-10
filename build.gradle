@@ -26,7 +26,6 @@ evaluationDependsOnChildren()
 
 subprojects {
   apply from: rootProject.file('gradle/common.gradle')
-  apply from: rootProject.file('gradle/publishing-java.gradle')
 }
 
 distributions {

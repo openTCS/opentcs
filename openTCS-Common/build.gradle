@@ -1,11 +1,12 @@
 apply from: "${rootDir}/gradle/java-project.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
   compile project(':openTCS-API-Base')
-  
+
   compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
   compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
 }
@@ -15,7 +16,7 @@ processResources.doLast {
   def props = new Properties()
   props.setProperty('opentcs.version', version)
   props.setProperty('opentcs.builddate', project.ext.buildDate)
-  
+
   new File(sourceSets.main.output.resourcesDir, 'opentcs.properties').withWriter() {
     props.store(it, null)
   }

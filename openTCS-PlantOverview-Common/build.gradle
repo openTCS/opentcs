@@ -2,13 +2,14 @@ apply from: "${rootDir}/gradle/java-project.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
 apply from: "${rootDir}/gradle/guice-project.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
   compile project(':openTCS-API-Injection')
   compile project(':openTCS-Common')
   compile project(':openTCS-PlantOverview-Base')
-  
+
   // There does not seem to be an official binary release for JHotDraw...
   compile group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506'
   // This preview version of Docking Frames is not in Maven Central, yet.

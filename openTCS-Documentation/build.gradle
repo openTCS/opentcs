@@ -16,6 +16,7 @@ evaluationDependsOn(':openTCS-PlantOverview-Panel-LoadGenerator')
 apply from: "${rootDir}/gradle/java-project.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
 apply from: "${rootDir}/gradle/license-headers.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 apply plugin: 'distribution'
@@ -46,20 +47,20 @@ swaggerSources {
 dependencies {
   compile project(':openTCS-Common')
   compile project(':openTCS-Kernel')
-  
+
   schemagen project(':openTCS-Kernel')
   schemagen project(':openTCS-ModelEditor')
   schemagen project(':openTCS-OperationsDesk')
   schemagen jar.outputs.files
-  
+
   configdocgen project(':openTCS-Kernel')
   configdocgen project(':openTCS-KernelControlCenter')
   configdocgen project(':openTCS-ModelEditor')
   configdocgen project(':openTCS-OperationsDesk')
   configdocgen jar.outputs.files
-  
+
   swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '3.20.5'
-  
+
   asciidoctor group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: '1.5.0'
   asciidoctor group: 'org.asciidoctor', name: 'asciidoctorj-pdf', version: '1.5.0-alpha.11'
 }
@@ -156,7 +157,7 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.AsciidoctorTask) {
   sourceDir = file("src/docs/release-notes")
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = releaseNotesDir
-  // Whether to put backends' outputs into separate subdirectories  
+  // Whether to put backends' outputs into separate subdirectories
   separateOutputDirs = false
   sources {
     include 'index.adoc'
@@ -176,7 +177,7 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
   sourceDir = file("src/docs/users-guide")
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = userManualDir
-  // Whether to put backends' outputs into separate subdirectories  
+  // Whether to put backends' outputs into separate subdirectories
   separateOutputDirs = false
   sources {
     include 'opentcs-users-guide.adoc'
@@ -203,7 +204,7 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
   sourceDir = file("src/docs/developers-guide")
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = devManualDir
-  // Whether to put backends' outputs into separate subdirectories  
+  // Whether to put backends' outputs into separate subdirectories
   separateOutputDirs = false
   sources {
     include 'opentcs-developers-guide.adoc'
@@ -274,7 +275,7 @@ task samplesgen {
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS_SINGLE_VEHICLE", "${samplesDir}/sample-single-vehicle.json"
     }
-    
+
     javaexec {
       classpath configurations.runtime, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
@@ -289,10 +290,10 @@ task configdocgen {
   dependsOn ':openTCS-KernelControlCenter:jar'
   dependsOn ':openTCS-ModelEditor:jar'
   dependsOn ':openTCS-OperationsDesk:jar'
-  
+
   doLast {
     mkdir(configDocDir)
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
@@ -313,21 +314,21 @@ task configdocgen {
       args = ["${configDocDir}/DefaultDispatcherConfigurationEntries.adoc",
               "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/DefaultRouterConfigurationEntries.adoc",
               "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/ShortestPathConfigurationEntries.adoc",
               "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
@@ -362,7 +363,7 @@ task configdocgen {
       args = ["${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
               "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
@@ -376,68 +377,76 @@ task configdocgen {
       args = ["${configDocDir}/StatisticsCollectorConfigurationEntries.adoc",
               "org.opentcs.kernel.extensions.statistics.StatisticsCollectorConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
               "org.opentcs.virtualvehicle.VirtualVehicleConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
               "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
               "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/KccSslConfigurationEntries.adoc",
               "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
               "org.opentcs.guing.util.PlantOverviewApplicationConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PoSslConfigurationEntries.adoc",
               "org.opentcs.guing.exchange.SslConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewModelingApplicationConfigurationEntries.adoc",
               "org.opentcs.guing.util.PlantOverviewModelingApplicationConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
               "org.opentcs.guing.util.ElementNamingSchemeConfiguration"]
     }
-    
+
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewOperatingApplicationConfigurationEntries.adoc",
               "org.opentcs.guing.util.PlantOverviewOperatingApplicationConfiguration"]
+    }
+  }
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact distZip
     }
   }
 }
