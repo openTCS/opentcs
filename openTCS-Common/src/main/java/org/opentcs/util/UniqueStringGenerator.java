@@ -76,6 +76,16 @@ public class UniqueStringGenerator<S> {
   }
 
   /**
+   * Returns true if this generator has this string.
+   *
+   * @param str The string to test.
+   * @return true if this generator already has this string.
+   */
+  public boolean hasString(String str) {
+    return existingStrings.contains(str);
+  }
+
+  /**
    * Removes all known Strings.
    */
   public void clear() {

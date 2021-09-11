@@ -1176,10 +1176,17 @@ public class OpenTCSView
 
     // This method is being called by command objects that use undo/redo, so
     // avoid calling commands via undo/redo here.
-    if (requiresName(modelComponent) && modelComponent.getName().isEmpty()) {
-      String name = modelCompNameGen.getUniqueString(modelComponent.getClass());
-      modelComponent.setName(name);
-      modelCompNameGen.addString(name);
+    // Make sure the name of the modelComponent is unique
+    if (requiresName(modelComponent)) {
+      if (modelComponent.getName().isEmpty()
+          || modelCompNameGen.hasString(modelComponent.getName())) {
+        String name = modelCompNameGen.getUniqueString(modelComponent.getClass());
+        modelComponent.setName(name);
+        modelCompNameGen.addString(name);
+      }
+      else {
+        modelCompNameGen.addString(modelComponent.getName());
+      }
     }
 
     if (modelComponent instanceof LocationModel) {

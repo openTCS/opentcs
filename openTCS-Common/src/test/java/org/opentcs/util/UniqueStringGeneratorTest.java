@@ -9,6 +9,8 @@ package org.opentcs.util;
 
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A test case for class UniqueStringGenerator.
@@ -45,7 +47,7 @@ public class UniqueStringGeneratorTest {
     final String namePatterPrefix2 = "AnotherPrefix";
     final Object selector = new Object();
     final Object selector2 = new Object();
-    
+
     generator.registerNamePattern(selector, namePatternPrefix, "0000");
     generator.registerNamePattern(selector2, namePatterPrefix2, "0000");
 
@@ -70,6 +72,18 @@ public class UniqueStringGeneratorTest {
     String generatedString = generator.getUniqueString(null,
                                                        PATTERN_ONE_DIGIT);
     assertEquals("1", generatedString);
+  }
+
+  @Test
+  public void shouldHaveString() {
+    generator.addString("some string");
+    assertTrue(generator.hasString("some string"));
+  }
+  
+  @Test
+  public void shouldNotHaveString() {
+    generator.addString("some string");
+    assertFalse(generator.hasString("some other string"));
   }
 
 }
