@@ -13,7 +13,6 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
@@ -130,23 +129,20 @@ public class AssignNextDriveOrdersPhase
     }
     else {
       LOG.debug("Assigning next drive order to vehicle '{}'...", vehicle.getName());
-      // Get the next drive order to be processed.
-      DriveOrder currentDriveOrder = vehicleOrder.getCurrentDriveOrder();
-      if (transportOrderUtil.mustAssign(currentDriveOrder, vehicle)) {
+      if (transportOrderUtil.mustAssign(vehicleOrder.getCurrentDriveOrder(), vehicle)) {
         if (configuration.rerouteTrigger() == DRIVE_ORDER_FINISHED) {
           LOG.debug("Trying to reroute vehicle '{}' before assigning the next drive order...",
                     vehicle.getName());
           rerouteUtil.reroute(vehicle);
         }
         
-        // Get an up-to-date copy of the transport order in case the route changed
+        // Get an up-to-date copy of the transport order in case the route changed.
         vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
                                                          vehicle.getTransportOrder());
-        currentDriveOrder = vehicleOrder.getCurrentDriveOrder();
 
         // Let the vehicle controller know about the new drive order.
         vehicleControllerPool.getVehicleController(vehicle.getName())
-            .setDriveOrder(currentDriveOrder, vehicleOrder.getProperties());
+            .setTransportOrder(vehicleOrder);
 
         // The vehicle is still processing a transport order.
         vehicleService.updateVehicleProcState(vehicle.getReference(),

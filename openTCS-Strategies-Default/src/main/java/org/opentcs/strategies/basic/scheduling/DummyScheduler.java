@@ -63,14 +63,6 @@ public class DummyScheduler
   }
 
   @Override
-  public void updateProgressIndex(Client client, int index) {
-  }
-
-  @Override
-  public void unclaim(Client client) {
-  }
-
-  @Override
   public void allocate(Client resourceUser, Set<TCSResource<?>> resources) {
     requireNonNull(resourceUser, "resourceUser");
     requireNonNull(resources, "resources");

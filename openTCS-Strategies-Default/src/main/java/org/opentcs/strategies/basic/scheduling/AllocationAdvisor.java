@@ -83,6 +83,7 @@ public class AllocationAdvisor
   }
 
   @Override
+  @Deprecated
   public void claim(Scheduler.Client client, List<Set<TCSResource<?>>> resources) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
@@ -94,6 +95,7 @@ public class AllocationAdvisor
   }
 
   @Override
+  @Deprecated
   public void unclaim(Scheduler.Client client) {
     requireNonNull(client, "client");
 

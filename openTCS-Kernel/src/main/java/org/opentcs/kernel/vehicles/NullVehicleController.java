@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleController;
@@ -63,22 +64,46 @@ public class NullVehicleController
   }
 
   @Override
-  public void setDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties)
-      throws IllegalStateException {
+  public void setTransportOrder(TransportOrder newOrder) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 
   @Override
+  @Deprecated
+  public void setDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties) {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+  }
+
+  @Override
+  @Deprecated
+  public void updateDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties) {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+  }
+
+  @Override
+  public void abortTransportOrder(boolean immediate) {
+    if (immediate) {
+      clearDriveOrder();
+    }
+    else {
+      abortDriveOrder();
+    }
+  }
+
+  @Override
+  @Deprecated
   public void clearDriveOrder() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 
   @Override
+  @Deprecated
   public void abortDriveOrder() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 
   @Override
+  @Deprecated
   public void clearCommandQueue() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
@@ -111,12 +136,6 @@ public class NullVehicleController
 
   @Override
   public void allocationFailed(Set<TCSResource<?>> resources) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
-  public void updateDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties)
-      throws IllegalStateException {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 

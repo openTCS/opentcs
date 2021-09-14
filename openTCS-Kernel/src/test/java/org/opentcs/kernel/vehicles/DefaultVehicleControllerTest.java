@@ -11,16 +11,17 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.opentcs.DataObjectFactory;
 import org.opentcs.components.kernel.Scheduler;
@@ -34,6 +35,7 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
@@ -117,7 +119,7 @@ public class DefaultVehicleControllerTest {
     doReturn(peripheralInteractor).when(componentsFactory)
         .createPeripheralInteractor(vehicle.getReference());
 
-    scheduler = new DummyScheduler();
+    scheduler = spy(new DummyScheduler());
     scheduler.initialize();
     stdVehicleController = new DefaultVehicleController(vehicle,
                                                         commAdapter,
@@ -226,20 +228,25 @@ public class DefaultVehicleControllerTest {
     assertFalse(stdVehicleController.isInitialized());
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void shouldNotAcceptMultipleDriveOrders() {
+  @Test
+  public void shouldSetClaimOnNewTransportOrder() {
     Location location = dataObjectFactory.createLocation();
 
     Point dstPoint = dataObjectFactory.createPoint();
     Path stepPath = dataObjectFactory.createPath(dstPoint.getReference());
-    List<Route.Step> steps = Collections.singletonList(
-        new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0));
+    List<Route.Step> steps = List.of(
+        new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0)
+    );
 
     DriveOrder driveOrder = new DriveOrder(new DriveOrder.Destination(location.getReference()))
         .withRoute(new Route(steps, 1));
 
-    stdVehicleController.setDriveOrder(driveOrder, new HashMap<>());
-    // Should result in an IllegalStateException:
-    stdVehicleController.setDriveOrder(driveOrder, new HashMap<>());
+    TransportOrder transportOrder
+        = new TransportOrder("some-transport-order", List.of(driveOrder))
+            .withCurrentDriveOrderIndex(0);
+
+    stdVehicleController.setTransportOrder(transportOrder);
+
+    verify(scheduler).claim(eq(stdVehicleController), Mockito.any());
   }
 }

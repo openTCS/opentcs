@@ -132,6 +132,10 @@ class AllocatorTask
       // See if others want the resources this one didn't, then.
       scheduleRetryWaitingAllocations();
     }
+    // Notify modules about the changes in claimed/allocated resources for this client.
+    allocationAdvisor.setAllocationState(client,
+                                         reservationPool.allocatedResources(client),
+                                         reservationPool.getClaim(client));
   }
 
   /**
@@ -145,6 +149,13 @@ class AllocatorTask
     Set<TCSResource<?>> resources = command.getResources();
 
     synchronized (globalSyncObject) {
+      if (!reservationPool.isNextInClaim(client, resources)) {
+        LOG.error("{}: Not allocating resources that are not next claimed resources: {}",
+                  client.getId(),
+                  resources);
+        return false;
+      }
+
       LOG.debug("{}: Checking resource availability: {}...", client.getId(), resources);
       if (!reservationPool.resourcesAvailableForUser(resources, client)) {
         LOG.debug("{}: Resources unavailable.", client.getId());
@@ -166,6 +177,9 @@ class AllocatorTask
         reservationPool.getReservationEntry(curRes).allocate(client);
       }
 
+      LOG.debug("{}: Removing resources claim: {}...", client.getId(), resources);
+      reservationPool.unclaim(client, resources);
+
       return true;
     }
   }
@@ -176,6 +190,9 @@ class AllocatorTask
 
   /**
    * Unallocates the given set of resources.
+   * <p>
+   * Note that this does <em>not</em> return any previously claimed resources to the client!
+   * </p>
    *
    * @param command Describes the allocated resources.
    */

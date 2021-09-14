@@ -174,10 +174,11 @@ public class RerouteUtil {
                                                           newOrders);
 
     // If the vehicle is currently processing a (drive) order (and not waiting to get the next
-    // drive order) we need to take care of it
+    // drive order) we need to update the vehicle's current drive order with the new one.
     if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)) {
-      // Update the vehicle's current drive order with the new one
-      controller.updateDriveOrder(newDriveOrders.get(0), originalOrder.getProperties());
+      controller.setTransportOrder(
+          transportOrderService.fetchObject(TransportOrder.class, originalOrder.getReference())
+      );
     }
 
     // Let the router know the vehicle selected another route

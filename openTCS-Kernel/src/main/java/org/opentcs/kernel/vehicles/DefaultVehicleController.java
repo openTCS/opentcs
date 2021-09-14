@@ -11,7 +11,6 @@ import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +23,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -45,6 +46,7 @@ import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -142,6 +144,10 @@ public class DefaultVehicleController
    * execution of movement commands.
    */
   private final PeripheralInteractor peripheralInteractor;
+  /**
+   * The transport order that the vehicle is currently processing.
+   */
+  private volatile TransportOrder transportOrder;
   /**
    * The drive order that the vehicle currently has to process.
    */
@@ -291,27 +297,53 @@ public class DefaultVehicleController
   }
 
   @Override
+  public void setTransportOrder(@Nonnull TransportOrder newOrder)
+      throws IllegalArgumentException {
+    requireNonNull(newOrder, "newOrder");
+    requireNonNull(newOrder.getCurrentDriveOrder(), "newOrder.getCurrentDriveOrder()");
+
+    if (transportOrder == null
+        || !Objects.equals(newOrder.getName(), transportOrder.getName())
+        || newOrder.getCurrentDriveOrderIndex() != transportOrder.getCurrentDriveOrderIndex()) {
+      // We received either a new transport order or the same transport order for its next drive
+      // order.
+      transportOrder = newOrder;
+      setDriveOrder(transportOrder.getCurrentDriveOrder(), transportOrder.getProperties());
+    }
+    else {
+      // We received an update for a drive order we're already processing.
+      transportOrder = newOrder;
+      updateDriveOrder(transportOrder.getCurrentDriveOrder(), transportOrder.getProperties());
+    }
+  }
+
+  @Override
+  @Deprecated
   public void setDriveOrder(@Nonnull DriveOrder newOrder,
                             @Nonnull Map<String, String> orderProperties)
-      throws IllegalStateException {
+      throws IllegalArgumentException {
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
       requireNonNull(orderProperties, "orderProperties");
       requireNonNull(newOrder.getRoute(), "newOrder.getRoute()");
       // Assert that there isn't still is a drive order that hasn't been finished/removed, yet.
-      checkState(currentDriveOrder == null,
-                 "%s still has an order! Current order: %s, new order: %s",
-                 vehicle.getName(),
-                 currentDriveOrder,
-                 newOrder);
+      checkArgument(currentDriveOrder == null,
+                    "%s still has an order! Current order: %s, new order: %s",
+                    vehicle.getName(),
+                    currentDriveOrder,
+                    newOrder);
 
       LOG.debug("{}: Setting drive order: {}", vehicle.getName(), newOrder);
-      scheduler.claim(this, asResourceSequence(newOrder.getRoute().getSteps()));
 
       currentDriveOrder = newOrder;
       lastCommandExecuted = null;
+
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
+
+      // Set the claim for (the remainder of) this transport order.
+      scheduler.claim(this, remainingRequiredClaim(transportOrder));
+
       createFutureCommands(newOrder, orderProperties);
 
       if (canSendNextCommand()) {
@@ -326,28 +358,25 @@ public class DefaultVehicleController
   }
 
   @Override
+  @Deprecated
   public void updateDriveOrder(@Nonnull DriveOrder newOrder,
                                @Nonnull Map<String, String> orderProperties)
-      throws IllegalStateException {
+      throws IllegalArgumentException {
     synchronized (commAdapter) {
-      checkState(currentDriveOrder != null, "There's no drive order to be updated");
       requireNonNull(newOrder, "newOrder");
-
+      checkArgument(currentDriveOrder != null, "There's no drive order to be updated");
       checkArgument(driveOrdersContinual(currentDriveOrder, newOrder),
                     "The new drive order contains steps the vehicle didn't process for the current "
                     + "drive order.");
 
       LOG.debug("{}: Updating drive order: {}", vehicle.getName(), newOrder);
-      // XXX Be a bit more thoughtful of which resource to claim/unclaim
-      // XXX Unclaim only resources that would have been allocated in the future...
-      scheduler.unclaim(this);
-      // XXX ...and therefore claim only the resource that now will be allocated in the future
-      scheduler.claim(this, asResourceSequence(newOrder.getRoute().getSteps()));
-
       // Update the current drive order and future commands
       currentDriveOrder = newOrder;
       // There is a new drive order, so discard all the future/scheduled commands of the old one.
       discardFutureCommands();
+
+      // Update the claim.
+      scheduler.claim(this, remainingRequiredClaim(transportOrder));
 
       createFutureCommands(newOrder, orderProperties);
       // The current drive order got updated but our queue of future commands now contains commands
@@ -371,21 +400,49 @@ public class DefaultVehicleController
   private boolean driveOrdersContinual(DriveOrder oldOrder, DriveOrder newOrder) {
     LOG.debug("Checking drive order continuity for {} and {}.", oldOrder, newOrder);
 
-    // Get an up-tp-date copy of the vehicle
-    Vehicle updatedVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
-    int routeProgessIndex = updatedVehicle.getRouteProgressIndex();
-    if (routeProgessIndex == -1) {
+    int routeProgressIndex = getFutureOrCurrentPositionIndex();
+    if (routeProgressIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
       return true;
     }
 
     List<Step> oldSteps = oldOrder.getRoute().getSteps();
     List<Step> newSteps = newOrder.getRoute().getSteps();
 
-    List<Step> oldProcessedSteps = oldSteps.subList(0, routeProgessIndex + 1);
-    List<Step> newProcessedSteps = newSteps.subList(0, routeProgessIndex + 1);
+    List<Step> oldProcessedSteps = oldSteps.subList(0, routeProgressIndex + 1);
+    List<Step> newProcessedSteps = newSteps.subList(0, routeProgressIndex + 1);
 
     LOG.debug("Comparing {} and {} for equality.", oldProcessedSteps, newProcessedSteps);
     return Objects.equals(oldProcessedSteps, newProcessedSteps);
+  }
+
+  private int getFutureOrCurrentPositionIndex() {
+    if (getCommandsSent().isEmpty() && getInteractionsPendingCommand().isEmpty()) {
+      if (lastCommandExecuted == null) {
+        LOG.debug("{}: No commands expected to be executed and none executed. Route index: {}",
+                  vehicle.getName(),
+                  Vehicle.ROUTE_INDEX_DEFAULT);
+        return Vehicle.ROUTE_INDEX_DEFAULT;
+      }
+      else {
+        LOG.debug("{}: No commands expected to be executed but one executed. Route index: {}",
+                  vehicle.getName(),
+                  lastCommandExecuted.getStep().getRouteIndex());
+        return lastCommandExecuted.getStep().getRouteIndex();
+      }
+    }
+
+    if (getInteractionsPendingCommand().isPresent()) {
+      LOG.debug("{}: Command with pending peripheral operations present. Route index: {}",
+                vehicle.getName(),
+                getInteractionsPendingCommand().get().getStep().getRouteIndex());
+      return getInteractionsPendingCommand().get().getStep().getRouteIndex();
+    }
+
+    MovementCommand lastCommandSent = new LinkedList<>(getCommandsSent()).getLast();
+    LOG.debug("{}: Using the last command sent to the communication adapter. Route index: {}",
+              vehicle.getName(),
+              lastCommandSent);
+    return lastCommandSent.getStep().getRouteIndex();
   }
 
   private void discardFutureCommands() {
@@ -399,7 +456,7 @@ public class DefaultVehicleController
     MovementCommand lastCommandSent;
     if (commandsSent.isEmpty()) {
       if (lastCommandExecuted == null) {
-        // There are no commands to be dicarded
+        // There are no commands to be discarded.
         return;
       }
       else {
@@ -421,6 +478,17 @@ public class DefaultVehicleController
   }
 
   @Override
+  public void abortTransportOrder(boolean immediate) {
+    if (immediate) {
+      clearDriveOrder();
+    }
+    else {
+      abortDriveOrder();
+    }
+  }
+
+  @Override
+  @Deprecated
   public void clearDriveOrder() {
     synchronized (commAdapter) {
       currentDriveOrder = null;
@@ -439,6 +507,7 @@ public class DefaultVehicleController
   }
 
   @Override
+  @Deprecated
   public void abortDriveOrder() {
     synchronized (commAdapter) {
       if (currentDriveOrder == null) {
@@ -478,6 +547,7 @@ public class DefaultVehicleController
   }
 
   @Override
+  @Deprecated
   public void clearCommandQueue() {
     synchronized (commAdapter) {
       commAdapter.clearCommandQueue();
@@ -995,8 +1065,6 @@ public class DefaultVehicleController
       // Update the vehicle's progress index.
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      moveCommand.getStep().getRouteIndex());
-      // Let the scheduler know where we are now.
-      scheduler.updateProgressIndex(this, moveCommand.getStep().getRouteIndex());
     }
     else if (position == null) {
       LOG.info("{}: Resetting position for vehicle", vehicle.getName());
@@ -1113,13 +1181,32 @@ public class DefaultVehicleController
     return result;
   }
 
-  private static List<Set<TCSResource<?>>> asResourceSequence(@Nonnull List<Route.Step> steps) {
-    requireNonNull(steps, "steps");
+  private List<Set<TCSResource<?>>> remainingRequiredClaim(@Nonnull TransportOrder order) {
+    Stream<Step> stepStream = order.getAllDriveOrders().stream()
+        .skip(order.getCurrentDriveOrderIndex())
+        .flatMap(driveOrder -> driveOrder.getRoute().getSteps().stream());
 
-    List<Set<TCSResource<?>>> result = new ArrayList<>(steps.size());
-    for (Route.Step step : steps) {
-      result.add(new HashSet<>(Arrays.asList(step.getDestinationPoint(), step.getPath())));
+    // If we have already processed parts of the current drive order (in case of rerouting), we need
+    // to skip a few more steps.
+    if (!commandsSent.isEmpty() || lastCommandExecuted != null) {
+      Step lastCommandedStep = commandsSent.stream()
+          .reduce((cmd1, cmd2) -> cmd2)
+          .orElse(lastCommandExecuted)
+          .getStep();
+      // Skip until we find the step, and skip the step itself, too (thus the skip(1)).
+      stepStream = stepStream
+          .dropWhile(step -> !Objects.equals(step, lastCommandedStep))
+          .skip(1);
     }
-    return result;
+
+    return stepStream
+        .map(step -> toResourceSet(step))
+        .collect(Collectors.toList());
+  }
+
+  private Set<TCSResource<?>> toResourceSet(Step step) {
+    return step.getPath() != null
+        ? Set.of(step.getDestinationPoint(), step.getPath())
+        : Set.of(step.getDestinationPoint());
   }
 }

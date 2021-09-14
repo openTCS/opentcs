@@ -16,8 +16,48 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * A <code>Scheduler</code> manages resources used by vehicles, preventing
- * both collisions and deadlocks.
+ * Manages resources used by clients (vehicles) to help prevent both collisions and deadlocks.
+ * <p>
+ * Every client usually interacts with the <code>Scheduler</code> according to the following
+ * workflow:
+ * </p>
+ * <ol>
+ * <li>
+ * Initially, the client calls
+ * {@link #allocateNow(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) allocateNow()}
+ * when a vehicle pops up somewhere in the driving course.
+ * This usually happens either upon kernel startup or when a vehicle communicates its current
+ * position to the kernel for the first time.
+ * </li>
+ * <li>
+ * Once a transport order is assigned to a vehicle, the client calls
+ * {@link #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List) claim()} with the
+ * complete sequence of resource sets the vehicle needs to process the transport order - usually
+ * each containing a point and the path leading to it.
+ * </li>
+ * <li>
+ * As the vehicle processes the transport order, the client subsequently calls
+ * {@link #allocate(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) allocate()} for
+ * resources needed next (for reaching the next point on the route).
+ * The <code>Scheduler</code> asynchronously calls back either
+ * {@link Client#allocationSuccessful(java.util.Set)} or
+ * {@link Client#allocationFailed(java.util.Set)}, informing the client about the result.
+ * Upon allocating the resources for the client, it also implicitly removes them from the head of
+ * the client's claim sequence.
+ * </li>
+ * <li>
+ * As the vehicle passes points (and paths) on the route, the client calls
+ * {@link #free(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) free()} for resources
+ * it does not need any more, allowing these resources to be allocated by other clients.
+ * </li>
+ * </ol>
+ * <p>
+ * At the end of this process, the client's claim sequence is empty, and only the most recently
+ * allocated resources are still assigned to it, reflecting the vehicle's current position.
+ * (If the vehicle has disappeared from the driving course after processing the transport order, the
+ * client would call {@link #freeAll(org.opentcs.components.kernel.Scheduler.Client) freeAll()} to
+ * inform the <code>Scheduler</code> about this.)
+ * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -31,15 +71,25 @@ public interface Scheduler
   String PROPKEY_BLOCK_ENTRY_DIRECTION = "tcs:blockEntryDirection";
 
   /**
-   * Claims a set of resources for a vehicle.
+   * Sets/Updates the resource claim for a vehicle.
+   * <p>
+   * <em>Claimed</em> resources are resources that a vehicle will eventually require for executing
+   * its movements in the future, but for which it does not request allocation, yet.
+   * Claiming resources provides information to the scheduler about future allocations <em>and their
+   * intended order</em>, allowing the scheduler to consider these information for its resource
+   * planning.
+   * </p>
+   * <p>
+   * Resources can be claimed by multiple vehicles at the same time.
+   * This is different from allocations:
+   * Only a single vehicle can allocate a resource at the same time.
+   * </p>
    *
    * @param client The client claiming the resources.
-   * @param resourceSequence The sequence of resources claimed.
-   * @throws IllegalArgumentException If the given list of resources is empty, or if the client
-   * already holds a claim.
+   * @param resourceSequence The sequence of resources claimed. May be empty to clear the client's
+   * claim.
    */
-  void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> resourceSequence)
-      throws IllegalArgumentException;
+  void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> resourceSequence);
 
   /**
    * Notifies the scheduler that the given client has now reached the given index in its claimed
@@ -51,41 +101,83 @@ public interface Scheduler
    * @throws IllegalArgumentException If the client does not hold a claim, or if the new index is
    * larger than a valid index in its claim's resource sequence, or if the new index is not larger
    * than the current index.
+   * @deprecated Stick to
+   * {@link #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List) claim()} and
+   * {@link #allocate(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) allocate()}.
+   * They implicitly update both the set of claimed and the set of allocated resources.
    */
-  void updateProgressIndex(@Nonnull Client client, int index)
-      throws IllegalArgumentException;
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+  default void updateProgressIndex(@Nonnull Client client, int index)
+      throws IllegalArgumentException {
+  }
 
   /**
    * Unclaims a set of resources claimed by a vehicle.
    *
    * @param client The client unclaiming the resources.
    * @throws IllegalArgumentException If the given client does not hold a claim.
+   * @deprecated Use {@link #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List)}
+   * with an empty list, instead.
    */
-  void unclaim(@Nonnull Client client)
-      throws IllegalArgumentException;
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+  default void unclaim(@Nonnull Client client)
+      throws IllegalArgumentException {
+    claim(client, List.of());
+  }
 
   /**
    * Requests allocation of the given resources.
-   * The client will be notified via callback if the allocation was successful or not.
+   * The client will be informed via a callback to
+   * {@link Client#allocationSuccessful(java.util.Set)} or
+   * {@link Client#allocationFailed(java.util.Set)} whether the allocation was successful or not.
+   * <ul>
+   * <li>
+   * Clients may only allocate resources in the order they have previously
+   * {@link #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List) claim()}ed them.
+   * </li>
+   * <li>
+   * Upon allocation, the scheduler will implicitly remove the set of allocated resources from (the
+   * head of) the client's claim sequence.
+   * </li>
+   * <li>
+   * As a result, a client may only allocate the set of resources at the head of its claim sequence.
+   * </li>
+   * </ul>
    *
    * @param client The client requesting the resources.
-   * @param resources The resources requested.
-   * @throws IllegalArgumentException If the given client did not claim any resources, or if the
-   * resources to be allocated are not in the set of currently claimed resources, or if the client
-   * has already requested resources that have not yet been granted.
+   * @param resources The resources to be allocated.
+   * @throws IllegalArgumentException If the set of resources to be allocated is not equal to the
+   * <em>next</em> set in the sequence of currently claimed resources, or if the client has already
+   * requested resources that have not yet been granted.
+   * @see #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List)
    */
   void allocate(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources)
       throws IllegalArgumentException;
 
   /**
    * Informs the scheduler that a set of resources are to be allocated for the given client
-   * <em>immediately</em>, i.e. without blocking.
+   * <em>immediately</em>.
    * <p>
+   * Note the following:
+   * </p>
+   * <ul>
+   * <li>
    * This method should only be called in urgent/emergency cases, for instance if a vehicle has been
    * moved to a different point manually, which has to be reflected by resource allocation in the
    * scheduler.
-   * </p>
-   * This method does not block, which means that it's safe to call it synchronously.
+   * </li>
+   * <li>
+   * Unlike
+   * {@link #allocate(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) allocate()},
+   * this method does not block, i.e. the operation happens synchronously.
+   * </li>
+   * <li>
+   * This method does <em>not</em> implicitly deallocate or unclaim any other resources for the
+   * client.
+   * </li>
+   * </ul>
    *
    * @param client The client requesting the resources.
    * @param resources The resources requested.
@@ -168,7 +260,7 @@ public interface Scheduler
      * @param resources The resources reserved.
      * @return <code>true</code> if, and only if, this client accepts the resources allocated. A
      * return value of <code>false</code> indicates this client does not need the given resources
-     * (any more), freeing them implicitly.
+     * (any more), freeing them implicitly, but not restoring any previous claim.
      */
     boolean allocationSuccessful(@Nonnull Set<TCSResource<?>> resources);
 
@@ -192,15 +284,27 @@ public interface Scheduler
      *
      * @param client The client the resource sequence is claimed by.
      * @param claim The resource sequence, i.e. total claim.
+     * @deprecated Redundant - use
+     * {@link #setAllocationState(org.opentcs.components.kernel.Scheduler.Client, java.util.Set, java.util.List)}
+     * instead/exclusively.
      */
-    void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> claim);
+    @Deprecated
+    @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+    default void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> claim) {
+    }
 
     /**
      * Resets a client's <i>total claim</i>.
      *
      * @param client The client for which to reset the claim.
+     * @deprecated Redundant - use
+     * {@link #setAllocationState(org.opentcs.components.kernel.Scheduler.Client, java.util.Set, java.util.List)}
+     * instead/exclusively.
      */
-    void unclaim(@Nonnull Client client);
+    @Deprecated
+    @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+    default void unclaim(@Nonnull Client client) {
+    }
 
     /**
      * Informs this module about a client's current allocation state.

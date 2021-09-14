@@ -7,7 +7,6 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
-import static com.google.common.base.Preconditions.checkPositionIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +32,7 @@ import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.AllocationsReleased;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.CheckAllocationsPrepared;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.RetryAllocates;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +58,6 @@ public class DefaultScheduler
    * Takes care of modules.
    */
   private final Module allocationAdvisor;
-  /**
-   * All claims.
-   */
-  private final Map<Client, List<Set<TCSResource<?>>>> claimsByClient = new HashMap<>();
   /**
    * The reservation pool.
    */
@@ -142,9 +138,8 @@ public class DefaultScheduler
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
-      claimsByClient.put(client, resources);
+      reservationPool.setClaim(client, resources);
 
-      allocationAdvisor.claim(client, resources);
       allocationAdvisor.setAllocationState(client,
                                            reservationPool.allocatedResources(client),
                                            resources);
@@ -152,35 +147,16 @@ public class DefaultScheduler
   }
 
   @Override
-  public void updateProgressIndex(Client client, int index) {
-    requireNonNull(client, "client");
-    checkPositionIndex(index, Integer.MAX_VALUE, "index");
-
-    if (index == 0) {
-      return;
-    }
-    // XXX Verify that the index is only incremented, never decremented?
-
-    synchronized (globalSyncObject) {
-      List<Set<TCSResource<?>>> claims = claimsByClient.get(client);
-      List<Set<TCSResource<?>>> remainingClaims = claims.subList(index, claims.size());
-      allocationAdvisor.setAllocationState(client,
-                                           reservationPool.allocatedResources(client),
-                                           remainingClaims);
-    }
-  }
-
-  @Override
+  @Deprecated
   public void unclaim(Client client) {
     requireNonNull(client, "client");
 
     synchronized (globalSyncObject) {
-      claimsByClient.remove(client);
+      reservationPool.setClaim(client, new LinkedList<>());
 
       allocationAdvisor.setAllocationState(client,
                                            reservationPool.allocatedResources(client),
                                            new LinkedList<>());
-      allocationAdvisor.unclaim(client);
     }
   }
 
@@ -190,6 +166,10 @@ public class DefaultScheduler
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
+      checkArgument(reservationPool.isNextInClaim(client, resources),
+                    "Not the next claimed resources: %s",
+                    resources);
+
       Future<?> allocateFuture = kernelExecutor.submit(
           new AllocatorTask(plantModelService,
                             reservationPool,

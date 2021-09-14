@@ -88,15 +88,6 @@ public class SingleVehicleBlockModule
   }
 
   @Override
-  public void claim(Scheduler.Client client,
-                    List<Set<TCSResource<?>>> claim) {
-  }
-
-  @Override
-  public void unclaim(Scheduler.Client client) {
-  }
-
-  @Override
   public void setAllocationState(Scheduler.Client client,
                                  Set<TCSResource<?>> alloc,
                                  List<Set<TCSResource<?>>> remainingClaim) {

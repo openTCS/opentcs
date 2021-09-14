@@ -220,12 +220,11 @@ public class TransportOrderUtil
     router.selectRoute(vehicle, Collections.unmodifiableList(driveOrders));
     // Update the transport order's copy.
     TransportOrder updatedOrder = transportOrderService.fetchObject(TransportOrder.class, orderRef);
-    DriveOrder driveOrder = updatedOrder.getCurrentDriveOrder();
     // If the drive order must be assigned, do so.
-    if (mustAssign(driveOrder, vehicle)) {
+    if (mustAssign(updatedOrder.getCurrentDriveOrder(), vehicle)) {
       // Let the vehicle controller know about the first drive order.
       vehicleControllerPool.getVehicleController(vehicle.getName())
-          .setDriveOrder(driveOrder, updatedOrder.getProperties());
+          .setTransportOrder(updatedOrder);
     }
     // If the drive order need not be assigned, let the kernel know that the
     // vehicle is waiting for its next order - it will be dispatched again for
@@ -396,7 +395,7 @@ public class TransportOrderUtil
       LOG.info("{}: Immediate abort of transport order {}...",
                vehicle.getName(),
                order.getName());
-      vehicleController.clearDriveOrder();
+      vehicleController.abortTransportOrder(true);
       finishAbortion(order.getReference(), vehicle, disableVehicle);
     }
     else {
@@ -406,7 +405,7 @@ public class TransportOrderUtil
         LOG.debug("{}: To be disabled later", vehicle.getName());
         vehiclesToDisable.add(vehicle.getReference());
       }
-      vehicleController.abortDriveOrder();
+      vehicleController.abortTransportOrder(false);
       // XXX What if the controller does not have any more movements to be
       // finished? Will it ever re-dispatch the vehicle in that case?
     }
