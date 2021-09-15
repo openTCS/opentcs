@@ -250,6 +250,11 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
+  public boolean canAcceptNextCommand() {
+    return (getCommandQueue().size() + getSentQueue().size()) < getCommandQueueCapacity();
+  }
+
+  @Override
   public int getSentQueueCapacity() {
     return sentQueueCapacity;
   }

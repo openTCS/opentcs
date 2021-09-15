@@ -17,6 +17,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features:
 ** Properly specify and implement claim semantics in the scheduler, allowing custom scheduling strategies to take vehicles' planned future resource allocations into account.
+** Introduce `VehicleCommAdapter.canAcceptNextCommand()`, which can be used to (statically or dynamically) influence the amount of movement commands a comm adapter receives from its `VehicleController`.
 * Bugs fixed:
 ** Execute virtual vehicle simulation using the kernel executor to avoid potential deadlocks.
 ** Restore single-step mode for virtual vehicles.

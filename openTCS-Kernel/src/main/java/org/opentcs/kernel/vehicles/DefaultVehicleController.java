@@ -931,15 +931,13 @@ public class DefaultVehicleController
    * @return <code>true</code> if, and only if, we can send another command.
    */
   private boolean canSendNextCommand() {
-    int sendableCommands = Math.min(commAdapter.getCommandQueueCapacity() - commandsSent.size(),
-                                    futureCommands.size());
-    if (sendableCommands <= 0) {
-      LOG.debug("{}: Cannot send, number of sendable commands: {} (commandQueueCapacity={}, commandsSent={}, futureCommandsSize={})",
-                vehicle.getName(),
-                sendableCommands,
-                commAdapter.getCommandQueueCapacity(),
-                commandsSent.size(),
-                futureCommands.size());
+    if (futureCommands.isEmpty()) {
+      LOG.debug("{}: Cannot send, no commands to be sent.", vehicle.getName());
+      return false;
+    }
+    if (!commAdapter.canAcceptNextCommand()) {
+      LOG.debug("{}: Cannot send, comm adapter cannot accept any further commands.",
+                vehicle.getName());
       return false;
     }
     if (!futureCommands.peek().getStep().isExecutionAllowed()) {

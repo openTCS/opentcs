@@ -15,6 +15,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and
@@ -64,22 +65,44 @@ public interface VehicleCommAdapter
   VehicleProcessModelTO createTransferableProcessModel();
 
   /**
-   * Indicates how many commands this comm adapter's command queue accepts.
+   * Indicates how many commands this comm adapter accepts.
+   * <p>
+   * This capacity considers both the {@link #getCommandQueue() command queue} and the
+   * {@link #getSentQueue() sent queue}. This means that the number of elements in both queues
+   * combined must not exceed this number.
+   * </p>
    *
-   * @return The number of commands this comm adapter's command queue accepts.
+   * @return The number of commands this comm adapter accepts.
    */
   int getCommandQueueCapacity();
 
   /**
    * Returns this adapter's command queue.
+   * <p>
+   * This queue contains {@link MovementCommand}s that the comm adapter received from the
+   * {@link VehicleController} it's associated with. When a command is sent to the vehicle, the
+   * command is removed from this queue and added to the {@link #getSentQueue() sent queue}.
+   * </p>
    *
    * @return This adapter's command queue.
+   * @see #getCommandQueueCapacity()
    */
   @Nonnull
   Queue<MovementCommand> getCommandQueue();
 
   /**
-   * Returns the capacity of this adapter's <em>sent queue</em>.
+   * Checks whether this comm adapter can accept the next (i.e. one more)
+   * {@link MovementCommand command}.
+   *
+   * @return {@code true}, if this adapter can accept another command, otherwise {@code false}.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default boolean canAcceptNextCommand() {
+    return (getCommandQueue().size() + getSentQueue().size()) < getCommandQueueCapacity();
+  }
+
+  /**
+   * Returns the capacity of this adapter's {@link #getSentQueue() <em>sent queue</em>}.
    *
    * @return The capacity of this adapter's <em>sent queue</em>.
    */
@@ -91,6 +114,8 @@ public interface VehicleCommAdapter
    *
    * @return A queue containing the commands that this adapter has sent to the vehicle already but
    * which have not yet been processed by it.
+   * @see #getSentQueueCapacity()
+   * @see #getCommandQueueCapacity()
    */
   @Nonnull
   Queue<MovementCommand> getSentQueue();
