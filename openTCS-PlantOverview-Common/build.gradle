@@ -6,15 +6,15 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
-  compile project(':openTCS-API-Injection')
-  compile project(':openTCS-Common')
-  compile project(':openTCS-PlantOverview-Base')
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+  api project(':openTCS-PlantOverview-Base')
 
   // There does not seem to be an official binary release for JHotDraw...
-  compile group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506'
+  api group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506'
   // This preview version of Docking Frames is not in Maven Central, yet.
-  compile group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11'
-  compile group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11'
+  api group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11'
+  api group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11'
 }
 
 task release {

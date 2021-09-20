@@ -13,15 +13,15 @@ mainClassName = ext.mainClass
 ext.collectableDistDir = new File(buildDir, 'install')
 
 dependencies {
-  compile project(':openTCS-Common')
-  compile project(':openTCS-Impl-Configuration-cfg4j')
-  compile project(':openTCS-PlantOverview-Common')
-  compile project(':openTCS-PlantOverview-Panel-LoadGenerator')
-  compile project(':openTCS-PlantOverview-Panel-ResourceAllocation')
-  compile project(':openTCS-PlantOverview-Panel-Statistics')
-  compile project(':openTCS-PlantOverview-Themes-Default')
+  api project(':openTCS-Common')
+  api project(':openTCS-Impl-Configuration-cfg4j')
+  api project(':openTCS-PlantOverview-Common')
+  api project(':openTCS-PlantOverview-Panel-LoadGenerator')
+  api project(':openTCS-PlantOverview-Panel-ResourceAllocation')
+  api project(':openTCS-PlantOverview-Panel-Statistics')
+  api project(':openTCS-PlantOverview-Themes-Default')
 
-  runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
+  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 
 compileJava {

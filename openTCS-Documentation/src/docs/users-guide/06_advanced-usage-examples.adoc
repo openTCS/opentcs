@@ -85,7 +85,7 @@ To achieve this, do the following:
 . In the kernel's configuration file, enable SSL for the RMI interface and/or for the web service interface.
   (See <<RMI kernel interface configuration entries>> and/or <<Service web API configuration entries>> for a description of the configuration entries.)
 . If you enabled SSL for the RMI interface, you need to enable it in the Plant Overview's and the Kernel Control Center's configuration files, too.
-  (See <<SSL PO-side application configuration entries>> and <<SSL KCC-side application configuration entries>> for a description of the configuration entries.)
+  (See <<SSL model editor-side application configuration entries>>, <<SSL operation desk-side application configuration entries>> and <<SSL KCC-side application configuration entries>> for a description of the configuration entries.)
 
 === Configuring automatic parking and recharging
 

@@ -8,7 +8,7 @@ The openTCS distribution comes with the default (English) language and a German 
 Additional translations can be integrated -- how this is done is described in the Developer's Guide.
 
 For setting the language, each application has a configuration entry that needs to be set to a _language tag_ for the language to use.
-(See <<Kernel Control Center application configuration entries>> and <<Plant Overview application configuration entries>>.)
+(See <<Kernel Control Center application configuration entries>>, <<Model Editor application configuration entries>> and <<Operations Desk application configuration entries>>.)
 Examples for language tags are:
 
 * "en" for English

@@ -6,8 +6,8 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
-  compile project(':openTCS-API-Injection')
-  compile project(':openTCS-Common')
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
 }
 
 task release {

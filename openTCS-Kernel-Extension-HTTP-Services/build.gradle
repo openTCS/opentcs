@@ -6,14 +6,14 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
-  compile project(':openTCS-API-Injection')
-  compile project(':openTCS-Common')
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
 
-  compile group: 'com.sparkjava', name: 'spark-core', version: '2.9.1'
+  api group: 'com.sparkjava', name: 'spark-core', version: '2.9.1'
 
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11'
-  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11'
-  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11'
+  api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.11'
+  api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.8.11'
+  api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.11'
 }
 
 task release {

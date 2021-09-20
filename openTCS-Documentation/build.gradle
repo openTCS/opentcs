@@ -1,7 +1,8 @@
 plugins {
-  id 'org.hidetake.swagger.generator' version '2.16.0'
+  id 'org.hidetake.swagger.generator' version '2.18.2'
   // To use AsciiDoctor for documentation
-  id 'org.asciidoctor.convert' version '1.5.3'
+  id 'org.asciidoctor.jvm.convert' version '3.3.2'
+  id 'org.asciidoctor.jvm.pdf' version '3.3.2'
 }
 
 evaluationDependsOn(':openTCS-API-Base')
@@ -45,8 +46,8 @@ swaggerSources {
 }
 
 dependencies {
-  compile project(':openTCS-Common')
-  compile project(':openTCS-Kernel')
+  api project(':openTCS-Common')
+  api project(':openTCS-Kernel')
 
   schemagen project(':openTCS-Kernel')
   schemagen project(':openTCS-ModelEditor')
@@ -60,9 +61,6 @@ dependencies {
   configdocgen jar.outputs.files
 
   swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '3.20.5'
-
-  asciidoctor group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: '1.5.0'
-  asciidoctor group: 'org.asciidoctor', name: 'asciidoctorj-pdf', version: '1.5.0-alpha.11'
 }
 
 distributions {
@@ -97,12 +95,12 @@ installDist.dependsOn renderDocs
 
 distTar {
   dependsOn renderDocs
-  baseName = baseName.toLowerCase()
+  archiveBaseName = archiveBaseName.get().toLowerCase()
 }
 
 distZip {
   dependsOn renderDocs
-  baseName = baseName.toLowerCase()
+  archiveBaseName = archiveBaseName.get().toLowerCase()
 }
 
 task release {
@@ -150,40 +148,46 @@ asciidoctor {
   enabled = false
 }
 
-task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.AsciidoctorTask) {
+task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
   // Document type: article (default), book, inline, manpage)
   options doctype: 'article'
   // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/release-notes")
+  sourceDir = file("src/docs/release-notes")  
+  baseDirFollowsSourceDir()
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = releaseNotesDir
-  // Whether to put backends' outputs into separate subdirectories
-  separateOutputDirs = false
   sources {
     include 'index.adoc'
     include 'changelog.adoc'
     include 'contributors.adoc'
     include 'faq.adoc'
   }
-  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-	backends = ['html5']
+  outputOptions {
+    // Whether to put backends' outputs into separate subdirectories
+    separateOutputDirs = false
+    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+    backends = ['html5']
+  }
 }
 
-task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
+task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
   dependsOn 'configdocgen'
   // Document type: article (default), book, inline, manpage)
   options doctype: 'book'
   // Where to look for AsciiDoc files. Default: src/docs/asciidoc
   sourceDir = file("src/docs/users-guide")
+  baseDirFollowsSourceDir()
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = userManualDir
-  // Whether to put backends' outputs into separate subdirectories
-  separateOutputDirs = false
   sources {
     include 'opentcs-users-guide.adoc'
   }
-  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-	backends = ['html5', 'pdf']
+  outputOptions{
+    // Whether to put backends' outputs into separate subdirectories
+    separateOutputDirs = false
+    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+    backends = ['html5', 'pdf']
+  }
   attributes 'configdoc': configDocDir
   resources {
     from(sourceDir) {
@@ -196,22 +200,24 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
   }
 }
 
-task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.AsciidoctorTask) {
+task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
   dependsOn 'samplesgen'
   // Document type: article (default), book, inline, manpage)
   options doctype: 'book'
   // Where to look for AsciiDoc files. Default: src/docs/asciidoc
   sourceDir = file("src/docs/developers-guide")
+  baseDirFollowsSourceDir()
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = devManualDir
-  // Whether to put backends' outputs into separate subdirectories
-  separateOutputDirs = false
   sources {
     include 'opentcs-developers-guide.adoc'
   }
-  // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-	backends = ['html5', 'pdf']
-  requires 'asciidoctor-diagram'
+  outputOptions{
+    // Whether to put backends' outputs into separate subdirectories
+    separateOutputDirs = false
+    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+    backends = ['html5', 'pdf']
+  }
   attributes 'base-javaSrc': project(':openTCS-API-Base').javaSrcDir,
              'base-testSrc': project(':openTCS-API-Base').testSrcDir,
              'loopback-javaSrc': project(':openTCS-CommAdapter-Loopback').javaSrcDir,
@@ -251,33 +257,33 @@ task samplesgen {
     mkdir(samplesDir)
     //Args contains a tupel of (task-name, outputFile)
     javaexec {
-      classpath configurations.runtime, jar.outputs.files
+      classpath configurations.compileClasspath, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS", "${samplesDir}/sample-status.json"
     }
     javaexec {
-      classpath configurations.runtime, jar.outputs.files
+      classpath configurations.compileClasspath, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS_TRANSPORT_ORDERS", "${samplesDir}/sample-transport-orders.json"
     }
     javaexec {
-      classpath configurations.runtime, jar.outputs.files
+      classpath configurations.compileClasspath, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS_SINGLE_TRANSPORT_ORDER", "${samplesDir}/sample-single-transport-order.json"
     }
     javaexec {
-      classpath configurations.runtime, jar.outputs.files
+      classpath configurations.compileClasspath, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS_VEHICLES", "${samplesDir}/sample-vehicles.json"
     }
     javaexec {
-      classpath configurations.runtime, jar.outputs.files
+      classpath configurations.compileClasspath, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
       args "STATUS_SINGLE_VEHICLE", "${samplesDir}/sample-single-vehicle.json"
     }
 
     javaexec {
-      classpath configurations.runtime, jar.outputs.files
+      classpath configurations.compileClasspath, jar.outputs.files
       main = 'org.opentcs.documentation.HttpSamples'
       args "CREATE_ORDER", "${samplesDir}/sample-create-order.json"
     }

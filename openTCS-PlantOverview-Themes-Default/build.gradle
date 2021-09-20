@@ -5,7 +5,7 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
-  compile project(':openTCS-API-Base')
+  api project(':openTCS-API-Base')
 }
 
 task release {

@@ -159,7 +159,7 @@ The artifacts for these dependencies are downloaded automatically when building 
 
 The openTCS project heavily relies on link:https://github.com/google/guice[Guice] for dependency injection and wiring of components as well as for providing plugin-like extension mechanisms.
 In the injection API, relevant classes can be found in the package `org.opentcs.customizations`.
-For examples, see <<Customizing and extending the kernel application>>, <<Customizing and extending the plant overview application>> and <<Customizing and extending the control center application>>.
+For examples, see <<Customizing and extending the kernel application>>, <<Customizing and extending the Model Editor and the Operations Desk applications>> and <<Customizing and extending the control center application>>.
 
 === Logging
 

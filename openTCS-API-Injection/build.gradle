@@ -5,14 +5,14 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
-  compile project(':openTCS-API-Base')
+  api project(':openTCS-API-Base')
   //compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
   // Use the no_aop artifact of Guice to be JDK 13 compatible.
   // More information can be found here:
   // https://github.com/google/guice/wiki/OptionalAOP
   // https://github.com/google/guice/issues/1277
-  compile group: 'com.google.inject', name: 'guice', version: '4.2.2', classifier: 'no_aop'
-  compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.2'
+  api group: 'com.google.inject', name: 'guice', version: '4.2.2', classifier: 'no_aop'
+  api group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.2'
 }
 
 task release {

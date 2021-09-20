@@ -3,11 +3,12 @@ sourceSets {
 }
 
 configurations {
-  guiceConfigCompile.extendsFrom compile
+  guiceConfigApi.extendsFrom api
+  guiceConfigImplementation.extendsFrom implementation
 }
 
 dependencies {
-  guiceConfigCompile sourceSets.main.output
+  guiceConfigImplementation sourceSets.main.runtimeClasspath
 }
 
 // Attributes for the AsciiDoc documentation to include code from source files

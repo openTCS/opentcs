@@ -13,13 +13,13 @@ mainClassName = ext.mainClass
 ext.collectableDistDir = new File(buildDir, 'install')
 
 dependencies {
-  compile project(':openTCS-API-Injection')
-  compile project(':openTCS-Common')
-  compile project(':openTCS-CommAdapter-Loopback')
-  compile project(':openTCS-PeripheralCommAdapter-Loopback')
-  compile project(':openTCS-Impl-Configuration-cfg4j')
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+  api project(':openTCS-CommAdapter-Loopback')
+  api project(':openTCS-PeripheralCommAdapter-Loopback')
+  api project(':openTCS-Impl-Configuration-cfg4j')
 
-  runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
+  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 
 compileJava {
