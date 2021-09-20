@@ -9,13 +9,13 @@ All other required libraries are included in the openTCS distribution or will be
 
 === Available artifacts and API compatibility
 
-The openTCS project publishes artifacts for releases via link:https://bintray.com/bintray/jcenter[JCenter], so you can easily integrate them with build systems such as Gradle or Maven.
+The openTCS project publishes artifacts for releases via the link:https://repo1.maven.org/maven2/[Maven Central] artifact repository, so you can easily integrate them with build systems such as Gradle or Maven.
 In Gradle build scripts, for example, use something like the following to integrate an openTCS library:
 
 [source, groovy, subs="attributes"]
 ----
 repositories {
-  jcenter()
+  mavenCentral()
 }
 
 dependencies {

@@ -27,6 +27,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Fix an issue where the Operations Desk was not in sync with the Kernel when using very large models.
 ** Fix an issue where cutting and pasting elements in the Model Editor would create multiple elements with the same name.
 * Other changes:
+** Switch to publishing artifacts via the Maven Central artifact repository.
+   (Previously, artifacts used to be published to JCenter, an artifact repository that has been discontinued.)
 ** Update the license information:
    All components, including the Model Editor and Operations Desk applications, are now licensed under the terms of the MIT license.
 ** When a vehicle is waiting for resources to be allocated (e.g. because resources are occupied/blocked by another vehicle), allow it to be rerouted from its current position.
@@ -358,7 +360,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Version 4.2 (2017-05-29)
 
-* Simplify the kernel API by using transfer objects to create plant models and transport orders. 
+* Simplify the kernel API by using transfer objects to create plant models and transport orders.
   Expect plant models to be transferred as a whole instead of updating existing model elements with multiple calls.
 * Actually make use of modules in the default scheduler: A scheduler module can be used to influence the allocation process of resources to vehicles (e.g. to wait for infrastructure feedback before letting a vehicle pass a path).
 * A location type's (default) symbol can now be overwritten by a location to display an empty symbol.
