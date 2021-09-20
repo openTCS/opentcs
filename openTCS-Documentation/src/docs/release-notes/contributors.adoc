@@ -1,6 +1,5 @@
 = openTCS: Contributors List
 The openTCS developers
-openTCS {project-version}
 :doctype: article
 :toc!:
 :sectnums!:

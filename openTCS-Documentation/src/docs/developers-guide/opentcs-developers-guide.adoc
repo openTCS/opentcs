@@ -1,6 +1,5 @@
 = openTCS: Developer's Guide
 The openTCS developers
-openTCS {project-version}
 :doctype: book
 :toc: left
 :toclevels: 3

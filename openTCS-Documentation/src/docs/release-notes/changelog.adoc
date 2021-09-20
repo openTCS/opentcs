@@ -1,6 +1,5 @@
 = openTCS: Change Log
 The openTCS developers
-openTCS {project-version}
 :doctype: article
 :toc: left
 :toclevels: 3
