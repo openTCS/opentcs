@@ -34,26 +34,17 @@ The openTCS source code is licensed under the terms of the MIT License.
 Please note that openTCS is distributed without any warranty - without even the implied warranty of merchantability or fitness for a particular purpose.
 Please refer to the license (`LICENSE.txt`) for details.
 
-== Support
-
-Please note that, while Fraunhofer IML is happy to be able to release openTCS to the public as free software and would like to see it used and improved continuously, the development team cannot provide unlimited free support for it.
-
-If you have technical/support questions, please post them on the project's mailing list, where the community and the developers involved will respond as time permits.
-You can subscribe to the mailing list on the project homepage at https://sourceforge.net/projects/opentcs/.
-
-Legal notice:
-This announcement of possible supporting services is not intended to create any binding or legal obligations or an obligation on entering any contract.
-It does not impose any duty on Fraunhofer IML to disclose any information nor to enter into any individual agreement or obligation.
-
 === Further documentation
 
 If you intend to extend and customize openTCS, please also see the Developer's Guide and the JavaDoc documentation that is part of the openTCS distribution.
 
-=== Questions and problem reports
+=== Support
 
-If you have questions about this manual, the openTCS project or about using or extending openTCS, please contact the development team by using the mailing list at https://sourceforge.net/projects/opentcs/.
+Please note that, while Fraunhofer IML is happy to be able to release openTCS to the public as free software and would like to see it used and improved continuously, the development team cannot provide unlimited free support for it.
 
-If you encounter technical problems using openTCS, please remember to include enough data in your problem report to help the developers help you, e.g.:
+If you have technical/support questions, please post them on the project's discussion forum, where the community and the developers involved will respond as time permits.
+You can find the discussion forum at https://github.com/openTCS/opentcs/discussions.
+Please remember to include enough data in your problem report to help the developers help you, e.g.:
 
-* The applications' log files, contained in the subdirectory `log/` of both the kernel and the plant overview application
-* The plant model you are working with, contained in the subdirectory `data/` of the kernel and/or plant overview application
+* The applications' log files, contained in the subdirectory `log/` of the kernel, kernel control center, model editor and operations desk application
+* The plant model you are working with, contained in the subdirectory `data/` of the kernel and/or model editor application
