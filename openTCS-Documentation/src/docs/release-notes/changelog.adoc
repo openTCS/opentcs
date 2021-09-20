@@ -15,13 +15,13 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * New features:
-** Properly specify and implement claim semantics in the scheduler, allowing custom scheduling strategies to take vehicles' planned future resource allocations into account.
+** Properly specify and implement claim semantics in the `Scheduler` interface, allowing custom scheduling strategies to take vehicles' planned future resource allocations into account.
 ** Introduce `VehicleCommAdapter.canAcceptNextCommand()`, which can be used to (statically or dynamically) influence the amount of movement commands a comm adapter receives from its `VehicleController`.
 * Bugs fixed:
 ** Execute virtual vehicle simulation using the kernel executor to avoid potential deadlocks.
 ** Restore single-step mode for virtual vehicles.
 ** Fix immediate withdrawal of transport orders.
-** When the kernel application is started, initialize its components (e.g. dispatcher, router, scheduler) using the kernel executor, especially to avoid scheduling issues with plant models that are loaded with application start up.
+** When the Kernel application is started, initialize its components (e.g. dispatcher, router, scheduler) using the kernel executor, especially to avoid scheduling issues with plant models that are loaded with application start up.
 ** Fix the order sequence details panel which would not load due to some wrong paths to a resource bundle.
 ** Fix an issue where the Operations Desk was not in sync with the Kernel when using very large models.
 ** Fix an issue where cutting and pasting elements in the Model Editor would create multiple elements with the same name.
