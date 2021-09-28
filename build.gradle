@@ -119,7 +119,7 @@ publishing {
       artifact distSrcZip
 
       pom {
-        artifactId = 'distribution'
+        artifactId = 'opentcs'
 
         name = project.name
         description = project.name
