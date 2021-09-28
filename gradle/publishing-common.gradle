@@ -16,12 +16,15 @@ publishing {
 
 signing {
   useInMemoryPgpKeys(
-    project.hasProperty('SIGNING_KEY') ? project.property('SIGNING_KEY') : '', 
+    project.hasProperty('SIGNING_KEY') ? project.property('SIGNING_KEY') : '',
     project.hasProperty('SIGNING_PASSWORD') ? project.property('SIGNING_PASSWORD') : ''
   )
   sign publishing.publications
 }
 
 tasks.withType(Sign) {
-    onlyIf { project.hasProperty('SIGNING_KEY') && project.hasProperty('SIGNING_PASSWORD') }
+  onlyIf {
+    project.hasProperty('SIGNING_KEY') && !project.property('SIGNING_KEY').toString().isEmpty() \
+    && project.hasProperty('SIGNING_PASSWORD') && !project.property('SIGNING_PASSWORD').toString().isEmpty()
+  }
 }

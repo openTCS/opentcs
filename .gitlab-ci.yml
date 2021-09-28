@@ -1,6 +1,8 @@
 # The following variables are expected to be set:
 # DO_DEPLOY: Whether or not to deploy.
 # NO_BUILD_NUMBER: Whether to include the build number in the artifacts' version numbers.
+# SIGNING_KEY: The key to use for signing artifacts.
+# SIGNING_PASSWORD: The password for the signing key.
 # DEPLOY_REPO_URL: URL of the repository to deploy artifacts to.
 # DEPLOY_REPO_USERNAME: User name for logging in with the repository.
 # DEPLOY_REPO_PASSWORD: Password for logging in with the repository.
@@ -43,7 +45,7 @@ build:
     - echo "DEPLOY_REPO_USERNAME is $DEPLOY_REPO_USERNAME"
     - 'if [ "$DO_DEPLOY" = "true" ]; then
         echo "Executing build with deployment...";
-        ./gradlew clean build publish -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER" -PDEPLOY_REPO_URL="$DEPLOY_REPO_URL" -PDEPLOY_REPO_USERNAME="$DEPLOY_REPO_USERNAME" -PDEPLOY_REPO_PASSWORD="$DEPLOY_REPO_PASSWORD";
+        ./gradlew clean build publish -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER" -PSIGNING_KEY="$SIGNING_KEY" -PSIGNING_PASSWORD="$SIGNING_PASSWORD" -PDEPLOY_REPO_URL="$DEPLOY_REPO_URL" -PDEPLOY_REPO_USERNAME="$DEPLOY_REPO_USERNAME" -PDEPLOY_REPO_PASSWORD="$DEPLOY_REPO_PASSWORD";
       else
         echo "Executing build without deployment...";
         ./gradlew clean build -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER";
