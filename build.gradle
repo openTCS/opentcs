@@ -22,11 +22,11 @@ apply plugin: 'com.github.ben-manes.versions'
 apply from: "${rootDir}/gradle/common.gradle"
 apply from: "${rootDir}/gradle/publishing-common.gradle"
 
-evaluationDependsOnChildren()
-
 subprojects {
   apply from: rootProject.file('gradle/common.gradle')
 }
+
+evaluationDependsOnChildren()
 
 distributions {
   main {
