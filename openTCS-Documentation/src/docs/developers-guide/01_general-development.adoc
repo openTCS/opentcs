@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-  compile group: 'org.opentcs', name: '${ARTIFACT}', version: '{project-version}'
+  compile group: 'org.opentcs', name: '${ARTIFACT}', version: '{revnumber}'
 }
 ----
 
