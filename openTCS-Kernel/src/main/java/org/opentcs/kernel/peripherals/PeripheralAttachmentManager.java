@@ -134,6 +134,12 @@ public class PeripheralAttachmentManager
     initialized = false;
   }
 
+  /**
+   * Attaches a peripheral comm adapter to a location.
+   *
+   * @param location The location to attach to.
+   * @param description The description of the comm adapter to attach.
+   */
   public void attachAdapterToLocation(@Nonnull TCSResourceReference<Location> location,
                                       @Nonnull PeripheralCommAdapterDescription description) {
     requireNonNull(location, "location");
@@ -143,6 +149,12 @@ public class PeripheralAttachmentManager
                             commAdapterRegistry.findFactoryFor(description));
   }
 
+  /**
+   * Returns the attachment information for a location.
+   *
+   * @param location The location to get attachment information about.
+   * @return The attachment information for a location.
+   */
   @Nonnull
   public PeripheralAttachmentInformation getAttachmentInformation(
       @Nonnull TCSResourceReference<Location> location) {
@@ -193,7 +205,8 @@ public class PeripheralAttachmentManager
       return;
     }
 
-    Location location = peripheralService.fetchObject(Location.class, peripheralEntry.getLocation());
+    Location location = peripheralService.fetchObject(Location.class,
+                                                      peripheralEntry.getLocation());
     List<PeripheralCommAdapterFactory> factories = commAdapterRegistry.findFactoriesFor(location);
     if (!factories.isEmpty()) {
       LOG.debug("Attaching {} to first available adapter: {}.",

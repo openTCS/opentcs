@@ -24,21 +24,21 @@ public final class TestEnvironment {
   /**
    * The home directory for the openTCS system during tests.
    */
-  private static final File kernelHomeDirectory;
+  private static final File KERNEL_HOME_DIRECTORY;
   /**
    * The directory in which persistent data of the openTCS kernel is stored.
    */
-  private static final File kernelDataDirectory;
+  private static final File KERNEL_DATA_DIRECTORY;
   /**
    * The directory in which log files are kept.
    */
-  private static final File logFileDirectory;
+  private static final File LOG_FILE_DIRECTORY;
   
   static {
-    kernelHomeDirectory =
+    KERNEL_HOME_DIRECTORY =
           new File(System.getProperty("java.io.tmpdir"), "openTCS-Tests");
-    kernelDataDirectory = new File(kernelHomeDirectory, "data");
-    logFileDirectory = new File(System.getProperty("java.io.tmpdir"), "log");
+    KERNEL_DATA_DIRECTORY = new File(KERNEL_HOME_DIRECTORY, "data");
+    LOG_FILE_DIRECTORY = new File(System.getProperty("java.io.tmpdir"), "log");
   }
   
   /**
@@ -53,7 +53,7 @@ public final class TestEnvironment {
    * @return The home directory for the openTCS system during tests.
    */
   public static File getKernelHomeDirectory() {
-    return kernelHomeDirectory;
+    return KERNEL_HOME_DIRECTORY;
   }
   
   /**
@@ -61,10 +61,10 @@ public final class TestEnvironment {
    */
   private static void init() {
     // Clean and recreate the home directory.
-    FileSystems.deleteRecursively(kernelHomeDirectory);
-    kernelHomeDirectory.mkdirs();
-    kernelDataDirectory.mkdirs();
-    logFileDirectory.mkdirs();
+    FileSystems.deleteRecursively(KERNEL_HOME_DIRECTORY);
+    KERNEL_HOME_DIRECTORY.mkdirs();
+    KERNEL_DATA_DIRECTORY.mkdirs();
+    LOG_FILE_DIRECTORY.mkdirs();
   }
   
   /**

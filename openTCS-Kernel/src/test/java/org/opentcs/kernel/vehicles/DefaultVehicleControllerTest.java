@@ -200,7 +200,7 @@ public class DefaultVehicleControllerTest {
     final String eventString = "myString";
     final List<VehicleCommAdapterEvent> eventsReceived = new LinkedList<>();
 
-    eventBus.subscribe((event) -> {
+    eventBus.subscribe(event -> {
       if (event instanceof VehicleCommAdapterEvent) {
         eventsReceived.add((VehicleCommAdapterEvent) event);
       }

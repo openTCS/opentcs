@@ -40,6 +40,7 @@ import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.opentcs.kernel.workingset.TransportOrderPool;
 
 /**
+ * Tests the operating state of the kernel.
  *
  * @author Mats Wilhelm (Fraunhofer IML)
  */
@@ -47,7 +48,7 @@ public class KernelStateOperatingTest {
 
   private final Set<Vehicle> vehicles = new HashSet<>();
 
-  private int objectID = 0;
+  private int objectID;
 
   private KernelState operating;
 

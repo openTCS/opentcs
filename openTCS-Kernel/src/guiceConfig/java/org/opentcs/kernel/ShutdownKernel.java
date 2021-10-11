@@ -22,6 +22,11 @@ public class ShutdownKernel {
   private ShutdownKernel() {
   }
 
+  /**
+   * Java main.
+   *
+   * @param args command line args
+   */
   public static void main(String[] args) {
     if (args.length > 2) {
       System.err.println("ShutdownKernel [<host>] [<port>]");

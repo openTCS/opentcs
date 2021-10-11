@@ -22,6 +22,7 @@ import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.util.persistence.ModelParser;
 
 /**
+ * Tests the {@link XMLFileModelPersister}.
  *
  * @author Tobias Marquardt (Fraunhofer IML)
  * @author Mustafa Yalciner (Fraunhofer IML)

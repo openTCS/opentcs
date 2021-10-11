@@ -69,12 +69,14 @@ public class PeripheralInteractor
    * The peripheral interactions to be performed BEFORE the exexution of a movement command mapped
    * to the corresponding movement command.
    */
-  private final Map<MovementCommand, PeripheralInteraction> preMovementInteractions = new HashMap<>();
+  private final Map<MovementCommand, PeripheralInteraction> preMovementInteractions
+      = new HashMap<>();
   /**
    * The peripheral interactions to be performed AFTER the exexution of a movement command mapped
    * to the corresponding movement command.
    */
-  private final Map<MovementCommand, PeripheralInteraction> postMovementInteractions = new HashMap<>();
+  private final Map<MovementCommand, PeripheralInteraction> postMovementInteractions
+      = new HashMap<>();
   /**
    * Indicates whether this instance is initialized.
    */
@@ -158,7 +160,7 @@ public class PeripheralInteractor
 
     Map<PeripheralOperation.ExecutionTrigger, List<PeripheralOperation>> operations
         = path.getPeripheralOperations().stream()
-            .collect(Collectors.groupingBy((t) -> t.getExecutionTrigger()));
+            .collect(Collectors.groupingBy(t -> t.getExecutionTrigger()));
     operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT,
                                executionTrigger -> new ArrayList<>());
     operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT,
@@ -217,7 +219,7 @@ public class PeripheralInteractor
               movementCommand.getStep().getDestinationPoint().getName());
     preMovementInteractions.get(movementCommand).start(succeededCallback, failedCallback);
 
-    // In case there are only operations with the completion required flag not set, the interaction 
+    // In case there are only operations with the completion required flag not set, the interaction
     // is immediately finished and we can remove it right away.
     if (preMovementInteractions.get(movementCommand).isFinished()) {
       preMovementInteractions.remove(movementCommand);
@@ -256,7 +258,7 @@ public class PeripheralInteractor
               movementCommand.getStep().getDestinationPoint().getName());
     postMovementInteractions.get(movementCommand).start(succeededCallback, failedCallback);
 
-    // In case there are only operations with the completion required flag not set, the interaction 
+    // In case there are only operations with the completion required flag not set, the interaction
     // is immediately finished and we can remove it right away.
     if (postMovementInteractions.get(movementCommand).isFinished()) {
       postMovementInteractions.remove(movementCommand);
@@ -324,10 +326,14 @@ public class PeripheralInteractor
         // We're working with two streams from two maps which can each contain the same keys.
         // Therefore we have to use the groupingBy collector and need to flat map each interaction's
         // pending required operations.
-        .collect(Collectors.groupingBy(
-            interaction -> interaction.getMovementCommand().getStep().getDestinationPoint().getName(),
-            Collectors.flatMapping(interaction -> interaction.getPendingRequiredOperations().stream(),
-                                   Collectors.toList()))
+        .collect(
+            Collectors.groupingBy(
+                interact -> interact.getMovementCommand().getStep().getDestinationPoint().getName(),
+                Collectors.flatMapping(
+                    interaction -> interaction.getPendingRequiredOperations().stream(),
+                    Collectors.toList()
+                )
+            )
         );
   }
 
@@ -362,8 +368,12 @@ public class PeripheralInteractor
         .map(entry -> entry.getKey())
         .collect(Collectors.toSet());
 
-    preMovementsPrepared.forEach(movementCommand -> preMovementInteractions.remove(movementCommand));
-    postMovementsPrepared.forEach(movementCommand -> postMovementInteractions.remove(movementCommand));
+    preMovementsPrepared.forEach(
+        movementCommand -> preMovementInteractions.remove(movementCommand)
+    );
+    postMovementsPrepared.forEach(
+        movementCommand -> postMovementInteractions.remove(movementCommand)
+    );
   }
 
   private void onPeripheralJobFailed(PeripheralJob job) {
@@ -372,6 +382,9 @@ public class PeripheralInteractor
         .forEach(interaction -> interaction.onPeripheralJobFailed(job));
   }
 
+  /**
+   * Clears the interactions.
+   */
   public void clear() {
     preMovementInteractions.clear();
     postMovementInteractions.clear();

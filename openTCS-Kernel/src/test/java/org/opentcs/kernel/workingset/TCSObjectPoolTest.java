@@ -174,7 +174,7 @@ public class TCSObjectPoolTest {
 
     List<Object> receivedEvents = new LinkedList<>();
 
-    eventBus.subscribe((event) -> {
+    eventBus.subscribe(event -> {
       receivedEvents.add(event);
     });
 

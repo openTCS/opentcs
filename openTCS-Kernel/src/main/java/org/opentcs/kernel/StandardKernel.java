@@ -79,9 +79,10 @@ final class StandardKernel
   /**
    * Creates a new kernel.
    *
-   * @param eventHub The central event hub to be used.
+   * @param eventBus The central event bus to be used.
    * @param kernelExecutor An executor for this kernel's tasks.
    * @param stateProviders The state map to be used.
+   * @param notificationService The notification service to be used.
    */
   @Inject
   StandardKernel(@ApplicationEventBus EventBus eventBus,

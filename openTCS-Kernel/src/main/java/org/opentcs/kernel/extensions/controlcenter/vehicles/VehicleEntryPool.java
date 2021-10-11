@@ -84,11 +84,22 @@ public class VehicleEntryPool
     initialized = false;
   }
 
+  /**
+   * Returns all entries in the pool.
+   *
+   * @return Map of vehicle names to their vehicle entries.
+   */
   @Nonnull
   public Map<String, VehicleEntry> getEntries() {
     return entries;
   }
 
+  /**
+   * Returns the {@link VehicleEntry} for the given vehicle name.
+   *
+   * @param vehicleName The vehicle name to get the entry for.
+   * @return the vehicle entry for the given vehicle name.
+   */
   @Nullable
   public VehicleEntry getEntryFor(@Nonnull String vehicleName) {
     requireNonNull(vehicleName, "vehicleName");

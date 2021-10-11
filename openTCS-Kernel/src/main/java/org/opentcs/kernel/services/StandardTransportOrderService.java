@@ -80,14 +80,14 @@ public class StandardTransportOrderService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       OrderSequence seq = globalObjectPool.getObject(OrderSequence.class, ref);
-      // Make sure we don't execute this if the sequence is already marked as finished, as that 
+      // Make sure we don't execute this if the sequence is already marked as finished, as that
       // would make it possible to trigger disposition of a vehicle at any given moment.
       if (seq.isFinished()) {
         return;
       }
 
       orderPool.setOrderSequenceFinished(ref);
-      // If the sequence was being processed by a vehicle, clear its back reference to the sequence 
+      // If the sequence was being processed by a vehicle, clear its back reference to the sequence
       // to make it available again and dispatch it.
       if (seq.getProcessingVehicle() != null) {
         Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,
@@ -170,17 +170,17 @@ public class StandardTransportOrderService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       OrderSequence seq = globalObjectPool.getObject(OrderSequence.class, ref);
-      // Make sure we don't execute this if the sequence is already marked as finished, as that 
+      // Make sure we don't execute this if the sequence is already marked as finished, as that
       // would make it possible to trigger disposition of a vehicle at any given moment.
       if (seq.isComplete()) {
         return;
       }
       orderPool.setOrderSequenceComplete(ref);
-      // If there aren't any transport orders left to be processed as part of the sequence, mark 
+      // If there aren't any transport orders left to be processed as part of the sequence, mark
       // it as finished, too.
       if (seq.getNextUnfinishedOrder() == null) {
         orderPool.setOrderSequenceFinished(ref);
-        // If the sequence was being processed by a vehicle, clear its back reference to the 
+        // If the sequence was being processed by a vehicle, clear its back reference to the
         // sequence to make it available again and dispatch it.
         if (seq.getProcessingVehicle() != null) {
           Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,

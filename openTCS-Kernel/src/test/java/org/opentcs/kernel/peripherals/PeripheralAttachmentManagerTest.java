@@ -37,10 +37,13 @@ import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventHandler;
 
 /**
+ * Tests for the {@link PeripheralAttachmentManager}.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralAttachmentManagerTest {
+
+  private static final String LOCATION_NAME = "Location-01";
 
   private final PeripheralAttachmentManager attachmentManager;
   private final InternalPeripheralService peripheralService;
@@ -48,7 +51,6 @@ public class PeripheralAttachmentManagerTest {
   private final PeripheralCommAdapterFactory commAdapterFactory;
   private final PeripheralEntryPool peripheralEntryPool;
 
-  private static final String LOCATION_NAME = "Location-01";
   private final Location location;
 
   public PeripheralAttachmentManagerTest() {

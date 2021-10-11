@@ -460,7 +460,7 @@ public class DefaultVehicleController
         return;
       }
       else {
-        // No commands in the 'sent queue', but the vehicle already executed some commands 
+        // No commands in the 'sent queue', but the vehicle already executed some commands
         lastCommandSent = lastCommandExecuted;
       }
     }
@@ -533,7 +533,7 @@ public class DefaultVehicleController
       scheduler.free(this, resources);
     }
 
-    // Forget about the peripheral interactions we were waiting for so that the completion of 
+    // Forget about the peripheral interactions we were waiting for so that the completion of
     // ongoing peripheral operations is ignored in any case.
     LOG.debug("{}: Clearing peripheral interactions...", vehicle.getName());
     peripheralInteractor.clear();
@@ -637,7 +637,7 @@ public class DefaultVehicleController
         waitingForAllocation = false;
         pendingResources = null;
         // In case the contoller's vehicle got rerouted while waiting for resource allocation
-        // the pending command is reset and therefore the associated allocation will be ignored. 
+        // the pending command is reset and therefore the associated allocation will be ignored.
         // Since there's now a new/updated route we need to trigger the next allocation. Otherwise
         // the vehicle would wait forever to get the next command.
         if (canSendNextCommand()) {
@@ -794,7 +794,7 @@ public class DefaultVehicleController
     }
     else {
       point = vehicleService.fetchObject(Point.class, position);
-      // If the new position is not in the model, ignore it. (Some vehicles/drivers send 
+      // If the new position is not in the model, ignore it. (Some vehicles/drivers send
       // intermediate positions that cannot be order destinations and thus do not exist in
       // the model.
       if (point == null) {
@@ -1131,7 +1131,7 @@ public class DefaultVehicleController
   private void allocateVehiclePosition() {
     VehicleProcessModel processModel = commAdapter.getProcessModel();
     // We don't want to set the vehicle position right away, since the vehicle's currently
-    // allocated resources would be freed in the first place. We need to check, if the vehicle's 
+    // allocated resources would be freed in the first place. We need to check, if the vehicle's
     // current position is already part of it's allocated resoruces.
     if (!alreadyAllocated(processModel.getVehiclePosition())) {
       // Set vehicle's position to allocate the resources

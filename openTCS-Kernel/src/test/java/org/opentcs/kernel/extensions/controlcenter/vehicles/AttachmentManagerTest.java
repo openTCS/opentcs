@@ -45,6 +45,9 @@ import org.slf4j.LoggerFactory;
  */
 public class AttachmentManagerTest {
 
+  private static final String VEHICLE_1_NAME = "Vehicle1";
+  private static final String VEHICLE_2_NAME = "Vehicle2";
+
   private final AttachmentManager attachmentManager;
   private final TCSObjectService objectService;
   private final LocalVehicleControllerPool vehicleControllerPool;
@@ -53,8 +56,6 @@ public class AttachmentManagerTest {
   private final VehicleCommAdapterFactory commAdapterFactory;
   private final EventHandler eventHandler;
 
-  private static final String VEHICLE_1_NAME = "Vehicle1";
-  private static final String VEHICLE_2_NAME = "Vehicle2";
   private final Vehicle vehicle1;
   private final Vehicle vehicle2;
 
@@ -186,7 +187,7 @@ public class AttachmentManagerTest {
 
     @Override
     public boolean providesAdapterFor(Vehicle vehicle) {
-      return (vehicle.equals(vehicle1) || vehicle.equals(vehicle2));
+      return vehicle.equals(vehicle1) || vehicle.equals(vehicle2);
     }
 
     @Override

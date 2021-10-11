@@ -5,6 +5,16 @@
 
 <!-- See http://checkstyle.sourceforge.net/checks.html for all checks + descriptions. -->
 <module name="Checker">
+  
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="MissingJavadocMethod"/>
+    <property name="files" value=".*Test.java|.*Configuration.java"/>
+  </module>
+  
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="JavadocVariable"/>
+    <property name="files" value=".*Test.java"/>
+  </module>
 
   <property name="severity" value="warning"/>
   
@@ -225,11 +235,6 @@
       <property name="severity" value="warning"/>
     </module>
     
-    <module name="ReturnCount">
-      <property name="max" value="3"/>
-      <property name="severity" value="warning"/>
-    </module>
-    
     <module name="DeclarationOrder">
       <property name="severity" value="warning"/>
     </module>
@@ -306,15 +311,10 @@
     </module>
     
     <module name="UncommentedMain">
-      <property name="excludedClasses" value="RunKernel"/>
+      <property name="excludedClasses" value="RunKernel|ShutdownKernel"/>
       <property name="severity" value="info"/>
     </module>
 
-    <module name="TodoComment">
-      <property name="format" value="TODO|XXX"/>
-      <property name="severity" value="info"/>
-    </module>
-    
     <module name="AvoidNestedBlocks">
       <property name="severity" value="info"/>
     </module>
@@ -359,6 +359,16 @@
     <module name="Indentation">
       <property name="basicOffset" value="2"/>
       <property name="caseIndent" value="2"/>
+      <property name="severity" value="ignore"/>
+    </module>
+    
+    <module name="ReturnCount">
+      <property name="max" value="3"/>
+      <property name="severity" value="ignore"/>
+    </module>
+    
+    <module name="TodoComment">
+      <property name="format" value="TODO|XXX"/>
       <property name="severity" value="ignore"/>
     </module>
     

@@ -86,6 +86,13 @@ public class TCSObjectPool {
     objectNameGenerator.addString(newObject.getName());
   }
 
+  /**
+   * Uses the given object to replace an object in the pool with same name.
+   *
+   * @param <E> Type of the object.
+   * @param object The replacing object.
+   * @return The replacing object.
+   */
   public <E extends TCSObject<E>> E replaceObject(E object) {
     requireNonNull(object, "object");
     checkArgument(objectsByName.containsKey(object.getName()),

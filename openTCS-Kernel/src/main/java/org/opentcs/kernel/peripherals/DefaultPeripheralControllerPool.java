@@ -50,6 +50,12 @@ public class DefaultPeripheralControllerPool
    */
   private boolean initialized;
 
+  /**
+   * Creates a new DefaultPeripheralControllerPool.
+   *
+   * @param objectService The object service to be used.
+   * @param controllerFactory The controller factory to be used.
+   */
   @Inject
   public DefaultPeripheralControllerPool(TCSObjectService objectService,
                                          PeripheralControllerFactory controllerFactory) {

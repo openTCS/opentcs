@@ -121,10 +121,25 @@ class KernelStateOperating
   /**
    * Creates a new KernelStateOperating.
    *
+   * @param globalSyncObject kernel threads' global synchronization object.
    * @param objectPool The object pool to be used.
+   * @param model The model to be used
+   * @param orderPool The transport order pool to be used.
+   * @param jobPool The peripheral job pool top be used.
    * @param modelPersister The model persister to be used.
    * @param configuration This class's configuration.
-   * @param recoveryEvaluator The recovery evaluator to be used.
+   * @param router The router to be used.
+   * @param scheduler The scheduler to be used.
+   * @param dispatcher The dispatcher to be used.
+   * @param peripheralJobDispatcher The peripheral job dispatcher to be used.
+   * @param controllerPool The vehicle controller pool to be used.
+   * @param peripheralControllerPool The peripheral controller pool to be used.
+   * @param kernelExecutor The kernel executer to be used.
+   * @param orderCleanerTask The order cleaner task to be used.
+   * @param extensions The kernel extensions to load.
+   * @param attachmentManager The attachment manager to be used.
+   * @param peripheralAttachmentManager The peripheral attachment manager to be used.
+   * @param vehicleService The vehicle service to be used.
    */
   @Inject
   KernelStateOperating(@GlobalSyncObject Object globalSyncObject,

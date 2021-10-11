@@ -60,7 +60,10 @@ class OrderCleanerTask
   /**
    * Creates a new instance.
    *
-   * @param kernel The kernel.
+   * @param globalSyncObject The kernel threads' global synchronization object.
+   * @param orderPool The transport order pool to be used.
+   * @param orderCleanupApprovals The set of order cleanup approvals to use.
+   * @param sequenceCleanupApprovals The set of sequence cleanup approvals to use.
    * @param configuration This class's configuration.
    */
   @Inject
@@ -112,6 +115,9 @@ class OrderCleanerTask
   private class OrderApproval
       implements Predicate<TransportOrder> {
 
+    /**
+     * Threshold for when a transport order can be removed if it was created before this.
+     */
     private final Instant creationTimeThreshold;
 
     public OrderApproval(Instant creationTimeThreshold) {
@@ -144,6 +150,9 @@ class OrderCleanerTask
   private class SequenceApproval
       implements Predicate<OrderSequence> {
 
+    /**
+     * Threshold for when a sequence can be removed if it was created before this.
+     */
     private final Instant creationTimeThreshold;
 
     public SequenceApproval(Instant creationTimeThreshold) {

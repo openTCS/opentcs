@@ -43,11 +43,10 @@ abstract class KernelState
   /**
    * Creates a new state.
    *
-   * @param kernel The kernel.
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param objectPool The object pool to be used.
    * @param model The model to be used.
-   * @param notificationBuffer The notification buffer to be used.
+   * @param modelPersister The model persister to be used.
    */
   KernelState(Object globalSyncObject,
               TCSObjectPool objectPool,

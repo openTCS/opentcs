@@ -44,9 +44,12 @@ class KernelStateModelling
   /**
    * Creates a new instance.
    *
+   * @param globalSyncObject The kernel threads' global synchronization object.
    * @param objectPool The object pool to be used.
+   * @param model The model to be used.
    * @param modelPersister The model persister to be used.
    * @param configuration This class's configuration.
+   * @param extensions The kernel extensions to be used.
    */
   @Inject
   KernelStateModelling(@GlobalSyncObject Object globalSyncObject,

@@ -25,6 +25,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
+ * Test the {@link Model}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

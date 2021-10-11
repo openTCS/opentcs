@@ -143,7 +143,7 @@ public class VehicleCommAdapterRegistry
     requireNonNull(vehicle, "vehicle");
 
     return factories.values().stream()
-        .filter((factory) -> factory.providesAdapterFor(vehicle))
+        .filter(factory -> factory.providesAdapterFor(vehicle))
         .collect(Collectors.toList());
   }
 }

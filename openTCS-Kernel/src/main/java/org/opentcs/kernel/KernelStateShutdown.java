@@ -30,7 +30,9 @@ final class KernelStateShutdown
   /**
    * Creates a new StandardKernelShutdownState.
    *
+   * @param globalSyncObject The kernel threads' global synchronization object
    * @param objectPool The object pool to be used.
+   * @param model The model to be used.
    * @param modelPersister The model persister to be used.
    */
   @Inject

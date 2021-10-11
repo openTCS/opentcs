@@ -60,6 +60,14 @@ public class DefaultPeripheralController
    */
   private boolean initialized;
 
+  /**
+   * Creates a new DefaultPeripheralController.
+   *
+   * @param location The location representing the peripheral device.
+   * @param commAdapter The comm adapter that controls the peripheral device.
+   * @param peripheralService The peripheral service to be used.
+   * @param eventBus The event bus to be used.
+   */
   @Inject
   public DefaultPeripheralController(@Assisted @Nonnull TCSResourceReference<Location> location,
                                      @Assisted @Nonnull PeripheralCommAdapter commAdapter,

@@ -129,7 +129,7 @@ public class PeripheralCommAdapterRegistry
     requireNonNull(location, "location");
 
     return factories.values().stream()
-        .filter((factory) -> factory.providesAdapterFor(location))
+        .filter(factory -> factory.providesAdapterFor(location))
         .collect(Collectors.toList());
   }
 }

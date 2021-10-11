@@ -894,6 +894,14 @@ public class Model {
     return vehicle;
   }
 
+  /**
+   * Sets the allowed order types for a given vehicle.
+   *
+   * @param ref Reference to the vehicle.
+   * @param allowedOrderTypes Set of allowed order types.
+   * @return The vehicle with the allowed order types.
+   * @throws ObjectUnknownException The vehicle reference is not known.
+   */
   public Vehicle setVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException {
@@ -1152,6 +1160,11 @@ public class Model {
     return newGroup;
   }
 
+  /**
+   * Returns a PlantModelCreationTO for this model.
+   *
+   * @return A PlantModelCreationTO for this model.
+   */
   @SuppressWarnings("deprecation")
   public PlantModelCreationTO createPlantModelCreationTO() {
     return new PlantModelCreationTO(name)
@@ -1256,18 +1269,18 @@ public class Model {
     Set<Vehicle> vehicles = objectPool.getObjects(Vehicle.class);
     List<VehicleCreationTO> result = new ArrayList<>();
 
-    for (Vehicle curVehicle : vehicles) {
+    for (Vehicle vehicle : vehicles) {
       result.add(
-          new VehicleCreationTO(curVehicle.getName())
-              .withLength(curVehicle.getLength())
-              .withEnergyLevelGood(curVehicle.getEnergyLevelGood())
-              .withEnergyLevelCritical(curVehicle.getEnergyLevelCritical())
-              .withEnergyLevelFullyRecharged(curVehicle.getEnergyLevelFullyRecharged())
-              .withEnergyLevelSufficientlyRecharged(curVehicle.getEnergyLevelSufficientlyRecharged())
-              .withMaxVelocity(curVehicle.getMaxVelocity())
-              .withMaxReverseVelocity(curVehicle.getMaxReverseVelocity())
-              .withProperties(curVehicle.getProperties())
-              .withLayout(new VehicleCreationTO.Layout(curVehicle.getLayout().getRouteColor()))
+          new VehicleCreationTO(vehicle.getName())
+              .withLength(vehicle.getLength())
+              .withEnergyLevelGood(vehicle.getEnergyLevelGood())
+              .withEnergyLevelCritical(vehicle.getEnergyLevelCritical())
+              .withEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
+              .withEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged())
+              .withMaxVelocity(vehicle.getMaxVelocity())
+              .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
+              .withProperties(vehicle.getProperties())
+              .withLayout(new VehicleCreationTO.Layout(vehicle.getLayout().getRouteColor()))
       );
     }
 

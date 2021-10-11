@@ -174,7 +174,7 @@ public class AttachmentManager
                vehicleEntry.getVehicle().getName());
       return;
     }
-    
+
     // Perform a cleanup for the old adapter.
     disableAndTerminateAdapter(vehicleEntry);
     controllerPool.detachVehicleController(vehicleEntry.getVehicle().getName());
@@ -193,6 +193,11 @@ public class AttachmentManager
     updateAttachmentInformation(vehicleEntry);
   }
 
+  /**
+   * Automatically attach a vehicle to an adapter.
+   *
+   * @param vehicleName The name of the vehicle to attach.
+   */
   public void autoAttachAdapterToVehicle(@Nonnull String vehicleName) {
     requireNonNull(vehicleName, "vehicleName");
 
@@ -229,12 +234,21 @@ public class AttachmentManager
     }
   }
 
+  /**
+   * Automatically attach all vehicles to an adapter.
+   */
   public void autoAttachAllAdapters() {
     vehicleEntryPool.getEntries().forEach((vehicleName, entry) -> {
       autoAttachAdapterToVehicle(vehicleName);
     });
   }
 
+  /**
+   * Returns the attachment information for a vehicle.
+   *
+   * @param vehicleName The name of the vehicle.
+   * @return Attachment information about the vehicle.
+   */
   public AttachmentInformation getAttachmentInformation(String vehicleName) {
     requireNonNull(vehicleName, "vehicleName");
     Assertions.checkArgument(attachmentPool.get(vehicleName) != null,
@@ -289,7 +303,8 @@ public class AttachmentManager
     }
     else {
       eventHandler.onEvent(new ProcessModelEvent(vehicleName,
-                                                 entry.getCommAdapter().createTransferableProcessModel()));
+                                                 entry.getCommAdapter()
+                                                     .createTransferableProcessModel()));
     }
   }
 

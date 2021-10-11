@@ -19,6 +19,7 @@ import org.junit.*;
 import org.opentcs.access.to.CreationTO;
 
 /**
+ * Tests for a {@link PrefixedUlidObjectNameProvider}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -43,11 +44,11 @@ public class PrefixedUlidObjectNameProviderTest {
 
   @Test
   public void shouldProvideNamesInChronologicalOrder() {
-    final int COUNT = 100000;
+    final int count = 100000;
     final CreationTO to = new CreationTO("SomeName-");
 
-    List<String> namesInOrderOfCreation = new ArrayList<>(COUNT);
-    for (int i = 0; i < COUNT; i++) {
+    List<String> namesInOrderOfCreation = new ArrayList<>(count);
+    for (int i = 0; i < count; i++) {
       namesInOrderOfCreation.add(nameProvider.apply(to));
     }
 

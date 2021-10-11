@@ -482,7 +482,8 @@ public class TransportOrderPool {
     if (to.getWrappingSequence() == null) {
       return null;
     }
-    OrderSequence sequence = getObjectPool().getObject(OrderSequence.class, to.getWrappingSequence());
+    OrderSequence sequence = getObjectPool().getObject(OrderSequence.class,
+                                                       to.getWrappingSequence());
     if (sequence == null) {
       throw new ObjectUnknownException(to.getWrappingSequence());
     }

@@ -279,7 +279,7 @@ public class DefaultKernelInjectionModule
     ScheduledExecutorService executor
         = new LoggingScheduledThreadPoolExecutor(
             1,
-            (runnable) -> {
+            runnable -> {
               Thread thread = new Thread(runnable, "kernelExecutor");
               thread.setUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
               return thread;

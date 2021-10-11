@@ -221,7 +221,7 @@ public class PeripheralInteraction {
    * @return A list of operations.
    */
   public List<PeripheralOperation> getPendingRequiredOperations() {
-    // If we're already done interacting with the peripheral device, there cannot be any pending 
+    // If we're already done interacting with the peripheral device, there cannot be any pending
     // operations.
     if (hasState(State.FINSHED)) {
       return new ArrayList<>();
@@ -238,7 +238,7 @@ public class PeripheralInteraction {
           .collect(Collectors.toList());
     }
 
-    // The interaction is still ongoing but no jobs have been created (yet) for the required 
+    // The interaction is still ongoing but no jobs have been created (yet) for the required
     // operations.
     return operations.stream()
         .filter(PeripheralOperation::isCompletionRequired)
@@ -261,8 +261,10 @@ public class PeripheralInteraction {
     return peripheralJobService.createPeripheralJob(
         new PeripheralJobCreationTO("Job-",
                                     reservationToken,
-                                    new PeripheralOperationCreationTO(operation.getOperation(),
-                                                                      operation.getLocation().getName()))
+                                    new PeripheralOperationCreationTO(
+                                        operation.getOperation(),
+                                        operation.getLocation().getName()
+                                    ))
             .withIncompleteName(true)
     );
   }
