@@ -570,6 +570,17 @@ public class DefaultVehicleController
 
   @Override
   @Nonnull
+  public ExplainedBoolean canProcess(TransportOrder order) {
+    requireNonNull(order, "order");
+    
+    synchronized (commAdapter) {
+      return commAdapter.canProcess(order);
+    }
+  }
+
+  @Override
+  @Deprecated
+  @Nonnull
   public ExplainedBoolean canProcess(@Nonnull List<String> operations) {
     requireNonNull(operations, "operations");
 

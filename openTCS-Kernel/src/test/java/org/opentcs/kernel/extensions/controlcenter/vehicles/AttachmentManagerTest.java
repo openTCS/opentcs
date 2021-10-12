@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.DefaultVehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -173,6 +174,12 @@ public class AttachmentManagerTest {
     }
 
     @Override
+    public ExplainedBoolean canProcess(TransportOrder order) {
+      return new ExplainedBoolean(true, "");
+    }
+
+    @Override
+    @Deprecated
     public ExplainedBoolean canProcess(List<String> list) {
       return new ExplainedBoolean(true, "");
     }

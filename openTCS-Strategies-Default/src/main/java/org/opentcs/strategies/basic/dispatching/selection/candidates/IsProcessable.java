@@ -10,9 +10,7 @@ package org.opentcs.strategies.basic.dispatching.selection.candidates;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
@@ -88,19 +86,6 @@ public class IsProcessable
       return new ExplainedBoolean(false, ORDER_TYPE_CONFLICT);
     }
 
-    return vehicleControllerPool.getVehicleController(vehicle.getName())
-        .canProcess(operationSequence(order));
-  }
-
-  /**
-   * Returns the sequence of operations to be executed when processing the given transport order.
-   *
-   * @param order The transport order from which to extract the sequence of operations.
-   * @return The sequence of operations to be executed when processing the given transport order.
-   */
-  private List<String> operationSequence(TransportOrder order) {
-    return order.getFutureDriveOrders().stream()
-        .map(driveOrder -> driveOrder.getDestination().getOperation())
-        .collect(Collectors.toList());
+    return vehicleControllerPool.getVehicleController(vehicle.getName()).canProcess(order);
   }
 }

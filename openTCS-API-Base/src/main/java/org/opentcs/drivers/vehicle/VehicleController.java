@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
@@ -153,16 +154,38 @@ public interface VehicleController
   }
 
   /**
-   * Checks if the vehicle would be able to process the given sequence of
-   * operations, taking into account its current state.
+   * Checks if the vehicle would be able to process the given transport order, taking into account
+   * its current state.
    *
-   * @param operations A sequence of operations that might appear in future
-   * commands.
-   * @return A <code>Processability</code> telling if the vehicle would be able
-   * to process every single operation in the list (in the given order).
+   * @param order The transport order to be checked.
+   * @return An <code>ExplainedBoolean</code> indicating whether the vehicle would be able to
+   * process given order.
    */
   @Nonnull
-  ExplainedBoolean canProcess(@Nonnull List<String> operations);
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default ExplainedBoolean canProcess(@Nonnull TransportOrder order) {
+    return canProcess(
+        order.getFutureDriveOrders().stream()
+            .map(driveOrder -> driveOrder.getDestination().getOperation())
+            .collect(Collectors.toList())
+    );
+  }
+
+  /**
+   * Checks if the vehicle would be able to process the given sequence of operations, taking into
+   * account its current state.
+   *
+   * @param operations A sequence of operations that might appear in future commands.
+   * @return An <code>ExplainedBoolean</code> indicating whether the vehicle would be able to
+   * process every single operation in the list (in the given order).
+   * @deprecated Use {@link #canProcess(org.opentcs.data.order.TransportOrder)} instead.
+   */
+  @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+  default ExplainedBoolean canProcess(@Nonnull List<String> operations) {
+    return new ExplainedBoolean(false, "VehicleController default implementation");
+  }
 
   /**
    * Delivers a generic message to the communication adapter.

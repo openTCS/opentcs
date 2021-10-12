@@ -17,11 +17,13 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -215,6 +217,18 @@ public class LoopbackCommunicationAdapter
   }
 
   @Override
+  public synchronized ExplainedBoolean canProcess(TransportOrder order) {
+    requireNonNull(order, "order");
+
+    return canProcess(
+        order.getFutureDriveOrders().stream()
+            .map(driveOrder -> driveOrder.getDestination().getOperation())
+            .collect(Collectors.toList())
+    );
+  }
+
+  @Override
+  @Deprecated
   public synchronized ExplainedBoolean canProcess(List<String> operations) {
     requireNonNull(operations, "operations");
 

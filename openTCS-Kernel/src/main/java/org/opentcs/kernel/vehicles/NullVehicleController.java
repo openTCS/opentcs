@@ -109,6 +109,12 @@ public class NullVehicleController
   }
 
   @Override
+  public ExplainedBoolean canProcess(TransportOrder order) {
+    return new ExplainedBoolean(false, "NullVehicleController");
+  }
+
+  @Override
+  @Deprecated
   public ExplainedBoolean canProcess(List<String> operations) {
     return new ExplainedBoolean(false, "NullVehicleController");
   }
