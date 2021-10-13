@@ -21,7 +21,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
@@ -331,19 +330,6 @@ public class KernelControlCenter
   }
 
   /**
-   * Shows a message dialog to confirm the user wants to shut down the kernel.
-   *
-   * @return true for yes, false otherwise.
-   */
-  private boolean confirmExit() {
-    int n = JOptionPane.showConfirmDialog(this,
-                                          BUNDLE.getString("kernelControlCenter.optionPane_exitConfirmation.message"),
-                                          BUNDLE.getString("kernelControlCenter.optionPane_exitConfirmation.title"),
-                                          JOptionPane.YES_NO_OPTION);
-    return n == JOptionPane.YES_OPTION;
-  }
-
-  /**
    * Adds the ControlCenterInfoHandler to the root logger.
    */
   private void registerControlCenterInfoHandler() {
@@ -361,12 +347,6 @@ public class KernelControlCenter
         + portalManager.getPort() + ")";
 
     setTitle(titleBase + loadedModel + connectedTo);
-  }
-
-  private void exitApplication() {
-    if (confirmExit()) {
-      application.terminate();
-    }
   }
 
   // CHECKSTYLE:OFF
@@ -481,7 +461,7 @@ public class KernelControlCenter
     }// </editor-fold>//GEN-END:initComponents
 
   private void menuButtonExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonExitActionPerformed
-    exitApplication();
+    application.terminate();
   }//GEN-LAST:event_menuButtonExitActionPerformed
 
   private void autoScrollCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoScrollCheckBoxActionPerformed
@@ -499,7 +479,7 @@ public class KernelControlCenter
   }//GEN-LAST:event_menuAboutActionPerformed
 
   private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-    exitApplication();
+    application.terminate();
   }//GEN-LAST:event_formWindowClosing
 
   private void menuButtonConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonConnectActionPerformed
