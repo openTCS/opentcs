@@ -18,6 +18,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Enable vehicle drivers to inspect the whole transport order before accepting it, not just the respective sequence of destination operations.
 * Other changes:
 ** Skip the user confirmation for exiting the Kernel Control Center application.
+** Update Jackson to 2.13.0.
+** Update Spark to 2.9.3.
 
 == Version 5.3 (2021-09-28)
 
