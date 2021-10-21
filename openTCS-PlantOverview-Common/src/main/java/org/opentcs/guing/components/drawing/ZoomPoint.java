@@ -12,24 +12,7 @@ import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 /**
- * Ein Punkt, der eine exakte Position wiedergibt, die sich auch durch das
- * Zoomen nicht verändert. Insbesondere ist diese Art von Punkt für das Zoomen
- * nötig, bei dem die Positionen der Figures geändert werden, nicht jedoch deren
- * Größe.
- * <p>
- * i. Auftretende Fälle bei symbolischer Zeichenweise: <br> (a)
- * Änderung des x- oder y-Attributes: keine Auswirkungen (b) Bewegung des
- * Punktes mit der Maus: genaue Position ist in dem Zoompunkt zu speichern (c)
- * Zoomen: die neue Position des Punktes wird anhand der genauen Werte des
- * Zoompunkts ermittelt
- * <p>
- * ii. Auftretende Fälle bei maßstabsgetreuer
- * Zeichenweise: <br> (a) Änderung des x- oder y-Attributes: der Punkt muss der
- * Zoomstufe entsprechend möglichst genau platziert werden; der exakte Wert ist
- * zu ermitteln und im Zoompunkt abzulegen (b) Bewegung des Punktes mit der
- * Maus: genaue Position ist in dem Zoompunkt zu speichern (c) Zoomen: die neue
- * Position des Punktes wird anhand der genauen Werte des Zoompunkts ermittelt;
- * das x- und y-Attribut darf davon nicht beeinflusst werden
+ * Represents an exact point that won't change when zooming the model.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -37,15 +20,15 @@ public class ZoomPoint
     implements Serializable {
 
   /**
-   * Der x-Wert in Pixel bei Zoomfaktor 1.
+   * The x position with a scale of 1.
    */
   protected double fX;
   /**
-   * Der y-Wert in Pixel bei Zoomfaktor 1.
+   * The y position with a scale of 1.
    */
   protected double fY;
   /**
-   * Die momentane Zoomstufe.
+   * The current scale.
    */
   protected double fScale;
 
@@ -57,14 +40,21 @@ public class ZoomPoint
   }
 
   /**
-   * Konstruktor mit Übergabe des x- und y-Werts.
+   * Creates a new instance.
+   *
+   * @param x The x position for this point.
+   * @param y The y position for this point.
    */
   public ZoomPoint(double x, double y) {
     this(x, y, 1.0);
   }
 
   /**
-   * Konstruktor mit Übergabe des x-, y-Wertes und des momentanten Zoomfaktors.
+   * Creates a new instance.
+   *
+   * @param x The x position for this point.
+   * @param y The y position for this point.
+   * @param scale The current scale.
    */
   public ZoomPoint(double x, double y, double scale) {
     fX = x / scale;
@@ -73,44 +63,52 @@ public class ZoomPoint
   }
 
   /**
-   * Liefert die aktuelle Zoomstufe.
+   * Returns the current scale.
    */
   public double scale() {
     return fScale;
   }
 
   /**
-   * Setzt den Wert für x.
+   * Sets the x position.
+   *
+   * @param x the x position.
    */
   public void setX(double x) {
     fX = x;
   }
 
   /**
-   * Setzt den y-Wert.
+   * Sets the y position.
+   *
+   * @param y the y position.
    */
   public void setY(double y) {
     fY = y;
   }
 
   /**
-   * Liefert den x-Wert.
+   * Returns the x position.
+   *
+   * @return the x position.
    */
   public double getX() {
     return fX;
   }
 
   /**
-   * Liefert den y-Wert.
+   * Returns the y position.
+   *
+   * @return the y position.
    */
   public double getY() {
     return fY;
   }
 
   /**
-   * Liefert die Position des Punktes in Pixel bei der aktuellen Zoomstufe.
+   * Returns a point with the position.
    *
-   * @return die Position in Pixel
+   * @return a point with the position.
    */
   public Point getPixelLocation() {
     int x = (int) (getX() * scale());
@@ -120,10 +118,9 @@ public class ZoomPoint
   }
 
   /**
-   * Liefert die exakte Position des Punktes in Pixel bei der aktuellen
-   * Zoomstufe.
+   * Returns the exact position of the point in pixels with the current zoom level.
    *
-   * @return die Position in Pixel
+   * @return the exact position.
    */
   public Point2D getPixelLocationExactly() {
     double x = getX() * scale();
@@ -133,20 +130,19 @@ public class ZoomPoint
   }
 
   /**
-   * Mitteilung, dass sich die Zoomstufe geändert hat.
+   * Event that the scale has changed.
    *
-   * @param scale Der neue Zoomfaktor.
+   * @param scale The new scale factor.
    */
   public void scaleChanged(double scale) {
     fScale = scale;
   }
 
   /**
-   * Nachricht, dass der Punkt direkt durch den Benutzer mit der Maus bewegt
-   * wurde. Der Zoompunkt muss daraus die genaue Position ermittelt.
+   * Event that the point has been moved by the user.
    *
-   * @param x Die x-Koordinate in Pixel.
-   * @param y Die y-Koordinate in Pixel.
+   * @param x The x-coordinate in Pixel.
+   * @param y The y-coordinate in Pixel.
    */
   public void movedByMouse(int x, int y) {
     fX = x / scale();

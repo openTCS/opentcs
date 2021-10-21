@@ -30,8 +30,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
- * Ein Figure-Objekt, das einen Meldepunkt darstellt. Das zugehörige Datenobjekt
- * ist vom Typ Point. Darstellung als Kreis mit 20 Layout-Units Durchmesser
+ * A figure that represents a decision point.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -72,7 +71,6 @@ public class PointFigure
     super(model);
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
 
-    // TO DO: Grid Constrainer anpassen, sodass auch kleinere Figur auf das "10er" Raster gezogen wird.
     fDiameter = 10;
     fDisplayBox = new Rectangle(fDiameter, fDiameter);
     fZoomPoint = new ZoomPoint(0.5 * fDiameter, 0.5 * fDiameter);

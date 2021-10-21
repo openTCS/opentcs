@@ -11,7 +11,7 @@ import java.io.Serializable;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Interface für Eigenschaften (Property) von ModelComponent-Objekten.
+ * Interface to specify how an attribute of a model component must appear.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -21,45 +21,43 @@ public interface ModelAttribute
   public static enum ChangeState {
 
     NOT_CHANGED,
-    CHANGED, // Das Attribut wurde in der Tabelle geändert
-    DETAIL_CHANGED, // Das Attribut wurde über den Popup-Dialog geändert
+    CHANGED,
+    DETAIL_CHANGED,
   };
 
   /**
-   * Liefert das Model, zu dem dieses Attribut gehört.
+   * Returns the model component this attribute is attached to.
    *
    * @return The model component.
    */
   public ModelComponent getModel();
 
   /**
+   * Sets the model component this attribute is attached to.
    *
    * @param model The model component.
    */
   public void setModel(ModelComponent model);
 
   /**
-   * Kennzeichnet das Attribut als geändert. Wird vom Controller/View
-   * aufgerufen, der die Änderung vorgenommen hat.
+   * Marks the attribute as changed.
    */
   void markChanged();
 
   /**
-   * Kennzeichnet ein Attribut als nicht geändert. Hebt damit markChanged() auf.
-   * Wird vom Model aufgerufen, nachdem sich alle Views aktualisiert haben.
+   * Marks the attribute as not changed.
    */
   void unmarkChanged();
 
   /**
+   * Sets the change state for this attribute.
    *
-   * @param changeState The change state.
+   * @param changeState The new change state.
    */
   void setChangeState(AbstractModelAttribute.ChangeState changeState);
 
   /**
-   * Gibt zurück, ob sich der Zustand geändert hat oder nicht. Damit wissen
-   * Views und Fahrkurselemente von Fahrzeugtypen, ob überhaupt eine
-   * übernehmenswerte Änderung vorliegt.
+   * Returns whether or not the attribute has changed.
    *
    * @return {@code true}, if the state of the model attribute has changed, otherwiese
    * {@code false}.
@@ -67,36 +65,37 @@ public interface ModelAttribute
   boolean hasChanged();
 
   /**
-   * Setzt die Bezeichnung dieser Zustandsrepräsentation.
+   * Sets the description of the attribute.
    *
    * @param description The description.
    */
   void setDescription(String description);
 
   /**
-   * Liefert die Bezeichnung eines Zustands.
+   * Returns the description of the attribute.
    *
    * @return The description.
    */
   String getDescription();
 
   /**
-   * Setzt den Hilfetext für einen Zustand.
+   * Sets the tooltip text for this attribute.
    *
-   * @param helptext The helptext.
+   * @param helptext The tooltip text.
    */
   void setHelptext(String helptext);
 
   /**
-   * Liefert den Hilfetext für diesen Zustand.
+   * Returns the tooltip text for this attribute.
    *
    * @return The helptext.
    */
   String getHelptext();
 
   /**
-   * Sagt, ob das Attribut gleichzeitig mit den gleichnamigen Attributen anderer
-   * Fahrkurselemente bearbeitet werden kann.
+   *
+   * Sets whether or not the attribute is collectively editable with attributes
+   * of the same name of other model components.
    *
    * @param collectiveEditable Whether the attribute is collectively editable with attributes
    * of the same name of other model components.
@@ -104,8 +103,8 @@ public interface ModelAttribute
   void setCollectiveEditable(boolean collectiveEditable);
 
   /**
-   * Zeigt an, ob das Attribut gleichzeitig mit den gleichnamigen Attributen
-   * anderer Fahrkurselemente desselben Fahrzeugtyps bearbeitet werden kann.
+   * Returns whether or not the attribute is collectively editable with attributes of the same name
+   * of other model components.
    *
    * @return Whether the attribute is collectively editable with attributes of the same name
    * of other model components.
@@ -113,26 +112,26 @@ public interface ModelAttribute
   boolean isCollectiveEditable();
 
   /**
-   * @param editable true, wenn der Benutzer das Attribut im Kernel-Modus
-   * "Modelling" verändern kann.
+   * Sets whether or not the attribute can be changed in modelling mode.
+   * @param editable True if the attribute can be changed in modelling mode.
    */
   void setModellingEditable(boolean editable);
 
   /**
-   * @return true, wenn der Benutzer das Property im Kernel-Modus "Modelling"
-   * verändern kann, ansonsten false.
+   * Returns whether or not the attribute can be changed in modelling mode.
+   * @return True if the attribute can be changed in modelling mode.
    */
   boolean isModellingEditable();
 
   /**
-   * @param editable true, wenn der Benutzer das Attribut im Kernel-Modus
-   * "Operating" verändern kann.
+   * Sets whether or not the attribute can be changed in operating mode.
+   * @param editable True if the attribute can be changed in operating mode.
    */
   void setOperatingEditable(boolean editable);
 
   /**
-   * @return true, wenn der Benutzer das Property im Kernel-Modus "Operating"
-   * verändern kann, ansonsten false.
+   * Returns whether or not the attribute can be changed in operating mode.
+   * @return True if the attribute can be changed in operating mode.
    */
   boolean isOperatingEditable();
 

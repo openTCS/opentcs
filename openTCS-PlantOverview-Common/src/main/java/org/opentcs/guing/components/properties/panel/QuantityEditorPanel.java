@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Ein Panel, mit dem ein Zahlenwert und eine Maï¿½einheit editiert werden kï¿½nnen.
+ * A panel that can edit a quantity property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -31,7 +31,7 @@ public class QuantityEditorPanel
    */
   private static final Logger LOG = LoggerFactory.getLogger(QuantityEditorPanel.class);
   /**
-   * Das Property, auf das der Panel zugreift.
+   * The property that is being edited.
    */
   private AbstractQuantity<?> fProperty;
 
@@ -49,8 +49,7 @@ public class QuantityEditorPanel
   }
 
   /**
-   * Richtet die Dialogelemente entsprechend den Eigenschaftswerten ein. Diese
-   * Methode wird aufgerufen, wenn der Dialog geï¿½ffnet wird.
+   * Initialises the dialog elements.
    */
   public void initFields() {
     unitComboBox.setSelectedItem(fProperty.getUnit());

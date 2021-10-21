@@ -10,8 +10,8 @@ package org.opentcs.guing.components.tree;
 import java.util.Comparator;
 
 /**
- * Vergleicht zwei Elemente der Baumansicht zu Zwecken der Sortierung. Die
- * Sortierung erfolgt in absteigender Reihenfolge nach dem Namen.
+ * Compares two elements of a tree view for sorting.
+ * Sorts based on their name in descending order.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

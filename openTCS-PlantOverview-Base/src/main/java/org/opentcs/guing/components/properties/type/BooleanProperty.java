@@ -10,7 +10,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für einen booleschen Wert.
+ * A property for a boolean value.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -27,7 +27,7 @@ public class BooleanProperty
   }
 
   /**
-   * Konstruktor mit booleschem Wert.
+   * Creates a new property with a value.
    *
    * @param model The model component.
    * @param value The value.

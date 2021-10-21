@@ -14,7 +14,7 @@ import org.opentcs.guing.model.elements.LayoutModel;
 import org.opentcs.guing.persistence.ModelManager;
 
 /**
- * Die Repräsentation eines Point-Objekts in der Baumansicht.
+ * Represents a point object in the TreeView.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)

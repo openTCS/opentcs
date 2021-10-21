@@ -319,7 +319,6 @@ public class OpenTCSDrawingEditor
 
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), DeleteAction.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.ID);
-    // Alle Verschiebungen über MoveAction, nicht über MoveConstrainedAction
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), MoveAction.West.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), MoveAction.East.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), MoveAction.North.ID);

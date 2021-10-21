@@ -13,10 +13,7 @@ import java.util.Objects;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Property, das einen Wert aus einer gegebenen Menge von Werten annehmen
- * kann.
- * Beispiel: links aus der Menge {links, rechts},
- * Nord aus der Menge {Nord, Süd, Ost, West}
+ * A property whose value is one out of a list of possible values.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @param <E> The type of the enum.
@@ -26,12 +23,12 @@ public class SelectionProperty<E extends Enum<E>>
     implements Selectable<E> {
 
   /**
-   * Die möglichen Werte.
+   * The possible values.
    */
   private List<E> fPossibleValues;
 
   /**
-   * Standardkonstruktor.
+   * Creates a new instance.
    *
    * @param model The model component.
    */
@@ -59,9 +56,9 @@ public class SelectionProperty<E extends Enum<E>>
   }
 
   /**
-   * Setzt die möglichen Werte im Nachhinein.
+   * Sets the possible values for this property.
    *
-   * @param possibleValues Ein Array mit den möglichen Werte.
+   * @param possibleValues A list of possible values.
    */
   @Override
   public void setPossibleValues(List<E> possibleValues) {

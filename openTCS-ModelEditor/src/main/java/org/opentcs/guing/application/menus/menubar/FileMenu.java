@@ -93,11 +93,11 @@ public class FileMenu
     this.setToolTipText(labels.getString("fileMenu.tooltipText"));
     this.setMnemonic('F');
 
-    // Menu item File -> New Model (nur in Mode Modelling)
+    // Menu item File -> New Model
     menuItemNewModel = new JMenuItem(actionMap.get(NewModelAction.ID));
     add(menuItemNewModel);
 
-    // Menu item File -> Load Model (nur in Mode Modelling)
+    // Menu item File -> Load Model
     menuItemLoadModel = new JMenuItem(actionMap.get(LoadModelAction.ID));
     add(menuItemLoadModel);
 
@@ -133,7 +133,7 @@ public class FileMenu
 
     // Menu item File -> Close
     menuItemClose = new JMenuItem(actionMap.get(CloseFileAction.ID));
-    add(menuItemClose); // TODO: Nur bei "Stand-Alone" Frame
+    add(menuItemClose);
   }
 
 }

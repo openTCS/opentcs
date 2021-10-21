@@ -107,7 +107,6 @@ public class TCSLabelFigure
 
       if (newOffset.x != fOffset.x || newOffset.y != fOffset.y) {
         fOffset = newOffset;
-        // Die Properties des Kernel-Objekts
         StringProperty sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
 
         if (sp != null) {
@@ -121,13 +120,6 @@ public class TCSLabelFigure
           sp.setText(String.format("%d", (long) newOffset.y));
           sp.markChanged();
         }
-        // TODO Point Label Orientation Angle!
-//      sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
-
-//      if (sp != null) {
-//        sp.setText(String.format("%d", 0));  
-//        sp.markChanged();
-//      }
         model.propertiesChanged(fParent);
       }
     }
@@ -148,7 +140,6 @@ public class TCSLabelFigure
       setText(name);
 
       if (isLabelVisible) {
-        // Label neu zeichnen
         invalidate();
         validate();
       }

@@ -11,9 +11,7 @@ import java.util.EventObject;
 import org.opentcs.guing.components.properties.table.AttributesTable;
 
 /**
- * Ein Event, der generiert wird, wenn der Benutzer eine Tabellenzeile
- * selektiert. Das Event enthält die Tabelle, in der die Selektierung stattfand,
- * sowie das Attribut, das sich in der selektierten Tabellenzeile befindet.
+ * An Event emitted when a line in a table is selected.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -21,7 +19,7 @@ public class TableSelectionChangeEvent
     extends EventObject {
 
   /**
-   * Das Attribut.
+   * The attribute.
    */
   protected Object fSelectedValue;
 
@@ -34,7 +32,7 @@ public class TableSelectionChangeEvent
   }
 
   /**
-   * Liefert das Attribut, das sich in der selektierten Tabellenzeile befindet.
+   * Returns the attribute contained in the selected line.
    */
   public Object getSelectedValue() {
     return fSelectedValue;

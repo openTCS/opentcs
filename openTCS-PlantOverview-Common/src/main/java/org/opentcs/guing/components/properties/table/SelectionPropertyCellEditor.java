@@ -15,16 +15,10 @@ import javax.swing.JTable;
 import org.opentcs.guing.components.properties.type.AbstractProperty;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.Selectable;
-import org.opentcs.guing.components.properties.type.SelectionProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {
- *
- * @see SelectionProperty}. Der Editor besteht nur aus einer ComboBox, so dass
- * der Benutzer aus einer Liste von Werten einen Wert auswählen kann. Einen
- * Button mit drei Punkten, bei dessen Anklicken sich ein DetailsDialog zum
- * komfortablen Bearbeiten des Attributs öffnet, gibt es nicht.
+ * A cell editor for a selection property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -62,12 +56,10 @@ public class SelectionPropertyCellEditor
 
   @Override
   public Object getCellEditorValue() {
-    // Wenn das Objekt über den Popup-Dialog geändert wurde, wird dieser Wert übernommen
     if (property().getChangeState() == ModelAttribute.ChangeState.DETAIL_CHANGED) {
       Object value = property().getValue();  // DEBUG
     }
     else {
-      // ...sonst den Wert direkt im Tabellenfeld auswählen
       Object selectedItem = getComponent().getSelectedItem();
       Object oldValue = property().getValue();
       property().setValue(selectedItem);
@@ -81,9 +73,9 @@ public class SelectionPropertyCellEditor
   }
 
   /**
-   * Liefert das Attribut.
+   * Return the property for this editor.
    *
-   * @return
+   * @return the property for this editor.
    */
   protected AbstractProperty property() {
     return (AbstractProperty) fProperty;

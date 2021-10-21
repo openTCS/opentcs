@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Property für einen String.
+ * A property for a string.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -19,7 +19,7 @@ public class StringProperty
     extends AbstractProperty {
 
   /**
-   * Der String.
+   * The string.
    */
   private String fText;
 
@@ -33,7 +33,7 @@ public class StringProperty
   }
 
   /**
-   * Konstruktor, dem der String übergeben wird.
+   * Creates a new instance with a value.
    *
    * @param model The model component.
    * @param text The text.
@@ -49,18 +49,18 @@ public class StringProperty
   }
 
   /**
-   * Setzt den String.
+   * Set the string.
    *
-   * @param text The text.
+   * @param text the new string.
    */
   public void setText(String text) {
     fText = text;
   }
 
   /**
-   * Liefert den String.
+   * Returns the string.
    *
-   * @return The text.
+   * @return The String.
    */
   public String getText() {
     return fText;

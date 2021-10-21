@@ -21,21 +21,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.application.OperationMode;
-import org.opentcs.guing.components.properties.AttributesComponent;
 import org.opentcs.guing.components.properties.event.TableChangeListener;
 import org.opentcs.guing.components.properties.event.TableSelectionChangeEvent;
 import org.opentcs.guing.components.properties.type.ModelAttribute;
 
 /**
- * Eine Tabelle, in der Attribute dargestellt und verändert werden können. Sie
- * besteht aus zwei Spalten: die erste enthält die Namen der Attribute, die
- * zweite die Werte der Attribute.
- * <p>
- * Die Tabelle ist Teil der {@link AttributesComponent}. Diese besitzt unterhalb der Tabelle einen 
- * Bereich für attributspezifische Hilfetexte. AttributesComponent muss deshalb wissen,
- * welche Tabellenzeile der Benutzer gerade selektiert, um den entsprechenden
- * Hilfetext anzeigen zu können. Daher registriert sich AttributesComponent als
- * {@link TableChangeListener} bei der Tabelle und wird dann über jede Veränderung informiert.
+ * A table in which properties are displayed and can be edited.
+ * The table has two columns, the first with the name of the property and the second with the 
+ * value of the property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -48,8 +41,7 @@ public class AttributesTable
    */
   private final ApplicationState appState;
   /**
-   * Eine Liste von Objekten, die daran interessiert sind, welche Tabellenzeile
-   * gerade selektiert ist.
+   * List of table change listeners.
    */
   private final List<TableChangeListener> fTableChangeListeners
       = new LinkedList<>();
@@ -67,7 +59,7 @@ public class AttributesTable
   }
 
   /**
-   * Konfiguriert das Erscheinungsbild der Tabelle.
+   * Initialises the style of the table.
    */
   protected final void setStyle() {
     setRowHeight(20);
@@ -97,26 +89,25 @@ public class AttributesTable
   }
 
   /**
-   * Fügt einen TableSelectionChangeListener hinzu.
+   * Adds a TableSelectionChangeListener.
    *
-   * @param l
+   * @param l The listener to add.
    */
   public void addTableChangeListener(TableChangeListener l) {
     fTableChangeListeners.add(l);
   }
 
   /**
-   * Entfernt einen TableSelectionChangeListener.
+   * Removes a TableSelectionChangeListener.
    *
-   * @param l
+   * @param l the listener to remove.
    */
   public void removeTableChangeListener(TableChangeListener l) {
     fTableChangeListeners.remove(l);
   }
 
   /**
-   * Benachrichtigt alle registrierten TableChangeListener, dass der Benutzer
-   * eine Tabellenzeile (und damit ein Attribut) selektiert hat.
+   * Notify all registered listeners that a table row has been selected.
    *
    * @param selectedValue
    */
@@ -145,15 +136,10 @@ public class AttributesTable
   }
 
   /**
-   * Zeigt an, ob die übergebene Zeile editierbar ist. Dies ist dann der Fall,
-   * wenn das Attribut in seiner
-   * <code>isEditable()
-   * </code> Methode
-   * <code>true</code> liefert. Diese Methode wird von CellRenderern benutzt, um
-   * nicht veränderbare Zeilen anders darzustellen.
+   * Indicates whether the specified row is editable.
    *
-   * @param row
-   * @return
+   * @param row The index of the row to be checked.
+   * @return True if the row is editable.
    */
   public boolean isEditable(int row) { 
     AttributesTableModel tableModel = (AttributesTableModel) getModel();

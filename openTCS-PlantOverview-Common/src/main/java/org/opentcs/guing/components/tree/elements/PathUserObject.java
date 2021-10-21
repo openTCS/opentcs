@@ -17,7 +17,7 @@ import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repräsentation eines Pfades in der Baumansicht.
+ * Represents a path in the TreeView.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

@@ -214,10 +214,6 @@ public class TransportOrderView
     return tableModel;
   }
 
-  /**
-   * Wird aufgerufen, wenn sich die Auswahl in der Tabelle der Fahraufträge
-   * geändert hat.
-   */
   private void driveOrdersTableSelectionChanged() {
     DriveOrder driveOrder
         = fTransportOrder.getAllDriveOrders().get(driveOrdersTable.getSelectedRow());

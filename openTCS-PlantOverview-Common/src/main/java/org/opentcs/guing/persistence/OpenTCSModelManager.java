@@ -479,8 +479,6 @@ public class OpenTCSModelManager
     // Label
     String labelOffsetX = locationModel.getPropertyLabelOffsetX().getText();
     String labelOffsetY = locationModel.getPropertyLabelOffsetY().getText();
-    // TODO: labelOrientationAngle auswerten
-//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
     int labelPositionX;
     int labelPositionY;
@@ -655,7 +653,6 @@ public class OpenTCSModelManager
       pathModel.addAttributesChangeListener(pathFigure);
       systemModel.getMainFolder(SystemModel.FolderKey.PATHS).add(pathModel);
       restoredFigures.add(pathFigure);
-      // Koordinaten der Kontrollpunkte �ndern sich, wenn der Ma�stab ver�ndert wird
       origin.addListener(pathFigure);
       pathFigure.set(FigureConstants.ORIGIN, origin);
     }
@@ -756,8 +753,6 @@ public class OpenTCSModelManager
     // Label
     String labelOffsetX = pointModel.getPropertyPointLabelOffsetX().getText();
     String labelOffsetY = pointModel.getPropertyPointLabelOffsetY().getText();
-    // TODO: labelOrientationAngle auswerten
-//      String labelOrientationAngle = layoutProperties.get(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE);
 
     int labelPositionX;
     int labelPositionY;
@@ -774,7 +769,6 @@ public class OpenTCSModelManager
 
       label.setOffset(labelPositionX, labelPositionY);
     }
-    // Figur auf diese Position verschieben
     figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
     pointFigure.setBounds(figurePosition, figurePosition);
 
@@ -793,7 +787,6 @@ public class OpenTCSModelManager
                                   TCSObjectService objectService) {
     for (Point point : allPoints) {
       PointModel pointModel = new PointModel();
-      // Setze Typ, Koordinaten, ... aus dem Kernel-Modell
       procAdapterUtil.processAdapterFor(pointModel)
           .updateModelProperties(point, pointModel, systemModel, objectService);
 
@@ -806,7 +799,6 @@ public class OpenTCSModelManager
       systemModel.getMainFolder(SystemModel.FolderKey.POINTS).add(pointModel);
       restoredFigures.add(lpf);
 
-      // Koordinaten der Punkte �ndern sich, wenn der Ma�stab ver�ndert wird
       origin.addListener(lpf);
       lpf.set(FigureConstants.ORIGIN, origin);
     }

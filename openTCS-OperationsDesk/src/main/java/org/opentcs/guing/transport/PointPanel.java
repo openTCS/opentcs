@@ -24,8 +24,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * Eine Benutzerschnittstelle zum Auswählen einer Station oder eines
- * Meldepunktes als direktes Fahrtziel für ein Fahrzeug.
+ * A UI to select a location or a point as a vehicle destination.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -33,7 +32,7 @@ public class PointPanel
     extends DialogContent {
 
   /**
-   * Die zur Auswahl stehenden Stationen.
+   * Available locations.
    */
   protected List<PointModel> fItems;
   /**
@@ -88,15 +87,9 @@ public class PointPanel
   }
 
   /**
-   * Liefert einen Comparator zum Sortieren der Elemente.
+   * Returns the selected element.
    *
-   * @return den Comparator
-   */
-  /**
-   * Liefert das ausgewählte Ziel, zu dem das Fahrzeug hinbeordert werden soll.
-   *
-   * @return das Ziel oder
-   * <code>null</code>, falls kein Ziel ausgewählt wurde
+   * @return The selected model component.
    */
   public ModelComponent getSelectedItem() {
     int index = itemsComboBox.getSelectedIndex();
@@ -109,12 +102,10 @@ public class PointPanel
 
   @Override
   public void update() {
-    // wird nicht benötigt
   }
 
   @Override
   public void initFields() {
-    // wird nicht benötigt
   }
 
   protected final Comparator<ModelComponent> getComparator() {

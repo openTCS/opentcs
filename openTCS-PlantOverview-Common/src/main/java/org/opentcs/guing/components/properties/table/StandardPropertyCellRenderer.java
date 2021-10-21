@@ -19,11 +19,7 @@ import org.opentcs.guing.components.properties.type.MultipleDifferentValues;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Ein CellRenderer für alle Attribute außer vom Typ {
- *
- * @see BooleanProperty}. Dargestellt wird lediglich der Text, den ein Attribut
- * in der
- * <code>toString()</code> Methode zurückliefert.
+ * A standard cell renderer for for properties in general.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -41,7 +37,7 @@ public class StandardPropertyCellRenderer
   }
 
   /**
-   * Konfiguriert das Aussehen des Labels.
+   * Initialises the style fo the labels.
    */
   protected final void setStyle() {
     setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -50,12 +46,9 @@ public class StandardPropertyCellRenderer
   }
 
   /**
-   * Liefert die Komponente zur Darstellung des Attributs (hier das Label mit
-   * dem Text, den das Attribut in seiner toString()- Methode liefert. Ist das
-   * Attribut in der Zeile nicht veränderbar, so wird für das Label
-   * <code>enabled(false)</code> gesetzt.
+   * Returns a component with the visualisation for this property.
    *
-   * @return
+   * @return a component with the visualisation for this property.
    */
   @Override
   public Component getTableCellRendererComponent(

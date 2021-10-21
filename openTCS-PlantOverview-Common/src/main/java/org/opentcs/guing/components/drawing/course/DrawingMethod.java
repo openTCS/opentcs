@@ -8,22 +8,19 @@
 package org.opentcs.guing.components.drawing.course;
 
 /**
- * Ein Interface für Zeichenmethoden. Mögliche Zeichenmethoden können sein:
+ * An interface for drawing methods. Possible drawing methods are:
  * <p>
- * <ul> <li> symbolisch: Zwischen der Realposition von Fahrkurselementen und der
- * Position von Figures besteht kein Zusammenhang <li> auf Koordinaten
- * basierend: Die Position der Figures entspricht genau der Position der
- * Realkoordinaten. </ul>
- *
- * Entwurfsmuster: Strategie. DrawingMethod ist eine abstrakte Strategie,
- * Unterklassen sind konkrete Strategien.
+ * <ul> <li> symbolic: No relation between the real position and the position of the figure.
+ * <li> coordinate based: The position of the figure is the exact real position. </ul>
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface DrawingMethod {
 
   /**
-   * Liefert den Origin.
+   * Returns the origin point.
+   *
+   * @return the origin point.
    */
   Origin getOrigin();
 }

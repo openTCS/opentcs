@@ -10,7 +10,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für einen ganzzahligen Wert.
+ * A property for an integer value.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -18,7 +18,7 @@ public class IntegerProperty
     extends AbstractProperty {
 
   /**
-   * Creates a new instance of BooleanProperty
+   * Creates a new instance.
    *
    * @param model The model component.
    */
@@ -27,7 +27,7 @@ public class IntegerProperty
   }
 
   /**
-   * Konstruktor mit ganzzahligen Wert.
+   * Creates a new instance with a value.
    *
    * @param model The model component.
    * @param value The value.

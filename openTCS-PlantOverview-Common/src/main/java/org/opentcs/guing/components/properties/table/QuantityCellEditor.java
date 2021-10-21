@@ -18,11 +18,7 @@ import org.opentcs.guing.util.UserMessageHelper;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Ein CellEditor fï¿½r Attribute vom Typ {
- *
- * @see AbstractQuantity}. Der Editor umfasst ein Textfeld zur schnellen Eingabe
- * sowie den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs ï¿½ffnet.
+ * A cell editor for a quantity property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -41,7 +37,7 @@ public class QuantityCellEditor
   }
 
   /**
-   * Konfiguriert das Aussehen des Textfeldes.
+   * Initialises the style of the text field.
    *
    * @param textField
    */
@@ -51,22 +47,19 @@ public class QuantityCellEditor
   }
 
   /**
-   * Liefert das Attribut.
+   * Returns the property for this editor.
    *
-   * @return
+   * @return The property for this editor.
    */
   protected AbstractQuantity<?> property() {
     return (AbstractQuantity<?>) fProperty;
   }
 
   /**
-   * Extrahiert aus dem String des Textfeldes den Wert und die Einheit. Wurde
-   * die Eingabe durch den Benutzer nicht korrekt getï¿½tigt, wird eine Exception
-   * ausgelï¿½st. In diesem Fall erfolgt keine ï¿½nderung des Attributs.
-   * Unterklassen kï¿½nnen diese Methode ï¿½berschreiben, um ein toleranteres
-   * Verhalten zu implementieren.
+   * Extracts the value and the unit from the text in the text field.
+   * If the text cannot be parsed, the property is not changed.
    *
-   * @param text
+   * @param text The text to extract the value and unit from.
    */
   protected void extractQuantity(String text) {
 

@@ -27,8 +27,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.elements.LocationModel;
 
 /**
- * LabeledLocationFigure: LocationFigure mit zugehörigem Label, das mit der
- * Figur bewegt wird.
+ * {@link LocationFigure} with a label.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -91,10 +90,6 @@ public class LabeledLocationFigure
   @Override
   public Collection<Action> getActions(Point2D.Double p) {
     LinkedList<Action> editOptions = new LinkedList<>();
-//    editOptions.add(new CutAction());
-//    editOptions.add(new CopyAction());
-//    editOptions.add(new PasteAction());
-//    editOptions.add(new DuplicateAction());
 
     return editOptions;
   }
@@ -150,7 +145,7 @@ public class LabeledLocationFigure
     getPresentationFigure().propertiesChanged(event);
 
     invalidate();
-    // Auch das Label aktualisieren
+    // also update the label.
     fireFigureChanged();
   }
 
@@ -169,7 +164,7 @@ public class LabeledLocationFigure
     }
 
     invalidate();
-    // Auch das Label aktualisieren
+    // also update the label.
     fireFigureChanged();
   }
 
@@ -180,16 +175,12 @@ public class LabeledLocationFigure
     LocationModel model = lf.getModel();
     CoordinateProperty cpx = model.getPropertyModelPositionX();
     CoordinateProperty cpy = model.getPropertyModelPositionY();
-    // Schreibt die aktuellen Modell-Koordinaten in die Properties
     if ((double) cpx.getValue() == 0.0 && (double) cpy.getValue() == 0.0) {
-      // Koordinaten nur einmal beim Erzeugen aus Layout übernehmen
       origin.calculateRealPosition(lf.center(), cpx, cpy);
       cpx.markChanged();
       cpy.markChanged();
     }
-    // Schreibt die aktuellen Layout-Koordinaten in die Properties
     ZoomPoint zoomPoint = lf.getZoomPoint();
-    // Wenn die Figure gerade gelöscht wurde, kann der Origin schon null sein
     if (zoomPoint != null && origin != null) {
       StringProperty lpx = model.getPropertyLayoutPositionX();
       int oldX = 0;
@@ -230,11 +221,11 @@ public class LabeledLocationFigure
       }
 
     }
-    // Immer den Typ aktualisieren
+    // update the type.
     model.getPropertyType().markChanged();
 
     model.propertiesChanged(this);
-    // Auch das Label aktualisieren
+    // also update the label.
     fireFigureChanged();
   }
 }

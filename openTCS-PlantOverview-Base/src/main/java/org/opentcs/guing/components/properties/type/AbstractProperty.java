@@ -10,9 +10,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierung für ein Property. Stellt Methoden bereit, um die
- * Veränderbarkeit eines Attributs und die Sichtbarkeit eingestellt werden kann.
- * Außerdem ist die Verwaltung eines Hilfstextes zu dem Attribut implementiert.
+ * Base implementation for a property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

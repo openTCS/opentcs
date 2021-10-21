@@ -42,17 +42,9 @@ import org.opentcs.guing.util.ModelComponentFactory;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Standardimplementierung des Datenmodells des gesamten modellierten Systems.
- * Besteht aus den Batterien, den Transportgütern, den Fahrzeugtypen mit ihren
- * Fahrzeugen und dem Fahrkurslayout. Das Systemmodell verwaltet zusätzlich zu
- * seinen Kindelementen eine Hastable mit den Komposita-Komponenten, die
- * unbedingt vorhanden sein müssen. Die Applikation als Klient fragt das
- * Systemmodell dann nach einer bestimmten Komponente (z.B. der für die
- * Transportgüter), um herauszufinden, wo ein neu erzeugtes Transportgut
- * abgelegt werden kann.
- * <p>
- * <b>Entwurfsmuster:</b> Kompositum.
- * StandardSystemModel ist ein konkretes Kompositum.
+ * Base implementation for a SystemModel.
+ * Holds the vehicles and the layout of the model. The SystemModel has a map of base components
+ * for each component type (e.g. points, locations, vehicles, ...).
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -61,14 +53,13 @@ class StandardSystemModel
     implements SystemModel {
 
   /**
-   * Die Hashtable mit Zuordnungen zwischen Strings und den Hauptkomponenten des
-   * Modells.
+   * A Map that represents the main folder of the system model.
+   * Maps a folder key to the main model component for that folder.
    */
   private final Map<FolderKey, ModelComponent> fMainFolders = new HashMap<>();
   /**
-   * Enthält Zuordnungen zwischen den Hauptordnern des Modells und
-   * Class-Objekten von ModelComponent-Objekten. Hierdurch ist praktisch
-   * konfigurierbar, welche ModelComponent-Objekte in welchen Ordner gehören.
+   * Maps a model component class to a main folder component.
+   * Practically determines which folder a model component belongs to.
    */
   private final Map<Class<?>, ModelComponent> fParentFolders = new HashMap<>();
   /**
@@ -76,11 +67,11 @@ class StandardSystemModel
    */
   private final Map<ModelComponent, Figure> figuresMap = new HashMap<>();
   /**
-   * Die Zeichnung.
+   * The drawing.
    */
   private final Drawing fDrawing = new DefaultDrawing();
   /**
-   * Die für das Modell verwendete Zeichenmethode.
+   * The used drawing method.
    */
   private final DrawingMethod fDrawingMethod = new CoordinateBasedDrawingMethod();
 
@@ -327,10 +318,10 @@ class StandardSystemModel
   }
 
   /**
-   * Liefert rekursiv alle Komponenten in dem Ordner.
+   * Return all model components in a folder.
    *
-   * @param folder der Ordner
-   * @return alle Elemente in dem Ordner
+   * @param folder The folder of which to get the components from.
+   * @return A list of all model components in that folder.
    */
   private List<ModelComponent> getAll(CompositeModelComponent folder) {
     List<ModelComponent> result = new LinkedList<>();
@@ -361,10 +352,7 @@ class StandardSystemModel
   }
 
   /**
-   * Erstellt die unveränderlichen Hauptordner des TreeViews. Hauptordner
-   * existieren immer, auch wenn es sonst keine Komponenten im Systemmodell
-   * gibt. Hauptordner sollen allein durch Nutzereingaben nicht gelöscht werden
-   * können.
+   * Creates the main folder in the system model.
    */
   private void createMainFolders() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
@@ -422,8 +410,7 @@ class StandardSystemModel
   }
 
   /**
-   * Erzeugt einen Hauptordner, der sowohl dem TreeView als auch dem
-   * Systemmodell hinzugefügt wird.
+   * Creates a folder for the system model and the TreeView.
    */
   private void createMainFolder(ModelComponent parentFolder,
                                 FolderKey key,
@@ -433,8 +420,7 @@ class StandardSystemModel
   }
 
   /**
-   * Initialisiert die Zuordnungen zwischen ModelComponent-Ordnern und
-   * ModelComponent-Inhalten anhand von Class-Objekten.
+   * Initialises the association between a main folder and a model component class.
    */
   private void setupParentFolders() {
     fParentFolders.put(VehicleModel.class, getMainFolder(FolderKey.VEHICLES));

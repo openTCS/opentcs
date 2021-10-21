@@ -8,14 +8,9 @@
 package org.opentcs.guing.components.properties.type;
 
 /**
- * Interface für Attribute. Die Attribute arbeiten als Wrapper, d.h. sie
- * erlauben den Zugriff auf ihre Daten, ohne dabei jedoch ein neues
- * Attribut-Objekt zu erzeugen. Die Datentypen String, Boolean, Integer usw.
- * bieten dieses nicht, so dass die Veränderung eines Attributs zu einem neuen
- * Attribut führen würde. Ergebnis wäre das ständige Setzen der Attribute im
- * Datenobjekt.
- * Vorteil der hier eingesetzten Methode ist, dass das Attribut-Objekt selbst
- * stets dasselbe bleibt, dessen Inhalt sich jedoch ändern lässt.
+ * Interface for properties.
+ * Wraps a type into a property to be able to change a value without creating a new object.
+ * The property object stays the same while the value changes.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -24,8 +19,7 @@ public interface Property
             Cloneable {
 
   /**
-   * Übernimmt die Werte von dem übergebenen Attribut. Die Eigenschaften
-   * Visibility, Editable usw. werden jedoch nicht übernommen.
+   * Copies the value of the property into this property.
    *
    * @param property The property.
    */
@@ -39,7 +33,7 @@ public interface Property
   Object getComparableValue();
 
   /**
-   * Klont das Property.
+   * Creates a copy of this property.
    *
    * @return The cloned property.
    */

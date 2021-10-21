@@ -20,12 +20,7 @@ import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Die Repräsentation eines Figure-Objekts in der Baumansicht. Korrekter wäre
- * es, wenn FigureUserObject nicht FigureUserObject hieße, sondern
- * FigureComponentUserObject, denn es fungiert als Stellvertreter für ein
- * FigureComponent-Objekt und nicht für ein Figure-Objekt.
- * <p>
- * <b>Entwurfsmuster:</b> Befehl. FigureUserObject ist ein konkreter Befehl.
+ * Represents a Figure component in the TreeView.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

@@ -14,11 +14,7 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.MultipleDifferentValues;
 
 /**
- * Ein CellRenderer für Attribute vom Typ {
- *
- * @see BooleanProperty}. Ein solches Attribut wird nicht durch einen Text
- * dargestellt, sondern durch ein Kästchen mit einem Häkchen (abhängig vom
- * Zustand des Attributs). Zum Einsatz kommt daher eine Checkbox.
+ * A cell renderer for a boolean property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -27,7 +23,7 @@ public class BooleanPropertyCellRenderer
     implements javax.swing.table.TableCellRenderer {
 
   /**
-   * Creates a new instance of BooleanCellRenderer
+   * Creates a new instance of BooleanCellRenderer.
    */
   public BooleanPropertyCellRenderer() {
     super();

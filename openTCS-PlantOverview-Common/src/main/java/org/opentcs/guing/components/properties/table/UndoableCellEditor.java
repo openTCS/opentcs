@@ -18,7 +18,7 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
- * Ein Undo-Umwickler für CellEditoren.
+ * A cell editor wrapped in an undo manager.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -27,15 +27,15 @@ public class UndoableCellEditor
     implements javax.swing.table.TableCellEditor {
 
   /**
-   * Der Undo-Manager.
+   * The undo manager.
    */
   protected UndoRedoManager fUndoRedoManager;
   /**
-   * Der eigentliche CellEditor.
+   * The actual cell editor.
    */
   protected TableCellEditor fWrappedCellEditor;
   /**
-   * Das Undo.
+   * The undo activity.
    */
   protected PropertyUndoActivity fUndoActivity;
 
@@ -50,19 +50,18 @@ public class UndoableCellEditor
   }
 
   /**
-   * Setzt den Undo-Manager.
+   * Set the undo manager.
    *
-   * @param undoManager
+   * @param undoManager the undo manager.
    */
   public void setUndoManager(UndoRedoManager undoManager) {
     fUndoRedoManager = undoManager;
   }
 
   /**
-   * Setzt den Dialog, mit dessen Hilfe der Eigenschaftswert komfortabel
-   * bearbeitet werden kann.
+   * Sets the details dialog that is used to edit the property.
    *
-   * @param detailsDialog
+   * @param detailsDialog the details dialog that is used to edit the property.
    */
   public void setDetailsDialog(DetailsDialog detailsDialog) {
     if (fWrappedCellEditor instanceof AbstractPropertyCellEditor) {
@@ -80,8 +79,9 @@ public class UndoableCellEditor
   }
 
   /**
+   * Returns the actual cell editor.
    *
-   * @return
+   * @return the actual cell editor.
    */
   public TableCellEditor getWrappedCellEditor() {
     return fWrappedCellEditor;

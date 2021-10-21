@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
- * Basisimplementierung für Dialog- und Registerkarteninhalte.
+ * Base implementation for a dialog and tab content.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -19,26 +19,23 @@ public abstract class DialogContent
     extends JPanel {
 
   /**
-   * Der Titel der Komponente, wenn sie in einem Dialog angezeigt wird.
+   * Title of the component in a dialog.
    */
   protected String fDialogTitle;
   /**
-   * Der Titel der Komponente, wenn sie in einer Registerkarte angezeigt wird.
+   * Title of the component in a tab.
    */
   protected String fTabTitle;
   /**
-   * Zeigt an, ob das Übernehmen der Werte aus den Bedienelementen fehlgeschlagen ist.
+   * Indicates that the update of the value has failed.
    */
   protected boolean updateFailed;
   /**
-   * Zeigt an, ob der Dialog, der diese Komponente enthält, modal sein soll oder
-   * nicht. Der Standardwert ist
-   * <code>
-   * true</code>.
+   * Whether or not this dialog is modal.
    */
   protected boolean fModal;
   /**
-   * Der Dialog, in den dieser Inhalt eingebettet ist.
+   * Parent dialog where this content is added to.
    */
   protected StandardContentDialog fDialog;
 
@@ -50,101 +47,91 @@ public abstract class DialogContent
   }
 
   /**
-   * Liefert die Komponente.
+   * Returns the component.
    *
-   * @return die Komponente
+   * @return The component of this dialog.
    */
   public JComponent getComponent() {
     return this;
   }
 
   /**
-   * Vermerkt den Wunsch, in einem modalen bzw. nicht modalen Dialog angezeigt
-   * zu werden.
+   * Sets the dialog to be modal.
    *
-   * @param modal ist
-   * <code>true</code>, wenn die Komponente in einem modalen Dialog angezeigt
-   * werden möchte
+   * @param modal true if the dialog should be modal.
    */
   public final void setModal(boolean modal) {
     fModal = modal;
   }
 
   /**
-   * Zeigt an, ob die Komponente in einem modalen bzw. nicht modalen Dialog
-   * angezeigt werden möchte.
-   *
-   * @return
-   * <code>true</code>, wenn die Komponente in einem modalen Dialog angezeigt
-   * werden möchte
+   * Returns whether or not the component is modal.
+   * 
+   * @return Whether or not the component is modal.
    */
   public boolean getModal() {
     return fModal;
   }
 
   /**
-   * Liefert den Titel der Komponente, falls sie in einer Registerkarte
-   * angezeigt wird.
+   * Returns the title for a tab.
    *
-   * @return den Registerkartentitel
+   * @return The title for a tab.
    */
   public String getTabTitle() {
     return fTabTitle;
   }
 
   /**
-   * Liefert den Titel des Dialogs, der diese Komponente anzeigt.
+   * Returns the title for a dialog.
    *
-   * @return den Dialogtitel
+   * @return The title for a dialog.
    */
   public String getDialogTitle() {
     return fDialogTitle;
   }
 
   /**
-   * Setzt den Titel des Dialogs, der diese Komponente anzeigt.
+   * Set the title for a dialog.
    *
-   * @param title der Titel
+   * @param title The new title for a dialog.
    */
   protected void setDialogTitle(String title) {
     fDialogTitle = title;
   }
 
   /**
-   * Setzt den Titel der Registerkarte, der diese Komponente anzeigt.
+   * Set the title for a tab.
    *
-   * @param title der Titel
+   * @param title The new title for a tab.
    */
   protected void setTabTitle(String title) {
     fTabTitle = title;
   }
 
   /**
-   * Benachrichtigt den registrierten Listener, dass der Dialoginhalt gern
-   * möchte, dass sein Dialog geschlossen wird.
+   * Notifies the registered listeners that the dialog would like to close.
    */
   protected void notifyRequestClose() {
     fDialog.requestClose();
   }
 
   /**
-   * Zeigt an, ob das Übernehmen der Werte aus den Bedienelementen
-   * fehlgeschlagen ist.
+   * Returns whether or not the update of the UI elements failed.
    *
-   * @return
-   * <code> true </code>, wenn ein Fehler aufgetreten ist
+   * @return true if the update failed.
    */
   public boolean updateFailed() {
     return updateFailed;
   }
 
   /**
-   * Initialisiert die Dialogelemente.
+   * Initialises the dialog elements.
    */
   public abstract void initFields();
 
   /**
-   * Übernimmt die Werte aus den Dialogelementen.
+   * Updates the values from the dialog elements.
    */
   public abstract void update();
 }

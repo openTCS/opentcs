@@ -25,10 +25,8 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.util.event.EventHandler;
 
 /**
- * Der TreeViewManager spielt die Rolle einer Schnittstelle zwischen Applikation
- * und TreeView. Dadurch wird Code aus der Applikation ausgelagert. Der
- * TreeViewManager leitet Aufgaben der Applikation an den TreeView weiter.
- * Umgekehrt gibt es jedoch keinen Kommunikationsweg.
+ * The tree view manager is the interface between the application and the TreeView.
+ * It passes actions on to the TreeView.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see TreeView
@@ -178,10 +176,9 @@ public abstract class TreeViewManager
   }
 
   /**
-   * Erstellt die Baumansicht für die übergebene Komponente des Systemmodells.
-   * Dieser Aufruf ergeht dann rekursiv an alle Kindkomponenten.
+   * Creates the tree view from the specified model component.
    *
-   * @param component
+   * @param component The component to restore.
    */
   public void restoreTreeView(ModelComponent component) {
     restoreTreeViewRecursively(null, component);
@@ -196,46 +193,44 @@ public abstract class TreeViewManager
   }
 
   /**
-   * Fügt dem TreeView ein Item hinzu.
+   * Add an item to the TreeView.
    *
-   * @param parent das Elternobjekt
-   * @param item das hinzuzufügende Element
+   * @param parent The parent item to add to.
+   * @param item The item to add.
    */
   public abstract void addItem(Object parent, ModelComponent item);
 
   /**
-   * Teilt dem TreeView mit, dass sich ein Item geändert hat, welches also
-   * aktualisiert werden müsste.
+   * Notifies the TreeView that the item has changed.
    *
-   * @param item
+   * @param item the item that was changed.
    */
   public void itemChanged(Object item) {
     fTreeView.itemChanged(item);
   }
 
   /**
-   * Teilt dem TreeView mit, dass es ein bestimmtes Item löschen soll.
+   * Notifies the TreeView that an item has been deleted.
    *
-   * @param item
+   * @param item The item that has been deleted.
    */
   public void removeItem(Object item) {
     fTreeView.removeItem(item);
   }
 
   /**
-   * Teilt dem TreeView mit, dass alle Kindelemente eines bestimmtes Items
-   * gelöscht werden sollen. Das übergebene Item wird jedoch nicht entfernt.
+   * Notifies the TreeView that all child elements of the specified element should be deleted.
    *
-   * @param item
+   * @param item The item of which to delete its children.
    */
   public void removeChildren(Object item) {
     fTreeView.removeChildren(item);
   }
 
   /**
-   * Selektiert ein Item im TreeView.
+   * Select an item in the TreeView.
    *
-   * @param component
+   * @param component The component to select.
    */
   public void selectItem(ModelComponent component) {
     if (component != null && component.isTreeViewVisible()) {

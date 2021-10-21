@@ -65,7 +65,6 @@ public class TransportOrdersDocument {
   public String toXml() {
     StringWriter stringWriter = new StringWriter();
     try {
-      // Als XML in eine Datei schreiben.
       JAXBContext jc = JAXBContext.newInstance(TransportOrdersDocument.class);
       Marshaller marshaller = jc.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

@@ -13,22 +13,9 @@ import javax.swing.JPopupMenu;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein UserObject hat die Funktion eines Stellvertreters für ein Datenobjekt
- * (ModelComponent) im TreeView. Es kennt sein Datenobjekt und ist dafür
- * zuständig, Aktionen des Nutzer wie Selektieren, Löschen, Doppelklicken usw.
- * auszuwerten. In der Regel wird es jeweils eine bestimmte Methode der
- * Applikation aufrufen, in der dann das Ereignis behandelt wird. <br> Neben der
- * Auswertung von Nutzereingaben kann ein UserObject ein Popup-Menü sowie ein
- * Icon bereitstellen. <br> Im TreeView sind prinzipiell alle Objekte vom Typ
- * DefaultMutableTreeNode. Ein DefaultMutableTreeNode besitzt eine Referenz auf
- * ein UserObject. Der TreeView kennt bei einer Aktion des Nutzers nur den
- * DefaultMutableTreeNode, auf dem die Aktion ausgeführt wurde. Dadurch, dass
- * aber jeder DefaultMutableTreeNode ein UserObject besitzt, können auf dem
- * UserObject die jeweiligen Aktionen ausgeführt werden.
- * <p>
- * <b>Entwurfsmuster:
- * </b>Befehl. UserObject ist der abstrakte Befehl. Klient ist der TreeView und
- * Empfänger ist die Applikation.
+ * A UserObject has the purpose of representing a model component in the TreeView.
+ * It manages its model component and is responsible for executing user interactions e.g. selecting,
+ * deleting, double clicking.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see ModelComponent
@@ -36,52 +23,49 @@ import org.opentcs.guing.model.ModelComponent;
 public interface UserObject {
 
   /**
-   * Liefert das gekapselte Datenobjekt (ModelComponent).
+   * Returns the wrapped model component.
    *
-   * @return
+   * @return the wrapped model component.
    */
   ModelComponent getModelComponent();
 
   /**
-   * Liefert ein passendes Popup-Menü.
+   * Return the popup menu for the model component.
    *
-   * @return
+   * @return the popup menu for the model component.
    */
   JPopupMenu getPopupMenu();
 
   /**
-   * Liefert das zugehörige Icon.
+   * Return the icon for this user object.
    *
-   * @return
+   * @return the icon for this user object.
    */
   ImageIcon getIcon();
 
   /**
-   * Wird aufgerufen, wenn das Objekt im Baum selektiert wurde.
+   * Is called when the object is selected in the tree view.
    */
   void selected();
 
   /**
-   * Wird aufgerufen, wenn das Objekt aus dem Baum entfernt wurde (aufgrund
-   * einer Nutzereingabe).
+   * Is called when this object is removed from the tree view.
    *
    * @return
    */
   boolean removed();
 
   /**
-   * Wird aufgerunfen, wenn das Objekt in der Baumansicht mit der rechten
-   * Maustaste angeklickt wird.
+   * Is called when the object was right clicked in the tree view.
    *
    * @param component
-   * @param x
-   * @param y
+   * @param x X position of the mouse click.
+   * @param y Y position of the mouse click.
    */
   void rightClicked(JComponent component, int x, int y);
 
   /**
-   * Wird aufgerufen, wenn das Objekt in der Baumansicht doppelt angeklickt
-   * wird.
+   * Is called when the object is double clicked in the tree view.
    */
   void doubleClicked();
 

@@ -19,15 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Der Ursprung des Koordinatensystems. Er ist sozusagen das Modell zur {
- *
- * @see OriginFigure}. Er kennt die Ausdehnung der Zeichnung in m, mm oder cm
- * und er kennt das gewï¿½nschte Koordinatensystem. Anhand des Koordinatensystems
- * kann die reale Position von anderen Figures berechnet werden (Umrechnung von
- * Pixel in eine Lï¿½ngeneinheit).
- * <p>
- * Die aktuelle Position des Ursprungs in
- * Pixel wird durch die OriginFigure bestimmt.
+ * The origin of the coordinate system. Represents the current scale, coordinate system and
+ * position of the origin on the screen.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -42,28 +35,27 @@ public final class Origin {
    */
   public static final double DEFAULT_SCALE = 50.0;
   /**
-   * Soviele mm entsprechen einem Pixel in waagerechter Richtung.
+   * Amount of mm to equal one pixel on screen in horizontal direction.
    */
   private double fScaleX = DEFAULT_SCALE;
   /**
-   * Soviele mm entsprechen einem Pixel in senkrechter Richtung.
+   * Amount of mm to equal one pixel on screen in horizontal direction.
    */
   private double fScaleY = DEFAULT_SCALE;
   /**
-   * Die aktuelle Position in Pixel.
+   * Current position in pixels.
    */
   private Point fPosition;
   /**
-   * Das Koordinatensystem.
+   * The coordinate system.
    */
   private CoordinateSystem fCoordinateSystem;
   /**
-   * Liste aller Objekte, die an einer ï¿½nderung des Referenzpunktes interessiert
-   * sind.
+   * List of {@link OriginChangeListener}.
    */
   private final Set<OriginChangeListener> fListeners = new HashSet<>();
   /**
-   * Die grafische Darstellung des Ursprungs.
+   * Graphical figure to represent the origin.
    */
   private final OriginFigure fFigure = new OriginFigure();
 
@@ -76,8 +68,7 @@ public final class Origin {
   }
 
   /**
-   * Setzt die Werte der Millimeter pro Pixel. Diese Werte kï¿½nnen sich mit jedem
-   * Zoom ï¿½ndern.
+   * Set the scale in millimeter per pixel.
    */
   public void setScale(double scaleX, double scaleY) {
     if (fScaleX == scaleX && fScaleY == scaleY) {
@@ -89,25 +80,25 @@ public final class Origin {
   }
 
   /**
-   * Liefert die Millimeter pro Pixel waagrecht.
+   * Return the millimeter per pixel in horizontal direction.
    *
-   * @return den Wert
+   * @return the millimeter per pixel in horizontal direction.
    */
   public double getScaleX() {
     return fScaleX;
   }
 
   /**
-   * Liefert die Millimeter pro Pixel senkrecht.
+   * Return the millimeter per pixel in vertical direction.
    *
-   * @return den Wert
+   * @return the millimeter per pixel in vertical direction.
    */
   public double getScaleY() {
     return fScaleY;
   }
 
   /**
-   * Setzt das Koordinatensystem.
+   * Set the coordinate system.
    */
   public void setCoordinateSystem(CoordinateSystem coordinateSystem) {
     fCoordinateSystem = coordinateSystem;
@@ -115,27 +106,29 @@ public final class Origin {
   }
 
   /**
-   * Setzt die aktuelle Position des Ursprungs in Pixel.
+   * Set the position of the origin.
    *
-   * @param position die Position
+   * @param position the position of the origin.
    */
   public void setPosition(Point position) {
     fPosition = position;
   }
 
   /**
-   * Liefert die aktuelle Position des Referenzpunktes in Pixel.
+   * Return the current position of the origin.
    *
-   * @return die Position
+   * @return the current position of the origin.
    */
   public Point getPosition() {
     return fPosition;
   }
 
   /**
-   * Wandelt echte Koordinaten in Pixelkoordinaten um. Die echten Koordinaten
-   * gibt der Benutzer durch ï¿½ndern der Attribute vor. Daraufhin muss berechnet
-   * werden, an welche Position in Pixel das entsprechende Figure zu setzen ist.
+   * Translates the real coordinate into pixel coordinates.
+   *
+   * @param xReal The real x position.
+   * @param yReal The real y position.
+   * @return A point with the pixel position.
    */
   public Point calculatePixelPosition(LengthProperty xReal, LengthProperty yReal) {
     Point2D pixelExact = calculatePixelPositionExactly(xReal, yReal);
@@ -144,13 +137,11 @@ public final class Origin {
   }
 
   /**
-   * Wandelt echte Koordinaten in Pixelkoordinaten um. Die echten Koordinaten
-   * gibt der Benutzer durch ï¿½ndern der Attribute vor. Daraufhin muss berechnet
-   * werden, an welche Position in Pixel das entsprechende Figure zu setzen ist.
+   * Translates the real coordinate into pixel coordinates with double precision.
    *
-   * @param xReal
-   * @param yReal
-   * @return Die exakte Pixelposition.
+   * @param xReal The real x position.
+   * @param yReal The real y position.
+   * @return A point with the pixel position with double precision.
    */
   public Point2D calculatePixelPositionExactly(LengthProperty xReal, LengthProperty yReal) {
     Point2D realPosition = new Point2D.Double(
@@ -162,6 +153,14 @@ public final class Origin {
     return pixelPosition;
   }
 
+  /**
+   * Translates the real coordinate into pixel coordinates with double precision from
+   * string properties.
+   *
+   * @param xReal The real x position.
+   * @param yReal The real y position.
+   * @return A point with the pixel position with double precision.
+   */
   public Point2D calculatePixelPositionExactly(StringProperty xReal, StringProperty yReal) {
     try {
       double xPos = Double.parseDouble(xReal.getText());
@@ -178,15 +177,13 @@ public final class Origin {
   }
 
   /**
-   * Wandelt Pixelkoordinaten in echte Koordinaten um. Der Benutzer verschiebt
-   * ein Figure. Diese neue Position in Pixel muss nun in reale Koordinaten
-   * umgerechnet werden.
+   * Translates a pixel position into a real position and write to the length properties.
    *
-   * @param pixelPosition die Position des Figures in Pixeln
-   * @param xReal das Lï¿½ngenattribut fï¿½r die x-Achse, in welches der errechnete
-   * reale Wert geschrieben wird
-   * @param yReal das Lï¿½ngenattribut fï¿½r die y-Achse, in welches der errechnete
-   * reale Wert geschrieben wird
+   *
+   * @param pixelPosition The pixel position to convert.
+   * @param xReal The length property to write the x position to.
+   * @param yReal The length property to write the y position to.
+   * @return A point with the pixel position with double precision.
    */
   public Point2D calculateRealPosition(Point pixelPosition, LengthProperty xReal,
                                        LengthProperty yReal) {
@@ -204,9 +201,10 @@ public final class Origin {
   }
 
   /**
+   * Translates a pixel position onto a real position.
    *
-   * @param pixelPosition
-   * @return
+   * @param pixelPosition The pixel position to convert.
+   * @return A point with the pixel position with double precision.
    */
   public Point2D calculateRealPosition(Point pixelPosition) {
     Point2D realPosition = fCoordinateSystem.toReal(fPosition, pixelPosition, fScaleX, fScaleY);
@@ -215,33 +213,36 @@ public final class Origin {
   }
 
   /**
-   * Fï¿½gt einen Beobachter hinzu.
+   * Add an origin change listener.
+   *
+   * @param l The origin change listener to add.
    */
   public void addListener(OriginChangeListener l) {
     fListeners.add(l);
   }
 
   /**
-   * Entfernt einen Beobachter.
+   * Remove an origin change listener.
+   *
+   * @param l The origin change listener to remove.
    */
   public void removeListener(OriginChangeListener l) {
     fListeners.remove(l);
   }
 
   /**
-   * Prï¿½ft, ob ein bestimmter Beobachter vorhanden ist.
    *
-   * @param l der zu prï¿½fende Boebachter
-   * @return
-   * <code> true </code>, wenn der Beobachter vorhanden ist
+   * Tests whether a specific origin change listener is registerd.
+   *
+   * @param l The origin change listener to test for.
+   * @return <code> true </code>, if the listener is registerd.
    */
   public boolean containsListener(OriginChangeListener l) {
     return fListeners.contains(l);
   }
 
   /**
-   * Informiert alle Beobachter, dass sich die Position des Referenzpunktes
-   * geï¿½ndert hat.
+   * Notifies all registered listeners that the position of the origin has changed.
    */
   public void notifyLocationChanged() {
     for (OriginChangeListener l : fListeners) {
@@ -250,7 +251,7 @@ public final class Origin {
   }
 
   /**
-   * Informiert alle Beobachter, dass sich der Maï¿½stab geï¿½ndert hat.
+   * Notifies all registered listeners that the scale has changed.
    */
   public void notifyScaleChanged() {
     for (OriginChangeListener l : fListeners) {
@@ -259,10 +260,9 @@ public final class Origin {
   }
 
   /**
-   * Liefert die grafische Reprï¿½sentation des Ursprungs.
+   * Return the graphical representation of the origin.
    *
-   * @return das {@link OriginFigure} als grafische Reprï¿½sentation des
-   * Referenzpunktes
+   * @return The graphical representation of the origin.
    */
   public OriginFigure getFigure() {
     return fFigure;

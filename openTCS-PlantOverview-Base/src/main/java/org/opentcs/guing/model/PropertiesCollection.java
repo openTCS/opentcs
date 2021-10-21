@@ -18,8 +18,7 @@ import org.opentcs.guing.components.properties.type.MultipleDifferentValues;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Erlaubt die gleichzeitige Änderung von gleichnamigen Attributen mehrerer
- * Modellkomponenten auf einmal.
+ * Allows to change properties with the same name of multiple model components at the same time.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -47,7 +46,7 @@ public class PropertiesCollection
   }
 
   /**
-   * Findet die Attribute heraus, die gemeinschaftlich bearbeitet werden können.
+   * Finds the properties that can be collectively edited.
    */
   private void extractSameProperties() {
     if (getChildComponents().isEmpty()) {
@@ -68,7 +67,6 @@ public class PropertiesCollection
 
       for (int i = 1; i < getChildComponents().size(); i++) {
         ModelComponent followingModel = getChildComponents().get(i);
-        // Typ der Modelle vergleichen - nur gleichartige Objekte sollen gemeinsam editierbar sein
         if (!firstModel.getClass().equals(followingModel.getClass())) {
           return;
         }
@@ -119,9 +117,7 @@ public class PropertiesCollection
   }
 
   /**
-   * Informiert alle registrierten Listener (Controller/Views) über die Änderung
-   * der Daten. Der Controller/View, der die Änderung verursacht hat, ruft diese
-   * Methode auf und übergibt sich dabei selbst.
+   * Notifies the registered listeners about the changed properties.
    *
    * @param listener The listener that initiated the property change.
    */
@@ -136,7 +132,7 @@ public class PropertiesCollection
   }
 
   /**
-   * Übernimmt alle Werte der hiesigen Attribute für das übergebene Modell.
+   * Copies the properties to the model component.
    *
    * @param model The model component to copy properties to.
    */

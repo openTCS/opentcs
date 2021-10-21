@@ -17,11 +17,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {
- *
- * @see StringProperty}. Der Editor umfasst ein Textfeld zur schnellen Eingabe
- * sowie den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs öffnet.
+ * A cell editor for a string property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -40,9 +36,9 @@ public class StringPropertyCellEditor
   }
 
   /**
-   * Konfiguriert das Aussehen des Textfeldes.
+   * Initialises the style of the text field.
    *
-   * @param textField
+   * @param textField the text field to style.
    */
   protected final void setStyle(JTextField textField) {
     setClickCountToStart(1);
@@ -78,9 +74,9 @@ public class StringPropertyCellEditor
   }
 
   /**
-   * Liefert das Attribut.
+   * Returns the property for this editor.
    *
-   * @return
+   * @return the property for this editor.
    */
   protected StringProperty property() {
     return (StringProperty) fProperty;

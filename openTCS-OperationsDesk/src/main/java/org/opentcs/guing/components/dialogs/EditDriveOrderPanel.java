@@ -23,7 +23,7 @@ import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Benutzeroberfläche zur Bearbeitung eines Fahrauftrags.
+ * Panel to edit a drive order.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -31,22 +31,22 @@ public class EditDriveOrderPanel
     extends DialogContent {
 
   /**
-   * Die zur Auswahl stehenden Stationen.
+   * Available locations.
    */
   private final List<LocationModel> fLocations;
   /**
-   * Die ausgewählte Station.
+   * The selected location.
    */
   private AbstractConnectableModelComponent fSelectedLocation;
   /**
-   * Die ausgewählte Aktion.
+   * Selected action.
    */
   private String fSelectedAction;
 
   /**
    * Creates new form EditDriveOrderPanel
    *
-   * @param locations die zur Auswahl stehenden Stationen
+   * @param locations available locations.
    */
   public EditDriveOrderPanel(List<LocationModel> locations) {
     initComponents();
@@ -58,9 +58,9 @@ public class EditDriveOrderPanel
   /**
    * Creates new form EditDriveOrderPanel
    *
-   * @param locations die zur Auswahl stehenden Stationen
-   * @param location die Station
-   * @param action die Aktion
+   * @param locations available locations.
+   * @param location selected location
+   * @param action selected action.
    */
   public EditDriveOrderPanel(List<LocationModel> locations,
                              AbstractConnectableModelComponent location, String action) {
@@ -76,10 +76,10 @@ public class EditDriveOrderPanel
   }
 
   /**
-   * Sortiert eine Liste mit Stationen anhand des Namens.
+   * Sorts a list of locations based on their name.
    *
-   * @param locations die zu sortierende Liste
-   * @return die sortierte Liste
+   * @param locations list of locations to sort.
+   * @return The list of sorted locations.
    */
   private List<LocationModel> sortLocations(List<LocationModel> locations) {
     Comparator<LocationModel> c = new Comparator<LocationModel>() {
@@ -121,9 +121,9 @@ public class EditDriveOrderPanel
   }
 
   /**
-   * Liefert die ausgewählte Station.
+   * Returns the selected location.
    *
-   * @return die ausgewählte Station
+   * @return The selected location
    */
   public Optional<LocationModel> getSelectedLocation() {
     int index = locationComboBox.getSelectedIndex();
@@ -131,9 +131,9 @@ public class EditDriveOrderPanel
   }
 
   /**
-   * Liefert die ausgewählte Aktion.
+   * Returns the selected action.
    *
-   * @return die ausgewählte Aktion
+   * @return The selected action.
    */
   public Optional<String> getSelectedAction() {
     return Optional.ofNullable((String) actionComboBox.getSelectedItem());
@@ -204,11 +204,9 @@ public class EditDriveOrderPanel
   // CHECKSTYLE:ON
 
   /**
-   * Aktualisiert den Inhalt der ComboBox mit den Aktionen. Wird aufgerufen,
-   * wenn in der ComboBox mit den Stationen ein anderes Element ausgewählt
-   * wurde.
+   * Updates the contents of the ComboBox with the allowed operations.
    *
-   * @param evt das auslösende Ereignis
+   * @param evt the event.
    */
   private void locationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboBoxActionPerformed
     DefaultComboBoxModel<String> model

@@ -34,8 +34,7 @@ import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * LabeledPointFigure: PointFigure mit zugehörigem Label, das mit der Figur
- * bewegt wird.
+ * {@link PointFigure} with a label.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -75,25 +74,7 @@ public class LabeledPointFigure
 
   @Override
   public Connector findConnector(Point2D.Double p, ConnectionFigure prototype) {
-//    double min = java.lang.Double.MAX_VALUE;
-//    Connector closest = null;
-//
-//    for (Connector c : connectors) {
-//      Point2D.Double p2 = Geom.center(c.getBounds());
-//      double d2 = Geom.length2(p.x, p.y, p2.x, p2.y);  // distance^2
-//
-//      if (d2 < min) {
-//        min = d2;
-//        closest = c;
-//
-////        if (min == 0.0) {
-////          break;
-////        }
-//      }
-//    }
-//
-//    return closest;
-    return (new ChopEllipseConnector(this));
+    return new ChopEllipseConnector(this);
   }
 
   @Override
@@ -116,11 +97,6 @@ public class LabeledPointFigure
   @Override
   public Collection<Action> getActions(Point2D.Double p) {
     LinkedList<Action> editOptions = new LinkedList<>();
-//    editOptions.add(new CutAction());
-//    editOptions.add(new CopyAction());
-//    editOptions.add(new PasteAction());
-//    editOptions.add(new DuplicateAction());
-
     return editOptions;
   }
 
@@ -133,7 +109,7 @@ public class LabeledPointFigure
   public boolean isVisible() {
     return getPresentationFigure().isVisible();
   }
-  
+
   @Override
   public void propertiesChanged(AttributesChangeEvent event) {
     if (event.getInitiator().equals(this)) {
@@ -163,7 +139,6 @@ public class LabeledPointFigure
     }
 
     invalidate();
-    // Auch das Label aktualisieren
     fireFigureChanged();
   }
 
@@ -174,16 +149,13 @@ public class LabeledPointFigure
     if (origin != null) {
       PointFigure pf = getPresentationFigure();
 
-//      getLabel().willChange();
       Point2D exact = origin.calculatePixelPositionExactly(pf.getModel().getPropertyLayoutPosX(),
                                                            pf.getModel().getPropertyLayoutPosY());
       Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
       setBounds(anchor, anchor);
-//      getLabel().changed();
     }
 
     invalidate();
-    // Auch das Label aktualisieren
     fireFigureChanged();
   }
 
@@ -194,16 +166,13 @@ public class LabeledPointFigure
     PointModel model = pf.getModel();
     CoordinateProperty cpx = model.getPropertyModelPositionX();
     CoordinateProperty cpy = model.getPropertyModelPositionY();
-    // Schreibt die aktuellen Modell-Koordinaten in die Properties
+    // Write current model position to properties once when creating the layout.
     if ((double) cpx.getValue() == 0.0 && (double) cpy.getValue() == 0.0) {
-      // Koordinaten nur einmal beim Erzeugen aus Layout übernehmen
       origin.calculateRealPosition(pf.center(), cpx, cpy);
       cpx.markChanged();
       cpy.markChanged();
     }
-    // Schreibt die aktuellen Layout-Koordinaten in die Properties
     ZoomPoint zoomPoint = pf.getZoomPoint();
-    // Wenn die Figure gerade gelöscht wurde, kann der Origin schon null sein
     if (zoomPoint != null && origin != null) {
       StringProperty lpx = model.getPropertyLayoutPosX();
 
@@ -243,14 +212,12 @@ public class LabeledPointFigure
       }
 
     }
-    // Immer den Typ aktualisieren
     model.getPropertyType().markChanged();
 
     model.propertiesChanged(this);
-    // Auch das Label aktualisieren
     fireFigureChanged();
   }
-  
+
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
     LinkedList<Handle> handles = new LinkedList<>();
@@ -258,16 +225,14 @@ public class LabeledPointFigure
     if (!isVisible()) {
       return handles;
     }
-    
+
     switch (detailLevel) {
       case -1: // Mouse Moved
         handles.add(new PointOutlineHandle(getPresentationFigure()));
         break;
 
       case 0:  // Mouse clicked
-        // 4 Rechteckige Move Handles in den Ecken der Figur
         MoveHandle.addMoveHandles(this, handles);
-        // 4 Rechteckige Move Handles in den Ecken des Labels
         for (Figure child : getChildren()) {
           MoveHandle.addMoveHandles(child, handles);
           handles.add(new DragHandle(child));
@@ -276,8 +241,6 @@ public class LabeledPointFigure
         break;
 
       case 1:  // Double-Click
-        // Blauer Rahemen + 8 kleine blaue Resize Handles an den Ecken und den Seiten der Figur
-        // TODO: Figur "springt" in die falsche Richtung!
         ResizeHandleKit.addResizeHandles(this, handles);
         break;
 

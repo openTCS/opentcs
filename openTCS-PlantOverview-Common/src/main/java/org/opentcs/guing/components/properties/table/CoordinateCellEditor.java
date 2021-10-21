@@ -16,11 +16,8 @@ import javax.swing.JTextField;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {CoordinateQuantity}.
- * Der Editor umfasst:
- * - ein Textfeld zur schnellen Eingabe
- * - den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs öffnet
+ * 
+ * A cell editor for a coordinate property.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */

@@ -8,8 +8,8 @@
 package org.opentcs.guing.components.drawing.course;
 
 /**
- * Eine Zeichenmethode, bei der die Position des Figures und die Realposition in
- * direktem Zusammenhang stehen und sich gegenseitig beeinflussen.
+ * A drawing method where the position of a figure and the real position are in relation 
+ * to each other.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Heinz Huber (Fraunhofer IML)
@@ -18,7 +18,7 @@ public class CoordinateBasedDrawingMethod
     implements DrawingMethod {
 
   /**
-   * Der Referenzpunkt.
+   * The origin point.
    */
   protected Origin fOrigin;
 

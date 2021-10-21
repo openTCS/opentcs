@@ -175,7 +175,6 @@ public abstract class AbstractOpenTCSDrawingView
       if (model != null) {
         Origin origin = model.getDrawingMethod().getOrigin();
         OriginFigure originFigure = origin.getFigure();
-        // OriginFigure nur einmal zuf�gen!
         if (!newValue.contains(originFigure)) {
           newValue.add(originFigure);
         }
@@ -251,7 +250,7 @@ public abstract class AbstractOpenTCSDrawingView
     // zoom.
     Rectangle2D.Double visibleViewRect = viewToDrawing(getVisibleRect());
     final int centerX = (int) (visibleViewRect.getCenterX() + 0.5);
-    final int centerY = (int) -(visibleViewRect.getCenterY() + 0.5);  // Vorzeichen!
+    final int centerY = (int) -(visibleViewRect.getCenterY() + 0.5);
     for (BitmapFigure bmFigure : bitmapFigures) {
       bmFigure.setScaleFactor(getScaleFactor(), newValue);
     }

@@ -37,7 +37,7 @@ public class KeyValueSetPropertyViewerEditorPanel
   private final ResourceBundleUtil resBundle
       = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
   /**
-   * Das zu bearbeitende Attribut.
+   * The property edited.
    */
   private KeyValueSetProperty fProperty;
 
@@ -83,7 +83,7 @@ public class KeyValueSetPropertyViewerEditorPanel
   }
 
   /**
-   * Sortiert die Schlüssel-Wert-Paare nach ihrem Schlüssel.
+   * Sorts the entries based on their keys.
    */
   protected void sortItems() {
     Map<String, String> items = new HashMap<>();

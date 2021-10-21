@@ -11,7 +11,7 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein grafisches Symbol.
+ * A property for a graphical symbol.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -19,9 +19,9 @@ public class SymbolProperty
     extends AbstractComplexProperty {
 
   /**
-   * Der Dateiname des grafischen Symbols.
+   * The location representation.
    */
-  private LocationRepresentation fFile;
+  private LocationRepresentation locationRepresentation;
 
   /**
    * Creates a new instance.
@@ -34,25 +34,25 @@ public class SymbolProperty
 
   @Override
   public Object getComparableValue() {
-    return fFile;
+    return locationRepresentation;
   }
 
   /**
-   * Setzt den Namen der Datei, welche das grafische Symbol enthält.
+   * Set the location representation for this property.
    *
-   * @param filename der Name der Bilddatei
+   * @param locationRepresentation The location representation.
    */
-  public void setLocationRepresentation(LocationRepresentation filename) {
-    fFile = filename;
+  public void setLocationRepresentation(LocationRepresentation locationRepresentation) {
+    locationRepresentation = locationRepresentation;
   }
 
   /**
-   * Liefert den Namen der Bilddatei mit dem grafischen Symbol.
+   * Returns the location representation for this property.
    *
-   * @return den Namen der Bilddatei
+   * @return The location representation.
    */
   public LocationRepresentation getLocationRepresentation() {
-    return fFile;
+    return locationRepresentation;
   }
 
   @Override // java.lang.Object
@@ -61,13 +61,13 @@ public class SymbolProperty
       return fValue.toString();
     }
 
-    return fFile == null ? "" : fFile.name();
+    return locationRepresentation == null ? "" : locationRepresentation.name();
   }
 
   @Override // AbstractProperty
   public void copyFrom(Property property) {
     SymbolProperty symbolProperty = (SymbolProperty) property;
-    symbolProperty.setValue(null); // Text "<different Values>" löschen
+    symbolProperty.setValue(null);
     setLocationRepresentation(symbolProperty.getLocationRepresentation());
   }
 }

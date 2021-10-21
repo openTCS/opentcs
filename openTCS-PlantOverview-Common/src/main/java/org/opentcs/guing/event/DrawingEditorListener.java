@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.event;
 
+import org.opentcs.guing.components.drawing.OpenTCSDrawingEditor;
+
 /**
  * An interface that has to be implemented by the application to receive
  * events from the <code>DrawingEditor</code>. Events are: figure added,
@@ -18,19 +20,10 @@ package org.opentcs.guing.event;
 public interface DrawingEditorListener {
 
   /**
-   * Listener-Methode, die aufgerufen wird, wenn ein Figure-Objekt im
-   * OpenTCSDrawingEditor durch eine Aktion des Benutzers hinzugefügt wurde.
-   * Gets called when a figure is added in the <code>OpenTCSDrawingEditor</code>
+   * Gets called when a figure is added in the {@link OpenTCSDrawingEditor}
    * by an action of the user.
    *
-   * TODO: Kommentar aktualisieren! HH 2014-02-27
-   * Hier können verschiedene Konstellationen auftreten:
-   * 1. das hinzugefügte Figure hat bereits einen ModelSwitcher
-   * (das ist bei einem Paste-Befehl der Fall)
-   * 2. das hinzugefügte Figure hat nur ein Model-Prototyp (Normalfall)
-   * 3. das hinzugefügte Figure hat gar nichts (z.B. TextFigure, OriginFigure)
-   *
-   * @param e
+   * @param e Event for when a figure is added to the OpenTCSDrawingEditor.
    */
   void figureAdded(DrawingEditorEvent e);
 
@@ -43,9 +36,7 @@ public interface DrawingEditorListener {
   void figureRemoved(DrawingEditorEvent e);
 
   /**
-   * Nachricht, dass im DrawingEditor ein Figure-Objekt selektiert wurde.
-   * Gets called when a figure was selected in the
-   * <code>OpenTCSDrawingEditor</code>.
+   * Gets called when a figure was selected in the {@link OpenTCSDrawingEditor}.
    *
    * @param e The fired event.
    */

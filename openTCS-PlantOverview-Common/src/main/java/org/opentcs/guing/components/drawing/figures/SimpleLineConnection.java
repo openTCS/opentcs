@@ -41,10 +41,8 @@ public abstract class SimpleLineConnection
       = new AttributeKey<>("FillColor", Color.class);
   protected static final AttributeKey<Color> STROKE_COLOR
       = new AttributeKey<>("StrokeColor", Color.class);
-  // Pfeil fï¿½r Vorwï¿½rtsfahrt: gefï¿½llt mit Stroke Color
   protected static final ArrowTip ARROW_FORWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, true);
-  // Pfeil fï¿½r Rï¿½ckwï¿½rtsfahrt: gefï¿½llt mit Fill Color
   protected static final ArrowTip ARROW_BACKWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, false);
   private static final Logger logger
@@ -61,8 +59,7 @@ public abstract class SimpleLineConnection
   }
 
   /**
-   * Wird aufgerufen, wenn das Figure gerade durch Klonen erzeugt wurde und
-   * erlaubt das Durchfï¿½hren von Initialisierungen.
+   * Initialise this figure.
    */
   protected final void initConnectionFigure() {
     updateDecorations();
@@ -74,8 +71,9 @@ public abstract class SimpleLineConnection
   }
 
   /**
+   * Return the shape.
    *
-   * @return
+   * @return the shape.
    */
   public Shape getShape() {
     return path;
@@ -83,7 +81,7 @@ public abstract class SimpleLineConnection
 
   @Override // BezierFigure
   protected BezierPath getCappedPath() {
-    // Workaround wegen NullPointerException in BezierFigure.getCappedPath()
+    // Workaround for NullPointerException in BezierFigure.getCappedPath()
     try {
       return super.getCappedPath();
     }
@@ -94,8 +92,7 @@ public abstract class SimpleLineConnection
   }
 
   /**
-   * Aktualisiert die Eigenschaften des Models. Wird z.B. aufgerufen, wenn sich
-   * der Maï¿½stab des Layout geï¿½ndert hat
+   * Update the properties of the model.
    */
   public abstract void updateModel();
 
@@ -146,7 +143,6 @@ public abstract class SimpleLineConnection
 
   @Override // LineConnectionFigure
   public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView drawingView) {
-    // TODO Do we need to override this method?
     return false;
   }
 
@@ -160,7 +156,6 @@ public abstract class SimpleLineConnection
 
   @Override // OriginChangeListener
   public void originLocationChanged(EventObject event) {
-    // ist fï¿½r Strecken uninteressant
   }
 
   @Override // OriginChangeListener
@@ -177,7 +172,6 @@ public abstract class SimpleLineConnection
       return clone;
     }
     catch (CloneNotSupportedException exc) {
-      // XXX Do something.
       throw new IllegalStateException("Unexpected exception encountered", exc);
     }
   }

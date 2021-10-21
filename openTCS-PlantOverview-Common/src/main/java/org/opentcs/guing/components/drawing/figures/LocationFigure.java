@@ -118,7 +118,6 @@ public class LocationFigure
 
   @Override  // Figure
   public void transform(AffineTransform tx) {
-    // TODO: Beim Draggen soll der Zoompoint immer auf das Raster des Gridconstrainers einrasten
     Point2D center = getZoomPoint().getPixelLocationExactly();
     setBounds((Point2D.Double) tx.transform(center, center), null);
   }
@@ -133,13 +132,11 @@ public class LocationFigure
 
   @Override // AbstractFigure
   public Connector findConnector(Point2D.Double p, ConnectionFigure prototype) {
-    // Location Figure hat nur einen Connector in der Mitte der Figur (?)
     return new ChopEllipseConnector(this);
   }
 
   @Override // AbstractFigure
   public Connector findCompatibleConnector(Connector c, boolean isStartConnector) {
-    // Location Figure hat nur einen Connector in der Mitte der Figur (?)
     return new ChopEllipseConnector(this);
   }
 

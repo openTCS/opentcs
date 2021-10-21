@@ -14,17 +14,7 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.StringProperty;
 
 /**
- * Interface für alle Komponenten des Systemmodells. Konkrete Implementierungen
- * sind entweder Komposita oder Blätter. Eine Komponente ist für folgende Dinge
- * zuständig:
- * - Bereitstellung einer JComponent (in der Regel eines JPanels), auf dem
- * die Eigenschaften der Komponente veränderbar sind
- * - Bereitstellung eines passenden UserObjects, das für die Anzeige der
- * Komponente im TreeView eingesetzt wird
- * - Verwaltung der Kindelemente, wenn es sich um ein Kompositum handelt
- * - Wiederherstellung des TreeViews nach dem Laden von der Festplatte
- *
- * <b>Entwurfsmuster:</b> Kompositum. ModelComponent ist die Komponente.
+ * Defines a component in the system model.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -32,11 +22,11 @@ public interface ModelComponent
     extends Cloneable {
 
   /**
-   * Der Schlüssel für das Namensattribut.
+   * Key for the name property.
    */
   String NAME = "Name";
   /**
-   * Der Schlüssel für sonstige Eigenschaften.
+   * Key for the miscellaneous properties.
    */
   String MISCELLANEOUS = "Miscellaneous";
 

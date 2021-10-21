@@ -22,10 +22,7 @@ import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.IconToolkit;
 
 /**
- * Ein Fahrzeug-Objekt in der Baumansicht.
- * <p>
- * <b>Entwurfsmuster:</b> Befehl.
- * VehicleUserObject ist ein konkreter Befehl.
+ * Represents a vehicle object in the TreeView.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

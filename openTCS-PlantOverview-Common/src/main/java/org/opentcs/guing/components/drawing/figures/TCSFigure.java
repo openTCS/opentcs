@@ -17,8 +17,7 @@ import org.opentcs.guing.model.DrawnModelComponent;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierung für Figures, die mit den Standardfunktionen von JHotDraw
- * nicht auskommen.
+ * Base implementation for figures.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
@@ -31,7 +30,7 @@ public abstract class TCSFigure
    */
   protected Rectangle fDisplayBox;
   /**
-   * Enthält die exakte Position des Mittelpunkts der Figur
+   * The exact position for the middle of the figure.
    */
   protected ZoomPoint fZoomPoint;
 
@@ -46,24 +45,25 @@ public abstract class TCSFigure
   }
 
   /**
-   * @return den Zoompunkt
+   * Returns the exact point at the middle of the figure.
+   *
+   * @return the exact point at the middle of the figure.
    */
   public ZoomPoint getZoomPoint() {
     return fZoomPoint;
   }
 
   /**
-   * Setzt den ZoomPunkt.
+   * Sets the zoom point.
    *
-   * @param zoomPoint Der Zoompunkt *
+   * @param zoomPoint The point at the middle of the figure.
    */
   public void setZoomPoint(ZoomPoint zoomPoint) {
     fZoomPoint = zoomPoint;
   }
 
   /**
-   * Wird beim Erzeugen eines neuen Grafik-Objekts mit dem Creation Tool
-   * aufgerufen. Dabei wird auch das zugehörige Modell ge-"cloned".
+   * Clones this figure, also clones the associated model component.
    *
    * @return
    */

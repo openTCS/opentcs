@@ -11,11 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Basisimplementierung für ein Kompositum im Systemmodell. Ein Kompositum
- * enthält eine Menge von Kindobjekten.
- * <p>
- * <b>Entwurfsmuster:</b> Kompositum.
- * CompositeModelComponent ist ein abstraktes Kompositum.
+ * Abstract implementation of a composite model component that holds a set of child components.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)

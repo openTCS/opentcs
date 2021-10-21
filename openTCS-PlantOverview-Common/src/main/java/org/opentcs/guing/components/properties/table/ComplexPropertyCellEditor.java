@@ -24,14 +24,7 @@ import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.type.AbstractComplexProperty;
 
 /**
- * Ein CellEditor für Attribute vom Typ {
- *
- * @see AbstractComplexProperty} sowie Unterklassen. Der Editor ist ein Button;
- * beim Anklicken öffnet sich sofort ein DetailsDialog. Einen Button mit drei
- * Punkten gibt es nicht extra. Das liegt daran, dass Attribute vom Typ {
- * @see AbstractComplexProperty} so speziell und mitunter komplex sind, dass
- * eine Bearbeitung mit einer ComboBox, einem Textfeld oder einer CheckBox in
- * aller Regel keinen Sinn macht.
+ * A cell editor for a complex property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -112,7 +105,6 @@ public class ComplexPropertyCellEditor
 
     if (detailsDialog.getReturnStatus() == StandardDetailsDialog.RET_OK) {
       stopCellEditing();
-//      fireEditingStopped(); // bewirkt nichts
     }
     else {
       cancelCellEditing();

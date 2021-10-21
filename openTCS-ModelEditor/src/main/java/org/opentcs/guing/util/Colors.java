@@ -30,7 +30,6 @@ public class Colors {
 
   public static final List<Color> defaultColors() {
     List<Color> colors = new ArrayList<>();
-    // Farbbezeichnungen aus CorelDraw-Palette
     colors.add(new Color(255, 0, 0));  // Rot
     colors.add(new Color(0, 0, 255));  // Blau
     colors.add(new Color(0, 255, 255));  // Cyan

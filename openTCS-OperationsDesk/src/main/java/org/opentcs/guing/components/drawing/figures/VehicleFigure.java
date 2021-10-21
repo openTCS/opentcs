@@ -210,8 +210,7 @@ public class VehicleFigure
     PointModel point = getModel().getPoint();
 
     if (point == null) {
-      // Vehicle nur zeichnen, wenn Point bekannt ist oder wenn Precise Position
-      // bekannt ist und nicht ignoriert werden soll.
+      // Only draw the vehicle if the point is known or the precise position is to be used.
       setVisible(!ignorePrecisePosition);
     }
     else {
@@ -234,8 +233,7 @@ public class VehicleFigure
     PointModel point = getModel().getPoint();
 
     if (point == null) {
-      // Vehicle nur zeichnen, wenn Point bekannt ist oder wenn Precise Position
-      // bekannt ist und nicht ignoriert werden soll.
+      // Only draw the vehicle if the point is known or the precise position is to be used.
       setVisible(!ignorePrecisePosition);
     }
     else {
@@ -289,12 +287,11 @@ public class VehicleFigure
 
   private void updateVehicleOrientation() {
     VehicleModel model = getModel();
-    // Winkelausrichtung:
-    // 1. Exakte Pose vom Fahrzeugtreiber gemeldet oder
-    // 2. Property des aktuellen Punktes oder
-    // 3. Zielrichtung zum nï¿½chsten Punkt oder
-    // 4. letzte Ausrichtung beibehalten
-    // ... oder beliebigen Nachbarpunkt suchen???
+    // orientation:
+    // 1. Use exact orientation from vehicle adapter.
+    // 2. Use orientation from current point.
+    // 3. Use direction to next point.
+    // 4. Use last known orientation.
     double angle = model.getOrientationAngle();
     PointModel currentPoint = model.getPoint();
 
@@ -314,8 +311,6 @@ public class VehicleFigure
         fAngle = angle;
       }
       else {
-        // Wenn fï¿½r diesen Punkt keine Winkelausrichtung spezifiziert ist,
-        // Winkel zum nï¿½chsten Zielpunkt bestimmen
         alignVehicleToNextPoint();
       }
     }
@@ -335,7 +330,7 @@ public class VehicleFigure
         connection = currentPoint.getConnectionTo(nextPoint);
       }
       else {
-        // Wenn es keinen Zielpunkt gibt, einen beliebigen (?) Nachbarpunkt zum aktuellen Punkt suchen
+        // No destination point, use a random point connected to the current point.
         connection = currentPoint.getConnections().stream()
             .filter(con -> con instanceof PathModel)
             .filter(con -> Objects.equals(con.getStartComponent(), currentPoint))
@@ -365,7 +360,6 @@ public class VehicleFigure
       Point2D.Double cp = bezierPath.get(0, BezierPath.C2_MASK);
       double dx = cp.getX() - cpf.getZoomPoint().getX();
       double dy = cp.getY() - cpf.getZoomPoint().getY();
-      // An die Tangente der Verbindungskurve ausrichten
       return Math.toDegrees(Math.atan2(-dy, dx));
     }
     else {
@@ -374,7 +368,6 @@ public class VehicleFigure
       PointFigure npf = nlpf.getPresentationFigure();
       double dx = npf.getZoomPoint().getX() - cpf.getZoomPoint().getX();
       double dy = npf.getZoomPoint().getY() - cpf.getZoomPoint().getY();
-      // Nach dem direkten Winkel ausrichten
       return Math.toDegrees(Math.atan2(-dy, dx));
     }
   }
@@ -393,8 +386,6 @@ public class VehicleFigure
     VehicleModel model = getModel();
     PointModel currentPoint = model.getPoint();
     Triple precisePosition = model.getPrecisePosition();
-    // Fahrzeug nur zeichnen, wenn es einem Punkt zugewiesen ist oder eine exakte
-    // Position gesetzt ist
     if (currentPoint != null || precisePosition != null) {
       drawFill(g2d);
     }
@@ -423,7 +414,7 @@ public class VehicleFigure
       g2d.setTransform(oldAF);
     }
     else {
-      // TODO: Rechteck als Umriss zeichnen
+      // TODO: Draw an outline, e.g. a rectangle.
     }
   }
 

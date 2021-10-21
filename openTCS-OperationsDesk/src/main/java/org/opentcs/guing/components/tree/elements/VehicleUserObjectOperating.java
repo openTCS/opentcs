@@ -17,10 +17,7 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 
 /**
- * Ein Fahrzeug-Objekt in der Baumansicht.
- * <p>
- * <b>Entwurfsmuster:</b> Befehl.
- * VehicleUserObject ist ein konkreter Befehl.
+ * A Vehicle in the tree view.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -49,7 +46,7 @@ public class VehicleUserObjectOperating
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
   }
 
-  @Override  // AbstractUserObject
+  @Override
   public JPopupMenu getPopupMenu() {
     return menuFactory.createVehiclePopupMenu(selectedVehicles);
   }

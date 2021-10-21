@@ -92,37 +92,30 @@ public class ToolBarManager
   private DragTool dragTool;
   /**
    * A button for creating points.
-   * Available in modelling mode only.
    */
   private final JPopupButton buttonCreatePoint;
   /**
    * A button for creating locations.
-   * Available in modelling mode only.
    */
   private final JToggleButton buttonCreateLocation;
   /**
    * A button for creating paths.
-   * Available in modelling mode only.
    */
   private final JPopupButton buttonCreatePath;
   /**
    * A button for creating location links.
-   * Available in modelling mode only.
    */
   private final JToggleButton buttonCreateLink;
   /**
    * A button for creating location types.
-   * Available in modelling mode only.
    */
   private final JButton buttonCreateLocationType;
   /**
    * A button for creating vehicles.
-   * Available in modelling mode only.
    */
   private final JButton buttonCreateVehicle;
   /**
    * A button for creating blocks.
-   * Available in modelling mode only.
    */
   private final JButton buttonCreateBlock;
 
@@ -161,13 +154,13 @@ public class ToolBarManager
 
     toolBarCreation.addSeparator();
 
-    // --- Create Point Figure (only in Modelling mode) ---
+    // --- Create Point Figure ---
     LabeledPointFigure lpf = crsObjFactory.createPointFigure();
     CreationTool creationTool = creationToolFactory.createCreationTool(lpf);
     buttonCreatePoint = pointToolButton(toolBarCreation, editor, creationTool);
     creationTool.setToolDoneAfterCreation(false);
 
-    // --- Create Location Figure (only in Modelling mode) ---
+    // --- Create Location Figure ---
     LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
     creationTool = creationToolFactory.createCreationTool(llf);
     buttonCreateLocation = addToolButton(toolBarCreation,
@@ -177,13 +170,13 @@ public class ToolBarManager
                                          ImageDirectory.getImageIcon("/toolbar/location.22.png"));
     creationTool.setToolDoneAfterCreation(false);
 
-    // --- Create Path Figure (only in Modelling mode) ---
+    // --- Create Path Figure ---
     PathConnection pc = crsObjFactory.createPathConnection();
     ConnectionTool connectionTool = creationToolFactory.createConnectionTool(pc);
     buttonCreatePath = pathToolButton(toolBarCreation, editor, connectionTool);
     connectionTool.setToolDoneAfterCreation(false);
 
-    // --- Create Link (only in Modelling mode) ---
+    // --- Create Link ---
     LinkConnection lc = crsObjFactory.createLinkConnection();
     connectionTool = creationToolFactory.createConnectionTool(lc);
     buttonCreateLink = addToolButton(toolBarCreation,
@@ -195,17 +188,17 @@ public class ToolBarManager
 
     toolBarCreation.addSeparator();
 
-    // --- Location Type: No Figure, just creates a tree entry (only in Modelling mode) ---
+    // --- Location Type: No Figure, just creates a tree entry ---
     buttonCreateLocationType = new JButton(actionMap.get(CreateLocationTypeAction.ID));
     buttonCreateLocationType.setText(null);
     toolBarCreation.add(buttonCreateLocationType);
 
-    // --- Create Vehicle Figure (only in Modelling mode) ---
+    // --- Create Vehicle Figure ---
     buttonCreateVehicle = new JButton(actionMap.get(CreateVehicleAction.ID));
     buttonCreateVehicle.setText(null);
     toolBarCreation.add(buttonCreateVehicle);
 
-    // --- Create Block (only in Modelling mode) ---
+    // --- Create Block ---
     buttonCreateBlock = new JButton(actionMap.get(CreateBlockAction.ID));
     buttonCreateBlock.setText(null);
     toolBarCreation.add(buttonCreateBlock);
@@ -215,17 +208,7 @@ public class ToolBarManager
     toolBarCreation.setName(labels.getString("toolBarManager.toolbar_drawing.title"));
     toolBarList.add(toolBarCreation);
 
-    // --- 2. ToolBar: Attributes ---
-    // TODO: Diesen Toolbar "später" wieder einfügen, sobald es freie Grafikelemente im Modell gibt
-    // Pick, Apply
-    // Color: Stroke, Fill, Text
-    // Stroke: Decoration, Width, Dashes, Type, Placement, Cap, Join
-    // Font: Font; Bold, Italic, Underline
-//    JToolBar toolBarAttributes = new JToolBar();
-//    ButtonFactory.addAttributesButtonsTo(toolBarAttributes, editor);
-//    toolBarAttributes.setName(labels.getString("toolBarManager.toolbar_attributes.title"));
-//    toolBarList.add(toolBarAttributes);
-    // --- 3. ToolBar: Alignment (nur im Modelling Mode) ---
+    // --- 3. ToolBar: Alignment ---
     // Align: West, East, Horizontal; North, South, Vertical
     // Move: West, East, North, South
     // Bring to front, Send to back

@@ -24,8 +24,7 @@ import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Grafische Benutzeroberfläche zur Bearbeitung eines Attributs, das ein
- * grafisches Symbol repreäsentiert.
+ * User interface to edit a symbol property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -35,11 +34,11 @@ public class SymbolPropertyEditorPanel
     implements DetailsDialogContent {
 
   /**
-   * Die Enum-Namen der Symbole.
+   * The possible symbols.
    */
   private final List<LocationRepresentation> fRepresentations = new ArrayList<>();
   /**
-   * Die Symbole.
+   * The symbol.
    */
   private final List<ImageIcon> fSymbols = new ArrayList<>();
   /**
@@ -47,11 +46,11 @@ public class SymbolPropertyEditorPanel
    */
   private final LocationTheme locationTheme;
   /**
-   * Der Index des angezeigten Symbols.
+   * The index of the selected symbols.
    */
   private int fIndex;
   /**
-   * Das Attribut.
+   * The property.
    */
   private SymbolProperty fProperty;
 
@@ -112,7 +111,7 @@ public class SymbolPropertyEditorPanel
   }
 
   /**
-   * Aktualisiert die Ansicht.
+   * Updates the view.
    */
   private void updateView() {
     fSymbols.clear();
@@ -207,11 +206,6 @@ public class SymbolPropertyEditorPanel
     add(removeButton, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
 
-  /**
-   * Blättert weiter zum nächsten Symbol.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void nextSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSymbolButtonActionPerformed
       if (fIndex >= fSymbols.size() - 1 || fIndex < 0) {
         fIndex = 0;
@@ -223,11 +217,6 @@ public class SymbolPropertyEditorPanel
       updateView();
     }//GEN-LAST:event_nextSymbolButtonActionPerformed
 
-  /**
-   * Blättert zurück zum vorherigen Symbol.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void previousSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousSymbolButtonActionPerformed
       if (fIndex <= 0 || fIndex >= fSymbols.size()) {
         fIndex = fSymbols.size() - 1;
@@ -239,11 +228,6 @@ public class SymbolPropertyEditorPanel
       updateView();
     }//GEN-LAST:event_previousSymbolButtonActionPerformed
 
-  /**
-   * Remove the symbol for the Location or LocationType
-   *
-   * @param evt
-   */
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
     labelSymbol.setIcon(null);
     labelSymbolName.setText(LocationRepresentation.DEFAULT.name());

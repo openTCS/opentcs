@@ -17,16 +17,10 @@ import javax.swing.tree.TreeNode;
 import org.opentcs.guing.components.tree.elements.UserObject;
 
 /**
- * Ein Interface für die Baumansicht auf der linken Seite. Eine Baumansicht
- * verwaltet ein Modell, das eine Menge von DefaultMutableTreeNode-Objekten
- * besitzt. Jeder DefaultMutableTreeNode referenziert ein UserObject. Ein
- * UserObject kapselt ein richtiges Objekt (z.B. Article, Figure, ...). Es weiß,
- * welche Methode der Applikation aufgerufen werden muss, wenn sein Objekt im
- * Baum selektiert, gelöscht oder doppelt angeklickt wird.
- * <p>
- * <b>Entwurfsmuster:</b> Befehl. TreeView (bzw. eine Unterklasse) ist der
- * Auslöser für die Ausführung eines konkreten UserObjects, welches ja einen
- * Befehl darstellt.
+ * A TreeView manages a model which has a set of {@link DefaultMutableTreeNode} objects.
+ * Each DefaultMutableTreeNode has a UserObject. Each UserObject wraps a real object 
+ * (e.g. Article, Figure, ...). It knows which methods to call to when an object is selected 
+ * in the tree or is deleted or is double-clicked.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see UserObject
@@ -34,11 +28,10 @@ import org.opentcs.guing.components.tree.elements.UserObject;
 public interface TreeView {
 
   /**
-   * Fügt dem Baum ein Item hinzu. Übergebenes Elternobjekt ist ein richtiges
-   * Objekt, das im Baum gesucht werden muss. Item ist ein UserObject.
-   *
-   * @param parent
-   * @param item
+   * Adds an item to the tree.
+   * 
+   * @param parent A real object that is seached in the tree.
+   * @param item Is a UserObject.
    */
   void addItem(Object parent, UserObject item);
 
@@ -100,58 +93,51 @@ public interface TreeView {
   void setCursor(Cursor cursor);
 
   /**
-   * Löscht aus dem Baum ein Item. Item ist ein richtiges Objekt, d.h. kein
-   * DefaultMutableTreeNode und kein UserObject sondern beispielsweise ein
-   * Article.
+   * Removes an item from the tree.
    *
-   * @param item
+   * @param item A real object.
    */
   void removeItem(Object item);
 
   /**
-   * Entfernt alle Kindelemente eines Items.
+   * Removes all child elements from an item.
    *
-   * @param item
+   * @param item The item to remove child elements from.
    */
   void removeChildren(Object item);
 
   /**
-   * Selektiert ein Item im Baum. Item ist ein richtiges Objekt, d.h. kein
-   * DefaultMutableTreeNode und kein UserObject sondern beispielsweise ein
-   * Article.
+   * Selects an item in the tree.
    *
-   * @param item
+   * @param item The item to select.
    */
   void selectItem(Object item);
 
   /**
-   * Selektiert mehrere Items im Baum.
+   * Selects a set of items in the tree.
    *
-   * @param items
+   * @param items The set of items to select.
    */
   void selectItems(Set<?> items);
 
   /**
-   * Teilt dem Baum mit, dass sich die Eigenschaften des übergeben Objekts
-   * geändert haben und seine Darstellung aktualisiert werden muss. Item ist ein
-   * richtiges Objekt, d.h. kein DefaultMutableTreeNode und kein UserObject
-   * sondern beispielsweise ein Article.
+   * Notifies the tree that a property of the specified item has changed.
    *
    * @param item
    */
   void itemChanged(Object item);
 
   /**
-   * Liefert das selektierte Element.
+   * Return the selected item.
    *
-   * @return
+   * @return the selected item.
    */
   UserObject getSelectedItem();
 
   /**
-   * Liefert die selektierten Elemente.
+   * Return the selected items.
    *
-   * @return
+   * @return the selected items.
    */
   Set<UserObject> getSelectedItems();
 

@@ -65,7 +65,7 @@ public class SingleVehicleView
    */
   private static final Color GREEN = new Color(0x77, 0xdb, 0x6c);
   /**
-   * Das darzustellende Fahrzeug.
+   * The Vehicle to be displayed.
    */
   private final VehicleModel fVehicleModel;
   /**
@@ -94,7 +94,7 @@ public class SingleVehicleView
    */
   private final ModelManager modelManager;
   /**
-   * Die Zeichenfläche im Dialog.
+   * Panel to draw on.
    */
   private final JPanel fVehicleView;
 
@@ -150,8 +150,6 @@ public class SingleVehicleView
   private void drawVehicle(Graphics2D g2d) {
     figure = crsObjFactory.createVehicleFigure(fVehicleModel);
     figure.setIgnorePrecisePosition(true);
-    // Figur im Dialog-Panel zentrieren
-    // TODO: Maßstab berücksichtigen!
     Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2, fVehicleView.getHeight() / 2);
     figure.setBounds(posDialog, null);
     figure.setAngle(0.0);

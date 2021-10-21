@@ -12,8 +12,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.slf4j.LoggerFactory;
 
 /**
- * Ein Property fï¿½r einen 3D-Punkt. Der Datentyp fï¿½r die Koordinaten des Punktes
- * ist <code>long</code>.
+ * A property for a 3 dimensional point.
  *
  * @author Heinz Huber (Fraunhofer IML)
  */
@@ -21,7 +20,7 @@ public class TripleProperty
     extends AbstractProperty {
 
   /**
-   * Der Punkt.
+   * The point.
    */
   private Triple fTriple;
 
@@ -40,9 +39,7 @@ public class TripleProperty
   }
 
   /**
-   * Setzt fï¿½r das Attribut einen neuen Wert und eine neue Maï¿½einheit. Eine
-   * Ausnahme wird ausgelï¿½st, wenn es sich bei der Maï¿½einheit um keine mï¿½gliche
-   * Einheit handelt.
+   * Set the value of this property.
    *
    * @param triple The triple.
    */

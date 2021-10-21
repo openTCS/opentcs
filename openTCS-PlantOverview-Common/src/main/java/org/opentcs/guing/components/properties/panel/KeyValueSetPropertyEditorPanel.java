@@ -28,7 +28,7 @@ import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Benutzeroberfläche zum Bearbeiten einer Menge von Key-Value-Paaren.
+ * UI for editing a set of key value pairs.
  *
  * @see KeyValueSetProperty
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -107,9 +107,9 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Liefert das ausgewählte KeyValueProperty.
+   * Returns the selected key/value property.
    *
-   * @return das ausgewählte KeyValueProperty
+   * @return the selected key/value property.
    */
   private KeyValueProperty getSelectedKeyValueProperty() {
     int i = itemsTable.getSelectedRow();
@@ -125,10 +125,9 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Wählt eine bestimmte Tabellezeile (das heißt ein bestimmtes
-   * Schlüssel-Wert-Paar) aus.
+   * Selects a row/an item based on a key.
    *
-   * @param key der Schlüssel des auszuwählenden Paares
+   * @param key The key for the row/item to select.
    */
   private void selectItem(String key) {
     for (int i = 0; i < itemsTable.getRowCount(); i++) {
@@ -140,12 +139,10 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Setzt einen Eintrag in der Tabelle bestehend aus Schlüssel und Wert. Ist
-   * der Schlüssel bereits vorhanden, wird der zugehörige Wert überschrieben
-   * andernfalls wird ein neuer Eintrag erzeugt.
+   * Add a new key/value pair.
    *
-   * @param key der Schlüssel
-   * @param value der Wert
+   * @param key the key.
+   * @param value the value.
    */
   private void addItem(String key, String value) {
     for (int i = 0; i < itemsTable.getRowCount(); i++) {
@@ -192,9 +189,6 @@ public class KeyValueSetPropertyEditorPanel
     }
   }
 
-  /**
-   * Bearbeitet den ausgewählten Eintrag.
-   */
   private void edit() {
     KeyValueProperty p = getSelectedKeyValueProperty();
 
@@ -221,7 +215,7 @@ public class KeyValueSetPropertyEditorPanel
   }
 
   /**
-   * Fügt einen neuen Eintrag hinzu.
+   * Adds a new entry.
    */
   private void add() {
     JDialog parent = (JDialog) getTopLevelAncestor();
@@ -242,16 +236,12 @@ public class KeyValueSetPropertyEditorPanel
     }
   }
 
-  /**
-   * Wird aufgerufen, wenn ein anderes Schlüssel-Wert-Paar ausgewählt wurde.
-   */
   private void handleSelectionChanged() {
     updateView();
   }
 
   /**
-   * Macht die verschiedenen Schaltflächen benutzbar oder unbenutzbar, je
-   * nachdem, ob ein Schlüssel-Wert-Paar ausgewählt wurde.
+   * Updates the UI based on whether or not an entry is selected.
    */
   private void updateView() {
     final TableModel model = itemsTable.getModel();
@@ -259,8 +249,6 @@ public class KeyValueSetPropertyEditorPanel
 
     for (int selRowIndex : itemsTable.getSelectedRows()) {
       String key = (String) model.getValueAt(selRowIndex, 0);
-      // Sonderfall: Dieses Property wird indirekt über das Symbol einer Location
-      // gesetzt und sollte nicht direkt editierbar sein
       if (key.equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
           || key.equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
         selectedAreEditable = false;
@@ -365,11 +353,6 @@ public class KeyValueSetPropertyEditorPanel
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
 
-  /**
-   * Entfernt das ausgewählte Element.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
       int selectedRowIndex = itemsTable.getSelectedRow();
 
@@ -382,20 +365,10 @@ public class KeyValueSetPropertyEditorPanel
       updateView();
     }//GEN-LAST:event_removeButtonActionPerformed
 
-  /**
-   * Bearbeitet das ausgewählte Element.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
       edit();
     }//GEN-LAST:event_editButtonActionPerformed
 
-  /**
-   * Fügt ein Element hinzu.
-   *
-   * @param evt das auslösende Ereignis
-   */
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       add();
     }//GEN-LAST:event_addButtonActionPerformed

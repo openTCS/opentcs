@@ -16,41 +16,9 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
- * Eine Komponente zur Ansicht und Bearbeitung von Eigenschaftswerten.
- * Dargestellt werden die Eigenschaften in einer zweispaltigen Tabelle. Die
- * linke Spalte zeigt die Namen der Eigenschaften, die rechte die Werte. Durch
- * Anklicken eines Eigenschaftswerts kann dieser - je nach angemessener Form -
- * bearbeitet werden.
- * <p>
- * Die Komponente zeigt oberhalb der Tabelle einen Text
- * an, der das Objekt, zu dem die gerade angezeigten Eigenschaften gehören,
- * bezeichnet.
- * <p>
- * Wird eine Eigenschaft in der Tabelle angeklickt, so erscheint
- * im unteren Teil der Komponente ein Hilfetext, der die Eigenschaft genauer
- * erläutert.
- * <p>
- * Die Funktionen der Listener-Implementierungen: <br>
- * TableChangeListener: Hat der Benutzer in irgendeinem Tabellenfeld den
- * Editiermodus aktiviert, so ist davon auszugehen, dass sich dieses Attribut
- * geändert hat. Als registrierter TableChangeListener wird die
- * PropertiesComponent davon unterrichtet und kann daraufhin dem aktuellen
- * ModelComponent mitteilen, dass sich seine Attribute geändert haben. <br>
- * PropertiesModelChangeListener: PropertiesComponent stellt die Attribute
- * jeweils eines ModelComponent dar. Ändern sich die Attributwerte durch
- * irgendeinen Grund, so müssen die neuen Werte unverzüglich in der
- * PropertiesComponent zu sehen sein. Als registrierter
- * PropertiesModelChangeListener wird PropertiesComponent sofort von Änderungen
- * unterrichtet und kann sich aktualisieren. <br> ConnectionChangeListener:
- * Referenzen zwischen Knoten und Station laufen über eine allgemeine Referenz,
- * die alle Methodenaufrufe an eine spezialisierte Referenz delegiert. Die
- * spezialisierte Referenz richtet sich nach der Station. Wird nun die Referenz
- * von einer Station an eine andere gehängt, so ändert sich also die
- * spezialisierte Referenz und damit auch die darzustellenden Attribute. Da sich
- * die allgemeine Referenz jedoch dabei nicht ändert, schlägt die
- * Benachrichtigung der PropertiesComponent über den
- * PropertiesModelChangeListener fehl; der Weg über den ConnectionChangeListener
- * funktioniert aber.
+ * A component for viewing and editing of properties. 
+ * Shows a table with two columns. The left column contains the name of the property.
+ * The right column contains the value of the property and can be clicked to edit the value.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -60,19 +28,19 @@ public class AttributesComponent
     implements ComponentSelectionListener {
 
   /**
-   * Die Tabelle mit den Properties.
+   * The table with the properties.
    */
   private AttributesContent fPropertiesContent;
   private Component fPropertiesComponent;
   /**
-   * Der Undo-Manager.
+   * The undo manager.
    */
   private final UndoRedoManager fUndoRedoManager;
 
   /**
-   * Konstruktor mit Undo-Manager und Parent.
+   * Creates a new instance.
    *
-   * @param undoManager
+   * @param undoManager The undo manager to use.
    */
   @Inject
   public AttributesComponent(UndoRedoManager undoManager) {
@@ -86,9 +54,9 @@ public class AttributesComponent
   }
 
   /**
-   * Setzt eine neues ModelComponent-Objekt.
+   * Set the model component.
    *
-   * @param model
+   * @param model the model component to show properties for.
    */
   public void setModel(ModelComponent model) {
     fPropertiesContent.setModel(model);
@@ -98,8 +66,7 @@ public class AttributesComponent
   }
 
   /**
-   * Setzt die Anzeige zurück, wenn kein ModelComponente-Objekt mehr dargestellt
-   * werden soll.
+   * Resets the display when no model component should be shown.
    */
   public void reset() {
     if (fPropertiesContent != null) {
@@ -110,18 +77,16 @@ public class AttributesComponent
   }
 
   /**
-   * Setzt den Text, der im oberen Teil der Komponente angezeigt wird. Der Text
-   * bezeichnet das Objekt, dessen Eigenschaften in der Tabelle angezeigt
-   * werden.
+   * Set the text that describes the current model component.
    */
   protected void setDescription() {
     descriptionLabel.setText(fPropertiesContent.getDescription());
   }
 
   /**
-   * Setzt einen PropertiesContent an dem übergebenen Index.
+   * Set the properties content.
    *
-   * @param content
+   * @param content the properties content.
    */
   public void setPropertiesContent(AttributesContent content) {
     fPropertiesContent = content;

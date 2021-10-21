@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Ein Dialog, der einen Schließen-Button besitzt.
+ * A dialog that has a close button.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -41,7 +41,7 @@ public class ClosableDialog
   }
 
   /**
-   * Schließt den Dialog.
+   * Closes the dialog.
    */
   private void doClose() {
     setVisible(false);

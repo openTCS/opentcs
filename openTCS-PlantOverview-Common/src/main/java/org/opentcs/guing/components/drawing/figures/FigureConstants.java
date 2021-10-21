@@ -12,18 +12,18 @@ import org.opentcs.guing.components.drawing.course.Origin;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Allgemeine Konstanten, die insbesondere Figures betreffen.
+ * Constants that are relevant to figures.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface FigureConstants {
 
   /**
-   * Über diesen Schlüssel greifen Figures auf ihr Model zu.
+   * Key for figures to access their models.
    */
   AttributeKey<ModelComponent> MODEL = new AttributeKey<>("Model", ModelComponent.class);
   /**
-   * Über dieses Attribut erhalten Figures Zugriff auf den Referenzpunkt.
+   * Key for figures to access the origin.
    */
   AttributeKey<Origin> ORIGIN = new AttributeKey<>("Origin", Origin.class);
 }

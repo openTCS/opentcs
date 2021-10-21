@@ -12,8 +12,7 @@ import java.util.List;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für Winkelangaben.
- * Beispiele: 0.1 rad, 30 deg
+ * A property for angles.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -63,7 +62,6 @@ public class AngleProperty
 
   @Override
   protected void initValidRange() {
-    // max not neccessary as setValue computes % 360
     validRange.setMin(0);
   }
 

@@ -15,11 +15,7 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Ein CellEditor für Attribute vom Typ {
- *
- * @see BooleanProperty}. Gezeigt wird eine CheckBox mit zwei möglichen
- * Zuständen. Einen Button mit drei Punkten sowie den damit verbundenen
- * DetailsDialog gibt es nicht.
+ * A cell editor for boolean properties.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -66,20 +62,19 @@ public class BooleanPropertyCellEditor
   }
 
   /**
-   * Liefert das Property.
+   * Return the property of this editor.
    *
-   * @return
+   * @return The property of this editor.
    */
   protected BooleanProperty property() {
     return (BooleanProperty) fProperty;
   }
 
   /**
-   * Erzeugt den Button mit den drei Punkten. Liefert
-   * <code>null
-   * </code> zurück, da ein solcher Button nicht benötigt wird.
-   *
-   * @return
+   * Creates the details dialog.
+   * Always returns null, does not create a details dialog.
+   * 
+   * @return always returns null, does not create a details dialog.
    */
   @Override
   protected JComponent createButtonDetailsDialog() {

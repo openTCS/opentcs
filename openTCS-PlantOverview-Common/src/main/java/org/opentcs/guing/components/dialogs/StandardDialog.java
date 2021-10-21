@@ -17,9 +17,7 @@ import javax.swing.border.EmptyBorder;
 import org.opentcs.util.gui.Icons;
 
 /**
- * Ein Dialog mit einem Ok- und einem Cancel-Button, dem im Konstruktor ein
- * JComponent-Objekt als Inhalt übergeben wird. Für gewöhnlich handelt es sich
- * bei den Inhalten um PropertiesPane-Objekte.
+ * A dialog with an ok and a cancel button.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -35,19 +33,18 @@ public class StandardDialog
    */
   public static final int RET_OK = 1;
   /**
-   * Der Inhalt des Dialogs.
+   * The content of this dialog.
    */
   protected JComponent fContent;
   private int returnStatus = RET_CANCEL;
 
   /**
-   * Erzeugt ein neues Exemplar von StandardDialog. Die Größe des Dialogs wird
-   * an den Inhalt angepasst.
+   * Creates a new instance.
    *
-   * @param parent Die Komponente, zu der der Dialog zentriert wird.
-   * @param modal True, wenn der Dialog modal sein soll.
-   * @param content Der Inhalt des Dialogs neben den beiden Standardbuttons.
-   * @param title Der Titel des Dialogs.
+   * @param parent The parent component.
+   * @param modal Whether or not the dialog is modal.
+   * @param content The content component.
+   * @param title The title of the dialog.
    */
   public StandardDialog(Component parent, boolean modal, JComponent content, String title) {
     super(JOptionPane.getFrameForComponent(parent), title, modal);
@@ -58,9 +55,9 @@ public class StandardDialog
   }
 
   /**
-   * Passt die Größe des Dialogs nach dem Hinzufügen des Panels an.
+   * Initialises the size of the dialog based on the content.
    *
-   * @param content
+   * @param content the dialog to base the size on.
    */
   protected final void initSize(JComponent content) {
     fContent = content;
@@ -71,18 +68,18 @@ public class StandardDialog
   }
 
   /**
-   * Liefert den Inhalt des Dialogs.
+   * Returns the content of this dialog.
    *
-   * @return
+   * @return the content of this dialog.
    */
   public JComponent getContent() {
     return fContent;
   }
 
   /**
-   * return the return status of this dialog - one of RET_OK or RET_CANCEL
+   * Return the return status of this dialog - one of RET_OK or RET_CANCEL.
    *
-   * @return
+   * @return the return status of this dialog - one of RET_OK or RET_CANCEL.
    */
   public int getReturnStatus() {
     return returnStatus;
@@ -142,15 +139,12 @@ public class StandardDialog
       doClose(RET_CANCEL);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-  /**
-   * Closes the dialog
-   */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
       doClose(RET_CANCEL);
     }//GEN-LAST:event_closeDialog
 
   /**
-   * Schließt den Dialog.
+   * Closes the dialog.
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;

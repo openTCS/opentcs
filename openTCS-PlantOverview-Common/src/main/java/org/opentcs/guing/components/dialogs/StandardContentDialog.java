@@ -17,9 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Ein Standarddialog mit einem Ok- und einem Abbrechen-Button. Ein
- * Standarddialog nimmt jeglichen Inhalt vom Typ JComponent auf und stellt ihn
- * als Inhalt dar.
+ * A standard dialog with an OK and a cancel button.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -28,35 +26,35 @@ public class StandardContentDialog
     implements InputValidationListener {
 
   /**
-   * A return status code - returned if Cancel button has been pressed
+   * A return status code - returned if Cancel button has been pressed.
    */
   public static final int RET_CANCEL = 0;
   /**
-   * A return status code - returned if OK button has been pressed
+   * A return status code - returned if OK button has been pressed.
    */
   public static final int RET_OK = 1;
   /**
-   * Button-Konfiguration Ok und Abbrechen.
+   * Button configuration for an OK and a cancel button.
    */
   public static final int OK_CANCEL = 10;
   /**
-   * Button-Konfiguration Ok, Abbrechen und Übernehmen.
+   * Button configuration for an OK, cancel and apply button.
    */
   public static final int OK_CANCEL_APPLY = 11;
   /**
-   * Button-Konfiguration Schließen.
+   * Button configuration for a close button.
    */
   public static final int CLOSE = 12;
   /**
-   * Button-Konfiguration benutzerdefiniert.
+   * Button configuration user-defined.
    */
   public static final int USER_DEFINED = 13;
   /**
-   * Der Dialoginhalt.
+   * Content for this dialog.
    */
   protected DialogContent fContent;
   /**
-   *
+   * The return status.
    */
   private int returnStatus = RET_CANCEL;
 
@@ -70,10 +68,10 @@ public class StandardContentDialog
   /**
    * Creates new form StandardDialog.
    *
-   * @param parent Die Komponente, zu der der Dialog zentriert wird
-   * @param content der Inhalt
-   * @param modal ob der Dialog modal sein soll
-   * @param options welche Schaltflächen angezeigt werden sollen
+   * @param parent The parent component on which this dialog is centered.
+   * @param content The content.
+   * @param modal whether or not this dialog is modal.
+   * @param options Which user interface options to use.
    */
   public StandardContentDialog(Component parent,
                                DialogContent content,
@@ -106,12 +104,7 @@ public class StandardContentDialog
   }
 
   /**
-   * Initialisiert die Schaltknöpfe.
-   *
-   * @param options welche Schaltknöpfe angezeigt werden sollen
-   */
-  /**
-   * Liefert den Return-Status.
+   * Returns the returns status code.
    *
    * @return the return status of this dialog - one of RET_OK or RET_CANCEL
    */
@@ -120,10 +113,10 @@ public class StandardContentDialog
   }
 
   /**
-   * Fügt eine benutzerdefinierte Schaltfläche hinzu.
+   * Adds a user-defined button.
    *
-   * @param text die Beschriftung der Schaltfläche
-   * @param returnStatus der Rückgabewert, wenn die Schaltfläche gedrückt wird
+   * @param text The text for the button.
+   * @param returnStatus The return value when the button is pressed.
    */
   public void addUserDefinedButton(String text, final int returnStatus) {
     JButton button = new JButton(text);
@@ -139,7 +132,7 @@ public class StandardContentDialog
   }
 
   /**
-   * Botschaft des Dialoginhaltes, dass der Dialog geschlossen werden kann.
+   * Event of the dialog content that the dialog can be closed.
    */
   public void requestClose() {
     doClose(RET_CANCEL);
@@ -241,27 +234,27 @@ public class StandardContentDialog
   // CHECKSTYLE:ON
 
   /**
-   * Button "Schließen" gedrückt.
+   * Button "close" pressed.
    *
-   * @param evt das Ereignis
+   * @param evt The action event.
    */
   private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
     doClose(RET_CANCEL);
   }//GEN-LAST:event_closeButtonActionPerformed
 
   /**
-   * Button "Übernehmen" gedrückt.
+   * Button "apply" pressed.
    *
-   * @param evt das Ereignis
+   * @param evt The action event.
    */
   private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
     fContent.update();
   }//GEN-LAST:event_applyButtonActionPerformed
 
   /**
-   * Button "Ok" gedrückt.
+   * Button "Ok" pressed.
    *
-   * @param evt das Ereignis
+   * @param evt The action event.
    */
   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
     fContent.update();
@@ -272,9 +265,9 @@ public class StandardContentDialog
   }//GEN-LAST:event_okButtonActionPerformed
 
   /**
-   * Button "Abbrechen" gedrückt.
+   * Button "cancel" pressed.
    *
-   * @param evt das Ereignis
+   * @param evt The action event.
    */
   private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     doClose(RET_CANCEL);
@@ -288,9 +281,9 @@ public class StandardContentDialog
   }//GEN-LAST:event_closeDialog
 
   /**
-   * Schließt den Dialog.
+   * Closes the dialog.
    *
-   * @param retStatus der Rückgabestatus
+   * @param retStatus The return status code.
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;

@@ -37,23 +37,23 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    */
   private final Class<U> fUnitClass;
   /**
-   * Die mï¿½glichen Einheiten.
+   * List of possible units.
    */
   private final List<U> fPossibleUnits;
   /**
-   * Die Verhï¿½ltnisse zwischen den Einheiten.
+   * List of relations between different units.
    */
   private final List<Relation<U>> fRelations;
   /**
-   * Die aktuelle Einheit zum Zahlenwert.
+   * Current unit.
    */
   private U fUnit;
   /**
-   * Ob es sich um einen ganzzahligen Wert handeln soll.
+   * Whether or not this property is an integer value.
    */
   private boolean fIsInteger;
   /**
-   * Ob es sich um einen vorzeichenlosen Wert handeln soll.
+   * Whether or not this property is unsigned.
    */
   private boolean fIsUnsigned;
   /**
@@ -108,7 +108,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   protected abstract void initValidRange();
 
   /**
-   * Setzt den Wert auf ganzzahlig oder gebrochen.
+   * Sets the value of this property to be an integer or decimal number.
    *
    * @param isInteger Whether the value is an integer.
    */
@@ -117,7 +117,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Zeigt an, ob eine ganzzahlige Darstellung erfolgen soll.
+   * Returns true if the value of this property is an integer value.
    *
    * @return Whether the value is an integer.
    */
@@ -126,7 +126,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Setzt den Wert auf vorzeichenbehaftet oder vorzeichenlos.
+   * Sets the value of this property to be unsigned or not.
    *
    * @param isUnsigned Whether the value is unsigned.
    */
@@ -135,6 +135,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
+   * Indicates whether or not the value is unsigned or not.
    *
    * @return Whether the value is unsigned.
    */
@@ -161,10 +162,9 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Liefert den Wert, der der ï¿½bergebenen Einheit entspricht, ohne eine feste
-   * Umwandlung vorzunehmen.
+   * Returns the value of this property converted to the specified unit.
    *
-   * @param unit The unit.
+   * @param unit The unit return.
    * @return The value by the given unit.
    */
   public double getValueByUnit(U unit) {
@@ -200,10 +200,9 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Konvertiert den aktuellen Wert mit der aktuellen Einheit in einen neuen
-   * Wert mit der ï¿½bergebenen
+   * Converts the property to the new unit.
    *
-   * @param unit Einheit.
+   * @param unit The new unit to use.
    */
   public void convertTo(U unit) {
     if (!fPossibleUnits.contains(unit)) {
@@ -260,7 +259,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Liefert die Maï¿½einheit.
+   * Returns the current unit for this property.
    *
    * @return The unit.
    */
@@ -269,10 +268,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Prï¿½ft, ob es sich bei der ï¿½bergebenen Maï¿½einheit um eine mï¿½gliche Einheit
-   * handelt. Gibt in diesem Fall
-   * <code>true
-   * </code> zurï¿½ck.
+   * Checks if this property is applicable to the specified unit.
    *
    * @param unit The unit.
    * @return {@code true}, if the given unit is a valid/possible one, otherwise {@code false}.
@@ -297,12 +293,11 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Setzt fï¿½r das Attribut einen neuen Wert und eine neue Maï¿½einheit. Eine
-   * Ausnahme wird ausgelï¿½st, wenn es sich bei der Maï¿½einheit um keine mï¿½gliche
-   * Einheit handelt.
+   * Set the value and unit for this property.
+   * {@link IllegalArgumentException} is thrown if the unit is not applicable to this property.
    *
-   * @param value The value.
-   * @param unit The unit.
+   * @param value The new value.
+   * @param unit The new unit.
    * @throws IllegalArgumentException If the given unit is not usable.
    */
   public void setValueAndUnit(double value, U unit)
@@ -317,7 +312,6 @@ public abstract class AbstractQuantity<U extends Enum<U>>
         }
       }
       else {
-        // Wenn fValue vorher "<different values>" war
         markChanged();
       }
     }
@@ -358,7 +352,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Liefert die mï¿½glichen Maï¿½einheiten.
+   * Returns a list of possible units for this property.
    *
    * @return A list of possible units.
    */
@@ -385,8 +379,9 @@ public abstract class AbstractQuantity<U extends Enum<U>>
   }
 
   /**
-   * Findet aus der Menge der Umwandlungsverhï¿½ltnisse das heraus, welches fï¿½r
-   * die beiden ï¿½bergebenen Einheiten passend ist.
+   * Finds the conversion relation that is applicable for both specified units.
+   *
+   * @return the conversion relation for the units.
    */
   private Relation<U> findFittingRelation(U unitFrom, U unitTo) {
     for (Relation<U> relation : fRelations) {

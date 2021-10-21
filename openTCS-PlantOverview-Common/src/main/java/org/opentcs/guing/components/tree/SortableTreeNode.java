@@ -14,7 +14,7 @@ import javax.swing.tree.TreeNode;
 import org.slf4j.LoggerFactory;
 
 /**
- * Ein TreeNode, dessen Elemente sortiert werden kï¿½nnen.
+ * A tree node that can be sorted.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -22,14 +22,14 @@ public class SortableTreeNode
     extends DefaultMutableTreeNode {
 
   /**
-   * True, wenn die Kindelemente dieses Knotens sortiert werden sollen.
+   * True if the child elements of this node can be sorted.
    */
   private boolean fSorting;
 
   /**
-   * Erzeugt ein neues Objekt von SortableTreeNode.
+   * Creates a new instance.
    *
-   * @param userObject Das UserObject.
+   * @param userObject The UserObject.
    */
   public SortableTreeNode(Object userObject) {
     super(userObject);
@@ -37,27 +37,27 @@ public class SortableTreeNode
   }
 
   /**
+   * Sets whether or not the child elements of this node can be sorted.
    *
-   * @param sorting true, wenn die Kindelemente des Knotens sortiert werden
-   * sollen.
+   * @param sorting True if the child elements of this node can be sorted.
    */
   public final void setSorting(boolean sorting) {
     fSorting = sorting;
   }
 
   /**
-   *
-   * @return true, wenn die Kindelemente des Knotens sortiert werden sollen.
+   * Returns true if the child elements of this node can be sorted.
+   * 
+   * @return True if the child elements of this node can be sorted.
    */
   public boolean isSorting() {
     return fSorting;
   }
 
   /**
-   * Sortiert die Kindelemente. Um die Darstellung zu aktualisieren, ist ein
-   * reload() im TreeModel nï¿½tig.
+   * Sort the child elements.
    *
-   * @param comparator
+   * @param comparator The comparator to be used for sorting.
    */
   @SuppressWarnings("unchecked")
   public void sort(Comparator<Object> comparator) {

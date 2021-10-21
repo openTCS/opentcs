@@ -58,7 +58,6 @@ public class OriginFigure
     fDisplayBox = new Rectangle(-fSideLength / 2, -fSideLength / 2,
                                 fSideLength, fSideLength);
     set(AttributeKeys.STROKE_COLOR, Color.blue);
-    // Kein Copy/Paste etc. für diese Figur!
     setSelectable(false);
   }
 

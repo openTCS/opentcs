@@ -10,7 +10,7 @@ package org.opentcs.guing.components.properties.type;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Basisimplementierung für Attribute von ModelComponent-Objekten.
+ * Attribute of a {@link ModelComponent}.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -18,32 +18,32 @@ public abstract class AbstractModelAttribute
     implements ModelAttribute {
 
   /**
-   * Das Model, zu dem dieses Attribut gehört.
+   * The model this attribute is attached to.
    */
   private ModelComponent fModel;
   /**
-   * Zeigt an, ob sich das Attribut geändert hat.
+   * Indicates that this attribute has changed.
    */
   private ChangeState fChangeState = ChangeState.NOT_CHANGED;
   /**
-   * Die Bezeichnung des Attributs.
+   * Description of this attribute.
    */
   private String fDescription = "";
   /**
-   * Der Hilfetext.
+   * Tooltip text.
    */
   private String fHelptext = "";
   /**
-   * Zeigt an, ob das Attribut gemeinsam mit gleichnamigen Attributen anderer
-   * ModelComponent-Objekte bearbeitet werden kann.
+   * Indicates whether or not this attribute can simultaneously be edited with other
+   * attributes of the same name of other model components.
    */
   private boolean fCollectiveEditable;
   /**
-   * Zeigt an, ob das Attribut im Modus "Modelling" verändert werden kann.
+   * Indicates whether or not this attribute can be changed in modeling mode.
    */
   private boolean fModellingEditable = true;
   /**
-   * Zeigt an, ob das Attribut im Modus "Operating" verändert werden kann.
+   * Indicates whether or not this attribute can be changed in operating mode.
    */
   private boolean fOperatingEditable;
 
@@ -82,7 +82,7 @@ public abstract class AbstractModelAttribute
   }
 
   /**
-   *
+   * Returns the change state of this attribute.
    * @return The change state.
    */
   public ChangeState getChangeState() {

@@ -24,8 +24,7 @@ import org.opentcs.guing.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Eine Benutzerschnittstelle zum Auswählen einer Station oder eines
- * Meldepunktes als direktes Fahrtziel für ein Fahrzeug.
+ * A UI to select a point or location as a destination for a vehicle.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -33,11 +32,11 @@ public class LocationActionPanel
     extends DialogContent {
 
   /**
-   * Die zur Auswahl stehenden Stationen.
+   * Available locations.
    */
   protected List<LocationModel> fLocations;
   /**
-   * Die zur Auswahl stehenden Aktionen.
+   * Available actions.
    */
   protected List<String> fActions;
 
@@ -66,9 +65,9 @@ public class LocationActionPanel
   }
 
   /**
-   * Liefert einen Comparator zum Sortieren der Elemente.
+   * Returns a Comparator to sort model components by their name.
    *
-   * @return den Comparator
+   * @return The Comparator
    */
   protected final Comparator<ModelComponent> getComparator() {
     return (ModelComponent item1, ModelComponent item2) -> {
@@ -82,10 +81,9 @@ public class LocationActionPanel
   }
 
   /**
-   * Liefert das ausgewählte Ziel, zu dem das Fahrzeug hinbeordert werden soll.
+   * Returns the selected location.
    *
-   * @return das Ziel oder
-   * <code>null</code>, falls kein Ziel ausgewählt wurde
+   * @return the selected location or null.
    */
   public LocationModel getSelectedLocation() {
     int index = locationsComboBox.getSelectedIndex();
@@ -107,15 +105,11 @@ public class LocationActionPanel
     return fActions.get(index);
   }
 
-  /**
-   * Zu der selektierten Location die passenden Actions anzeigen
-   */
   private void updateActions() {
     LocationModel selectedLocation = getSelectedLocation();
     LocationTypeModel locationType = selectedLocation.getLocationType();
     List<String> actions = locationType.getPropertyAllowedOperations().getItems();
     Collections.sort(actions);
-    // "No Operation" immer als erste Aktion anzeigen
     fActions = new ArrayList<>();
     fActions.add(DriveOrder.Destination.OP_NOP);
     fActions.addAll(actions);

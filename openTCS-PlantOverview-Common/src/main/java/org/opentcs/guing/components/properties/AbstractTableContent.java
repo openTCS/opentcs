@@ -25,9 +25,7 @@ import org.opentcs.guing.components.properties.table.AttributesTable;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Basisimplementierung für Inhalte, die Eigenschaften eines Modells in einer
- * Tabelle darstellen. Im unteren Bereich wird zu jeder Eigenschaft ein
- * Hilfetext angezeigt.
+ * Base implementation for content that displays model properties in a table.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -36,16 +34,15 @@ public abstract class AbstractTableContent
     implements TableChangeListener {
 
   /**
-   * Die Tabelle zur Darstellung der Eigenschaften.
+   * The table that shows the properties.
    */
   protected AttributesTable fTable;
   /**
-   * Die CellEditoren.
+   * The cell editors.
    */
   protected List<TableCellEditor> fCellEditors = new ArrayList<>();
   /**
-   * Zeigt an, ob Änderungen am Tabellenmodell ausgewertet, das heißt, an
-   * ModelComponent weitergeleitet werden sollen.
+   * Indicates that changes to the tabel model should also update the model component.
    */
   protected boolean fEvaluateTableChanges = true;
   /**
@@ -84,7 +81,7 @@ public abstract class AbstractTableContent
   }
 
   /**
-   * Schablonenmethode zur Erzeugung und Konfiguration der Tabelle.
+   * Initialises the table.
    */
   protected void initTable() {
     fTable = tableProvider.get();
@@ -94,28 +91,25 @@ public abstract class AbstractTableContent
   }
 
   /**
-   * Setzt die Renderer für die Tabelle.
+   * Set the table cell renderers.
    */
   protected void setTableCellRenderers() {
   }
 
   /**
-   * Setzt die Editoren für die Tabelle.
+   * Set the table cell editors.
    */
   protected void setTableCellEditors() {
   }
 
   /**
-   * Weist der Tabelle einen neuen Inhalt zu (neue Eigenschaften und Werte).
-   * Die Eigenschaften und ihre Werte befinden sich in der übergebenen
-   * <code>Hashtable</code>.
+   * Set new table content.
    *
-   * @param content
+   * @param content A map from property name to property.
    */
   protected void setTableContent(Map<String, Property> content) {
     fEvaluateTableChanges = false;
 
-    // Spaltenbreiten retten
     TableColumnModel columnModel = fTable.getColumnModel();
     int[] widths = new int[columnModel.getColumnCount()];
 
@@ -123,10 +117,8 @@ public abstract class AbstractTableContent
       widths[i] = columnModel.getColumn(i).getWidth();
     }
 
-    // neues Modell setzen
     fTable.setModel(createTableModel(content));
 
-    // Spaltenbreiten wieder herstellen
     for (int i = 0; i < widths.length; i++) {
       columnModel.getColumn(i).setPreferredWidth(widths[i]);
     }
@@ -135,11 +127,10 @@ public abstract class AbstractTableContent
   }
 
   /**
-   * Erzeugt aus der übergebenen <code>Hashtable</code> ein neues
-   * <code>TableModel</code>.
+   * Creates a new table model from the content.
    *
-   * @param content
-   * @return Das erzeugte <code>TableModel</code>.
+   * @param content Map from property name to property.
+   * @return A table model that represents the content.
    */
   protected abstract TableModel createTableModel(Map<String, Property> content);
 

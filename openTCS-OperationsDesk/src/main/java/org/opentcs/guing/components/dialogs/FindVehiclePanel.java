@@ -20,7 +20,7 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 
 /**
- * Panel zur Auswahl eines Fahrzeugs, das dann im View gesucht werden kann.
+ * Panel to select a Vehicle that will be searched for in the view.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -111,8 +111,7 @@ public class FindVehiclePanel
   // CHECKSTYLE:ON
 
   /**
-   * Startet die Suche nach einem Fahrzeug. Wird aufgerufen, wenn der Benutzer
-   * den Button "Fahrzeug finden" anklickt.
+   * Starts the search for the vehicle.
    */
     private void buttonFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonFindActionPerformed
       VehicleModel vehicle = getSelectedVehicle();

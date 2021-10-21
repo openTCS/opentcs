@@ -130,7 +130,7 @@ public class CloseFileAction
           break;
 
         case JOptionPane.NO_OPTION:  // Don't save
-          fileSaved = JOptionPane.NO_OPTION; // Der Benutzer will nicht speichern
+          fileSaved = JOptionPane.NO_OPTION;
           doIt(evt.getActionCommand(), view);
           break;
 

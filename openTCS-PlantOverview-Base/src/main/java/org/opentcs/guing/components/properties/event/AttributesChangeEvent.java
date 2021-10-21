@@ -11,9 +11,8 @@ import java.util.EventObject;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Erweiterung von PropertiesModelChangeEvent um das Objekt, dessen Properties
- * geändert wurden. Wichtig für eine Klasse, die sich bei mehreren
- * PropertiesModel-Objekten als Listener registriert.
+ * An event that notifies all {@link AttributesChangeListener}s that a model component has been
+ * changed.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -21,7 +20,7 @@ public class AttributesChangeEvent
     extends EventObject {
 
   /**
-   * Das Model.
+   * The model.
    */
   protected ModelComponent fModelComponent;
 
@@ -37,14 +36,14 @@ public class AttributesChangeEvent
   }
 
   /**
-   * @return Das Modell.
+   * @return the model.
    */
   public ModelComponent getModel() {
     return fModelComponent;
   }
 
   /**
-   * @return Der Verursacher.
+   * @return the initiator.
    */
   public AttributesChangeListener getInitiator() {
     return (AttributesChangeListener) getSource();

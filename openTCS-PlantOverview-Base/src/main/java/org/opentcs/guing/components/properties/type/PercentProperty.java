@@ -11,8 +11,7 @@ import java.util.LinkedList;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für Prozentangaben.
- * Beispiele: 47 %
+ * A property for percentages.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -40,7 +39,7 @@ public class PercentProperty
   }
 
   /**
-   * Creates a new instance.
+   * Creates a new instance with value.
    *
    * @param model The model component.
    * @param value The property's value.

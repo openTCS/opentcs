@@ -25,17 +25,7 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.util.UserMessageHelper;
 
 /**
- * Basisimplementierung für einen
- * <code>CellEditor</code>, der aus einer Editor-Komponente (Textfeld, ComboBox
- * oder CheckBox) sowie aus einem kleinen Button mit drei Punkten besteht. Beim
- * Anklicken des kleinen Buttons erscheint ein Dialog, mit dessen Hilfe der Wert
- * eines Attributs komfortabler geändert werden kann.
- * <p>
- * Ein
- * <code>CellEditor</code> verwaltet ein {
- *
- * @see Property}, das bearbeitet werden kann (der Editor wird jedoch mehrfach,
- * genauer gesagt für eine bestimmte Klasse von Property eingesetzt).
+ * Base implementation for a cell editor to edit a property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -48,16 +38,15 @@ public abstract class AbstractPropertyCellEditor
    */
   public static final Color DIFFERENT_VALUE_COLOR = new Color(202, 225, 255);
   /**
-   * Das Attribut.
+   * The property.
    */
   protected Property fProperty;
   /**
-   * Der Dialog, der eine komfortablere Bearbeitung des Attributs erlaubt.
+   * The details dialog that allows editing of the property.
    */
   protected DetailsDialog fDetailsDialog;
   /**
-   * Die Komponente mit Textfeld, ComboBox oder CheckBox sowie dem Button mit
-   * den drei Punkten.
+   * The UI component.
    */
   protected final JComponent fComponent;
   /**
@@ -66,8 +55,7 @@ public abstract class AbstractPropertyCellEditor
   protected final UserMessageHelper userMessageHelper;
 
   /**
-   * Erezugt ein neues Objekt von AbstractCellEditor, wobei die
-   * Editor-Komponente ein Textfeld ist.
+   * Creates a new instance.
    *
    * @param textField
    * @param umh
@@ -79,8 +67,7 @@ public abstract class AbstractPropertyCellEditor
   }
 
   /**
-   * Erezugt ein neues Objekt von AbstractCellEditor, wobei die
-   * Editor-Komponente eine CheckBox ist.
+   * Creates a new instance.
    *
    * @param checkBox
    * @param umh
@@ -92,8 +79,7 @@ public abstract class AbstractPropertyCellEditor
   }
 
   /**
-   * Erezugt ein neues Objekt von AbstractCellEditor, wobei die
-   * Editor-Komponente eine ComboBox ist.
+   * Creates a new instance.
    *
    * @param comboBox
    * @param umh
@@ -105,9 +91,9 @@ public abstract class AbstractPropertyCellEditor
   }
 
   /**
-   * Erzeugt die Komponente, die aus Editor und kleinem Button besteht.
+   * Creates the component that edits the property.
    *
-   * @return
+   * @return The component that edits the property.
    */
   protected JComponent createComponent() {
     JPanel panel = new JPanel();
@@ -124,11 +110,9 @@ public abstract class AbstractPropertyCellEditor
   }
 
   /**
-   * Erzeugt den Button mit den drei Punkten. Soll kein Button erscheinen, muss
-   * hier
-   * <code>null</code> zurückgegeben werden.
+   * Creates a button with three dots.
    *
-   * @return
+   * @return A button with three dots or null.
    */
   protected JComponent createButtonDetailsDialog() {
     JButton button = new JButton("...");
@@ -146,34 +130,32 @@ public abstract class AbstractPropertyCellEditor
   }
 
   /**
-   * Setzt den Dialog, mit dessen Hilfe der Eigenschaftswert komfortabel
-   * bearbeitet werden kann.
+   * Set the dialog that alows for easy edit of the property.
    *
-   * @param detailsDialog
+   * @param detailsDialog The dialog that allows editing of the property.
    */
   public void setDetailsDialog(DetailsDialog detailsDialog) {
     fDetailsDialog = detailsDialog;
   }
 
   /**
-   * Setzt den Eigenschaftswert.
+   * Set the property.
    *
-   * @param value
+   * @param value The property.
    */
   protected void setValue(Object value) {
     fProperty = (Property) value;
   }
 
   /**
-   * Markiert das Attribut als geändert.
+   * Mark the property as changed.
    */
   protected void markProperty() {
     fProperty.markChanged();
   }
 
   /**
-   * Öffnet den Dialog, mit dessen Hilfe die Eigenschaften eines Attributs
-   * komfortabler eingestellt werden können.
+   * Opens the dialog.
    */
   protected void showDialog() {
     if (fDetailsDialog != null) {

@@ -23,9 +23,7 @@ import org.opentcs.guing.model.elements.PointModel;
 import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
- * Interface für das Datenmodell des gesamten modellierten Systems. Besteht aus
- * den Fahrzeugen und dem Fahrkurslayout. Das Systemmodell verwaltet
- * Komposita-Komponenten, die unbedingt vorhanden sein müssen.
+ * Interface for the date model of the whole system model.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -40,7 +38,7 @@ public interface SystemModel
   KeyValueSetProperty getPropertyMiscellaneous();
 
   /**
-   * Fügt dem Systemmodell eine Hauptkomponente hinzu.
+   * Add a main component to the system model.
    *
    * @param key The folder key
    * @param component The model component to be added to the folder
@@ -48,7 +46,7 @@ public interface SystemModel
   void addMainFolder(FolderKey key, ModelComponent component);
 
   /**
-   * Liefert die zum Schlüssel passende Hauptkomponente.
+   * Return the main model component for the folder key.
    *
    * @param key The folder key
    * @return The model component that represents the main folder
@@ -56,8 +54,7 @@ public interface SystemModel
   ModelComponent getMainFolder(FolderKey key);
 
   /**
-   * Liefert das Elternobjekt zu einem ModelComponent-Objekt. Die Zuordnung wird
-   * über das Class-Objekt von item vorgenommen.
+   * Returns the parent folder for a specified model component.
    *
    * @param item The model component where a parent folder should be found from
    * @return The parent folder of the item
@@ -65,18 +62,18 @@ public interface SystemModel
   ModelComponent getFolder(ModelComponent item);
 
   /**
-   * Liefert alle Objekt, die zu einer bestimmten Klasse gehören.
+   * Return all object of a specified class in a folder.
    *
-   * @param foldername der Name des Ordners, in dem gesucht werden soll
-   * @param classType die Klasse, von der die Objekte sein müssen
-   * @return alle Objekte einer Klasse
+   * @param foldername Key of the folder in which to search.
+   * @param classType Tha class of the objects to find.
+   * @return List of all object of specified type in the folder.
    */
   <T> List<T> getAll(FolderKey foldername, Class<T> classType);
 
   /**
-   * Liefert alle Objekte in allen Ordnern.
+   * Return all model components in the system model.
    *
-   * @return Liste aller Objekte
+   * @return List of all model components in the system model.
    */
   List<ModelComponent> getAll();
 
@@ -102,15 +99,14 @@ public interface SystemModel
   Figure getFigure(ModelComponent component);
 
   /**
-   * Liefert die Zeichnung.
+   * Return the drawing.
    *
-   * @return die Zeichnung
+   * @return The drawing.
    */
   Drawing getDrawing();
 
   /**
-   * Liefert die Zeichenmethode. Hier sind beispielsweise möglich "symbolisch"
-   * und auf "Koordinaten basierend".
+   * Return the drawing method.
    *
    * @return The drawing method
    */
@@ -125,19 +121,17 @@ public interface SystemModel
   ModelComponent getModelComponent(String name);
 
   /**
-   * Liefert eine Liste aller Fahrzeuge.
+   * Return a list of all vehicles.
    *
    * @return The list of vehicle models
    */
   List<VehicleModel> getVehicleModels();
 
   /**
-   * Sucht ein Fahrzeug mit einem bestimmten Namen.
+   * Return a vehicle with a specified name.
    *
-   * @param name der Name des gesuchten Fahrzeugs
-   * @return das gefundene Fahrzeug oder
-   * <code> null </code>, wenn kein entsprechendes Fahrzeug gefunden werden
-   * konnte
+   * @param name The name of the vehicle to search.
+   * @return The vehicle or null if vehicle is not found.
    */
   VehicleModel getVehicleModel(String name);
 
@@ -149,52 +143,47 @@ public interface SystemModel
   LayoutModel getLayoutModel();
 
   /**
-   * Liefert eine Liste aller Knoten.
+   * Return a list of all points.
    *
    * @return The list of points
    */
   List<PointModel> getPointModels();
 
   /**
-   * Sucht einen Knoten mit einem bestimmten Namen.
+   * Return a point with the specified name.
    *
-   * @param name der Name des gesuchten Knotens
-   * @return den gefundenen Knoten oder
-   * <code> null </code>, wenn kein entsprechender Knoten gefunden werden konnte
+   * @param name The name of the point to return.
+   * @return The point or null if the name is not found.
    */
   PointModel getPointModel(String name);
 
   /**
-   * Liefert alle Stationen (Übergabestationen, Batterieladestation,
-   * Arbeitsstationen).
+   * Return all locations.
    *
-   * @return eine Liste aller Stationen
+   * @return List of all locations.
    */
   List<LocationModel> getLocationModels();
 
   /**
-   * Liefert alle Stationen, die zu einem bestimmten Typ gehören.
+   * Return all locations with a specified location type.
    *
-   * @param locationType der Stationstyp
-   * @return die Stationen
+   * @param locationType The location type.
+   * @return List of locations with the location type.
    */
   List<LocationModel> getLocationModels(LocationTypeModel locationType);
 
   /**
-   * Sucht eine Station mit einem bestimmten Namen.
+   * Return a location with the specified name.
    *
-   * @param name der Name der gesuchten Station
-   * @return die gefundene Station oder
-   * <code> null </code>, wenn keine entsprechende Station gefunden werden
-   * konnte
+   * @param name The name of the location to return.
+   * @return The location or null if the name is not found.
    */
   LocationModel getLocationModel(String name);
 
   /**
-   * Liefert alle Kanten zwischen zwei Punkten.
+   * Return all paths.
    *
-   * @return eine Liste mit allen Kanten, die jeweils zwei Punkte miteinander
-   * verbinden
+   * @return A list of all paths.
    */
   List<PathModel> getPathModels();
 
@@ -207,32 +196,32 @@ public interface SystemModel
   PathModel getPathModel(String name);
 
   /**
-   * Liefert alle ´Links, die jeweils einen Punkt mit einer Station verbinden.
+   * Return all links in the model.
    *
-   * @return eine Liste aller Referenzen
+   * @return A list of all links.
    */
   List<LinkModel> getLinkModels();
 
   /**
-   * Liefert alle Links auf Stationen eines bestimmten Typs.
+   * Return all links attached to a location with a specified location type.
    *
-   * @param locationType der Stationstyp
-   * @return eine Liste aller Links
+   * @param locationType The location type.
+   * @return A list of all links attached to a location with a specified location type.
    */
   List<LinkModel> getLinkModels(LocationTypeModel locationType);
 
   /**
-   * Liefert alle Stationstypen.
+   * Return all location types.
    *
-   * @return alle Stationstypen
+   * @return List of all location types.
    */
   List<LocationTypeModel> getLocationTypeModels();
 
   /**
-   * Liefert den Stationstyp mit einem bestimmten Namen.
+   * Return the location type with the specified name.
    *
-   * @param name der Name des gesuchten Stationstyps
-   * @return der gesuchte Stationstyp
+   * @param name The name of the location type to return.
+   * @return The location type.
    */
   LocationTypeModel getLocationTypeModel(String name);
 
@@ -245,18 +234,16 @@ public interface SystemModel
   BlockModel getBlockModel(String name);
 
   /**
-   * Liefert alle Blockbereiche.
+   * Return all block models.
    *
-   * @return eine Liste aller Blockbereiche
+   * @return A list of all block models.
    */
   List<BlockModel> getBlockModels();
 
   /**
-   * Liefert alle grafischen Objekte, die lediglich eine illustrierende Wirkung
-   * haben. Diese Objekte sind für den Fahrkurs irrelevant.
+   * Return all figures that are used for visualisation purposes.
    *
-   * @return eine Liste aller sonstigen grafischen Objekte, die mit dem Fahrkurs
-   * direkt nichts zu tun haben
+   * @return A list of all figures that are used for visualisation purposes.
    */
   List<OtherGraphicalElement> getOtherGraphicalElements();
 

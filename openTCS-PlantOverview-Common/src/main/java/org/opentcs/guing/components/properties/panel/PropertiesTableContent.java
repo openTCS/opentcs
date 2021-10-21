@@ -81,9 +81,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Zeigt die Attribute eines ModelComponent in einer Tabelle. Die
- * PropertiesTable kann entweder nur die Attribute zu einem bestimmten
- * Fahrzeugtyp anzeigen oder je nach aktivem Fahrzeugtyp variieren.
+ * Shows the attributes of a model component in a table.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -163,7 +161,6 @@ public class PropertiesTableContent
       setModel(fModel);
     }
     else {
-      // Prï¿½fen, ob Name gï¿½ltig
       if (fModel.getName().isEmpty()) {
         try {
           if (fUndoRedoManager.canUndo()) {
@@ -174,7 +171,6 @@ public class PropertiesTableContent
           LOG.warn("Exception trying to undo", ex);
         }
       }
-      // 2013-11-04 HH: Alle ï¿½nderungen im Modell speichern, nicht nur den Namen!
       fModel.propertiesChanged(this);
       eventBus.onEvent(new ResetInteractionToolCommand(this));
     }
@@ -225,17 +221,9 @@ public class PropertiesTableContent
 
   @Override  // AttributesChangeListener
   public void propertiesChanged(AttributesChangeEvent e) {
-//    if (e.getInitiator() == this) {
-//      // Setzt das SelectionTool zurï¿½ck, wenn der Benutzer ï¿½nderungen
-//      // an der Tabelle vorgenommen hat
-//      guiManager.resetSelectionTool();
-//    }
-//    else {
-    // 2013-12-09 HH Test: Tabelle immer sofort aktualisieren - gibt das Performance-Verluste?
     fEvaluateTableChanges = false;
     ((DefaultTableModel) fTable.getModel()).fireTableDataChanged();
     fEvaluateTableChanges = true;
-//    }
   }
 
   @Override  // ConnectionChangeListener
@@ -272,7 +260,7 @@ public class PropertiesTableContent
     // An editor allowing undo/redo
     UndoableCellEditor undoableEditor;
     UserMessageHelper umh = new UserMessageHelper();
-    
+
     ListCellRenderer<Object> defaultRenderer = new StringListCellRenderer<>(this::objectToString);
 
     // String properties: Name etc.
@@ -416,10 +404,10 @@ public class PropertiesTableContent
     ResourceBundleUtil r = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
     String attributeColumn = r.getString("propertiesTableContent.column_attribute.headerText");
     String valueColumn = r.getString("propertiesTableContent.column_value.headerText");
-    model.setColumnIdentifiers(new Object[] {attributeColumn, valueColumn});
+    model.setColumnIdentifiers(new Object[]{attributeColumn, valueColumn});
 
     for (Property property : content.values()) {
-      model.addRow(new Object[] {property.getDescription(), property});
+      model.addRow(new Object[]{property.getDescription(), property});
     }
 
     return model;

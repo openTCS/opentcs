@@ -56,7 +56,7 @@ public abstract class CoordinateUndoActivity
   }
 
   /**
-   * Erstellt eine Momentaufnahme vor der Änderung des Attributs.
+   * Creates a snapshot before the modification of the properties.
    */
   public void snapShotBeforeModification() {
     pxBeforeModification = (CoordinateProperty) pxModel.clone();
@@ -66,7 +66,7 @@ public abstract class CoordinateUndoActivity
   }
 
   /**
-   * Erstellt eine Momentaufnahme nach der Änderung des Attributs.
+   * Creates a snapshot after the modification of the properties.
    */
   public void snapShotAfterModification() {
     pxAfterModification = (CoordinateProperty) pxModel.clone();

@@ -13,7 +13,7 @@ import org.opentcs.guing.components.properties.event.NullAttributesChangeListene
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Ein Undo für die Änderung eines Attributs.
+ * An undo action for a property change.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -21,18 +21,19 @@ public class PropertyUndoActivity
     extends javax.swing.undo.AbstractUndoableEdit {
 
   /**
-   * Das Attribut daselbst.
+   * The property that changes.
    */
   protected Property fProperty;
   /**
-   * Der Zustand des Attributs vor der Änderung.
+   * The property before the change.
    */
   protected Property fBeforeModification;
   /**
-   * Der Zustand des Attributs nach der Änderung.
+   * The property after the change.
    */
   protected Property fAfterModification;
   /**
+   * Indicates whether this change has been performed.
    * Defaults to true; becomes false if this edit is undone, true
    * again if it is redone.
    */
@@ -53,23 +54,23 @@ public class PropertyUndoActivity
   }
 
   /**
-   * Erstellt eine Momentaufnahme vor der Änderung des Attributs.
+   * Creates a snapshot of the property before the change.
    */
   public void snapShotBeforeModification() {
     fBeforeModification = createMemento();
   }
 
   /**
-   * Erstellt eine Momentaufnahme nach der Änderung des Attributs.
+   * Creates a snapshot of the property after the change.
    */
   public void snapShotAfterModification() {
     fAfterModification = createMemento();
   }
 
   /**
-   * Erzeugt eine Momentaufnahme des aktuellen Zustands des Attributs.
+   * Creates a copy of the current state of the property.
    *
-   * @return
+   * @return A copy of the current state of the property.
    */
   protected Property createMemento() {
     return (Property) fProperty.clone();
@@ -86,7 +87,8 @@ public class PropertyUndoActivity
   }
 
   @Override
-  public void undo() throws CannotUndoException {
+  public void undo()
+      throws CannotUndoException {
     fProperty.copyFrom(fBeforeModification);
     fProperty.markChanged();
     fProperty.getModel().propertiesChanged(new NullAttributesChangeListener());
@@ -94,7 +96,8 @@ public class PropertyUndoActivity
   }
 
   @Override
-  public void redo() throws CannotRedoException {
+  public void redo()
+      throws CannotRedoException {
     fProperty.copyFrom(fAfterModification);
     fProperty.markChanged();
     fProperty.getModel().propertiesChanged(new NullAttributesChangeListener());

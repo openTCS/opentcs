@@ -248,11 +248,6 @@ public class PeripheralOperationsPropertyEditorPanel
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
 
-  /**
-   * Bewegt den aktuellen Eintrag nach unten.
-   *
-   * @param evt das auslösende Ereignis
-   */
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
     int index = itemsList.getSelectedIndex();
     if (index == -1 || index == itemsList.getModel().getSize() - 1) {

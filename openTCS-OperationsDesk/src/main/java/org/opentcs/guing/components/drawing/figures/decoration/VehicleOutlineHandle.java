@@ -40,11 +40,9 @@ public class VehicleOutlineHandle
       at.rotate(-Math.toRadians(vf.getAngle()));
       at.translate(-bounds.getCenterX(), -bounds.getCenterY());
       Path2D shape = (Path2D) at.createTransformedShape(bounds);
-      // Rahmen um die Figur
       g.setClip(shape);
       g.setStroke(new BasicStroke(2.0f));
       g.draw(shape);
-      // Transparente Füllung über die Figur
       Color c = new Color(127, 0, 127, 127);
       g.setPaint(c);
       g.fill(shape);

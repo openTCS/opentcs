@@ -669,7 +669,7 @@ public class OpenTCSView
       ModelComponent folder = fModelManager.getModel().getFolder(modelComponent);
 
       if (folder == null) {
-        // Workaround: Eigentlich sollten im Tree keine Folder selektiert sein!
+        // Workaround: No folders should be selected in the tree!
         return null;
       }
 
@@ -778,7 +778,7 @@ public class OpenTCSView
     DrawingView drawingView = fDrawingEditor.getActiveView();
     drawingView.clearSelection();
     Figure figure = findFigure(modelComponent);
-    // LocationType hat keine Figur
+    // LocationTypes don't have a figure.
     if (figure != null) {
       drawingView.toggleSelection(figure);
     }
@@ -822,8 +822,8 @@ public class OpenTCSView
     // Point/Location: Remove corresponding Figure.
     if (model instanceof PointModel || model instanceof LocationModel) {
       LabeledFigure lf = (LabeledFigure) fModelManager.getModel().getFigure(model);
-      // Die Drawing l�scht auch ggf. mit dem Point verbundene PathConnections
-      // bzw. eine mit der Location verbundenen LinkConnection
+      // The drawing will also remove any connected PathConnections or LinkConnections
+      // that belong to the figure.
       fDrawingEditor.getActiveView().getDrawing().remove(lf);
       componentRemoved = true;
     }
@@ -1191,7 +1191,7 @@ public class OpenTCSView
 
     if (modelComponent instanceof LocationModel) {
       LocationModel location = (LocationModel) modelComponent;
-      // Zu einer neu erzeugten Location zun�chst den Default-Typ zuweisen
+      // Add a default LocationType to new Locations.
       if (location.getLocationType() == null) {
         List<LocationTypeModel> types = fModelManager.getModel().getLocationTypeModels();
         LocationTypeModel type;
@@ -1212,10 +1212,9 @@ public class OpenTCSView
 
 //    procAdapterUtil.registerProcessAdapter(modelComponent,
 //                                           fModelManager.getModel().getProcessAdapterPool());
-    // Knoten "Modell"
     fComponentsTreeManager.addItem(folder, modelComponent);
     modelComponent.addAttributesChangeListener(attributesEventHandler);
-    // Neuer LocationType: allen existierenden Locations bekannt machen
+    // Notify all locations of a new LocationType.
     if (modelComponent instanceof LocationTypeModel) {
       List<LocationTypeModel> types = fModelManager.getModel().getLocationTypeModels();
 

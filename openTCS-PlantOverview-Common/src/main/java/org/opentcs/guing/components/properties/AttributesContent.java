@@ -12,46 +12,42 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
- * Ein Inhalt für eine Swing-Komponente, der über Eigenschaften eines
- * ModelComponent-Objekt Auskunft gibt und Möglichkeiten bietet, diese
- * Eigenschaften zu verändern.
+ * Interface for Swing components that allow editing and viewing a model component attribute.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface AttributesContent {
 
   /**
-   * @param model Das ModelComponent-Objekt, dessen Eigenschaften dargestellt 
-   * werden sollen.
+   * Sets the model component whose properties are to be displayed.
+   *
+   * @param model The model component whose properties are to be displayed.
    */
   void setModel(ModelComponent model);
 
   /**
-   * Setzt die Anzeige zurück, wenn kein ModelComponente-Objekt mehr dargestellt
-   * werden soll.
+   * Resets this content to no longer display the model component properties.
    */
   void reset();
 
   /**
-   * Liefert den Inhalt, der in eine andere Swing-Komponente eingebunden werden
-   * kann.
+   * Returns the content as a Swing component.
    *
-   * @return
+   * @return The content as a Swing component.
    */
   JComponent getComponent();
 
   /**
-   * Liefert eine Beschreibung des Inhalts, der bei Aktivierung in der
-   * übergeordneten Swing-Komponente angezeigt werden kann.
+   * Return a description of the content.
    *
-   * @return
+   * @return A description of the content.
    */
   String getDescription();
 
   /**
-   * Initialisiert den Inhalt mit dem Parent und dem UndoManager.
+   * Initialises the content with the undo manager.
    *
-   * @param undoRedoManager
+   * @param undoRedoManager The content with the undo manager.
    */
   void setup(UndoRedoManager undoRedoManager);
 }

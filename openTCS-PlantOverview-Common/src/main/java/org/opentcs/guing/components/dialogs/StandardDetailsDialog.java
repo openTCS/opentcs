@@ -17,9 +17,8 @@ import org.opentcs.guing.components.properties.type.ModelAttribute;
 import org.opentcs.guing.components.properties.type.Property;
 
 /**
- * Ein Dialog, in den eine Komponente vom Typ DialogContent zum Ändern von
- * Eigenschaftswerten hineingelegt werden.
- * Der Dialog verfügt über einen Ok- und einen Cancel-Button.
+ * A dialog in which a {@link DialogContent} can be added.
+ * The dialog has an OK and a cancel button.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -37,7 +36,7 @@ public class StandardDetailsDialog
   public static final int RET_OK = 1;
   private int returnStatus = RET_CANCEL;
   /**
-   * Die Komponente, die das Ändern eines Properties erlaubt.
+   * The details dialog content to change a property.
    */
   private final DetailsDialogContent fContent;
   private final Component fParentComponent;
@@ -45,9 +44,9 @@ public class StandardDetailsDialog
   /**
    * Creates new form JDialog
    *
-   * @param parent Die Komponente, zu der der Dialog zentriert wird
-   * @param content der Inhalt
-   * @param modal ob der Dialog modal sein soll
+   * @param parent The parent component.
+   * @param content Details dialog content.
+   * @param modal Whether or not the dialog is modal.
    */
   public StandardDetailsDialog(JPanel parent, boolean modal, DetailsDialogContent content) {
     super(JOptionPane.getFrameForComponent(parent), modal);
@@ -57,11 +56,11 @@ public class StandardDetailsDialog
   }
 
   /**
-   * Konstruktor mit einem Dialog als Besitzer.
+   * Creates a new dialog.
    *
-   * @param parent
-   * @param modal
-   * @param content
+   * @param parent The parent dialog.
+   * @param modal Whether or not the dialog is modal.
+   * @param content Details dialog content.
    */
   public StandardDetailsDialog(JDialog parent, boolean modal, DetailsDialogContent content) {
     super(parent, modal);
@@ -70,8 +69,8 @@ public class StandardDetailsDialog
     initialize();
   }
 
-  /**
-   * Initialisiert den Dialog.
+  /*
+   * Initialises the dialog.
    */
   protected final void initialize() {
     JComponent component = (JComponent) fContent;
@@ -94,8 +93,7 @@ public class StandardDetailsDialog
   }
 
   /**
-   * Gibt zurück, ob der Benutzer den Ok- oder den Cancel-Button gedrückt hat,
-   * um dem Dialog zu beenden.
+   * Returns the return status.
    *
    * @return the return status of this dialog - one of RET_OK or RET_CANCEL
    */
@@ -157,16 +155,10 @@ public class StandardDetailsDialog
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
 
-  /**
-   * Wird aufgerufen, wenn der Nutzer den Cancel-Button drückt.
-   */
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
       doClose(RET_CANCEL);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-  /**
-   * Wird aufgerufen, wenn der Nutzer den OK-Button drückt.
-   */
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
       fContent.updateValues();
 
@@ -180,7 +172,7 @@ public class StandardDetailsDialog
     }//GEN-LAST:event_okButtonActionPerformed
 
   /**
-   * Schließt den Dialog.
+   * Closes the dialog.
    */
   private void doClose(int retStatus) {
     returnStatus = retStatus;
@@ -188,9 +180,6 @@ public class StandardDetailsDialog
     setVisible(false);
   }
 
-  /**
-   * Closes the dialog
-   */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
       doClose(RET_CANCEL);
     }//GEN-LAST:event_closeDialog

@@ -21,7 +21,7 @@ import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Benutzerschnittstelle zum Auswählen eines Wertes aus einer ComboBox.
+ * Panel for selecting a property from a combo box.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

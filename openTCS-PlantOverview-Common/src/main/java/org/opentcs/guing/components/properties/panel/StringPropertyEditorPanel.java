@@ -15,7 +15,7 @@ import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Ein Panel, mit dem ein String editiert werden kann.
+ * A panel that can edit a string property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -24,7 +24,7 @@ public class StringPropertyEditorPanel
     implements DetailsDialogContent {
 
   /**
-   * Das Property, auf das der Panel zugreift.
+   * The property that is being edited.
    */
   private StringProperty fProperty;
 
@@ -42,8 +42,7 @@ public class StringPropertyEditorPanel
   }
 
   /**
-   * Richtet die Dialogelemente entsprechend den Eigenschaftswerten ein. Diese
-   * Methode wird aufgerufen, wenn der Dialog geöffnet wird.
+   * Initialises the dialog elements.
    */
   public void initFields() {
     textArea.setText(fProperty.getText());

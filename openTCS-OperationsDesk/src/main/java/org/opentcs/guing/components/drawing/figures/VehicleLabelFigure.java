@@ -17,7 +17,7 @@ import org.opentcs.guing.model.elements.VehicleModel;
 
 /**
  *
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class VehicleLabelFigure
@@ -30,7 +30,7 @@ public class VehicleLabelFigure
     super(vehicleName);
   }
 
-  @Override  // TextFigure
+  @Override
   protected void drawFill(Graphics2D g) {
     if (getText() != null) {
       TextLayout layout = getTextLayout();
@@ -46,11 +46,11 @@ public class VehicleLabelFigure
     }
   }
 
-  @Override  // TextFigure
+  @Override
   protected void drawStroke(Graphics2D g) {
   }
 
-  @Override  // TextFigure
+  @Override
   protected void drawText(Graphics2D g) {
     if (getText() != null || isEditable()) {
       TextLayout layout = getTextLayout();
@@ -59,26 +59,19 @@ public class VehicleLabelFigure
     }
   }
 
-  @Override  // LabelFigure
+  @Override
   public void figureChanged(FigureEvent event) {
     if (event.getFigure() instanceof LabeledFigure) {
       LabeledFigure lf = (LabeledFigure) event.getFigure();
       TCSFigure figure = lf.getPresentationFigure();
       VehicleModel model = (VehicleModel) figure.getModel();
       String name = model.getName();
-      
+
       if (model.getPoint() != null) {
         name += "@" + model.getPoint().getName();
       }
 
-      // TODO: Mehrzeilig/HTML? - So geht's nicht:
-//      String name = "<html>" + model.getName() + "</html>";
-//      if (model.getPoint() != null) {
-//        name = "<html>" + model.getName() + "</br>" + model.getPoint().getName() + "</html>";
-//      }
-      
       setText(name);
-      // Label neu zeichnen
       invalidate();
       validate();
     }

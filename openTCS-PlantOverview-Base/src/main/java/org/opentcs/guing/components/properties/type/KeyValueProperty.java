@@ -19,7 +19,7 @@ public class KeyValueProperty
     extends AbstractComplexProperty {
 
   /**
-   * Der Schlüssel.
+   * The key.
    */
   private String fKey;
 
@@ -33,7 +33,7 @@ public class KeyValueProperty
   }
 
   /**
-   * Creates a new instance.
+   * Creates a new instance with a key and value.
    *
    * @param model The model component.
    * @param key The key.
@@ -47,14 +47,14 @@ public class KeyValueProperty
 
   @Override
   public Object getComparableValue() {
-    return fKey + fValue; // besser: toString() ???
+    return fKey + fValue;
   }
 
   /**
-   * Setzt den Schlüssel und den Wert.
+   * Set the key and the value.
    *
-   * @param key der Schlüssel
-   * @param value der Wert
+   * @param key The key
+   * @param value The value
    */
   public void setKeyAndValue(String key, String value) {
     fKey = key;
@@ -62,9 +62,9 @@ public class KeyValueProperty
   }
 
   /**
-   * Liefert den Schlüssel.
+   * Returns the key.
    *
-   * @return den Schlüssel
+   * @return The key of this property.
    */
   public String getKey() {
     return fKey;

@@ -12,8 +12,7 @@ import java.util.List;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für Geschwindigkeitsangaben.
- * Beispiele: 1 m/s, 2.2 km/h
+ * A property for speeds.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -31,7 +30,7 @@ public class SpeedProperty
   }
 
   /**
-   * Konstruktor mit Wert und Maßeinheit.
+   * Creates a new instance with a value and a unit.
    *
    * @param model The model component.
    * @param value The value.
@@ -39,7 +38,6 @@ public class SpeedProperty
    */
   public SpeedProperty(ModelComponent model, double value, Unit unit) {
     super(model, value, unit, Unit.class, relations());
-    // MaxVelocity and MaxReverseVelocity of a path must not be negative.
     setUnsigned(true);
   }
 

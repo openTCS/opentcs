@@ -55,15 +55,9 @@ import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Standardimplementierung einer Baumansicht zur Darstellung der Modellelemente
- * in einem einzigen Baum.
- * <p>
- * <b>Entwurfsmuster:</b> Befehl.
- * StandardTreeViewPanel ist der Auslöser für die Ausführung eines konkreten
- * UserObjects, welches ja einen Befehl darstellt.
+ * Abstract implementation of a tree view to display model components in a tree.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @see UserObject
  */
 public abstract class AbstractTreeViewPanel
     extends JPanel
@@ -71,11 +65,11 @@ public abstract class AbstractTreeViewPanel
                EditableComponent {
 
   /**
-   * Der Wurzelknoten.
+   * The root node.
    */
   private SortableTreeNode fRootNode;
   /**
-   * Das Modell hinter dem JTree.
+   * The model for the JTree.
    */
   private DefaultTreeModel fTreeModel;
   /**
@@ -87,7 +81,7 @@ public abstract class AbstractTreeViewPanel
    */
   private final ComponentsManager componentsManager;
   /**
-   *
+   * The undo manger.
    */
   protected final UndoRedoManager fUndoRedoManager;
   /**
@@ -226,11 +220,10 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Traversiert den gesamten Baum, um den Knoten zu finden, der das übergebene
-   * Datenobjekt in seinem UserObject hält.
+   * Searches the tree to find the node that is associated with the specified model component.
    *
-   * @param dataObject
-   * @return
+   * @param dataObject the object to search for.
+   * @return the node that holds the dataObject.
    */
   public DefaultMutableTreeNode findFirst(Object dataObject) {
     DefaultMutableTreeNode searchNode = null;
@@ -286,10 +279,10 @@ public abstract class AbstractTreeViewPanel
     }
     else {
       SimpleFolder folder;
-      boolean sorting = true;  // Die Kindelemente des Knotens sollen sortiert werden
+      boolean sorting = true;
 
       if (item instanceof LayoutUserObject) {
-        sorting = false; // Kindelemente des Layouts nicht sortieren
+        sorting = false;
       }
 
       SortableTreeNode treeItem = createTreeNode(item, sorting);
@@ -439,12 +432,11 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Fügt ein Element am übergebenen Index bzw an letzter Stelle ein, falls
-   * das Elternobjekt weniger Elemente besitzt.
+   * Adds an element at the specified index or the end if the parent item has fewer elements.
    *
-   * @param treeItem Das einzufügende Item.
-   * @param parentItem Das Elternobjekt.
-   * @param index Die Position.
+   * @param treeItem The item to add.
+   * @param parentItem the parent item.
+   * @param index The index at which to add the item.
    */
   private void insertElementAt(SortableTreeNode treeItem,
                                DefaultMutableTreeNode parentItem,
@@ -466,11 +458,11 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Fabrikmethode zur Erzeugung eines Knotens.
+   * Creates a new tree node.
    *
-   * @param item Das UserObject.
-   * @param sorting Ob die Kindelemente des Knotens sortiert werden sollen.
-   * @return Der Knoten.
+   * @param item The item the node should represent.
+   * @param sorting Whether or not the child components should be sorted.
+   * @return The new tree node.
    */
   private SortableTreeNode createTreeNode(UserObject item, boolean sorting) {
     SortableTreeNode treeNode = new SortableTreeNode(item);
@@ -480,21 +472,19 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Fabrikmethode zur Erzeugung eines Comparators, mit dessen Hilfe die
-   * Sortierung durchgeführt wird.
+   * Creates a new comparator to sort the tree.
    *
-   * @return
+   * @return a new comparator to sort the tree.
    */
   private Comparator<Object> createSortComparator() {
     return new AscendingTreeViewNameComparator();
   }
 
   /**
-   * Traversiert den gesamten Baum, um alle Knoten zu finden, die das übergebene
-   * Datenobjekt in ihrem UserObject halten.
+   * Searches the tree to find all the nodes that are associated with the specified data object.
    *
-   * @param dataObject
-   * @return
+   * @param dataObject The object to search for.
+   * @return A list of all tree nodes that are associated with the data object.
    */
   private List<DefaultMutableTreeNode> findAll(Object dataObject) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
@@ -539,9 +529,9 @@ public abstract class AbstractTreeViewPanel
   }
 
   /**
-   * Liefert das DefaultMutableTreeNode-Objekt zu dem angegeben Pfad.
+   * Return the user object for the selected path.
    *
-   * @return
+   * @return the user object for the selected path.
    */
   private UserObject getUserObject() {
     DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) objectTree.getLastSelectedPathComponent();

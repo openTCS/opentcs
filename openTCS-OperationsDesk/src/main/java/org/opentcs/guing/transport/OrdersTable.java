@@ -13,8 +13,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 /**
- * Eine Tabelle für Transportaufträge und Fahraufträge, die weder das Editieren
- * noch das Selektieren von Zellen erlaubt.
+ * A table for transport orders.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

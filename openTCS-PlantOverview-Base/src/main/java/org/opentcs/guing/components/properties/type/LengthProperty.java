@@ -12,8 +12,7 @@ import java.util.List;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Attribut für Längenangaben.
- * Beispiele: 1 mm, 20 cm, 3.4 m, 17.98 km
+ * A property for a length.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -31,7 +30,7 @@ public class LengthProperty
   }
 
   /**
-   * Konstruktor mit Wert und Maßeinheit.
+   * Creates a new instance with a value and a unit.
    *
    * @param model The model component.
    * @param value The value.

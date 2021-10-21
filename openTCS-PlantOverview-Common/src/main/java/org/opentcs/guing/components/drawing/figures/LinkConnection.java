@@ -25,9 +25,7 @@ import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.model.elements.PointModel;
 
 /**
- * Eine gestrichelte Linie, die einen Meldepunkt mit einer Übergabestation oder
- * einer Batterieladestation verbindet. Eine SimpleLineConnection besitzt keine
- * Pfeilspitzen.
+ * A dashed line that connects a decision point with a location.
  *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
@@ -69,10 +67,10 @@ public class LinkConnection
   }
 
   /**
-   * Verknüpft zwei Figure-Objekte durch diese Verbindung.
+   * Connects two figures.
    *
-   * @param point das erste Figure-Objekt
-   * @param location das zweite Figure-Objekt
+   * @param point The point figure to connect.
+   * @param location The location figure to connect.
    */
   public void connect(LabeledPointFigure point, LabeledLocationFigure location) {
     Connector compConnector = new ChopEllipseConnector();
@@ -94,7 +92,6 @@ public class LinkConnection
 
   @Override
   public boolean canConnect(Connector start) {
-    // Allow links to be created only starting from locations.
     return start.getOwner().get(FigureConstants.MODEL) instanceof LocationModel;
   }
 

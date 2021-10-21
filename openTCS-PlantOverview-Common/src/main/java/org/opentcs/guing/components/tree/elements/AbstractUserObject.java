@@ -16,14 +16,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.persistence.ModelManager;
 
 /**
- * Defaultimplementierung des UserObject-Interfaces. Ein UserObject ist das
- * Objekt, das ein DefaultMutableTreeNode in einem JTree mit verwaltet. Ein
- * UserObject hat hier die Funktion des Befehls im Befehlsmuster. Die
- * ModelingApplication ist der Befehlsempfänger. Ein UserObject hält darüber
- * hinaus eine Referenz auf ein Datenobjekt aus dem Systemmodell.
- * <p>
- * <b>Entwurfsmuster:</b> Befehl. AbstractUserObject ist der abstrakte Befehl.
- * Klient ist der TreeView und Empfänger die Applikation.
+ * Abstract implementation of a UserObject.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -31,7 +24,7 @@ public abstract class AbstractUserObject
     implements UserObject {
 
   /**
-   * Das Datenobjekt aus dem Systemmodell.
+   * The model component this user object represents.
    */
   private final ModelComponent fModelComponent;
   /**
@@ -105,7 +98,7 @@ public abstract class AbstractUserObject
   }
 
   /**
-   * Wird aufgerufen, wenn mehrere Objekte im Baum selektiert werden sollen.
+   * Is called when multiple objects in a tree are selected.
    */
   public void selectMultipleObjects() {
     getGuiManager().addSelectedModelComponent(getModelComponent());

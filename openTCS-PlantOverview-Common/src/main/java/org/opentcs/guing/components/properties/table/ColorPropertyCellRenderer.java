@@ -15,7 +15,7 @@ import javax.swing.border.Border;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 
 /**
- * Ein Renderer für ein ColorProperty.
+ * A cell renderer for a color property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -24,7 +24,7 @@ public class ColorPropertyCellRenderer
     implements javax.swing.table.TableCellRenderer {
 
   /**
-   * Creates a new instance of ColorPropertyCellRenderer
+   * Creates a new instance of ColorPropertyCellRenderer.
    */
   public ColorPropertyCellRenderer() {
     super();

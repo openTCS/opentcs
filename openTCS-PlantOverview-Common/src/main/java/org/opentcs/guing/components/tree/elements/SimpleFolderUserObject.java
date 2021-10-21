@@ -15,8 +15,7 @@ import org.opentcs.guing.model.CompositeModelComponent;
 import org.opentcs.guing.persistence.ModelManager;
 
 /**
- * Ein einfacher Ordner in der Baumansicht, dem keine weitere Funktionalität
- * zugeordnet ist.
+ * A folder in the TreeView with no added functionality.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */

@@ -11,7 +11,7 @@ import java.awt.Color;
 import org.opentcs.guing.model.ModelComponent;
 
 /**
- * Ein Farbattribut.
+ * A color property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -19,12 +19,12 @@ public final class ColorProperty
     extends AbstractProperty {
 
   /**
-   * Die Farbe.
+   * The color.
    */
   private Color fColor;
 
   /**
-   * Konstruktor mit Übergabe einer Farbe.
+   * Create a new instance with a color.
    *
    * @param model The model component.
    * @param color The color.
@@ -35,7 +35,7 @@ public final class ColorProperty
   }
 
   /**
-   * Setzt die Farbe.
+   * Set the color.
    *
    * @param color The color
    */
@@ -44,7 +44,7 @@ public final class ColorProperty
   }
 
   /**
-   * Liefert die Farbe.
+   * Returns the color.
    *
    * @return The color.
    */

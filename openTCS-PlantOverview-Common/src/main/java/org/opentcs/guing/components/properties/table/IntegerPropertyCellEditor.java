@@ -14,16 +14,11 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import org.opentcs.guing.components.properties.type.IntegerProperty;
-import org.opentcs.guing.components.properties.type.StringProperty;
 import org.opentcs.guing.util.UserMessageHelper;
 import org.slf4j.LoggerFactory;
 
 /**
- * Ein CellEditor fï¿½r Attribute vom Typ {
- *
- * @see StringProperty}. Der Editor umfasst ein Textfeld zur schnellen Eingabe
- * sowie den Button mit drei Punkten, bei dessen Anklicken sich ein
- * DetailsDialog zum komfortablen Bearbeiten des Attributs ï¿½ffnet.
+ * A cell editor for an integer property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -42,7 +37,7 @@ public class IntegerPropertyCellEditor
   }
 
   /**
-   * Konfiguriert das Aussehen des Textfeldes.
+   * Initialises the style for the text field.
    *
    * @param textField
    */
@@ -52,9 +47,9 @@ public class IntegerPropertyCellEditor
   }
 
   /**
-   * Erzeugt die Komponente, die aus Editor und kleinem Button besteht.
+   * Create the component for this editor.
    *
-   * @return
+   * @return the component for this editor.
    */
   @Override
   protected JComponent createComponent() {
@@ -108,9 +103,9 @@ public class IntegerPropertyCellEditor
   }
 
   /**
-   * Liefert das Attribut.
+   * Returns the property for this editor.
    *
-   * @return
+   * @return the property for this editor.
    */
   protected IntegerProperty property() {
     return (IntegerProperty) fProperty;

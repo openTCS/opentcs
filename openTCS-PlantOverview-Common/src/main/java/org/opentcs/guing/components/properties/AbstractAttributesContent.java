@@ -12,8 +12,7 @@ import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.thirdparty.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
- * Basisimplementierung für Inhalte zur Darstellung von Eigenschaften eines
- * ModelComponent-Objekts.
+ * Base implementation for visualisation of model component properties.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -21,15 +20,15 @@ public abstract class AbstractAttributesContent
     implements AttributesContent {
 
   /**
-   * Das Model, dessen Eigenschaften angezeigt werden sollen.
+   * The model component to show the properties of.
    */
   protected ModelComponent fModel;
   /**
-   * Der Undo-Manager.
+   * The undo manager.
    */
   protected UndoRedoManager fUndoRedoManager;
   /**
-   * Die eigene Swing-Komponente.
+   * The swing component.
    */
   protected JComponent fComponent;
 
@@ -64,9 +63,9 @@ public abstract class AbstractAttributesContent
   }
 
   /**
-   * Fabrikmethode zur Erzeugung der Gesamtkomponente.
+   * Creates the component.
    *
-   * @return
+   * @return The created component.
    */
   protected abstract JComponent createComponent();
 }

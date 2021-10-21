@@ -872,7 +872,6 @@ toTable.getSelectionModel().addListSelectionListener(listener);
   private void orderGenChkBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_orderGenChkBoxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
       if (sharedPortal.getPortal().getState().equals(Kernel.State.OPERATING)) {
-        // Start order generation.
         orderGenTrigger = createOrderGenTrigger();
         if (orderGenTrigger == null) {
           return;

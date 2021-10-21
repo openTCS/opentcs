@@ -10,7 +10,7 @@ package org.opentcs.guing.components.properties.type;
 import java.io.Serializable;
 
 /**
- * Ein Umwandlungsverhältnis zwischen zwei Einheiten.
+ * A conversion relationship between two units.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
@@ -19,15 +19,15 @@ public class Relation<U>
     implements Serializable {
 
   /**
-   * Die Maßeinheit von der umgewandelt wird.
+   * The source unit.
    */
   private final U fUnitFrom;
   /**
-   * Die Maßeinheit, in die umgewandelt wird.
+   * The destination unit.
    */
   private final U fUnitTo;
   /**
-   * Das Umwandlungsverhältnis.
+   * The conversion relationship.
    */
   private final double fRelationValue;
 
@@ -45,8 +45,7 @@ public class Relation<U>
   }
 
   /**
-   * Prüft, ob das Umwandlungsverhältnis für die beiden übergebenen Einheiten
-   * passend ist. Liefert <code>true</code> zurück, falls ja.
+   * Checks if this relation is applicable to the specified units.
    *
    * @param unitA The first unit.
    * @param unitB The second unit.
@@ -66,7 +65,7 @@ public class Relation<U>
   }
 
   /**
-   * Liefert das Umwandlungsverhältnis als eine Zahl.
+   * Returns the conversion relationship as a number.
    *
    * @return The relation value between the two units. 
    */
@@ -75,11 +74,7 @@ public class Relation<U>
   }
 
   /**
-   * Liefert die Rechenoperation, die für die Umwandlung der ersten Einheit in
-   * die zweite Einheit angewendet werden muss. In Frage kommt die
-   * Multiplikation und die Division. Zurückgeliefert wird nicht die Operation
-   * im eigentlichen Sinne, sondern nur ein beschreibender Text aus der Menge
-   * {"multiplication", "division"}.
+   * Returns the operation used for the conversion of the first unit into the second unit.
    *
    * @param unitFrom The unit from which to convert.
    * @param unitTo The unit to which to convert.

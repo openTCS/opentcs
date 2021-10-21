@@ -19,9 +19,8 @@ import org.opentcs.guing.components.properties.type.Property;
 import org.opentcs.guing.components.properties.type.StringProperty;
 
 /**
- * Standardimplementierung für eine Blatt-Komponente des Systemmodells.
- * <p>
- * <b>Entwurfsmuster:</b> Kompositum. AbstractModelComponent ist die Komponente.
+ *
+ * Abstract implementation of a model component.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Heinz Huber (Fraunhofer IML)
@@ -31,19 +30,19 @@ public abstract class AbstractModelComponent
     implements ModelComponent {
 
   /**
-   * Der Name der Komponente, wie er im TreeView erscheint.
+   * Name of the component in the tree view.
    */
   private final String fTreeViewName;
   /**
-   * Ob die Komponente im TreeView angezeigt werden soll.
+   * Whether or not the component is visible in the tree view.
    */
   private boolean fTreeViewVisibility = true;
   /**
-   * Die direkte Elternkomponente.
+   * The parent component.
    */
   private transient ModelComponent fParent;
   /**
-   * Die Objekte, die an Änderungen der Attribute interessiert sind.
+   * Attribute change listeners.
    */
   private transient List<AttributesChangeListener> fAttributesChangeListeners
       = new CopyOnWriteArrayList<>();

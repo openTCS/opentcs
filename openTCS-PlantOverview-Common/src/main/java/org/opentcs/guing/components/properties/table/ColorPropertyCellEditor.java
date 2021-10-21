@@ -18,7 +18,7 @@ import static org.opentcs.guing.util.I18nPlantOverview.PROPERTIES_PATH;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * Ein CellEditor für ein ColorProperty.
+ * A cell editor for a color property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
@@ -28,20 +28,20 @@ public class ColorPropertyCellEditor
                java.awt.event.ActionListener {
 
   /**
-   * Für den CellEditor wird ein Button verwendet.
+   * The button to use for the editor.
    */
   protected JButton fButton;
   /**
-   * Das Farbattribut.
+   * The color property.
    */
   protected ColorProperty fColorProperty;
   /**
-   * Die Tabelle als Parent des Farbauswahldialogs.
+   * The parent table.
    */
   protected JTable fTable;
 
   /**
-   * Creates a new instance of ColorPropertyCellEditor
+   * Creates a new instance of ColorPropertyCellEditor.
    */
   public ColorPropertyCellEditor() {
     super();

@@ -153,8 +153,7 @@ public class PathConnection
   }
 
   /**
-   * Bei Umwandlung von DIRECT/ELBOW/SLANTED in BEZIER-Kurve:
-   * Initiale Kontrollpunkte bei 1/n, 2/n, ... der Strecke setzen.
+   * Initialise the control points when converting into BEZIER curve.
    *
    * @param type the type of the curve
    */
@@ -208,11 +207,10 @@ public class PathConnection
   }
 
   /**
-   * Im "alten" Modell wird zu quadratischen Kurven ein Kontrollpunkt
-   * gespeichert, zu kubischen Kurven zwei.
+   * Add control points.
    *
-   * @param cp1
-   * @param cp2 Identisch mit cp1 bei quadratischen Kurven
+   * @param cp1 First control point.
+   * @param cp2 Identical with cp1 for quadratic curves.
    */
   public void addControlPoints(Point2D.Double cp1, Point2D.Double cp2) {
     this.cp1 = cp1;
@@ -229,7 +227,6 @@ public class PathConnection
                                  ep.x, ep.y, //Current point
                                  cp2.x, cp2.y, //Previous point
                                  ep.x, ep.y)); //Next point
-    //getModel().getProperty(ElementPropKeys.PATH_CONTROL_POINTS).markChanged();
   }
 
   /**
@@ -344,7 +341,7 @@ public class PathConnection
   }
 
   /**
-   * Die Bezier und Polypath Kontrollpunkte aktualisieren
+   * Update bezier and polypath control points.
    */
   public void updateControlPoints() {
     String sControlPoints = "";
@@ -424,9 +421,6 @@ public class PathConnection
    * @param end The second figure.
    */
   public void connect(LabeledPointFigure start, LabeledPointFigure end) {
-    // ChopEllipseConnector zeichnet die Linienenden/Pfeilspitzen auf
-    // die direkte Verbindungsgerade von Start nach End.
-    // TODO: Auf Tangenten zu Controlpoints ausrichten?
     Connector compConnector = new ChopEllipseConnector();
     Connector startConnector = start.findCompatibleConnector(compConnector, true);
     Connector endConnector = end.findCompatibleConnector(compConnector, true);
@@ -512,7 +506,6 @@ public class PathConnection
 
       if (property != null) {
         double length = (double) property.getValue();
-        // Tbd: Wann soll die Lï¿½nge aus dem Abstand der verbundenen Punkte neu berechnet werden?
         if (length <= 0.0) {
           PointFigure start = ((LabeledPointFigure) getStartFigure()).getPresentationFigure();
           PointFigure end = ((LabeledPointFigure) getEndFigure()).getPresentationFigure();
@@ -578,13 +571,13 @@ public class PathConnection
         }
         else {
           if (cp1 != null) {
-            // Startpunkt: Handle nach CP2
+            // Start point: handle to CP2
             handles.add(new BezierLinerControlPointHandle(this, 0, BezierPath.C2_MASK));
             if (cp2 != null) {
-              // Endpunkt: Handle für CP3
+              // End point: handle to CP3
               handles.add(new BezierLinerControlPointHandle(this, 1, BezierPath.C1_MASK));
               if (cp3 != null) {
-                // Endpunkt: Handle nach EP
+                // End point: handle to EP
                 handles.add(new BezierLinerControlPointHandle(this, 2, BezierPath.C1_MASK));
               }
             }
@@ -594,8 +587,6 @@ public class PathConnection
         break;
 
       case 1:  // double click
-        // Rechteckiger Rahmen + Drehpunkt
-//      TransformHandleKit.addTransformHandles(this, handles);
         handles.add(new BezierOutlineHandle(this));
         break;
 

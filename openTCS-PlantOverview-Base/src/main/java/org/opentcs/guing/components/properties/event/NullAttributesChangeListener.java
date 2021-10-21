@@ -8,9 +8,7 @@
 package org.opentcs.guing.components.properties.event;
 
 /**
- * Ein PropertiesModelChangeListener, der benötigt wird, wenn ein
- * PropertiesModelChangeEvent erzeugt werden soll, jedoch kein direkter
- * PropertiesModelChangeListener die Änderung verursacht hat.
+ * A PropertiesModelChangeListener that does nothing.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
