@@ -40,6 +40,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
@@ -136,6 +137,10 @@ public class DefaultVehicleController
    */
   private MovementCommand lastCommandExecuted;
   /**
+   * The resources this controller has claimed for future allocation.
+   */
+  private final Queue<Set<TCSResource<?>>> claimedResources = new LinkedList<>();
+  /**
    * The resources this controller has allocated for each command.
    */
   private final Deque<Set<TCSResource<?>>> allocatedResources = new LinkedList<>();
@@ -227,6 +232,7 @@ public class DefaultVehicleController
     );
     updateVehicleState(commAdapter.getProcessModel().getVehicleState());
 
+    claimedResources.clear();
     // Add a first entry into allocatedResources to shift freeing of resources
     // in commandExecuted() by one - we need to free the resources allocated for
     // the command before the one executed there.
@@ -342,7 +348,13 @@ public class DefaultVehicleController
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
 
       // Set the claim for (the remainder of) this transport order.
-      scheduler.claim(this, remainingRequiredClaim(transportOrder));
+      List<Set<TCSResource<?>>> claim = remainingRequiredClaim(transportOrder);
+      scheduler.claim(this, claim);
+      claimedResources.clear();
+      claimedResources.addAll(claim);
+
+      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
+                                                   toListOfResourceSets(claimedResources));
 
       createFutureCommands(newOrder, orderProperties);
 
@@ -376,7 +388,13 @@ public class DefaultVehicleController
       discardFutureCommands();
 
       // Update the claim.
-      scheduler.claim(this, remainingRequiredClaim(transportOrder));
+      List<Set<TCSResource<?>>> claim = remainingRequiredClaim(transportOrder);
+      scheduler.claim(this, claim);
+      claimedResources.clear();
+      claimedResources.addAll(claim);
+
+      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
+                                                   toListOfResourceSets(claimedResources));
 
       createFutureCommands(newOrder, orderProperties);
       // The current drive order got updated but our queue of future commands now contains commands
@@ -479,11 +497,21 @@ public class DefaultVehicleController
 
   @Override
   public void abortTransportOrder(boolean immediate) {
-    if (immediate) {
-      clearDriveOrder();
-    }
-    else {
-      abortDriveOrder();
+    synchronized (commAdapter) {
+      if (immediate) {
+        clearDriveOrder();
+      }
+      else {
+        abortDriveOrder();
+      }
+
+      scheduler.claim(this, List.of());
+      claimedResources.clear();
+
+      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
+                                                   toListOfResourceSets(claimedResources));
+      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                     toListOfResourceSets(allocatedResources));
     }
   }
 
@@ -572,7 +600,7 @@ public class DefaultVehicleController
   @Nonnull
   public ExplainedBoolean canProcess(TransportOrder order) {
     requireNonNull(order, "order");
-    
+
     synchronized (commAdapter) {
       return commAdapter.canProcess(order);
     }
@@ -662,7 +690,13 @@ public class DefaultVehicleController
 
       LOG.debug("{}: Accepting allocated resources: {}", vehicle.getName(), resources);
       allocatedResources.add(resources);
+      claimedResources.poll();
       waitingForAllocation = false;
+
+      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
+                                                   toListOfResourceSets(claimedResources));
+      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                     toListOfResourceSets(allocatedResources));
 
       interactionsPendingCommand = command;
 
@@ -861,6 +895,9 @@ public class DefaultVehicleController
       else {
         LOG.debug("{}: Nothing to free.", vehicle.getName());
       }
+
+      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                     toListOfResourceSets(allocatedResources));
 
       peripheralInteractor.startPostMovementInteractions(executedCommand,
                                                          this::checkForPendingCommands,
@@ -1061,6 +1098,10 @@ public class DefaultVehicleController
                  exc);
       }
     }
+
+    vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                   toListOfResourceSets(allocatedResources));
+
     updatePosition(toReference(point), null);
   }
 
@@ -1187,6 +1228,22 @@ public class DefaultVehicleController
     Map<String, String> result = new HashMap<>();
     result.putAll(orderProps);
     result.putAll(destProps);
+    return result;
+  }
+
+  private static List<Set<TCSResourceReference<?>>> toListOfResourceSets(
+      Queue<Set<TCSResource<?>>> resources
+  ) {
+    List<Set<TCSResourceReference<?>>> result = new ArrayList<>(resources.size());
+
+    for (Set<TCSResource<?>> resourceSet : resources) {
+      result.add(
+          resourceSet.stream()
+              .map(resource -> resource.getReference())
+              .collect(Collectors.toSet())
+      );
+    }
+
     return result;
   }
 

@@ -10,6 +10,7 @@ package org.opentcs.kernel.workingset;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1098,6 +1099,48 @@ public class Model {
   }
 
   /**
+   * Sets a vehicle's claimed resources.
+   *
+   * @param vehicleRef A reference to the vehicle to be modified.
+   * @param resources The new resources.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  public Vehicle setVehicleClaimedResources(TCSObjectReference<Vehicle> vehicleRef,
+                                            List<Set<TCSResourceReference<?>>> resources)
+      throws ObjectUnknownException {
+    LOG.debug("method entry");
+    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
+    Vehicle previousState = vehicle;
+    vehicle = objectPool.replaceObject(vehicle.withClaimedResources(unmodifiableCopy(resources)));
+    objectPool.emitObjectEvent(vehicle,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+
+  /**
+   * Sets a vehicle's allocated resources.
+   *
+   * @param vehicleRef A reference to the vehicle to be modified.
+   * @param resources The new resources.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  public Vehicle setVehicleAllocatedResources(TCSObjectReference<Vehicle> vehicleRef,
+                                              List<Set<TCSResourceReference<?>>> resources)
+      throws ObjectUnknownException {
+    LOG.debug("method entry");
+    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
+    Vehicle previousState = vehicle;
+    vehicle = objectPool.replaceObject(vehicle.withAllocatedResources(unmodifiableCopy(resources)));
+    objectPool.emitObjectEvent(vehicle,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+
+  /**
    * Creates a new block with a unique name and all other attributes set to
    * default values.
    *
@@ -1527,5 +1570,16 @@ public class Model {
       result.append("  Length: " + curVehicle.getLength());
     }
     return result.toString();
+  }
+
+  private static List<Set<TCSResourceReference<?>>> unmodifiableCopy(
+      List<Set<TCSResourceReference<?>>> resources) {
+    List<Set<TCSResourceReference<?>>> result = new ArrayList<>();
+
+    for (Set<TCSResourceReference<?>> resSet : resources) {
+      result.add(Set.copyOf(resSet));
+    }
+
+    return Collections.unmodifiableList(result);
   }
 }

@@ -19,6 +19,7 @@ import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -195,6 +196,24 @@ public class StandardVehicleService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       model.setVehicleRouteProgressIndex(ref, index);
+    }
+  }
+
+  @Override
+  public void updateVehicleClaimedResources(TCSObjectReference<Vehicle> ref,
+                                            List<Set<TCSResourceReference<?>>> resources)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      model.setVehicleClaimedResources(ref, resources);
+    }
+  }
+
+  @Override
+  public void updateVehicleAllocatedResources(TCSObjectReference<Vehicle> ref,
+                                              List<Set<TCSResourceReference<?>>> resources)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      model.setVehicleAllocatedResources(ref, resources);
     }
   }
 

@@ -8,9 +8,11 @@
 package org.opentcs.components.kernel.services;
 
 import java.util.List;
+import java.util.Set;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -129,6 +131,28 @@ public interface InternalVehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
   void updateVehicleRouteProgressIndex(TCSObjectReference<Vehicle> ref, int index)
+      throws ObjectUnknownException;
+
+  /**
+   * Updates a vehicle's claimed resources.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param resources The new resources.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  void updateVehicleClaimedResources(TCSObjectReference<Vehicle> ref,
+                                     List<Set<TCSResourceReference<?>>> resources)
+      throws ObjectUnknownException;
+
+  /**
+   * Updates a vehicle's allocated resources.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param resources The new resources.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  void updateVehicleAllocatedResources(TCSObjectReference<Vehicle> ref,
+                                       List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException;
 
   /**

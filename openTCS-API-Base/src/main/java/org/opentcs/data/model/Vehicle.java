@@ -115,6 +115,14 @@ public class Vehicle
    */
   private final int routeProgressIndex;
   /**
+   * The resources this vehicle has claimed for future allocation.
+   */
+  private final List<Set<TCSResourceReference<?>>> claimedResources;
+  /**
+   * The resources this vehicle has allocated.
+   */
+  private final List<Set<TCSResourceReference<?>>> allocatedResources;
+  /**
    * A reference to the point which this vehicle currently occupies.
    */
   private final TCSObjectReference<Point> currentPosition;
@@ -158,6 +166,8 @@ public class Vehicle
     this.orderSequence = null;
     this.allowedOrderTypes = new HashSet<>(Arrays.asList(OrderConstants.TYPE_ANY));
     this.routeProgressIndex = ROUTE_INDEX_DEFAULT;
+    this.claimedResources = List.of();
+    this.allocatedResources = List.of();
     this.state = State.UNKNOWN;
     this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
     this.currentPosition = null;
@@ -185,6 +195,8 @@ public class Vehicle
                   TCSObjectReference<OrderSequence> orderSequence,
                   Set<String> allowedOrderTypes,
                   int routeProgressIndex,
+                  List<Set<TCSResourceReference<?>>> claimedResources,
+                  List<Set<TCSResourceReference<?>>> allocatedResources,
                   State state,
                   IntegrationLevel integrationLevel,
                   TCSObjectReference<Point> currentPosition,
@@ -217,6 +229,8 @@ public class Vehicle
     this.orderSequence = orderSequence;
     this.allowedOrderTypes = requireNonNull(allowedOrderTypes, "allowedOrderTypes");
     this.routeProgressIndex = routeProgressIndex;
+    this.claimedResources = requireNonNull(claimedResources, "claimedResources");
+    this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
     this.state = requireNonNull(state, "state");
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     this.currentPosition = currentPosition;
@@ -251,6 +265,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -280,6 +296,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -309,6 +327,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -338,6 +358,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -381,6 +403,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -477,6 +501,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -522,6 +548,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -565,6 +593,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -609,6 +639,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -654,6 +686,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -697,6 +731,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -740,6 +776,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -783,6 +821,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -837,6 +877,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -889,6 +931,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -935,6 +979,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -979,6 +1025,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1025,6 +1073,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1071,6 +1121,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1114,6 +1166,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1159,6 +1213,98 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices,
+                       layout);
+  }
+
+  /**
+   * Returns the resources this vehicle has claimed for future allocation.
+   *
+   * @return The resources this vehicle has claimed for future allocation.
+   */
+  public List<Set<TCSResourceReference<?>>> getClaimedResources() {
+    return claimedResources;
+  }
+
+  /**
+   * Creates a copy of this object, with the given claimed resources.
+   *
+   * @param claimedResources The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withClaimedResources(List<Set<TCSResourceReference<?>>> claimedResources) {
+    return new Vehicle(getName(),
+                       getProperties(),
+                       getHistory(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       allowedOrderTypes,
+                       routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
+                       state,
+                       integrationLevel,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices,
+                       layout);
+  }
+
+  /**
+   * Returns the resources this vehicle has allocated.
+   *
+   * @return The resources this vehicle has allocated.
+   */
+  public List<Set<TCSResourceReference<?>>> getAllocatedResources() {
+    return claimedResources;
+  }
+
+  /**
+   * Creates a copy of this object, with the given allocated resources.
+   *
+   * @param allocatedResources The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withAllocatedResources(List<Set<TCSResourceReference<?>>> allocatedResources) {
+    return new Vehicle(getName(),
+                       getProperties(),
+                       getHistory(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       allowedOrderTypes,
+                       routeProgressIndex,
+                       allocatedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1204,6 +1350,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1249,6 +1397,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1294,6 +1444,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1339,6 +1491,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1382,6 +1536,8 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
                        state,
                        integrationLevel,
                        currentPosition,
@@ -1419,6 +1575,8 @@ public class Vehicle
         + ", length=" + length
         + ", transportOrder=" + transportOrder
         + ", routeProgressIndex=" + routeProgressIndex
+        + ", claimedResources=" + claimedResources
+        + ", allocatedResources=" + allocatedResources
         + ", orderSequence=" + orderSequence
         + ", energyLevelGood=" + energyLevelGood
         + ", energyLevelCritical=" + energyLevelCritical
