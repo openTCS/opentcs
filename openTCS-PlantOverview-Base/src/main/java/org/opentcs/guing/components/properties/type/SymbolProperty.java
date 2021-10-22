@@ -43,7 +43,7 @@ public class SymbolProperty
    * @param locationRepresentation The location representation.
    */
   public void setLocationRepresentation(LocationRepresentation locationRepresentation) {
-    locationRepresentation = locationRepresentation;
+    this.locationRepresentation = locationRepresentation;
   }
 
   /**
