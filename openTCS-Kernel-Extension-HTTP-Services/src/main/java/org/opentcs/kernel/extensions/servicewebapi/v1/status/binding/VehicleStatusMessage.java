@@ -10,6 +10,12 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import static java.util.Objects.requireNonNull;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 
@@ -41,6 +47,12 @@ public class VehicleStatusMessage
   @JsonProperty(required = true)
   @JsonPropertyDescription("The vehicle's current processing state")
   private Vehicle.ProcState procState;
+
+  @JsonPropertyDescription("The resources allocated.")
+  private List<List<String>> allocatedResources = new ArrayList<>();
+
+  @JsonPropertyDescription("The resources claimed, i.e. not yet allocated.")
+  private List<List<String>> claimedResources = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -95,13 +107,29 @@ public class VehicleStatusMessage
   public void setProcState(Vehicle.ProcState procState) {
     this.procState = procState;
   }
-  
-  public static VehicleStatusMessage fromVehicle(Vehicle vehicle, 
+
+  public List<List<String>> getAllocatedResources() {
+    return allocatedResources;
+  }
+
+  public void setAllocatedResources(List<List<String>> allocatedResources) {
+    this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
+  }
+
+  public List<List<String>> getClaimedResources() {
+    return claimedResources;
+  }
+
+  public void setClaimedResources(List<List<String>> claimedResources) {
+    this.claimedResources = requireNonNull(claimedResources, "claimedResources");
+  }
+
+  public static VehicleStatusMessage fromVehicle(Vehicle vehicle,
                                                  long sequenceNumber) {
     return fromVehicle(vehicle, sequenceNumber, Instant.now());
-  }  
+  }
 
-  public static VehicleStatusMessage fromVehicle(Vehicle vehicle, 
+  public static VehicleStatusMessage fromVehicle(Vehicle vehicle,
                                                  long sequenceNumber,
                                                  Instant creationTimeStamp) {
     VehicleStatusMessage vehicleMessage = new VehicleStatusMessage();
@@ -121,7 +149,24 @@ public class VehicleStatusMessage
           precisePos.getX(), precisePos.getY(), precisePos.getZ());
       vehicleMessage.setPrecisePosition(precisePosElement);
     }
+    vehicleMessage.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
+    vehicleMessage.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
     return vehicleMessage;
+  }
+
+  private static List<List<String>> toListOfListOfNames(
+      List<Set<TCSResourceReference<?>>> resources) {
+    List<List<String>> result = new ArrayList<>(resources.size());
+
+    for (Set<TCSResourceReference<?>> resSet : resources) {
+      result.add(
+          resSet.stream()
+              .map(resRef -> resRef.getName())
+              .collect(Collectors.toList())
+      );
+    }
+
+    return result;
   }
 
   /**

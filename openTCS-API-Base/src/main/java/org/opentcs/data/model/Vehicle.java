@@ -1277,7 +1277,7 @@ public class Vehicle
    * @return The resources this vehicle has allocated.
    */
   public List<Set<TCSResourceReference<?>>> getAllocatedResources() {
-    return claimedResources;
+    return allocatedResources;
   }
 
   /**
@@ -1303,7 +1303,7 @@ public class Vehicle
                        orderSequence,
                        allowedOrderTypes,
                        routeProgressIndex,
-                       allocatedResources,
+                       claimedResources,
                        allocatedResources,
                        state,
                        integrationLevel,

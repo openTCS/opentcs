@@ -593,11 +593,31 @@ components:
             - EXECUTING
             - CHARGING
           description: The vehicle's current state.
+        allocatedResources:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceSet"
+          description: The resources already allocated by the vehicle.
+          example: [ [ "Path-0039--0040", "Point-0040" ], [ "Path-0040--0041", "Point-0041" ] ]
+        claimedResources:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceSet"
+          description: The resources claimed - i.e. not yet allocated - for the vehicle's route.
+          example: [ [ "Path-0041--0042", "Point-0042" ], [ "Path-0042--0043", "Point-0043", "Location-2345" ] ]
       required:
         - length
         - energyLevelGood
         - energyLevelCritical
         - energyLevel
+        - allocatedResources
+        - claimedResources
+    ResourceSet:
+      type: array
+      items:
+        type: string
+        description: Name of the resource
+      example: [ Point-0042, Path-0041--0042 ]
     StatusMessageList:
       title: Status Message List
       type: object
@@ -730,12 +750,26 @@ components:
                 - AWAITING_ORDER
                 - PROCESSING_ORDER
               description: The vehicle's current processing state
+            allocatedResources:
+              type: array
+              items:
+                $ref: "#/components/schemas/ResourceSet"
+              description: The resources already allocated by the vehicle.
+              example: [ [ "Path-0039--0040", "Point-0040" ], [ "Path-0040--0041", "Point-0041" ] ]
+            claimedResources:
+              type: array
+              items:
+                $ref: "#/components/schemas/ResourceSet"
+              description: The resources claimed - i.e. not yet allocated - for the vehicle's route.
+              example: [ [ "Path-0041--0042", "Point-0042" ], [ "Path-0042--0043", "Point-0043", "Location-2345" ] ]
       title: VehicleStatusMessage
       required:
         - type
         - vehicleName
         - state
         - procState
+        - allocatedResources
+        - claimedResources
     Property:
       type: object
       additionalProperties: false
