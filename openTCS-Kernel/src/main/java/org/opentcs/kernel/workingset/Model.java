@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -56,7 +55,6 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.Colors;
-import org.opentcs.util.Comparators;
 import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,154 +215,6 @@ public class Model {
   }
 
   /**
-   * Overrides the layout data in {@code TCSObject}s with the data stored in their respective
-   * model layout element.
-   *
-   * @param layout The visual layout to get the layout data from.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  private void overrideLayoutData(VisualLayoutCreationTO layout) {
-    for (org.opentcs.access.to.model.ModelLayoutElementCreationTO mleTO : layout.getModelElements()) {
-      TCSObject<?> object = objectPool.getObject(mleTO.getName());
-      Map<String, String> props = mleTO.getProperties();
-
-      if (object instanceof Point) {
-        overridePointLayoutData((Point) object, props);
-      }
-      else if (object instanceof Path) {
-        overridePathLayoutData((Path) object, props);
-      }
-      else if (object instanceof Location) {
-        overrideLocationLayoutData((Location) object, props);
-      }
-      else if (object instanceof Block) {
-        overrideBlockLayoutData((Block) object, props);
-      }
-      else if (object instanceof Vehicle) {
-        overrideVehicleLayoutData((Vehicle) object, props);
-      }
-    }
-  }
-
-  private void overridePointLayoutData(Point oldPoint, Map<String, String> properties)
-      throws NumberFormatException {
-    long positionX = properties.get(ElementPropKeys.POINT_POS_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_X))
-        : oldPoint.getLayout().getPosition().getX();
-    long positionY = properties.get(ElementPropKeys.POINT_POS_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_Y))
-        : oldPoint.getLayout().getPosition().getY();
-    long labelOffsetX = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X))
-        : oldPoint.getLayout().getLabelOffset().getX();
-    long labelOffsetY = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y))
-        : oldPoint.getLayout().getLabelOffset().getY();
-    Point newPoint = oldPoint.withLayout(
-        new Point.Layout(new Couple(positionX, positionY),
-                         new Couple(labelOffsetX, labelOffsetY),
-                         oldPoint.getLayout().getLayerId())
-    );
-    objectPool.replaceObject(newPoint);
-    objectPool.emitObjectEvent(newPoint, oldPoint, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overridePathLayoutData(Path oldPath, Map<String, String> properties)
-      throws IllegalArgumentException {
-    String connectionTypeString
-        = properties.getOrDefault(ElementPropKeys.PATH_CONN_TYPE,
-                                  oldPath.getLayout().getConnectionType().name());
-    Path.Layout.ConnectionType connectionType;
-    switch (connectionTypeString) {
-      case "DIRECT":
-        connectionType = Path.Layout.ConnectionType.DIRECT;
-        break;
-      case "ELBOW":
-        connectionType = Path.Layout.ConnectionType.ELBOW;
-        break;
-      case "SLANTED":
-        connectionType = Path.Layout.ConnectionType.SLANTED;
-        break;
-      case "POLYPATH":
-        connectionType = Path.Layout.ConnectionType.POLYPATH;
-        break;
-      case "BEZIER":
-        connectionType = Path.Layout.ConnectionType.BEZIER;
-        break;
-      case "BEZIER_3":
-        connectionType = Path.Layout.ConnectionType.BEZIER_3;
-        break;
-      default:
-        throw new IllegalArgumentException("Unhandled connection type: " + connectionTypeString);
-    }
-
-    List<Couple> controlPoints = oldPath.getLayout().getControlPoints();
-    String controlPointsString = properties.get(ElementPropKeys.PATH_CONTROL_POINTS);
-    if (controlPointsString != null) {
-      controlPoints = Arrays.asList(controlPointsString.split(";")).stream()
-          .map(controlPointString -> {
-            String[] coordinateStrings = controlPointString.split(",");
-            return new Couple(Long.parseLong(coordinateStrings[0]),
-                              Long.parseLong(coordinateStrings[1]));
-          })
-          .collect(Collectors.toList());
-    }
-
-    Path newPath = oldPath.withLayout(new Path.Layout(connectionType,
-                                                      controlPoints,
-                                                      oldPath.getLayout().getLayerId()));
-
-    objectPool.replaceObject(newPath);
-    objectPool.emitObjectEvent(newPath, oldPath, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overrideLocationLayoutData(Location oldLocation, Map<String, String> properties)
-      throws NumberFormatException {
-    long positionX = properties.get(ElementPropKeys.LOC_POS_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_X))
-        : oldLocation.getLayout().getPosition().getX();
-    long positionY = properties.get(ElementPropKeys.LOC_POS_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_Y))
-        : oldLocation.getLayout().getPosition().getY();
-    long labelOffsetX = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X))
-        : oldLocation.getLayout().getLabelOffset().getX();
-    long labelOffsetY = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y))
-        : oldLocation.getLayout().getLabelOffset().getY();
-    Location newLocation = oldLocation.withLayout(
-        new Location.Layout(new Couple(positionX, positionY),
-                            new Couple(labelOffsetX, labelOffsetY),
-                            oldLocation.getLayout().getLocationRepresentation(),
-                            oldLocation.getLayout().getLayerId())
-    );
-    objectPool.replaceObject(newLocation);
-    objectPool.emitObjectEvent(newLocation, oldLocation, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overrideBlockLayoutData(Block oldBlock, Map<String, String> properties)
-      throws NumberFormatException {
-    Color color = properties.get(ElementPropKeys.BLOCK_COLOR) != null
-        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.BLOCK_COLOR))
-        : oldBlock.getLayout().getColor();
-    Block newBlock = oldBlock.withLayout(new Block.Layout(color));
-    objectPool.replaceObject(newBlock);
-    objectPool.emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overrideVehicleLayoutData(TCSObject<?> object, Map<String, String> properties)
-      throws NumberFormatException {
-    Vehicle oldVehicle = (Vehicle) object;
-    Color routeColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR) != null
-        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR))
-        : oldVehicle.getLayout().getRouteColor();
-    Vehicle newVehicle = oldVehicle.withLayout(new Vehicle.Layout(routeColor));
-    objectPool.replaceObject(newVehicle);
-    objectPool.emitObjectEvent(newVehicle, oldVehicle, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  /**
    * Creates a new visual layout with a unique name and all other attributes set
    * to default values.
    *
@@ -412,89 +262,6 @@ public class Model {
     objectPool.emitObjectEvent(newPoint, null, TCSObjectEvent.Type.OBJECT_CREATED);
     // Return the newly created point.
     return newPoint;
-  }
-
-  /**
-   * Adds an incoming path to a point.
-   *
-   * @param pointRef A reference to the point to be modified.
-   * @param pathRef A reference to the path.
-   * @return The modified point.
-   * @throws ObjectUnknownException If the referenced point or path do not
-   * exist.
-   */
-  private Point addPointIncomingPath(TCSObjectReference<Point> pointRef,
-                                     TCSObjectReference<Path> pathRef)
-      throws ObjectUnknownException {
-    LOG.debug("method entry");
-    Point point = objectPool.getObject(Point.class, pointRef);
-    Path path = objectPool.getObject(Path.class, pathRef);
-    // Check if the point really is the path's destination point.
-    if (!path.getDestinationPoint().equals(point.getReference())) {
-      throw new IllegalArgumentException("Point is not the path's destination.");
-    }
-    Path previousState = path;
-    Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
-    incomingPaths.add(path.getReference());
-    point = objectPool.replaceObject(point.withIncomingPaths(incomingPaths));
-    objectPool.emitObjectEvent(point,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
-    return point;
-  }
-
-  /**
-   * Removes an incoming path from a point.
-   *
-   * @param pointRef A reference to the point to be modified.
-   * @param pathRef A reference to the path.
-   * @return The modified point.
-   * @throws ObjectUnknownException If the referenced point or path do not
-   * exist.
-   */
-  private Point removePointIncomingPath(TCSObjectReference<Point> pointRef,
-                                        TCSObjectReference<Path> pathRef)
-      throws ObjectUnknownException {
-    LOG.debug("method entry");
-    Point point = objectPool.getObject(Point.class, pointRef);
-    Path path = objectPool.getObject(Path.class, pathRef);
-    Path previousState = path;
-    Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
-    incomingPaths.remove(path.getReference());
-    point = objectPool.replaceObject(point.withIncomingPaths(incomingPaths));
-    objectPool.emitObjectEvent(point,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
-    return point;
-  }
-
-  /**
-   * Adds an outgoing path to a point.
-   *
-   * @param pointRef A reference to the point to be modified.
-   * @param pathRef A reference to the path.
-   * @return The modified point.
-   * @throws ObjectUnknownException If the referenced point or path do not
-   * exist.
-   */
-  private Point addPointOutgoingPath(TCSObjectReference<Point> pointRef,
-                                     TCSObjectReference<Path> pathRef)
-      throws ObjectUnknownException {
-    LOG.debug("method entry");
-    Point point = objectPool.getObject(Point.class, pointRef);
-    Path path = objectPool.getObject(Path.class, pathRef);
-    // Check if the point really is the path's source.
-    if (!path.getSourcePoint().equals(point.getReference())) {
-      throw new IllegalArgumentException("Point is not the path's source.");
-    }
-    Path previousState = path;
-    Set<TCSObjectReference<Path>> outgoingPaths = new HashSet<>(point.getOutgoingPaths());
-    outgoingPaths.add(path.getReference());
-    point = objectPool.replaceObject(point.withOutgoingPaths(outgoingPaths));
-    objectPool.emitObjectEvent(point,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
-    return point;
   }
 
   /**
@@ -1495,81 +1262,209 @@ public class Model {
   }
 
   /**
-   * Returns an informational string describing this model's topology.
+   * Overrides the layout data in {@code TCSObject}s with the data stored in their respective
+   * model layout element.
    *
-   * @return An informational string describing this model's topology.
+   * @param layout The visual layout to get the layout data from.
    */
-  public String getInfo() {
-    StringBuilder result = new StringBuilder();
-    Set<Point> points = new TreeSet<>(Comparators.objectsByName());
-    Set<Path> paths = new TreeSet<>(Comparators.objectsByName());
-    Set<LocationType> locationTypes = new TreeSet<>(Comparators.objectsByName());
-    Set<Location> locations = new TreeSet<>(Comparators.objectsByName());
-    Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    Set<TCSObject<?>> objects = objectPool.getObjects((Pattern) null);
-    for (TCSObject<?> curObject : objects) {
-      if (curObject instanceof Point) {
-        points.add((Point) curObject);
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
+  private void overrideLayoutData(VisualLayoutCreationTO layout) {
+    for (org.opentcs.access.to.model.ModelLayoutElementCreationTO mleTO : layout.getModelElements()) {
+      TCSObject<?> object = objectPool.getObject(mleTO.getName());
+      Map<String, String> props = mleTO.getProperties();
+
+      if (object instanceof Point) {
+        overridePointLayoutData((Point) object, props);
       }
-      else if (curObject instanceof Path) {
-        paths.add((Path) curObject);
+      else if (object instanceof Path) {
+        overridePathLayoutData((Path) object, props);
       }
-      else if (curObject instanceof LocationType) {
-        locationTypes.add((LocationType) curObject);
+      else if (object instanceof Location) {
+        overrideLocationLayoutData((Location) object, props);
       }
-      else if (curObject instanceof Location) {
-        locations.add((Location) curObject);
+      else if (object instanceof Block) {
+        overrideBlockLayoutData((Block) object, props);
       }
-      else if (curObject instanceof Vehicle) {
-        vehicles.add((Vehicle) curObject);
+      else if (object instanceof Vehicle) {
+        overrideVehicleLayoutData((Vehicle) object, props);
       }
     }
-    result.append("Model data:\n");
-    result.append(" Name: " + name + "\n");
-    result.append("Points:\n");
-    for (Point curPoint : points) {
-      result.append(" Point:\n");
-      result.append("  Name: " + curPoint.getName() + "\n");
-      result.append("  Type: " + curPoint.getType() + "\n");
-      result.append("  X: " + curPoint.getPosition().getX() + "\n");
-      result.append("  Y: " + curPoint.getPosition().getY() + "\n");
-      result.append("  Z: " + curPoint.getPosition().getZ() + "\n");
+  }
+
+  private void overridePointLayoutData(Point oldPoint, Map<String, String> properties)
+      throws NumberFormatException {
+    long positionX = properties.get(ElementPropKeys.POINT_POS_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_X))
+        : oldPoint.getLayout().getPosition().getX();
+    long positionY = properties.get(ElementPropKeys.POINT_POS_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_Y))
+        : oldPoint.getLayout().getPosition().getY();
+    long labelOffsetX = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X))
+        : oldPoint.getLayout().getLabelOffset().getX();
+    long labelOffsetY = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y))
+        : oldPoint.getLayout().getLabelOffset().getY();
+    Point newPoint = oldPoint.withLayout(
+        new Point.Layout(new Couple(positionX, positionY),
+                         new Couple(labelOffsetX, labelOffsetY),
+                         oldPoint.getLayout().getLayerId())
+    );
+    objectPool.replaceObject(newPoint);
+    objectPool.emitObjectEvent(newPoint, oldPoint, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overridePathLayoutData(Path oldPath, Map<String, String> properties)
+      throws IllegalArgumentException {
+    String connectionTypeString
+        = properties.getOrDefault(ElementPropKeys.PATH_CONN_TYPE,
+                                  oldPath.getLayout().getConnectionType().name());
+    Path.Layout.ConnectionType connectionType;
+    switch (connectionTypeString) {
+      case "DIRECT":
+        connectionType = Path.Layout.ConnectionType.DIRECT;
+        break;
+      case "ELBOW":
+        connectionType = Path.Layout.ConnectionType.ELBOW;
+        break;
+      case "SLANTED":
+        connectionType = Path.Layout.ConnectionType.SLANTED;
+        break;
+      case "POLYPATH":
+        connectionType = Path.Layout.ConnectionType.POLYPATH;
+        break;
+      case "BEZIER":
+        connectionType = Path.Layout.ConnectionType.BEZIER;
+        break;
+      case "BEZIER_3":
+        connectionType = Path.Layout.ConnectionType.BEZIER_3;
+        break;
+      default:
+        throw new IllegalArgumentException("Unhandled connection type: " + connectionTypeString);
     }
-    result.append("Paths:\n");
-    for (Path curPath : paths) {
-      result.append(" Path:\n");
-      result.append("  Name: " + curPath.getName() + "\n");
-      result.append("  Source: " + curPath.getSourcePoint().getName() + "\n");
-      result.append("  Destination: " + curPath.getDestinationPoint().getName() + "\n");
-      result.append("  Length: " + curPath.getLength() + "\n");
+
+    List<Couple> controlPoints = oldPath.getLayout().getControlPoints();
+    String controlPointsString = properties.get(ElementPropKeys.PATH_CONTROL_POINTS);
+    if (controlPointsString != null) {
+      controlPoints = Arrays.asList(controlPointsString.split(";")).stream()
+          .map(controlPointString -> {
+            String[] coordinateStrings = controlPointString.split(",");
+            return new Couple(Long.parseLong(coordinateStrings[0]),
+                              Long.parseLong(coordinateStrings[1]));
+          })
+          .collect(Collectors.toList());
     }
-    result.append("LocationTypes:\n");
-    for (LocationType curType : locationTypes) {
-      result.append(" LocationType:\n");
-      result.append("  Name: " + curType.getName() + "\n");
-      result.append("  Operations: "
-          + curType.getAllowedOperations().toString() + "\n");
-      result.append("  Peripheral Operations: "
-          + curType.getAllowedPeripheralOperations().toString() + "\n");
+
+    Path newPath = oldPath.withLayout(new Path.Layout(connectionType,
+                                                      controlPoints,
+                                                      oldPath.getLayout().getLayerId()));
+
+    objectPool.replaceObject(newPath);
+    objectPool.emitObjectEvent(newPath, oldPath, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overrideLocationLayoutData(Location oldLocation, Map<String, String> properties)
+      throws NumberFormatException {
+    long positionX = properties.get(ElementPropKeys.LOC_POS_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_X))
+        : oldLocation.getLayout().getPosition().getX();
+    long positionY = properties.get(ElementPropKeys.LOC_POS_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_Y))
+        : oldLocation.getLayout().getPosition().getY();
+    long labelOffsetX = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X))
+        : oldLocation.getLayout().getLabelOffset().getX();
+    long labelOffsetY = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y) != null
+        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y))
+        : oldLocation.getLayout().getLabelOffset().getY();
+    Location newLocation = oldLocation.withLayout(
+        new Location.Layout(new Couple(positionX, positionY),
+                            new Couple(labelOffsetX, labelOffsetY),
+                            oldLocation.getLayout().getLocationRepresentation(),
+                            oldLocation.getLayout().getLayerId())
+    );
+    objectPool.replaceObject(newLocation);
+    objectPool.emitObjectEvent(newLocation, oldLocation, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overrideBlockLayoutData(Block oldBlock, Map<String, String> properties)
+      throws NumberFormatException {
+    Color color = properties.get(ElementPropKeys.BLOCK_COLOR) != null
+        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.BLOCK_COLOR))
+        : oldBlock.getLayout().getColor();
+    Block newBlock = oldBlock.withLayout(new Block.Layout(color));
+    objectPool.replaceObject(newBlock);
+    objectPool.emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  private void overrideVehicleLayoutData(TCSObject<?> object, Map<String, String> properties)
+      throws NumberFormatException {
+    Vehicle oldVehicle = (Vehicle) object;
+    Color routeColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR) != null
+        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR))
+        : oldVehicle.getLayout().getRouteColor();
+    Vehicle newVehicle = oldVehicle.withLayout(new Vehicle.Layout(routeColor));
+    objectPool.replaceObject(newVehicle);
+    objectPool.emitObjectEvent(newVehicle, oldVehicle, TCSObjectEvent.Type.OBJECT_MODIFIED);
+  }
+
+  /**
+   * Adds an incoming path to a point.
+   *
+   * @param pointRef A reference to the point to be modified.
+   * @param pathRef A reference to the path.
+   * @return The modified point.
+   * @throws ObjectUnknownException If the referenced point or path do not
+   * exist.
+   */
+  private Point addPointIncomingPath(TCSObjectReference<Point> pointRef,
+                                     TCSObjectReference<Path> pathRef)
+      throws ObjectUnknownException {
+    LOG.debug("method entry");
+    Point point = objectPool.getObject(Point.class, pointRef);
+    Path path = objectPool.getObject(Path.class, pathRef);
+    // Check if the point really is the path's destination point.
+    if (!path.getDestinationPoint().equals(point.getReference())) {
+      throw new IllegalArgumentException("Point is not the path's destination.");
     }
-    result.append("Locations:\n");
-    for (Location curLocation : locations) {
-      result.append(" Location:\n");
-      result.append("  Name: " + curLocation.getName() + "\n");
-      result.append("  Type: " + curLocation.getType().getName() + "\n");
-      for (Location.Link curLink : curLocation.getAttachedLinks()) {
-        result.append("  Link:\n");
-        result.append("   Point: " + curLink.getPoint().getName() + "\n");
-        result.append("   Allowed operations:" + curLink.getAllowedOperations() + "\n");
-      }
+    Path previousState = path;
+    Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
+    incomingPaths.add(path.getReference());
+    point = objectPool.replaceObject(point.withIncomingPaths(incomingPaths));
+    objectPool.emitObjectEvent(point,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return point;
+  }
+
+  /**
+   * Adds an outgoing path to a point.
+   *
+   * @param pointRef A reference to the point to be modified.
+   * @param pathRef A reference to the path.
+   * @return The modified point.
+   * @throws ObjectUnknownException If the referenced point or path do not
+   * exist.
+   */
+  private Point addPointOutgoingPath(TCSObjectReference<Point> pointRef,
+                                     TCSObjectReference<Path> pathRef)
+      throws ObjectUnknownException {
+    LOG.debug("method entry");
+    Point point = objectPool.getObject(Point.class, pointRef);
+    Path path = objectPool.getObject(Path.class, pathRef);
+    // Check if the point really is the path's source.
+    if (!path.getSourcePoint().equals(point.getReference())) {
+      throw new IllegalArgumentException("Point is not the path's source.");
     }
-    result.append("Vehicles:\n");
-    for (Vehicle curVehicle : vehicles) {
-      result.append(" Vehicle:\n");
-      result.append("  Name: " + curVehicle.getName() + "\n");
-      result.append("  Length: " + curVehicle.getLength());
-    }
-    return result.toString();
+    Path previousState = path;
+    Set<TCSObjectReference<Path>> outgoingPaths = new HashSet<>(point.getOutgoingPaths());
+    outgoingPaths.add(path.getReference());
+    point = objectPool.replaceObject(point.withOutgoingPaths(outgoingPaths));
+    objectPool.emitObjectEvent(point,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return point;
   }
 
   private static List<Set<TCSResourceReference<?>>> unmodifiableCopy(
