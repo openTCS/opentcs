@@ -10,14 +10,12 @@ package org.opentcs.guing.plugins.panels.allocation;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.TCSResourceReference;
 import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
 
 /**
@@ -45,20 +43,21 @@ public class AllocationTreeModel
   /**
    * Updates the vehicle resource allocations displayed in this tree model.
    *
+   * @param vehicleName The name of the vehicle
    * @param newAllocations The new vehicle resource allocations
    */
-  public void updateAllocations(Map<String, Set<TCSResource<?>>> newAllocations) {
-    newAllocations.forEach(this::updateVehicleAllocation);
-    removeNotAllocatedVehicles(newAllocations.keySet());
+  public void updateAllocations(String vehicleName, List<TCSResourceReference<?>> newAllocations) {
+    updateVehicleAllocation(vehicleName, newAllocations);
+    removeNotAllocatedVehicles(vehicleName, newAllocations);
   }
 
   /**
-   * Removes all vehicle tree nodes where the stored vehicle name does not exist in the new
-   * allocation.
+   * Removes all vehicle tree nodes where the vehicle does not have any resources allocated.
    *
    * @param allocatedVehicles The vehicles which have a resource allocation
    */
-  private void removeNotAllocatedVehicles(Set<String> allocatedVehicles) {
+  private void removeNotAllocatedVehicles(String vehicleName,
+                                          List<TCSResourceReference<?>> resources) {
     @SuppressWarnings("unchecked")
     List<DefaultMutableTreeNode> rootChildren
         = Collections.list((Enumeration<DefaultMutableTreeNode>) root.children());
@@ -66,7 +65,7 @@ public class AllocationTreeModel
     for (DefaultMutableTreeNode currentNode : rootChildren) {
       Object userObject = currentNode.getUserObject();
       //If we have a vehicle node but the vehicle name is not in the set, remove it
-      if (userObject instanceof String && !allocatedVehicles.contains((String) userObject)) {
+      if (userObject.equals(vehicleName) && resources.isEmpty()) {
         removeNodeFromParent(currentNode);
       }
     }
@@ -78,7 +77,7 @@ public class AllocationTreeModel
    * @param vehicleName The name of the vehicle
    * @param resources The allocated resources of the vehicle
    */
-  private void updateVehicleAllocation(String vehicleName, Set<TCSResource<?>> resources) {
+  private void updateVehicleAllocation(String vehicleName, List<TCSResourceReference<?>> resources) {
     DefaultMutableTreeNode vehicleNode = null;
     for (int x = 0; x < root.getChildCount(); x++) {
       DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) root.getChildAt(x);
@@ -94,20 +93,20 @@ public class AllocationTreeModel
         .map(treeNode -> (DefaultMutableTreeNode) treeNode)
         .collect(Collectors.toList());
     for (DefaultMutableTreeNode current : vehicleChildren) {
-      if (!resources.contains((TCSResource<?>) current.getUserObject())) {
+      if (!resources.contains((TCSResourceReference<?>) current.getUserObject())) {
         vehicleNode.remove(current);
       }
     }
     //Add new resources that are not in the jtree already at the correct position
     int index = 0;
-    for (TCSResource<?> resource : resources) {
+    for (TCSResourceReference<?> resource : resources) {
       if (vehicleNode.getChildCount() <= index) {
         //Insert the resource at this position
         vehicleNode.insert(new DefaultMutableTreeNode(resource, false), index);
       }
       else {
         DefaultMutableTreeNode current = (DefaultMutableTreeNode) vehicleNode.getChildAt(index);
-        TCSResource<?> resource2 = (TCSResource<?>) current.getUserObject();
+        TCSResourceReference<?> resource2 = (TCSResourceReference<?>) current.getUserObject();
         //Check if the resource exists at the current position - then we dont have to do anything
         if (!resource.equals(resource2)) {
           //Check if the resource exists at another position in the children list
@@ -133,7 +132,7 @@ public class AllocationTreeModel
    * @param vehicleNode The parent node
    * @return The index of the node containing the resource or -1 if not found
    */
-  private int getChildIndexOf(TCSResource<?> resource, DefaultMutableTreeNode vehicleNode) {
+  private int getChildIndexOf(TCSResourceReference<?> resource, DefaultMutableTreeNode vehicleNode) {
     int index = 0;
 
     List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children()).stream()

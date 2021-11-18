@@ -7,16 +7,24 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import java.util.ArrayList;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.swing.SwingUtilities;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SchedulerAllocationState;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
@@ -90,8 +98,7 @@ public class ResourceAllocationPanel
     eventSource.subscribe(this);
 
     // Trigger an update to the table model.
-    handleVehicleStateChange(sharedPortal.getPortal().getSchedulerService().fetchSchedulerAllocations());
-
+    updateAllVehicleAllocations();
     initialized = true;
   }
 
@@ -143,7 +150,16 @@ public class ResourceAllocationPanel
       LOG.debug("Kernel is not in operating mode - skipping.");
       return;
     }
-    handleVehicleStateChange(sharedPortal.getPortal().getSchedulerService().fetchSchedulerAllocations());
+    SwingUtilities.invokeLater(()
+        -> handleVehicleStateChange((Vehicle) tcsObjectEvent.getCurrentOrPreviousObjectState())
+    );
+  }
+
+  private void updateAllVehicleAllocations() {
+    SwingUtilities.invokeLater(()
+        -> sharedPortal.getPortal().getVehicleService().fetchObjects(Vehicle.class).stream()
+            .forEach(this::handleVehicleStateChange)
+    );
   }
 
   /**
@@ -152,13 +168,33 @@ public class ResourceAllocationPanel
    *
    * @param vehicle The vehicle which changed
    */
-  private void handleVehicleStateChange(SchedulerAllocationState allocationState) {
-    if (allocationState == null) {
-      LOG.debug("Kernel did not answer to the scheduled allocations query.");
-      return;
-    }
+  private void handleVehicleStateChange(Vehicle vehicle) {
+    ((AllocationTreeModel) allocationTable.getModel()).updateAllocations(
+        vehicle.getName(),
+        vehicle.getAllocatedResources().stream()
+            .flatMap(set -> inClassOrder(set).stream())
+            .collect(Collectors.toList())
+    );
+  }
 
-    ((AllocationTreeModel) allocationTable.getModel()).updateAllocations(allocationState.getAllocationStates());
+  private List<TCSResourceReference<?>> inClassOrder(Set<TCSResourceReference<?>> resources) {
+    List<TCSResourceReference<?>> result = new ArrayList<>();
+    List<TCSResourceReference<?>> points = new ArrayList<>();
+    List<TCSResourceReference<?>> locations = new ArrayList<>();
+    resources.forEach(resource -> {
+      if (resource.getReferentClass() == Path.class) {
+        result.add(resource);
+      }
+      else if (resource.getReferentClass() == Point.class) {
+        points.add(resource);
+      }
+      else if (resource.getReferentClass() == Location.class) {
+        locations.add(resource);
+      }
+    });
+    result.addAll(points);
+    result.addAll(locations);
+    return result;
   }
 
   /**

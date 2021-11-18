@@ -16,7 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * Renders the tree nodes with vehicle, point and path icons.
@@ -67,13 +67,13 @@ public class AllocationTreeCellRenderer
         setIcon(vehicleIcon);
       }
       //User object is of type TCSResource only if the node contains a path or a point
-      else if (treeNode.getUserObject() instanceof TCSResource) {
-        TCSResource<?> resource = (TCSResource<?>) treeNode.getUserObject();
+      else if (treeNode.getUserObject() instanceof TCSResourceReference) {
+        TCSResourceReference<?> resource = (TCSResourceReference<?>) treeNode.getUserObject();
         setText(resource.getName());
-        if (resource instanceof Path) {
+        if (resource.getReferentClass() == Path.class) {
           setIcon(pathIcon);
         }
-        else if (resource instanceof Point) {
+        else if (resource.getReferentClass() == Point.class) {
           setIcon(pointIcon);
         }
       }
