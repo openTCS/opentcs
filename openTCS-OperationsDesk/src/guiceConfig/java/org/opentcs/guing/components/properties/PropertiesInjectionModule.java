@@ -16,6 +16,7 @@ import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.KeyValueSetPropertyViewerEditorPanel;
 import org.opentcs.guing.components.properties.panel.LinkActionsEditorPanel;
+import org.opentcs.guing.components.properties.panel.ResourcePropertyViewerEditorPanel;
 import org.opentcs.guing.components.properties.panel.LocationTypeActionsEditorPanel;
 import org.opentcs.guing.components.properties.panel.OrderTypesPropertyEditorPanel;
 import org.opentcs.guing.components.properties.panel.PropertiesPanelFactory;
@@ -25,6 +26,7 @@ import org.opentcs.guing.components.properties.type.AbstractComplexProperty;
 import org.opentcs.guing.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LinkActionsProperty;
+import org.opentcs.guing.components.properties.type.ResourceProperty;
 import org.opentcs.guing.components.properties.type.LocationTypeActionsProperty;
 import org.opentcs.guing.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.components.properties.type.SymbolProperty;
@@ -68,6 +70,9 @@ public class PropertiesInjectionModule
     dialogContentMapBinder
         .addBinding(OrderTypesProperty.class)
         .to(OrderTypesPropertyEditorPanel.class);
+    dialogContentMapBinder
+        .addBinding(ResourceProperty.class)
+        .to(ResourcePropertyViewerEditorPanel.class);
 
     bind(SelectionPropertiesComponent.class)
         .in(Singleton.class);

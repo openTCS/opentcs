@@ -22,6 +22,7 @@ import org.opentcs.guing.components.properties.type.BooleanProperty;
 import org.opentcs.guing.components.properties.type.ColorProperty;
 import org.opentcs.guing.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.components.properties.type.LengthProperty;
+import org.opentcs.guing.components.properties.type.ResourceProperty;
 import org.opentcs.guing.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.components.properties.type.PercentProperty;
 import org.opentcs.guing.components.properties.type.SelectionProperty;
@@ -60,6 +61,8 @@ public class VehicleModel
   public static final String MAXIMUM_VELOCITY = "MaximumVelocity";
   public static final String MAXIMUM_REVERSE_VELOCITY = "MaximumReverseVelocity";
   public static final String ALLOWED_ORDER_TYPES = "AllowedOrderTypes";
+  public static final String ALLOCATED_RESOURCES = "AllocatedResources";
+  public static final String CLAIMED_RESOURCES = "ClaimedResources";
   /**
    * This class's resource bundle.
    */
@@ -412,6 +415,14 @@ public class VehicleModel
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
+  
+  public ResourceProperty getAllocatedResources(){
+    return (ResourceProperty) getProperty(ALLOCATED_RESOURCES);
+  }
+  
+  public ResourceProperty getClaimedResources(){
+    return (ResourceProperty) getProperty(CLAIMED_RESOURCES);
+  }
 
   private void createProperties() {
     StringProperty pName = new StringProperty(this);
@@ -612,5 +623,27 @@ public class VehicleModel
     pAllowedOrderTypes.setModellingEditable(false);
     pAllowedOrderTypes.setOperatingEditable(true);
     setProperty(ALLOWED_ORDER_TYPES, pAllowedOrderTypes);
+
+    ResourceProperty allocatedResources = new ResourceProperty(this);
+    allocatedResources.setDescription(
+        bundle.getString("vehicleModel.property_allocatedResources.description")
+    );
+    allocatedResources.setHelptext(
+        bundle.getString("vehicleModel.property_allocatedResources.helptext")
+    );
+    allocatedResources.setModellingEditable(false);
+    allocatedResources.setOperatingEditable(true);
+    setProperty(ALLOCATED_RESOURCES, allocatedResources);
+    
+    ResourceProperty claimedResources = new ResourceProperty(this);
+    claimedResources.setDescription(
+        bundle.getString("vehicleModel.property_claimedResources.description")
+    );
+    claimedResources.setHelptext(
+        bundle.getString("vehicleModel.property_claimedResources.helptext")
+    );
+    claimedResources.setModellingEditable(false);
+    claimedResources.setOperatingEditable(true);
+    setProperty(CLAIMED_RESOURCES, claimedResources);
   }
 }

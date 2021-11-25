@@ -101,6 +101,9 @@ public class VehicleAdapter
       updateModelDriveOrder(objectService, vehicle, model, systemModel);
       updateModelLayoutProperties(model, vehicle);
 
+      model.getAllocatedResources().setItems(vehicle.getAllocatedResources());
+      model.getClaimedResources().setItems(vehicle.getClaimedResources());
+      
       model.propertiesChanged(new NullAttributesChangeListener());
     }
     catch (CredentialsException e) {

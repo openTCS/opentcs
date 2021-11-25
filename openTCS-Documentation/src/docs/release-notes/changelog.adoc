@@ -17,6 +17,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features:
 ** Enable vehicle drivers to inspect the whole transport order before accepting it, not just the respective sequence of destination operations.
 ** Reflect the currently claimed and allocated resources in a vehicle's state.
+** Show the currently claimed and allocated resources for a selected vehicle in the properties panel in the Operations Desk application.
 ** Add claimed and allocated resources to the vehicle state and vehicle status message specification of the web API.
 * Other changes:
 ** Skip the user confirmation for exiting the Kernel Control Center application.
