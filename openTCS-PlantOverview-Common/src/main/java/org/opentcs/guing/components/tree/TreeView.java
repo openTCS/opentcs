@@ -17,8 +17,8 @@ import javax.swing.tree.TreeNode;
 import org.opentcs.guing.components.tree.elements.UserObject;
 
 /**
- * A TreeView manages a model which has a set of {@link DefaultMutableTreeNode} objects.
- * Each DefaultMutableTreeNode has a UserObject. Each UserObject wraps a real object 
+ * A TreeView manages a model which has a set of TreeNode objects.
+ * Each TreeNode has a UserObject. Each UserObject wraps a real object 
  * (e.g. Article, Figure, ...). It knows which methods to call to when an object is selected 
  * in the tree or is deleted or is double-clicked.
  *
