@@ -22,6 +22,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.order.OrderHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.RequestStatusHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.StatusEventDispatcher;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOrderState;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -130,9 +131,13 @@ public class V1RequestHandler
              ObjectExistsException,
              IllegalArgumentException,
              IllegalStateException {
-    orderHandler.createOrder(request.params(":NAME"), fromJson(request.body(), Transport.class));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(
+        TransportOrderState.fromTransportOrder(
+            orderHandler.createOrder(request.params(":NAME"),
+                                     fromJson(request.body(), Transport.class))
+        )
+    );
   }
 
   private Object handlePostWithdrawalByOrder(Request request, Response response)

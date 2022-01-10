@@ -22,6 +22,9 @@ import javax.validation.constraints.Size;
  */
 public class Transport {
 
+  @JsonPropertyDescription("Whether the name given for the transport order is incomplete")
+  private boolean incompleteName;
+
   @JsonPropertyDescription("The (optional) deadline of the transport order")
   private Instant deadline;
 
@@ -46,6 +49,14 @@ public class Transport {
    * Creates a new instance.
    */
   public Transport() {
+  }
+
+  public boolean hasIncompleteName() {
+    return incompleteName;
+  }
+
+  public void setIncompleteName(boolean incompleteName) {
+    this.incompleteName = incompleteName;
   }
 
   public Instant getDeadline() {

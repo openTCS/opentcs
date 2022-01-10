@@ -75,7 +75,7 @@ public class OrderHandler {
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
-  public void createOrder(String name, Transport order)
+  public TransportOrder createOrder(String name, Transport order)
       throws ObjectUnknownException,
              ObjectExistsException,
              KernelRuntimeException,
@@ -85,16 +85,20 @@ public class OrderHandler {
 
     TransportOrderCreationTO to
         = new TransportOrderCreationTO(name, destinations(order))
+            .withIncompleteName(order.hasIncompleteName())
             .withIntendedVehicleName(order.getIntendedVehicle())
             .withDependencyNames(new HashSet<>(order.getDependencies()))
             .withDeadline(deadline(order))
             .withProperties(properties(order.getProperties()));
 
     try {
-      kernelExecutor.submit(() -> {
-        orderService.createTransportOrder(to);
-        dispatcherService.dispatch();
-      }).get();
+      return kernelExecutor.submit(
+          () -> {
+            TransportOrder result = orderService.createTransportOrder(to);
+            dispatcherService.dispatch();
+            return result;
+          }
+      ).get();
     }
     catch (InterruptedException exc) {
       throw new IllegalStateException("Unexpectedly interrupted");

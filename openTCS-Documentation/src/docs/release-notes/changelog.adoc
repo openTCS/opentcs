@@ -18,8 +18,10 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Enable vehicle drivers to inspect the whole transport order before accepting it, not just the respective sequence of destination operations.
 ** Reflect the currently claimed and allocated resources in a vehicle's state.
 ** Show the currently claimed and allocated resources for a selected vehicle in the properties panel in the Operations Desk application.
-** Add claimed and allocated resources to the vehicle state and vehicle status message specification of the web API.
-** Add the precise position to the vehicle state message specification of the web API.
+** Update web API specification and implementation to version 1.1.0:
+*** Add claimed and allocated resources to the vehicle state and vehicle status message specification.
+*** Add the precise position to the vehicle state message specification.
+*** When creating transport orders, allow clients to provide incomplete transport order names, i.e. have the kernel complete/generate the names.
 * Other changes:
 ** Skip the user confirmation for exiting the Kernel Control Center application.
 ** In the _File_ menu, improve the names of the entries for uploading a model to the kernel and downloading it from the kernel.
