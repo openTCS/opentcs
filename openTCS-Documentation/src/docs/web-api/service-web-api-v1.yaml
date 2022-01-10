@@ -583,6 +583,8 @@ components:
           type: string
           description: The name of the point which the vehicle currently occupies.
           example: Point-0001
+        precisePosition:
+          $ref: "#/components/schemas/PrecisePosition"
         state:
           type: string
           enum:

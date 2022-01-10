@@ -16,7 +16,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 
 /**
@@ -142,12 +141,10 @@ public class VehicleStatusMessage
         vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName());
     vehicleMessage.setState(vehicle.getState());
     vehicleMessage.setProcState(vehicle.getProcState());
-    Triple precisePos = vehicle.getPrecisePosition();
-    if (precisePos != null) {
-      VehicleStatusMessage.PrecisePosition precisePosElement;
-      precisePosElement = new VehicleStatusMessage.PrecisePosition(
-          precisePos.getX(), precisePos.getY(), precisePos.getZ());
-      vehicleMessage.setPrecisePosition(precisePosElement);
+    if (vehicle.getPrecisePosition() != null) {
+      vehicleMessage.setPrecisePosition(new PrecisePosition(vehicle.getPrecisePosition().getX(),
+                                                            vehicle.getPrecisePosition().getY(),
+                                                            vehicle.getPrecisePosition().getZ()));
     }
     vehicleMessage.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleMessage.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));

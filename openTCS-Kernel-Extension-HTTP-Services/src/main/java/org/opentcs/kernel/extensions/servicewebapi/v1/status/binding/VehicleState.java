@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +61,9 @@ public class VehicleState {
 
   @JsonPropertyDescription("The name of the point which the vehicle currently occupies.")
   private String currentPosition;
+
+  @JsonPropertyDescription("The precise position of the vehicle")
+  private PrecisePosition precisePosition;
 
   @JsonPropertyDescription("The vehicle's current state.")
   private State state = State.UNKNOWN;
@@ -145,6 +149,14 @@ public class VehicleState {
     this.currentPosition = currentPosition;
   }
 
+  public PrecisePosition getPrecisePosition() {
+    return precisePosition;
+  }
+
+  public void setPrecisePosition(PrecisePosition precisePosition) {
+    this.precisePosition = precisePosition;
+  }
+
   public State getState() {
     return state;
   }
@@ -199,6 +211,11 @@ public class VehicleState {
     vehicleState.setProcState(vehicle.getProcState());
     vehicleState.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
     vehicleState.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));
+    if (vehicle.getPrecisePosition() != null) {
+      vehicleState.setPrecisePosition(new PrecisePosition(vehicle.getPrecisePosition().getX(),
+                                                          vehicle.getPrecisePosition().getY(),
+                                                          vehicle.getPrecisePosition().getZ()));
+    }
     vehicleState.setState(vehicle.getState());
     vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
@@ -224,4 +241,64 @@ public class VehicleState {
     return result;
   }
 
+  /**
+   * A precise position of a vehicle.
+   */
+  public static class PrecisePosition {
+
+    @JsonProperty(required = true)
+    @JsonPropertyDescription("The position's X coordinate")
+    private long x;
+
+    @JsonProperty(required = true)
+    @JsonPropertyDescription("The position's Y coordinate")
+    private long y;
+
+    @JsonProperty(required = true)
+    @JsonPropertyDescription("The position's Z coordinate")
+    private long z;
+
+    /**
+     * Creates a new instance.
+     */
+    public PrecisePosition() {
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param x x value
+     * @param y y value
+     * @param z z value
+     */
+    public PrecisePosition(long x, long y, long z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
+
+    public long getX() {
+      return x;
+    }
+
+    public void setX(long x) {
+      this.x = x;
+    }
+
+    public long getY() {
+      return y;
+    }
+
+    public void setY(long y) {
+      this.y = y;
+    }
+
+    public long getZ() {
+      return z;
+    }
+
+    public void setZ(long z) {
+      this.z = z;
+    }
+  }
 }
