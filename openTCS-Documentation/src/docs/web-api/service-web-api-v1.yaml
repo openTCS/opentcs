@@ -393,6 +393,28 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Parameter 'timeout' is not in the correct range.
+  /dispatcher/trigger:
+    post:
+      tags:
+        - Transport orders
+        - Vehicles
+      summary: Explicitly triggers dispatching of vehicles / transport orders.
+      description: >-
+        Triggers the kernel's dispatcher to assign vehicles to transport orders.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+        "500":
+          description: >-
+            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
 components:
   securitySchemes:
     ApiKeyAuth:

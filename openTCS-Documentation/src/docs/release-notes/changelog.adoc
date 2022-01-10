@@ -22,6 +22,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** Add claimed and allocated resources to the vehicle state and vehicle status message specification.
 *** Add the precise position to the vehicle state message specification.
 *** When creating transport orders, allow clients to provide incomplete transport order names, i.e. have the kernel complete/generate the names.
+*** Add an endpoint for explicitly triggering dispatcher runs.
 * Other changes:
 ** Skip the user confirmation for exiting the Kernel Control Center application.
 ** In the _File_ menu, improve the names of the entries for uploading a model to the kernel and downloading it from the kernel.

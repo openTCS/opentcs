@@ -95,7 +95,6 @@ public class OrderHandler {
       return kernelExecutor.submit(
           () -> {
             TransportOrder result = orderService.createTransportOrder(to);
-            dispatcherService.dispatch();
             return result;
           }
       ).get();
@@ -109,6 +108,11 @@ public class OrderHandler {
       }
       throw new KernelRuntimeException(exc.getCause());
     }
+  }
+
+  public void triggerDispatcher()
+      throws KernelRuntimeException {
+    dispatcherService.dispatch();
   }
 
   public void withdrawByTransportOrder(String name, boolean immediate, boolean disableVehicle)
