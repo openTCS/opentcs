@@ -110,9 +110,8 @@ public class OrderHandler {
     }
   }
 
-  public void triggerDispatcher()
-      throws KernelRuntimeException {
-    dispatcherService.dispatch();
+  public void triggerDispatcher() {
+    kernelExecutor.submit(() -> dispatcherService.dispatch());
   }
 
   public void withdrawByTransportOrder(String name, boolean immediate, boolean disableVehicle)
