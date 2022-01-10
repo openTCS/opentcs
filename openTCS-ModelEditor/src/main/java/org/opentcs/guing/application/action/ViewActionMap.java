@@ -20,8 +20,8 @@ import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.NewModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAsAction;
-import org.opentcs.guing.application.action.synchronize.LoadModelFromKernelAction;
-import org.opentcs.guing.application.action.synchronize.PersistInKernelAction;
+import org.opentcs.guing.application.action.file.DownloadModelFromKernelAction;
+import org.opentcs.guing.application.action.file.UploadModelToKernelAction;
 import org.opentcs.guing.application.action.view.AddBitmapAction;
 import org.opentcs.guing.application.action.view.RestoreDockingLayoutAction;
 import org.opentcs.thirdparty.jhotdraw.application.action.edit.ClearSelectionAction;
@@ -56,7 +56,7 @@ public class ViewActionMap
                        UndoRedoManager undoRedoManager,
                        AboutAction aboutAction,
                        ModelPropertiesAction modelPropertiesAction,
-                       LoadModelFromKernelAction loadModelFromKernelAction) {
+                       DownloadModelFromKernelAction loadModelFromKernelAction) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(aboutAction, "aboutAction");
@@ -70,8 +70,8 @@ public class ViewActionMap
     put(CloseFileAction.ID, new CloseFileAction(view));
 
     // --- Menu Synchronize ---
-    put(PersistInKernelAction.ID, new PersistInKernelAction(view));
-    put(LoadModelFromKernelAction.ID, loadModelFromKernelAction);
+    put(UploadModelToKernelAction.ID, new UploadModelToKernelAction(view));
+    put(DownloadModelFromKernelAction.ID, loadModelFromKernelAction);
 
     // --- Menu Edit ---
     // Undo, Redo

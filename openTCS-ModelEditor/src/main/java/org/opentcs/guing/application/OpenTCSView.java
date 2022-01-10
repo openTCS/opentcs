@@ -568,9 +568,9 @@ public class OpenTCSView
     fDrawingEditor.initializeViewport();
   }
 
-  public void loadCurrentKernelModel() {
+  public void downloadModelFromKernel() {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-      loadCurrentKernelModel(sharedPortal.getPortal());
+      downloadModelFromKernel(sharedPortal.getPortal());
     }
     catch (ServiceUnavailableException exc) {
       LOG.info("Kernel unavailable, aborting.", exc);
@@ -580,7 +580,7 @@ public class OpenTCSView
   /**
    * Loads the current kernel model.
    */
-  private void loadCurrentKernelModel(KernelServicePortal portal) {
+  private void downloadModelFromKernel(KernelServicePortal portal) {
     if (hasUnsavedChanges()) {
       if (!showUnsavedChangesDialog()) {
         return;
@@ -615,7 +615,7 @@ public class OpenTCSView
     else {
       fModelManager.restoreModel(portal);
       statusPanel.setLogMessage(Level.INFO,
-                                bundle.getFormatted("openTcsView.message_modelLoaded.text",
+                                bundle.getFormatted("openTcsView.message_modelDownloaded.text",
                                                     fModelManager.getModel().getName()));
     }
 
@@ -939,28 +939,31 @@ public class OpenTCSView
   }
 
   /**
-   * Persists the current (local) model in the kernel.
+   * Uploads the current (local) model to the kernel.
    *
-   * @return Whether the model was actually saved.
+   * @return Whether the model was actually uploaded.
    */
-  public boolean persistModel() {
+  public boolean uploadModelToKernel() {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-      return persistModel(sharedPortal.getPortal());
+      return uploadModelToKernel(sharedPortal.getPortal());
     }
     catch (ServiceUnavailableException exc) {
-      LOG.warn("Exception persisting model", exc);
+      LOG.warn("Exception uploading model", exc);
       return false;
     }
   }
 
-  private boolean persistModel(KernelServicePortal portal) {
+  private boolean uploadModelToKernel(KernelServicePortal portal) {
     if (hasUnsavedChanges()) {
-      JOptionPane.showMessageDialog(null, bundle.getString("openTcsView.optionPane_saveModelBeforeKernelPersist.message"));
-      if (fModelManager.persistModel(true)) {
+      JOptionPane.showMessageDialog(
+          null,
+          bundle.getString("openTcsView.optionPane_saveModelBeforeUpload.message")
+      );
+      if (fModelManager.saveModelToFile(true)) {
         setHasUnsavedChanges(false);
         String modelName = fModelManager.getModel().getName();
         setModelNameProperty(modelName);
-        return persistModel(portal);
+        return uploadModelToKernel(portal);
       }
       return false;
     }
@@ -974,18 +977,19 @@ public class OpenTCSView
           return false;
         }
       }
-      boolean didSave = fModelManager.persistModel(portal);
+      boolean didSave = fModelManager.uploadModel(portal);
       if (didSave) {
         String modelName = fModelManager.getModel().getName();
         setModelNameProperty(modelName);
         setHasUnsavedChanges(false);
-        String persistMsg = bundle.getFormatted("openTcsView.message_modelSaved.text", modelName);
+        String persistMsg = bundle.getFormatted("openTcsView.message_modelUploaded.text",
+                                                modelName);
         statusPanel.setLogMessage(Level.INFO, persistMsg);
       }
       return didSave;
     }
     catch (KernelRuntimeException e) {
-      LOG.warn("Exception persisting model {}", fModelManager.getModel().getName(), e);
+      LOG.warn("Exception uploading model {}", fModelManager.getModel().getName(), e);
       statusPanel.setLogMessage(Level.WARNING, e.getMessage());
       return false;
     }
@@ -993,7 +997,7 @@ public class OpenTCSView
 
   @Override
   public boolean saveModel() {
-    boolean saved = fModelManager.persistModel(false);
+    boolean saved = fModelManager.saveModelToFile(false);
     if (saved) {
       String modelName = fModelManager.getModel().getName();
       setModelNameProperty(modelName);
@@ -1004,7 +1008,7 @@ public class OpenTCSView
 
   @Override  // GuiManager
   public boolean saveModelAs() {
-    boolean saved = fModelManager.persistModel(true);
+    boolean saved = fModelManager.saveModelToFile(true);
     if (saved) {
       String modelName = fModelManager.getModel().getName();
       setModelNameProperty(modelName);

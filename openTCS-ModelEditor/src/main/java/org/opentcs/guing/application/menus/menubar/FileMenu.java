@@ -12,13 +12,13 @@ import javax.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.application.action.ViewActionMap;
+import org.opentcs.guing.application.action.file.DownloadModelFromKernelAction;
 import org.opentcs.guing.application.action.file.LoadModelAction;
 import org.opentcs.guing.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.application.action.file.NewModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAction;
 import org.opentcs.guing.application.action.file.SaveModelAsAction;
-import org.opentcs.guing.application.action.synchronize.LoadModelFromKernelAction;
-import org.opentcs.guing.application.action.synchronize.PersistInKernelAction;
+import org.opentcs.guing.application.action.file.UploadModelToKernelAction;
 import org.opentcs.guing.util.I18nPlantOverviewModeling;
 import org.opentcs.thirdparty.jhotdraw.application.action.file.CloseFileAction;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
@@ -40,29 +40,21 @@ public class FileMenu
    */
   private final JMenuItem menuItemLoadModel;
   /**
-   * A menu item for persisting the kernel's current model.
+   * A menu item for saving the kernel's current model.
    */
   private final JMenuItem menuItemSaveModel;
   /**
-   * A menu item for persisting the kernel's current model with a new name.
+   * A menu item for saving the kernel's current model with a new name.
    */
   private final JMenuItem menuItemSaveModelAs;
   /**
-   * A submenu for importers.
-   */
-  private final FileImportMenu menuImport;
-  /**
-   * A submenu for exporters.
-   */
-  private final FileExportMenu menuExport;
-  /**
    * A menu item for retrieving the system model data from the kernel.
    */
-  private final JMenuItem menuItemLoadModelFromKernel;
+  private final JMenuItem menuItemDownloadModelFromKernel;
   /**
    * A menu item for transferring the system model data to the kernel.
    */
-  private final JMenuItem menuItemPersistInKernel;
+  private final JMenuItem menuItemUploadModelToKernel;
   /**
    * A menu item for showing the current model's properties.
    */
@@ -84,8 +76,8 @@ public class FileMenu
                   FileImportMenu menuImport,
                   FileExportMenu menuExport) {
     requireNonNull(actionMap, "actionMap");
-    this.menuImport = requireNonNull(menuImport, "menuImport");
-    this.menuExport = requireNonNull(menuExport, "menuExport");
+    requireNonNull(menuImport, "menuImport");
+    requireNonNull(menuExport, "menuExport");
 
     final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
@@ -117,12 +109,12 @@ public class FileMenu
     addSeparator();
 
     // Load model from kernel
-    menuItemLoadModelFromKernel = new JMenuItem(actionMap.get(LoadModelFromKernelAction.ID));
-    add(menuItemLoadModelFromKernel);
+    menuItemDownloadModelFromKernel = new JMenuItem(actionMap.get(DownloadModelFromKernelAction.ID));
+    add(menuItemDownloadModelFromKernel);
 
     // Persist model in kernel
-    menuItemPersistInKernel = new JMenuItem(actionMap.get(PersistInKernelAction.ID));
-    add(menuItemPersistInKernel);
+    menuItemUploadModelToKernel = new JMenuItem(actionMap.get(UploadModelToKernelAction.ID));
+    add(menuItemUploadModelToKernel);
 
     addSeparator();
 

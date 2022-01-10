@@ -25,7 +25,7 @@ You can set the properties the following way:
 . In the plant overview client's tree view of the plant model, select a vehicle.
 . In the table showing the vehicle's properties, click into the value field labelled btn:[Miscellaneous].
   In the dialog shown, add a property key and value according to the list below.
-. Save the model and persist it in the kernel as described in <<Saving the plant model>>.
+. Save the model and upload it to the kernel as described in <<Saving the plant model>>.
 
 The loopback driver interprets properties with the following keys:
 

@@ -30,12 +30,12 @@ public interface ModelManager {
   void createEmptyModel();
 
   /**
-   * Persists the given system model in to a file.
+   * Saves the given system model to a file.
    *
-   * @param chooseName Whether a dialog to choose a name shall be shown.
+   * @param chooseName Whether a dialog to choose a file name shall be shown.
    * @return Whether the model was actually saved.
    */
-  boolean persistModel(boolean chooseName);
+  boolean saveModelToFile(boolean chooseName);
 
   /**
    * Creates figures and process adapters for all model components in the current system model.

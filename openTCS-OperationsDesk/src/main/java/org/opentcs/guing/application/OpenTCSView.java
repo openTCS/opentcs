@@ -816,7 +816,7 @@ public class OpenTCSView
   private boolean showSwitchStateUnsavedChangesDialog() {
     String title = bundle.getString("openTcsView.dialog_unsavedChanges.title");
     String text = bundle.getString("openTcsView.dialog_unsavedChanges.message");
-    String[] options = {bundle.getString("openTcsView.dialog_unsavedChanges.option_persist.text"),
+    String[] options = {bundle.getString("openTcsView.dialog_unsavedChanges.option_upload.text"),
                         bundle.getString("openTcsView.dialog_unsavedChanges.option_discard.text"),
                         bundle.getString("openTcsView.dialog_unsavedChanges.option_cancel.text")};
     switch (userMessageHelper.showOptionsDialog(title,
@@ -824,7 +824,7 @@ public class OpenTCSView
                                                 UserMessageHelper.Type.ERROR,
                                                 options)) {
       case 0:
-        return persistModel();
+        return uploadModelToKernel();
       case 1:
         setHasUnsavedChanges(false);
         return true;
@@ -1060,17 +1060,17 @@ public class OpenTCSView
   }
 
   /**
-   * Persists the current (local) model in the kernel.
+   * Uploads the current (local) model to the kernel.
    *
-   * @return Whether the model was actually saved.
+   * @return Whether the model was actually uploaded.
    */
-  public boolean persistModel() {
+  private boolean uploadModelToKernel() {
     return false;
   }
 
   @Override
   public boolean saveModel() {
-    boolean saved = fModelManager.persistModel(false);
+    boolean saved = fModelManager.saveModelToFile(false);
     if (saved) {
       String modelName = fModelManager.getModel().getName();
       setModelNameProperty(modelName);
@@ -1081,7 +1081,7 @@ public class OpenTCSView
 
   @Override  // GuiManager
   public boolean saveModelAs() {
-    boolean saved = fModelManager.persistModel(true);
+    boolean saved = fModelManager.saveModelToFile(true);
     if (saved) {
       String modelName = fModelManager.getModel().getName();
       setModelNameProperty(modelName);

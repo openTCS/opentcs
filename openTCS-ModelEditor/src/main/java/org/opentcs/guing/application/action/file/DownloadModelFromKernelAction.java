@@ -5,10 +5,11 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.guing.application.action.synchronize;
+package org.opentcs.guing.application.action.file;
 
 import java.awt.event.ActionEvent;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.ACCELERATOR_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;
@@ -18,36 +19,38 @@ import static org.opentcs.guing.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * An action to save the (local) model in the kernel.
+ * An action to load the current kernel model in the plant overview.
  *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
+ * @author Philipp Seifert (Fraunhofer IML)
  */
-public class PersistInKernelAction
+public class DownloadModelFromKernelAction
     extends AbstractAction {
 
-  public static final String ID = "synchronize.saveModelInKernel";
+  public static final String ID = "file.downloadModelFromKernel";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
-
+  /**
+   * The OpenTCS view.
+   */
   private final OpenTCSView openTCSView;
 
   /**
    * Creates a new instance.
    *
-   * @param openTCSView The openTCS view
+   * @param openTCSView The openTCS view.
    */
-  public PersistInKernelAction(OpenTCSView openTCSView) {
-    this.openTCSView = Objects.requireNonNull(openTCSView);
+  @Inject
+  public DownloadModelFromKernelAction(OpenTCSView openTCSView) {
+    this.openTCSView = requireNonNull(openTCSView);
 
-    putValue(NAME, BUNDLE.getString("persistInKernelAction.name"));
-    putValue(SHORT_DESCRIPTION, BUNDLE.getString("persistInKernelAction.shortDescription"));
-    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt P"));
-    putValue(MNEMONIC_KEY, Integer.valueOf('P'));
-
+    putValue(NAME, BUNDLE.getString("downloadModelFromKernelAction.name"));
+    putValue(SHORT_DESCRIPTION, BUNDLE.getString("downloadModelFromKernelAction.shortDescription"));
+    putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt K"));
+    putValue(MNEMONIC_KEY, Integer.valueOf('K'));
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    openTCSView.persistModel();
+    openTCSView.downloadModelFromKernel();
   }
 }

@@ -93,9 +93,9 @@ Select btn:[menu:File[Save Model]] or btn:[menu:File[Save Model As...]] and ente
 
 ===== Loading the model into a running kernel
 
-Select btn:[menu:File[Persist model in the kernel]] and your model will be loaded into the kernel, letting you use it for operating a plant.
+Select btn:[menu:File[Upload model to kernel]] and your model will be loaded into the kernel, letting you use it for operating a plant.
 This, though, requires you to save it locally first.
-Note that any model that was previously loaded in the kernel will be replaced, as the kernel can only work with a single model at a time.
+Note that any model that was previously loaded in the kernel will be replaced, as the kernel can only store a single model at a time.
 
 === Operating the plant
 

@@ -15,7 +15,7 @@ import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 
 /**
- * Manages (loads, persists and keeps) the driving course model.
+ * Manages (loads, saves and keeps) the driving course model.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -52,12 +52,12 @@ public interface ModelManagerModeling
   boolean importModel(@Nonnull PlantModelImporter importer);
 
   /**
-   * Persists the given system model with the kernel.
+   * Uploads the given system model to the kernel.
    *
-   * @param portal The kernel client portal providing the list of existing models.
-   * @return Whether the model was actually saved.
+   * @param portal The kernel client portal to upload the model to.
+   * @return Whether the model was actually uploaded.
    */
-  boolean persistModel(KernelServicePortal portal);
+  boolean uploadModel(KernelServicePortal portal);
 
   /**
    * Exports a model using the given exporter.

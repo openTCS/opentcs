@@ -187,7 +187,7 @@ public class OpenTCSModelManagerModeling
   }
 
   @Override
-  public boolean persistModel(KernelServicePortal portal) {
+  public boolean uploadModel(KernelServicePortal portal) {
     try {
       setModelName(getModel().getName());
       getStatusPanel().clear();

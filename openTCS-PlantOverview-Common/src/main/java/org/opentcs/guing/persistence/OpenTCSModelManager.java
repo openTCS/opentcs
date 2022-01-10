@@ -193,7 +193,7 @@ public class OpenTCSModelManager
   }
 
   @Override
-  public boolean persistModel(boolean chooseName) {
+  public boolean saveModelToFile(boolean chooseName) {
     fModelName = systemModel.getName();
     if (chooseName
         || currentModelFile == null
