@@ -194,7 +194,6 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
       include '**/*.jpg'
       include '**/*.png'
       include '**/*.svg'
-      exclude 'samples'
       exclude 'themes'
     }
   }
@@ -238,12 +237,10 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
              'operationsDesk-javaSrc': project(':openTCS-OperationsDesk').javaSrcDir,
              'operationsDesk-guiceSrc': project(':openTCS-OperationsDesk').guiceSrcDir,
              'operationsDesk-testSrc': project(':openTCS-OperationsDesk').testSrcDir,
-             'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
-             'samples': samplesDir
+             'imagesoutdir': devManualImagesDir // Set the images directory for the output of asciidoctor-diagram
   resources {
     from(sourceDir) {
       include '**/*.png'
-      exclude 'samples'
     }
   }
   doLast{
