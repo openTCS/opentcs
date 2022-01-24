@@ -12,11 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListModel;
+import javax.swing.table.AbstractTableModel;
 import org.opentcs.guing.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.components.dialogs.StandardDetailsDialog;
 import org.opentcs.guing.components.properties.type.PeripheralOperationsProperty;
@@ -25,7 +23,6 @@ import org.opentcs.guing.model.PeripheralOperationModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.guing.util.I18nPlantOverview;
 import org.opentcs.thirdparty.jhotdraw.util.ResourceBundleUtil;
-import org.opentcs.util.gui.StringListCellRenderer;
 
 /**
  * User interface to edit a peripheral operations property.
@@ -39,7 +36,8 @@ public class PeripheralOperationsPropertyEditorPanel
   /**
    * The bundle to be used.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
+  private final ResourceBundleUtil bundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
   /**
    * Manager of the system model.
    */
@@ -50,35 +48,30 @@ public class PeripheralOperationsPropertyEditorPanel
   private PeripheralOperationsProperty fProperty;
 
   /**
-   * Creates new form PeripheralOperationsPropertyEditorPanel.
+   * Creates a new instance.
+   *
+   * @param modelManager Manages the system model.
    */
   @Inject
   public PeripheralOperationsPropertyEditorPanel(ModelManager modelManager) {
-    initComponents();
     this.modelManager = requireNonNull(modelManager, "modelManager");
-    setPreferredSize(new Dimension(350, 250));
+
+    initComponents();
+
+    setPreferredSize(new Dimension(600, 250));
+
+    itemsTable.setModel(new ItemsTableModel());
   }
 
   @Override
   public void setProperty(Property property) {
     fProperty = (PeripheralOperationsProperty) property;
-    DefaultListModel<PeripheralOperationModel> model = new DefaultListModel<>();
-
-    for (PeripheralOperationModel item : fProperty.getValue()) {
-      model.addElement(item);
-    }
-
-    itemsList.setModel(model);
+    ((ItemsTableModel) itemsTable.getModel()).setValues(fProperty.getValue());
   }
 
   @Override
   public void updateValues() {
-    List<PeripheralOperationModel> items = new ArrayList<>();
-    ListModel<PeripheralOperationModel> model = itemsList.getModel();
-    for (int i = 0; i < model.getSize(); i++) {
-      items.add(model.getElementAt(i));
-    }
-    fProperty.setValue(items);
+    fProperty.setValue(((ItemsTableModel) itemsTable.getModel()).getValues());
   }
 
   @Override
@@ -95,23 +88,25 @@ public class PeripheralOperationsPropertyEditorPanel
    * Edits the selected value.
    */
   protected void edit() {
-    PeripheralOperationModel value = getItemsList().getSelectedValue();
-    if (value == null) {
+    int selectedRow = itemsTable.getSelectedRow();
+    if (selectedRow == -1) {
       return;
     }
+    PeripheralOperationModel selectedModel = ((ItemsTableModel) itemsTable.getModel())
+        .getValues().get(selectedRow);
 
-    int index = getItemsList().getSelectedIndex();
     JDialog parent = (JDialog) getTopLevelAncestor();
     PeripheralOperationPanel content = new PeripheralOperationPanel(modelManager.getModel());
-    content.setPeripheralOpartionModel(value);
+    content.setPeripheralOpartionModel(selectedModel);
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
 
     if (dialog.getReturnStatus() == StandardDetailsDialog.RET_OK
         && content.getPeripheralOperationModel().isPresent()) {
-      ((DefaultListModel<PeripheralOperationModel>) getItemsList().getModel())
-          .setElementAt(content.getPeripheralOperationModel().get(), index);
+      ((ItemsTableModel) itemsTable.getModel())
+          .getValues().set(selectedRow, content.getPeripheralOperationModel().get());
+      ((ItemsTableModel) itemsTable.getModel()).fireTableRowsUpdated(selectedRow, selectedRow);
     }
   }
 
@@ -127,18 +122,12 @@ public class PeripheralOperationsPropertyEditorPanel
 
     if (dialog.getReturnStatus() == StandardDetailsDialog.RET_OK
         && content.getPeripheralOperationModel().isPresent()) {
-      ((DefaultListModel<PeripheralOperationModel>) getItemsList().getModel())
-          .addElement(content.getPeripheralOperationModel().get());
+      ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+      List<PeripheralOperationModel> values = model.getValues();
+      values.add(content.getPeripheralOperationModel().get());
+      model.setValues(values);
+      model.fireTableRowsInserted(values.size() - 1, values.size() - 1);
     }
-  }
-
-  /**
-   * Returns the list with the values.
-   *
-   * @return The list with the values.
-   */
-  protected JList<PeripheralOperationModel> getItemsList() {
-    return itemsList;
   }
 
   // CHECKSTYLE:OFF
@@ -152,7 +141,7 @@ public class PeripheralOperationsPropertyEditorPanel
     java.awt.GridBagConstraints gridBagConstraints;
 
     itemsScrollPane = new javax.swing.JScrollPane();
-    itemsList = new javax.swing.JList<>();
+    itemsTable = new javax.swing.JTable();
     controlPanel = new javax.swing.JPanel();
     addButton = new javax.swing.JButton();
     editButton = new javax.swing.JButton();
@@ -163,9 +152,18 @@ public class PeripheralOperationsPropertyEditorPanel
 
     setLayout(new java.awt.BorderLayout());
 
-    itemsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-    itemsList.setCellRenderer(new StringListCellRenderer<PeripheralOperationModel>(model -> model.getLocationName() + ": " + model.getOperation()));
-    itemsScrollPane.setViewportView(itemsList);
+    itemsTable.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][] {
+        {},
+        {},
+        {},
+        {}
+      },
+      new String [] {
+
+      }
+    ));
+    itemsScrollPane.setViewportView(itemsTable);
 
     add(itemsScrollPane, java.awt.BorderLayout.CENTER);
 
@@ -249,41 +247,48 @@ public class PeripheralOperationsPropertyEditorPanel
   }// </editor-fold>//GEN-END:initComponents
 
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
-    int index = itemsList.getSelectedIndex();
-    if (index == -1 || index == itemsList.getModel().getSize() - 1) {
+    int selectedRow = itemsTable.getSelectedRow();
+    if (selectedRow == -1 || selectedRow == itemsTable.getModel().getRowCount() - 1) {
       return;
     }
 
-    DefaultListModel<PeripheralOperationModel> model
-        = (DefaultListModel<PeripheralOperationModel>) itemsList.getModel();
-    PeripheralOperationModel value = model.getElementAt(index);
-    model.removeElementAt(index);
-    model.insertElementAt(value, index + 1);
-    itemsList.setSelectedIndex(index + 1);
+    ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+    List<PeripheralOperationModel> values = model.getValues();
+    PeripheralOperationModel value = values.get(selectedRow);
+    values.remove(selectedRow);
+    values.add(selectedRow + 1, value);
+    model.setValues(values);
+    model.fireTableRowsUpdated(selectedRow, selectedRow + 1);
+    itemsTable.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
   }//GEN-LAST:event_moveDownButtonActionPerformed
 
   private void moveUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpButtonActionPerformed
-    int index = itemsList.getSelectedIndex();
-    if (index == -1 || index == 0) {
+    int selectedRow = itemsTable.getSelectedRow();
+    if (selectedRow == -1 || selectedRow == 0) {
       return;
     }
 
-    DefaultListModel<PeripheralOperationModel> model
-        = (DefaultListModel<PeripheralOperationModel>) itemsList.getModel();
-    PeripheralOperationModel value = model.getElementAt(index);
-    model.removeElementAt(index);
-    model.insertElementAt(value, index - 1);
-    itemsList.setSelectedIndex(index - 1);
+    ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+    List<PeripheralOperationModel> values = model.getValues();
+    PeripheralOperationModel value = values.get(selectedRow);
+    values.remove(selectedRow);
+    values.add(selectedRow - 1, value);
+    model.setValues(values);
+    model.fireTableRowsUpdated(selectedRow - 1, selectedRow);
+    itemsTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
   }//GEN-LAST:event_moveUpButtonActionPerformed
 
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-    PeripheralOperationModel value = itemsList.getSelectedValue();
-
-    if (value == null) {
+    int selectedRow = itemsTable.getSelectedRow();
+    if (selectedRow == -1) {
       return;
     }
 
-    ((DefaultListModel<PeripheralOperationModel>) itemsList.getModel()).removeElement(value);
+    ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+    List<PeripheralOperationModel> values = model.getValues();
+    values.remove(selectedRow);
+    model.setValues(values);
+    model.fireTableRowsDeleted(selectedRow, selectedRow);
   }//GEN-LAST:event_removeButtonActionPerformed
 
   private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
@@ -297,12 +302,100 @@ public class PeripheralOperationsPropertyEditorPanel
   private javax.swing.JButton addButton;
   private javax.swing.JPanel controlPanel;
   private javax.swing.JButton editButton;
-  private javax.swing.JList<PeripheralOperationModel> itemsList;
   private javax.swing.JScrollPane itemsScrollPane;
+  private javax.swing.JTable itemsTable;
   private javax.swing.JButton moveDownButton;
   private javax.swing.JButton moveUpButton;
   private javax.swing.JButton removeButton;
   private javax.swing.JPanel rigidArea;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+
+  protected class ItemsTableModel
+      extends AbstractTableModel {
+
+    /**
+     * Column classes.
+     */
+    private final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
+      String.class,
+      String.class,
+      String.class,
+      Boolean.class
+    };
+
+    /**
+     * The column names.
+     */
+    private final String[] COLUMN_NAMES = new String[]{
+      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_location.headerText"),
+      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_operation.headerText"),
+      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_trigger.headerText"),
+      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_completion.headerText")
+    };
+
+    private final int COLUMN_LOCATION = 0;
+    private final int COLUMN_OPERATION = 1;
+    private final int COLUMN_TRIGGER = 2;
+    private final int COLUMN_COMPLETION_REQUIRED = 3;
+
+    /**
+     * Values in this model.
+     */
+    private List<PeripheralOperationModel> values = new ArrayList<>();
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+      return COLUMN_CLASSES[columnIndex];
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+      return COLUMN_NAMES[columnIndex];
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+      return false;
+    }
+
+    @Override
+    public int getRowCount() {
+      return values.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+      return COLUMN_NAMES.length;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+      if (rowIndex < 0 || rowIndex >= getRowCount()) {
+        return null;
+      }
+      PeripheralOperationModel entry = values.get(rowIndex);
+      switch (columnIndex) {
+        case COLUMN_LOCATION:
+          return entry.getLocationName();
+        case COLUMN_OPERATION:
+          return entry.getOperation();
+        case COLUMN_TRIGGER:
+          return entry.getExecutionTrigger().name();
+        case COLUMN_COMPLETION_REQUIRED:
+          return entry.isCompletionRequired();
+        default:
+          throw new IllegalArgumentException("Invalid column index: " + columnIndex);
+      }
+    }
+
+    public void setValues(List<PeripheralOperationModel> values) {
+      this.values = values;
+    }
+
+    public List<PeripheralOperationModel> getValues() {
+      return this.values;
+    }
+
+  }
 }
