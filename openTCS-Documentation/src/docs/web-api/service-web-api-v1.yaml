@@ -578,21 +578,21 @@ components:
         length:
           type: integer
           description: The vehicle's length (in mm).
-          example: "1000"
+          example: 1000
         energyLevelGood:
           type: integer
           description: The value at/above which the vehicle's energy level is considered
             'good'.
-          example: "90"
+          example: 90
         energyLevelCritical:
           type: integer
           description: The value at/below which the vehicle's energy level is considered
             'critical'.
-          example: "30"
+          example: 30
         energyLevel:
           type: integer
           description: The vehicle's remaining energy (in percent of the maximum).
-          example: "60"
+          example: 60
         integrationLevel:
           type: string
           enum:
@@ -685,7 +685,7 @@ components:
         sequenceNumber:
           type: integer
           description: The (unique) sequence number of this status message
-          example: "123"
+          example: 123
         creationTimeStamp:
           type: string
           format: date-time
@@ -709,6 +709,8 @@ components:
               enum:
                 - TransportOrder
               default: TransportOrder
+            sequenceNumber:
+              example: 124
             orderName:
               type: string
               description: The (optional) transport order name
@@ -754,6 +756,8 @@ components:
               enum:
                 - Vehicle
               default: Vehicle
+            sequenceNumber:
+              example: 125
             vehicleName:
               type: string
               description: The vehicle's name
@@ -828,15 +832,15 @@ components:
         x:
           type: integer
           description: The position's X coordinate
-          example: "60"
+          example: 60
         y:
           type: integer
           description: The position's Y coordinate
-          example: "40"
+          example: 40
         z:
           type: integer
           description: The position's Z coordinate
-          example: "0"
+          example: 0
       required:
         - x
         - y
