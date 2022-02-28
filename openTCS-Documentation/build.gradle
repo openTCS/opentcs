@@ -24,7 +24,7 @@ apply plugin: 'distribution'
 
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
-def webApiDir = file("$buildDir/swagger-ui-webapi")
+def webApiDir = file("$buildDir/swagger-ui-servicewebapiv1")
 def samplesDir = file("$buildDir/samples")
 def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
@@ -40,8 +40,8 @@ configurations {
 }
 
 swaggerSources {
-  webapi {
-    inputFile = file("src/docs/web-api/service-web-api-v1.yaml")
+  servicewebapiv1 {
+    inputFile = file("src/docs/service-web-api-v1/openapi.yaml")
   }
 }
 
@@ -72,7 +72,7 @@ distributions {
       into('developer/api-injection')
     }
     contents.from(webApiDir) {
-      into('developer/web-api')
+      into('developer/service-web-api-v1')
     }
     contents.from(devManualDir) {
       into('developer/developers-guide')
