@@ -55,6 +55,27 @@ build:
       junit: openTCS-*/build/test-results/test/TEST-*.xml
     when: always
 
+ensure_tests_passed:
+  stage: test
+  tags:
+    - opentcs-runner
+  variables:
+    CONCATENATED_REPORT_FILE: concatenated-test-reports.xml
+  script:
+    - echo "Checking test reports for failures..."
+    - rm -f $CONCATENATED_REPORT_FILE
+    - find . -name "TEST-*.xml" -exec cat '{}' + >> $CONCATENATED_REPORT_FILE
+    # There are examples of simply using 'grep -L "<failure", but the
+    # grep we have here doesn't provide the expected exit status with
+    # that, so we stick to plain grep and an if-else clause.
+    - 'if grep "<failure" $CONCATENATED_REPORT_FILE ; then
+        echo "There are failed tests - failing this job...";
+        false;
+      else
+        echo "No failed tests here.";
+        true;
+      fi'
+
 code_quality:
   stage: test
   tags:
