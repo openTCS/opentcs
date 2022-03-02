@@ -51,6 +51,7 @@ build:
     paths:
       - build/distributions/*.zip
       - openTCS-*/build/reports/checkstyle/*.xml
+      - openTCS-*/build/test-results/test/TEST-*.xml
     reports:
       junit: openTCS-*/build/test-results/test/TEST-*.xml
     when: always
