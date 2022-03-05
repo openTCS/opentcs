@@ -7,7 +7,7 @@ apply plugin: 'org.kordamp.gradle.stats'
 dependencies {
   api project(':openTCS-API-Base')
 
-  implementation group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.0'
+  implementation group: 'org.cfg4j', name: 'cfg4j-core', version: '4.4.1'
 }
 
 task release {
