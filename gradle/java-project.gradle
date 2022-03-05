@@ -17,11 +17,11 @@ dependencies {
 
   // For JUnit 4.x tests
   testCompileOnly group: 'junit', name: 'junit', version: '4.13.2'
-  testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.2'
+  testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.8.2'
   // For JUnit 5 tests
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.7.2'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.8.2'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
 
   testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
