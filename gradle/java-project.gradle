@@ -12,8 +12,8 @@ dependencies {
 
   compileOnly group: 'javax.inject', name: 'javax.inject', version: '1'
 
-  compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-  testCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+  compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+  testCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
   // For JUnit 4.x tests
   testCompileOnly group: 'junit', name: 'junit', version: '4.13.2'
