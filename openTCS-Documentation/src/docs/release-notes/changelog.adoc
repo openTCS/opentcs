@@ -14,7 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Other changes:
+** Update SLF4J to 1.7.36.
 
 == Version 5.4 (2022-02-25)
 

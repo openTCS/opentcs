@@ -19,7 +19,7 @@ dependencies {
   api project(':openTCS-PlantOverview-Panel-Statistics')
   api project(':openTCS-PlantOverview-Themes-Default')
 
-  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
+  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
 }
 
 compileJava {
