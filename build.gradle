@@ -8,8 +8,6 @@ buildscript {
   dependencies {
     // License plugin
     classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1'
-    // Versions plugin
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
     // Stats plugin
     classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.0'
   }
@@ -17,7 +15,6 @@ buildscript {
 
 apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
-apply plugin: 'com.github.ben-manes.versions'
 
 apply from: "${rootDir}/gradle/common.gradle"
 apply from: "${rootDir}/gradle/publishing-common.gradle"
