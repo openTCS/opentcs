@@ -16,7 +16,6 @@ dependencies {
   api project(':openTCS-Common')
   api project(':openTCS-Impl-Configuration-cfg4j')
   api project(':openTCS-PlantOverview-Common')
-  api project(':openTCS-PlantOverview-Panel-Statistics')
   api project(':openTCS-PlantOverview-Themes-Default')
 
   runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'

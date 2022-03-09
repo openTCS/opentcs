@@ -377,13 +377,6 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/StatisticsCollectorConfigurationEntries.adoc",
-              "org.opentcs.kernel.extensions.statistics.StatisticsCollectorConfiguration"]
-    }
-
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
               "org.opentcs.virtualvehicle.VirtualVehicleConfiguration"]
     }

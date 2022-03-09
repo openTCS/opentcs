@@ -15,6 +15,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * Other changes:
+** Remove the statistics kernel extension and plugin panel.
+   They have been moved to the example integration project.
 ** Update SLF4J to 1.7.36.
 ** Update Jackson to 2.13.1.
 ** Update JSR305 to 3.0.2.
