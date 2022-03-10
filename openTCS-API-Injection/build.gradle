@@ -6,8 +6,8 @@ apply plugin: 'org.kordamp.gradle.stats'
 
 dependencies {
   api project(':openTCS-API-Base')
-  api group: 'com.google.inject', name: 'guice', version: '4.2.3'
-  api group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.3'
+  api group: 'com.google.inject', name: 'guice', version: '5.1.0'
+  api group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '5.1.0'
 }
 
 task release {
