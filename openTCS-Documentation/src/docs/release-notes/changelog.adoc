@@ -25,6 +25,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update cfg4j to 4.4.1.
 ** Update JSR305 to 3.0.2.
 ** Update JUnit to 5.8.2.
+** Update AssertJ to 3.22.0.
 ** Update Swagger UI to 3.52.5.
 ** Update the Gradle wrapper to 6.9.2.
 ** Update Stats Gradle Plugin to 0.2.2.
