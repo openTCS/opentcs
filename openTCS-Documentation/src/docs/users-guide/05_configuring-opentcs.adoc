@@ -95,12 +95,6 @@ The kernel's SSL encryption can be configured using the following configuration 
 
 include::{configdoc}/KernelSslConfigurationEntries.adoc[]
 
-==== Statistics collector configuration entries
-
-The kernel's statistics collector can be configured using the following configuration entries:
-
-include::{configdoc}/StatisticsCollectorConfigurationEntries.adoc[]
-
 ==== Virtual vehicle configuration entries
 
 The virtual vehicle (loopback communication adapter) can be configured using the following configuration entries:

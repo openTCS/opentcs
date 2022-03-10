@@ -215,20 +215,6 @@ Using btn:[Create orders according to definition], you can define an arbitrary n
 . Start the order generator by activating the corresponding checkbox at the bottom of the btn:[Continuous load] panel.
   The load generator will then generate transport orders according to its configuration until the checkbox is deactivated or the panel is closed.
 
-==== Statistics reports about transport orders and vehicles
-
-During plant operation, the openTCS kernel collects some data about processed, finished and failed transport orders as well as busy and idle vehicles.
-It writes this data to log files in the `log/statistics/` subdirectory.
-To see a basic statistics report for the order processing in a plant operation session, you can use another plugin for the Operations Desk application that comes with the openTCS distribution:
-
-. In the Operations Desk application, select btn:[menu:View[Plugins > Statistics]] from the menu.
-. Click the btn:[Read input file] button and select a log file from `log/statistics/` in the kernel application's directory.
-. The panel will then show an accumulation of the data collected in the statistics log file you opened.
-
-NOTE: As the steps above should indicate, the statistics plugin currently does not provide a live view on statistical data in a running plant operation session.
-The report is an offline report that can be generated only after a plant operation session has ended.
-Future versions of openTCS may include a live report plugin that collects data directly from the openTCS kernel instead of reading the data from a log file.
-
 ==== Removing a vehicle from a running system
 
 There may be situations in which you want to remove a single vehicle from a system, e.g. because the vehicle temporarily cannot be used by openTCS due to a hardware defect that has to be dealt with first.
