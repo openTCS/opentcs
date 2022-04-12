@@ -15,6 +15,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the plant model service must provide which are not accessible to remote
@@ -62,7 +63,12 @@ public interface InternalPlantModelService
    * @param token The location's new reservation token.
    * @throws ObjectUnknownException If the referenced location does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @deprecated Use
+   * {@link InternalPeripheralService#updatePeripheralReservationToken(org.opentcs.data.model.TCSResourceReference, java.lang.String)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   void updateLocationReservationToken(TCSObjectReference<Location> ref, @Nullable String token)
       throws ObjectUnknownException, KernelRuntimeException;
 }

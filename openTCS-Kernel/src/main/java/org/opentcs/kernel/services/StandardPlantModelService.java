@@ -198,6 +198,7 @@ public class StandardPlantModelService
     }
   }
 
+  @Deprecated
   @Override
   public void updateLocationReservationToken(TCSObjectReference<Location> ref, String token)
       throws ObjectUnknownException, KernelRuntimeException {
