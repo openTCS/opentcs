@@ -1,7 +1,7 @@
 
 == Supplementing configuration sources
 
-As described in the openTCS User's Guide, the openTCS Kernel, Kernel Control Center and Plant Overview applications read their configurations from properties files.
+As described in the openTCS User's Guide, the openTCS Kernel, Kernel Control Center, Model Editor and Operations Desk applications read their configurations from properties files.
 This functionality is provided by the link:http://www.cfg4j.org/[cfg4j] library.
 
 It is possible to register additional configuration sources, e.g. for reading configuration data from network resources or files in different formats.

@@ -17,7 +17,7 @@ Examples for language tags are:
 * "zh" for Chinese
 
 By default, the configuration entries are set to "en", resulting in English texts.
-Since a German translation is included, you can switch e.g. the Plant Overview to German by setting its `locale` configuration entry to "de".
+Since a German translation is included, you can switch e.g. the Operations Desk application to German by setting its `locale` configuration entry to "de".
 (Note that the application needs to be restarted for this.)
 
 Configuring an application to use a language for which there is no translation will result in the default (English) language to be used.

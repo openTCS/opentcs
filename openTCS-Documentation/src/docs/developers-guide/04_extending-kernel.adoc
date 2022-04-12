@@ -219,4 +219,4 @@ Event handlers should behave accordingly and finish quickly/not block execution 
 If processing an event requires time-consuming actions to be taken, these should be executed on a different thread.
 
 NOTE: As its name indicates, the kernel executor is only available within the kernel application.
-It is not available for code running in other applications like the Plant Overview, and it is not required there (for avoiding concurrency issues in the kernel).
+It is not available for code running in other applications like the Operations Desk, and it is not required there (for avoiding concurrency issues in the kernel).

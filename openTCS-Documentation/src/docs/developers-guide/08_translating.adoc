@@ -34,7 +34,7 @@ Alternatively, to use link:https://7-zip.org/[7-Zip] in a shell on a Windows sys
 ----
 
 You will find the extracted language files in the `i18n/` directory, then.
-For the Plant Overview application, an excerpt of that directory's contents would look similar to this:
+For the Model Editor or Operations Desk application, an excerpt of that directory's contents would look similar to this:
 
 ....
 i18n/

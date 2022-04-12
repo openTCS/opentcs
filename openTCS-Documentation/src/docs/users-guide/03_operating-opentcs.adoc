@@ -160,7 +160,7 @@ To create a new transport order, do the following:
   You can add an arbitrary number of destinations to the order this way.
   They will be processed in the given order.
 . After creating the transport order with the given destinations by clicking btn:[OK], the kernel will look for a vehicle that can process the order.
-  If a vehicle is found, it is assigned the order immediately and the route computed for it will be highlighted in the plant overview client.
+  If a vehicle is found, it is assigned the order immediately and the route computed for it will be highlighted in the Operations Desk application.
   The loopback driver then simulates the vehicle's movement to the destinations and the execution of the operations.
 
 ==== Withdrawing transport orders using the Operations Desk application

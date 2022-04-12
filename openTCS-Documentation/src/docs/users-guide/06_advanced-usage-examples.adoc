@@ -21,8 +21,8 @@ To automatically select a specific driver in such cases, set a property with the
 The loopback driver supports some (limited) configuration of the virtual vehicle's characteristics via properties set in the plant model.
 You can set the properties the following way:
 
-. Start the plant overview client in modelling mode and create or load a plant model.
-. In the plant overview client's tree view of the plant model, select a vehicle.
+. Start the Model Editor application and create or load a plant model.
+. In the Model Editor application's tree view of the plant model, select a vehicle.
 . In the table showing the vehicle's properties, click into the value field labelled btn:[Miscellaneous].
   In the dialog shown, add a property key and value according to the list below.
 . Save the model and upload it to the kernel as described in <<Saving the plant model>>.
@@ -80,11 +80,11 @@ To achieve this, do the following:
 .. The scripts use the key and certificate management tool 'keytool' that is included in both the Java JDK and JRE.
    If 'keytool' is not contained in the system's `Path` environment variable the `KEYTOOL_PATH` variable in the respective script needs to be modified to point to the location where the 'keytool' is located.
 .. By default, the generated files are placed in the kernel application's `config` directory.
-. Copy the `truststore.p12` file to the client application's (plant overview and/or kernel control center) `config` directory.
+. Copy the `truststore.p12` file to the client application's (Model Editor, Operations Desk or Kernel Control Center) `config` directory.
   Leave the file in the kernel application's `config` directory as well.
 . In the kernel's configuration file, enable SSL for the RMI interface and/or for the web service interface.
   (See <<RMI kernel interface configuration entries>> and/or <<Service web API configuration entries>> for a description of the configuration entries.)
-. If you enabled SSL for the RMI interface, you need to enable it in the Plant Overview's and the Kernel Control Center's configuration files, too.
+. If you enabled SSL for the RMI interface, you need to enable it in the Model Editor's, Operations Desk's and the Kernel Control Center's configuration files, too.
   (See <<SSL model editor-side application configuration entries>>, <<SSL operation desk-side application configuration entries>> and <<SSL KCC-side application configuration entries>> for a description of the configuration entries.)
 
 === Configuring automatic parking and recharging
@@ -115,7 +115,7 @@ Every object in the plant model - i.e. points, paths, locations, location types 
 Possible uses for such data could be informing the vehicle driver about additional actions to be performed by a vehicle when moving along a path in the model (e.g. flashing direction indicators, displaying a text string on a display, giving an acoustic warning) or controlling the behaviour of peripheral systems (e.g. automatic fire protection gates).
 
 The data can be stored in properties, i.e. key-value pairs attached to the model elements, where both the key and the corresponding value are text strings.
-These key-value pairs can be created and edited using the plant overview client:
+These key-value pairs can be created and edited using the Model Editor application:
 Simply select the model element you want to add a key-value pair to and click into the value field labelled btn:[Miscellaneous] in the properties table.
 In the dialog shown, set the key-value pairs you need to store your project-specific information.
 

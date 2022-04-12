@@ -171,7 +171,7 @@ include::{kernel-testSrc}/org/opentcs/documentation/WithdrawTransportOrderTest.j
 
 === Using the event bus
 
-Each of the main openTCS applications -- Kernel, Kernel Control Center and Plant Overview -- provides an event bus that can be used to receive or emit event objects application-wide.
+Each of the main openTCS applications -- Kernel, Kernel Control Center, Model Editor and Operations Desk -- provides an event bus that can be used to receive or emit event objects application-wide.
 To acquire the respective application's event bus instance, request it to be provided via dependency injection.
 Any of the following three variants of constructor parameters are equivalent:
 

@@ -60,11 +60,11 @@ Assuming your `data/` directory contains three model subdirectories `modelA`, `m
 After step one, the three model directories should have been copied to another location.
 After step two, the `data/` directory should be empty and after step three, it should contain only the `model.xml` from directory `modelA`._
 . Start the kernel and have it load your model.
-Then start the plant overview client in modelling mode and select btn:[menu:File[Load current kernel model]] from its menu to read the model data from the kernel.
-. In the plant overview client, select btn:[menu:File[Save Model]] or btn:[menu:File[Save Model As]] from the menu.
-The plant overview client will persist the model data in a file with the given name and the extension `.opentcs`.
+Then start the Model Editor application and select btn:[menu:File[Load current kernel model]] from its menu to read the model data from the kernel.
+. In the Model Editor application, select btn:[menu:File[Save Model]] or btn:[menu:File[Save Model As]] from the menu.
+The Model Editor application will persist the model data in a file with the given name and the extension `.xml`.
 +
-_Example: Following the previous example a file with the name `modelA.opentcs` should exist now._
+_Example: Following the previous example a file with the name `modelA.xml` should exist now._
 . Delete the `model.xml` file you just moved to the `data/` directory of the kernel.
 The migration of this plant model is finished.
 . Shut down the kernel, go back to step three and repeat the procedure for the remaining models that you want to migrate.
@@ -89,7 +89,7 @@ The openTCS kernel itself works with a logical driving course model - geometric 
 It may, however, have to provide (real/physical) coordinates of a destination point to a vehicle, depending on the way the vehicle's navigation works.
 With openTCS, these are called the __model coordinates__.
 
-The __layout coordinates__, on the other hand, are coordinates that are used merely for visualizing the driving course in the plant overview.
+The __layout coordinates__, on the other hand, are coordinates that are used merely for visualizing the driving course in the Model Editor and Operations Desk applications.
 These coordinates will probably be the same as the model coordinates in most cases, but they may differ, e.g. in cases where the driving course is supposed to be modelled/displayed in a distorted way.
 
 == Transport orders
