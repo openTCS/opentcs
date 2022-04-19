@@ -62,6 +62,8 @@ public class DefaultModelGraphMapper
     requireNonNull(points, "points");
     requireNonNull(paths, "paths");
     requireNonNull(vehicle, "vehicle");
+    
+    edgeEvaluator.onGraphComputationStart(vehicle);
 
     Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
 
@@ -72,7 +74,6 @@ public class DefaultModelGraphMapper
     boolean allowNegativeEdgeWeights = configuration.algorithm().isHandlingNegativeCosts();
 
     for (Path path : paths) {
-
       if (shouldAddForwardEdge(path, vehicle)) {
         Edge edge = new Edge(path, false);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
@@ -114,8 +115,9 @@ public class DefaultModelGraphMapper
           graph.setEdgeWeight(edge, weight);
         }
       }
-
     }
+    
+    edgeEvaluator.onGraphComputationEnd(vehicle);
 
     return graph;
   }

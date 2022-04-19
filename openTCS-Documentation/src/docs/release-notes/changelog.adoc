@@ -14,6 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features:
+** Inform `EdgeEvaluator` implementations about beginning and end of routing graph creation to allow them to optimize computations, e.g. by caching data that does not change while building the graph.
 * Other changes:
 ** Replace old references to the Plant Overview application in the developer's and user's guides with references to the Model Editor and/or Operations Desk applications.
 ** Remove the statistics kernel extension and plugin panel.

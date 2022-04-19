@@ -47,6 +47,14 @@ public class EdgeEvaluatorExplicitProperties
   }
 
   @Override
+  public void onGraphComputationStart(Vehicle vehicle) {
+  }
+
+  @Override
+  public void onGraphComputationEnd(Vehicle vehicle) {
+  }
+
+  @Override
   public double computeWeight(Edge edge, Vehicle vehicle) {
     requireNonNull(edge, "edge");
     requireNonNull(vehicle, "vehicle");

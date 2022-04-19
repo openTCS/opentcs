@@ -30,6 +30,14 @@ public class EdgeEvaluatorTravelTime
   }
 
   @Override
+  public void onGraphComputationStart(Vehicle vehicle) {
+  }
+
+  @Override
+  public void onGraphComputationEnd(Vehicle vehicle) {
+  }
+
+  @Override
   public double computeWeight(Edge edge, Vehicle vehicle) {
     int maxVelocity;
     if (edge.isTravellingReverse()) {

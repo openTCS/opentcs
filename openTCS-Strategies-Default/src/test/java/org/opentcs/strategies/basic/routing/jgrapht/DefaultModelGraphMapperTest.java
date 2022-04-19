@@ -14,6 +14,7 @@ import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
@@ -37,6 +38,9 @@ public class DefaultModelGraphMapperTest {
   private Path pathCD;
   private Path pathAD;
 
+  private Vehicle vehicle;
+
+  private EdgeEvaluatorComposite evaluator;
   private ShortestPathConfiguration configuration;
   private DefaultModelGraphMapper mapper;
 
@@ -60,8 +64,11 @@ public class DefaultModelGraphMapperTest {
         .withMaxVelocity(1000)
         .withMaxReverseVelocity(1000);
 
+    vehicle = new Vehicle("someVehicle");
+
+    evaluator = mock(EdgeEvaluatorComposite.class);
     configuration = mock(ShortestPathConfiguration.class);
-    mapper = new DefaultModelGraphMapper(mock(EdgeEvaluatorComposite.class), configuration);
+    mapper = new DefaultModelGraphMapper(evaluator, configuration);
   }
 
   @Test
@@ -70,9 +77,12 @@ public class DefaultModelGraphMapperTest {
 
     Graph<String, Edge> graph = mapper.translateModel(new HashSet<>(),
                                                       new HashSet<>(),
-                                                      new Vehicle("someVehicle"));
+                                                      vehicle);
+
     assertEquals("Number of vertices", 0, graph.vertexSet().size());
     assertEquals("Number of edges", 0, graph.edgeSet().size());
+    verify(evaluator).onGraphComputationStart(vehicle);
+    verify(evaluator).onGraphComputationEnd(vehicle);
   }
 
   @Test
@@ -82,13 +92,16 @@ public class DefaultModelGraphMapperTest {
     Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(),
-                                new Vehicle("someVehicle"));
+                                vehicle);
+
     assertEquals("Number of vertices", 4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
     assertTrue(graph.vertexSet().contains(pointC.getName()));
     assertTrue(graph.vertexSet().contains(pointD.getName()));
     assertEquals("Number of edges", 0, graph.edgeSet().size());
+    verify(evaluator).onGraphComputationStart(vehicle);
+    verify(evaluator).onGraphComputationEnd(vehicle);
   }
 
   @Test
@@ -98,7 +111,8 @@ public class DefaultModelGraphMapperTest {
     Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAB)),
-                                new Vehicle("someVehicle"));
+                                vehicle);
+
     assertEquals("Number of vertices", 4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
@@ -111,6 +125,8 @@ public class DefaultModelGraphMapperTest {
                      .filter(edge -> edge.getPath().getName().equals(pathAB.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
+    verify(evaluator).onGraphComputationStart(vehicle);
+    verify(evaluator).onGraphComputationEnd(vehicle);
   }
 
   @Test
@@ -120,7 +136,8 @@ public class DefaultModelGraphMapperTest {
     Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAD)),
-                                new Vehicle("someVehicle"));
+                                vehicle);
+
     assertEquals("Number of vertices", 4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
@@ -139,6 +156,8 @@ public class DefaultModelGraphMapperTest {
                      .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> edge.isTravellingReverse())
                      .count());
+    verify(evaluator).onGraphComputationStart(vehicle);
+    verify(evaluator).onGraphComputationEnd(vehicle);
   }
 
   @Test
@@ -148,7 +167,8 @@ public class DefaultModelGraphMapperTest {
     Graph<String, Edge> graph
         = mapper.translateModel(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
                                 new HashSet<>(Arrays.asList(pathAB, pathBC, pathCD, pathAD)),
-                                new Vehicle("someVehicle"));
+                                vehicle);
+
     assertEquals("Number of vertices", 4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
@@ -185,6 +205,8 @@ public class DefaultModelGraphMapperTest {
                      .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> edge.isTravellingReverse())
                      .count());
+    verify(evaluator).onGraphComputationStart(vehicle);
+    verify(evaluator).onGraphComputationEnd(vehicle);
   }
 
 }

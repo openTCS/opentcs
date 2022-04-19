@@ -61,6 +61,20 @@ public class EdgeEvaluatorComposite
   }
 
   @Override
+  public void onGraphComputationStart(Vehicle vehicle) {
+    for (EdgeEvaluator component : evaluators) {
+      component.onGraphComputationStart(vehicle);
+    }
+  }
+
+  @Override
+  public void onGraphComputationEnd(Vehicle vehicle) {
+    for (EdgeEvaluator component : evaluators) {
+      component.onGraphComputationEnd(vehicle);
+    }
+  }
+
+  @Override
   public double computeWeight(Edge edge, Vehicle vehicle) {
     double result = 0.0;
     for (EdgeEvaluator component : evaluators) {

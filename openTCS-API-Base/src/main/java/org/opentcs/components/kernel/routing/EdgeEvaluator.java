@@ -9,6 +9,7 @@ package org.opentcs.components.kernel.routing;
 
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Computes the weight of edges in the routing graph.
@@ -16,6 +17,24 @@ import org.opentcs.data.model.Vehicle;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public interface EdgeEvaluator {
+
+  /**
+   * Called when/before computation of a routing graph starts.
+   *
+   * @param vehicle The vehicle for which the routing graph is computed.
+   */
+  @ScheduledApiChange(details = "Default implementation will be removed.", when = "6.0")
+  default void onGraphComputationStart(@Nonnull Vehicle vehicle) {
+  }
+
+  /**
+   * Called when/after a computation of a routing graph is done.
+   *
+   * @param vehicle The vehicle for which the routing graph is computed.
+   */
+  @ScheduledApiChange(details = "Default implementation will be removed.", when = "6.0")
+  default void onGraphComputationEnd(@Nonnull Vehicle vehicle) {
+  }
 
   /**
    * Computes the weight of an edge in the routing graph.

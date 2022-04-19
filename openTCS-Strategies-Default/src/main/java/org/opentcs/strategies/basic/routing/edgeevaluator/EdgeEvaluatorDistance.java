@@ -29,6 +29,14 @@ public class EdgeEvaluatorDistance
   }
 
   @Override
+  public void onGraphComputationStart(Vehicle vehicle) {
+  }
+
+  @Override
+  public void onGraphComputationEnd(Vehicle vehicle) {
+  }
+
+  @Override
   public double computeWeight(Edge edge, Vehicle vehicle) {
     return edge.getPath().getLength();
   }

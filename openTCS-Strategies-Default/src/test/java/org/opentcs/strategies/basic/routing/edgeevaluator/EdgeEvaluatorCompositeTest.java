@@ -14,6 +14,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.junit.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
@@ -28,14 +31,14 @@ import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
  */
 public class EdgeEvaluatorCompositeTest {
 
+  private static final String EVALUATOR_MOCK = "EVALUATOR_MOCK";
   private static final String EVALUATOR_1 = "EVALUATOR_1";
   private static final String EVALUATOR_2 = "EVALUATOR_2";
   private static final String EVALUATOR_3 = "EVALUATOR_3";
 
   private Edge edge;
-
   private Vehicle vehicle;
-
+  private EdgeEvaluator evaluatorMock;
   private ShortestPathConfiguration configuration;
   private final Map<String, EdgeEvaluator> evaluators = new HashMap<>();
 
@@ -50,19 +53,36 @@ public class EdgeEvaluatorCompositeTest {
 
     configuration = mock(ShortestPathConfiguration.class);
 
+    evaluatorMock = mock(EdgeEvaluator.class);
+
+    evaluators.put(EVALUATOR_MOCK, evaluatorMock);
     evaluators.put(EVALUATOR_1, (someEdge, someVehicle) -> 1.0);
     evaluators.put(EVALUATOR_2, (someEdge, someVehicle) -> 0.9);
     evaluators.put(EVALUATOR_3, (someEdge, someVehicle) -> Double.POSITIVE_INFINITY);
   }
 
-  @After
-  public void tearDown() {
+  @Test
+  public void notifyOnGraphComputation() {
+    when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_MOCK));
+    EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
+
+    verify(evaluatorMock, never()).onGraphComputationStart(vehicle);
+    verify(evaluatorMock, never()).onGraphComputationEnd(vehicle);
+
+    edgeEvaluator.onGraphComputationStart(vehicle);
+    verify(evaluatorMock).onGraphComputationStart(vehicle);
+    verify(evaluatorMock, never()).onGraphComputationEnd(vehicle);
+
+    edgeEvaluator.onGraphComputationEnd(vehicle);
+    verify(evaluatorMock).onGraphComputationStart(vehicle);
+    verify(evaluatorMock).onGraphComputationEnd(vehicle);
   }
 
   @Test
   public void computeZeroWithoutComponents() {
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
+    verifyZeroInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(0.0));
   }
 
@@ -71,6 +91,7 @@ public class EdgeEvaluatorCompositeTest {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
+    verifyZeroInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(1.0));
   }
 
@@ -79,6 +100,7 @@ public class EdgeEvaluatorCompositeTest {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
+    verifyZeroInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(1.9));
   }
 
@@ -87,6 +109,7 @@ public class EdgeEvaluatorCompositeTest {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2, EVALUATOR_3));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
+    verifyZeroInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(Double.POSITIVE_INFINITY));
   }
 }
