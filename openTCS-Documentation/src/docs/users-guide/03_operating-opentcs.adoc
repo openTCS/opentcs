@@ -38,7 +38,7 @@ image::screenshot_modelling.png[]
 . Create a new vehicle by clicking on the vehicle button in the driving course elements toolbar.
 . Define the allowed operations for vehicles at the newly created locations by
 .. selecting the locations' type in the tree view to the left of the drawing area (see blue frame in the screenshot above).
-.. clicking the value cell labelled btn:[Actions] in the property window below the tree view.
+.. clicking the value cell labelled btn:[Supported vehicle operations] in the property window below the tree view.
 .. entering the allowed operations as arbitrary text in the dialog shown, for instance `"Load cargo"` and `"Unload cargo"`.
 .. Optionally, you can choose a symbol for locations of the selected type by editing the property `"Symbol"`.
 
@@ -169,8 +169,8 @@ image::screenshot_driver_panel.png[]
 ==== Creating a transport order
 
 To create a transport order, the Operations Desk application provides a dialog window presented when selecting btn:[menu:Actions[Create transport order...]] from the menu.
-Transport orders are defined as a sequence of destination locations at which actions are to be performed by the vehicle processing the order.
-You can select a destination location and action from a dropdown menu.
+Transport orders are defined as a sequence of destination locations at which operations are to be performed by the vehicle processing the order.
+You can select a destination location and operation from a dropdown menu.
 You may also optionally select the vehicle intended to process this order.
 If none is explicitly selected, the control system automatically assigns the order to a vehicle according to its internal, configurable strategies (see <<Default dispatcher configuration entries>>).
 You may also optionally select or define a type for the transport order to be created.
