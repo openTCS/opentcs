@@ -12,6 +12,7 @@ evaluationDependsOn(':openTCS-Kernel')
 evaluationDependsOn(':openTCS-KernelControlCenter')
 evaluationDependsOn(':openTCS-ModelEditor')
 evaluationDependsOn(':openTCS-OperationsDesk')
+evaluationDependsOn(':openTCS-PeripheralCommAdapter-Loopback')
 evaluationDependsOn(':openTCS-PlantOverview-Panel-LoadGenerator')
 
 apply from: "${rootDir}/gradle/java-project.gradle"
@@ -222,6 +223,9 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
              'loopback-javaSrc': project(':openTCS-CommAdapter-Loopback').javaSrcDir,
              'loopback-guiceSrc': project(':openTCS-CommAdapter-Loopback').guiceSrcDir,
              'loopback-testSrc': project(':openTCS-CommAdapter-Loopback').testSrcDir,
+             'peripheral-loopback-javaSrc': project(':openTCS-PeripheralCommAdapter-Loopback').javaSrcDir,
+             'peripheral-loopback-guiceSrc': project(':openTCS-PeripheralCommAdapter-Loopback').guiceSrcDir,
+             'peripheral-loopback-testSrc': project(':openTCS-PeripheralCommAdapter-Loopback').testSrcDir,
              'kernel-javaSrc': project(':openTCS-Kernel').javaSrcDir,
              'kernel-guiceSrc': project(':openTCS-Kernel').guiceSrcDir,
              'kernel-testSrc': project(':openTCS-Kernel').testSrcDir,

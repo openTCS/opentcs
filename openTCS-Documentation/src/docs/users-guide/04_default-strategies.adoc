@@ -153,3 +153,53 @@ This strategy ensures that resources are used when they are available.
 It does not, however, strictly ensure fairness/avoid starvation:
 Vehicles waiting for allocation of a large resource set may theoretically wait forever if other vehicles can keep allocating subsets of those resources continuously.
 Such situations are likely a hint at problems in the plant model graph's topology, which is why this deficiency is considered acceptable for the default implementation.
+
+=== Default peripheral job dispatcher
+
+When either a peripheral job or a peripheral device becomes available, the peripheral job dispatcher needs to decide what should happen with which peripheral job and which peripheral device should do what.
+To make this decision, the default peripheral job dispatcher takes the following steps:
+
+. Peripheral devices that are currently unoccupied but have their reservation token set are assigned to processable peripheral jobs, if possible.
+** Criteria for a peripheral device to be taken into account are:
+*** It must not be assigned to a peripheral job.
+*** It must have its reservation token set.
+** Criteria for a periphreal job to be taken into account are:
+*** It must match the reservation token of a peripheral device.
+*** It must be processable by a peripheral device.
+** If there are multiple peripheral jobs that meet these criteria, the oldest one according to the creation time is assigned first.
+. Peripheral devices that could not be assigned to a peripheral job with a matching reservation token have their reservation released.
+** The release of reserved peripheral devices is performed via a replaceable strategy.
+   The default strategy releases peripheral devices according to the following rules:
+*** A peripheral devices's state must be `IDLE`.
+*** A peripheral devices's processing state must be `IDLE`.
+*** A peripheral devices's reservation token must be set.
+. Peripheral devices that are currently unoccupied and do not have their reservation token set are assigned to processable peripheral jobs, if possible.
+** Criteria for a peripheral device to be taken into account are:
+*** It must not be assigned to a peripheral job.
+*** It must not have its reservation token set.
+** Cirteria for a peripheral job to be taken into account are:
+*** It must be generally available to be processed by a peripheral device.
+*** It must be processable by a peripheral device.
+** The selection of a peripheral job for a peripheral device is performed via a replaceable strategy.
+   The default strategy selects peripheral jobs according to the following rules:
+*** The location of a peripheral job's operation must match the given location.
+*** If there are multiple peripheral jobs that meet these criteria, the oldest one according to the creation time is selected.
+
+==== Reservation token
+
+As described above, reservation tokens are relevant for the assignment of peripheral jobs to peripheral devices.
+This section describes the different types of reservation tokens:
+
+. Reservation tokens for transport orders.
+** Optionally, transport orders can be provided with a reservation token.
+** If a transport order's reservation token is set, it is used for peripheral jobs that are created in the context of the transport order (i.e., for peripheral jobs that are created implicitly by vehicles processing a transport order - see <<Implicit creation of peripheral jobs>>).
+. Reservation tokens for peripheral jobs.
+** Peripheral jobs must always be provided with a reservation token.
+** For peripheral jobs that are created implicitly by vehicles as they traverse paths that have peripheral operations defined on them, the reservation token is set to
+*** the reservation token of the transport order the corresponding vehicle is processing
+*** or the name of the vehicle, if the reservation token on the transport order is not set.
+. Reservation tokens for locations that represent peripheral devices.
+** Initially, the reservation token of a location representing a peripheral device is not set.
+   This indicates that the peripheral device is generally available to accept a peripheral job with any reservation token.
+** Once the peripheral device is assigned a peripheral job, the location's reservation token is set to the peripheral job's reservation token.
+   As a result, the peripheral device is only available for peripheral jobs with the same reservation token until the peripheral device's reservation is released (i.e., until the peripheral device's reservation token is reset).

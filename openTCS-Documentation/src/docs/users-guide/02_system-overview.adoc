@@ -97,6 +97,22 @@ A path's main attributes, next to its source and destination point, are:
 * A _maximum velocity_ and _maximum reverse velocity_, which may be a relevant information for a vehicle in plant operation mode.
   Depending on the router configuration, it may also be used for computing routing costs/finding an optimal route to a destination point.
 * A _locked_ flag, which, when set, tells the router that the path may not be used when computing routes for vehicles.
+* A sequence of _peripheral operations_ describing operations that are to be perfomed by peripheral devices (in their given order) when a vehicle traverses the path.
+
+===== Peripheral operation
+
+A peripheral operation's attributes are:
+
+* A reference to the _location_ representing the peripheral device by which the operation is to be performed -- see <<Location>>.
+* The actual _operation_ to be performed by the peripheral device.
+* An _execution trigger_ defining the moment at which the operation is to be performed.
+  The supported values are:
+  ** `BEFORE_MOVEMENT`: The execution of the operation should be triggered _before_ a vehicle traverses the path.
+  ** `AFTER_MOVEMENT`: The execution of the operation should be triggered _after_ a vehicle has traversed the path.
+* A _completion required_ flag, which, when set, requires the operation to be completed to allow a vehicle to continue driving.
+  This flag works in combination with the execution trigger.
+  With the `BEFORE_MOVEMENT` execution trigger and the completion required flag set to `true`, a vehicle has to wait at the path's source point until the operation is completed.
+  With the `AFTER_MOVEMENT` execution trigger and the completion required flag set to `true`, a vehicle has to wait at the path's destination point until the operation is completed.
 
 ==== Location
 
@@ -107,12 +123,16 @@ A location's attributes are:
 * A set of _links_ to points that the location can be reached from.
   To be of any use for vehicles in the plant model, a location needs to be linked to at least one point.
 
+Additionally, locations can map peripheral devices for the purpose of communicating with them and allowing vehicles to interact with them (e.g. opening/closing fire doors along paths).
+See <<Adding and configuring peripheral devices>> for details on how to add and configure peripheral devices.
+
 ==== Location type
 
 Location types are abstract elements that group locations.
-A location type has only one relevant attribute:
+A location type has only two relevant attributes:
 
-* A set of _allowed operations_, defining which operations a vehicle may execute at locations of this type.
+* A set of _allowed/supported vehicle operations_, defining which operations a vehicle may execute at locations of this type.
+* A set of _allowed/supported peripheral operations_, defining which operations peripheral devices mapped to locations of this type may execute.
 
 ==== Vehicle
 
@@ -249,6 +269,17 @@ An order sequence carries the following attributes:
 
 .An order sequence
 image::ordersequence_example.png[]
+
+==== Peripheral job
+
+A peripheral job describes an operation to be performed by a peripheral device.
+A peripheral job carries the following attributes:
+
+* An _operation_ to be performed by a peripheral device -- see <<Peripheral operation>>.
+* A _reservation token_ that may be used to reserve a peripheral device.
+  A peripheral device that is reserved for a specific token can only process jobs which match that reservation token -- see <<Reservation token>>.
+* An optional _related vehicle_ referencing the vehicle by which the peripheral job was created.
+* An optional _related transport order_ referencing the transport order in which context the peripheral job was created.
 
 === Common element attributes
 

@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features:
 ** Inform `EdgeEvaluator` implementations about beginning and end of routing graph creation to allow them to optimize computations, e.g. by caching data that does not change while building the graph.
 * Other changes:
+** Add documentation for peripheral devices and peripheral operations.
+   Also enable the respective GUI components by default now that there is documentation.
 ** Replace old references to the Plant Overview application in the developer's and user's guides with references to the Model Editor and/or Operations Desk applications.
 ** Remove the statistics kernel extension and plugin panel.
    They have been moved to the example integration project.

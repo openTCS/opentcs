@@ -74,7 +74,7 @@ When developing a vehicle driver, the most important classes and interfaces in t
 
 ==== Classes and interfaces for the control center application
 
-NOTE: For the kernel control center application the following interfaces are the most important.
+For the kernel control center application, the following interfaces and classes are the most important ones:
 
 .Classes of a comm adapter implementation (kernel control center side)
 image::commadapter_classes_kcc.png[]
@@ -96,7 +96,7 @@ image::commadapter_classes_kcc.png[]
 . Create an implementation of `VehicleCommAdapter`:
 .. Subclass `BasicVehicleCommAdapter` unless you have a reason not to.
    You don't have to, but if you don't, you also need to implement command queue management yourself.
-.. Implement the abstract methods of `BasicVehicleCommAdapter` in the derived class to realize communication with the vehicle and to provide driver-specific visualization panels, if any.
+.. Implement the abstract methods of `BasicVehicleCommAdapter` in the derived class to realize communication with the vehicle.
 .. In situations in which the state of the vehicle changes in a way that is relevant for the kernel or the comm adapter's custom panels, the comm adapter should call the respective methods on the model.
    Most importantly, call `setVehiclePosition()` and `commandExecuted()` on the comm adapter's model when the controlled vehicle's reported state indicates that it has moved to a different position or that it has finished an order.
 . Create an implementation of `VehicleCommAdapterFactory` that provides instances of your `VehicleCommAdapter` for given `Vehicle` objects.
@@ -165,6 +165,91 @@ include::{kernel-testSrc}/org/opentcs/documentation/ReceiveCommAdapterMessageTes
 ----
 
 Unlike information published via events, data stored as properties in `Vehicle` or `TransportOrder` objects can be retrieved at any time.
+
+=== Developing peripheral drivers
+
+In addition to vehicle drivers, openTCS supports the integration of custom peripheral drivers that implement peripheral-specific communication protocols and thus mediate between the kernel and the peripheral device.
+In openTCS, a peripheral device is a device a vehicle may interact with along its route, e.g. an elevator or a fire door.
+Due to its function, a peripheral driver is also called a peripheral communication adapter.
+The following sections describe which requirements must be met by a driver and which steps are necessary to create and use it.
+
+==== Classes and interfaces for the kernel
+
+.Classes of a peripheral comm adapter implementation (kernel side)
+image::peripheral_commadapter_classes_kernel.png[]
+
+When developing a peripheral driver, the most important classes and interfaces in the base library are the following:
+
+* `PeripheralCommAdapter` declares methods that every comm adapter must implement.
+  These methods are called by components within the kernel, for instance to tell a peripheral device that it is supposed to perform an operation, e.g. for an elevator to move to a specific floor.
+  Classes implementing this interface are expected to perform the actual communication with a peripheral device, e.g. via TCP, UDP or some field bus.
+* `BasicPeripheralCommAdapter` is the recommended base class for implementing a `PeripheralCommAdapter`.
+  It primarily provides some basic event dispatching with regards to the `PeripheralProcessModel`.
+* `PeripheralCommAdapterFactory` describes a factory for `PeripheralCommAdapter` instances.
+  The kernel instantiates and uses one such factory per peripheral driver to create instances of the respective `PeripheralCommAdapter` implementation on demand.
+* A single `PeripheralProcessModel` instance should be provided by every `PeripheralCommAdapter` instance in which it keeps the relevant state of both the peripheral device and the comm adapter.
+  This model instance is supposed to be updated to notify the kernel about relevant changes.
+  The comm adapter implementation should e.g. update the peripheral device's current state in the model when it receives that information to allow the kernel and GUI frontends to use it.
+  `PeripheralProcessModel` may be used as it is, as it contains members for all the information the openTCS kernel itself needs.
+  However, developers may use driver-specific subclasses of `PeripheralProcessModel` to have the comm adapter and other components exchange more than the default set of attributes.
+
+==== Classes and interfaces for the control center application
+
+For the kernel control center application, the following classes and interfaces are the most important:
+
+.Classes of a peripheral comm adapter implementation (kernel control center side)
+image::peripheral_commadapter_classes_kcc.png[]
+
+* `PeripheralCommAdapterPanel` instances may be created by a `PeripheralCommAdapterPanelFactory` e.g. to display information about the associated peripheral device or send low-level messages to it.
+* `PeripheralProcessModel` instances are used in a comm adapter's `PeripheralCommAdapterPanel` instances for updating their contents.
+  In contrast to a `VehicleCommAdapter`, there is no class such as `PeripheralProcessModelTO`, since `PeripheralProcessModel` already implements the `Serializable` interface.
+  Developers should keep that in mind when creating driver-specific subclasses of `PeripheralProcessModel`.
+* Instances of `PeripheralCommAdapterDescription` provide a string describing/identifying the comm adapter implementation.
+  This string is shown e.g. when the user may select one of a set of driver implementations and should thus be unique.
+  It is also used for attaching a comm adapter implementation via `PeripheralService.attachCommAdapter()`.
+* `PeripheralAdapterCommand` instances can be sent from a panel to a `PeripheralCommAdapter` instance via `PeripheralService.sendCommAdapterCommand()`.
+  They are supposed to be executed by the comm adapter and can be used to execute arbitrary methods, e.g. methods of the `PeripheralCommAdapter` itself, or update contents of the comm adapter's `PeripheralProcessModel`.
+  Note that `PeripheralAdapterCommand` instances can only be sent to and processed by the kernel application if they are serializable and present in the kernel application's classpath.
+
+==== Steps to create a new peripheral driver
+
+. Create an implementation of `PeripheralCommAdapter`:
+.. Subclass `BasicPeripheralCommAdapter` unless you have a reason not to.
+.. Implement the abstract methods of `BasicPeripheralCommAdapter` in the derived class to realize communication with the peripheral device.
+.. In situations in which the state of the peripheral device changes in a way that is relevant for the kernel or the comm adapter's custom panels, the comm adapter should call the respective methods on the model and publish a corresponding `PeripheralProcessModelEvent` via the kernel's `ApplicationEventBus`.   
+   Most importantly, call `PeripheralJobCallback.peripheralJobFinished()` on the callback instance provided with `PeripheralCommAdapter.process()` when the controlled peripheral device's reported state indicates that it has finished a job.
+. Create an implementation of `PeripheralCommAdapterFactory` that provides instances of your `PeripheralCommAdapter` for given `Location` objects.
+. Optional: Create any number of implementations of `PeripheralCommAdapterPanel` that the kernel control center application should display for the comm adapter.
+  Create and return instances of these panels in the `getPanelsFor()` method of your ``PeripheralCommAdapterPanelFactory``s implementation.
+
+See the API documentation for more details.
+For an example, refer to the implementation of the loopback peripheral comm adapter for virtual peripheral devices in the openTCS source distribution.
+(Note, however, that this implementation does not implement communication with any physical peripheral device.)
+
+==== Registering a peripheral driver with the kernel
+
+. Create a Guice module for your peripheral driver by creating a subclass of `KernelInjectionModule`.
+Implement the `configure()` method and register a binding to your `PeripheralCommAdapterFactory`.
+For example, the peripheral loopback driver that is part of the openTCS distribution registers its own factory class with the following line in its `configure()` method:
++
+[source, java]
+----
+include::{peripheral-loopback-guiceSrc}/org/opentcs/commadapter/peripheral/loopback/LoopbackPeripheralKernelModule.java[tags=documentation_createCommAdapterModule]
+----
+
+. In the JAR file containing your driver, ensure that there exists a folder named `META-INF/services/` with a file named `org.opentcs.customizations.kernel.KernelInjectionModule`.
+This file should consist of a single line of text holding simply the name of the Guice module class, e.g.:
++
+[source]
+----
+org.opentcs.commadapter.peripheral.loopback.LoopbackPeripheralKernelModule
+----
+NOTE: Background: openTCS uses `java.util.ServiceLoader` to automatically find Guice modules on startup, which depends on this file (with this name) being present.
+See the JDK's API documentation for more information about how this mechanism works.
+. Place the JAR file of your driver including all neccessary resources in the subdirectory `lib/openTCS-extensions/` of the openTCS kernel application's installation directory _before_ the kernel is started.
+(The openTCS start scripts include all JAR files in that directory in the application's classpath.)
+
+Drivers meeting these requirements are found automatically when you start the kernel.
 
 [#section-kernel-executor]
 === Executing code in kernel context

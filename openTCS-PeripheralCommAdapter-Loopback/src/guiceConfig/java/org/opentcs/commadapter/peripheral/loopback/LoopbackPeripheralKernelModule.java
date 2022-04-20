@@ -41,6 +41,8 @@ public class LoopbackPeripheralKernelModule
 
     install(new FactoryModuleBuilder().build(LoopbackPeripheralAdapterComponentsFactory.class));
 
+    // tag::documentation_createCommAdapterModule[]
     peripheralCommAdaptersBinder().addBinding().to(LoopbackPeripheralCommAdapterFactory.class);
+    // end::documentation_createCommAdapterModule[]
   }
 }
