@@ -10,11 +10,14 @@ package org.opentcs.guing.transport;
 import java.awt.event.ItemEvent;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
+import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.guing.components.dialogs.DialogContent;
 import org.opentcs.guing.model.elements.LocationModel;
 import org.opentcs.guing.persistence.ModelManager;
@@ -48,7 +51,11 @@ public class CreatePeripheralJobPanel
   @Inject
   public CreatePeripheralJobPanel(ModelManager modelManager) {
     requireNonNull(modelManager, "modelManager");
-    locations = modelManager.getModel().getLocationModels();
+    locations = modelManager.getModel().getLocationModels().stream()
+        .filter(location -> !Objects.equals(location.getPropertyPeripheralState().getText(),
+                                            PeripheralInformation.State.NO_PERIPHERAL.name()))
+        .sorted(BY_NAME)
+        .collect(Collectors.toList());
 
     initComponents();
     setDialogTitle(bundle.getString("createPeripheralJobPanel.title"));
@@ -56,11 +63,8 @@ public class CreatePeripheralJobPanel
 
   @Override
   public void initFields() {
-    locations.stream()
-        .sorted(BY_NAME)
-        .forEach(locationCombobox::addItem);
+    locations.stream().forEach(locationCombobox::addItem);
     loadOperations();
-
   }
 
   @Override

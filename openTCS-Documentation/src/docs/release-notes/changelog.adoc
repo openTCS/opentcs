@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** Add documentation for peripheral devices and peripheral operations.
    Also enable the respective GUI components by default now that there is documentation.
+** In the Operations Desk application's dialog for creating peripheral jobs, offer locations attached to a peripheral driver only.
 ** Replace old references to the Plant Overview application in the developer's and user's guides with references to the Model Editor and/or Operations Desk applications.
 ** Remove the statistics kernel extension and plugin panel.
    They have been moved to the example integration project.
