@@ -27,7 +27,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Guice to 5.1.0.
 ** Update Jakarta XML Bind API to 2.3.3.
 ** Update JAXB Runtime to 2.3.6.
-** Update Jackson to 2.13.2.
+** Update Jackson to 2.13.2 (and its data-binding package to 2.13.2.2).
 ** Update Sulky ULID to 8.3.0.
 ** Update JGraphT to 1.5.1.
 ** Update cfg4j to 4.4.1.
