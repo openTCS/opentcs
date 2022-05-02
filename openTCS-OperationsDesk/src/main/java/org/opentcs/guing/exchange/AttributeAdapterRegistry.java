@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
-import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.event.SystemModelTransitionEvent;
 import org.opentcs.guing.exchange.adapter.LocationLockAdapter;
 import org.opentcs.guing.exchange.adapter.PathLockAdapter;
@@ -24,8 +23,6 @@ import org.opentcs.guing.model.elements.VehicleModel;
 import org.opentcs.guing.persistence.ModelManager;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Handles registering of model attribute adapters that update a model component's attribute with
@@ -38,17 +35,9 @@ public class AttributeAdapterRegistry
                Lifecycle {
 
   /**
-   * This class' logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(AttributeAdapterRegistry.class);
-  /**
    * Provides access to a portal.
    */
   private final SharedKernelServicePortalProvider portalProvider;
-  /**
-   * The state of the plant overview.
-   */
-  private final ApplicationState applicationState;
   /**
    * The model manager.
    */
@@ -64,11 +53,9 @@ public class AttributeAdapterRegistry
 
   @Inject
   public AttributeAdapterRegistry(SharedKernelServicePortalProvider portalProvider,
-                                  ApplicationState applicationState,
                                   ModelManager modelManager,
                                   @ApplicationEventBus EventSource eventSource) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
-    this.applicationState = requireNonNull(applicationState, "applicationState");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.eventSource = requireNonNull(eventSource, "eventSource");
   }
@@ -114,19 +101,14 @@ public class AttributeAdapterRegistry
   private void registerAdapters() {
     for (VehicleModel model : modelManager.getModel().getVehicleModels()) {
       model.addAttributesChangeListener(new VehicleAllowedOrderTypesAdapter(portalProvider,
-                                                                            applicationState,
                                                                             model));
       model.addAttributesChangeListener(new VehiclePausedAdapter(portalProvider, model));
     }
     for (PathModel model : modelManager.getModel().getPathModels()) {
-      model.addAttributesChangeListener(new PathLockAdapter(portalProvider,
-                                                            applicationState,
-                                                            model));
+      model.addAttributesChangeListener(new PathLockAdapter(portalProvider, model));
     }
     for (LocationModel model : modelManager.getModel().getLocationModels()) {
-      model.addAttributesChangeListener(new LocationLockAdapter(portalProvider,
-                                                                applicationState,
-                                                                model));
+      model.addAttributesChangeListener(new LocationLockAdapter(portalProvider, model));
     }
   }
 }

@@ -15,7 +15,6 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.model.elements.VehicleModel;
@@ -43,10 +42,6 @@ public class VehicleAllowedOrderTypesAdapter
    */
   private final SharedKernelServicePortalProvider portalProvider;
   /**
-   * The state of the plant overview.
-   */
-  private final ApplicationState applicationState;
-  /**
    * The vehicle's allowed order types the last time we checked them.
    */
   private Set<String> previousAllowedOrderTypes;
@@ -55,14 +50,11 @@ public class VehicleAllowedOrderTypesAdapter
    * Creates a new instance.
    *
    * @param portalProvider A kernel provider.
-   * @param applicationState Keeps the plant overview's state.
    * @param model The vehicle model.
    */
   public VehicleAllowedOrderTypesAdapter(SharedKernelServicePortalProvider portalProvider,
-                                         ApplicationState applicationState,
                                          VehicleModel model) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
-    this.applicationState = requireNonNull(applicationState, "applicationState");
     this.model = requireNonNull(model, "model");
     this.previousAllowedOrderTypes = getAllowedOrderTypes();
   }
@@ -74,10 +66,8 @@ public class VehicleAllowedOrderTypesAdapter
     }
 
     Set<String> allowedOrderTypes = getAllowedOrderTypes();
-    if (previousAllowedOrderTypes.size() == allowedOrderTypes.size()
-        && previousAllowedOrderTypes.containsAll(allowedOrderTypes)) {
-      LOG.debug("Ignoring vehicle properties update because the allowed order types did not "
-          + "change");
+    if (previousAllowedOrderTypes.equals(allowedOrderTypes)) {
+      LOG.debug("Ignoring vehicle properties update as the allowed order types did not change");
       return;
     }
 

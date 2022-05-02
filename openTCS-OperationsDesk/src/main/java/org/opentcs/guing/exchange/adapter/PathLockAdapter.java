@@ -14,7 +14,6 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.data.model.Path;
-import org.opentcs.guing.application.ApplicationState;
 import org.opentcs.guing.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.model.elements.PathModel;
@@ -42,10 +41,6 @@ public class PathLockAdapter
    */
   private final SharedKernelServicePortalProvider portalProvider;
   /**
-   * The state of the plant overview.
-   */
-  private final ApplicationState applicationState;
-  /**
    * Indicates whether the path was locked the last time we checked.
    */
   private boolean lockedPreviously;
@@ -54,14 +49,11 @@ public class PathLockAdapter
    * Creates a new instance.
    *
    * @param portalProvider A portal provider.
-   * @param applicationState Keeps the plant overview's state.
    * @param model The path model.
    */
   public PathLockAdapter(SharedKernelServicePortalProvider portalProvider,
-                         ApplicationState applicationState,
                          PathModel model) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
-    this.applicationState = requireNonNull(applicationState, "applicationState");
     this.model = requireNonNull(model, "model");
     this.lockedPreviously = isPathLocked();
   }
@@ -86,7 +78,7 @@ public class PathLockAdapter
   }
 
   private void updateLockInKernel(boolean locked) {
-    try ( SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       KernelServicePortal portal = sharedPortal.getPortal();
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
