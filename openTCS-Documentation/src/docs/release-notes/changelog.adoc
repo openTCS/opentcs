@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features:
 ** Add explicit support for pausing vehicles, which would previously be implemented using messages sent to the vehicle drivers without being interpreted by the kernel.
    Vehicles now have a proper _paused_ state, and `VehicleService` (and the Operations Desk application with it) provides an explicit way to modify it for each individual vehicle.
+** Defer resource allocations for paused vehicles.
+   This keeps vehicles that do not explicitly support pausing from receiving more movement commands, effectively stopping them after they have processed the commands received before pausing.
 
 == Version 5.5 (2022-04-26)
 

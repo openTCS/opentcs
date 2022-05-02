@@ -25,14 +25,19 @@ import javax.inject.Inject;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.AllocationsReleased;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.CheckAllocationsPrepared;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.RetryAllocates;
 import static org.opentcs.util.Assertions.checkArgument;
+import org.opentcs.util.event.EventBus;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +49,8 @@ import org.slf4j.LoggerFactory;
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultScheduler
-    implements Scheduler {
+    implements Scheduler,
+               EventHandler {
 
   /**
    * This class's Logger.
@@ -71,6 +77,10 @@ public class DefaultScheduler
    */
   private final ScheduledExecutorService kernelExecutor;
   /**
+   * The kernel's event bus.
+   */
+  private final EventBus eventBus;
+  /**
    * A global object to be used for synchronization within the kernel.
    */
   private final Object globalSyncObject;
@@ -90,6 +100,7 @@ public class DefaultScheduler
    * @param allocationAdvisor Takes care of modules.
    * @param reservationPool The reservation pool to be used.
    * @param kernelExecutor Executes scheduling tasks.
+   * @param eventBus The kernel's event bus.
    * @param globalSyncObject The kernel threads' global synchronization object.
    */
   @Inject
@@ -97,11 +108,13 @@ public class DefaultScheduler
                           AllocationAdvisor allocationAdvisor,
                           ReservationPool reservationPool,
                           @KernelExecutor ScheduledExecutorService kernelExecutor,
+                          @ApplicationEventBus EventBus eventBus,
                           @GlobalSyncObject Object globalSyncObject) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
+    this.eventBus = requireNonNull(eventBus, "eventBus");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
   }
 
@@ -113,6 +126,8 @@ public class DefaultScheduler
 
     reservationPool.clear();
     allocationAdvisor.initialize();
+
+    eventBus.subscribe(this);
 
     initialized = true;
   }
@@ -128,7 +143,10 @@ public class DefaultScheduler
       return;
     }
 
+    eventBus.unsubscribe(this);
+
     allocationAdvisor.terminate();
+
     initialized = false;
   }
 
@@ -323,6 +341,26 @@ public class DefaultScheduler
                                             kernelExecutor,
                                             globalSyncObject,
                                             new CheckAllocationsPrepared(client, resources)));
+  }
+
+  @Override
+  public void onEvent(Object event) {
+    if (!(event instanceof TCSObjectEvent)) {
+      return;
+    }
+
+    TCSObjectEvent tcsObjectEvent = (TCSObjectEvent) event;
+    if (tcsObjectEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED
+        || !(tcsObjectEvent.getCurrentObjectState() instanceof Vehicle)) {
+      return;
+    }
+
+    // If the vehicle was unpaused, trigger a scheduling run in case the vehicle is waiting for
+    // resources.
+    if (((Vehicle) tcsObjectEvent.getPreviousObjectState()).isPaused()
+        && !((Vehicle) tcsObjectEvent.getCurrentObjectState()).isPaused()) {
+      reschedule();
+    }
   }
 
   private void addAllocateFuture(Client client, Future<?> allocateFuture) {
