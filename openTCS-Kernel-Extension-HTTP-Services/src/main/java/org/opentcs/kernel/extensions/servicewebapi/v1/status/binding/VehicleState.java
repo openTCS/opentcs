@@ -53,6 +53,9 @@ public class VehicleState {
   @JsonPropertyDescription("The vehicle's integration level.")
   private IntegrationLevel integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
 
+  @JsonPropertyDescription("Whether the vehicle is paused.")
+  private boolean paused;
+
   @JsonPropertyDescription("The vehicle's current processing state.")
   private ProcState procState = ProcState.IDLE;
 
@@ -123,6 +126,14 @@ public class VehicleState {
 
   public void setIntegrationLevel(IntegrationLevel integrationLevel) {
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
+  }
+
+  public boolean isPaused() {
+    return paused;
+  }
+
+  public void setPaused(boolean paused) {
+    this.paused = paused;
   }
 
   public ProcState getProcState() {
@@ -208,6 +219,7 @@ public class VehicleState {
     vehicleState.setEnergyLevelCritical(vehicle.getEnergyLevelCritical());
     vehicleState.setEnergyLevel(vehicle.getEnergyLevel());
     vehicleState.setIntegrationLevel(vehicle.getIntegrationLevel());
+    vehicleState.setPaused(vehicle.isPaused());
     vehicleState.setProcState(vehicle.getProcState());
     vehicleState.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
     vehicleState.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));

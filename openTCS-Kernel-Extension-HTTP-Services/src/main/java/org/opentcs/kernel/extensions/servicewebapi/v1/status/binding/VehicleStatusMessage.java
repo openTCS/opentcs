@@ -39,6 +39,9 @@ public class VehicleStatusMessage
   @JsonPropertyDescription("The precise position of the vehicle")
   private PrecisePosition precisePosition;
 
+  @JsonPropertyDescription("Whether the vehicle is paused.")
+  private boolean paused;
+
   @JsonProperty(required = true)
   @JsonPropertyDescription("The vehicle's current state")
   private Vehicle.State state;
@@ -91,6 +94,14 @@ public class VehicleStatusMessage
     this.precisePosition = precisePosition;
   }
 
+  public boolean isPaused() {
+    return paused;
+  }
+
+  public void setPaused(boolean paused) {
+    this.paused = paused;
+  }
+
   public Vehicle.State getState() {
     return state;
   }
@@ -139,6 +150,7 @@ public class VehicleStatusMessage
         vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName());
     vehicleMessage.setPosition(
         vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName());
+    vehicleMessage.setPaused(vehicle.isPaused());
     vehicleMessage.setState(vehicle.getState());
     vehicleMessage.setProcState(vehicle.getProcState());
     if (vehicle.getPrecisePosition() != null) {

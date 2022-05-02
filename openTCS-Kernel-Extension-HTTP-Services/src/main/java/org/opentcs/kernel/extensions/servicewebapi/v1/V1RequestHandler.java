@@ -101,6 +101,8 @@ public class V1RequestHandler
 
     service.get("/events",
                 this::handleGetEvents);
+    service.put("/vehicles/:NAME/paused",
+                this::handlePutVehiclePaused);
     service.put("/vehicles/:NAME/integrationLevel",
                 this::handlePutVehicleIntegrationLevel);
     service.post("/vehicles/:NAME/withdrawal",
@@ -200,6 +202,16 @@ public class V1RequestHandler
   private Object handlePutVehicleIntegrationLevel(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
     statusInformationProvider.putVehicleIntegrationLevel(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutVehiclePaused(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putVehiclePaused(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
