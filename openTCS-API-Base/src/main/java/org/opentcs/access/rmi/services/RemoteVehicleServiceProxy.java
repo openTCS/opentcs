@@ -136,6 +136,19 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
+  public void updateVehiclePaused(TCSObjectReference<Vehicle> ref, boolean paused)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateVehiclePaused(getClientId(), ref, paused);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
   public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException, KernelRuntimeException {

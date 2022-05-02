@@ -18,7 +18,6 @@ import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
-import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.guing.model.ModelComponent;
 import org.opentcs.guing.model.SystemModel;
 import org.opentcs.guing.model.elements.VehicleModel;
@@ -99,8 +98,7 @@ public class PauseAllVehiclesAction
       for (ModelComponent component : folder.getChildComponents()) {
         VehicleModel vModel = (VehicleModel) component;
         LOG.info("Pausing vehicle {}...", vModel.getVehicle().getName());
-        portal.getVehicleService().sendCommAdapterMessage(vModel.getVehicle().getReference(),
-                                                          new SetSpeedMultiplier(0));
+        portal.getVehicleService().updateVehiclePaused(vModel.getVehicle().getReference(), true);
       }
     }
   }

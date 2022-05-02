@@ -188,6 +188,17 @@ public interface VehicleController
   }
 
   /**
+   * Notifies the implementation that the vehicle's <em>paused</em> state in the kernel has changed.
+   * If pausing between points in the plant model is supported by the vehicle, the communication
+   * adapter may want to inform the vehicle about this change of state.
+   *
+   * @param paused The vehicle's new paused state.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void onVehiclePaused(boolean paused) {
+  }
+
+  /**
    * Delivers a generic message to the communication adapter.
    *
    * @param message The message to be delivered.

@@ -98,6 +98,10 @@ public class Vehicle
    */
   private final IntegrationLevel integrationLevel;
   /**
+   * Whether this vehicle is currently paused.
+   */
+  private final boolean paused;
+  /**
    * A reference to the transport order this vehicle is currently processing.
    */
   private final TCSObjectReference<TransportOrder> transportOrder;
@@ -170,6 +174,7 @@ public class Vehicle
     this.allocatedResources = List.of();
     this.state = State.UNKNOWN;
     this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
+    this.paused = false;
     this.currentPosition = null;
     this.nextPosition = null;
     this.precisePosition = null;
@@ -199,6 +204,7 @@ public class Vehicle
                   List<Set<TCSResourceReference<?>>> allocatedResources,
                   State state,
                   IntegrationLevel integrationLevel,
+                  boolean paused,
                   TCSObjectReference<Point> currentPosition,
                   TCSObjectReference<Point> nextPosition,
                   Triple precisePosition,
@@ -233,6 +239,7 @@ public class Vehicle
     this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
     this.state = requireNonNull(state, "state");
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
+    this.paused = paused;
     this.currentPosition = currentPosition;
     this.nextPosition = nextPosition;
     this.precisePosition = precisePosition;
@@ -269,6 +276,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -300,6 +308,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -331,6 +340,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -362,6 +372,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -407,6 +418,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -505,6 +517,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -552,6 +565,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -597,6 +611,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -643,6 +658,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -690,6 +706,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -735,6 +752,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -780,6 +798,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -825,6 +844,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -881,6 +901,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -935,6 +956,53 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices,
+                       layout);
+  }
+
+  /**
+   * Indicates whether this vehicle is paused.
+   *
+   * @return Whether this vehicle is paused.
+   */
+  public boolean isPaused() {
+    return paused;
+  }
+
+  /**
+   * Creates a copy of this object, with the given paused state.
+   *
+   * @param paused The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withPaused(boolean paused) {
+    return new Vehicle(getName(),
+                       getProperties(),
+                       getHistory(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       allowedOrderTypes,
+                       routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
+                       state,
+                       integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -983,6 +1051,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1029,6 +1098,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1077,6 +1147,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1125,6 +1196,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1170,6 +1242,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1217,6 +1290,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1262,6 +1336,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1307,6 +1382,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1354,6 +1430,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1401,6 +1478,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1448,6 +1526,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1495,6 +1574,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1540,6 +1620,7 @@ public class Vehicle
                        allocatedResources,
                        state,
                        integrationLevel,
+                       paused,
                        currentPosition,
                        nextPosition,
                        precisePosition,
@@ -1565,6 +1646,7 @@ public class Vehicle
         + "name=" + getName()
         + ", procState=" + procState
         + ", integrationLevel=" + integrationLevel
+        + ", paused=" + paused
         + ", state=" + state
         + ", energyLevel=" + energyLevel
         + ", currentPosition=" + currentPosition

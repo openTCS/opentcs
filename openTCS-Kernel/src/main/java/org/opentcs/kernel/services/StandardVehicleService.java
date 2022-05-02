@@ -333,6 +333,16 @@ public class StandardVehicleService
   }
 
   @Override
+  public void updateVehiclePaused(TCSObjectReference<Vehicle> ref, boolean paused)
+      throws ObjectUnknownException, KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      model.setVehiclePaused(ref, paused);
+
+      vehicleControllerPool.getVehicleController(ref.getName()).onVehiclePaused(paused);
+    }
+  }
+
+  @Override
   public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException {

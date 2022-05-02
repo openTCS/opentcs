@@ -11,6 +11,7 @@ import java.util.Collection;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.action.course.FollowVehicleAction;
 import org.opentcs.guing.application.action.course.IntegrationLevelChangeAction;
+import org.opentcs.guing.application.action.course.PauseAction;
 import org.opentcs.guing.application.action.course.ScrollToVehicleAction;
 import org.opentcs.guing.application.action.course.SendVehicleToLocationAction;
 import org.opentcs.guing.application.action.course.SendVehicleToPointAction;
@@ -36,4 +37,6 @@ public interface ActionFactory {
 
   IntegrationLevelChangeAction createIntegrationLevelChangeAction(Collection<VehicleModel> vehicles,
                                                                   Vehicle.IntegrationLevel level);
+
+  PauseAction createPauseAction(Collection<VehicleModel> vehicles, boolean pause);
 }

@@ -51,6 +51,7 @@ public class VehicleModel
   public static final String STATE = "State";
   public static final String PROC_STATE = "ProcState";
   public static final String INTEGRATION_LEVEL = "IntegrationLevel";
+  public static final String PAUSED = "Paused";
   public static final String POINT = "Point";
   public static final String NEXT_POINT = "NextPoint";
   public static final String PRECISE_POSITION = "PrecisePosition";
@@ -380,6 +381,10 @@ public class VehicleModel
     return (SelectionProperty<Vehicle.IntegrationLevel>) getProperty(INTEGRATION_LEVEL);
   }
 
+  public BooleanProperty getPropertyPaused() {
+    return (BooleanProperty) getProperty(PAUSED);
+  }
+
   public AngleProperty getPropertyOrientationAngle() {
     return (AngleProperty) getProperty(ORIENTATION_ANGLE);
   }
@@ -415,12 +420,12 @@ public class VehicleModel
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
-  
-  public ResourceProperty getAllocatedResources(){
+
+  public ResourceProperty getAllocatedResources() {
     return (ResourceProperty) getProperty(ALLOCATED_RESOURCES);
   }
-  
-  public ResourceProperty getClaimedResources(){
+
+  public ResourceProperty getClaimedResources() {
     return (ResourceProperty) getProperty(CLAIMED_RESOURCES);
   }
 
@@ -553,6 +558,13 @@ public class VehicleModel
     pIntegrationLevel.setModellingEditable(false);
     setProperty(INTEGRATION_LEVEL, pIntegrationLevel);
 
+    BooleanProperty pPaused = new BooleanProperty(this);
+    pPaused.setDescription(bundle.getString("vehicleModel.property_paused.description"));
+    pPaused.setHelptext(bundle.getString("vehicleModel.property_paused.helptext"));
+    pPaused.setModellingEditable(false);
+    pPaused.setOperatingEditable(true);
+    setProperty(PAUSED, pPaused);
+
     StringProperty pPoint = new StringProperty(this);
     pPoint.setDescription(bundle.getString("vehicleModel.property_currentPoint.description"));
     pPoint.setHelptext(bundle.getString("vehicleModel.property_currentPoint.helptext"));
@@ -634,7 +646,7 @@ public class VehicleModel
     allocatedResources.setModellingEditable(false);
     allocatedResources.setOperatingEditable(true);
     setProperty(ALLOCATED_RESOURCES, allocatedResources);
-    
+
     ResourceProperty claimedResources = new ResourceProperty(this);
     claimedResources.setDescription(
         bundle.getString("vehicleModel.property_claimedResources.description")

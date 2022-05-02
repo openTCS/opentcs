@@ -80,6 +80,7 @@ public class VehicleAdapter
       model.getPropertyState().setValue(vehicle.getState());
       model.getPropertyProcState().setValue(vehicle.getProcState());
       model.getPropertyIntegrationLevel().setValue(vehicle.getIntegrationLevel());
+      model.getPropertyPaused().setValue(vehicle.isPaused());
 
       updateModelCurrentPoint(model, vehicle, systemModel);
       updateModelNextPoint(model, vehicle, systemModel);

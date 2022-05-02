@@ -72,6 +72,11 @@ public interface RemoteVehicleService
                                      Vehicle.IntegrationLevel integrationLevel)
       throws RemoteException;
 
+  void updateVehiclePaused(ClientID clientId,
+                           TCSObjectReference<Vehicle> ref,
+                           boolean paused)
+      throws RemoteException;
+
   void updateVehicleAllowedOrderTypes(ClientID clientId,
                                       TCSObjectReference<Vehicle> ref,
                                       Set<String> allowedOrderTypes)

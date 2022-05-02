@@ -618,6 +618,13 @@ public class DefaultVehicleController
   }
 
   @Override
+  public void onVehiclePaused(boolean paused) {
+    synchronized (commAdapter) {
+      commAdapter.onVehiclePaused(paused);
+    }
+  }
+
+  @Override
   public void sendCommAdapterMessage(@Nullable Object message) {
     synchronized (commAdapter) {
       commAdapter.processMessage(message);

@@ -642,6 +642,26 @@ public class Model {
   }
 
   /**
+   * Sets a vehicle's paused state.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param paused The vehicle's new paused state.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  public Vehicle setVehiclePaused(TCSObjectReference<Vehicle> ref,
+                                  boolean paused)
+      throws ObjectUnknownException {
+    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = vehicle;
+    vehicle = objectPool.replaceObject(vehicle.withPaused(paused));
+    objectPool.emitObjectEvent(vehicle,
+                               previousState,
+                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+
+  /**
    * Sets a vehicle's processing state.
    *
    * @param ref A reference to the vehicle to be modified.

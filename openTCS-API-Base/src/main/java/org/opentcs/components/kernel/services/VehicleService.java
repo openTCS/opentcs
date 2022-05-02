@@ -122,6 +122,18 @@ public interface VehicleService
   void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                      Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException, KernelRuntimeException, IllegalArgumentException;
+  
+  /**
+   * Updates the vehicle's paused state.
+   *
+   * @param ref A refrence to the vehicle.
+   * @param paused The vehicle's new paused state.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  void updateVehiclePaused(TCSObjectReference<Vehicle> ref,
+                           boolean paused)
+      throws ObjectUnknownException, KernelRuntimeException;
 
   /**
    * Updates the types of transport orders a vehicle is allowed to process.

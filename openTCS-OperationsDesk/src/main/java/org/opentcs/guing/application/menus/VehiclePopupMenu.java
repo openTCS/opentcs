@@ -90,6 +90,22 @@ public class VehiclePopupMenu
       addSeparator();
     }
 
+    JMenu pauseSubMenu = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_pause.text"));
+
+    action = actionFactory.createPauseAction(vehicles, true);
+    checkBoxMenuItem = new JCheckBoxMenuItem(action);
+    checkBoxMenuItem.setSelected(allPaused(vehicles));
+    pauseSubMenu.add(checkBoxMenuItem);
+
+    action = actionFactory.createPauseAction(vehicles, false);
+    checkBoxMenuItem = new JCheckBoxMenuItem(action);
+    checkBoxMenuItem.setSelected(nonePaused(vehicles));
+    pauseSubMenu.add(checkBoxMenuItem);
+
+    add(pauseSubMenu);
+
+    addSeparator();
+
     JMenu integrateSubMenu
         = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_integrate.text"));
 
@@ -141,8 +157,20 @@ public class VehiclePopupMenu
     add(withdrawSubMenu);
   }
 
+  private boolean allPaused(Collection<VehicleModel> vehicles) {
+    return vehicles.stream().allMatch(vehicle -> isPaused(vehicle));
+  }
+
+  private boolean nonePaused(Collection<VehicleModel> vehicles) {
+    return vehicles.stream().noneMatch(vehicle -> isPaused(vehicle));
+  }
+
   private boolean isAnyProcessingOrder(Collection<VehicleModel> vehicles) {
     return vehicles.stream().anyMatch(vehicle -> isProcessingOrder(vehicle));
+  }
+
+  private boolean isPaused(VehicleModel vehicle) {
+    return Boolean.TRUE.equals(vehicle.getPropertyPaused().getValue());
   }
 
   private boolean isProcessingOrder(VehicleModel vehicle) {

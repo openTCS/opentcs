@@ -31,7 +31,6 @@ import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.virtualvehicle.VelocityController.WayEntry;
 import org.slf4j.Logger;
@@ -202,13 +201,12 @@ public class LoopbackCommunicationAdapter
   }
 
   @Override
+  public void onVehiclePaused(boolean paused) {
+    getProcessModel().setVehiclePaused(paused);
+  }
+
+  @Override
   public void processMessage(Object message) {
-    // Process speed multiplier message which might pause the vehicle.
-    if (message instanceof SetSpeedMultiplier) {
-      SetSpeedMultiplier lsMessage = (SetSpeedMultiplier) message;
-      int multiplier = lsMessage.getMultiplier();
-      getProcessModel().setVehiclePaused(multiplier == 0);
-    }
   }
 
   @Override

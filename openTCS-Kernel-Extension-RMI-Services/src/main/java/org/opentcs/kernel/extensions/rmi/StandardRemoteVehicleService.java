@@ -257,6 +257,23 @@ public class StandardRemoteVehicleService
   }
 
   @Override
+  public void updateVehiclePaused(ClientID clientId,
+                                  TCSObjectReference<Vehicle> ref,
+                                  boolean paused)
+      throws RemoteException {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
+
+    try {
+      kernelExecutor.submit(
+          () -> vehicleService.updateVehiclePaused(ref, paused)
+      ).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
   public void updateVehicleAllowedOrderTypes(ClientID clientId, TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
