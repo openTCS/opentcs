@@ -163,6 +163,11 @@ A vehicle provides the following attributes:
      The vehicle is not available for transport orders. 
   ** ..._utilized_:
      The vehicle is available for transport orders and will be utilized by the openTCS.
+* A _paused_ flag, indicating whether the vehicle is currently paused or not.
+  A vehicle that is paused is supposed not to move/operate.
+  In case it is currently moving when its paused flag is set, it is expected to stop as soon as possible.
+  Some vehicle types may not support stopping before reaching their movement commands' destination.
+  In such cases, openTCS will still ensure no further movement commands are sent to vehicles as long as they are paused.
 * A set of _allowed transport order types_, which are strings used for filtering transport orders (by their type) that are allowed to be assigned to the vehicle.
   Also see <<Transport order>>.
 * A _route color_, which is the color used for visualizing the route the vehicle is taking to its destination.
