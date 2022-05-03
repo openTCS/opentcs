@@ -122,6 +122,7 @@ A location's attributes are:
 * Its _type_, basically defining which operations are allowed at the location -- see <<Location type>>.
 * A set of _links_ to points that the location can be reached from.
   To be of any use for vehicles in the plant model, a location needs to be linked to at least one point.
+* A _locked_ flag, which, when set, tells the dispatcher that transport orders requiring an operation at the location may not be assigned to vehicles.
 
 Additionally, locations can map peripheral devices for the purpose of communicating with them and allowing vehicles to interact with them (e.g. opening/closing fire doors along paths).
 See <<Adding and configuring peripheral devices>> for details on how to add and configure peripheral devices.
@@ -160,7 +161,7 @@ A vehicle provides the following attributes:
      The vehicle is not available for transport orders.
   ** ..._respected_:
      The resources for the vehicle's reported position will be allocated.
-     The vehicle is not available for transport orders. 
+     The vehicle is not available for transport orders.
   ** ..._utilized_:
      The vehicle is available for transport orders and will be utilized by the openTCS.
 * A _paused_ flag, indicating whether the vehicle is currently paused or not.
