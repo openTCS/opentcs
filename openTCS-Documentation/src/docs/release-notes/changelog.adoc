@@ -20,6 +20,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Defer resource allocations for paused vehicles.
    This keeps vehicles that do not explicitly support pausing from receiving more movement commands, effectively stopping them after they have processed the commands received before pausing.
 ** Reflect vehicles' paused states in the web API and provide an endpoint to modify them.
+* Other changes:
+** Update the demo model provided in the Model Editor application:
+*** Add a new section to show the integration and use of peripheral devices.
+    The demo model now contains a location that represents an exemplary fire door that vehicles have to interact with when traversing the new section.
+*** Update the demo model to use the latest model format (v0.0.4). 
 
 == Version 5.5 (2022-04-26)
 
