@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -213,7 +214,7 @@ public class OpenTCSModelManager
       systemModel.getPropertyMiscellaneous().addItem(
           new KeyValueProperty(systemModel,
                                ObjectPropConstants.MODEL_FILE_LAST_MODIFIED,
-                               Instant.now().toString())
+                               Instant.now().truncatedTo(ChronoUnit.SECONDS).toString())
       );
 
       return persistModel(systemModel,
