@@ -20,6 +20,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Defer resource allocations for paused vehicles.
    This keeps vehicles that do not explicitly support pausing from receiving more movement commands, effectively stopping them after they have processed the commands received before pausing.
 ** Reflect vehicles' paused states in the web API and provide an endpoint to modify them.
+** Reflect vehicles' paused states in the operations desk by shading paused vehicles.
 * Bugs fixed:
 ** Fix a bug where adding peripheral operations to a (newly created) path would also affect other paths in a plant model.
 * Other changes:

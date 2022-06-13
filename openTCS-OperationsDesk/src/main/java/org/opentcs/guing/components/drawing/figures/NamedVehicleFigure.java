@@ -62,8 +62,6 @@ public class NamedVehicleFigure
   protected void updateFigureDetails(VehicleModel model) {
     super.updateFigureDetails(model);
 
-    fImage = getVehicleTheme().statefulImage(model.getVehicle());
-
     PointModel point = model.getPoint();
     Triple precisePosition = model.getPrecisePosition();
 

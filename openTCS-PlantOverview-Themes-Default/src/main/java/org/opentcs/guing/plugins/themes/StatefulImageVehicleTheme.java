@@ -38,14 +38,24 @@ public class StatefulImageVehicleTheme
    */
   private static final Font LABEL_FONT = new Font("Arial", Font.BOLD, 12);
   /**
-   * Map containing images for a specific vehicle state when it's unloaded.
+   * Map containing images for a specific vehicle state when it's in a default state.
    */
-  private final Map<Vehicle.State, Image> stateMapUnloaded
+  private final Map<Vehicle.State, Image> stateMapDefault
       = new EnumMap<>(Vehicle.State.class);
   /**
    * Map containing images for a specific vehicle state when it's loaded.
    */
   private final Map<Vehicle.State, Image> stateMapLoaded
+      = new EnumMap<>(Vehicle.State.class);
+  /**
+   * Map containing images for a specific vehicle state when it's paused.
+   */
+  private final Map<Vehicle.State, Image> stateMapPaused
+      = new EnumMap<>(Vehicle.State.class);
+  /**
+   * Map containing images for a specific vehicle state when it's loaded and paused.
+   */
+  private final Map<Vehicle.State, Image> stateMapLoadedPaused
       = new EnumMap<>(Vehicle.State.class);
 
   public StatefulImageVehicleTheme() {
@@ -56,16 +66,23 @@ public class StatefulImageVehicleTheme
   public Image statelessImage(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
-    return stateMapUnloaded.get(Vehicle.State.IDLE);
+    return stateMapDefault.get(Vehicle.State.IDLE);
   }
 
   @Override
   public Image statefulImage(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
-    return loaded(vehicle)
-        ? stateMapLoaded.get(vehicle.getState())
-        : stateMapUnloaded.get(vehicle.getState());
+    if (loaded(vehicle)) {
+      return vehicle.isPaused()
+          ? stateMapLoadedPaused.get(vehicle.getState())
+          : stateMapLoaded.get(vehicle.getState());
+    }
+    else {
+      return vehicle.isPaused()
+          ? stateMapPaused.get(vehicle.getState())
+          : stateMapDefault.get(vehicle.getState());
+    }
   }
 
   @Override
@@ -97,19 +114,33 @@ public class StatefulImageVehicleTheme
    * Initializes the maps with values.
    */
   private void initMaps() {
-    stateMapUnloaded.put(Vehicle.State.CHARGING, loadImage(PATH + "unloaded_charging.png"));
-    stateMapUnloaded.put(Vehicle.State.ERROR, loadImage(PATH + "unloaded_error.png"));
-    stateMapUnloaded.put(Vehicle.State.EXECUTING, loadImage(PATH + "unloaded_normal.png"));
-    stateMapUnloaded.put(Vehicle.State.IDLE, loadImage(PATH + "unloaded_normal.png"));
-    stateMapUnloaded.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "unloaded_normal.png"));
-    stateMapUnloaded.put(Vehicle.State.UNKNOWN, loadImage(PATH + "unloaded_normal.png"));
+    stateMapDefault.put(Vehicle.State.CHARGING, loadImage(PATH + "charging.png"));
+    stateMapDefault.put(Vehicle.State.ERROR, loadImage(PATH + "error.png"));
+    stateMapDefault.put(Vehicle.State.EXECUTING, loadImage(PATH + "normal.png"));
+    stateMapDefault.put(Vehicle.State.IDLE, loadImage(PATH + "normal.png"));
+    stateMapDefault.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal.png"));
+    stateMapDefault.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal.png"));
 
-    stateMapLoaded.put(Vehicle.State.CHARGING, loadImage(PATH + "loaded_charging.png"));
-    stateMapLoaded.put(Vehicle.State.ERROR, loadImage(PATH + "loaded_error.png"));
-    stateMapLoaded.put(Vehicle.State.EXECUTING, loadImage(PATH + "loaded_normal.png"));
-    stateMapLoaded.put(Vehicle.State.IDLE, loadImage(PATH + "loaded_normal.png"));
-    stateMapLoaded.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "loaded_normal.png"));
-    stateMapLoaded.put(Vehicle.State.UNKNOWN, loadImage(PATH + "loaded_normal.png"));
+    stateMapLoaded.put(Vehicle.State.CHARGING, loadImage(PATH + "charging_loaded.png"));
+    stateMapLoaded.put(Vehicle.State.ERROR, loadImage(PATH + "error_loaded.png"));
+    stateMapLoaded.put(Vehicle.State.EXECUTING, loadImage(PATH + "normal_loaded.png"));
+    stateMapLoaded.put(Vehicle.State.IDLE, loadImage(PATH + "normal_loaded.png"));
+    stateMapLoaded.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal_loaded.png"));
+    stateMapLoaded.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_loaded.png"));
+
+    stateMapPaused.put(Vehicle.State.CHARGING, loadImage(PATH + "charging_paused.png"));
+    stateMapPaused.put(Vehicle.State.ERROR, loadImage(PATH + "error_paused.png"));
+    stateMapPaused.put(Vehicle.State.EXECUTING, loadImage(PATH + "normal_paused.png"));
+    stateMapPaused.put(Vehicle.State.IDLE, loadImage(PATH + "normal_paused.png"));
+    stateMapPaused.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal_paused.png"));
+    stateMapPaused.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_paused.png"));
+
+    stateMapLoadedPaused.put(Vehicle.State.CHARGING, loadImage(PATH + "charging_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.ERROR, loadImage(PATH + "error_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.EXECUTING, loadImage(PATH + "normal_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.IDLE, loadImage(PATH + "normal_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_loaded_paused.png"));
   }
 
   /**

@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.application.menus.MenuFactory;
@@ -82,10 +83,6 @@ public class SingleVehicleView
    */
   private final OpenTCSDrawingEditor drawingEditor;
   /**
-   * A factory to create vehicle figures.
-   */
-  private final VehicleCourseObjectFactory crsObjFactory;
-  /**
    * A factory for popup menus.
    */
   private final MenuFactory menuFactory;
@@ -97,8 +94,6 @@ public class SingleVehicleView
    * Panel to draw on.
    */
   private final JPanel fVehicleView;
-
-  private VehicleFigure figure;
 
   /**
    * Creates new instance.
@@ -127,10 +122,10 @@ public class SingleVehicleView
     this.propertiesComponent = requireNonNull(propertiesComponent,
                                               "propertiesComponent");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
-    this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
     this.modelManager = requireNonNull(modelManager, "modelManager");
-    this.fVehicleView = new VehicleView(fVehicleModel);
+    requireNonNull(crsObjFactory, "crsObjFactory");
+    this.fVehicleView = new VehicleView(fVehicleModel, crsObjFactory.createVehicleFigure(fVehicleModel));
 
     initComponents();
 
@@ -140,20 +135,6 @@ public class SingleVehicleView
 
     vehicleLabel.setText(vehicle.getName());
     updateVehicle();
-  }
-
-  /**
-   * Draws the vehicle figure into the dialog.
-   *
-   * @param g2d The graphics context.
-   */
-  private void drawVehicle(Graphics2D g2d) {
-    figure = crsObjFactory.createVehicleFigure(fVehicleModel);
-    figure.setIgnorePrecisePosition(true);
-    Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2, fVehicleView.getHeight() / 2);
-    figure.setBounds(posDialog, null);
-    figure.setAngle(0.0);
-    figure.forcedDraw(g2d);
   }
 
   private void showPopup(int x, int y) {
@@ -251,12 +232,6 @@ public class SingleVehicleView
   @Override
   public void propertiesChanged(AttributesChangeEvent e) {
     updateVehicle();
-
-    if (figure == null) {
-      drawVehicle((Graphics2D) getGraphics());
-    }
-
-    figure.propertiesChanged(e);
   }
 
   // CHECKSTYLE:OFF
@@ -431,18 +406,20 @@ public class SingleVehicleView
   }
 
   private class VehicleView
-      extends JPanel {
+      extends JPanel
+      implements AttributesChangeListener {
 
-    public VehicleView(VehicleModel vehicleModel) {
+    private final VehicleFigure figure;
+
+    public VehicleView(VehicleModel vehicleModel, VehicleFigure figure) {
+      this.figure = requireNonNull(figure, "figure");
       requireNonNull(vehicleModel, "vehicleModel");
 
-      setBackground(Color.WHITE);
+      vehicleModel.addAttributesChangeListener(this);
 
-      Figure vehicleFigure = modelManager.getModel().getFigure(vehicleModel);
-      Rectangle2D.Double r2d = vehicleFigure == null
-          ? new Rectangle2D.Double(0, 0, 30, 20)
-          : vehicleFigure.getBounds();
-      Rectangle r = r2d.getBounds();
+      setBackground(Color.WHITE);
+      
+      Rectangle r = figure.getBounds().getBounds();
       r.grow(10, 10);
       setPreferredSize(new Dimension(r.width, r.height));
 
@@ -450,9 +427,32 @@ public class SingleVehicleView
     }
 
     @Override
+    public void propertiesChanged(AttributesChangeEvent e) {
+      figure.propertiesChanged(e);
+
+      // Because the figure is not part of any drawing it does not automatically redraw itself.
+      SwingUtilities.invokeLater(() -> {
+        this.repaint();
+      });
+    }
+
+    @Override
     protected void paintComponent(Graphics g) {
       super.paintComponent(g);
       drawVehicle((Graphics2D) g);
+    }
+
+    /**
+     * Draws the vehicle figure into the dialog.
+     *
+     * @param g2d The graphics context.
+     */
+    private void drawVehicle(Graphics2D g2d) {
+      figure.setIgnorePrecisePosition(true);
+      Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2, fVehicleView.getHeight() / 2);
+      figure.setBounds(posDialog, null);
+      figure.setAngle(0.0);
+      figure.forcedDraw(g2d);
     }
   }
 

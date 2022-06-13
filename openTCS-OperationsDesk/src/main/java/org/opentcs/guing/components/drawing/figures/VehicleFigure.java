@@ -491,6 +491,8 @@ public class VehicleFigure
    * @param model The updated vehicle model.
    */
   protected void updateFigureDetails(VehicleModel model) {
+    fImage = getVehicleTheme().statefulImage(model.getVehicle());
+    setFigureDetailsChanged(true);
   }
 
   @Override
