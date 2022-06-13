@@ -20,8 +20,9 @@ import org.opentcs.guing.model.PeripheralOperationModel;
  */
 public class PeripheralOperationsProperty
     extends AbstractComplexProperty {
-  
-  public PeripheralOperationsProperty(ModelComponent model, List<PeripheralOperationModel> operations){
+
+  public PeripheralOperationsProperty(ModelComponent model,
+                                      List<PeripheralOperationModel> operations) {
     super(model);
     fValue = operations;
   }
@@ -30,25 +31,32 @@ public class PeripheralOperationsProperty
   public Object getComparableValue() {
     return this.toString();
   }
-  
+
   @Override
-  public String toString(){
+  public String toString() {
     return getValue().stream()
-        .map(op -> op.getLocationName()+ ": " + op.getOperation())
+        .map(op -> op.getLocationName() + ": " + op.getOperation())
         .collect(Collectors.joining(", "));
   }
-  
+
   @Override
   public void copyFrom(Property property) {
     PeripheralOperationsProperty other = (PeripheralOperationsProperty) property;
     List<PeripheralOperationModel> items = new LinkedList<>(other.getValue());
     setValue(items);
   }
-  
+
   @Override
-  @SuppressWarnings("unchecked")
-  public List<PeripheralOperationModel> getValue(){
-    return (List) super.getValue();
+  public Object clone() {
+    PeripheralOperationsProperty clone = (PeripheralOperationsProperty) super.clone();
+    List<PeripheralOperationModel> items = new LinkedList<>(getValue());
+    clone.setValue(items);
+    return clone;
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<PeripheralOperationModel> getValue() {
+    return (List) super.getValue();
+  }
 }
