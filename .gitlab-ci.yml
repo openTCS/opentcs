@@ -1,11 +1,3 @@
-# The following variables are expected to be set:
-# DO_DEPLOY: Whether or not to deploy.
-# NO_BUILD_NUMBER: Whether to include the build number in the artifacts' version numbers.
-# SIGNING_KEY: The key to use for signing artifacts.
-# SIGNING_PASSWORD: The password for the signing key.
-# DEPLOY_REPO_URL: URL of the repository to deploy artifacts to.
-# DEPLOY_REPO_USERNAME: User name for logging in with the repository.
-# DEPLOY_REPO_PASSWORD: Password for logging in with the repository.
 image: adoptopenjdk:13-jdk-hotspot
 
 workflow:
@@ -16,6 +8,30 @@ workflow:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  DO_DEPLOY_PRIVATE:
+    value: "false"
+    description: "Whether ('true') or not ('false') to deploy artifacts to private (GitLab) repository."
+  DO_DEPLOY_PUBLIC:
+    value: "false"
+    description: "Whether ('true') or not ('false') to deploy artifacts to public repository, e.g. for release builds."
+  NO_BUILD_NUMBER:
+    value: "false"
+    description: "Whether ('true') or not ('false') to exclude the build number in the artifacts' version number, e.g. for release builds."
+  SIGNING_KEY:
+    value: ""
+    description: "The key to use for signing artifacts."
+  SIGNING_PASSWORD:
+    value: ""
+    description: "The password to use for signing artifacts."
+  DEPLOY_REPO_PUBLIC_URL:
+    value: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    description: "URL of the public repository to deploy artifacts to."
+  DEPLOY_REPO_PUBLIC_USERNAME:
+    value: ""
+    description: "User name for logging in with the public repository."
+  DEPLOY_REPO_PUBLIC_PASSWORD:
+    value: ""
+    description: "Password for logging in with the public repository."
 
 before_script:
   # Put GRADLE_USER_HOME into the cache directory so the wrapper is not
@@ -35,17 +51,20 @@ build:
     - opentcs-runner
   script:
     - echo "CI_PIPELINE_IID is $CI_PIPELINE_IID"
-    - echo "DO_DEPLOY is $DO_DEPLOY"
+    - echo "DO_DEPLOY_PRIVATE is $DO_DEPLOY_PRIVATE"
+    - echo "DO_DEPLOY_PUBLIC is $DO_DEPLOY_PUBLIC"
     - echo "NO_BUILD_NUMBER is $NO_BUILD_NUMBER"
-    - echo "DEPLOY_REPO_URL is $DEPLOY_REPO_URL"
-    - echo "DEPLOY_REPO_USERNAME is $DEPLOY_REPO_USERNAME"
-    - 'if [ "$DO_DEPLOY" = "true" ]; then
-        echo "Executing build with deployment...";
-        ./gradlew clean build publish -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER" -PSIGNING_KEY="$SIGNING_KEY" -PSIGNING_PASSWORD="$SIGNING_PASSWORD" -PDEPLOY_REPO_URL="$DEPLOY_REPO_URL" -PDEPLOY_REPO_USERNAME="$DEPLOY_REPO_USERNAME" -PDEPLOY_REPO_PASSWORD="$DEPLOY_REPO_PASSWORD";
-      else
-        echo "Executing build without deployment...";
-        ./gradlew clean build -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER";
-      fi'
+    - echo "DEPLOY_REPO_PUBLIC_URL is $DEPLOY_REPO_PUBLIC_URL"
+    - echo "DEPLOY_REPO_PUBLIC_USERNAME is $DEPLOY_REPO_PUBLIC_USERNAME"
+    - ./gradlew clean build publish
+        -PDO_DEPLOY_PRIVATE="$DO_DEPLOY_PRIVATE"
+        -PDO_DEPLOY_PUBLIC="$DO_DEPLOY_PUBLIC"
+        -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
+        -PSIGNING_KEY="$SIGNING_KEY"
+        -PSIGNING_PASSWORD="$SIGNING_PASSWORD"
+        -PDEPLOY_REPO_PUBLIC_URL="$DEPLOY_REPO_PUBLIC_URL"
+        -PDEPLOY_REPO_PUBLIC_USERNAME="$DEPLOY_REPO_PUBLIC_USERNAME"
+        -PDEPLOY_REPO_PUBLIC_PASSWORD="$DEPLOY_REPO_PUBLIC_PASSWORD"
   artifacts:
     paths:
       - build/distributions/*.zip
