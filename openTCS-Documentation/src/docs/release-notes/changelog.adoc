@@ -23,6 +23,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Reflect vehicles' paused states in the operations desk by shading paused vehicles.
 * Bugs fixed:
 ** Fix a bug where adding peripheral operations to a (newly created) path would also affect other paths in a plant model.
+** Fix a bug with auto-attaching communication adapters to vehicles that have a preferred communication adapter configured.
+   Only attach a preferred communication adapter to a vehicle, if the corresponding adapter factory can actually provide an adapter instance for it.
 * Other changes:
 ** Update the demo model provided in the Model Editor application:
 *** Add a new section to show the integration and use of peripheral devices.

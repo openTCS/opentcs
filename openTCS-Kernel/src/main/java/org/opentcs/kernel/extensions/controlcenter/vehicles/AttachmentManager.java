@@ -217,7 +217,7 @@ public class AttachmentManager
     Vehicle vehicle = getUpdatedVehicle(vehicleEntry.getVehicle());
     String prefAdapter = vehicle.getProperties().get(Vehicle.PREFERRED_ADAPTER);
     VehicleCommAdapterFactory factory = findFactoryWithName(prefAdapter);
-    if (factory != null) {
+    if (factory != null && factory.providesAdapterFor(vehicle)) {
       attachAdapterToVehicle(vehicleName, factory);
     }
     else {

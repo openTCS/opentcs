@@ -48,6 +48,7 @@ public class AttachmentManagerTest {
 
   private static final String VEHICLE_1_NAME = "Vehicle1";
   private static final String VEHICLE_2_NAME = "Vehicle2";
+  private static final String VEHICLE_3_NAME = "Vehicle3";
 
   private final AttachmentManager attachmentManager;
   private final TCSObjectService objectService;
@@ -59,6 +60,7 @@ public class AttachmentManagerTest {
 
   private final Vehicle vehicle1;
   private final Vehicle vehicle2;
+  private final Vehicle vehicle3;
 
   public AttachmentManagerTest() {
     objectService = mock(TCSObjectService.class);
@@ -78,6 +80,9 @@ public class AttachmentManagerTest {
     vehicle2 = new Vehicle(VEHICLE_2_NAME)
         .withProperty(Vehicle.PREFERRED_ADAPTER,
                       SimpleCommAdapterFactory.class.getName());
+    vehicle3 = new Vehicle(VEHICLE_3_NAME)
+        .withProperty(Vehicle.PREFERRED_ADAPTER,
+                      RefusingCommAdapterFactory.class.getName());
   }
 
   @Before
@@ -85,6 +90,7 @@ public class AttachmentManagerTest {
     Set<Vehicle> vehicles = new HashSet<>();
     vehicles.add(vehicle1);
     vehicles.add(vehicle2);
+    vehicles.add(vehicle3);
     when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
     attachmentManager.initialize();
     for (VehicleEntry entry : vehicleEntryPool.getEntries().values()) {
@@ -148,6 +154,20 @@ public class AttachmentManagerTest {
     verify(attachmentManager, times(1)).attachAdapterToVehicle(VEHICLE_1_NAME, factories.get(0));
   }
 
+  @Test
+  public void shouldFallBackToFirstAvailableAdapterIfPreferredAdapterIsNotProvided() {
+    SimpleCommAdapterFactory simpleCommAdapterFactory = new SimpleCommAdapterFactory();
+    when(commAdapterRegistry.getFactories())
+        .thenReturn(Arrays.asList(new RefusingCommAdapterFactory(), simpleCommAdapterFactory));
+    when(commAdapterRegistry.findFactoriesFor(vehicle3))
+        .thenReturn(Arrays.asList(simpleCommAdapterFactory));
+
+    attachmentManager.autoAttachAdapterToVehicle(VEHICLE_3_NAME);
+
+    verify(attachmentManager, times(1))
+        .attachAdapterToVehicle(VEHICLE_3_NAME, simpleCommAdapterFactory);
+  }
+
   private class SimpleCommAdapter
       extends BasicVehicleCommAdapter {
 
@@ -194,12 +214,12 @@ public class AttachmentManagerTest {
 
     @Override
     public boolean providesAdapterFor(Vehicle vehicle) {
-      return vehicle.equals(vehicle1) || vehicle.equals(vehicle2);
+      return vehicle.equals(vehicle1) || vehicle.equals(vehicle2) || vehicle.equals(vehicle3);
     }
 
     @Override
     public VehicleCommAdapter getAdapterFor(Vehicle vehicle) {
-      if (vehicle.equals(vehicle1) || vehicle.equals(vehicle2)) {
+      if (vehicle.equals(vehicle1) || vehicle.equals(vehicle2) || vehicle.equals(vehicle3)) {
         return new SimpleCommAdapter(vehicle);
       }
       else {
@@ -237,6 +257,38 @@ public class AttachmentManagerTest {
     @Override
     public boolean isSimVehicleCommAdapter() {
       return false;
+    }
+  }
+
+  private class RefusingCommAdapterFactory
+      implements VehicleCommAdapterFactory {
+
+    @Override
+    public boolean providesAdapterFor(Vehicle vehicle) {
+      return false;
+    }
+
+    @Override
+    public VehicleCommAdapter getAdapterFor(Vehicle vehicle) {
+      return null;
+    }
+
+    @Override
+    public VehicleCommAdapterDescription getDescription() {
+      return new DefaultVehicleCommAdapterDescription("refusingCommAdapter", false);
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public boolean isInitialized() {
+      return true;
+    }
+
+    @Override
+    public void terminate() {
     }
   }
 }
