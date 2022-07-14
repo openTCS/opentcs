@@ -410,35 +410,35 @@ task configdocgen {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
-              "org.opentcs.guing.util.PlantOverviewApplicationConfiguration"]
+              "org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration"]
     }
 
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PoSslConfigurationEntries.adoc",
-              "org.opentcs.guing.exchange.SslConfiguration"]
+              "org.opentcs.guing.common.exchange.SslConfiguration"]
     }
 
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewModelingApplicationConfigurationEntries.adoc",
-              "org.opentcs.guing.util.PlantOverviewModelingApplicationConfiguration"]
+              "org.opentcs.modeleditor.util.PlantOverviewModelingApplicationConfiguration"]
     }
 
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
-              "org.opentcs.guing.util.ElementNamingSchemeConfiguration"]
+              "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration"]
     }
 
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
       args = ["${configDocDir}/PlantOverviewOperatingApplicationConfigurationEntries.adoc",
-              "org.opentcs.guing.util.PlantOverviewOperatingApplicationConfiguration"]
+              "org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration"]
     }
   }
 }

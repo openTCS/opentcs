@@ -33,4 +33,4 @@ start /b %JAVA% -enableassertions ^
     -XX:-OmitStackTraceInFastThrow ^
     -classpath "%OPENTCS_CP%" ^
     -splash:bin/splash-image.gif ^
-    org.opentcs.guing.RunOperationsDesk
+    org.opentcs.operationsdesk.RunOperationsDesk

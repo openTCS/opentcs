@@ -30,4 +30,4 @@ ${JAVA} -enableassertions \
     -XX:-OmitStackTraceInFastThrow \
     -classpath "${OPENTCS_CP}" \
     -splash:bin/splash-image.gif \
-    org.opentcs.guing.RunModelEditor
+    org.opentcs.modeleditor.RunModelEditor

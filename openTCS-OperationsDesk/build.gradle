@@ -6,7 +6,7 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 apply plugin: 'org.kordamp.gradle.stats'
 
 if (!hasProperty('mainClass')) {
-  ext.mainClass = 'org.opentcs.guing.RunOperationsDesk'
+  ext.mainClass = 'org.opentcs.operationsdesk.RunOperationsDesk'
 }
 mainClassName = ext.mainClass
 
