@@ -1,9 +1,11 @@
 apply plugin: 'java-library'
+apply plugin: 'jacoco'
 
 sourceCompatibility = '1.8'
 archivesBaseName = name.toLowerCase()
 
 repositories {
+  mavenLocal()
   mavenCentral()
 }
 

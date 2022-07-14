@@ -56,7 +56,7 @@ build:
     - echo "NO_BUILD_NUMBER is $NO_BUILD_NUMBER"
     - echo "DEPLOY_REPO_PUBLIC_URL is $DEPLOY_REPO_PUBLIC_URL"
     - echo "DEPLOY_REPO_PUBLIC_USERNAME is $DEPLOY_REPO_PUBLIC_USERNAME"
-    - ./gradlew clean build publish
+    - ./gradlew clean build jacocoLogAggregatedCoverage publish
         -PDO_DEPLOY_PRIVATE="$DO_DEPLOY_PRIVATE"
         -PDO_DEPLOY_PUBLIC="$DO_DEPLOY_PUBLIC"
         -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
@@ -65,6 +65,7 @@ build:
         -PDEPLOY_REPO_PUBLIC_URL="$DEPLOY_REPO_PUBLIC_URL"
         -PDEPLOY_REPO_PUBLIC_USERNAME="$DEPLOY_REPO_PUBLIC_USERNAME"
         -PDEPLOY_REPO_PUBLIC_PASSWORD="$DEPLOY_REPO_PUBLIC_PASSWORD"
+  coverage: '/Branch Coverage: ([0-9.]+)%/'
   artifacts:
     paths:
       - build/distributions/*.zip
