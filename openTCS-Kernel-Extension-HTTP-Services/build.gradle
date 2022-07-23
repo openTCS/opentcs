@@ -9,7 +9,7 @@ dependencies {
   api project(':openTCS-API-Injection')
   api project(':openTCS-Common')
 
-  api group: 'com.sparkjava', name: 'spark-core', version: '2.9.3'
+  api group: 'com.sparkjava', name: 'spark-core', version: '2.9.4'
 
   api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
   api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.13.2'
