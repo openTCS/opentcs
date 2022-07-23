@@ -16,7 +16,7 @@ import org.junit.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
@@ -82,7 +82,7 @@ public class EdgeEvaluatorCompositeTest {
   public void computeZeroWithoutComponents() {
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
-    verifyZeroInteractions(evaluatorMock);
+    verifyNoInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(0.0));
   }
 
@@ -91,7 +91,7 @@ public class EdgeEvaluatorCompositeTest {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
-    verifyZeroInteractions(evaluatorMock);
+    verifyNoInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(1.0));
   }
 
@@ -100,7 +100,7 @@ public class EdgeEvaluatorCompositeTest {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
-    verifyZeroInteractions(evaluatorMock);
+    verifyNoInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(1.9));
   }
 
@@ -109,7 +109,7 @@ public class EdgeEvaluatorCompositeTest {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2, EVALUATOR_3));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
-    verifyZeroInteractions(evaluatorMock);
+    verifyNoInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(Double.POSITIVE_INFINITY));
   }
 }
