@@ -31,6 +31,7 @@ This change log lists the most relevant changes for past releases in reverse chr
     The demo model now contains a location that represents an exemplary fire door that vehicles have to interact with when traversing the new section.
 *** Update the demo model to use the latest model format (v0.0.4). 
 ** Update Spark to 2.9.4.
+** Update AssertJ to 3.23.1.
 
 == Version 5.5 (2022-04-26)
 
