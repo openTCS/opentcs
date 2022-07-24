@@ -1,7 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
-sourceCompatibility = '1.8'
 archivesBaseName = name.toLowerCase()
 
 repositories {
@@ -33,11 +32,13 @@ dependencies {
 }
 
 compileJava {
+  options.release = 13
   options.compilerArgs << "-Xlint:all"
   options.compilerArgs << "-Xlint:-serial"
 }
 
 compileTestJava {
+  options.release = 13
   options.compilerArgs << "-Xlint:all"
   options.compilerArgs << "-Xlint:-serial"
 }
