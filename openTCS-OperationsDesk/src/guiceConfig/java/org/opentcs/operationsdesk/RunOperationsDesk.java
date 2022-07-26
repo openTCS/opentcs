@@ -19,6 +19,7 @@ import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.cfg4j.Cfg4jConfigurationBindingProvider;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
+import org.opentcs.guing.common.util.CompatibilityChecker;
 import org.opentcs.operationsdesk.application.PlantOverviewStarter;
 import org.opentcs.util.Environment;
 import org.opentcs.util.logging.UncaughtExceptionLogger;
@@ -53,9 +54,19 @@ public class RunOperationsDesk {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
 
     Environment.logSystemInfo();
+    ensureVersionCompatibility();
 
     Injector injector = Guice.createInjector(customConfigurationModule());
     injector.getInstance(PlantOverviewStarter.class).startPlantOverview();
+  }
+
+  private static void ensureVersionCompatibility() {
+    String version = System.getProperty("java.version");
+    if (!CompatibilityChecker.versionCompatibleWithDockingFrames(version)) {
+      LOG.error("Version incompatible with Docking Frames: '{}'", version);
+      CompatibilityChecker.showVersionIncompatibleWithDockingFramesMessage();
+      System.exit(1);
+    }
   }
 
   /**

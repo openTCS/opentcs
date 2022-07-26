@@ -10,7 +10,7 @@ It should generally be possible to control any automatic vehicle with communicat
 
 openTCS is being maintained by the openTCS team at the [Fraunhofer Institute for Material Flow and Logistics](https://www.iml.fraunhofer.de/).
 
-The software runs on the Java platform (version 13).
+The software runs on the Java platform version 13, with the recommended Java distribution being the one provided by the [Adoptium project](https://adoptium.net/).
 All libraries required for compiling and/or using it are freely available, too.
 
 openTCS itself is not a complete product you can use out-of-the-box to control AGVs with.
