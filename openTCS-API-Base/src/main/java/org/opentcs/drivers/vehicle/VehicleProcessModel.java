@@ -9,8 +9,11 @@ package org.opentcs.drivers.vehicle;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import javax.annotation.Nonnull;
@@ -44,6 +47,16 @@ public class VehicleProcessModel {
    * Used for implementing property change events.
    */
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+  /**
+   * The vehicle properties set by the driver.
+   * (I.e. this map does <em>not</em> contain properties/values set by any other components!)
+   */
+  private final Map<String, String> vehicleProperties = new HashMap<>();
+  /**
+   * The transport order properties set by the driver.
+   * (I.e. this map does <em>not</em> contain properties/values set by any other components!)
+   */
+  private final Map<String, String> transportOrderProperties = new HashMap<>();
   /**
    * Whether the comm adapter is currently enabled.
    */
@@ -348,6 +361,17 @@ public class VehicleProcessModel {
    * @param value The property's new value.
    */
   public void setVehicleProperty(@Nonnull String key, @Nullable String value) {
+    requireNonNull(key, "key");
+
+    // Check whether the new value is the same as the last one we set. If yes, ignore the update,
+    // as it would cause unnecessary churn in the kernel.
+    // Note that this assumes that other components do not modify properties set by this driver.
+    String oldValue = vehicleProperties.get(key);
+    if (Objects.equals(value, oldValue)) {
+      return;
+    }
+    vehicleProperties.put(key, value);
+
     getPropertyChangeSupport().firePropertyChange(Attribute.VEHICLE_PROPERTY.name(),
                                                   null,
                                                   new VehiclePropertyUpdate(key, value));
@@ -393,7 +417,17 @@ public class VehicleProcessModel {
    * @param value The property's new value.
    */
   public void setTransportOrderProperty(@Nonnull String key, @Nullable String value) {
-    // XXX Should check if property already has the new value.
+    requireNonNull(key, "key");
+
+    // Check whether the new value is the same as the last one we set. If yes, ignore the update,
+    // as it would cause unnecessary churn in the kernel.
+    // Note that this assumes that other components do not modify properties set by this driver.
+    String oldValue = transportOrderProperties.get(key);
+    if (Objects.equals(value, oldValue)) {
+      return;
+    }
+    transportOrderProperties.put(key, value);
+
     getPropertyChangeSupport().firePropertyChange(Attribute.TRANSPORT_ORDER_PROPERTY.name(),
                                                   null,
                                                   new TransportOrderPropertyUpdate(key, value));
