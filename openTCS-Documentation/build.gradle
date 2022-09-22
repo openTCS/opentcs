@@ -32,6 +32,7 @@ def userManualDir = file("$buildDir/users-guide")
 def devManualDir = file("$buildDir/developers-guide")
 def devManualImagesDir = file("$devManualDir/images")
 def releaseNotesDir = file("$buildDir/release-notes")
+def assetsDir = file("src/docs/_assets")
 
 ext.collectableDistDir = file("$buildDir/install")
 
@@ -82,6 +83,9 @@ distributions {
       into('user')
     }
     contents.from(releaseNotesDir)
+    contents.from(assetsDir) {
+      into('_assets')
+    }
   }
 }
 
@@ -169,6 +173,11 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
     // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
     backends = ['html5']
   }
+  // Attributes specific to the HTML output 
+  attributes 'webfonts': false, // Disable webfonts
+             'iconfont-remote': false, // Disable remote icon fonts
+             'docinfo': "${file('src/docs/release-notes/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+             
 }
 
 task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
@@ -189,7 +198,12 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
     // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
     backends = ['html5', 'pdf']
   }
-  attributes 'configdoc': configDocDir
+  attributes 'configdoc': configDocDir,
+             // Attributes specific to the HTML output
+             'webfonts': false, // Disable webfonts
+             'iconfont-remote': false, // Disable remote icon fonts
+             'docinfo': "${file('src/docs/users-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+             
   resources {
     from(sourceDir) {
       include '**/*.jpg'
@@ -241,7 +255,14 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
              'operationsDesk-javaSrc': project(':openTCS-OperationsDesk').javaSrcDir,
              'operationsDesk-guiceSrc': project(':openTCS-OperationsDesk').guiceSrcDir,
              'operationsDesk-testSrc': project(':openTCS-OperationsDesk').testSrcDir,
-             'imagesoutdir': devManualImagesDir // Set the images directory for the output of asciidoctor-diagram
+             'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
+             // Attributes specific to the HTML output
+             'webfonts': false, // Disable webfonts
+             'iconfont-remote': false, // Disable remote icon fonts
+             'docinfo': "${file('src/docs/developers-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+
+             // 'docinfo': "${file('src/docs/docinfo.html')}, shared", // doesn't seem to work
+             //'docinfodir': file('src/docs'),
   resources {
     from(sourceDir) {
       include '**/*.png'
