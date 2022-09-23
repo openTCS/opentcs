@@ -26,24 +26,18 @@ public class LoopbackPeripheralProcessModel
    * Whether the peripheral device is manual mode (i.e. the user triggers the job execution).
    */
   private final boolean manualModeEnabled;
-  /**
-   * Whether the peripheral device is paused or not.
-   */
-  private final boolean peripheralPaused;
 
   public LoopbackPeripheralProcessModel(TCSResourceReference<Location> location) {
-    this(location, false, false, PeripheralInformation.State.UNKNOWN, false, false);
+    this(location, false, false, PeripheralInformation.State.UNKNOWN, false);
   }
 
   private LoopbackPeripheralProcessModel(TCSResourceReference<Location> location,
                                          boolean commAdapterEnabled,
                                          boolean commAdapterConnected,
                                          PeripheralInformation.State state,
-                                         boolean manualModeEnabled,
-                                         boolean peripheralPaused) {
+                                         boolean manualModeEnabled) {
     super(location, commAdapterEnabled, commAdapterConnected, state);
     this.manualModeEnabled = manualModeEnabled;
-    this.peripheralPaused = peripheralPaused;
   }
 
   @Override
@@ -52,8 +46,7 @@ public class LoopbackPeripheralProcessModel
                                               isCommAdapterEnabled(),
                                               isCommAdapterConnected(),
                                               getState(),
-                                              manualModeEnabled,
-                                              peripheralPaused);
+                                              manualModeEnabled);
   }
 
   @Override
@@ -62,8 +55,7 @@ public class LoopbackPeripheralProcessModel
                                               commAdapterEnabled,
                                               isCommAdapterConnected(),
                                               getState(),
-                                              manualModeEnabled,
-                                              peripheralPaused);
+                                              manualModeEnabled);
   }
 
   @Override
@@ -72,8 +64,7 @@ public class LoopbackPeripheralProcessModel
                                               isCommAdapterEnabled(),
                                               commAdapterConnected,
                                               getState(),
-                                              manualModeEnabled,
-                                              peripheralPaused);
+                                              manualModeEnabled);
   }
 
   @Override
@@ -82,8 +73,7 @@ public class LoopbackPeripheralProcessModel
                                               isCommAdapterEnabled(),
                                               isCommAdapterConnected(),
                                               state,
-                                              manualModeEnabled,
-                                              peripheralPaused);
+                                              manualModeEnabled);
   }
 
   /**
@@ -107,32 +97,7 @@ public class LoopbackPeripheralProcessModel
                                               isCommAdapterEnabled(),
                                               isCommAdapterConnected(),
                                               getState(),
-                                              manualModeEnabled,
-                                              peripheralPaused);
-  }
-
-  /**
-   * Returns whether the peripheral device is paused or not.
-   *
-   * @return Whether the peripheral device is paused or not.
-   */
-  public boolean isPeripheralPaused() {
-    return peripheralPaused;
-  }
-
-  /**
-   * Creates a copy of the object, with the given value.
-   *
-   * @param peripheralPaused The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   */
-  public LoopbackPeripheralProcessModel withPeripheralPaused(boolean peripheralPaused) {
-    return new LoopbackPeripheralProcessModel(getLocation(),
-                                              isCommAdapterEnabled(),
-                                              isCommAdapterConnected(),
-                                              getState(),
-                                              manualModeEnabled,
-                                              peripheralPaused);
+                                              manualModeEnabled);
   }
 
   /**
@@ -143,9 +108,5 @@ public class LoopbackPeripheralProcessModel
      * Indicates a change of the manual mode enabled property.
      */
     MANUAL_MODE_ENABLED,
-    /**
-     * Indicates a change of the peripheral paused property.
-     */
-    PERIPHERAL_PAUSED;
   }
 }

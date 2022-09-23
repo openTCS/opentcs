@@ -166,16 +166,6 @@ public class LoopbackPeripheralCommAdapter
     });
   }
 
-  public void pausePeripheral(boolean paused) {
-    kernelExecutor.submit(() -> {
-      setProcessModel(getProcessModel().withPeripheralPaused(paused));
-
-      // TODO Implement pause
-
-      sendProcessModelChangedEvent(LoopbackPeripheralProcessModel.Attribute.PERIPHERAL_PAUSED);
-    });
-  }
-
   public void updateState(PeripheralInformation.State state) {
     kernelExecutor.submit(() -> {
       setProcessModel(getProcessModel().withState(state));

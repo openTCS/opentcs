@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.commadapter.peripheral.loopback.commands.EnableManualModeCommand;
 import org.opentcs.commadapter.peripheral.loopback.commands.FinishJobProcessingCommand;
-import org.opentcs.commadapter.peripheral.loopback.commands.SetPeripheralPausedCommand;
 import org.opentcs.commadapter.peripheral.loopback.commands.SetStateCommand;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.PeripheralInformation;
@@ -83,14 +82,12 @@ public class LoopbackPeripheralCommAdapterPanel
   private void updateComponentsEnabled() {
     boolean enabled = processModel.isCommAdapterEnabled();
     stateComboBox.setEnabled(enabled);
-    pausePeripheralCheckBox.setEnabled(enabled);
     finishCurrentJobButton.setEnabled(processModel.isManualModeEnabled());
     failCurrentJobButton.setEnabled(processModel.isManualModeEnabled());
   }
 
   private void updateComponentContents() {
     stateComboBox.setSelectedItem(processModel.getState());
-    pausePeripheralCheckBox.setSelected(processModel.isPeripheralPaused());
     manualModeRadioButton.setSelected(processModel.isManualModeEnabled());
     automaticModeRadioButton.setSelected(!processModel.isManualModeEnabled());
   }
@@ -116,8 +113,6 @@ public class LoopbackPeripheralCommAdapterPanel
     java.awt.GridBagConstraints gridBagConstraints;
 
     statePanel = new javax.swing.JPanel();
-    pausePeripheralLabel = new javax.swing.JLabel();
-    pausePeripheralCheckBox = new javax.swing.JCheckBox();
     stateLabel = new javax.swing.JLabel();
     stateComboBox = new javax.swing.JComboBox<>();
     jobProcessingPanel = new javax.swing.JPanel();
@@ -130,31 +125,6 @@ public class LoopbackPeripheralCommAdapterPanel
     statePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("loopbackPeripheralCommAdapterPanel.panel_state.border.title"))); // NOI18N
     statePanel.setName("statePanel"); // NOI18N
     statePanel.setLayout(new java.awt.GridBagLayout());
-
-    pausePeripheralLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    pausePeripheralLabel.setText(bundle.getString("loopbackPeripheralCommAdapterPanel.label_pausePeripheral.text")); // NOI18N
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 0);
-    statePanel.add(pausePeripheralLabel, gridBagConstraints);
-
-    pausePeripheralCheckBox.setEnabled(false);
-    pausePeripheralCheckBox.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-    pausePeripheralCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-    pausePeripheralCheckBox.setName("pausePeripheralCheckBox"); // NOI18N
-    pausePeripheralCheckBox.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        pausePeripheralCheckBoxActionPerformed(evt);
-      }
-    });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-    statePanel.add(pausePeripheralCheckBox, gridBagConstraints);
 
     stateLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     stateLabel.setText(bundle.getString("loopbackPeripheralCommAdapterPanel.label_state.text")); // NOI18N
@@ -265,7 +235,7 @@ public class LoopbackPeripheralCommAdapterPanel
         .addComponent(statePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(jobProcessingPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(140, Short.MAX_VALUE))
+        .addContainerGap(165, Short.MAX_VALUE))
     );
 
     getAccessibleContext().setAccessibleName(bundle.getString("loopbackPeripheralCommAdapterPanel.accessibleName")); // NOI18N
@@ -282,10 +252,6 @@ public class LoopbackPeripheralCommAdapterPanel
   private void finishCurrentJobButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finishCurrentJobButtonActionPerformed
     sendCommAdapterCommand(new FinishJobProcessingCommand(false));
   }//GEN-LAST:event_finishCurrentJobButtonActionPerformed
-
-  private void pausePeripheralCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pausePeripheralCheckBoxActionPerformed
-    sendCommAdapterCommand(new SetPeripheralPausedCommand(pausePeripheralCheckBox.isSelected()));
-  }//GEN-LAST:event_pausePeripheralCheckBoxActionPerformed
 
   private void stateComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_stateComboBoxItemStateChanged
     if (evt.getStateChange() != ItemEvent.SELECTED) {
@@ -315,8 +281,6 @@ public class LoopbackPeripheralCommAdapterPanel
   private javax.swing.JButton finishCurrentJobButton;
   private javax.swing.JPanel jobProcessingPanel;
   private javax.swing.JRadioButton manualModeRadioButton;
-  private javax.swing.JCheckBox pausePeripheralCheckBox;
-  private javax.swing.JLabel pausePeripheralLabel;
   private javax.swing.JComboBox<PeripheralInformation.State> stateComboBox;
   private javax.swing.JLabel stateLabel;
   private javax.swing.JPanel statePanel;
