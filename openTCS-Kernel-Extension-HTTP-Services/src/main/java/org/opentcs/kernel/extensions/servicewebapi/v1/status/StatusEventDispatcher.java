@@ -18,8 +18,10 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.OrderStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.PeripheralJobStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleStatusMessage;
@@ -124,6 +126,14 @@ public class StatusEventDispatcher
         events.notifyAll();
       }
     }
+    else if (object instanceof PeripheralJob) {
+      synchronized (events) {
+        addPeripheralStatusMessage((PeripheralJob) object, eventCount);
+        eventCount++;
+        cleanUpEvents();
+        events.notifyAll();
+      }
+    }
   }
 
   /**
@@ -164,6 +174,10 @@ public class StatusEventDispatcher
 
   private void addVehicleStatusMessage(Vehicle vehicle, long sequenceNumber) {
     events.put(sequenceNumber, VehicleStatusMessage.fromVehicle(vehicle, sequenceNumber));
+  }
+
+  private void addPeripheralStatusMessage(PeripheralJob job, long sequenceNumber) {
+    events.put(sequenceNumber, PeripheralJobStatusMessage.fromPeripheralJob(job, sequenceNumber));
   }
 
   private void cleanUpEvents() {

@@ -28,6 +28,8 @@ tags:
     description: Working with transport orders
   - name: Vehicles
     description: Working with vehicles
+  - name: Peripheral jobs
+    description: Working with peripheral jobs
   - name: Status
     description: Retrieving status updates
 security:
@@ -367,6 +369,155 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  /peripheralJobs:
+    get:
+      tags:
+        - Peripheral jobs
+      summary: Retrieves a set of peripheral jobs.
+      description: ""
+      parameters:
+        - name: relatedVehicle
+          in: query
+          description: >-
+            The name of the vehicle for which the peripheral jobs to be retrieved were created.
+          required: false
+          schema:
+            type: string
+            default: null
+        - name: relatedTransportOrder
+          in: query
+          description: >-
+            The name of the transport order for which the peripheral jobs to be retrieved were created.
+          required: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfPeripheralJobs
+                type: array
+                items:
+                  $ref: "#/components/schemas/PeripheralJobState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find the related vehicle 'Vehicle-0001'.
+  "/peripheralJobs/{NAME}":
+    get:
+      tags:
+        - Peripheral jobs
+      summary: Retrieves a single named peripheral job.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral job to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeripheralJobState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find peripheral job 'PJob-01'.
+    post:
+      tags:
+        - Peripheral jobs
+      summary: Creates a new peripheral job with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral job to be created.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PeripheralJob"
+        description: The details of the peripheral job to be created.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeripheralJobState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find related vehicle 'Vehicle-0001'.
+        "409":
+          description: An object with the same name already exists in the model.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Peripheral job 'PJob-01' already exists.
+        "500":
+          description: >-
+            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+  /peripheralJobs/dispatcher/trigger:
+    post:
+      tags:
+        - Peripheral jobs
+      summary: Explicitly triggers dispatching of peripheral jobs.
+      description: >-
+        Triggers the kernel's dispatcher to assign peripheral jobs to peripheral devices.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+        "500":
+          description: >-
+            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
   /events:
     get:
       tags:
@@ -706,6 +857,7 @@ components:
             oneOf:
               - $ref: "#/components/schemas/OrderStatusMessage"
               - $ref: "#/components/schemas/VehicleStatusMessage"
+              - $ref: "#/components/schemas/PeripheralJobStatusMessage"
           description: The status messages
       required:
         - timeStamp
@@ -719,6 +871,7 @@ components:
           enum:
             - OrderStatusMessage
             - VehicleStatusMessage
+            - PeripheralJob
         sequenceNumber:
           type: integer
           description: The (unique) sequence number of this status message
@@ -851,6 +1004,19 @@ components:
         - procState
         - allocatedResources
         - claimedResources
+    PeripheralJobStatusMessage:
+      title: PeripheralJobStatusMessage
+      type: object
+      additionalProperties: false
+      allOf:
+        - $ref: "#/components/schemas/StatusMessage"
+        - $ref: "#/components/schemas/PeripheralJobState"
+        - properties:
+            type:
+              type: string
+              default: PeripheralJob
+            sequenceNumber:
+              example: 126
     Property:
       type: object
       additionalProperties: false
@@ -886,3 +1052,134 @@ components:
         - x
         - y
         - z
+    PeripheralJobState:
+      title: Peripheral Job State
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: The name of the peripheral job.
+          example: PJob-01
+        reservationToken:
+          type: string
+          description: >-
+            A token that may be used to reserve a peripheral device.
+            A peripheral device that is reserved for a specific token can only process jobs which match that reservation token.
+          example: Vehicle-0001
+        relatedVehicle:
+          type: string
+          description: >-
+            The name of the vehicle for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          example: Vehicle-0001
+        relatedTransportOrder:
+          type: string
+          description: >-
+            The name of the transport order for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          example: TOrder-01
+        peripheralOperation:
+          $ref: "#/components/schemas/PeripheralOperation"
+        state:
+          type: string
+          description: The peripheral job's current state.
+          enum:
+            - TO_BE_PROCESSED
+            - BEING_PROCESSED
+            - FINISHED
+            - FAILED
+        creationTime:
+          type: string
+          format: date-time
+          description: The point of time at which this peripheral job was created (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        finishedTime:
+          type: string
+          format: date-time
+          description: The point of time at which processing of this peripheral job was finished (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        properties:
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+          description: The peripheral job's properties.
+      required:
+        - name
+        - reservationToken
+        - relatedVehicle
+        - relatedTransportOrder
+        - peripheralOperation
+        - state
+        - creationTime
+        - finishedTime
+    PeripheralJob:
+      title: Peripheral Job
+      type: object
+      additionalProperties: false
+      properties:
+        incompleteName:
+          type: boolean
+          description: >-
+            Whether the name of the peripheral job is considered to be incomplete.
+            If set, the kernel will complete the name according to its configuration, e.g. by appending a suffix to it.
+            It is recommended to set this, as names generated by the kernel can be guaranteed to be unique, while clients typically cannot guarantee this.
+          default: false
+        reservationToken:
+          type: string
+          description: >-
+            The token that may be used to reserve a peripheral device.
+            A peripheral device that is reserved for a specific token can only process jobs which match that reservation token.
+            The reservation token may not be empty.
+        relatedVehicle:
+          type: string
+          description: >-
+            The name of the vehicle for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          default: null
+        relatedTransportOrder:
+          type: string
+          description: >-
+            The name of the transport order for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          default: null
+        peripheralOperation:
+          $ref: "#/components/schemas/PeripheralOperation"
+        properties:
+          type: array
+          minItems: 0
+          maxItems: 2147483647
+          items:
+            $ref: "#/components/schemas/Property"
+          description: The peripheral jobs's properties.
+      required:
+        - reservationToken
+        - peripheralOperation
+    PeripheralOperation:
+      title: Peripheral Operation
+      description: An operation that is to be executed by a peripheral device.
+      type: object
+      additionalProperties: false
+      properties:
+        operation:
+          type: string
+          description: The operation to be performed by the peripheral device.
+          example: Open door
+        locationName:
+          type: string
+          description: The name of the location the peripheral device is associated with.
+          example: Location-01
+        executionTrigger:
+          type: string
+          description: The moment at which this operation is to be performed.
+          enum:
+            - BEFORE_MOVEMENT
+            - AFTER_MOVEMENT
+          default: BEFORE_MOVEMENT
+        completionRequired:
+          type: boolean
+          description: Whether the completion of this operation is required to allow a vehicle to continue driving.
+          default: false
+      required:
+        - operation
+        - locationName

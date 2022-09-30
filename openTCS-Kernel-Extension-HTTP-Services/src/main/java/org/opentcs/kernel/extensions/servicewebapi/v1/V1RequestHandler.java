@@ -20,9 +20,11 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
 import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.OrderHandler;
+import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Job;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.RequestStatusHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.StatusEventDispatcher;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.PeripheralJobState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOrderState;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -121,6 +123,14 @@ public class V1RequestHandler
                 this::handleGetTransportOrders);
     service.post("/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
+    service.get("/peripheralJobs",
+                this::handleGetPeripheralJobs);
+    service.get("/peripheralJobs/:NAME",
+                this::handleGetPeripheralJobsByName);
+    service.post("/peripheralJobs/:NAME",
+                 this::handlePostPeripheralJobsByName);
+    service.post("/peripheralJobs/dispatcher/trigger",
+                 this::handlePostPeripheralJobsDispatchTrigger);
   }
 
   private Object handlePostDispatcherTrigger(Request request, Response response)
@@ -216,6 +226,37 @@ public class V1RequestHandler
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handleGetPeripheralJobs(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(
+        statusInformationProvider.getPeripheralJobs(
+            valueIfKeyPresent(request.queryMap(), "relatedVehicle"),
+            valueIfKeyPresent(request.queryMap(), "relatedTransportOrder")
+        )
+    );
+  }
+
+  private Object handleGetPeripheralJobsByName(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(statusInformationProvider.getPeripheralJobByName(request.params(":NAME")));
+  }
+
+  private Object handlePostPeripheralJobsByName(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(
+        PeripheralJobState.fromPeripheralJob(
+            orderHandler.createPeripheralJob(request.params(":NAME"),
+                                             fromJson(request.body(), Job.class))
+        )
+    );
+  }
+
+  private Object handlePostPeripheralJobsDispatchTrigger(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    orderHandler.triggerJobDispatcher();
     return "";
   }
 

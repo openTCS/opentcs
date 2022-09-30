@@ -16,19 +16,27 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
+import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.PeripheralDispatcherService;
+import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Destination;
+import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Job;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
 
@@ -52,6 +60,14 @@ public class OrderHandler {
    */
   private final DispatcherService dispatcherService;
   /**
+   * The service we use to create peripheral jobs.
+   */
+  private final PeripheralJobService jobService;
+  /**
+   * The service we use to dispatch peripheral jobs.
+   */
+  private final PeripheralDispatcherService jobDispatcherService;
+  /**
    * Executes tasks modifying kernel data.
    */
   private final ExecutorService kernelExecutor;
@@ -62,16 +78,22 @@ public class OrderHandler {
    * @param orderService Used to create transport orders.
    * @param vehicleService Used to update vehicle state.
    * @param dispatcherService Used to withdraw transport orders.
+   * @param jobService Used to create peripheral jobs.
+   * @param jobDispatcherService Used to dispatch peripheral jobs.
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
   public OrderHandler(TransportOrderService orderService,
                       VehicleService vehicleService,
                       DispatcherService dispatcherService,
+                      PeripheralJobService jobService,
+                      PeripheralDispatcherService jobDispatcherService,
                       @KernelExecutor ExecutorService kernelExecutor) {
     this.orderService = requireNonNull(orderService, "orderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
+    this.jobService = requireNonNull(jobService, "jobService");
+    this.jobDispatcherService = requireNonNull(jobDispatcherService, "jobDispatcherService");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
@@ -110,8 +132,73 @@ public class OrderHandler {
     }
   }
 
+  public PeripheralJob createPeripheralJob(String name, Job job) {
+    requireNonNull(name, "name");
+    requireNonNull(job, "job");
+
+    // Check if the vehicle, location and transport order exist.
+    if (job.getRelatedVehicle() != null
+        && vehicleService.fetchObject(Vehicle.class, job.getRelatedVehicle()) == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + job.getRelatedVehicle());
+    }
+    if (job.getRelatedTransportOrder() != null
+        && vehicleService.fetchObject(TransportOrder.class,
+                                      job.getRelatedTransportOrder()) == null) {
+      throw new ObjectUnknownException(
+          "Unknown transport order: " + job.getRelatedTransportOrder()
+      );
+    }
+    if (job.getPeripheralOperation().getLocationName() != null
+        && vehicleService.fetchObject(Location.class,
+                                      job.getPeripheralOperation().getLocationName()) == null) {
+      throw new ObjectUnknownException(
+          "Unknown location: " + job.getPeripheralOperation().getLocationName()
+      );
+    }
+
+    PeripheralJobCreationTO to = new PeripheralJobCreationTO(
+        name,
+        job.getReservationToken(),
+        new PeripheralOperationCreationTO(
+            job.getPeripheralOperation().getOperation(),
+            job.getPeripheralOperation().getLocationName())
+            .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired())
+            .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger()))
+        .withIncompleteName(job.isIncompleteName())
+        .withProperties(job.getProperties().stream()
+            .collect(Collectors.toMap(
+                property -> property.getKey(),
+                property -> property.getValue()
+            ))
+        )
+        .withRelatedTransportOrderName(job.getRelatedTransportOrder())
+        .withRelatedVehicleName(job.getRelatedVehicle());
+
+    try {
+      return kernelExecutor.submit(
+          () -> {
+            PeripheralJob result = jobService.createPeripheralJob(to);
+            return result;
+          }
+      ).get();
+    }
+    catch (InterruptedException exc) {
+      throw new IllegalStateException("Unexpectedly interrupted");
+    }
+    catch (ExecutionException exc) {
+      if (exc.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) exc.getCause();
+      }
+      throw new KernelRuntimeException(exc.getCause());
+    }
+  }
+
   public void triggerDispatcher() {
     kernelExecutor.submit(() -> dispatcherService.dispatch());
+  }
+
+  public void triggerJobDispatcher() {
+    kernelExecutor.submit(() -> jobDispatcherService.dispatch());
   }
 
   public void withdrawByTransportOrder(String name, boolean immediate, boolean disableVehicle)

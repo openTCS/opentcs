@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A property of a Destination or a TransportOrder
+ * A key-value property.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */

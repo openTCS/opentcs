@@ -7,25 +7,23 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-
 /**
- * A property of a Destination or a TransportOrder
+ * A key-value property.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class Property {
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The property's key")
   private String key = "";
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The property's value")
   private String value = "";
 
   public Property() {
+  }
+
+  public Property(String key, String value) {
+    this.key = key;
+    this.value = value;
   }
 
   public String getKey() {

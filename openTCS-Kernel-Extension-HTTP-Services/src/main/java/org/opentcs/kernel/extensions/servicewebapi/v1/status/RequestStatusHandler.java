@@ -11,6 +11,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TransportOrderService;
@@ -19,8 +20,11 @@ import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.PeripheralJobState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOrderState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.PeripheralJobFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.TransportOrderFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.VehicleFilter;
 
@@ -100,6 +104,50 @@ public class RequestStatusHandler {
         .map(t -> TransportOrderState.fromTransportOrder(t))
         .findAny()
         .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
+  }
+
+  /**
+   * Returns all peripheral jobs, optionally filtered using the given parameters.
+   *
+   * @param relatedVehicle Which vehicle to filter peripheral jobs for. Not filtered if the value is
+   * null.
+   * @param relatedTransportOrder Which transport order to filter peripheral jobs for. Not filtered
+   * if the value is null.
+   * @return List of peripheral job states.
+   */
+  public List<PeripheralJobState> getPeripheralJobs(@Nullable String relatedVehicle,
+                                                    @Nullable String relatedTransportOrder) {
+    // If a related vehicle or transport order is set, make sure they exist.
+    if (relatedVehicle != null && orderService.fetchObject(Vehicle.class, relatedVehicle) == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + relatedVehicle);
+    }
+    if (relatedTransportOrder != null
+        && orderService.fetchObject(TransportOrder.class, relatedTransportOrder) == null) {
+      throw new ObjectUnknownException("Unknown transport order: " + relatedTransportOrder);
+    }
+
+    return orderService.fetchObjects(PeripheralJob.class,
+                                     new PeripheralJobFilter(relatedVehicle, relatedTransportOrder))
+        .stream()
+        .map(peripheralJob -> PeripheralJobState.fromPeripheralJob(peripheralJob))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Find a peripheral job by name.
+   *
+   * @param name The name of the peripheral job.
+   * @return The peripheral job state.
+   */
+  public PeripheralJobState getPeripheralJobByName(@Nonnull String name) {
+    requireNonNull(name, "name");
+
+    PeripheralJob job = orderService.fetchObject(PeripheralJob.class, name);
+    if (job == null) {
+      throw new ObjectUnknownException("Unknown peripheral job: " + name);
+    }
+
+    return PeripheralJobState.fromPeripheralJob(job);
   }
 
   /**
