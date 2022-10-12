@@ -122,18 +122,25 @@ public class PeripheralJobStatusMessage
     PeripheralJobStatusMessage message = new PeripheralJobStatusMessage();
     message.setSequenceNumber(sequenceNumber);
     message.setCreationTimeStamp(creationTimestamp);
+
     message.setName(job.getName());
     message.setReservationToken(job.getReservationToken());
-    message.setRelatedVehicle(job.getRelatedVehicle().getName());
-    message.setRelatedTransportOrder(job.getRelatedTransportOrder().getName());
+    if (job.getRelatedVehicle() != null) {
+      message.setRelatedVehicle(job.getRelatedVehicle().getName());
+    }
+    if (job.getRelatedTransportOrder() != null) {
+      message.setRelatedTransportOrder(job.getRelatedTransportOrder().getName());
+    }
     message.setPeripheralOperation(
         PeripheralOperationDescription.fromPeripheralOperation(job.getPeripheralOperation())
     );
     message.setState(job.getState());
+    message.setCreationTime(job.getCreationTime());
+    message.setFinishedTime(job.getFinishedTime());
     message.setProperties(job.getProperties().entrySet().stream()
         .map(entry -> new Property(entry.getKey(), entry.getValue()))
         .collect(Collectors.toList()));
+
     return message;
   }
-
 }

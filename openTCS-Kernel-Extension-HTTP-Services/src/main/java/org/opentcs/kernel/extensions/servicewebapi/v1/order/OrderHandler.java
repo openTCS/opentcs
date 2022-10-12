@@ -156,28 +156,42 @@ public class OrderHandler {
       );
     }
 
-    PeripheralJobCreationTO to = new PeripheralJobCreationTO(
+    PeripheralOperationCreationTO operationCreationTO  = new PeripheralOperationCreationTO(
+        job.getPeripheralOperation().getOperation(),
+        job.getPeripheralOperation().getLocationName())
+        .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired());
+    if (job.getPeripheralOperation().getExecutionTrigger() != null) {
+      operationCreationTO  = operationCreationTO
+          .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger());
+    }
+
+    PeripheralJobCreationTO jobCreationTO = new PeripheralJobCreationTO(
         name,
         job.getReservationToken(),
-        new PeripheralOperationCreationTO(
-            job.getPeripheralOperation().getOperation(),
-            job.getPeripheralOperation().getLocationName())
-            .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired())
-            .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger()))
-        .withIncompleteName(job.isIncompleteName())
-        .withProperties(job.getProperties().stream()
-            .collect(Collectors.toMap(
-                property -> property.getKey(),
-                property -> property.getValue()
-            ))
-        )
-        .withRelatedTransportOrderName(job.getRelatedTransportOrder())
-        .withRelatedVehicleName(job.getRelatedVehicle());
+        operationCreationTO )
+        .withIncompleteName(job.isIncompleteName());
+    if (job.getProperties() != null) {
+      jobCreationTO = jobCreationTO.withProperties(job.getProperties().stream()
+          .collect(Collectors.toMap(
+              property -> property.getKey(),
+              property -> property.getValue()
+          ))
+      );
+    }
+    if (job.getRelatedTransportOrder() != null) {
+      jobCreationTO = jobCreationTO.withRelatedTransportOrderName(job.getRelatedTransportOrder());
+    }
+    if (job.getRelatedVehicle() != null) {
+      jobCreationTO = jobCreationTO.withRelatedVehicleName(job.getRelatedVehicle());
+    }
+    
+    
 
     try {
+      final PeripheralJobCreationTO finalJobCreationTO = jobCreationTO;
       return kernelExecutor.submit(
           () -> {
-            PeripheralJob result = jobService.createPeripheralJob(to);
+            PeripheralJob result = jobService.createPeripheralJob(finalJobCreationTO);
             return result;
           }
       ).get();

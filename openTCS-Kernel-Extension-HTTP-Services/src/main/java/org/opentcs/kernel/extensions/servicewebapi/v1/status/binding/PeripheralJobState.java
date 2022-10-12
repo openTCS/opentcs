@@ -34,7 +34,7 @@ public class PeripheralJobState {
 
   private Instant creationTime;
 
-  private Instant finishTime;
+  private Instant finishedTime;
 
   private List<Property> properties;
 
@@ -69,8 +69,8 @@ public class PeripheralJobState {
     return creationTime;
   }
 
-  public Instant getFinishTime() {
-    return finishTime;
+  public Instant getFinishedTime() {
+    return finishedTime;
   }
 
   public List<Property> getProperties() {
@@ -91,11 +91,10 @@ public class PeripheralJobState {
         = PeripheralOperationDescription.fromPeripheralOperation(job.getPeripheralOperation());
     state.state = job.getState();
     state.creationTime = job.getCreationTime();
-    state.finishTime = job.getFinishedTime();
+    state.finishedTime = job.getFinishedTime();
     state.properties = job.getProperties().entrySet().stream()
         .map(entry -> new Property(entry.getKey(), entry.getValue()))
         .collect(Collectors.toList());
-    job.getPeripheralOperation();
     return state;
   }
 }
