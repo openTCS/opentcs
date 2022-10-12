@@ -302,6 +302,7 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withState(State state) {
+    // XXX Finished time should probably not be set implicitly.
     return new PeripheralJob(getName(),
                              getProperties(),
                              getHistory(),
@@ -311,7 +312,7 @@ public class PeripheralJob
                              peripheralOperation,
                              state,
                              creationTime,
-                             finishedTime);
+                             state == State.FINISHED ? Instant.now() : finishedTime);
   }
 
   /**
