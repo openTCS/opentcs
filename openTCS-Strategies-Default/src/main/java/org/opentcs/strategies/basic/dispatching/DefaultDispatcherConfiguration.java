@@ -89,16 +89,16 @@ public interface DefaultDispatcherConfiguration {
   boolean dismissUnroutableTransportOrders();
 
   @ConfigurationEntry(
-      type = "String",
-      description = {
-        "What triggers rerouting of vehicles.",
-        "Possible values:",
-        "NONE: Rerouting is disabled.",
-        "DRIVE_ORDER_FINISHED: Vehicles get rerouted as soon as they finish a drive order.",
-        "TOPOLOGY_CHANGE: Vehicles get rerouted immediately on topology changes."
-      },
+      type = "Boolean",
+      description = "Whether vehicles should be rerouted immediately on topology changes.",
       orderKey = "1_orders_special_2")
-  RerouteTrigger rerouteTrigger();
+  boolean rerouteOnTopologyChanges();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether vehicles should be rerouted as soon as they finish a drive order.",
+      orderKey = "1_orders_special_3")
+  boolean rerouteOnDriveOrderFinished();
 
   @ConfigurationEntry(
       type = "String",
@@ -112,7 +112,7 @@ public interface DefaultDispatcherConfiguration {
         "PAUSE_AT_PATH_LOCK: Send further orders to the vehicle only until it reaches a locked "
         + "path; then wait for another rerouting opportunity."
       },
-      orderKey = "1_orders_special_3")
+      orderKey = "1_orders_special_4")
   ReroutingImpossibleStrategy reroutingImpossibleStrategy();
 
   @ConfigurationEntry(
@@ -151,12 +151,6 @@ public interface DefaultDispatcherConfiguration {
       description = "The interval between redispatching of vehicles.",
       orderKey = "9_misc")
   long idleVehicleRedispatchingInterval();
-
-  enum RerouteTrigger {
-    NONE,
-    DRIVE_ORDER_FINISHED,
-    TOPOLOGY_CHANGE;
-  }
 
   enum ReroutingImpossibleStrategy {
     IGNORE_PATH_LOCKS,

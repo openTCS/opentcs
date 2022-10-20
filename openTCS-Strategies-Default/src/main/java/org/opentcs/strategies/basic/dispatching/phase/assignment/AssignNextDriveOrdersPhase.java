@@ -16,7 +16,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.DRIVE_ORDER_FINISHED;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.RerouteUtil;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
@@ -130,12 +129,12 @@ public class AssignNextDriveOrdersPhase
     else {
       LOG.debug("Assigning next drive order to vehicle '{}'...", vehicle.getName());
       if (transportOrderUtil.mustAssign(vehicleOrder.getCurrentDriveOrder(), vehicle)) {
-        if (configuration.rerouteTrigger() == DRIVE_ORDER_FINISHED) {
+        if (configuration.rerouteOnDriveOrderFinished()) {
           LOG.debug("Trying to reroute vehicle '{}' before assigning the next drive order...",
                     vehicle.getName());
           rerouteUtil.reroute(vehicle);
         }
-        
+
         // Get an up-to-date copy of the transport order in case the route changed.
         vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
                                                          vehicle.getTransportOrder());

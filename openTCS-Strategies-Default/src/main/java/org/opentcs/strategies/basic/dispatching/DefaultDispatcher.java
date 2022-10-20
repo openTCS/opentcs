@@ -21,7 +21,6 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.TOPOLOGY_CHANGE;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,7 +207,7 @@ public class DefaultDispatcher
 
   @Override
   public void topologyChanged() {
-    if (configuration.rerouteTrigger() == TOPOLOGY_CHANGE) {
+    if (configuration.rerouteOnTopologyChanges()) {
       LOG.debug("Scheduling reroute task...");
       kernelExecutor.submit(() -> {
         LOG.debug("Rerouting vehicles due to topology change...");

@@ -18,6 +18,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Avoid redundant property updates from vehicle drivers.
 ** Avoid using webfonts / Google Fonts API in Asciidoctor documentation.
 ** Add support for working with peripheral jobs to the web API.
+** Split the kernel application's `defaultdispatcher.rerouteTrigger` configuration entry into two separate entries: `defaultdispatcher.rerouteOnTopologyChanges` and `defaultdispatcher.rerouteOnDriveOrderFinished`.
 
 == Version 5.6 (2022-07-23)
 
