@@ -205,7 +205,7 @@ public class V1RequestHandler
 
   private Object handleGetVehicleByName(Request request, Response response)
       throws ObjectUnknownException {
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return toJson(statusInformationProvider.getVehicleStateByName(request.params(":NAME")));
   }
 

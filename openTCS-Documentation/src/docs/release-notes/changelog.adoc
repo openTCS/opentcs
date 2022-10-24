@@ -14,6 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* Bugs fixed:
+** In the web API, set the content type for a reply to `GET /vehicles/{NAME}` to `application/json` as specified.
 * Other changes:
 ** Avoid redundant property updates from vehicle drivers.
 ** Avoid using webfonts / Google Fonts API in Asciidoctor documentation.
