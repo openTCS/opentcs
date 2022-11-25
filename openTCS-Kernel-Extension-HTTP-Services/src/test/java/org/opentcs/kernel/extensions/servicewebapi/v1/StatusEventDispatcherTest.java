@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status;
+package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.util.ArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessageList;
 import org.opentcs.util.event.EventSource;
 import org.opentcs.util.event.SimpleEventBus;
 

@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status;
+package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
@@ -20,11 +20,11 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.OrderStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.PeripheralJobStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.OrderStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessageList;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleStatusMessage;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;

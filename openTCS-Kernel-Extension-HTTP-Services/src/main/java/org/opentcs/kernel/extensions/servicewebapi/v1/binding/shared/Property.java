@@ -5,11 +5,12 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.order.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A key-value property.
@@ -18,20 +19,14 @@ import static java.util.Objects.requireNonNull;
  */
 public class Property {
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The property's key")
-  private String key = "";
+  private String key;
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The property's value")
-  private String value = "";
+  private String value;
 
-  public Property() {
-  }
-
-  public Property(String key, String value) {
+  public Property(@Nonnull @JsonProperty(required = true, value = "key") String key,
+                  @Nullable @JsonProperty(required = false, value = "value") String value) {
     this.key = requireNonNull(key, "key");
-    this.value = requireNonNull(value, "value");
+    this.value = value;
   }
 
   /**
@@ -39,6 +34,7 @@ public class Property {
    *
    * @return The property key.
    */
+  @Nonnull
   public String getKey() {
     return key;
   }
@@ -48,8 +44,8 @@ public class Property {
    *
    * @param key The new key.
    */
-  public void setKey(String key) {
-    this.key = key;
+  public void setKey(@Nonnull String key) {
+    this.key = requireNonNull(key, "key");
   }
 
   /**
@@ -57,6 +53,7 @@ public class Property {
    *
    * @return The property value.
    */
+  @Nullable
   public String getValue() {
     return value;
   }
@@ -66,7 +63,7 @@ public class Property {
    *
    * @param value The new value.
    */
-  public void setValue(String value) {
+  public void setValue(@Nullable String value) {
     this.value = value;
   }
 }

@@ -27,14 +27,14 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Destination;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Property;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.OrderStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.StatusMessageList;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOrderState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Destination;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Transport;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.OrderStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessageList;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -195,24 +195,18 @@ public class HttpSamples {
   }
 
   private static void writeTransportOrderCreationSample(File outputFile) {
-    Transport transport = new Transport();
-    transport.setDeadline(Instant.now());
-    transport.setIntendedVehicle("Vehicle-01");
-
-    Destination dest = new Destination();
-    dest.setLocationName("Storage 01");
-    dest.setOperation("Load cargo");
-    transport.getDestinations().add(dest);
-
-    dest = new Destination();
-    dest.setLocationName("Storage 02");
-    dest.setOperation("Unload cargo");
-    dest.getProperties().add(new Property("destination-specific key", "some value"));
-    transport.getDestinations().add(dest);
-
-    transport.getProperties().add(new Property("transport order-specific key",
-                                               "some value"));
-
+    Transport transport = new Transport(
+        false,
+        Instant.now(),
+        "Vehicle-01",
+        List.of(
+            new Destination("Storage 01", "Load cargo", List.of()),
+            new Destination("Storage 02",
+                            "Unload cargo",
+                            List.of(new Property("destination-specific key", "some value")))),
+        List.of(new Property("transport order-specific key", "some value")),
+        null
+    );
     writeToFile(transport, outputFile);
   }
 

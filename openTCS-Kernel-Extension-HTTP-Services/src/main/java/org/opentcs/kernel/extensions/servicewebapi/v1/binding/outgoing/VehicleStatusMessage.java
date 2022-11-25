@@ -5,10 +5,8 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,34 +24,22 @@ import org.opentcs.data.model.Vehicle;
 public class VehicleStatusMessage
     extends StatusMessage {
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The vehicle's name")
   private String vehicleName = "";
 
-  @JsonPropertyDescription("The name of the transport order the vehicle currently processes")
   private String transportOrderName = "";
 
-  @JsonPropertyDescription("The name of the point the vehicle currently occupies")
   private String position;
 
-  @JsonPropertyDescription("The precise position of the vehicle")
   private PrecisePosition precisePosition;
 
-  @JsonPropertyDescription("Whether the vehicle is paused.")
   private boolean paused;
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The vehicle's current state")
   private Vehicle.State state;
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The vehicle's current processing state")
   private Vehicle.ProcState procState;
 
-  @JsonPropertyDescription("The resources allocated.")
   private List<List<String>> allocatedResources = new ArrayList<>();
 
-  @JsonPropertyDescription("The resources claimed, i.e. not yet allocated.")
   private List<List<String>> claimedResources = new ArrayList<>();
 
   /**
@@ -183,16 +169,10 @@ public class VehicleStatusMessage
    */
   public static class PrecisePosition {
 
-    @JsonProperty(required = true)
-    @JsonPropertyDescription("The position's X coordinate")
     private long x;
 
-    @JsonProperty(required = true)
-    @JsonPropertyDescription("The position's Y coordinate")
     private long y;
 
-    @JsonProperty(required = true)
-    @JsonPropertyDescription("The position's Z coordinate")
     private long z;
 
     /**

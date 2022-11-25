@@ -5,36 +5,27 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.validation.constraints.Size;
+import javax.annotation.Nonnull;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A {@link org.opentcs.data.order.DriveOrder DriveOrder}'s destination.
  */
 public class Destination {
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The name of the destination location")
   private String locationName = "";
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The destination operation")
   private String operation = "";
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The drive order's state")
-  private State state;
+  private State state = State.PRISTINE;
 
-  @JsonPropertyDescription("The drive order's properties")
-  @Size(min = 0)
   private List<Property> properties = new LinkedList<>();
 
   /**
@@ -43,36 +34,40 @@ public class Destination {
   public Destination() {
   }
 
+  @Nonnull
   public String getLocationName() {
     return locationName;
   }
 
-  public void setLocationName(String name) {
+  public void setLocationName(@Nonnull String name) {
     this.locationName = requireNonNull(name, "name");
   }
 
+  @Nonnull
   public String getOperation() {
     return operation;
   }
 
-  public void setOperation(String operation) {
+  public void setOperation(@Nonnull String operation) {
     this.operation = requireNonNull(operation, "operation");
   }
 
+  @Nonnull
   public State getState() {
     return state;
   }
 
-  public void setState(State state) {
+  public void setState(@Nonnull State state) {
     this.state = requireNonNull(state, "state");
   }
 
+  @Nonnull
   public List<Property> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<Property> properties) {
-    this.properties = properties;
+  public void setProperties(@Nonnull List<Property> properties) {
+    this.properties = requireNonNull(properties, "properties");
   }
 
   public static Destination fromDriveOrder(DriveOrder driveOrder) {
@@ -86,10 +81,7 @@ public class Destination {
 
     for (Map.Entry<String, String> mapEntry
              : driveOrder.getDestination().getProperties().entrySet()) {
-      Property prop = new Property();
-      prop.setKey(mapEntry.getKey());
-      prop.setValue(mapEntry.getValue());
-      destination.getProperties().add(prop);
+      destination.getProperties().add(new Property(mapEntry.getKey(), mapEntry.getValue()));
     }
     return destination;
   }

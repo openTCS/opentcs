@@ -5,13 +5,14 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralJob.State;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * The current state of a peripheral job.

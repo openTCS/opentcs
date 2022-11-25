@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.order;
+package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -35,10 +36,10 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Destination;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Job;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Property;
-import org.opentcs.kernel.extensions.servicewebapi.v1.order.binding.Transport;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Destination;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Job;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Transport;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * Handles requests for creating or withdrawing transport orders.
@@ -109,7 +110,7 @@ public class OrderHandler {
         = new TransportOrderCreationTO(name, destinations(order))
             .withIncompleteName(order.hasIncompleteName())
             .withIntendedVehicleName(order.getIntendedVehicle())
-            .withDependencyNames(new HashSet<>(order.getDependencies()))
+            .withDependencyNames(dependencyNames(order.getDependencies()))
             .withDeadline(deadline(order))
             .withProperties(properties(order.getProperties()));
 
@@ -156,19 +157,19 @@ public class OrderHandler {
       );
     }
 
-    PeripheralOperationCreationTO operationCreationTO  = new PeripheralOperationCreationTO(
+    PeripheralOperationCreationTO operationCreationTO = new PeripheralOperationCreationTO(
         job.getPeripheralOperation().getOperation(),
         job.getPeripheralOperation().getLocationName())
         .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired());
     if (job.getPeripheralOperation().getExecutionTrigger() != null) {
-      operationCreationTO  = operationCreationTO
+      operationCreationTO = operationCreationTO
           .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger());
     }
 
     PeripheralJobCreationTO jobCreationTO = new PeripheralJobCreationTO(
         name,
         job.getReservationToken(),
-        operationCreationTO )
+        operationCreationTO)
         .withIncompleteName(job.isIncompleteName());
     if (job.getProperties() != null) {
       jobCreationTO = jobCreationTO.withProperties(job.getProperties().stream()
@@ -184,8 +185,6 @@ public class OrderHandler {
     if (job.getRelatedVehicle() != null) {
       jobCreationTO = jobCreationTO.withRelatedVehicleName(job.getRelatedVehicle());
     }
-    
-    
 
     try {
       final PeripheralJobCreationTO finalJobCreationTO = jobCreationTO;
@@ -260,8 +259,10 @@ public class OrderHandler {
       DestinationCreationTO to = new DestinationCreationTO(dest.getLocationName(),
                                                            dest.getOperation());
 
-      for (Property prop : dest.getProperties()) {
-        to = to.withProperty(prop.getKey(), prop.getValue());
+      if (dest.getProperties() != null) {
+        for (Property prop : dest.getProperties()) {
+          to = to.withProperty(prop.getKey(), prop.getValue());
+        }
       }
 
       result.add(to);
@@ -270,14 +271,20 @@ public class OrderHandler {
     return result;
   }
 
+  private Set<String> dependencyNames(List<String> dependencies) {
+    return dependencies == null ? new HashSet<>() : new HashSet<>(dependencies);
+  }
+
   private Instant deadline(Transport order) {
     return order.getDeadline() == null ? Instant.MAX : order.getDeadline();
   }
 
   private Map<String, String> properties(List<Property> properties) {
     Map<String, String> result = new HashMap<>();
-    for (Property prop : properties) {
-      result.put(prop.getKey(), prop.getValue());
+    if (properties != null) {
+      for (Property prop : properties) {
+        result.put(prop.getKey(), prop.getValue());
+      }
     }
     return result;
   }

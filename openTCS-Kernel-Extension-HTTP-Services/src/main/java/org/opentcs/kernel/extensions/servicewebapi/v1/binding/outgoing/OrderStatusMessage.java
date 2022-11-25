@@ -5,16 +5,15 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.Size;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A status message containing details about a transport order.
@@ -24,20 +23,14 @@ import org.opentcs.data.order.TransportOrder;
 public class OrderStatusMessage
     extends StatusMessage {
 
-  @JsonPropertyDescription("The (optional) transport order name")
   private String orderName;
 
-  @JsonPropertyDescription("The processing vehicle's name")
   private String processingVehicleName;
 
-  @JsonPropertyDescription("The transport order's current state")
   private OrderState orderState;
 
-  @JsonPropertyDescription("The transport order's destinations")
-  @Size(min = 1)
   private List<Destination> destinations = new LinkedList<>();
 
-  @JsonPropertyDescription("The transport order's properties")
   private List<Property> properties = new LinkedList<>();
 
   /**
@@ -105,10 +98,7 @@ public class OrderStatusMessage
       orderMessage.getDestinations().add(Destination.fromDriveOrder(curDriveOrder));
     }
     for (Map.Entry<String, String> mapEntry : order.getProperties().entrySet()) {
-      Property prop = new Property();
-      prop.setKey(mapEntry.getKey());
-      prop.setValue(mapEntry.getValue());
-      orderMessage.getProperties().add(prop);
+      orderMessage.getProperties().add(new Property(mapEntry.getKey(), mapEntry.getValue()));
     }
     return orderMessage;
   }

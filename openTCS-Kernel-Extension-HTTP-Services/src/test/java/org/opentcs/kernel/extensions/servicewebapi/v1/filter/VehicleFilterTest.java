@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.filter;
+package org.opentcs.kernel.extensions.servicewebapi.v1.filter;
 
 import org.junit.*;
 import static org.junit.Assert.assertFalse;

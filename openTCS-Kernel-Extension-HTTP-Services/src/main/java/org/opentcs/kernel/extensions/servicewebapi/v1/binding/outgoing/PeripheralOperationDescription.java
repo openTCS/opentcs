@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.data.peripherals.PeripheralOperation.ExecutionTrigger;

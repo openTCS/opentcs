@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status;
+package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -21,12 +21,12 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.PeripheralJobState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOrderState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.PeripheralJobFilter;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.TransportOrderFilter;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.VehicleFilter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.filter.PeripheralJobFilter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.filter.TransportOrderFilter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.filter.VehicleFilter;
 
 /**
  * Handles requests for getting the current state of model elements.

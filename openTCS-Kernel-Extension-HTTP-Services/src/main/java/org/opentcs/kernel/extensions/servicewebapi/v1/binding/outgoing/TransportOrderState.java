@@ -5,9 +5,8 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -22,24 +21,16 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class TransportOrderState {
 
-  @JsonPropertyDescription("The name of the transport order.")
   private String name = "";
   
-  @JsonPropertyDescription("The type of the transport order.")
   private String type = "";
 
-  @JsonPropertyDescription("The transport order's current state.")
   private TransportOrder.State state = TransportOrder.State.RAW;
 
-  @JsonPropertyDescription(
-      "The name of the vehicle that is intended to process the transport order.")
   private String intendedVehicle;
 
-  @JsonPropertyDescription(
-      "The name of the vehicle currently processing the transport order.")
   private String processingVehicle;
 
-  @JsonPropertyDescription("The sequence of destinations of the transport order.")
   private List<Destination> destinations = new ArrayList<>();
 
   private TransportOrderState() {
@@ -94,12 +85,10 @@ public class TransportOrderState {
   }
 
   /**
-   * Creates a <Code>TransportOrderState</Code> instance from a <Code>TransportOrder</Code> instance.
+   * Creates a new instance from a <code>TransportOrder</code>.
    *
-   * @param transportOrder The transport order whose properties will be used to create a
-   * <Code>TransportOrderState</Code> instance.
-   * @return A new <Code>TransportOrderState</Code> instance filled with data from
-   * the given transport order.
+   * @param transportOrder The transport order to create an instance from.
+   * @return A new instance containing the data from the given transport order.
    */
   public static TransportOrderState fromTransportOrder(TransportOrder transportOrder) {
     if (transportOrder == null) {

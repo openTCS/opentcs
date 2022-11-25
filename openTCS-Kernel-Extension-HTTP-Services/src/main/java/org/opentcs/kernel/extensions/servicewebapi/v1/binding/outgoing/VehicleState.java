@@ -5,10 +5,8 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,51 +28,34 @@ import org.opentcs.data.model.Vehicle.State;
  */
 public class VehicleState {
 
-  @JsonPropertyDescription("The name of the vehicle")
   private String name;
 
-  @JsonPropertyDescription("A set of properties (key-value pairs) associated with this object.")
   private Map<String, String> properties = new HashMap<>();
 
-  @JsonPropertyDescription("The vehicle's length (in mm).")
   private int length;
 
-  @JsonPropertyDescription(
-      "The value at/above which the vehicle's energy level is considered 'good'.")
   private int energyLevelGood;
 
-  @JsonPropertyDescription(
-      "The value at/below which the vehicle's energy level is considered 'critical'.")
   private int energyLevelCritical;
 
-  @JsonPropertyDescription("The vehicle's remaining energy (in percent of the maximum).")
   private int energyLevel;
 
-  @JsonPropertyDescription("The vehicle's integration level.")
   private IntegrationLevel integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
 
-  @JsonPropertyDescription("Whether the vehicle is paused.")
   private boolean paused;
 
-  @JsonPropertyDescription("The vehicle's current processing state.")
   private ProcState procState = ProcState.IDLE;
 
-  @JsonPropertyDescription("The name of the transport order the vehicle is currently processing.")
   private String transportOrder;
 
-  @JsonPropertyDescription("The name of the point which the vehicle currently occupies.")
   private String currentPosition;
 
-  @JsonPropertyDescription("The precise position of the vehicle")
   private PrecisePosition precisePosition;
 
-  @JsonPropertyDescription("The vehicle's current state.")
   private State state = State.UNKNOWN;
 
-  @JsonPropertyDescription("The resources allocated.")
   private List<List<String>> allocatedResources = new ArrayList<>();
 
-  @JsonPropertyDescription("The resources claimed, i.e. not yet allocated.")
   private List<List<String>> claimedResources = new ArrayList<>();
 
   private VehicleState() {
@@ -258,16 +239,10 @@ public class VehicleState {
    */
   public static class PrecisePosition {
 
-    @JsonProperty(required = true)
-    @JsonPropertyDescription("The position's X coordinate")
     private long x;
 
-    @JsonProperty(required = true)
-    @JsonPropertyDescription("The position's Y coordinate")
     private long y;
 
-    @JsonProperty(required = true)
-    @JsonPropertyDescription("The position's Z coordinate")
     private long z;
 
     /**

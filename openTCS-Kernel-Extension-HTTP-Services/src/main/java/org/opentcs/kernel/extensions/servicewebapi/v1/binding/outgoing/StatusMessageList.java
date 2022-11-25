@@ -5,10 +5,8 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.status.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,12 +19,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class StatusMessageList {
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The point of time at which this data structure was created")
   private Instant timeStamp = Instant.now();
 
-  @JsonProperty(required = true)
-  @JsonPropertyDescription("The status messages")
   private List<StatusMessage> statusMessages = new LinkedList<>();
 
   /**

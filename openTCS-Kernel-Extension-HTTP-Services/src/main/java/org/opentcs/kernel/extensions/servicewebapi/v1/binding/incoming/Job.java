@@ -5,11 +5,11 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.order.binding;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming;
 
 import java.util.List;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.PeripheralOperationDescription;
-import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.Property;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralOperationDescription;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A peripheral job to be processed by the kernel.
