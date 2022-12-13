@@ -259,12 +259,16 @@ public class PeripheralInteraction {
 
   private PeripheralJob createPeripheralJob(PeripheralOperation operation) {
     return peripheralJobService.createPeripheralJob(
-        new PeripheralJobCreationTO("Job-",
-                                    reservationToken,
-                                    new PeripheralOperationCreationTO(
-                                        operation.getOperation(),
-                                        operation.getLocation().getName()
-                                    ))
+        new PeripheralJobCreationTO(
+            "Job-",
+            reservationToken,
+            new PeripheralOperationCreationTO(
+                operation.getOperation(),
+                operation.getLocation().getName()
+            )
+                .withExecutionTrigger(operation.getExecutionTrigger())
+                .withCompletionRequired(operation.isCompletionRequired())
+        )
             .withIncompleteName(true)
     );
   }
