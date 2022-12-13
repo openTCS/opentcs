@@ -37,6 +37,8 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByEnergyLevel;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByName;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
+import org.opentcs.strategies.basic.dispatching.rerouting.RegularDriveOrderMerger;
+import org.opentcs.strategies.basic.dispatching.rerouting.RegularReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.selection.AssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelectionFilter;
@@ -183,6 +185,13 @@ public class DefaultDispatcherModule
 
     bind(TransportOrderUtil.class)
         .in(Singleton.class);
+    
+    configureRerouteComponents();
   }
 
+  private void configureRerouteComponents() {
+    bind(RerouteUtil.class).in(Singleton.class);
+    bind(RegularReroutingStrategy.class).in(Singleton.class);
+    bind(RegularDriveOrderMerger.class).in(Singleton.class);
+  }
 }
