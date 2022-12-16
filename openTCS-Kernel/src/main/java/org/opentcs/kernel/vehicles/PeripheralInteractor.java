@@ -150,9 +150,11 @@ public class PeripheralInteractor
    * determining the interactions that have to be performed before and after the movement command
    * is executed.
    *
+   * @param orderRef A reference to the transport order that the movement command belongs to.
    * @param movementCommand The movement command to prepare peripheral interactions for.
    */
-  public void prepareInteractions(MovementCommand movementCommand) {
+  public void prepareInteractions(TCSObjectReference<TransportOrder> orderRef,
+                                  MovementCommand movementCommand) {
     Path path = movementCommand.getStep().getPath();
     if (path == null) {
       return;
@@ -172,6 +174,7 @@ public class PeripheralInteractor
     if (!preMovementOperations.isEmpty()) {
       preMovementInteractions.put(movementCommand,
                                   new PeripheralInteraction(vehicleRef,
+                                                            orderRef,
                                                             movementCommand,
                                                             preMovementOperations,
                                                             peripheralJobService,
@@ -183,6 +186,7 @@ public class PeripheralInteractor
     if (!postMovementOperations.isEmpty()) {
       postMovementInteractions.put(movementCommand,
                                    new PeripheralInteraction(vehicleRef,
+                                                             orderRef,
                                                              movementCommand,
                                                              postMovementOperations,
                                                              peripheralJobService,

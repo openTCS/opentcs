@@ -76,7 +76,9 @@ public class PeripheralJobUtil {
     peripheralService.updatePeripheralJob(locationRef, jobRef);
     peripheralJobService.updatePeripheralJobState(jobRef, PeripheralJob.State.BEING_PROCESSED);
 
-    peripheralControllerPool.getPeripheralController(locationRef).process(peripheralJob,
-                                                                          peripheralJobCallback);
+    peripheralControllerPool.getPeripheralController(locationRef).process(
+        peripheralJobService.fetchObject(PeripheralJob.class, jobRef),
+        peripheralJobCallback
+    );
   }
 }

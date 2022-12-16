@@ -16,7 +16,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * Bugs fixed:
 ** In the web API, set the content type for a reply to `GET /vehicles/{NAME}` to `application/json` as specified.
-** When creating peripheral jobs, copy all attributes of the respective peripheral operation, too.
+** When creating peripheral jobs, copy all attributes of the respective peripheral operation, and set the related vehicle and transport order attributes, too.
 * Other changes:
 ** Avoid redundant property updates from vehicle drivers.
 ** Avoid using webfonts / Google Fonts API in Asciidoctor documentation.

@@ -707,7 +707,7 @@ public class DefaultVehicleController
 
       interactionsPendingCommand = command;
 
-      peripheralInteractor.prepareInteractions(command);
+      peripheralInteractor.prepareInteractions(transportOrder.getReference(), command);
       peripheralInteractor.startPreMovementInteractions(command,
                                                         () -> sendCommand(command),
                                                         this::onMovementInteractionFailed);

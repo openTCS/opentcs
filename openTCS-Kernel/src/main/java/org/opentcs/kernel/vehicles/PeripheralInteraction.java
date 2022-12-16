@@ -17,6 +17,7 @@ import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -55,6 +56,10 @@ public class PeripheralInteraction {
    */
   private final TCSObjectReference<Vehicle> vehicleRef;
   /**
+   * A reference to the transport order this interaction is related to.
+   */
+  private final TCSObjectReference<TransportOrder> orderRef;
+  /**
    * The movement command this interaction is associated with.
    */
   private final MovementCommand movementCommand;
@@ -92,17 +97,20 @@ public class PeripheralInteraction {
    * Creates a new instance.
    *
    * @param vehicleRef The reference to the vehicle that's interacting with peripheral devices.
+   * @param orderRef A reference to the transport order that this interaction is related to.
    * @param movementCommand The movement command this interaction is associated with.
    * @param operations The operations that jobs have to be created for.
    * @param peripheralJobService The peripheral job service to use for creating jobs.
    * @param reservationToken The reservation token to use for creating jobs.
    */
   public PeripheralInteraction(@Nonnull TCSObjectReference<Vehicle> vehicleRef,
+                               @Nonnull TCSObjectReference<TransportOrder> orderRef,
                                @Nonnull MovementCommand movementCommand,
                                @Nonnull List<PeripheralOperation> operations,
                                @Nonnull PeripheralJobService peripheralJobService,
                                @Nonnull String reservationToken) {
     this.vehicleRef = requireNonNull(vehicleRef, "vehicleRef");
+    this.orderRef = requireNonNull(orderRef, "orderRef");
     this.movementCommand = requireNonNull(movementCommand, "movementCommand");
     this.operations = requireNonNull(operations, "operations");
     this.peripheralJobService = requireNonNull(peripheralJobService, "peripheralJobService");
@@ -270,6 +278,8 @@ public class PeripheralInteraction {
                 .withCompletionRequired(operation.isCompletionRequired())
         )
             .withIncompleteName(true)
+            .withRelatedVehicleName(vehicleRef.getName())
+            .withRelatedTransportOrderName(orderRef.getName())
     );
   }
 
