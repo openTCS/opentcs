@@ -82,7 +82,9 @@ public class RunKernelControlCenter {
     List<ControlCenterInjectionModule> registeredModules = new LinkedList<>();
     for (ControlCenterInjectionModule module
              : ServiceLoader.load(ControlCenterInjectionModule.class)) {
-      LOG.info("Integrating injection module {}", module.getClass().getName());
+      LOG.info("Integrating injection module {} (source: {})",
+               module.getClass().getName(),
+               module.getClass().getProtectionDomain().getCodeSource());
       module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }

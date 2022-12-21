@@ -96,7 +96,9 @@ public class RunKernel {
       ConfigurationBindingProvider bindingProvider) {
     List<KernelInjectionModule> registeredModules = new LinkedList<>();
     for (KernelInjectionModule module : ServiceLoader.load(KernelInjectionModule.class)) {
-      LOG.info("Integrating injection module {}", module.getClass().getName());
+      LOG.info("Integrating injection module {} (source: {})",
+               module.getClass().getName(),
+               module.getClass().getProtectionDomain().getCodeSource());
       module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }

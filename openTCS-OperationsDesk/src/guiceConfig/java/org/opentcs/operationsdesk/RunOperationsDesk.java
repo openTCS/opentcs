@@ -94,7 +94,9 @@ public class RunOperationsDesk {
     List<PlantOverviewInjectionModule> registeredModules = new LinkedList<>();
     for (PlantOverviewInjectionModule module
              : ServiceLoader.load(PlantOverviewInjectionModule.class)) {
-      LOG.info("Integrating injection module {}", module.getClass().getName());
+      LOG.info("Integrating injection module {} (source: {})",
+               module.getClass().getName(),
+               module.getClass().getProtectionDomain().getCodeSource());
       module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }
