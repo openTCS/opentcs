@@ -11,9 +11,9 @@ dependencies {
 
   api group: 'com.sparkjava', name: 'spark-core', version: '2.9.4'
 
-  api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
-  api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.13.3'
-  api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
+  api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
+  api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.14.1'
+  api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.1'
 }
 
 task release {
