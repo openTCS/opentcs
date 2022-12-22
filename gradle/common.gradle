@@ -18,7 +18,7 @@ else if (System.env.CI_PIPELINE_IID) {
 // - The minor version number should be incremented when new feature were added.
 // - The patch level should be incremented with every small change to the code
 //   (e.g. bugfixes).
-project.version = "5.7.0"
+project.version = "5.8.0"
 if (!(project.hasProperty("NO_BUILD_NUMBER")
     && Boolean.valueOf(project.getProperties().get("NO_BUILD_NUMBER")))) {
   project.version += "-$versionBuild"
