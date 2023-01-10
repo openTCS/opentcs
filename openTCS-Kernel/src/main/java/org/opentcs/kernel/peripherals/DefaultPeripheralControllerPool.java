@@ -121,7 +121,7 @@ public class DefaultPeripheralControllerPool
 
     LOG.debug("{}: Attaching controller...", locationRef.getName());
     PeripheralController controller = controllerFactory.createPeripheralController(locationRef,
-                                                                                commAdapter);
+                                                                                   commAdapter);
     poolEntries.put(locationRef, new PoolEntry(locationRef, controller, commAdapter));
     controller.initialize();
   }
