@@ -157,6 +157,12 @@ public class TransportOrderPool {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
+
+    LOG.info("Transport order's state changes: {} -- {} -> {}",
+             order.getName(),
+             order.getState(),
+             newState);
+
     TransportOrder previousState = order;
     order = objectPool.replaceObject(order.withState(newState));
     objectPool.emitObjectEvent(order,
@@ -185,6 +191,12 @@ public class TransportOrderPool {
       List<DriveOrder> driveOrders)
       throws ObjectUnknownException, IllegalArgumentException {
     TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
+
+    LOG.info("Transport order's processing vehicle changes: {} -- {} -> {}",
+             order.getName(),
+             toObjectName(order.getProcessingVehicle()),
+             toObjectName(vehicleRef));
+
     TransportOrder previousState = order;
     if (vehicleRef == null) {
       order = objectPool.replaceObject(order.withProcessingVehicle(null));
@@ -256,6 +268,10 @@ public class TransportOrderPool {
     // Then, shift drive orders and send a second event.
     // Then, mark the current drive order as TRAVELLING and send another event.
     if (order.getCurrentDriveOrder() != null) {
+      LOG.info("Transport order's drive order finished: {} -- {}",
+               order.getName(),
+               order.getCurrentDriveOrder().getDestination());
+
       order = objectPool.replaceObject(order.withCurrentDriveOrderState(DriveOrder.State.FINISHED));
       TransportOrder newState = order;
       objectPool.emitObjectEvent(newState,
@@ -409,6 +425,12 @@ public class TransportOrderPool {
       throws ObjectUnknownException {
     LOG.debug("method entry");
     OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
+
+    LOG.info("Order sequence's processing vehicle changes: {} -- {} -> {}",
+             sequence.getName(),
+             toObjectName(sequence.getProcessingVehicle()),
+             toObjectName(vehicleRef));
+
     OrderSequence previousState = sequence;
     if (vehicleRef == null) {
       sequence = objectPool.replaceObject(sequence.withProcessingVehicle(null));
@@ -550,5 +572,10 @@ public class TransportOrderPool {
     else {
       return to.getName();
     }
+  }
+
+  @Nullable
+  private String toObjectName(TCSObjectReference<?> ref) {
+    return ref == null ? null : ref.getName();
   }
 }

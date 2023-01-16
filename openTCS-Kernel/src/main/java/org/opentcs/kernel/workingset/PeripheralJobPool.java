@@ -110,8 +110,13 @@ public class PeripheralJobPool {
   public PeripheralJob setPeripheralJobState(TCSObjectReference<PeripheralJob> ref,
                                              PeripheralJob.State newState)
       throws ObjectUnknownException {
-    LOG.debug("Updating state of peripheral job {} to {}...", ref.getName(), newState);
     PeripheralJob job = objectPool.getObject(PeripheralJob.class, ref);
+
+    LOG.info("Peripheral job's state changes: {} -- {} -> {}",
+             job.getName(),
+             job.getState(),
+             newState);
+
     PeripheralJob previousState = job;
     job = objectPool.replaceObject(job.withState(newState));
     objectPool.emitObjectEvent(job,

@@ -170,7 +170,7 @@ public class TransportOrderUtil
     requireNonNull(ref, "ref");
     requireNonNull(newState, "newState");
 
-    LOG.info("Updating state of transport order {} to {}...", ref.getName(), newState);
+    LOG.debug("Updating state of transport order {} to {}...", ref.getName(), newState);
     switch (newState) {
       case FINISHED:
         setTOStateFinished(ref);

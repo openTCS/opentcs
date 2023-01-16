@@ -633,6 +633,12 @@ public class Model {
                                             Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException {
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+
+    LOG.info("Vehicle's integration level changes: {} -- {} -> {}",
+             vehicle.getName(),
+             vehicle.getIntegrationLevel(),
+             integrationLevel);
+
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withIntegrationLevel(integrationLevel));
     objectPool.emitObjectEvent(vehicle,
@@ -653,6 +659,12 @@ public class Model {
                                   boolean paused)
       throws ObjectUnknownException {
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+
+    LOG.info("Vehicle's paused state changes: {} -- {} -> {}",
+             vehicle.getName(),
+             vehicle.isPaused(),
+             paused);
+
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withPaused(paused));
     objectPool.emitObjectEvent(vehicle,
