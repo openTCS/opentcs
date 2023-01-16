@@ -10,6 +10,7 @@ package org.opentcs.drivers.vehicle;
 import java.io.Serializable;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a single load handling device on a vehicle.
@@ -45,7 +46,10 @@ public class LoadHandlingDevice
    * Creates a new LoadHandlingDevice as a copy of the given one.
    *
    * @param original The instance to be copied.
+   * @deprecated Copying this immutable data structure does not make sense.
    */
+  @Deprecated
+  @ScheduledApiChange(details = "Will be removed", when = "6.0")
   public LoadHandlingDevice(LoadHandlingDevice original) {
     this(original.label, original.full);
   }

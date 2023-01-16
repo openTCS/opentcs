@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -169,7 +170,7 @@ public class NotificationBuffer {
    */
   public List<UserNotification> getNotifications() {
     LOG.debug("method entry");
-    return new LinkedList<>(notifications);
+    return new ArrayList<>(notifications);
   }
 
   /**
@@ -181,7 +182,7 @@ public class NotificationBuffer {
    */
   public List<UserNotification> getNotifications(Predicate<UserNotification> predicate) {
     LOG.debug("method entry");
-    List<UserNotification> result = new LinkedList<>();
+    List<UserNotification> result = new ArrayList<>(notifications.size());
     for (UserNotification notification : notifications) {
       if (predicate == null || predicate.test(notification)) {
         result.add(notification);

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,7 +51,7 @@ public class CompositeOrderCandidateComparatorTest {
   public void sortAlphabeticallyForOtherwiseEqualInstances() {
 
     Mockito.when(configuration.orderCandidatePriorities())
-        .thenReturn(new LinkedList<>());
+        .thenReturn(List.of());
     comparator = new CompositeOrderCandidateComparator(configuration, availableComparators);
 
     AssignmentCandidate candidate1 = candidateWithName("AA");
@@ -74,7 +73,7 @@ public class CompositeOrderCandidateComparatorTest {
   @Test
   public void sortsByAgeAndName() {
     Mockito.when(configuration.orderCandidatePriorities())
-        .thenReturn(new LinkedList<>());
+        .thenReturn(List.of());
     comparator = new CompositeOrderCandidateComparator(configuration, availableComparators);
 
     AssignmentCandidate candidate1 = candidateWithNameAndCreationtime("AA", 2);
@@ -97,7 +96,7 @@ public class CompositeOrderCandidateComparatorTest {
   public void sortsByAgeAndNameAndInitialRoutingCost() {
     String deadlineKey = "BY_DEADLINE";
     Mockito.when(configuration.orderCandidatePriorities())
-        .thenReturn(Arrays.asList(deadlineKey));
+        .thenReturn(List.of(deadlineKey));
     availableComparators.put(deadlineKey,
                              new CandidateComparatorByDeadline());
     comparator = new CompositeOrderCandidateComparator(configuration, availableComparators);
@@ -148,9 +147,10 @@ public class CompositeOrderCandidateComparatorTest {
     Route.Step dummyStep
         = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
     Route route = new Route(Arrays.asList(dummyStep), 10);
-    List<DriveOrder> driveOrders = new LinkedList<>();
-    driveOrders.add(new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
-        .withRoute(route));
+    List<DriveOrder> driveOrders = List.of(
+        new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
+            .withRoute(route)
+    );
     return driveOrders;
   }
 

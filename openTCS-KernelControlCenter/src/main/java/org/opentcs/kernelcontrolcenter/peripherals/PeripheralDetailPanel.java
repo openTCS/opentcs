@@ -9,7 +9,7 @@ package org.opentcs.kernelcontrolcenter.peripherals;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -45,7 +45,7 @@ public class PeripheralDetailPanel
   /**
    * The adapter specific list of panels.
    */
-  private final List<PeripheralCommAdapterPanel> customPanelList = new LinkedList<>();
+  private final List<PeripheralCommAdapterPanel> customPanelList = new ArrayList<>();
   /**
    * The set of factories to create adapter specific panels with.
    */

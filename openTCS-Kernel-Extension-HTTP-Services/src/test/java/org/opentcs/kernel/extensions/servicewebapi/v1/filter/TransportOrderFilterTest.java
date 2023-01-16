@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.filter;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import org.junit.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,15 +34,15 @@ public class TransportOrderFilterTest {
   @Before
   public void setUp() {
     vehicle1Reference = new Vehicle("Vehicle-001").getReference();
-    transportOrder1 = new TransportOrder("TransportOrder-001", new LinkedList<>())
+    transportOrder1 = new TransportOrder("TransportOrder-001", new ArrayList<>())
         .withIntendedVehicle(vehicle1Reference);
-    transportOrder2 = new TransportOrder("TransportOrder-002", new LinkedList<>())
+    transportOrder2 = new TransportOrder("TransportOrder-002", new ArrayList<>())
         .withIntendedVehicle(vehicle1Reference);
-    transportOrder3 = new TransportOrder("TransportOrder-003", new LinkedList<>())
+    transportOrder3 = new TransportOrder("TransportOrder-003", new ArrayList<>())
         .withIntendedVehicle(new Vehicle("Vehicle-002").getReference());
-    transportOrder4 = new TransportOrder("TransportOrder-004", new LinkedList<>())
+    transportOrder4 = new TransportOrder("TransportOrder-004", new ArrayList<>())
         .withIntendedVehicle(new Vehicle("Vehicle-003").getReference());
-    transportOrder5 = new TransportOrder("TransportOrder-005", new LinkedList<>())
+    transportOrder5 = new TransportOrder("TransportOrder-005", new ArrayList<>())
         .withIntendedVehicle(new Vehicle("Vehicle-004").getReference());
   }
 

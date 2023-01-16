@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -163,9 +162,11 @@ public class TransportOrder
                          State state,
                          Instant finishedTime) {
     super(name, properties, history);
+
     this.type = requireNonNull(type, "type");
+
     requireNonNull(driveOrders, "driveOrders");
-    this.driveOrders = new LinkedList<>();
+    this.driveOrders = new ArrayList<>(driveOrders.size());
     for (DriveOrder driveOrder : driveOrders) {
       this.driveOrders.add(driveOrder.withTransportOrder(this.getReference()));
     }

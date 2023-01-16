@@ -8,8 +8,8 @@
 package org.opentcs.kernel.workingset;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -514,7 +514,7 @@ public class TransportOrderPool {
 
   private List<DriveOrder> toDriveOrders(List<DestinationCreationTO> dests)
       throws ObjectUnknownException {
-    List<DriveOrder> result = new LinkedList<>();
+    List<DriveOrder> result = new ArrayList<>(dests.size());
     for (DestinationCreationTO destTo : dests) {
       TCSObject<?> destObject = objectPool.getObjectOrNull(destTo.getDestLocationName());
       if (!(destObject instanceof Location || destObject instanceof Point)) {

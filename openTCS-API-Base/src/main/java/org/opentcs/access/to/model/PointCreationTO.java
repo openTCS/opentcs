@@ -30,21 +30,21 @@ public class PointCreationTO
    * This point's position (in mm).
    */
   @Nonnull
-  private Triple position = new Triple(0, 0, 0);
+  private final Triple position;
   /**
    * The vehicle's (assumed) orientation angle (-360..360) when it is at this position.
    * May be Double.NaN if an orientation angle is not defined for this point.
    */
-  private double vehicleOrientationAngle = Double.NaN;
+  private final double vehicleOrientationAngle;
   /**
    * This point's type.
    */
   @Nonnull
-  private Point.Type type = Point.Type.HALT_POSITION;
+  private final Point.Type type;
   /**
    * The information regarding the grahical representation of this point.
    */
-  private Layout layout = new Layout();
+  private final Layout layout;
 
   /**
    * Creates a new instance.
@@ -53,6 +53,10 @@ public class PointCreationTO
    */
   public PointCreationTO(@Nonnull String name) {
     super(name);
+    this.position = new Triple(0, 0, 0);
+    this.vehicleOrientationAngle = Double.NaN;
+    this.type = Point.Type.HALT_POSITION;
+    this.layout = new Layout();
   }
 
   private PointCreationTO(@Nonnull String name,

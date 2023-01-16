@@ -9,6 +9,7 @@ package org.opentcs.drivers.vehicle;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +89,7 @@ public class VehicleProcessModel {
   /**
    * The vehicle's load handling devices (state).
    */
-  private List<LoadHandlingDevice> loadHandlingDevices = new LinkedList<>();
+  private List<LoadHandlingDevice> loadHandlingDevices = new ArrayList<>();
   /**
    * The vehicle's current state.
    */
@@ -342,10 +343,8 @@ public class VehicleProcessModel {
    * @param devices The new devices
    */
   public void setVehicleLoadHandlingDevices(@Nonnull List<LoadHandlingDevice> devices) {
-    List<LoadHandlingDevice> devs = new LinkedList<>();
-    for (LoadHandlingDevice lhd : devices) {
-      devs.add(new LoadHandlingDevice(lhd));
-    }
+    List<LoadHandlingDevice> devs = new ArrayList<>(devices);
+
     List<LoadHandlingDevice> oldValue = this.loadHandlingDevices;
     this.loadHandlingDevices = devs;
 

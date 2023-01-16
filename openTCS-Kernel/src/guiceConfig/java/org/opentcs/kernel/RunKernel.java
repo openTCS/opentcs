@@ -12,8 +12,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.opentcs.configuration.ConfigurationBindingProvider;
@@ -94,7 +94,7 @@ public class RunKernel {
    */
   private static List<KernelInjectionModule> findRegisteredModules(
       ConfigurationBindingProvider bindingProvider) {
-    List<KernelInjectionModule> registeredModules = new LinkedList<>();
+    List<KernelInjectionModule> registeredModules = new ArrayList<>();
     for (KernelInjectionModule module : ServiceLoader.load(KernelInjectionModule.class)) {
       LOG.info("Integrating injection module {} (source: {})",
                module.getClass().getName(),

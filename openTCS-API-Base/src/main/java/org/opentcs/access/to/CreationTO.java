@@ -28,13 +28,13 @@ public class CreationTO
    * The name of this transfer object.
    */
   @Nonnull
-  private String name;
+  private final String name;
 
   /**
    * The properties of this transfer object.
    */
   @Nonnull
-  private Map<String, String> properties = new HashMap<>();
+  private final Map<String, String> properties;
 
   /**
    * Creates a new instance.
@@ -43,6 +43,7 @@ public class CreationTO
    */
   public CreationTO(@Nonnull String name) {
     this.name = requireNonNull(name, "name");
+    this.properties = Map.of();
   }
 
   protected CreationTO(@Nonnull String name, @Nonnull Map<String, String> properties) {

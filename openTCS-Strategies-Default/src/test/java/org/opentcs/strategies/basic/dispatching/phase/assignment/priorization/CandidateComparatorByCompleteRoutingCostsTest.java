@@ -10,7 +10,6 @@ package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -58,11 +57,15 @@ public class CandidateComparatorByCompleteRoutingCostsTest {
 
   private AssignmentCandidate candidateWithRoutingCost(long cost) {
     TransportOrder trasportOrder = new TransportOrder("TOrder1", new ArrayList<>());
-    Route.Step dummyStep = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
+    Route.Step dummyStep = new Route.Step(null,
+                                          null,
+                                          new Point("Point1"),
+                                          Vehicle.Orientation.FORWARD, 1);
     Route route = new Route(Arrays.asList(dummyStep), cost);
-    List<DriveOrder> driveOrders = new LinkedList<>();
-    driveOrders.add(new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
-        .withRoute(route));
+    List<DriveOrder> driveOrders = List.of(
+        new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
+            .withRoute(route)
+    );
 
     return new AssignmentCandidate(new Vehicle("Vehicle1"), trasportOrder, driveOrders);
   }

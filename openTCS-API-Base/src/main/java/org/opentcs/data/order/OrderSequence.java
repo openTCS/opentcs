@@ -98,7 +98,7 @@ public class OrderSequence
   public OrderSequence(String name) {
     super(name);
     this.type = OrderConstants.TYPE_NONE;
-    this.orders = new ArrayList<>();
+    this.orders = List.of();
     this.finishedIndex = -1;
     this.complete = false;
     this.finished = false;

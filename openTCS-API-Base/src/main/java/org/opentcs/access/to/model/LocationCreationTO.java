@@ -9,7 +9,6 @@ package org.opentcs.access.to.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -32,26 +31,26 @@ public class LocationCreationTO
    * The name of this location's type.
    */
   @Nonnull
-  private String typeName;
+  private final String typeName;
   /**
    * This location's position (in mm).
    */
   @Nonnull
-  private Triple position;
+  private final Triple position;
   /**
    * The links attaching points to this location.
    * This is a map of point names to allowed operations.
    */
   @Nonnull
-  private Map<String, Set<String>> links = new HashMap<>();
+  private final Map<String, Set<String>> links;
   /**
    * A flag for marking this location as locked (i.e. to prevent vehicles from using it).
    */
-  private boolean locked;
+  private final boolean locked;
   /**
    * The information regarding the grahical representation of this location.
    */
-  private Layout layout = new Layout();
+  private final Layout layout;
 
   /**
    * Creates a new instance
@@ -66,6 +65,9 @@ public class LocationCreationTO
     super(name);
     this.typeName = requireNonNull(typeName, "typeName");
     this.position = position;
+    this.links = Map.of();
+    this.locked = false;
+    this.layout = new Layout();
   }
 
   private LocationCreationTO(@Nonnull String name,

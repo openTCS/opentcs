@@ -8,7 +8,7 @@
 package org.opentcs.kernel.vehicles;
 
 import static com.google.common.base.Preconditions.checkState;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -113,7 +113,7 @@ public class VehicleCommAdapterRegistry
    * @return All registered factories that can provide communication adapters.
    */
   public List<VehicleCommAdapterFactory> getFactories() {
-    return new LinkedList<>(factories.values());
+    return new ArrayList<>(factories.values());
   }
 
   /**

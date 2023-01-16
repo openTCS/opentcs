@@ -33,38 +33,38 @@ public class PathCreationTO
    * The point name this path originates in.
    */
   @Nonnull
-  private String srcPointName;
+  private final String srcPointName;
   /**
    * The point name this path ends in.
    */
   @Nonnull
-  private String destPointName;
+  private final String destPointName;
   /**
    * This path's length (in mm).
    */
-  private long length = 1;
+  private final long length;
   /**
    * The absolute maximum allowed forward velocity on this path (in mm/s).
    * A value of 0 (default) means forward movement is not allowed on this path.
    */
-  private int maxVelocity;
+  private final int maxVelocity;
   /**
    * The absolute maximum allowed reverse velocity on this path (in mm/s).
    * A value of 0 (default) means reverse movement is not allowed on this path.
    */
-  private int maxReverseVelocity;
+  private final int maxReverseVelocity;
   /**
    * The peripheral operations to be performed when a vehicle travels along this path.
    */
-  private List<PeripheralOperationCreationTO> peripheralOperations;
+  private final List<PeripheralOperationCreationTO> peripheralOperations;
   /**
    * A flag for marking this path as locked (i.e. to prevent vehicles from using it).
    */
-  private boolean locked;
+  private final boolean locked;
   /**
    * The information regarding the grahical representation of this path.
    */
-  private Layout layout = new Layout();
+  private final Layout layout;
 
   /**
    * Creates a new instance.
@@ -79,7 +79,12 @@ public class PathCreationTO
     super(name);
     this.srcPointName = requireNonNull(srcPointName, "srcPointName");
     this.destPointName = requireNonNull(destPointName, "destPointName");
-    this.peripheralOperations = new ArrayList<>();
+    this.length = 1;
+    this.maxVelocity = 0;
+    this.maxReverseVelocity = 0;
+    this.peripheralOperations = List.of();
+    this.locked = false;
+    this.layout = new Layout();
   }
 
   private PathCreationTO(String name,

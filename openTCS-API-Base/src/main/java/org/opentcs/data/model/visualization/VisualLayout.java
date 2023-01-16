@@ -8,8 +8,8 @@
 package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -59,9 +59,9 @@ public class VisualLayout
     super(name);
     this.scaleX = 50.0;
     this.scaleY = 50.0;
-    this.layoutElements = new HashSet<>();
-    this.layers = new LinkedList<>();
-    this.layerGroups = new LinkedList<>();
+    this.layoutElements = Set.of();
+    this.layers = List.of();
+    this.layerGroups = List.of();
   }
 
   /**
@@ -82,8 +82,8 @@ public class VisualLayout
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.layoutElements = new HashSet<>(requireNonNull(layoutElements, "layoutElements"));
-    this.layers = new LinkedList<>(requireNonNull(layers, "layers"));
-    this.layerGroups = new LinkedList<>(requireNonNull(layerGroups, "layerGroups"));
+    this.layers = new ArrayList<>(requireNonNull(layers, "layers"));
+    this.layerGroups = new ArrayList<>(requireNonNull(layerGroups, "layerGroups"));
   }
 
   @Override

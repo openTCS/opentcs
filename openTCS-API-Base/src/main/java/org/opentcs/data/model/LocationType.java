@@ -8,7 +8,6 @@
 package org.opentcs.data.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +45,8 @@ public class LocationType
    */
   public LocationType(String name) {
     super(name);
-    this.allowedOperations = new ArrayList<>();
-    this.allowedPeripheralOperations = new ArrayList<>();
+    this.allowedOperations = List.of();
+    this.allowedPeripheralOperations = List.of();
     this.layout = new Layout();
   }
 

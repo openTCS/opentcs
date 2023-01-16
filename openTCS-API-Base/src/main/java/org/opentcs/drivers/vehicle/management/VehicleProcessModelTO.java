@@ -8,6 +8,7 @@
 package org.opentcs.drivers.vehicle.management;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -63,7 +64,7 @@ public class VehicleProcessModelTO
   /**
    * A list of load handling devices attached to the vehicle.
    */
-  private List<LoadHandlingDevice> loadHandlingDevices = new LinkedList<>();
+  private List<LoadHandlingDevice> loadHandlingDevices = new ArrayList<>();
   /**
    * The vehicle's state.
    */

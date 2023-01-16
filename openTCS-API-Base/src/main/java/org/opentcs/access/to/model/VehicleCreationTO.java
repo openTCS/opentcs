@@ -28,35 +28,35 @@ public class VehicleCreationTO
   /**
    * The vehicle's length (in mm).
    */
-  private int length = 1000;
+  private final int length;
   /**
    * The energy level value at/below which the vehicle should be recharged.
    */
-  private int energyLevelCritical = 30;
+  private final int energyLevelCritical;
   /**
    * The energy level value at/above which the vehicle can be dispatched again when charging.
    */
-  private int energyLevelGood = 90;
+  private final int energyLevelGood;
   /**
    * The energy level value at/above which the vehicle is considered fully recharged.
    */
-  private int energyLevelFullyRecharged = 90;
+  private final int energyLevelFullyRecharged;
   /**
    * The energy level value at/above which the vehicle is considered sufficiently recharged.
    */
-  private int energyLevelSufficientlyRecharged = 30;
+  private final int energyLevelSufficientlyRecharged;
   /**
    * The vehicle's maximum velocity (in mm/s).
    */
-  private int maxVelocity = 1000;
+  private final int maxVelocity;
   /**
    * The vehicle's maximum reverse velocity (in mm/s).
    */
-  private int maxReverseVelocity = 1000;
+  private final int maxReverseVelocity;
   /**
    * The information regarding the grahical representation of this vehicle.
    */
-  private Layout layout = new Layout();
+  private final Layout layout;
 
   /**
    * Creates a new instance.
@@ -65,6 +65,14 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO(@Nonnull String name) {
     super(name);
+    this.length = 1000;
+    this.energyLevelCritical = 30;
+    this.energyLevelGood = 90;
+    this.energyLevelFullyRecharged = 90;
+    this.energyLevelSufficientlyRecharged = 30;
+    this.maxVelocity = 1000;
+    this.maxReverseVelocity = 1000;
+    this.layout = new Layout();
   }
 
   private VehicleCreationTO(@Nonnull String name,
@@ -321,7 +329,7 @@ public class VehicleCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public VehicleCreationTO withMaxVelocity(int maxVelocity) {
-    this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
+    checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
     return new VehicleCreationTO(getName(),
                                  getModifiableProperties(),
                                  length,

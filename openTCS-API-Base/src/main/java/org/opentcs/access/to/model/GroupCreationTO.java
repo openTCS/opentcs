@@ -9,7 +9,6 @@ package org.opentcs.access.to.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -33,7 +32,7 @@ public class GroupCreationTO
    * This group's member names.
    */
   @Nonnull
-  private Set<String> memberNames = new HashSet<>();
+  private final Set<String> memberNames;
 
   /**
    * Creates a new instance.
@@ -42,6 +41,8 @@ public class GroupCreationTO
    */
   public GroupCreationTO(String name) {
     super(name);
+
+    this.memberNames = Set.of();
   }
 
   private GroupCreationTO(@Nonnull String name,

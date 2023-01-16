@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -99,7 +99,7 @@ public class PeripheralCommAdapterRegistry
    * @return All registered factories that can provide peripheral communication adapters.
    */
   public List<PeripheralCommAdapterFactory> getFactories() {
-    return new LinkedList<>(factories.values());
+    return new ArrayList<>(factories.values());
   }
 
   /**

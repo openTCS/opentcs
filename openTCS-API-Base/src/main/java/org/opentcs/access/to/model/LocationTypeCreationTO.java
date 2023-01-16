@@ -9,7 +9,6 @@ package org.opentcs.access.to.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -29,15 +28,15 @@ public class LocationTypeCreationTO
   /**
    * The allowed operations for this location type.
    */
-  private List<String> allowedOperations = new LinkedList<>();
+  private final List<String> allowedOperations;
   /**
    * The allowed peripheral operations for this location type.
    */
-  private List<String> allowedPeripheralOperations = new LinkedList<>();
+  private final List<String> allowedPeripheralOperations;
   /**
    * The information regarding the grahical representation of this location type.
    */
-  private Layout layout = new Layout();
+  private final Layout layout;
 
   /**
    * Creates a new instance.
@@ -46,6 +45,9 @@ public class LocationTypeCreationTO
    */
   public LocationTypeCreationTO(@Nonnull String name) {
     super(name);
+    this.allowedOperations = List.of();
+    this.allowedPeripheralOperations = List.of();
+    this.layout = new Layout();
   }
 
   private LocationTypeCreationTO(@Nonnull String name,

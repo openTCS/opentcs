@@ -12,7 +12,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.opentcs.configuration.ConfigurationBindingProvider;
@@ -79,7 +79,7 @@ public class RunKernelControlCenter {
    */
   private static List<ControlCenterInjectionModule> findRegisteredModules(
       ConfigurationBindingProvider bindingProvider) {
-    List<ControlCenterInjectionModule> registeredModules = new LinkedList<>();
+    List<ControlCenterInjectionModule> registeredModules = new ArrayList<>();
     for (ControlCenterInjectionModule module
              : ServiceLoader.load(ControlCenterInjectionModule.class)) {
       LOG.info("Integrating injection module {} (source: {})",

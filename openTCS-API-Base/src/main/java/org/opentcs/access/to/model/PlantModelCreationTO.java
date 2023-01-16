@@ -8,9 +8,7 @@
 package org.opentcs.access.to.model;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -33,37 +31,36 @@ public class PlantModelCreationTO
   /**
    * The plant model's points.
    */
-  private List<PointCreationTO> points = new LinkedList<>();
+  private final List<PointCreationTO> points;
   /**
    * The plant model's paths.
    */
-  private List<PathCreationTO> paths = new LinkedList<>();
+  private final List<PathCreationTO> paths;
   /**
    * The plant model's location types.
    */
-  private List<LocationTypeCreationTO> locationTypes = new LinkedList<>();
+  private final List<LocationTypeCreationTO> locationTypes;
   /**
    * The plant model's locations.
    */
-  private List<LocationCreationTO> locations = new LinkedList<>();
+  private final List<LocationCreationTO> locations;
   /**
    * The plant model's blocks.
    */
-  private List<BlockCreationTO> blocks = new LinkedList<>();
+  private final List<BlockCreationTO> blocks;
   /**
    * The plant model's groups.
    */
   @Deprecated
-  private List<GroupCreationTO> groups = new LinkedList<>();
+  private final List<GroupCreationTO> groups;
   /**
    * The plant model's vehicles.
    */
-  private List<VehicleCreationTO> vehicles = new LinkedList<>();
+  private final List<VehicleCreationTO> vehicles;
   /**
    * The plant model's visual layouts.
    */
-  private List<VisualLayoutCreationTO> visualLayouts
-      = new LinkedList<>(Arrays.asList(defaultVisualLayout()));
+  private final List<VisualLayoutCreationTO> visualLayouts;
 
   /**
    * Creates a new instance.
@@ -72,6 +69,14 @@ public class PlantModelCreationTO
    */
   public PlantModelCreationTO(String name) {
     super(name);
+    this.points = List.of();
+    this.paths = List.of();
+    this.locationTypes = List.of();
+    this.locations = List.of();
+    this.blocks = List.of();
+    this.groups = List.of();
+    this.vehicles = List.of();
+    this.visualLayouts = List.of(defaultVisualLayout());
   }
 
   @SuppressWarnings("deprecation")

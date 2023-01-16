@@ -10,7 +10,6 @@ package org.opentcs.access.to.model;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -31,16 +30,16 @@ public class BlockCreationTO
    * This block's type.
    */
   @Nonnull
-  private Block.Type type = Block.Type.SINGLE_VEHICLE_ONLY;
+  private final Block.Type type;
   /**
    * This block's member names.
    */
   @Nonnull
-  private Set<String> memberNames = new HashSet<>();
+  private final Set<String> memberNames;
   /**
    * The information regarding the grahical representation of this block.
    */
-  private Layout layout = new Layout();
+  private final Layout layout;
 
   /**
    * Creates a new instance.
@@ -49,6 +48,9 @@ public class BlockCreationTO
    */
   public BlockCreationTO(String name) {
     super(name);
+    this.type = Block.Type.SINGLE_VEHICLE_ONLY;
+    this.memberNames = Set.of();
+    this.layout = new Layout();
   }
 
   /**

@@ -10,7 +10,7 @@ package org.opentcs.kernelcontrolcenter.vehicles;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -71,7 +71,7 @@ public class DetailPanel
   /**
    * The adapter specific list of JPanels.
    */
-  private final List<VehicleCommAdapterPanel> customPanelList = new LinkedList<>();
+  private final List<VehicleCommAdapterPanel> customPanelList = new ArrayList<>();
   /**
    * The set of factories to create adapter specific panels.
    */

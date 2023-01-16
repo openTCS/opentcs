@@ -29,7 +29,7 @@ public class ModelLayoutElementCreationTO
   /**
    * The layer on which this model layout element is to be displayed.
    */
-  private int layer;
+  private final int layer;
 
   /**
    * Creates a new instance.
@@ -38,6 +38,7 @@ public class ModelLayoutElementCreationTO
    */
   public ModelLayoutElementCreationTO(String name) {
     super(name);
+    this.layer = 0;
   }
 
   private ModelLayoutElementCreationTO(@Nonnull String name,

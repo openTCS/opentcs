@@ -9,7 +9,6 @@ package org.opentcs.access.to.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -31,29 +30,29 @@ public class VisualLayoutCreationTO
   /**
    * This layout's scale on the X axis (in mm/pixel).
    */
-  private double scaleX = 50.0;
+  private final double scaleX;
   /**
    * This layout's scale on the Y axis (in mm/pixel).
    */
-  private double scaleY = 50.0;
+  private final double scaleY;
   /**
    * This layout's model layout elements.
    */
   @Deprecated
-  private List<ModelLayoutElementCreationTO> modelElements = new LinkedList<>();
+  private final List<ModelLayoutElementCreationTO> modelElements;
   /**
    * This layout's shape layout elements.
    */
   @Deprecated
-  private List<ShapeLayoutElementCreationTO> shapeElements = new LinkedList<>();
+  private final List<ShapeLayoutElementCreationTO> shapeElements;
   /**
    * This layout's layers.
    */
-  private List<Layer> layers = new LinkedList<>();
+  private final List<Layer> layers;
   /**
    * The layout's layer groups.
    */
-  private List<LayerGroup> layerGroups = new LinkedList<>();
+  private final List<LayerGroup> layerGroups;
 
   /**
    * Creates a new instance.
@@ -62,6 +61,13 @@ public class VisualLayoutCreationTO
    */
   public VisualLayoutCreationTO(@Nonnull String name) {
     super(name);
+
+    this.scaleX = 50.0;
+    this.scaleY = 50.0;
+    this.modelElements = List.of();
+    this.shapeElements = List.of();
+    this.layers = List.of();
+    this.layerGroups = List.of();
   }
 
   @SuppressWarnings("deprecation")

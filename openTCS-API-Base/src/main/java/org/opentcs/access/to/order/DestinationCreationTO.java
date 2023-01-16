@@ -26,12 +26,12 @@ public class DestinationCreationTO
    * The name of the destination location (or point).
    */
   @Nonnull
-  private String destLocationName;
+  private final String destLocationName;
   /**
    * The operation to be performed at the destination.
    */
   @Nonnull
-  private String destOperation;
+  private final String destOperation;
 
   /**
    * Creates a new instance.
@@ -124,10 +124,10 @@ public class DestinationCreationTO
   public String getDestOperation() {
     return destOperation;
   }
-  
+
   /**
    * Creates a copy of this object with the given operation to be performed at the destination.
-   * 
+   *
    * @param destOperation The operation.
    * @return A copy of this object, differing in the given destination operation.
    */

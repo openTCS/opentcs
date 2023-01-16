@@ -8,7 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.opentcs.data.order.DriveOrder;
@@ -29,9 +29,9 @@ public class OrderStatusMessage
 
   private OrderState orderState;
 
-  private List<Destination> destinations = new LinkedList<>();
+  private List<Destination> destinations = new ArrayList<>();
 
-  private List<Property> properties = new LinkedList<>();
+  private List<Property> properties = new ArrayList<>();
 
   /**
    * Creates a new instance.

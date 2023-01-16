@@ -9,7 +9,7 @@ package org.opentcs.util.gui;
 
 import java.awt.Image;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public final class Icons {
    */
   public static List<Image> getOpenTCSIcons() {
     try {
-      List<Image> icons = new LinkedList<>();
+      List<Image> icons = new ArrayList<>();
       for (String iconFile : ICON_FILES) {
         String iconURL = ICON_PATH + iconFile;
         final Image icon = ImageIO.read(Icons.class.getResource(iconURL));
@@ -63,7 +63,7 @@ public final class Icons {
     }
     catch (IOException | IllegalArgumentException exc) {
       LOG.warn("Couldn't load icon images from path {}", ICON_PATH, exc);
-      return new LinkedList<>();
+      return new ArrayList<>();
     }
   }
 }

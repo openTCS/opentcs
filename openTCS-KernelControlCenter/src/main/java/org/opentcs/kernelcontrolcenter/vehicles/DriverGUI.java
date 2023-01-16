@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -361,7 +360,7 @@ public class DriverGUI
   }
 
   private List<LocalVehicleEntry> getSelectedVehicleEntries() {
-    List<LocalVehicleEntry> selectedEntries = new LinkedList<>();
+    List<LocalVehicleEntry> selectedEntries = new ArrayList<>();
     for (String selectedVehicleName : getSelectedVehicleNames()) {
       selectedEntries.add(vehicleEntryPool.getEntryFor(selectedVehicleName));
     }

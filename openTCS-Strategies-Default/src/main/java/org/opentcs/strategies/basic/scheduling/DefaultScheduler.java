@@ -174,7 +174,7 @@ public class DefaultScheduler
 
       allocationAdvisor.setAllocationState(client,
                                            reservationPool.allocatedResources(client),
-                                           new LinkedList<>());
+                                           new ArrayList<>());
     }
   }
 

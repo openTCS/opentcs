@@ -9,7 +9,6 @@ package org.opentcs.data.model;
 
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -180,7 +179,7 @@ public class Vehicle
     this.precisePosition = null;
     this.orientationAngle = Double.NaN;
     this.energyLevel = 100;
-    this.loadHandlingDevices = new ArrayList<>();
+    this.loadHandlingDevices = List.of();
     this.layout = new Layout();
   }
 

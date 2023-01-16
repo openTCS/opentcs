@@ -10,7 +10,6 @@ package org.opentcs.access.to.order;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -39,41 +38,41 @@ public class TransportOrderCreationTO
    * The destinations that need to be travelled to.
    */
   @Nonnull
-  private List<DestinationCreationTO> destinations;
+  private final List<DestinationCreationTO> destinations;
   /**
    * An optional token for reserving peripheral devices while processing this transport order.
    */
   @Nullable
-  private String peripheralReservationToken;
+  private final String peripheralReservationToken;
   /**
    * The (optional) name of the order sequence the transport order belongs to.
    */
   @Nullable
-  private String wrappingSequence;
+  private final String wrappingSequence;
   /**
    * The (optional) names of transport orders the transport order depends on.
    */
   @Nonnull
-  private Set<String> dependencyNames = new HashSet<>();
+  private final Set<String> dependencyNames;
   /**
    * The (optional) name of the vehicle that is supposed to execute the transport order.
    */
   @Nullable
-  private String intendedVehicleName;
+  private final String intendedVehicleName;
   /**
    * The type of the transport order.
    */
   @Nonnull
-  private String type = OrderConstants.TYPE_NONE;
+  private final String type;
   /**
    * The point of time at which execution of the transport order is supposed to be finished.
    */
   @Nonnull
-  private Instant deadline = Instant.MAX;
+  private final Instant deadline;
   /**
    * Whether the transport order is dispensable or not.
    */
-  private boolean dispensable;
+  private final boolean dispensable;
 
   /**
    * Creates a new instance.
@@ -86,6 +85,13 @@ public class TransportOrderCreationTO
     super(name);
     this.incompleteName = false;
     this.destinations = requireNonNull(destinations, "destinations");
+    this.peripheralReservationToken = null;
+    this.wrappingSequence = null;
+    this.dependencyNames = Set.of();
+    this.intendedVehicleName = null;
+    this.type = OrderConstants.TYPE_NONE;
+    this.deadline = Instant.MAX;
+    this.dispensable = false;
   }
 
   private TransportOrderCreationTO(@Nonnull String name,

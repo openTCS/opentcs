@@ -9,8 +9,8 @@ package org.opentcs.documentation;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import org.junit.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,7 +62,7 @@ public class CreateTransportOrderTest {
 
     // A list of destinations the transport order the vehicle is supposed
     // to travel to:
-    List<DestinationCreationTO> destinations = new LinkedList<>();
+    List<DestinationCreationTO> destinations = new ArrayList<>();
     // Create a new destination description and add it to the list.
     // Every destination is described by the name of the destination
     // location in the plant model and an operation the vehicle is supposed
@@ -103,7 +103,7 @@ public class CreateTransportOrderTest {
 
     // Create a list containing a single destination to a point.
     // Use Destination.OP_MOVE as the operation to be executed:
-    List<DestinationCreationTO> destinations = new LinkedList<>();
+    List<DestinationCreationTO> destinations = new ArrayList<>();
     destinations.add(new DestinationCreationTO("Some point name",
                                                Destination.OP_MOVE));
     // Create a transport order description with the destination and a

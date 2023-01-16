@@ -33,7 +33,7 @@ public class ObjectHistory
    * Creates a new instance.
    */
   public ObjectHistory() {
-    this(new ArrayList<>());
+    this(List.of());
   }
 
   /**

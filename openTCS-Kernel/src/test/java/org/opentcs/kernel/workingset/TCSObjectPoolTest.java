@@ -11,8 +11,8 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -172,7 +172,7 @@ public class TCSObjectPoolTest {
   public void shouldEmitEventForCreatedObject() {
     EventBus eventBus = new SimpleEventBus();
 
-    List<Object> receivedEvents = new LinkedList<>();
+    List<Object> receivedEvents = new ArrayList<>();
 
     eventBus.subscribe(event -> {
       receivedEvents.add(event);

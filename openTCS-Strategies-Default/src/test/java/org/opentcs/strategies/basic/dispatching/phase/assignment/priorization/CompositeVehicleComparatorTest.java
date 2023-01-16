@@ -8,11 +8,9 @@
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,7 +43,7 @@ public class CompositeVehicleComparatorTest {
   @Test
   public void sortNamesUpForOtherwiseEqualInstances() {
     Mockito.when(configuration.vehiclePriorities())
-        .thenReturn(new LinkedList<>());
+        .thenReturn(List.of());
     comparator = new CompositeVehicleComparator(configuration, availableComparators);
 
     Vehicle candidate1 = new Vehicle("AA");
@@ -67,7 +65,7 @@ public class CompositeVehicleComparatorTest {
   @Test
   public void sortsByNameAndEnergylevel() {
     Mockito.when(configuration.vehiclePriorities())
-        .thenReturn(new LinkedList<>());
+        .thenReturn(List.of());
     comparator = new CompositeVehicleComparator(configuration, availableComparators);
 
     Vehicle candidate1 = new Vehicle("AA").withEnergyLevel(1);
@@ -90,7 +88,7 @@ public class CompositeVehicleComparatorTest {
   public void sortsByNameEnergylevelRoutingCost() {
 
     Mockito.when(configuration.vehiclePriorities())
-        .thenReturn(Arrays.asList("IDLE_FIRST"));
+        .thenReturn(List.of("IDLE_FIRST"));
     availableComparators.put("IDLE_FIRST",
                              new VehicleComparatorIdleFirst());
 

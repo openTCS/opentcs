@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
@@ -26,7 +26,7 @@ public class EventBuffer
   /**
    * The buffered events.
    */
-  private final List<Object> events = new LinkedList<>();
+  private final List<Object> events = new ArrayList<>();
   /**
    * This buffer's event filter.
    */
@@ -90,7 +90,7 @@ public class EventBuffer
           waitingClient = false;
         }
       }
-      List<Object> result = new LinkedList<>(events);
+      List<Object> result = new ArrayList<>(events);
       events.clear();
       return result;
     }

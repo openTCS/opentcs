@@ -8,7 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 
@@ -21,7 +21,7 @@ public class StatusMessageList {
 
   private Instant timeStamp = Instant.now();
 
-  private List<StatusMessage> statusMessages = new LinkedList<>();
+  private List<StatusMessage> statusMessages = new ArrayList<>();
 
   /**
    * Creates a new instance.

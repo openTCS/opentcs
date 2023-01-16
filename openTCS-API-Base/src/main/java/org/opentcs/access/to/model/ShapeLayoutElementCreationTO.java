@@ -27,7 +27,7 @@ public class ShapeLayoutElementCreationTO
   /**
    * The layer on which this shape layout element is to be displayed.
    */
-  private int layer;
+  private final int layer;
 
   /**
    * Creates a new instance.
@@ -36,6 +36,7 @@ public class ShapeLayoutElementCreationTO
    */
   public ShapeLayoutElementCreationTO(String name) {
     super(name);
+    this.layer = 0;
   }
 
   /**

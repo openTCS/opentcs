@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class StatisticsLogParser {
       throws FileNotFoundException, IOException {
     requireNonNull(inputFile, "inputFile");
 
-    List<StatisticsRecord> result = new LinkedList<>();
+    List<StatisticsRecord> result = new ArrayList<>();
     try (BufferedReader inputReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(inputFile), Charset.forName("UTF-8")))) {
       String inputLine = inputReader.readLine();

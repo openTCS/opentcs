@@ -33,16 +33,16 @@ public class OrderSequenceCreationTO
   /**
    * The type of the order sequence.
    */
-  private String type = OrderConstants.TYPE_NONE;
+  private final String type;
   /**
    * The (optional) name of the vehicle that is supposed to execute the transport order.
    */
   @Nullable
-  private String intendedVehicleName;
+  private final String intendedVehicleName;
   /**
    * Whether failure of one transport order in the sequence makes subsequent ones fail, too.
    */
-  private boolean failureFatal;
+  private final boolean failureFatal;
 
   /**
    * Creates a new instance.
@@ -52,6 +52,9 @@ public class OrderSequenceCreationTO
   public OrderSequenceCreationTO(@Nonnull String name) {
     super(name);
     this.incompleteName = false;
+    this.type = OrderConstants.TYPE_NONE;
+    this.intendedVehicleName = null;
+    this.failureFatal = false;
   }
 
   private OrderSequenceCreationTO(@Nonnull String name,

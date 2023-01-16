@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -26,7 +26,7 @@ public class Destination {
 
   private State state = State.PRISTINE;
 
-  private List<Property> properties = new LinkedList<>();
+  private List<Property> properties = new ArrayList<>();
 
   /**
    * Creates a new instance.

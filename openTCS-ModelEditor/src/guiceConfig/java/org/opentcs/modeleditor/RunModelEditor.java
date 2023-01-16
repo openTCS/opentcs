@@ -12,7 +12,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.opentcs.configuration.ConfigurationBindingProvider;
@@ -91,7 +91,7 @@ public class RunModelEditor {
    */
   private static List<PlantOverviewInjectionModule> findRegisteredModules(
       ConfigurationBindingProvider bindingProvider) {
-    List<PlantOverviewInjectionModule> registeredModules = new LinkedList<>();
+    List<PlantOverviewInjectionModule> registeredModules = new ArrayList<>();
     for (PlantOverviewInjectionModule module
              : ServiceLoader.load(PlantOverviewInjectionModule.class)) {
       LOG.info("Integrating injection module {} (source: {})",

@@ -81,7 +81,7 @@ public class Path
     this.length = 1;
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
-    this.peripheralOperations = new ArrayList<>();
+    this.peripheralOperations = List.of();
     this.locked = false;
     this.layout = new Layout();
   }
