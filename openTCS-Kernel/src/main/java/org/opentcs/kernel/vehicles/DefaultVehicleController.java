@@ -529,7 +529,6 @@ public class DefaultVehicleController
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
 
-      clearPeripheralInteractions();
       clearCommandQueue();
     }
   }
@@ -583,6 +582,7 @@ public class DefaultVehicleController
       futureCommands.clear();
       pendingCommand = null;
       interactionsPendingCommand = null;
+      peripheralInteractor.clear();
       // Free all resource sets that were reserved for future commands, except the current one...
       Set<TCSResource<?>> neededResources = allocatedResources.poll();
       for (Set<TCSResource<?>> resSet : allocatedResources) {
