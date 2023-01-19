@@ -28,6 +28,8 @@ import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Realizes a bidirectional connection between the kernel and a comm adapter controlling a
@@ -39,6 +41,10 @@ public class DefaultPeripheralController
     implements PeripheralController,
                EventHandler {
 
+  /**
+   * This class's Logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultPeripheralController.class);
   /**
    * The location representing the peripheral device controlled by this controller/the comm adapter.
    */
@@ -136,6 +142,7 @@ public class DefaultPeripheralController
                location.getName(),
                canProcess.getReason());
 
+    LOG.debug("{}: Handing job to comm adapter: {}", location.getName(), job);
     commAdapter.process(job, callback);
   }
 

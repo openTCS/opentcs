@@ -729,6 +729,7 @@ public class DefaultVehicleController
 
   private void sendCommand(MovementCommand command)
       throws IllegalStateException {
+    LOG.debug("{}: Enqueuing movement command with comm adapter: {}", vehicle.getName(), command);
     // Send the command to the communication adapter.
     checkState(commAdapter.enqueueCommand(command),
                "Comm adapter did not accept command");

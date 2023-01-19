@@ -371,6 +371,20 @@ public class PeripheralJob
                              finishedTime);
   }
 
+  @Override
+  public String toString() {
+    return "PeripheralJob{"
+        + "name=" + getName()
+        + ", reservationToken=" + reservationToken
+        + ", relatedVehicle=" + relatedVehicle
+        + ", relatedTransportOrder=" + relatedTransportOrder
+        + ", peripheralOperation=" + peripheralOperation
+        + ", state=" + state
+        + ", creationTime=" + creationTime
+        + ", finishedTime=" + finishedTime
+        + '}';
+  }
+
   /**
    * Defines the various states a peripheral job may be in.
    */
