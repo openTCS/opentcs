@@ -199,6 +199,7 @@ public class HttpSamples {
         false,
         Instant.now(),
         "Vehicle-01",
+        "some type",
         List.of(
             new Destination("Storage 01", "Load cargo", List.of()),
             new Destination("Storage 02",

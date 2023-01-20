@@ -29,6 +29,8 @@ public class Transport {
 
   private String intendedVehicle;
 
+  private String type;
+
   private List<Destination> destinations;
 
   private List<Property> properties;
@@ -40,12 +42,14 @@ public class Transport {
       @JsonProperty(required = false, value = "incompleteName") boolean incompleteName,
       @Nullable @JsonProperty(required = false, value = "deadline") Instant deadline,
       @Nullable @JsonProperty(required = false, value = "intendedVehicle") String intendedVehicle,
+      @Nullable @JsonProperty(required = false, value = "type") String type,
       @Nonnull @JsonProperty(required = true, value = "destinations") List<Destination> destinations,
       @Nullable @JsonProperty(required = false, value = "properties") List<Property> properties,
       @Nullable @JsonProperty(required = false, value = "dependencies") List<String> dependencies) {
     this.incompleteName = incompleteName;
     this.deadline = deadline;
     this.intendedVehicle = intendedVehicle;
+    this.type = type;
     this.destinations = requireNonNull(destinations, "destinations");
     this.properties = properties;
     this.dependencies = dependencies;
@@ -75,6 +79,15 @@ public class Transport {
 
   public void setIntendedVehicle(@Nullable String intendedVehicle) {
     this.intendedVehicle = intendedVehicle;
+  }
+
+  @Nullable
+  public String getType() {
+    return type;
+  }
+
+  public void setType(@Nullable String type) {
+    this.type = type;
   }
 
   @Nonnull

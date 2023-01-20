@@ -14,6 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features:
+** Add support for specifying and retrieving the order type via web API.
 * Bugs fixed:
 ** Fix a bug where (immediately) withrawing a transport order from a vehicle that is waiting for a peripheral job to finish would prevent any further commands (e.g. for new transport orders) to be sent to the vehicle.
 * Other changes:

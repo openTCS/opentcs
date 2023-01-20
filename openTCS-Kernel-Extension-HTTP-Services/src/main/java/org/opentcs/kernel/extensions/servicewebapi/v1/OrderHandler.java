@@ -34,6 +34,7 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Destination;
@@ -112,6 +113,7 @@ public class OrderHandler {
             .withIntendedVehicleName(order.getIntendedVehicle())
             .withDependencyNames(dependencyNames(order.getDependencies()))
             .withDeadline(deadline(order))
+            .withType(order.getType() == null ? OrderConstants.TYPE_NONE : order.getType())
             .withProperties(properties(order.getProperties()));
 
     try {

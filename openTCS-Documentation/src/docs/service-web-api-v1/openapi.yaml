@@ -640,6 +640,10 @@ components:
           type: string
           description: The name of the vehicle currently processing the transport order.
           example: Vehicle-0002
+        type:
+          type: string
+          description: The type of the transport order
+          example: some type
         destinations:
           type: array
           items:
@@ -699,6 +703,10 @@ components:
           type: string
           description: The (optional) intended vehicle of the transport order
           example: Vehicle-01
+        type:
+          type: string
+          description: The (optional) type of the transport order
+          example: some type
         destinations:
           type: array
           minItems: 1
