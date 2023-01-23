@@ -8,8 +8,6 @@
 package org.opentcs.virtualvehicle;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A <code>VelocityListener</code> that keeps velocity values in a ring buffer.
@@ -18,10 +16,6 @@ import org.slf4j.LoggerFactory;
  */
 public class VelocityHistory {
 
-  /**
-   * This class's Logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(VelocityHistory.class);
   /**
    * The actual ring buffer, containing the velocity values.
    */
@@ -71,7 +65,6 @@ public class VelocityHistory {
    * @param newValue The value to be added.
    */
   public void addVelocityValue(int newValue) {
-    LOG.debug("method entry");
     synchronized (velocities) {
       if (valueCounter % divisor == 0) {
         velocities[writeIndex] = newValue;
@@ -87,7 +80,6 @@ public class VelocityHistory {
    * @return A copy of this listener's ring buffer.
    */
   public int[] getVelocities() {
-    LOG.debug("method entry");
     int[] result = new int[velocityQueueCapacity];
     synchronized (velocities) {
       int firstCount = velocityQueueCapacity - writeIndex;
@@ -106,7 +98,6 @@ public class VelocityHistory {
    * @return This listener's queue capacity.
    */
   public int getQueueSize() {
-    LOG.debug("method entry");
     return velocityQueueCapacity;
   }
 
@@ -115,7 +106,6 @@ public class VelocityHistory {
    * values in the queue to 0.
    */
   public void clear() {
-    LOG.debug("method entry");
     synchronized (velocities) {
       for (int i = 0; i < velocities.length; i++) {
         velocities[i] = 0;

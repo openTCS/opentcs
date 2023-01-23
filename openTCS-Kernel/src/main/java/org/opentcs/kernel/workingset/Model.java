@@ -108,7 +108,6 @@ public class Model {
    * model's data.
    */
   public TCSObjectPool getObjectPool() {
-    LOG.debug("method entry");
     return objectPool;
   }
 
@@ -118,7 +117,6 @@ public class Model {
    * @return This model's name.
    */
   public String getName() {
-    LOG.debug("method entry");
     return name;
   }
 
@@ -154,7 +152,6 @@ public class Model {
    */
   @SuppressWarnings("deprecation")
   public void clear() {
-    LOG.debug("method entry");
     for (TCSObject<?> curObject : objectPool.getObjects((Pattern) null)) {
       if (curObject instanceof Point
           || curObject instanceof Path
@@ -183,6 +180,8 @@ public class Model {
   @SuppressWarnings("deprecation")
   public void createPlantModelObjects(PlantModelCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
+    LOG.info("Plant model is being created: {}", to.getName());
+
     clear();
     setName(to.getName());
     setProperties(to.getProperties());
@@ -315,7 +314,6 @@ public class Model {
    */
   public Path setPathLocked(TCSObjectReference<Path> ref, boolean newLocked)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Path path = objectPool.getObject(Path.class, ref);
     Path previousState = path;
     path = objectPool.replaceObject(path.withLocked(newLocked));
@@ -545,7 +543,6 @@ public class Model {
   public Vehicle setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                        int energyLevel)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
     if (vehicle == null) {
       throw new ObjectUnknownException(ref);
@@ -569,7 +566,6 @@ public class Model {
   public Vehicle setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                              String rechargeOperation)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withRechargeOperation(rechargeOperation));
@@ -590,7 +586,6 @@ public class Model {
   public Vehicle setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                                List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withLoadHandlingDevices(devices));
@@ -611,7 +606,6 @@ public class Model {
   public Vehicle setVehicleState(TCSObjectReference<Vehicle> ref,
                                  Vehicle.State newState)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withState(newState));
@@ -684,7 +678,6 @@ public class Model {
   public Vehicle setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                      Vehicle.ProcState newState)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withProcState(newState));
@@ -728,7 +721,6 @@ public class Model {
   public Vehicle setVehiclePosition(TCSObjectReference<Vehicle> ref,
                                     TCSObjectReference<Point> newPosRef)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousVehicleState = vehicle;
     // If the vehicle was occupying a point before, clear it and send an event.
@@ -769,7 +761,6 @@ public class Model {
   public Vehicle setVehicleNextPosition(TCSObjectReference<Vehicle> ref,
                                         TCSObjectReference<Point> newPosition)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withNextPosition(newPosition));
@@ -790,7 +781,6 @@ public class Model {
   public Vehicle setVehiclePrecisePosition(TCSObjectReference<Vehicle> ref,
                                            Triple newPosition)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withPrecisePosition(newPosition));
@@ -811,7 +801,6 @@ public class Model {
   public Vehicle setVehicleOrientationAngle(TCSObjectReference<Vehicle> ref,
                                             double angle)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withOrientationAngle(angle));
@@ -832,7 +821,6 @@ public class Model {
   public Vehicle setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                           TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     if (orderRef == null) {
@@ -859,7 +847,6 @@ public class Model {
   public Vehicle setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                          TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     if (seqRef == null) {
@@ -887,7 +874,6 @@ public class Model {
   public Vehicle setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
                                               int index)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withRouteProgressIndex(index));
@@ -908,7 +894,6 @@ public class Model {
   public Vehicle setVehicleClaimedResources(TCSObjectReference<Vehicle> vehicleRef,
                                             List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withClaimedResources(unmodifiableCopy(resources)));
@@ -929,7 +914,6 @@ public class Model {
   public Vehicle setVehicleAllocatedResources(TCSObjectReference<Vehicle> vehicleRef,
                                               List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withAllocatedResources(unmodifiableCopy(resources)));
@@ -1272,7 +1256,6 @@ public class Model {
    */
   public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Set<TCSResource<?>> result = new HashSet<>();
     Set<Block> blocks = getObjectPool().getObjects(Block.class);
     for (TCSResourceReference<?> curRef : resources) {
@@ -1453,7 +1436,6 @@ public class Model {
   private Point addPointIncomingPath(TCSObjectReference<Point> pointRef,
                                      TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
     Path path = objectPool.getObject(Path.class, pathRef);
     // Check if the point really is the path's destination point.
@@ -1482,7 +1464,6 @@ public class Model {
   private Point addPointOutgoingPath(TCSObjectReference<Point> pointRef,
                                      TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
-    LOG.debug("method entry");
     Point point = objectPool.getObject(Point.class, pointRef);
     Path path = objectPool.getObject(Path.class, pathRef);
     // Check if the point really is the path's source.

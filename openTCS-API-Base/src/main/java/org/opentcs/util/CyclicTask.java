@@ -145,7 +145,6 @@ public abstract class CyclicTask
 
   @Override
   public void run() {
-    LOG.debug("method entry");
     // Save the executing thread for use in terminateAndWait().
     taskThread = Thread.currentThread();
     // Execute the actual task until terminated.
@@ -171,7 +170,6 @@ public abstract class CyclicTask
     // threads (in terminateAndWait()) that execute more than one task
     // subsequently.
     taskThread = null;
-    LOG.debug("end of method");
   }
 
   /**

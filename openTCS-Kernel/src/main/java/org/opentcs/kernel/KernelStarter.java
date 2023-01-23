@@ -86,7 +86,6 @@ public class KernelStarter {
       LOG.debug("Kernel initialized.");
 
       plantModelService.loadPlantModel();
-      LOG.info("Loaded model named '{}'.", plantModelService.getModelName());
 
       kernel.setState(Kernel.State.OPERATING);
     });

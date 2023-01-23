@@ -92,9 +92,13 @@ public class PeripheralJobPool {
         .withRelatedVehicle(toVehicleReference(to.getRelatedVehicleName()))
         .withRelatedTransportOrder(toTransportOrderReference(to.getRelatedTransportOrderName()))
         .withProperties(to.getProperties());
+
+    LOG.info("Peripheral job is being created: {} -- {}",
+             job.getName(),
+             job.getPeripheralOperation());
+
     objectPool.addObject(job);
     objectPool.emitObjectEvent(job, null, TCSObjectEvent.Type.OBJECT_CREATED);
-    LOG.debug("Created peripheral job {}...", job.getName());
 
     return job;
   }
