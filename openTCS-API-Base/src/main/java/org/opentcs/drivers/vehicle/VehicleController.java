@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
@@ -52,7 +54,9 @@ public interface VehicleController
    *
    * @param newOrder The new or updated transport order.
    * @throws IllegalArgumentException If {@code newOrder} cannot be processed for some reason, e.g.
-   * because it has already been partly processed and the route's continuity is not given.
+   * because it has already been partly processed and the route's continuity is not given, the
+   * vehicle's current position is unknown or the resources for the vehicle's current position may
+   * not be allocated (in case of forced rerouting).
    */
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
   default void setTransportOrder(@Nonnull TransportOrder newOrder)
@@ -232,5 +236,18 @@ public interface VehicleController
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
   default Optional<MovementCommand> getInteractionsPendingCommand() {
     return Optional.empty();
+  }
+
+  /**
+   * Checks if the given set of resources are safe to be allocated <em>immediately</em> by this
+   * controller.
+   *
+   * @param resources The requested resources.
+   * @return {@code true} if the given resources are safe to be allocated by this controller,
+   * otherwise {@code false}.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default boolean mayAllocateNow(@Nonnull Set<TCSResource<?>> resources) {
+    return false;
   }
 }

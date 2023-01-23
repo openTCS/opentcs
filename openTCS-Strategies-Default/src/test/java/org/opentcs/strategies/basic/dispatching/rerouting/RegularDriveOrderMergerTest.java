@@ -9,9 +9,12 @@ package org.opentcs.strategies.basic.dispatching.rerouting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -57,7 +60,7 @@ public class RegularDriveOrderMergerTest {
         = driveOrderMerger.mergeDriveOrders(orderA, orderB, new Vehicle("Vehicle")).getRoute();
 
     // Assert
-    assertEquals(expected, actual);
+    assertStepsEqualsIgnoringReroutingType(expected, actual);
   }
 
   private DriveOrder createDriveOrder(long routeCosts, String startPoint, String... pointNames) {
@@ -88,5 +91,21 @@ public class RegularDriveOrderMergerTest {
       routeSteps.add(new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, i));
     }
     return new Route(routeSteps, costs);
+  }
+
+  private void assertStepsEqualsIgnoringReroutingType(Route routeA, Route routeB) {
+    assertThat(routeA.getSteps().size(), is(routeB.getSteps().size()));
+    for (int i = 0; i < routeA.getSteps().size(); i++) {
+      Route.Step stepA = routeA.getSteps().get(i);
+      Route.Step stepB = routeB.getSteps().get(i);
+      assertTrue(
+          Objects.equals(stepA.getPath(), stepB.getPath())
+          && Objects.equals(stepA.getSourcePoint(), stepB.getSourcePoint())
+          && Objects.equals(stepA.getDestinationPoint(), stepB.getDestinationPoint())
+          && Objects.equals(stepA.getVehicleOrientation(), stepB.getVehicleOrientation())
+          && stepA.getRouteIndex() == stepB.getRouteIndex()
+          && stepA.isExecutionAllowed() == stepB.isExecutionAllowed()
+      );
+    }
   }
 }

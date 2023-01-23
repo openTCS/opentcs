@@ -10,6 +10,7 @@ package org.opentcs.strategies.basic.dispatching;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
@@ -30,7 +32,6 @@ import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.R
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.IGNORE_PATH_LOCKS;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_AT_PATH_LOCK;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_IMMEDIATELY;
-import org.opentcs.strategies.basic.dispatching.rerouting.RegularReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.rerouting.ReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.rerouting.VehiclePositionResolver;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class RerouteUtil {
 
   private final DefaultDispatcherConfiguration configuration;
 
-  private final ReroutingStrategy reroutingStrategy;
+  private final Map<ReroutingType, ReroutingStrategy> reroutingStrategies;
 
   private final VehiclePositionResolver vehiclePositionResolver;
 
@@ -73,7 +74,7 @@ public class RerouteUtil {
    * @param vehicleControllerPool The vehicle controller pool.
    * @param transportOrderService The object service.
    * @param configuration The configuration.
-   * @param reroutingStrategy The rerouting strategy to use.
+   * @param reroutingStrategies The rerouting strategies to select from.
    * @param vehiclePositionResolver Used to resolve the position of vehicles.
    */
   @Inject
@@ -81,24 +82,24 @@ public class RerouteUtil {
                      VehicleControllerPool vehicleControllerPool,
                      InternalTransportOrderService transportOrderService,
                      DefaultDispatcherConfiguration configuration,
-                     RegularReroutingStrategy reroutingStrategy,
+                     Map<ReroutingType, ReroutingStrategy> reroutingStrategies,
                      VehiclePositionResolver vehiclePositionResolver) {
     this.router = requireNonNull(router, "router");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.configuration = requireNonNull(configuration, "configuration");
-    this.reroutingStrategy = requireNonNull(reroutingStrategy, "reroutingStrategy");
+    this.reroutingStrategies = requireNonNull(reroutingStrategies, "reroutingStrategies");
     this.vehiclePositionResolver = requireNonNull(vehiclePositionResolver,
                                                   "vehiclePositionResolver");
   }
 
-  public void reroute(Collection<Vehicle> vehicles) {
+  public void reroute(Collection<Vehicle> vehicles, ReroutingType reroutingType) {
     for (Vehicle vehicle : vehicles) {
-      reroute(vehicle);
+      reroute(vehicle, reroutingType);
     }
   }
 
-  public void reroute(Vehicle vehicle) {
+  public void reroute(Vehicle vehicle, ReroutingType reroutingType) {
     requireNonNull(vehicle, "vehicle");
     LOG.debug("Trying to reroute vehicle '{}'...", vehicle.getName());
 
@@ -110,7 +111,16 @@ public class RerouteUtil {
     TransportOrder originalOrder = transportOrderService.fetchObject(TransportOrder.class,
                                                                      vehicle.getTransportOrder());
 
-    Optional<List<DriveOrder>> optOrders = reroutingStrategy.reroute(vehicle);
+    Optional<List<DriveOrder>> optOrders;
+    if (reroutingStrategies.containsKey(reroutingType)) {
+      optOrders = reroutingStrategies.get(reroutingType).reroute(vehicle);
+    }
+    else {
+      LOG.warn("Cannot reroute {} for unknown rerouting type: {}",
+               vehicle.getName(),
+               reroutingType.name());
+      optOrders = Optional.empty();
+    }
 
     // Get the drive order with the new route or stick to the old one
     List<DriveOrder> newDriveOrders;

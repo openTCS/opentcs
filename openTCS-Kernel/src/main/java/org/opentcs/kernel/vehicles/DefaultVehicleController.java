@@ -11,6 +11,7 @@ import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +46,7 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
@@ -319,6 +321,43 @@ public class DefaultVehicleController
     else {
       // We received an update for a drive order we're already processing.
       transportOrder = newOrder;
+
+      checkArgument(driveOrdersContinual(currentDriveOrder, transportOrder.getCurrentDriveOrder()),
+                    "The new and old drive orders are not considered continual.");
+
+      if (isForcedRerouting(transportOrder.getCurrentDriveOrder())) {
+        Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
+        if (currVehicle.getCurrentPosition() == null) {
+          throw new IllegalArgumentException("The vehicle's current position is unknown.");
+        }
+        Point currPosition = vehicleService.fetchObject(Point.class,
+                                                        currVehicle.getCurrentPosition());
+        // Before interacting with the scheduler in any way, ensure that the we will be able to
+        // allocate the required resources.
+        if (!mayAllocateNow(Set.of(currPosition))) {
+          throw new IllegalArgumentException(
+              "Resources for the vehicle's current position may not be allocated now."
+          );
+        }
+
+        freeAllResources();
+        try {
+          // Allocate the resources for the vehicle's current position.
+          scheduler.allocateNow(this, Set.of(currPosition));
+          allocatedResources.add(Set.of(currPosition));
+          vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                     toListOfResourceSets(allocatedResources));
+        }
+        catch (ResourceAllocationException ex) {
+          // May never happen. The caller is expected to call mayAllocateNow() first before applying
+          // forced rerouting.
+          throw new IllegalArgumentException(
+              "Unable to allocate resources for the vehicle's current position.",
+              ex
+          );
+        }
+      }
+
       updateDriveOrder(transportOrder.getCurrentDriveOrder(), transportOrder.getProperties());
     }
   }
@@ -377,9 +416,6 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
       checkArgument(currentDriveOrder != null, "There's no drive order to be updated");
-      checkArgument(driveOrdersContinual(currentDriveOrder, newOrder),
-                    "The new drive order contains steps the vehicle didn't process for the current "
-                    + "drive order.");
 
       LOG.debug("{}: Updating drive order: {}", vehicle.getName(), newOrder);
       // Update the current drive order and future commands
@@ -416,37 +452,54 @@ public class DefaultVehicleController
   }
 
   private boolean driveOrdersContinual(DriveOrder oldOrder, DriveOrder newOrder) {
-    LOG.debug("Checking drive order continuity for {} and {}.", oldOrder, newOrder);
+    LOG.debug("Checking drive order continuity for {} (old) and {} (new).", oldOrder, newOrder);
 
-    int routeProgressIndex = getFutureOrCurrentPositionIndex();
-    if (routeProgressIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
+    int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
+    if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
+      LOG.debug("No route progress, yet. Considering drive orders continuous.");
       return true;
     }
 
     List<Step> oldSteps = oldOrder.getRoute().getSteps();
     List<Step> newSteps = newOrder.getRoute().getSteps();
 
-    List<Step> oldProcessedSteps = oldSteps.subList(0, routeProgressIndex + 1);
-    List<Step> newProcessedSteps = newSteps.subList(0, routeProgressIndex + 1);
+    List<Step> oldProcessedSteps = oldSteps.subList(0, lastCommandExecutedRouteIndex + 1);
+    List<Step> newProcessedSteps = newSteps.subList(0, lastCommandExecutedRouteIndex + 1);
+    LOG.debug("Comparing steps up to the last executed command for equality: {} and {}",
+              oldProcessedSteps,
+              newProcessedSteps);
+    if (!Objects.equals(oldProcessedSteps, newProcessedSteps)) {
+      LOG.debug("Steps are not equal. Not considering drive orders continuous.");
+      return false;
+    }
 
-    LOG.debug("Comparing {} and {} for equality.", oldProcessedSteps, newProcessedSteps);
-    return Objects.equals(oldProcessedSteps, newProcessedSteps);
+    if (isForcedRerouting(newOrder)) {
+      LOG.debug("New order with forced rerouting. Considering drive orders continuous.");
+      return true;
+    }
+
+    int futureOrCurrentPositionIndex = getFutureOrCurrentPositionIndex();
+    List<Step> oldPendingSteps = oldSteps.subList(lastCommandExecutedRouteIndex + 1,
+                                                  futureOrCurrentPositionIndex + 1);
+    List<Step> newPendingSteps = newSteps.subList(lastCommandExecutedRouteIndex + 1,
+                                                  futureOrCurrentPositionIndex + 1);
+    LOG.debug("Comparing pending steps for equality: {} and {} ",
+              oldPendingSteps,
+              oldPendingSteps);
+    if (!Objects.equals(oldPendingSteps, newPendingSteps)) {
+      LOG.debug("Steps are not equal. Not considering drive orders continuous.");
+      return false;
+    }
+
+    return true;
   }
 
   private int getFutureOrCurrentPositionIndex() {
     if (getCommandsSent().isEmpty() && getInteractionsPendingCommand().isEmpty()) {
-      if (lastCommandExecuted == null) {
-        LOG.debug("{}: No commands expected to be executed and none executed. Route index: {}",
-                  vehicle.getName(),
-                  Vehicle.ROUTE_INDEX_DEFAULT);
-        return Vehicle.ROUTE_INDEX_DEFAULT;
-      }
-      else {
-        LOG.debug("{}: No commands expected to be executed but one executed. Route index: {}",
-                  vehicle.getName(),
-                  lastCommandExecuted.getStep().getRouteIndex());
-        return lastCommandExecuted.getStep().getRouteIndex();
-      }
+      LOG.debug("{}: No commands expected to be executed. Last executed command route index: {}",
+                vehicle.getName(),
+                getLastCommandExecutedRouteIndex());
+      return getLastCommandExecutedRouteIndex();
     }
 
     if (getInteractionsPendingCommand().isPresent()) {
@@ -459,8 +512,16 @@ public class DefaultVehicleController
     MovementCommand lastCommandSent = new LinkedList<>(getCommandsSent()).getLast();
     LOG.debug("{}: Using the last command sent to the communication adapter. Route index: {}",
               vehicle.getName(),
-              lastCommandSent);
+              lastCommandSent.getStep().getRouteIndex());
     return lastCommandSent.getStep().getRouteIndex();
+  }
+
+  private int getLastCommandExecutedRouteIndex() {
+    if (lastCommandExecuted == null) {
+      return Vehicle.ROUTE_INDEX_DEFAULT;
+    }
+
+    return lastCommandExecuted.getStep().getRouteIndex();
   }
 
   private void discardFutureCommands() {
@@ -646,6 +707,11 @@ public class DefaultVehicleController
   @Override
   public Optional<MovementCommand> getInteractionsPendingCommand() {
     return Optional.ofNullable(interactionsPendingCommand);
+  }
+
+  @Override
+  public boolean mayAllocateNow(Set<TCSResource<?>> resources) {
+    return scheduler.mayAllocateNow(this, resources);
   }
 
   @Override
@@ -1060,6 +1126,7 @@ public class DefaultVehicleController
   private void freeAllResources() {
     scheduler.freeAll(this);
     allocatedResources.clear();
+    vehicleService.updateVehicleAllocatedResources(vehicle.getReference(), List.of());
   }
 
   /**
@@ -1256,24 +1323,47 @@ public class DefaultVehicleController
   }
 
   private List<Set<TCSResource<?>>> remainingRequiredClaim(@Nonnull TransportOrder order) {
-    Stream<Step> stepStream = order.getAllDriveOrders().stream()
-        .skip(order.getCurrentDriveOrderIndex())
-        .flatMap(driveOrder -> driveOrder.getRoute().getSteps().stream());
+    List<Step> remainingClaimCurrentDriveOrder
+        = new ArrayList<>(order.getCurrentDriveOrder().getRoute().getSteps());
 
-    // If we have already processed parts of the current drive order (in case of rerouting), we need
-    // to skip a few more steps.
+    // Commands that we have already sent to the vehicle or executed should not be included in the
+    // remaining claim.
     if (!commandsSent.isEmpty() || lastCommandExecuted != null) {
       Step lastCommandedStep = commandsSent.stream()
           .reduce((cmd1, cmd2) -> cmd2)
           .orElse(lastCommandExecuted)
           .getStep();
+
       // Skip until we find the step, and skip the step itself, too (thus the skip(1)).
-      stepStream = stepStream
+      remainingClaimCurrentDriveOrder = remainingClaimCurrentDriveOrder.stream()
           .dropWhile(step -> !Objects.equals(step, lastCommandedStep))
-          .skip(1);
+          .skip(1)
+          .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    return stepStream
+    // If we have already sent commands to the vehicle, the resources for the corresponding steps
+    // have already been allocated and thus should not be contained in the set of claimed resources.
+    // We can try to remove them, but we want to do this only if they are the next resources in the
+    // remaining claim.
+    if (!commandsSent.isEmpty()) {
+      boolean remainingClaimStartsWithCommandsSent
+          = Collections.indexOfSubList(remainingClaimCurrentDriveOrder,
+                                       commandsSent.stream()
+                                           .map(command -> command.getStep())
+                                           .collect(Collectors.toList())) == 0;
+      if (remainingClaimStartsWithCommandsSent) {
+        remainingClaimCurrentDriveOrder.removeAll(commandsSent);
+      }
+      else {
+        // This should never happen. Something doesn't line up with the drive order's route.
+        LOG.warn("{}: Claiming resources that should have already been allocated for the vehicle.",
+                 vehicle.getName());
+      }
+    }
+
+    return Stream.concat(remainingClaimCurrentDriveOrder.stream(),
+                         order.getFutureDriveOrders().stream()
+                             .flatMap(driveOrder -> driveOrder.getRoute().getSteps().stream()))
         .map(step -> toResourceSet(step))
         .collect(Collectors.toList());
   }
@@ -1282,5 +1372,22 @@ public class DefaultVehicleController
     return step.getPath() != null
         ? Set.of(step.getDestinationPoint(), step.getPath())
         : Set.of(step.getDestinationPoint());
+  }
+
+  private boolean isForcedRerouting(DriveOrder newOrder) {
+    int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
+    if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
+      LOG.debug("No route progress, yet. Not considering rerouting as forced.");
+      return false;
+    }
+
+    // If it's a forced rerouting, the step after the one the vehicle executed last shoud be marked
+    // accordingly.
+    Step nextPendingStep = newOrder.getRoute().getSteps().get(lastCommandExecutedRouteIndex + 1);
+    if (nextPendingStep.getReroutingType() == ReroutingType.FORCED) {
+      return true;
+    }
+
+    return false;
   }
 }

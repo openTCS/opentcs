@@ -14,6 +14,7 @@ import java.util.Comparator;
 import javax.inject.Singleton;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.phase.parking.DefaultParkingPositionSupplier;
 import org.opentcs.strategies.basic.dispatching.phase.parking.ParkingPositionSupplier;
@@ -37,8 +38,10 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByEnergyLevel;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByName;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
+import org.opentcs.strategies.basic.dispatching.rerouting.ForcedReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.rerouting.RegularDriveOrderMerger;
 import org.opentcs.strategies.basic.dispatching.rerouting.RegularReroutingStrategy;
+import org.opentcs.strategies.basic.dispatching.rerouting.ReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.selection.AssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelectionFilter;
@@ -193,5 +196,16 @@ public class DefaultDispatcherModule
     bind(RerouteUtil.class).in(Singleton.class);
     bind(RegularReroutingStrategy.class).in(Singleton.class);
     bind(RegularDriveOrderMerger.class).in(Singleton.class);
+
+    MapBinder<ReroutingType, ReroutingStrategy> reroutingStrategies
+        = MapBinder.newMapBinder(binder(),
+                                 ReroutingType.class,
+                                 ReroutingStrategy.class);
+    reroutingStrategies
+        .addBinding(ReroutingType.REGULAR)
+        .to(RegularReroutingStrategy.class);
+    reroutingStrategies
+        .addBinding(ReroutingType.FORCED)
+        .to(ForcedReroutingStrategy.class);
   }
 }

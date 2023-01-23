@@ -157,6 +157,20 @@ public interface Scheduler
       throws IllegalArgumentException;
 
   /**
+   * Checks if the resulting system state is safe if the given set of resources
+   * would be allocated by the given client <em>immediately</em>.
+   *
+   * @param client The client requesting the resources.
+   * @param resources The requested resources.
+   * @return {@code true} if the given resources are safe to be allocated by the given client,
+   * otherwise {@code false}.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default boolean mayAllocateNow(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources) {
+    return false;
+  }
+
+  /**
    * Informs the scheduler that a set of resources are to be allocated for the given client
    * <em>immediately</em>.
    * <p>

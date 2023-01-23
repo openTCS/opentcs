@@ -20,6 +20,7 @@ import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
@@ -210,10 +211,24 @@ public class DefaultDispatcher
     if (configuration.rerouteOnTopologyChanges()) {
       LOG.debug("Scheduling reroute task...");
       kernelExecutor.submit(() -> {
-        LOG.debug("Rerouting vehicles due to topology change...");
-        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class));
+        LOG.info("Rerouting all vehicles due to topology change...");
+        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), ReroutingType.REGULAR);
       });
     }
+  }
+
+  @Override
+  public void reroute(Vehicle vehicle, ReroutingType reroutingType) {
+    LOG.debug("Scheduling reroute task...");
+    kernelExecutor.submit(() -> {
+      LOG.info(
+          "Rerouting vehicle due to explicit request: {} ({}, current position {})...",
+          vehicle.getName(),
+          reroutingType,
+          vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
+      );
+      rerouteUtil.reroute(vehicle, reroutingType);
+    });
   }
 
   private static boolean vehicleDispatchable(Vehicle vehicle) {

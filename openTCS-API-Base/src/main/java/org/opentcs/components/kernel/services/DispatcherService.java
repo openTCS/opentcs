@@ -7,13 +7,16 @@
  */
 package org.opentcs.components.kernel.services;
 
+import javax.annotation.Nonnull;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.order.TransportOrder.State;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the {@link Dispatcher}.
@@ -59,4 +62,16 @@ public interface DispatcherService {
    */
   void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref, boolean immediateAbort)
       throws ObjectUnknownException, KernelRuntimeException;
+
+  /**
+   * Explicitly trigger a rerouting for the given vehicles.
+   *
+   * @param ref The vehicle to be rerouted.
+   * @param reroutingType The type of the requested rerouting.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void reroute(@Nonnull TCSObjectReference<Vehicle> ref,
+                       @Nonnull ReroutingType reroutingType)
+      throws ObjectUnknownException, KernelRuntimeException {
+  }
 }

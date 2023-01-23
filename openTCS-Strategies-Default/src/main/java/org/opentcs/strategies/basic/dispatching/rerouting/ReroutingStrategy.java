@@ -28,7 +28,7 @@ public interface ReroutingStrategy {
    * list of {@link DriveOrder}s doesn't contain any drive orders that the vehicle already finished.
    *
    * @param vehicle The vehicle to calculate a new route for.
-   * @return An {@link Optional} containing the a of new drive orders or {@link Optional#EMPTY}, if
+   * @return An {@link Optional} containing the new drive orders or {@link Optional#EMPTY}, if
    * no new route could be calculated (e.g. because the given vehicle is not processing a transport
    * order).
    */

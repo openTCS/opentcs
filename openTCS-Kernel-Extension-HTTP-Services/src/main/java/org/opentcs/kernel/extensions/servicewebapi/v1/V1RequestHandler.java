@@ -106,6 +106,8 @@ public class V1RequestHandler
                 this::handlePutVehicleIntegrationLevel);
     service.post("/vehicles/:NAME/withdrawal",
                  this::handlePostWithdrawalByVehicle);
+    service.post("/vehicles/:NAME/rerouteRequest",
+                 this::handlePostVehicleRerouteRequest);
     service.get("/vehicles/:NAME",
                 this::handleGetVehicleByName);
     service.get("/vehicles",
@@ -173,6 +175,13 @@ public class V1RequestHandler
     orderHandler.withdrawByVehicle(request.params(":NAME"),
                                    immediate(request),
                                    disableVehicle(request));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePostVehicleRerouteRequest(Request request, Response response)
+      throws ObjectUnknownException {
+    orderHandler.reroute(request.params(":NAME"), forced(request));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
@@ -329,4 +338,9 @@ public class V1RequestHandler
   private boolean disableVehicle(Request request) {
     return Boolean.parseBoolean(request.queryParamOrDefault("disableVehicle", "false"));
   }
+
+  private boolean forced(Request request) {
+    return Boolean.parseBoolean(request.queryParamOrDefault("forced", "false"));
+  }
+
 }

@@ -10,7 +10,9 @@ package org.opentcs.components.kernel;
 import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a dispatcher module for the openTCS
@@ -94,4 +96,15 @@ public interface Dispatcher
    * Notifies the dispatcher of changes in the topology.
    */
   void topologyChanged();
+
+  /**
+   * Notifies the dispatcher of a request to reroute the given vehicle considering the given
+   * reoruting type.
+   *
+   * @param vehicle The vehicle to be rerouted.
+   * @param reroutingType The type of the requested rerouting.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void reroute(@Nonnull Vehicle vehicle, @Nonnull ReroutingType reroutingType) {
+  }
 }

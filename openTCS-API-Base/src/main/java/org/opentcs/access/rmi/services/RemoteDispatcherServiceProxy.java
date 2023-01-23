@@ -13,6 +13,7 @@ import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 
 /**
@@ -64,6 +65,19 @@ class RemoteDispatcherServiceProxy
       getRemoteService().withdrawByTransportOrder(getClientId(),
                                                   ref,
                                                   immediateAbort);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void reroute(TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().reroute(getClientId(), ref, reroutingType);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

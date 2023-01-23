@@ -209,6 +209,28 @@ public class DefaultScheduler
   }
 
   @Override
+  public boolean mayAllocateNow(Client client,
+                                Set<TCSResource<?>> resources) {
+    requireNonNull(client, "client");
+    requireNonNull(resources, "resources");
+
+    synchronized (globalSyncObject) {
+      for (TCSResource<?> curResource : resources) {
+        ReservationEntry entry = reservationPool.getReservationEntry(curResource);
+        if (!entry.isFree() && !entry.isAllocatedBy(client)) {
+          LOG.warn("{}: Resource {} unavailable, reserved by {}",
+                   client.getId(),
+                   curResource.getName(),
+                   entry.getClient().getId());
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }
+
+  @Override
   public void allocateNow(Client client, Set<TCSResource<?>> resources)
       throws ResourceAllocationException {
     requireNonNull(client, "client");

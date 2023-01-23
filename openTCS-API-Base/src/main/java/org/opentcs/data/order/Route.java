@@ -133,6 +133,40 @@ public class Route
      * Whether execution of this step is allowed.
      */
     private final boolean executionAllowed;
+    /**
+     * Marks this {@link Step} as the origin of a recalculated route and indicates which
+     * {@link ReroutingType} was used to determine the (new) route.
+     * <p>
+     * Might be {@code null}, if this {@link Step} is not the origin of a recalculated route.
+     */
+    private final ReroutingType reroutingType;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param path The path to travel.
+     * @param srcPoint The point that the vehicle is starting from.
+     * @param destPoint The point that is reached by travelling the path.
+     * @param orientation The vehicle's orientation on this step.
+     * @param routeIndex This step's index in the vehicle's route.
+     * @param executionAllowed Whether execution of this step is allowed.
+     * @param reroutingType Marks this step as the origin of a recalculated route.
+     */
+    public Step(@Nullable Path path,
+                @Nullable Point srcPoint,
+                @Nonnull Point destPoint,
+                @Nonnull Vehicle.Orientation orientation,
+                int routeIndex,
+                boolean executionAllowed,
+                @Nullable ReroutingType reroutingType) {
+      this.path = path;
+      this.sourcePoint = srcPoint;
+      this.destinationPoint = requireNonNull(destPoint, "destPoint");
+      this.vehicleOrientation = requireNonNull(orientation, "orientation");
+      this.routeIndex = routeIndex;
+      this.executionAllowed = executionAllowed;
+      this.reroutingType = reroutingType;
+    }
 
     /**
      * Creates a new instance.
@@ -150,12 +184,7 @@ public class Route
                 @Nonnull Vehicle.Orientation orientation,
                 int routeIndex,
                 boolean executionAllowed) {
-      this.path = path;
-      this.sourcePoint = srcPoint;
-      this.destinationPoint = requireNonNull(destPoint, "destPoint");
-      this.vehicleOrientation = requireNonNull(orientation, "orientation");
-      this.routeIndex = routeIndex;
-      this.executionAllowed = executionAllowed;
+      this(path, srcPoint, destPoint, orientation, routeIndex, executionAllowed, null);
     }
 
     /**
@@ -172,7 +201,7 @@ public class Route
                 @Nonnull Point destPoint,
                 @Nonnull Vehicle.Orientation orientation,
                 int routeIndex) {
-      this(path, srcPoint, destPoint, orientation, routeIndex, true);
+      this(path, srcPoint, destPoint, orientation, routeIndex, true, null);
     }
 
     /**
@@ -235,6 +264,21 @@ public class Route
       return executionAllowed;
     }
 
+    /**
+     * Returns the {@link ReroutingType} of this step.
+     * <p>
+     * Idicates whether this step is the origin of a recalculated route, and if so, which
+     * {@link ReroutingType} was used to determine the (new) route.
+     * <p>
+     * Might return {@code null}, if this step is not the origin of a recalculated route.
+     *
+     * @return The {@link ReroutingType} of this step.
+     */
+    @Nullable
+    public ReroutingType getReroutingType() {
+      return reroutingType;
+    }
+
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof Step)) {
@@ -245,12 +289,15 @@ public class Route
           && Objects.equals(sourcePoint, other.sourcePoint)
           && Objects.equals(destinationPoint, other.destinationPoint)
           && Objects.equals(vehicleOrientation, other.vehicleOrientation)
-          && routeIndex == other.routeIndex;
+          && routeIndex == other.routeIndex
+          && executionAllowed == other.executionAllowed
+          && reroutingType == other.reroutingType;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex);
+      return Objects.hash(path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex,
+                          executionAllowed, reroutingType);
     }
 
     @Override

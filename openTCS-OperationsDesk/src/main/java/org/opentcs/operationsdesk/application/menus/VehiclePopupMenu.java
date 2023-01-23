@@ -17,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.action.ActionFactory;
@@ -141,6 +142,21 @@ public class VehiclePopupMenu
 
     add(integrateSubMenu);
 
+    addSeparator();
+    
+    JMenu rerouteSubMenu
+        = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_reroute.text"));
+
+    action = actionFactory.createRerouteAction(vehicles, ReroutingType.REGULAR);
+    action.setEnabled(isAnyProcessingOrder(vehicles));
+    rerouteSubMenu.add(action);
+
+    action = actionFactory.createRerouteAction(vehicles, ReroutingType.FORCED);
+    action.setEnabled(isAnyProcessingOrder(vehicles));
+    rerouteSubMenu.add(action);
+
+    add(rerouteSubMenu);
+    
     addSeparator();
 
     JMenu withdrawSubMenu

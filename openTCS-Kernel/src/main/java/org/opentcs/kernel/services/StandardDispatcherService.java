@@ -15,6 +15,7 @@ import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 
@@ -77,6 +78,14 @@ public class StandardDispatcherService
     synchronized (globalSyncObject) {
       dispatcher.withdrawOrder(globalObjectPool.getObject(TransportOrder.class, ref),
                                immediateAbort);
+    }
+  }
+
+  @Override
+  public void reroute(TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      dispatcher.reroute(globalObjectPool.getObject(Vehicle.class, ref), reroutingType);
     }
   }
 }

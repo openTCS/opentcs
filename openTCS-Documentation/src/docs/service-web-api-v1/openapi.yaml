@@ -298,6 +298,39 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/rerouteRequest":
+    post:
+      tags:
+        - Vehicles
+      summary: Reroutes a vehicle with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: Name of the vehicle to be rerouted
+          required: true
+          schema:
+            type: string
+        - name: forced
+          in: query
+          description: Whether the vehicle should be rerouted even if it's not where it is expected to be.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
   "/vehicles/{NAME}/integrationLevel":
     put:
       tags:

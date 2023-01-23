@@ -83,6 +83,10 @@ public abstract class AbstractReroutingStrategy
     return Optional.of(newDriveOrders);
   }
 
+  protected TCSObjectService getObjectService() {
+    return objectService;
+  }
+
   /**
    * Determines the {@link Point} that should be the source point for the rerouting.
    *
@@ -117,7 +121,7 @@ public abstract class AbstractReroutingStrategy
   private Optional<List<DriveOrder>> tryReroute(Vehicle vehicle,
                                                 List<DriveOrder> driveOrders,
                                                 Point sourcePoint) {
-    LOG.debug("Trying to reroute drive orders for {} from {}: {}",
+    LOG.debug("Trying to reroute drive orders for {} from {}. Current drive orders: {}",
               vehicle.getName(),
               sourcePoint,
               driveOrders);

@@ -9,10 +9,12 @@ package org.opentcs.operationsdesk.application.action;
 
 import java.util.Collection;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.operationsdesk.application.action.course.FollowVehicleAction;
 import org.opentcs.operationsdesk.application.action.course.IntegrationLevelChangeAction;
 import org.opentcs.operationsdesk.application.action.course.PauseAction;
+import org.opentcs.operationsdesk.application.action.course.RerouteAction;
 import org.opentcs.operationsdesk.application.action.course.ScrollToVehicleAction;
 import org.opentcs.operationsdesk.application.action.course.SendVehicleToLocationAction;
 import org.opentcs.operationsdesk.application.action.course.SendVehicleToPointAction;
@@ -39,4 +41,7 @@ public interface ActionFactory {
                                                                   Vehicle.IntegrationLevel level);
 
   PauseAction createPauseAction(Collection<VehicleModel> vehicles, boolean pause);
+
+  RerouteAction createRerouteAction(Collection<VehicleModel> vehicles,
+                                    ReroutingType reroutingType);
 }

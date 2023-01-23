@@ -35,6 +35,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Destination;
@@ -251,6 +252,23 @@ public class OrderHandler {
       }
 
       dispatcherService.withdrawByVehicle(vehicle.getReference(), immediate);
+    });
+  }
+
+  public void reroute(String vehicleName, boolean forced)
+      throws ObjectUnknownException {
+    requireNonNull(vehicleName, "vehicleName");
+
+    Vehicle vehicle = orderService.fetchObject(Vehicle.class, vehicleName);
+    if (vehicle == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
+    }
+
+    kernelExecutor.submit(() -> {
+      dispatcherService.reroute(
+          vehicle.getReference(),
+          forced ? ReroutingType.FORCED : ReroutingType.REGULAR
+      );
     });
   }
 
