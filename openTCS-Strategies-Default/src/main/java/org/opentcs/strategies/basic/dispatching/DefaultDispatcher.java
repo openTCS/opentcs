@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.components.kernel.Dispatcher;
-import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
@@ -46,10 +45,6 @@ public class DefaultDispatcher
    * Provides services/utility methods for working with transport orders.
    */
   private final TransportOrderUtil transportOrderUtil;
-  /**
-   * The transport order service.
-   */
-  private final InternalTransportOrderService transportOrderService;
   /**
    * The vehicle service.
    */
@@ -86,7 +81,6 @@ public class DefaultDispatcher
    *
    * @param orderReservationPool Stores reservations of transport orders for vehicles.
    * @param transportOrderUtil Provides services for working with transport orders.
-   * @param transportOrderService The transport order service.
    * @param vehicleService The vehicle service.
    * @param eventSource Where this instance registers for application events.
    * @param kernelExecutor Executes dispatching tasks.
@@ -98,7 +92,6 @@ public class DefaultDispatcher
   @Inject
   public DefaultDispatcher(OrderReservationPool orderReservationPool,
                            TransportOrderUtil transportOrderUtil,
-                           InternalTransportOrderService transportOrderService,
                            InternalVehicleService vehicleService,
                            @ApplicationEventBus EventSource eventSource,
                            @KernelExecutor ScheduledExecutorService kernelExecutor,
@@ -108,7 +101,6 @@ public class DefaultDispatcher
                            RerouteUtil rerouteUtil) {
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
-    this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.eventSource = requireNonNull(eventSource, "eventSource");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
@@ -230,39 +222,4 @@ public class DefaultDispatcher
       rerouteUtil.reroute(vehicle, reroutingType);
     });
   }
-
-  private static boolean vehicleDispatchable(Vehicle vehicle) {
-    requireNonNull(vehicle, "vehicle");
-
-    if (vehicle.getCurrentPosition() == null) {
-      LOG.debug("Vehicle '{}' unknown position -> not dispatchable", vehicle.getName());
-      return false;
-    }
-    if (vehicle.getIntegrationLevel() != Vehicle.IntegrationLevel.TO_BE_UTILIZED) {
-      LOG.debug("Vehicle '{}' is not to be utilized.", vehicle.getName());
-      return false;
-    }
-    // ProcState IDLE, State CHARGING and energy level not high enough? Then let
-    // it charge a bit longer.
-    if (vehicle.hasProcState(Vehicle.ProcState.IDLE)
-        && vehicle.hasState(Vehicle.State.CHARGING)
-        && vehicle.isEnergyLevelCritical()) {
-      LOG.debug("Vehicle '{}' is CHARGING, energy level {}<={} -> not (yet) dispatchable.",
-                vehicle.getName(),
-                vehicle.getEnergyLevel(),
-                vehicle.getEnergyLevelCritical());
-      return false;
-    }
-    // Only dispatch vehicles that are either not processing any order at all or
-    // are waiting for the next drive order.
-    if (!vehicle.hasProcState(Vehicle.ProcState.IDLE)
-        && !vehicle.hasProcState(Vehicle.ProcState.AWAITING_ORDER)) {
-      LOG.debug("Vehicle '{}' is in processing state {} -> not dispatchable",
-                vehicle.getName(),
-                vehicle.getProcState());
-      return false;
-    }
-    return true;
-  }
-
 }
