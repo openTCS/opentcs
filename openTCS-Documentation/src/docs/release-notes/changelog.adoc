@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add support for specifying and retrieving the order type via web API.
 * Bugs fixed:
 ** Fix a bug where (immediately) withrawing a transport order from a vehicle that is waiting for a peripheral job to finish would prevent any further commands (e.g. for new transport orders) to be sent to the vehicle.
+** Fix resource management / order processing for cases in which the plant model contains report points.
 * Other changes:
 ** Update Jackson to 2.14.1.
 ** Update JUnit 5 to 5.9.1.

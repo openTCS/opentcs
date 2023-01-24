@@ -1364,6 +1364,7 @@ public class DefaultVehicleController
     return Stream.concat(remainingClaimCurrentDriveOrder.stream(),
                          order.getFutureDriveOrders().stream()
                              .flatMap(driveOrder -> driveOrder.getRoute().getSteps().stream()))
+        .filter(step -> step.getDestinationPoint().isHaltingPosition())
         .map(step -> toResourceSet(step))
         .collect(Collectors.toList());
   }
