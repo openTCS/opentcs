@@ -21,8 +21,14 @@ import org.opentcs.data.order.TransportOrder;
  */
 public class TransportOrderState {
 
+  private boolean dispensable;
+
   private String name = "";
-  
+
+  private String peripheralReservationToken;
+
+  private String wrappingSequence;
+
   private String type = "";
 
   private TransportOrder.State state = TransportOrder.State.RAW;
@@ -36,12 +42,36 @@ public class TransportOrderState {
   private TransportOrderState() {
   }
 
+  public boolean isDispensable() {
+    return dispensable;
+  }
+
+  public void setDispensable(boolean dispensable) {
+    this.dispensable = dispensable;
+  }
+
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = requireNonNull(name, "name");
+  }
+
+  public String getPeripheralReservationToken() {
+    return peripheralReservationToken;
+  }
+
+  public void setPeripheralReservationToken(String peripheralReservationToken) {
+    this.peripheralReservationToken = peripheralReservationToken;
+  }
+
+  public String getWrappingSequence() {
+    return wrappingSequence;
+  }
+
+  public void setWrappingSequence(String wrappingSequence) {
+    this.wrappingSequence = wrappingSequence;
   }
 
   public String getType() {
@@ -95,7 +125,14 @@ public class TransportOrderState {
       return null;
     }
     TransportOrderState transportOrderState = new TransportOrderState();
+    transportOrderState.setDispensable(transportOrder.isDispensable());
     transportOrderState.setName(transportOrder.getName());
+    transportOrderState.setPeripheralReservationToken(
+        transportOrder.getPeripheralReservationToken()
+    );
+    transportOrderState.setWrappingSequence(
+        nameOfNullableReference(transportOrder.getWrappingSequence())
+    );
     transportOrderState.setType(transportOrder.getType());
     transportOrderState.setDestinations(
         transportOrder.getAllDriveOrders()

@@ -25,9 +25,15 @@ public class Transport {
 
   private boolean incompleteName;
 
+  private boolean dispensable;
+
   private Instant deadline;
 
   private String intendedVehicle;
+
+  private String peripheralReservationToken;
+
+  private String wrappingSequence;
 
   private String type;
 
@@ -40,15 +46,21 @@ public class Transport {
   @JsonCreator
   public Transport(
       @JsonProperty(required = false, value = "incompleteName") boolean incompleteName,
+      @JsonProperty(required = false, value = "dispensable") boolean dispensable,
       @Nullable @JsonProperty(required = false, value = "deadline") Instant deadline,
       @Nullable @JsonProperty(required = false, value = "intendedVehicle") String intendedVehicle,
+      @Nullable @JsonProperty(required = false, value = "peripheralReservationToken") String peripheralReservationToken,
+      @Nullable @JsonProperty(required = false, value = "wrappingSequence") String wrappingSequence,
       @Nullable @JsonProperty(required = false, value = "type") String type,
       @Nonnull @JsonProperty(required = true, value = "destinations") List<Destination> destinations,
       @Nullable @JsonProperty(required = false, value = "properties") List<Property> properties,
       @Nullable @JsonProperty(required = false, value = "dependencies") List<String> dependencies) {
     this.incompleteName = incompleteName;
+    this.dispensable = dispensable;
     this.deadline = deadline;
     this.intendedVehicle = intendedVehicle;
+    this.peripheralReservationToken = peripheralReservationToken;
+    this.wrappingSequence = wrappingSequence;
     this.type = type;
     this.destinations = requireNonNull(destinations, "destinations");
     this.properties = properties;
@@ -61,6 +73,14 @@ public class Transport {
 
   public void setIncompleteName(boolean incompleteName) {
     this.incompleteName = incompleteName;
+  }
+
+  public boolean isDispensable() {
+    return dispensable;
+  }
+
+  public void setDispensable(boolean dispensable) {
+    this.dispensable = dispensable;
   }
 
   @Nullable
@@ -79,6 +99,24 @@ public class Transport {
 
   public void setIntendedVehicle(@Nullable String intendedVehicle) {
     this.intendedVehicle = intendedVehicle;
+  }
+
+  @Nullable
+  public String getPeripheralReservationToken() {
+    return peripheralReservationToken;
+  }
+
+  public void setPeripheralReservationToken(@Nullable String peripheralReservationToken) {
+    this.peripheralReservationToken = peripheralReservationToken;
+  }
+
+  @Nullable
+  public String getWrappingSequence() {
+    return wrappingSequence;
+  }
+
+  public void setWrappingSequence(@Nullable String wrappingSequence) {
+    this.wrappingSequence = wrappingSequence;
   }
 
   @Nullable

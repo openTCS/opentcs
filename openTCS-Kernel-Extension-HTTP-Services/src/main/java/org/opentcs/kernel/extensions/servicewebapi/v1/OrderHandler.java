@@ -111,9 +111,12 @@ public class OrderHandler {
     TransportOrderCreationTO to
         = new TransportOrderCreationTO(name, destinations(order))
             .withIncompleteName(order.hasIncompleteName())
+            .withDispensable(order.isDispensable())
             .withIntendedVehicleName(order.getIntendedVehicle())
             .withDependencyNames(dependencyNames(order.getDependencies()))
             .withDeadline(deadline(order))
+            .withPeripheralReservationToken(order.getPeripheralReservationToken())
+            .withWrappingSequence(order.getWrappingSequence())
             .withType(order.getType() == null ? OrderConstants.TYPE_NONE : order.getType())
             .withProperties(properties(order.getProperties()));
 

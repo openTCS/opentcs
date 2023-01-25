@@ -197,8 +197,11 @@ public class HttpSamples {
   private static void writeTransportOrderCreationSample(File outputFile) {
     Transport transport = new Transport(
         false,
+        false,
         Instant.now(),
         "Vehicle-01",
+        "example token",
+        "example sequence name",
         "some type",
         List.of(
             new Destination("Storage 01", "Load cargo", List.of()),
