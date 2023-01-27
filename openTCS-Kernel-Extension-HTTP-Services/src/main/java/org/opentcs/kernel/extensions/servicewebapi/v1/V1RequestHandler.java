@@ -100,6 +100,8 @@ public class V1RequestHandler
 
     service.get("/events",
                 this::handleGetEvents);
+    service.post("/vehicles/dispatcher/trigger",
+                this::handlePostDispatcherTrigger);
     service.put("/vehicles/:NAME/paused",
                 this::handlePutVehiclePaused);
     service.put("/vehicles/:NAME/integrationLevel",
@@ -112,6 +114,8 @@ public class V1RequestHandler
                 this::handleGetVehicleByName);
     service.get("/vehicles",
                 this::handleGetVehicles);
+    service.post("/transportOrders/dispatcher/trigger",
+                this::handlePostDispatcherTrigger);
     service.post("/transportOrders/:NAME/withdrawal",
                  this::handlePostWithdrawalByOrder);
     service.post("/transportOrders/:NAME",

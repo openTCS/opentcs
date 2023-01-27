@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features:
 ** Add support for explicitly triggering rerouting of single vehicles, including optional _forced_ rerouting from a vehicle's current position even if it was not routed to that position by openTCS.
 ** Add support for specifying and retrieving the following properties of transport orders via web API: dispensability, peripheral reservation token, wrapping sequence, type.
+** Add two new ways to trigger the dispatcher via web API: `POST /vehicles/dispatcher/trigger` and `POST /transportOrders/dispatcher/trigger`.
+   The old `POST /dispatcher/trigger` is now deprecated.
 * Bugs fixed:
 ** Fix a bug where (immediately) withrawing a transport order from a vehicle that is waiting for a peripheral job to finish would prevent any further commands (e.g. for new transport orders) to be sent to the vehicle.
 ** Fix resource management / order processing for cases in which the plant model contains report points.
@@ -54,7 +56,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update the demo model provided in the Model Editor application:
 *** Add a new section to show the integration and use of peripheral devices.
     The demo model now contains a location that represents an exemplary fire door that vehicles have to interact with when traversing the new section.
-*** Update the demo model to use the latest model format (v0.0.4). 
+*** Update the demo model to use the latest model format (v0.0.4).
 ** Update Spark to 2.9.4.
 ** Update Jackson to 2.13.3.
 ** Update AssertJ to 3.23.1.

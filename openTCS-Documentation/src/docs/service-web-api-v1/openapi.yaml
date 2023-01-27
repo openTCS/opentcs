@@ -197,6 +197,27 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find transport order 'TOrder-01'.
+  /transportOrders/dispatcher/trigger:
+    post:
+      tags:
+        - Transport orders
+      summary: Explicitly triggers dispatching of vehicles / transport orders.
+      description: >-
+        Triggers the kernel's dispatcher to assign vehicles to transport orders.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+        "500":
+          description: >-
+            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
   /vehicles:
     get:
       tags:
@@ -402,6 +423,27 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  /vehicles/dispatcher/trigger:
+    post:
+      tags:
+        - Vehicles
+      summary: Explicitly triggers dispatching of vehicles / transport orders.
+      description: >-
+        Triggers the kernel's dispatcher to assign vehicles to transport orders.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+        "500":
+          description: >-
+            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
   /peripheralJobs:
     get:
       tags:
@@ -612,6 +654,7 @@ paths:
                   example: Parameter 'timeout' is not in the correct range.
   /dispatcher/trigger:
     post:
+      deprecated: true
       tags:
         - Transport orders
         - Vehicles
