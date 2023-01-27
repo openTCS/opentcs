@@ -346,7 +346,7 @@ public class DefaultVehicleController
           scheduler.allocateNow(this, Set.of(currPosition));
           allocatedResources.add(Set.of(currPosition));
           vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                     toListOfResourceSets(allocatedResources));
+                                                         toListOfResourceSets(allocatedResources));
         }
         catch (ResourceAllocationException ex) {
           // May never happen. The caller is expected to call mayAllocateNow() first before applying
@@ -561,13 +561,22 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       if (immediate) {
         clearDriveOrder();
+
+        claimedResources.clear();
+        scheduler.claim(this, List.of());
       }
       else {
         abortDriveOrder();
-      }
 
-      scheduler.claim(this, List.of());
-      claimedResources.clear();
+        List<Set<TCSResource<?>>> newClaim = new ArrayList<>();
+        if (pendingResources != null) {
+          newClaim.add(pendingResources);
+        }
+
+        claimedResources.clear();
+        claimedResources.addAll(newClaim);
+        scheduler.claim(this, newClaim);
+      }
 
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
                                                    toListOfResourceSets(claimedResources));
