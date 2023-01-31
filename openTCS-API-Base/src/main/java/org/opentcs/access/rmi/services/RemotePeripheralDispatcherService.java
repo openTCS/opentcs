@@ -11,8 +11,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Declares the methods provided by the {@link PeripheralDispatcherService} via RMI.
@@ -38,6 +40,9 @@ public interface RemotePeripheralDispatcherService
       throws RemoteException;
 
   void withdrawByLocation(ClientID clientId, TCSResourceReference<Location> ref)
+      throws RemoteException;
+
+  void withdrawByPeripheralJob(ClientID clientId, TCSObjectReference<PeripheralJob> ref)
       throws RemoteException;
   // CHECKSTYLE:ON
 }

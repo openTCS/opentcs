@@ -21,8 +21,10 @@ import org.opentcs.access.rmi.services.RegistrationName;
 import org.opentcs.access.rmi.services.RemotePeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.peripherals.PeripheralJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,6 +173,18 @@ public class StandardRemotePeripheralDispatcherService
 
     try {
       kernelExecutor.submit(() -> dispatcherService.withdrawByLocation(ref)).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void withdrawByPeripheralJob(ClientID clientId, TCSObjectReference<PeripheralJob> ref) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_PERIPHERAL_JOBS);
+
+    try {
+      kernelExecutor.submit(() -> dispatcherService.withdrawByPeripheralJob(ref)).get();
     }
     catch (InterruptedException | ExecutionException exc) {
       throw findSuitableExceptionFor(exc);

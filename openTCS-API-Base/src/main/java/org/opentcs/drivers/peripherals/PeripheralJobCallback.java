@@ -19,6 +19,9 @@ public interface PeripheralJobCallback {
 
   /**
    * Called on successful completion of a job.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param job The job that was successfully completed.
    */
@@ -26,6 +29,9 @@ public interface PeripheralJobCallback {
 
   /**
    * Called on failed completion of a job.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param job The job whose completion has failed.
    */

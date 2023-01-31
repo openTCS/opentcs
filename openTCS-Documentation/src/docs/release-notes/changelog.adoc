@@ -16,11 +16,15 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features:
 ** Add support for explicitly triggering rerouting of single vehicles, including optional _forced_ rerouting from a vehicle's current position even if it was not routed to that position by openTCS.
+** Add support for withdrawing/aborting peripheral jobs:
+*** Peripheral jobs not related to a transport order can be withdrawn via the API.
+*** Peripheral jobs that are related to a transport order will implicitly be aborted when the respective transport order is forcibly withdrawn.
 ** Add support for specifying and retrieving the following properties of transport orders via web API: dispensability, peripheral reservation token, wrapping sequence, type.
 ** Add two new ways to trigger the dispatcher via web API: `POST /vehicles/dispatcher/trigger` and `POST /transportOrders/dispatcher/trigger`.
    The old `POST /dispatcher/trigger` is now deprecated.
 * Bugs fixed:
-** Fix a bug where (immediately) withrawing a transport order from a vehicle that is waiting for a peripheral job to finish would prevent any further commands (e.g. for new transport orders) to be sent to the vehicle.
+** Fix a bug where regularly withdrawing a transport order with peripheral jobs from a vehicle could prevent the withdrawal from being completed.
+** Fix a bug where forcibly withdrawing a transport order from a vehicle that is waiting for a peripheral job to finish would prevent any further commands (e.g. for new transport orders) to be sent to the vehicle.
 ** Fix resource management for cases in which a vehicle's transport order was withdrawn while the vehicle was waiting for a resource allocation.
 ** Fix resource management / order processing for cases in which the plant model contains report points.
 * Other changes:

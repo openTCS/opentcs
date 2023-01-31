@@ -101,7 +101,7 @@ public class V1RequestHandler
     service.get("/events",
                 this::handleGetEvents);
     service.post("/vehicles/dispatcher/trigger",
-                this::handlePostDispatcherTrigger);
+                 this::handlePostDispatcherTrigger);
     service.put("/vehicles/:NAME/paused",
                 this::handlePutVehiclePaused);
     service.put("/vehicles/:NAME/integrationLevel",
@@ -115,7 +115,7 @@ public class V1RequestHandler
     service.get("/vehicles",
                 this::handleGetVehicles);
     service.post("/transportOrders/dispatcher/trigger",
-                this::handlePostDispatcherTrigger);
+                 this::handlePostDispatcherTrigger);
     service.post("/transportOrders/:NAME/withdrawal",
                  this::handlePostWithdrawalByOrder);
     service.post("/transportOrders/:NAME",
@@ -132,6 +132,8 @@ public class V1RequestHandler
                 this::handleGetPeripheralJobsByName);
     service.post("/peripheralJobs/:NAME",
                  this::handlePostPeripheralJobsByName);
+    service.post("/peripheralJobs/:NAME/withdrawal",
+                 this::handlePostPeripheralJobWithdrawal);
     service.post("/peripheralJobs/dispatcher/trigger",
                  this::handlePostPeripheralJobsDispatchTrigger);
   }
@@ -179,6 +181,13 @@ public class V1RequestHandler
     orderHandler.withdrawByVehicle(request.params(":NAME"),
                                    immediate(request),
                                    disableVehicle(request));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePostPeripheralJobWithdrawal(Request request, Response response)
+      throws KernelRuntimeException {
+    orderHandler.withdrawPeripheralJob(request.params(":NAME"));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }

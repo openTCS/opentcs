@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.strategies.basic.peripherals.dispatching.phase.AssignFreePeripheralsPhase;
 import org.opentcs.strategies.basic.peripherals.dispatching.phase.AssignReservedPeripheralsPhase;
+import org.opentcs.strategies.basic.peripherals.dispatching.phase.FinishWithdrawalsPhase;
 import org.opentcs.strategies.basic.peripherals.dispatching.phase.ReleasePeripheralsPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class FullDispatchTask
    */
   private static final Logger LOG = LoggerFactory.getLogger(FullDispatchTask.class);
 
+  private final FinishWithdrawalsPhase finishWithdrawalsPhase;
   private final AssignReservedPeripheralsPhase assignReservedPeripheralsPhase;
   private final ReleasePeripheralsPhase releasePeripheralsPhase;
   private final AssignFreePeripheralsPhase assignFreePeripheralsPhase;
@@ -39,12 +41,14 @@ public class FullDispatchTask
   private boolean initialized;
 
   @Inject
-  public FullDispatchTask(AssignReservedPeripheralsPhase assignReservedPeripheralsPhase,
+  public FullDispatchTask(FinishWithdrawalsPhase finishWithdrawalsPhase,
+                          AssignReservedPeripheralsPhase assignReservedPeripheralsPhase,
                           ReleasePeripheralsPhase releasePeripheralsPhase,
                           AssignFreePeripheralsPhase assignFreePeripheralsPhase) {
+    this.finishWithdrawalsPhase = requireNonNull(finishWithdrawalsPhase, "finishWithdrawalsPhase");
     this.assignReservedPeripheralsPhase = requireNonNull(assignReservedPeripheralsPhase,
                                                          "assignReservedPeripheralsPhase");
-    this.releasePeripheralsPhase = requireNonNull(releasePeripheralsPhase, 
+    this.releasePeripheralsPhase = requireNonNull(releasePeripheralsPhase,
                                                   "releasePeripheralsPhase");
     this.assignFreePeripheralsPhase = requireNonNull(assignFreePeripheralsPhase,
                                                      "assignFreePeripheralsPhase");
@@ -56,6 +60,7 @@ public class FullDispatchTask
       return;
     }
 
+    finishWithdrawalsPhase.initialize();
     assignReservedPeripheralsPhase.initialize();
     releasePeripheralsPhase.initialize();
     assignFreePeripheralsPhase.initialize();
@@ -77,6 +82,7 @@ public class FullDispatchTask
     assignFreePeripheralsPhase.terminate();
     releasePeripheralsPhase.terminate();
     assignReservedPeripheralsPhase.terminate();
+    finishWithdrawalsPhase.terminate();
 
     initialized = false;
   }
@@ -85,7 +91,7 @@ public class FullDispatchTask
   public void run() {
     LOG.debug("Starting full dispatch run...");
 
-    // XXX Add a finishWithdrawalsPhase?
+    finishWithdrawalsPhase.run();
     assignReservedPeripheralsPhase.run();
     releasePeripheralsPhase.run();
     assignFreePeripheralsPhase.run();

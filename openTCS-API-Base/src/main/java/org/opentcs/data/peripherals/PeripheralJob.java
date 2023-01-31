@@ -389,9 +389,32 @@ public class PeripheralJob
    * Defines the various states a peripheral job may be in.
    */
   public static enum State {
+    /**
+     * Indicates a peripheral job is still waiting to be processed.
+     */
     TO_BE_PROCESSED,
+    /**
+     * Indicates a peripheral job is currently being processed by a peripheral.
+     */
     BEING_PROCESSED,
+    /**
+     * Indicates a peripheral job has been completed successfully.
+     */
     FINISHED,
+    /**
+     * Indicates execution of a peripheral job has failed / was aborted / was never started.
+     */
     FAILED;
+
+    /**
+     * Checks if this state is a final state for a peripheral job.
+     *
+     * @return <code>true</code> if, and only if, this state is a final state for a peripheral job -
+     * i.e. FINISHED or FAILED.
+     */
+    public boolean isFinalState() {
+      return this.equals(FINISHED)
+          || this.equals(FAILED);
+    }
   }
 }

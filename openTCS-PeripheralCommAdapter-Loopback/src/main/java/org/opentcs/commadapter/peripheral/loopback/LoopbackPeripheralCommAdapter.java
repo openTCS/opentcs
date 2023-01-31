@@ -43,7 +43,7 @@ public class LoopbackPeripheralCommAdapter
   /**
    * The time it takes for loopback peripherals to process a job.
    */
-  private static final Duration JOB_PROCESSING_DURATION = Duration.ofSeconds(5);
+  private static final Duration JOB_PROCESSING_DURATION = Duration.ofSeconds(10);
   /**
    * The kernel's executor.
    */
@@ -133,6 +133,16 @@ public class LoopbackPeripheralCommAdapter
                                                  JOB_PROCESSING_DURATION.getSeconds(),
                                                  TimeUnit.SECONDS);
     }
+  }
+
+  @Override
+  public void abortJob() {
+    jobTaskQueue.clear();
+    if (currentJobFuture != null) {
+      currentJobFuture.cancel(false);
+    }
+    setProcessModel(getProcessModel().withState(PeripheralInformation.State.IDLE));
+    sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
   }
 
   @Override

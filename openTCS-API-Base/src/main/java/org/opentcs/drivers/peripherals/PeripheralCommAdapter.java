@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and controlling a
@@ -59,13 +60,26 @@ public interface PeripheralCommAdapter
 
   /**
    * Processes the given job by sending it or a representation that the peripheral device
-   * understands to the peripheral device itself. The callback is used to inform about the
-   * successful or failed completion of the job.
+   * understands to the peripheral device itself.
    *
    * @param job The job to process.
-   * @param callback The callback to use.
+   * @param callback The callback to use to report back about the successful or failed completion of
+   * the job.
    */
   void process(@Nonnull PeripheralJob job, @Nonnull PeripheralJobCallback callback);
+
+  /**
+   * Aborts the current job, if any.
+   * <p>
+   * Whether a job can actually be aborted depends on the actual peripheral/job semantics.
+   * The callback for the current job may still be called to indicate the job has failed, but it is
+   * not strictly expected to.
+   * The kernel will ignore calls to the callback after calling this method.
+   * </p>
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed")
+  default void abortJob() {
+  }
 
   /**
    * Executes the given {@link PeripheralAdapterCommand}.

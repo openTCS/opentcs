@@ -147,6 +147,11 @@ public class DefaultPeripheralController
   }
 
   @Override
+  public void abortJob() {
+    commAdapter.abortJob();
+  }
+
+  @Override
   public ExplainedBoolean canProcess(PeripheralJob job) {
     requireNonNull(job, "job");
     return commAdapter.canProcess(job);

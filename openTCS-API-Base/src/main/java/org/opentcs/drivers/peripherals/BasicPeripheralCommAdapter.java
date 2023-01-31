@@ -10,6 +10,7 @@ package org.opentcs.drivers.peripherals;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.drivers.peripherals.management.PeripheralProcessModelEvent;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 
 /**
@@ -128,6 +129,13 @@ public abstract class BasicPeripheralCommAdapter
   @Override
   public PeripheralProcessModel getProcessModel() {
     return processModel;
+  }
+
+  @Override
+  @ScheduledApiChange(when = "6.0", details = "Implementation will be removed")
+  public void abortJob() {
+    setProcessModel(getProcessModel().withState(PeripheralInformation.State.IDLE));
+    sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
   }
 
   protected void setProcessModel(PeripheralProcessModel processModel) {

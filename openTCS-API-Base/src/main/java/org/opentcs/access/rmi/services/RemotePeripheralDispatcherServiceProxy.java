@@ -11,8 +11,10 @@ import java.rmi.RemoteException;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * The default implementation of the peripheral dispatcher service.
@@ -44,6 +46,19 @@ class RemotePeripheralDispatcherServiceProxy
 
     try {
       getRemoteService().withdrawByLocation(getClientId(), locationRef);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> jobRef)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().withdrawByPeripheralJob(getClientId(), jobRef);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

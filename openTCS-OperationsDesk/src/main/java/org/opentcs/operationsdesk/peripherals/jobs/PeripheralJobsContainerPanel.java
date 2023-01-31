@@ -8,25 +8,37 @@
 package org.opentcs.operationsdesk.peripherals.jobs;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToolBar;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SharedKernelServicePortal;
+import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.guing.common.util.IconToolkit;
+import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.PERIPHERALJOB_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.gui.StringTableCellRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Shows a table of the kernel's peripheral jobs.
@@ -36,6 +48,18 @@ import org.opentcs.util.gui.StringTableCellRenderer;
 public class PeripheralJobsContainerPanel
     extends JPanel {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(PeripheralJobsContainerPanel.class);
+  /**
+   * The path containing the icons.
+   */
+  private static final String ICON_PATH = "/org/opentcs/guing/res/symbols/panel/";
+  /**
+   * Provides access to a portal.
+   */
+  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * Maintains a set of all peripheral jobs existing on the kernel side.
    */
@@ -52,11 +76,14 @@ public class PeripheralJobsContainerPanel
   /**
    * Creates a new instance.
    *
+   * @param portalProvider Provides access to a kernel service portal.
    * @param peripheralJobsContainer Maintains a set of all peripheral jobs existing on the kernel
    * side.
    */
   @Inject
-  public PeripheralJobsContainerPanel(PeripheralJobsContainer peripheralJobsContainer) {
+  public PeripheralJobsContainerPanel(SharedKernelServicePortalProvider portalProvider,
+                                      PeripheralJobsContainer peripheralJobsContainer) {
+    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.peripheralJobsContainer = requireNonNull(peripheralJobsContainer,
                                                   "peripheralJobsContainer");
 
@@ -74,6 +101,8 @@ public class PeripheralJobsContainerPanel
     setLayout(new BorderLayout());
     initPeripheralJobTable();
     add(new JScrollPane(table), BorderLayout.CENTER);
+
+    add(createToolBar(), BorderLayout.NORTH);
   }
 
   private void initPeripheralJobTable() {
@@ -127,6 +156,22 @@ public class PeripheralJobsContainerPanel
     });
   }
 
+  private JToolBar createToolBar() {
+    JToolBar toolBar = new JToolBar();
+
+    JButton button = new JButton(
+        IconToolkit.instance().getImageIconByFullPath(ICON_PATH + "table-row-delete-2.16x16.png")
+    );
+    button.addActionListener((ActionEvent e) -> withdrawSelectedJobs());
+    button.setToolTipText(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PERIPHERALJOB_PATH)
+            .getString("peripheralJobsContainerPanel.button_withdrawSelectedJobs.tooltipText")
+    );
+    toolBar.add(button);
+
+    return toolBar;
+  }
+
   private void showSelectedJob() {
     int rowIndex = table.getSelectedRow();
     if (rowIndex > -1) {
@@ -146,4 +191,23 @@ public class PeripheralJobsContainerPanel
 
     menu.show(table, x, y);
   }
+
+  private void withdrawSelectedJobs() {
+    List<PeripheralJob> toBeWithdrawn = new ArrayList<>();
+
+    for (int i : table.getSelectedRows()) {
+      toBeWithdrawn.add(tableModel.getEntryAt(table.convertRowIndexToModel(i)));
+    }
+
+    try ( SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      for (PeripheralJob job : toBeWithdrawn) {
+        sharedPortal.getPortal().getPeripheralDispatcherService()
+            .withdrawByPeripheralJob(job.getReference());
+      }
+    }
+    catch (IllegalArgumentException | KernelRuntimeException exc) {
+      LOG.warn("Exception withdrawing transport order", exc);
+    }
+  }
+
 }

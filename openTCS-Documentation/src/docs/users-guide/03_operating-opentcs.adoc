@@ -197,17 +197,17 @@ A withdrawal can be issued by right-clicking on the respective vehicle in the Op
   The vehicle will process any movement commands it has already received and will stop after processing them.
   This type of withdrawal is what should normally be used for withdrawing a transport order from a vehicle.
 * '...and stop the vehicle immediately':
-  In addition to what happens in the case of a "normal" withdrawal, the vehicle is also asked to discard all movement commands it has already received.
+  In addition to what happens in the case of a regular withdrawal, the vehicle is also asked to discard all movement commands it has already received.
   (This _should_ make it come to a halt very soon in most cases.
   However, if and how far exactly it will still move highly depends on the vehicle's type, its current situation and how communication between openTCS and this type of vehicle works.)
   Furthermore, all reservations for resources on the withdrawn route (i.e. the next paths and points) except for the vehicle's currently reported position are cancelled, making these resources available to other vehicles.
-  This "immediate" withdrawal should be used with great care and usually only when the vehicle is currently _not moving_!
+  This forced withdrawal should be used with great care and usually only when the vehicle is currently _not moving_!
 
-CAUTION: Since an "immediate" withdrawal frees paths and points previously reserved for the vehicle, it is possible that other vehicles acquire and use these resources themselves right after the withdrawal.
+CAUTION: Since forced withdrawal frees paths and points previously reserved for the vehicle, it is possible that other vehicles acquire and use these resources themselves right after the withdrawal.
 At the same time, if the vehicle was moving when the withdrawal was issued, it may - depending on its type - not have come to a halt, yet, and still move along the route it had previously been ordered to follow.
 As the latter movement is not coordinated by openTCS, this can result in a _collision or deadlock_ between the vehicles!
-For this reason, it is highly recommended to issue an "immediate" withdrawal only if it is required for some reason, and only if the vehicle has already come to a halt on a position in the driving course or if other vehicles need not be taken into account.
-In all other cases, the "normal" withdrawal should be used.
+For this reason, it is highly recommended to issue a forced withdrawal only if it is required for some reason, and only if the vehicle has already come to a halt on a position in the driving course or if other vehicles need not be taken into account.
+In all other cases, the regular withdrawal should be used.
 
 Processing of a withdrawn transport order _cannot_ be resumed later.
 To resume a transportation process that was interrupted by withdrawing a transport order, you need to create a new transport order, which may, of course, contain the same destinations as the withdrawn one.
@@ -290,7 +290,13 @@ Note the following regarding the creation time of the peripheral job belonging t
 
 ==== Withdrawing peripheral jobs using the Operations Desk application
 
-NOTE: Withdrawal of peripheral jobs via the Operations Desk application is not supported at the moment.
+How a peripheral job can be withdrawn depends on whether it is related to a transport order:
+
+* Peripheral jobs that are not related to transport orders and peripheral jobs that are related to transport orders in a final state (finished or failed) can be withdrawn by selecting them in the peripheral jobs table and clicking the withdrawal button shown above the table.
+* Peripheral jobs that are related to transport orders will implicitly be aborted when the respective transport order is withdrawn.
+  Withdrawing them independently from the related transport order is not supported (unless the related transport order is already in a final state -- see above.)
+** For transport orders that are withdrawn regularly, related peripheral jobs are aborted after the vehicle has completed its pending movements.
+** For transport orders that are withdrawn forcibly, related peripheral jobs are aborted immediately.
 
 ==== Removing a vehicle from a running system
 

@@ -9,12 +9,15 @@ package org.opentcs.kernel.services;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.workingset.TCSObjectPool;
 
 /**
@@ -66,6 +69,14 @@ public class StandardPeripheralDispatcherService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       dispatcher.withdrawJob(globalObjectPool.getObject(Location.class, ref));
+    }
+  }
+
+  @Override
+  public void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> ref)
+      throws ObjectUnknownException, KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      dispatcher.withdrawJob(globalObjectPool.getObject(PeripheralJob.class, ref));
     }
   }
 }

@@ -258,6 +258,18 @@ public class OrderHandler {
     });
   }
 
+  public void withdrawPeripheralJob(String name)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+
+    PeripheralJob job = jobService.fetchObject(PeripheralJob.class, name);
+    if (job == null) {
+      throw new ObjectUnknownException("Unknown peripheral job: " + name);
+    }
+
+    kernelExecutor.submit(() -> jobDispatcherService.withdrawByPeripheralJob(job.getReference()));
+  }
+
   public void reroute(String vehicleName, boolean forced)
       throws ObjectUnknownException {
     requireNonNull(vehicleName, "vehicleName");

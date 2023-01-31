@@ -572,6 +572,32 @@ paths:
                 items:
                   type: string
                   description: Details on the actual error.
+  "/peripheralJobs/{NAME}/withdrawal":
+    post:
+      tags:
+        - Peripheral jobs
+      summary: Withdraws the peripheral job with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral job to be withdrawn.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find peripheral job 'PJob-01'.
   /peripheralJobs/dispatcher/trigger:
     post:
       tags:

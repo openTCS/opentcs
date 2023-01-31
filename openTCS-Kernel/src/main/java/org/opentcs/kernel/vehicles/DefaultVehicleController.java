@@ -612,35 +612,7 @@ public class DefaultVehicleController
         return;
       }
       futureCommands.clear();
-
-      clearPeripheralInteractions();
     }
-  }
-
-  private void clearPeripheralInteractions() {
-    if (peripheralInteractor.isWaitingForPreMovementInteractionsToFinish()) {
-      // We accepted resources that required peripheral interactions to be finished in order
-      // for a corresponding movement command to be sent to the comm adapter. Now, this movement
-      // command will never be sent to the comm adapter. We therefore need to let the scheduler
-      // know that we no longer need these resources.
-      Set<TCSResource<?>> resources = allocatedResources.removeLast();
-      LOG.debug("{}: Freeing most recent allocated resources: {}",
-                vehicle.getName(),
-                resources);
-      scheduler.free(this, resources);
-    }
-
-    // Forget about the peripheral interactions we were waiting for so that the completion of
-    // ongoing peripheral operations is ignored in any case.
-    LOG.debug("{}: Clearing peripheral interactions...", vehicle.getName());
-    peripheralInteractor.clear();
-
-    // At this point, either at least one of the required interactions failed or the transport order
-    // was withdrawn. In case we were still waiting for some required interactions to finish
-    // (which we're now no longer doing), we need to make sure the withdrawal of the transport order
-    // is finished properly.
-    LOG.debug("{}: Checking if drive order is finished...", vehicle.getName());
-    checkForPendingCommands();
   }
 
   @Override
@@ -818,8 +790,7 @@ public class DefaultVehicleController
   }
 
   private void onMovementInteractionFailed() {
-    LOG.debug("{}: Movement interaction failed, withdrawing current order...", vehicle.getName());
-    dispatcherService.withdrawByVehicle(vehicle.getReference(), false);
+    LOG.warn("{}: Movement interaction failed.", vehicle.getName());
   }
 
   @SuppressWarnings("unchecked")
