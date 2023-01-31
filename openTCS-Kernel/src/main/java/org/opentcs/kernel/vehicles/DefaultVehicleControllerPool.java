@@ -109,7 +109,7 @@ public final class DefaultVehicleControllerPool
 
     VehicleController controller = vehicleManagerFactory.createVehicleController(vehicle,
                                                                                  commAdapter);
-    PoolEntry poolEntry = new PoolEntry(vehicleName, controller, commAdapter);
+    PoolEntry poolEntry = new PoolEntry(vehicleName, controller);
     poolEntries.put(vehicleName, poolEntry);
     controller.initialize();
   }
@@ -149,10 +149,6 @@ public final class DefaultVehicleControllerPool
      * The vehicle controller associated with the vehicle.
      */
     private final VehicleController vehicleController;
-    /**
-     * The communication adapter associated with the vehicle.
-     */
-    private final VehicleCommAdapter commAdapter;
 
     /**
      * Creates a new pool entry.
@@ -160,12 +156,10 @@ public final class DefaultVehicleControllerPool
      * @param name The name of the vehicle managed.
      * @param manager The vehicle manager associated with the vehicle.
      * @param controller The VehicleController
-     * @param adapter The communication adapter associated with the vehicle.
      */
-    private PoolEntry(String name, VehicleController controller, VehicleCommAdapter adapter) {
+    private PoolEntry(String name, VehicleController controller) {
       vehicleName = requireNonNull(name, "name");
       vehicleController = requireNonNull(controller, "controller");
-      commAdapter = requireNonNull(adapter, "adapter");
     }
   }
 }

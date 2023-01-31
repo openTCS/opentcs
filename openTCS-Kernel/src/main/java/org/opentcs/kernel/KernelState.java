@@ -20,7 +20,7 @@ import org.opentcs.kernel.workingset.TCSObjectPool;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-abstract class KernelState
+public abstract class KernelState
     implements Lifecycle {
 
   /**
@@ -48,10 +48,10 @@ abstract class KernelState
    * @param model The model to be used.
    * @param modelPersister The model persister to be used.
    */
-  KernelState(Object globalSyncObject,
-              TCSObjectPool objectPool,
-              Model model,
-              ModelPersister modelPersister) {
+  public KernelState(Object globalSyncObject,
+                     TCSObjectPool objectPool,
+                     Model model,
+                     ModelPersister modelPersister) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.globalObjectPool = requireNonNull(objectPool, "objectPool");
     this.model = requireNonNull(model, "model");

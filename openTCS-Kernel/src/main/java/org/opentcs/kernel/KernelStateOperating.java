@@ -42,17 +42,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class KernelStateOperating
+public class KernelStateOperating
     extends KernelStateOnline {
 
   /**
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(KernelStateOperating.class);
-  /**
-   * The kernel application's configuration.
-   */
-  private final KernelApplicationConfiguration configuration;
   /**
    * The order facade to the object pool.
    */
@@ -142,25 +138,25 @@ class KernelStateOperating
    * @param vehicleService The vehicle service to be used.
    */
   @Inject
-  KernelStateOperating(@GlobalSyncObject Object globalSyncObject,
-                       TCSObjectPool objectPool,
-                       Model model,
-                       TransportOrderPool orderPool,
-                       PeripheralJobPool jobPool,
-                       ModelPersister modelPersister,
-                       KernelApplicationConfiguration configuration,
-                       Router router,
-                       Scheduler scheduler,
-                       Dispatcher dispatcher,
-                       PeripheralJobDispatcher peripheralJobDispatcher,
-                       LocalVehicleControllerPool controllerPool,
-                       LocalPeripheralControllerPool peripheralControllerPool,
-                       @KernelExecutor ScheduledExecutorService kernelExecutor,
-                       OrderCleanerTask orderCleanerTask,
-                       @ActiveInOperatingMode Set<KernelExtension> extensions,
-                       AttachmentManager attachmentManager,
-                       PeripheralAttachmentManager peripheralAttachmentManager,
-                       InternalVehicleService vehicleService) {
+  public KernelStateOperating(@GlobalSyncObject Object globalSyncObject,
+                              TCSObjectPool objectPool,
+                              Model model,
+                              TransportOrderPool orderPool,
+                              PeripheralJobPool jobPool,
+                              ModelPersister modelPersister,
+                              KernelApplicationConfiguration configuration,
+                              Router router,
+                              Scheduler scheduler,
+                              Dispatcher dispatcher,
+                              PeripheralJobDispatcher peripheralJobDispatcher,
+                              LocalVehicleControllerPool controllerPool,
+                              LocalPeripheralControllerPool peripheralControllerPool,
+                              @KernelExecutor ScheduledExecutorService kernelExecutor,
+                              OrderCleanerTask orderCleanerTask,
+                              @ActiveInOperatingMode Set<KernelExtension> extensions,
+                              AttachmentManager attachmentManager,
+                              PeripheralAttachmentManager peripheralAttachmentManager,
+                              InternalVehicleService vehicleService) {
     super(globalSyncObject,
           objectPool,
           model,
@@ -168,7 +164,6 @@ class KernelStateOperating
           configuration.saveModelOnTerminateOperating());
     this.orderPool = requireNonNull(orderPool, "orderPool");
     this.jobPool = requireNonNull(jobPool, "jobPool");
-    this.configuration = requireNonNull(configuration, "configuration");
     this.router = requireNonNull(router, "router");
     this.scheduler = requireNonNull(scheduler, "scheduler");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");

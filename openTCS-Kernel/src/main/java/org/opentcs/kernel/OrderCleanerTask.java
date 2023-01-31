@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class OrderCleanerTask
+public class OrderCleanerTask
     implements Runnable {
 
   /**

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-class KernelStateModelling
+public class KernelStateModelling
     extends KernelStateOnline {
 
   /**
@@ -52,12 +52,12 @@ class KernelStateModelling
    * @param extensions The kernel extensions to be used.
    */
   @Inject
-  KernelStateModelling(@GlobalSyncObject Object globalSyncObject,
-                       TCSObjectPool objectPool,
-                       Model model,
-                       ModelPersister modelPersister,
-                       KernelApplicationConfiguration configuration,
-                       @ActiveInModellingMode Set<KernelExtension> extensions) {
+  public KernelStateModelling(@GlobalSyncObject Object globalSyncObject,
+                              TCSObjectPool objectPool,
+                              Model model,
+                              ModelPersister modelPersister,
+                              KernelApplicationConfiguration configuration,
+                              @ActiveInModellingMode Set<KernelExtension> extensions) {
     super(globalSyncObject,
           objectPool,
           model,

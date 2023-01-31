@@ -10,21 +10,15 @@ package org.opentcs.kernel;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The base class for the kernel's online states.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-abstract class KernelStateOnline
+public abstract class KernelStateOnline
     extends KernelState {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(KernelStateOnline.class);
   /**
    * Whether to save the model when this state is terminated.
    */

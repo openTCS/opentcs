@@ -19,7 +19,7 @@ import org.opentcs.kernel.workingset.TCSObjectPool;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-final class KernelStateShutdown
+public class KernelStateShutdown
     extends KernelState {
 
   /**

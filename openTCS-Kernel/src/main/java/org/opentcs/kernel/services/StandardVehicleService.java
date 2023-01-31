@@ -35,7 +35,6 @@ import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.TCSObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +55,6 @@ public class StandardVehicleService
    * A global object to be used for synchronization within the kernel.
    */
   private final Object globalSyncObject;
-  /**
-   * The container of all course model and transport order objects.
-   */
-  private final TCSObjectPool globalObjectPool;
   /**
    * A pool of vehicle controllers.
    */
@@ -86,7 +81,6 @@ public class StandardVehicleService
    *
    * @param objectService The tcs object service.
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param globalObjectPool The object pool to be used.
    * @param vehicleControllerPool The controller pool to be used.
    * @param vehicleEntryPool The pool of vehicle entries to be used.
    * @param attachmentManager The attachment manager.
@@ -96,7 +90,6 @@ public class StandardVehicleService
   @Inject
   public StandardVehicleService(TCSObjectService objectService,
                                 @GlobalSyncObject Object globalSyncObject,
-                                TCSObjectPool globalObjectPool,
                                 LocalVehicleControllerPool vehicleControllerPool,
                                 VehicleEntryPool vehicleEntryPool,
                                 AttachmentManager attachmentManager,
@@ -104,7 +97,6 @@ public class StandardVehicleService
                                 Model model) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.vehicleEntryPool = requireNonNull(vehicleEntryPool, "vehicleEntryPool");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");

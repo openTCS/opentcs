@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-final class StandardKernel
+public class StandardKernel
     implements LocalKernel,
                Runnable {
 
@@ -85,10 +85,10 @@ final class StandardKernel
    * @param notificationService The notification service to be used.
    */
   @Inject
-  StandardKernel(@ApplicationEventBus EventBus eventBus,
-                 @KernelExecutor ScheduledExecutorService kernelExecutor,
-                 Map<Kernel.State, Provider<KernelState>> stateProviders,
-                 NotificationService notificationService) {
+  public StandardKernel(@ApplicationEventBus EventBus eventBus,
+                        @KernelExecutor ScheduledExecutorService kernelExecutor,
+                        Map<Kernel.State, Provider<KernelState>> stateProviders,
+                        NotificationService notificationService) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.stateProviders = requireNonNull(stateProviders, "stateProviders");

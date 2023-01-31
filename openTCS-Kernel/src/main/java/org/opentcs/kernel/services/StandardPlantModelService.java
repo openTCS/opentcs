@@ -33,8 +33,6 @@ import org.opentcs.data.notification.UserNotification;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
 import org.opentcs.util.event.EventHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is the standard implementation of the {@link PlantModelService} interface.
@@ -45,10 +43,6 @@ public class StandardPlantModelService
     extends AbstractTCSObjectService
     implements InternalPlantModelService {
 
-  /**
-   * This class' logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(StandardPlantModelService.class);
   /**
    * The kernel.
    */
