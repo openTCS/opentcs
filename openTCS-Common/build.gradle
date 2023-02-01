@@ -8,7 +8,7 @@ dependencies {
   api project(':openTCS-API-Base')
 
   api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
-  api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.6'
+  api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.7'
 }
 
 processResources.doLast {
