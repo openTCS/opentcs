@@ -1,7 +1,7 @@
 apply plugin: 'checkstyle'
 
 checkstyle {
-  toolVersion = '8.39'
+  toolVersion = '10.7.0'
   configFile = rootProject.file("config/checkstyle/checkstyle.xml")
   showViolations = false
 }

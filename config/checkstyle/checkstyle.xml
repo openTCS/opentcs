@@ -268,7 +268,7 @@
     </module>
 
     <module name="JavadocMethod">
-      <property name="scope" value="package"/>
+      <property name="accessModifiers" value="public, protected, package"/>
       <property name="severity" value="info"/>
     </module>
 
