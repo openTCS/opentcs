@@ -31,8 +31,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Fix a bug where the btn:[menu:View[Reset window arrangement]] option in the Operations Desk application would not restore the peripheral job view.
 * Other changes:
 ** Update Jackson to 2.14.2.
-** Update JUnit 5 to 5.9.1.
-** Update Mockito to 4.10.0.
+** Update JUnit 5 to 5.9.2.
+** Update AssertJ to 3.24.2.
+** Update Mockito to 4.11.0.
 ** Update Gradle wrapper to 6.9.3.
 
 == Version 5.7 (2022-12-22)
