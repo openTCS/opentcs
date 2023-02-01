@@ -15,6 +15,7 @@ import org.opentcs.guing.common.application.OperationMode;
 import org.opentcs.guing.common.application.menus.menubar.ViewPluginPanelsMenu;
 import org.opentcs.operationsdesk.application.action.ViewActionMap;
 import org.opentcs.operationsdesk.application.action.view.AddDrawingViewAction;
+import org.opentcs.operationsdesk.application.action.view.AddPeripheralJobViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderSequenceViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.operationsdesk.application.action.view.RestoreDockingLayoutAction;
@@ -41,6 +42,10 @@ public class ViewMenu
    * A menu item for adding an order sequence view.
    */
   private final JMenuItem menuOrderSequenceView;
+  /**
+   * A menu item for adding a peripheral job view.
+   */
+  private final JMenuItem menuPeripheralJobView;
   /**
    * A menu for showing/hiding plugin panels.
    */
@@ -79,6 +84,9 @@ public class ViewMenu
     // Menu item View -> Add transport order sequence view
     menuOrderSequenceView = new JMenuItem(actionMap.get(AddTransportOrderSequenceViewAction.ID));
     add(menuOrderSequenceView);
+    
+    menuPeripheralJobView = new JMenuItem(actionMap.get(AddPeripheralJobViewAction.ID));
+    add(menuPeripheralJobView);
 
     addSeparator();
 

@@ -21,6 +21,7 @@ import org.opentcs.operationsdesk.application.action.actions.PauseAllVehiclesAct
 import org.opentcs.operationsdesk.application.action.actions.ResumeAllVehiclesAction;
 import org.opentcs.operationsdesk.application.action.app.AboutAction;
 import org.opentcs.operationsdesk.application.action.view.AddDrawingViewAction;
+import org.opentcs.operationsdesk.application.action.view.AddPeripheralJobViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderSequenceViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.operationsdesk.application.action.view.RestoreDockingLayoutAction;
@@ -101,6 +102,8 @@ public class ViewActionMap
 
     // Menu View -> Add transport order sequence view
     put(AddTransportOrderSequenceViewAction.ID, new AddTransportOrderSequenceViewAction(view));
+    
+    put(AddPeripheralJobViewAction.ID, new AddPeripheralJobViewAction(view));
 
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));
 

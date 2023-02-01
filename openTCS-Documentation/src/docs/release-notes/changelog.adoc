@@ -22,11 +22,13 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add support for specifying and retrieving the following properties of transport orders via web API: dispensability, peripheral reservation token, wrapping sequence, type.
 ** Add two new ways to trigger the dispatcher via web API: `POST /vehicles/dispatcher/trigger` and `POST /transportOrders/dispatcher/trigger`.
    The old `POST /dispatcher/trigger` is now deprecated.
+** Add support for adding additional peripheral job views in the Operations Desk application via the btn:[View] menu.
 * Bugs fixed:
 ** Fix a bug where regularly withdrawing a transport order with peripheral jobs from a vehicle could prevent the withdrawal from being completed.
 ** Fix a bug where forcibly withdrawing a transport order from a vehicle that is waiting for a peripheral job to finish would prevent any further commands (e.g. for new transport orders) to be sent to the vehicle.
 ** Fix resource management for cases in which a vehicle's transport order was withdrawn while the vehicle was waiting for a resource allocation.
 ** Fix resource management / order processing for cases in which the plant model contains report points.
+** Fix a bug where the btn:[menu:View[Reset window arrangement]] option in the Operations Desk application would not restore the peripheral job view.
 * Other changes:
 ** Update Jackson to 2.14.1.
 ** Update JUnit 5 to 5.9.1.

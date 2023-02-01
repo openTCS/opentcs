@@ -677,6 +677,9 @@ public class OpenTCSView
     for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getOrderSequenceMap().keySet())) {
       dockingManager.removeDockable(dock);
     }
+    for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getPeripheralJobMap().keySet())) {
+      dockingManager.removeDockable(dock);
+    }
     dockingManager.reset();
     closeOpenedPluginPanels();
     viewManager.reset();
