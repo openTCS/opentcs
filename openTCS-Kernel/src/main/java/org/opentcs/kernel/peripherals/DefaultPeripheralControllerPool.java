@@ -131,7 +131,7 @@ public class DefaultPeripheralControllerPool
     requireNonNull(locationRef, "locationRef");
 
     if (!poolEntries.containsKey(locationRef)) {
-      LOG.warn("{}: No peripheral controller attached, doing nothing.", locationRef.getName());
+      LOG.debug("{}: No peripheral controller attached, doing nothing.", locationRef.getName());
       return;
     }
 

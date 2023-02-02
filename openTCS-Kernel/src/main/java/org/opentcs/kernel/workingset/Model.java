@@ -567,6 +567,12 @@ public class Model {
                                              String rechargeOperation)
       throws ObjectUnknownException {
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+
+    LOG.info("Vehicle's recharge operation changes: {} -- {} -> {}",
+             vehicle.getName(),
+             vehicle.getRechargeOperation(),
+             rechargeOperation);
+
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withRechargeOperation(rechargeOperation));
     objectPool.emitObjectEvent(vehicle,
@@ -607,6 +613,12 @@ public class Model {
                                  Vehicle.State newState)
       throws ObjectUnknownException {
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+
+    LOG.debug("Vehicle's state changes: {} -- {} -> {}",
+              vehicle.getName(),
+              vehicle.getState(),
+              newState);
+
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withState(newState));
     objectPool.emitObjectEvent(vehicle,
@@ -698,10 +710,13 @@ public class Model {
   public Vehicle setVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
+    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+
+    LOG.info("Vehicle's allowed order types change: {} -- {} -> {}",
+             vehicle.getName(),
+             vehicle.getAllowedOrderTypes(),
+             allowedOrderTypes);
+
     Vehicle previousState = vehicle;
     vehicle = objectPool.replaceObject(vehicle.withAllowedOrderTypes(allowedOrderTypes));
     objectPool.emitObjectEvent(vehicle,
@@ -722,6 +737,12 @@ public class Model {
                                     TCSObjectReference<Point> newPosRef)
       throws ObjectUnknownException {
     Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+
+    LOG.debug("Vehicle's position changes: {} -- {} -> {}",
+              vehicle.getName(),
+              vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName(),
+              newPosRef == null ? null : newPosRef.getName());
+
     Vehicle previousVehicleState = vehicle;
     // If the vehicle was occupying a point before, clear it and send an event.
     if (vehicle.getCurrentPosition() != null) {

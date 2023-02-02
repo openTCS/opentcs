@@ -159,7 +159,7 @@ public class AttachmentManager
     requireNonNull(vehicleName, "vehicleName");
     requireNonNull(factory, "factory");
 
-    LOG.info("Attaching vehicle comm adapter: '{}' - '{}'...",
+    LOG.info("Attaching vehicle comm adapter: '{}' -- '{}'...",
              vehicleName,
              factory.getClass().getName());
 

@@ -191,6 +191,7 @@ public abstract class BasicVehicleCommAdapter
     if (isEnabled()) {
       return;
     }
+    LOG.info("Vehicle comm adapter is being enabled: {}", getName());
     connectVehicle();
     enabled = true;
     getProcessModel().setCommAdapterEnabled(true);
@@ -207,6 +208,7 @@ public abstract class BasicVehicleCommAdapter
     if (!isEnabled()) {
       return;
     }
+    LOG.info("Vehicle comm adapter is being disabled: {}", getName());
     disconnectVehicle();
     enabled = false;
     // Update the vehicle's state for the rest of the system.

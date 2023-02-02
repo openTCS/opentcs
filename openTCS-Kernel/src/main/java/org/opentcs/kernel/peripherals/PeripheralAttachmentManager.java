@@ -167,6 +167,13 @@ public class PeripheralAttachmentManager
 
   private void attachAdapterToLocation(PeripheralEntry entry,
                                        PeripheralCommAdapterFactory factory) {
+    requireNonNull(entry, "entry");
+    requireNonNull(factory, "factory");
+
+    LOG.info("Attaching peripheral comm adapter: '{}' -- '{}'...",
+             entry.getLocation().getName(),
+             factory.getClass().getName());
+
     Location location = peripheralService.fetchObject(Location.class, entry.getLocation());
     PeripheralCommAdapter commAdapter = factory.getAdapterFor(location);
     if (commAdapter == null) {
