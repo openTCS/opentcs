@@ -27,7 +27,6 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import static org.opentcs.util.Assertions.checkArgument;
-import org.opentcs.util.UniqueStringGenerator;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +48,6 @@ public class TCSObjectPool {
    * The objects contained in this pool, mapped by their names.
    */
   private final Map<String, TCSObject<?>> objectsByName = new ConcurrentHashMap<>();
-  /**
-   * The generator providing unique names for objects in this pool.
-   */
-  private final UniqueStringGenerator<?> objectNameGenerator = new UniqueStringGenerator<>();
   /**
    * A handler we should emit object events to.
    */
@@ -83,7 +78,6 @@ public class TCSObjectPool {
       throw new ObjectExistsException("Object name " + newObject.getName() + " already exists.");
     }
     objectsByName.put(newObject.getName(), newObject);
-    objectNameGenerator.addString(newObject.getName());
   }
 
   /**
@@ -364,7 +358,6 @@ public class TCSObjectPool {
     if (rmObject == null) {
       throw new ObjectUnknownException(ref);
     }
-    objectNameGenerator.removeString(rmObject.getName());
     return rmObject;
   }
 
@@ -383,7 +376,6 @@ public class TCSObjectPool {
       TCSObject<?> removedObject = objectsByName.remove(curName);
       if (removedObject != null) {
         result.add(removedObject);
-        objectNameGenerator.removeString(removedObject.getName());
       }
     }
     return result;
