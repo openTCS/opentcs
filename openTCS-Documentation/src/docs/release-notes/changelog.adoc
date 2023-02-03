@@ -19,9 +19,13 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add support for withdrawing/aborting peripheral jobs:
 *** Peripheral jobs not related to a transport order can be withdrawn via the API.
 *** Peripheral jobs that are related to a transport order will implicitly be aborted when the respective transport order is forcibly withdrawn.
-** Add support for specifying and retrieving the following properties of transport orders via web API: dispensability, peripheral reservation token, wrapping sequence, type.
-** Add two new ways to trigger the dispatcher via web API: `POST /vehicles/dispatcher/trigger` and `POST /transportOrders/dispatcher/trigger`.
-   The old `POST /dispatcher/trigger` is now deprecated.
+** Extend web API:
+*** The following properties of transport orders can be specified/retrieved: dispensability, peripheral reservation token, wrapping sequence, type.
+*** The dispatcher can be triggered via new endpoints: `POST /transportOrders/dispatcher/trigger` and `POST /vehicles/dispatcher/trigger`.
+    The old `POST /dispatcher/trigger` is now deprecated.
+*** Vehicle drivers can be enabled/disabled.
+*** Information about a vehicle's available and currently attached drivers can be retrieved.
+*** The currently attached driver of a vehicle can be changed.
 ** Add support for adding additional peripheral job views in the Operations Desk application via the btn:[View] menu.
 * Bugs fixed:
 ** Fix a bug where regularly withdrawing a transport order with peripheral jobs from a vehicle could prevent the withdrawal from being completed.

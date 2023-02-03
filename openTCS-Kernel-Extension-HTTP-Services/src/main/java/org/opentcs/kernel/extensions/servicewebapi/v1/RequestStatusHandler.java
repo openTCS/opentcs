@@ -9,11 +9,13 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.KernelExecutor;
@@ -21,6 +23,8 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleState;
@@ -216,5 +220,75 @@ public class RequestStatusHandler {
     kernelExecutor.submit(
         () -> vehicleService.updateVehiclePaused(vehicle.getReference(), paused)
     );
+  }
+
+  public void putVehicleCommAdapterEnabled(String name, String value)
+      throws ObjectUnknownException, IllegalArgumentException {
+    requireNonNull(name, "name");
+    requireNonNull(value, "value");
+
+    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+    if (vehicle == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + name);
+    }
+
+    if (Boolean.parseBoolean(value)) {
+      kernelExecutor.submit(
+          () -> vehicleService.enableCommAdapter(vehicle.getReference())
+      );
+    }
+    else {
+      kernelExecutor.submit(
+          () -> vehicleService.disableCommAdapter(vehicle.getReference())
+      );
+    }
+  }
+
+  public AttachmentInformation getVehicleCommAdapterAttachmentInformation(String name)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+
+    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+    if (vehicle == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + name);
+    }
+
+    return vehicleService.fetchAttachmentInformation(vehicle.getReference());
+  }
+
+  public void putVehicleCommAdapter(String name, String value)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(value, "value");
+
+    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+    if (vehicle == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + name);
+    }
+
+    VehicleCommAdapterDescription newAdapter
+        = vehicleService.fetchAttachmentInformation(vehicle.getReference())
+            .getAvailableCommAdapters()
+            .stream()
+            .filter(description -> description.getClass().getName().equals(value))
+            .findAny()
+            .orElseThrow(
+                () -> new IllegalArgumentException("Unknown vehicle driver class name: " + value)
+            );
+
+    try {
+      kernelExecutor.submit(
+          () -> vehicleService.attachCommAdapter(vehicle.getReference(), newAdapter)
+      ).get();
+    }
+    catch (InterruptedException exc) {
+      throw new IllegalStateException("Unexpectedly interrupted");
+    }
+    catch (ExecutionException exc) {
+      if (exc.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) exc.getCause();
+      }
+      throw new KernelRuntimeException(exc.getCause());
+    }
   }
 }

@@ -23,6 +23,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Job;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Transport;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.AttachmentInformationTO;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -102,6 +103,12 @@ public class V1RequestHandler
                 this::handleGetEvents);
     service.post("/vehicles/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
+    service.put("/vehicles/:NAME/commAdapter/attachment",
+                this::handlePutVehicleCommAdapterAttachment);
+    service.get("/vehicles/:NAME/commAdapter/attachmentInformation",
+                this::handleGetVehicleCommAdapterAttachmentInfo);
+    service.put("/vehicles/:NAME/commAdapter/enabled",
+                this::handlePutVehicleCommAdapterEnabled);
     service.put("/vehicles/:NAME/paused",
                 this::handlePutVehiclePaused);
     service.put("/vehicles/:NAME/integrationLevel",
@@ -151,6 +158,38 @@ public class V1RequestHandler
     return toJson(statusEventDispatcher.fetchEvents(minSequenceNo(request),
                                                     maxSequenceNo(request),
                                                     timeout(request)));
+  }
+
+  private Object handlePutVehicleCommAdapterEnabled(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putVehicleCommAdapterEnabled(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handleGetVehicleCommAdapterAttachmentInfo(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(
+        AttachmentInformationTO.fromAttachmentInformation(
+            statusInformationProvider.getVehicleCommAdapterAttachmentInformation(
+                request.params(":NAME")
+            )
+        )
+    );
+  }
+
+  private Object handlePutVehicleCommAdapterAttachment(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putVehicleCommAdapter(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
   }
 
   private Object handlePostTransportOrder(Request request, Response response)

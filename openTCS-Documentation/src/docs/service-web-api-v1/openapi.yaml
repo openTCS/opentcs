@@ -423,6 +423,112 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/commAdapter/attachmentInformation":
+    get:
+      tags:
+        - Vehicles
+      summary: Retrieves the driver attachment information of this vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttachmentInformation"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/commAdapter/attachment":
+    put:
+      tags:
+        - Vehicles
+      summary: Attaches the given vehicle driver to this vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The description class name of the vehicle driver that is to be attached.
+          required: true
+          example: org.opentcs.virtualvehicle.LoopbackCommunicationAdapterDescription
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+        "400":
+          description: The submitted value is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: "Unknown vehicle driver class name: org.opentcs.someVehicle.driver11"
+  "/vehicles/{NAME}/commAdapter/enabled":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the enabled state for the named vehicle's driver.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The vehicle driver's new enabled state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
   /vehicles/dispatcher/trigger:
     post:
       tags:
@@ -708,6 +814,25 @@ components:
       in: header
       name: X-Api-Access-Key
   schemas:
+    AttachmentInformation:
+      title: Attachment Information
+      type: object
+      additionalProperties: false
+      properties:
+        vehicleName:
+          type: string
+          description: The name of the vehicle.
+          example: Vehicle-0001
+        availableCommAdapters:
+          type: array
+          items:
+            type: string
+          description: The list of drivers (as names of description classes) available for this vehicle.
+          example: [ "org.opentcs.someVehicle.driver001", "org.opentcs.someVehicle.driver002" ]
+        attachedCommAdapter:
+          type: string
+          description: The description class name of the vehicle driver currently attached to this vehicle.
+          example: org.opentcs.someVehicle.driver001
     TransportOrderState:
       title: Transport Order State
       type: object
