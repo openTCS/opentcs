@@ -16,6 +16,7 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.PlantModel;
 
 /**
  * The default implementation of the plant model service.
@@ -26,6 +27,19 @@ import org.opentcs.data.model.Location;
 class RemotePlantModelServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePlantModelService>
     implements PlantModelService {
+
+  @Override
+  public PlantModel getPlantModel()
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().getPlantModel(getClientId());
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
 
   @Override
   public void createPlantModel(PlantModelCreationTO to)

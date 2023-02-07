@@ -15,6 +15,7 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.PlantModel;
 
 /**
  * Declares the methods provided by the {@link PlantModelService} via RMI.
@@ -37,6 +38,9 @@ public interface RemotePlantModelService
             Remote {
 
   // CHECKSTYLE:OFF
+  PlantModel getPlantModel(ClientID clientId)
+      throws RemoteException;
+
   void createPlantModel(ClientID clientId, PlantModelCreationTO to)
       throws RemoteException;
 

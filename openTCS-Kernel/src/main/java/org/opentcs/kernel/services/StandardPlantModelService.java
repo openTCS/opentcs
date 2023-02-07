@@ -26,9 +26,16 @@ import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.Path;
+import org.opentcs.data.model.PlantModel;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.workingset.Model;
@@ -135,6 +142,21 @@ public class StandardPlantModelService
       throws IllegalStateException {
     synchronized (globalSyncObject) {
       modelPersister.saveModel(model.createPlantModelCreationTO());
+    }
+  }
+
+  @Override
+  public PlantModel getPlantModel() {
+    synchronized (globalSyncObject) {
+      return new PlantModel(model.getName())
+          .withProperties(getModelProperties())
+          .withPoints(fetchObjects(Point.class))
+          .withPaths(fetchObjects(Path.class))
+          .withLocationTypes(fetchObjects(LocationType.class))
+          .withLocations(fetchObjects(Location.class))
+          .withBlocks(fetchObjects(Block.class))
+          .withVehicles(fetchObjects(Vehicle.class))
+          .withVisuaLayouts(fetchObjects(VisualLayout.class));
     }
   }
 

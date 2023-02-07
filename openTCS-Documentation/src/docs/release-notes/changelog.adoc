@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add support for withdrawing/aborting peripheral jobs:
 *** Peripheral jobs not related to a transport order can be withdrawn via the API.
 *** Peripheral jobs that are related to a transport order will implicitly be aborted when the respective transport order is forcibly withdrawn.
+** Add `PlantModelService.getPlantModel()`, which returns a representation of the complete plant model.
 ** Extend web API:
 *** The following properties of transport orders can be specified/retrieved: dispensability, peripheral reservation token, wrapping sequence, type.
 *** The dispatcher can be triggered via new endpoints: `POST /transportOrders/dispatcher/trigger` and `POST /vehicles/dispatcher/trigger`.

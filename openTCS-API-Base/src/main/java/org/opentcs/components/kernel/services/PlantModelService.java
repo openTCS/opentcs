@@ -14,6 +14,7 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.PlantModel;
 
 /**
  * Provides methods concerning the plant model.
@@ -22,6 +23,15 @@ import org.opentcs.data.model.Location;
  */
 public interface PlantModelService
     extends TCSObjectService {
+
+  /**
+   * Returns a representation of the plant model's current state.
+   *
+   * @return The complete plant model.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  PlantModel getPlantModel()
+      throws KernelRuntimeException;
 
   /**
    * Creates a new plant model with the objects described in the given transfer object.
