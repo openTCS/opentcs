@@ -1,0 +1,3 @@
+variables:
+  # Remember to update this whenever you change the image contents in Dockerfile!
+  CODEQUALITY_IMAGE_TAG: "1.0.0"

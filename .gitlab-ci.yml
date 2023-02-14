@@ -1,5 +1,7 @@
 image: adoptopenjdk:13-jdk-hotspot
 
+include: '.gitlab/docker/codequality/version.yml'
+
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_IID
@@ -8,6 +10,9 @@ workflow:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  DO_BUILD_CODEQUALITY_IMAGE:
+    value: "false"
+    description: "Whether ('true') or not ('false') to (re-)build the Docker image for code quality jobs."
   DO_DEPLOY_PRIVATE:
     value: "false"
     description: "Whether ('true') or not ('false') to deploy artifacts to private (GitLab) repository."
@@ -76,6 +81,25 @@ build:
     when: always
     expire_in: 1 week
 
+build_code_quality_image:
+  stage: build
+  rules:
+    - if: $DO_BUILD_CODEQUALITY_IMAGE == "true"
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.1-debug
+    entrypoint: [""]
+  tags:
+    - opentcs-runner
+  script:
+    - echo "Building code quality image with tag ${CODEQUALITY_IMAGE_TAG}..."
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}/.gitlab/docker/codequality"
+      --dockerfile "${CI_PROJECT_DIR}/.gitlab/docker/codequality/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}"
+
 ensure_tests_passed:
   stage: test
   tags:
@@ -99,17 +123,14 @@ ensure_tests_passed:
 
 code_quality:
   stage: test
+  image: ${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}
   tags:
     - opentcs-runner
   variables:
     CODE_CLIMATE_FILE: gl-code-quality-report.json
   script:
-    - echo "Installing dependencies required for violations-command-line..."
-    - apt update && apt upgrade -y
-    - apt install -y nodejs npm
-    - npm install -g npx
     - echo "Converting CheckStyle reports to CodeClimate report..."
-    - npx violations-command-line@1.21.0 -cc $CODE_CLIMATE_FILE -print-violations false -diff-print-violations true -v "CHECKSTYLE" "." ".*checkstyle/.*\.xml$" "Checkstyle"
+    - violations-command-line -cc $CODE_CLIMATE_FILE -print-violations false -diff-print-violations true -v "CHECKSTYLE" "." ".*checkstyle/.*\.xml$" "Checkstyle"
     - sed -i.bak -e "s,$CI_PROJECT_DIR/,,g" $CODE_CLIMATE_FILE
   artifacts:
     reports:
