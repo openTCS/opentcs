@@ -26,7 +26,7 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
 import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
 import org.opentcs.kernel.peripherals.PeripheralEntry;
 import org.opentcs.kernel.peripherals.PeripheralEntryPool;
-import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * This class is the standard implementation of the {@link PeripheralService} interface.
@@ -50,9 +50,9 @@ public class StandardPeripheralService
    */
   private final PeripheralEntryPool peripheralEntryPool;
   /**
-   * The model facade to the object pool.
+   * The plant model manager.
    */
-  private final Model model;
+  private final PlantModelManager plantModelManager;
 
   /**
    * Creates a new instance.
@@ -61,19 +61,19 @@ public class StandardPeripheralService
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param attachmentManager The attachment manager.
    * @param peripheralEntryPool The pool of peripheral entries.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    */
   @Inject
   public StandardPeripheralService(TCSObjectService objectService,
                                    @GlobalSyncObject Object globalSyncObject,
                                    PeripheralAttachmentManager attachmentManager,
                                    PeripheralEntryPool peripheralEntryPool,
-                                   Model model) {
+                                   PlantModelManager plantModelManager) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
     this.peripheralEntryPool = requireNonNull(peripheralEntryPool, "peripheralEntryPool");
-    this.model = requireNonNull(model, "model");
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
   }
 
   @Override
@@ -135,7 +135,7 @@ public class StandardPeripheralService
                                         PeripheralInformation.ProcState state)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setLocationProcState(ref, state);
+      plantModelManager.setLocationProcState(ref, state);
     }
   }
 
@@ -144,7 +144,7 @@ public class StandardPeripheralService
                                                String reservationToken)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setLocationReservationToken(ref, reservationToken);
+      plantModelManager.setLocationReservationToken(ref, reservationToken);
     }
   }
 
@@ -153,7 +153,7 @@ public class StandardPeripheralService
                                     PeripheralInformation.State state)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setLocationState(ref, state);
+      plantModelManager.setLocationState(ref, state);
     }
   }
 
@@ -162,7 +162,7 @@ public class StandardPeripheralService
                                   TCSObjectReference<PeripheralJob> peripheralJob)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setLocationPeripheralJob(ref, peripheralJob);
+      plantModelManager.setLocationPeripheralJob(ref, peripheralJob);
     }
   }
 }

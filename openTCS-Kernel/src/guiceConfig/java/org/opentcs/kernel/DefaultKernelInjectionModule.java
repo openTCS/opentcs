@@ -71,12 +71,13 @@ import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
-import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.kernel.workingset.NotificationBuffer;
-import org.opentcs.kernel.workingset.PeripheralJobPool;
+import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
-import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.opentcs.kernel.workingset.TCSObjectManager;
+import org.opentcs.kernel.workingset.TCSObjectRepository;
+import org.opentcs.kernel.workingset.TransportOrderPoolManager;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.SimpleEventBus;
@@ -108,10 +109,11 @@ public class DefaultKernelInjectionModule
         .in(Singleton.class);
 
     // The kernel's data pool structures.
-    bind(TCSObjectPool.class).in(Singleton.class);
-    bind(Model.class).in(Singleton.class);
-    bind(TransportOrderPool.class).in(Singleton.class);
-    bind(PeripheralJobPool.class).in(Singleton.class);
+    bind(TCSObjectRepository.class).in(Singleton.class);
+    bind(TCSObjectManager.class).in(Singleton.class);
+    bind(PlantModelManager.class).in(Singleton.class);
+    bind(TransportOrderPoolManager.class).in(Singleton.class);
+    bind(PeripheralJobPoolManager.class).in(Singleton.class);
     bind(NotificationBuffer.class).in(Singleton.class);
 
     bind(ObjectNameProvider.class)

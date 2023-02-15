@@ -34,7 +34,7 @@ import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntry;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
-import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,9 +72,9 @@ public class StandardVehicleService
    */
   private final VehicleCommAdapterRegistry commAdapterRegistry;
   /**
-   * The model facade to the object pool.
+   * The plant model manager.
    */
-  private final Model model;
+  private final PlantModelManager plantModelManager;
 
   /**
    * Creates a new instance.
@@ -85,7 +85,7 @@ public class StandardVehicleService
    * @param vehicleEntryPool The pool of vehicle entries to be used.
    * @param attachmentManager The attachment manager.
    * @param commAdapterRegistry The registry for all communication adapters.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    */
   @Inject
   public StandardVehicleService(TCSObjectService objectService,
@@ -94,21 +94,21 @@ public class StandardVehicleService
                                 VehicleEntryPool vehicleEntryPool,
                                 AttachmentManager attachmentManager,
                                 VehicleCommAdapterRegistry commAdapterRegistry,
-                                Model model) {
+                                PlantModelManager plantModelManager) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.vehicleEntryPool = requireNonNull(vehicleEntryPool, "vehicleEntryPool");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
     this.commAdapterRegistry = requireNonNull(commAdapterRegistry, "commAdapterRegistry");
-    this.model = requireNonNull(model, "model");
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
   }
 
   @Override
   public void updateVehicleEnergyLevel(TCSObjectReference<Vehicle> ref, int energyLevel)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleEnergyLevel(ref, energyLevel);
+      plantModelManager.setVehicleEnergyLevel(ref, energyLevel);
     }
   }
 
@@ -117,7 +117,7 @@ public class StandardVehicleService
                                                List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleLoadHandlingDevices(ref, devices);
+      plantModelManager.setVehicleLoadHandlingDevices(ref, devices);
     }
   }
 
@@ -126,7 +126,7 @@ public class StandardVehicleService
                                         TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleNextPosition(vehicleRef, pointRef);
+      plantModelManager.setVehicleNextPosition(vehicleRef, pointRef);
     }
   }
 
@@ -135,7 +135,7 @@ public class StandardVehicleService
                                          TCSObjectReference<OrderSequence> sequenceRef)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleOrderSequence(vehicleRef, sequenceRef);
+      plantModelManager.setVehicleOrderSequence(vehicleRef, sequenceRef);
     }
   }
 
@@ -143,7 +143,7 @@ public class StandardVehicleService
   public void updateVehicleOrientationAngle(TCSObjectReference<Vehicle> ref, double angle)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleOrientationAngle(ref, angle);
+      plantModelManager.setVehicleOrientationAngle(ref, angle);
     }
   }
 
@@ -153,7 +153,7 @@ public class StandardVehicleService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       LOG.debug("Vehicle {} has reached point {}.", vehicleRef, pointRef);
-      model.setVehiclePosition(vehicleRef, pointRef);
+      plantModelManager.setVehiclePosition(vehicleRef, pointRef);
     }
   }
 
@@ -161,7 +161,7 @@ public class StandardVehicleService
   public void updateVehiclePrecisePosition(TCSObjectReference<Vehicle> ref, Triple position)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehiclePrecisePosition(ref, position);
+      plantModelManager.setVehiclePrecisePosition(ref, position);
     }
   }
 
@@ -170,7 +170,7 @@ public class StandardVehicleService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       LOG.debug("Updating procState of vehicle {} to {}...", ref.getName(), state);
-      model.setVehicleProcState(ref, state);
+      plantModelManager.setVehicleProcState(ref, state);
     }
   }
 
@@ -179,7 +179,7 @@ public class StandardVehicleService
                                              String rechargeOperation)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleRechargeOperation(ref, rechargeOperation);
+      plantModelManager.setVehicleRechargeOperation(ref, rechargeOperation);
     }
   }
 
@@ -187,7 +187,7 @@ public class StandardVehicleService
   public void updateVehicleRouteProgressIndex(TCSObjectReference<Vehicle> ref, int index)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleRouteProgressIndex(ref, index);
+      plantModelManager.setVehicleRouteProgressIndex(ref, index);
     }
   }
 
@@ -196,7 +196,7 @@ public class StandardVehicleService
                                             List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleClaimedResources(ref, resources);
+      plantModelManager.setVehicleClaimedResources(ref, resources);
     }
   }
 
@@ -205,7 +205,7 @@ public class StandardVehicleService
                                               List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleAllocatedResources(ref, resources);
+      plantModelManager.setVehicleAllocatedResources(ref, resources);
     }
   }
 
@@ -213,7 +213,7 @@ public class StandardVehicleService
   public void updateVehicleState(TCSObjectReference<Vehicle> ref, Vehicle.State state)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleState(ref, state);
+      plantModelManager.setVehicleState(ref, state);
     }
   }
 
@@ -222,7 +222,7 @@ public class StandardVehicleService
                                           TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleTransportOrder(vehicleRef, orderRef);
+      plantModelManager.setVehicleTransportOrder(vehicleRef, orderRef);
     }
   }
 
@@ -320,7 +320,7 @@ public class StandardVehicleService
         );
       }
 
-      model.setVehicleIntegrationLevel(ref, integrationLevel);
+      plantModelManager.setVehicleIntegrationLevel(ref, integrationLevel);
     }
   }
 
@@ -328,7 +328,7 @@ public class StandardVehicleService
   public void updateVehiclePaused(TCSObjectReference<Vehicle> ref, boolean paused)
       throws ObjectUnknownException, KernelRuntimeException {
     synchronized (globalSyncObject) {
-      model.setVehiclePaused(ref, paused);
+      plantModelManager.setVehiclePaused(ref, paused);
 
       vehicleControllerPool.getVehicleController(ref.getName()).onVehiclePaused(paused);
     }
@@ -339,7 +339,7 @@ public class StandardVehicleService
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
+      plantModelManager.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
     }
   }
 }

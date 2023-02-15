@@ -18,7 +18,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.TCSObjectRepository;
 
 /**
  * This class is the standard implementation of the {@link PeripheralDispatcherService} interface.
@@ -35,7 +35,7 @@ public class StandardPeripheralDispatcherService
   /**
    * The container of all course model and transport order objects.
    */
-  private final TCSObjectPool globalObjectPool;
+  private final TCSObjectRepository objectRepo;
   /**
    * The peripheral job dispatcher.
    */
@@ -45,15 +45,15 @@ public class StandardPeripheralDispatcherService
    * Creates a new instance.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param globalObjectPool The object pool to be used.
+   * @param objectRepo The object repo to be used.
    * @param dispatcher The peripheral job dispatcher.
    */
   @Inject
   public StandardPeripheralDispatcherService(@GlobalSyncObject Object globalSyncObject,
-                                             TCSObjectPool globalObjectPool,
+                                             TCSObjectRepository objectRepo,
                                              PeripheralJobDispatcher dispatcher) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
+    this.objectRepo = requireNonNull(objectRepo, "objectRepo");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
   }
 
@@ -68,7 +68,7 @@ public class StandardPeripheralDispatcherService
   public void withdrawByLocation(TCSResourceReference<Location> ref)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      dispatcher.withdrawJob(globalObjectPool.getObject(Location.class, ref));
+      dispatcher.withdrawJob(objectRepo.getObject(Location.class, ref));
     }
   }
 
@@ -76,7 +76,7 @@ public class StandardPeripheralDispatcherService
   public void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> ref)
       throws ObjectUnknownException, KernelRuntimeException {
     synchronized (globalSyncObject) {
-      dispatcher.withdrawJob(globalObjectPool.getObject(PeripheralJob.class, ref));
+      dispatcher.withdrawJob(objectRepo.getObject(PeripheralJob.class, ref));
     }
   }
 }

@@ -15,11 +15,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
@@ -30,6 +29,7 @@ import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -56,30 +56,27 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.Colors;
 import org.opentcs.util.annotations.ScheduledApiChange;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Instances of this class present a view on the complete static topology of an
- * openTCS model, i.e. Points, Paths etc., and Vehicles, contained
- * in a {@link TCSObjectPool TCSObjectPool}.
+ * Presents a view on the topology of a plant model contained in a
+ * {@link TCSObjectRepository}.
  * <p>
- * Note that no synchronization is done inside this class. Concurrent access of
- * instances of this class must be synchronized externally.
+ * Note that no synchronization is done inside this class. Concurrent access of instances of this
+ * class must be synchronized externally.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class Model {
+public class PlantModelManager
+    extends TCSObjectManager {
 
   /**
    * This class's Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(Model.class);
-  /**
-   * The system's global object pool.
-   */
-  private final TCSObjectPool objectPool;
+  private static final Logger LOG = LoggerFactory.getLogger(PlantModelManager.class);
   /**
    * This model's name.
    */
@@ -92,23 +89,13 @@ public class Model {
   /**
    * Creates a new model.
    *
-   * @param globalPool The object pool serving as the container for this model's
-   * data.
+   * @param objectRepo The object repo.
+   * @param eventHandler The event handler to publish events to.
    */
   @Inject
-  public Model(TCSObjectPool globalPool) {
-    this.objectPool = Objects.requireNonNull(globalPool);
-  }
-
-  /**
-   * Returns the <code>TCSObjectPool</code> serving as the container for this
-   * model's data.
-   *
-   * @return The <code>TCSObjectPool</code> serving as the container for this
-   * model's data.
-   */
-  public TCSObjectPool getObjectPool() {
-    return objectPool;
+  public PlantModelManager(@Nonnull TCSObjectRepository objectRepo,
+                           @Nonnull @ApplicationEventBus EventHandler eventHandler) {
+    super(objectRepo, eventHandler);
   }
 
   /**
@@ -152,20 +139,21 @@ public class Model {
    */
   @SuppressWarnings("deprecation")
   public void clear() {
-    for (TCSObject<?> curObject : objectPool.getObjects((Pattern) null)) {
-      if (curObject instanceof Point
-          || curObject instanceof Path
-          || curObject instanceof Vehicle
-          || curObject instanceof LocationType
-          || curObject instanceof Location
-          || curObject instanceof Block
-          || curObject instanceof org.opentcs.data.model.Group
-          || curObject instanceof VisualLayout) {
-        objectPool.removeObject(curObject.getReference());
-        objectPool.emitObjectEvent(null,
-                                   curObject,
-                                   TCSObjectEvent.Type.OBJECT_REMOVED);
-      }
+    List<TCSObject<?>> objects = new ArrayList<>();
+    objects.addAll(getObjectRepo().getObjects(VisualLayout.class));
+    objects.addAll(getObjectRepo().getObjects(Vehicle.class));
+    objects.addAll(getObjectRepo().getObjects(org.opentcs.data.model.Group.class));
+    objects.addAll(getObjectRepo().getObjects(Block.class));
+    objects.addAll(getObjectRepo().getObjects(Path.class));
+    objects.addAll(getObjectRepo().getObjects(Location.class));
+    objects.addAll(getObjectRepo().getObjects(LocationType.class));
+    objects.addAll(getObjectRepo().getObjects(Point.class));
+
+    for (TCSObject<?> curObject : objects) {
+      getObjectRepo().removeObject(curObject.getReference());
+      emitObjectEvent(null,
+                      curObject,
+                      TCSObjectEvent.Type.OBJECT_REMOVED);
     }
   }
 
@@ -214,96 +202,6 @@ public class Model {
   }
 
   /**
-   * Creates a new visual layout with a unique name and all other attributes set
-   * to default values.
-   *
-   * @param to The transfer object from which to create the new layout.
-   * @return The newly created layout.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
-   */
-  public VisualLayout createVisualLayout(VisualLayoutCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException {
-    VisualLayout newLayout = new VisualLayout(to.getName())
-        .withScaleX(to.getScaleX())
-        .withScaleY(to.getScaleY())
-        .withLayers(to.getLayers())
-        .withLayerGroups(to.getLayerGroups());
-
-    objectPool.addObject(newLayout);
-    objectPool.emitObjectEvent(newLayout,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created layout.
-    return newLayout;
-  }
-
-  /**
-   * Creates a new point with a unique name and all other attributes set to
-   * default values.
-   *
-   * @param to The transfer object from which to create the new point.
-   * @return The newly created point.
-   * @throws ObjectExistsException If an object with the point's name already exists.
-   */
-  public Point createPoint(PointCreationTO to)
-      throws ObjectExistsException {
-    // Get a unique ID for the new point and create an instance.
-    Point newPoint = new Point(to.getName())
-        .withPosition(to.getPosition())
-        .withType(to.getType())
-        .withVehicleOrientationAngle(to.getVehicleOrientationAngle())
-        .withProperties(to.getProperties())
-        .withLayout(new Point.Layout(to.getLayout().getPosition(),
-                                     to.getLayout().getLabelOffset(),
-                                     to.getLayout().getLayerId()));
-    objectPool.addObject(newPoint);
-    objectPool.emitObjectEvent(newPoint, null, TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created point.
-    return newPoint;
-  }
-
-  /**
-   * Creates a new path from the given transfer object.
-   *
-   * @param to The transfer object from which to create the new path.
-   * @return The newly created path.
-   * @throws ObjectUnknownException If the referenced point does not exist.
-   * @throws ObjectExistsException If an object with the same name as the path already exists.
-   */
-  public Path createPath(PathCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException {
-    requireNonNull(to, "to");
-
-    Point srcPoint = objectPool.getObject(Point.class, to.getSrcPointName());
-    Point destPoint = objectPool.getObject(Point.class, to.getDestPointName());
-    Path newPath = new Path(to.getName(),
-                            srcPoint.getReference(),
-                            destPoint.getReference())
-        .withLength(to.getLength())
-        .withMaxVelocity(to.getMaxVelocity())
-        .withMaxReverseVelocity(to.getMaxReverseVelocity())
-        .withPeripheralOperations(mapPeripheralOperationTOs(to.getPeripheralOperations()))
-        .withProperties(to.getProperties())
-        .withLocked(to.isLocked())
-        .withLayout(new Path.Layout(to.getLayout().getConnectionType(),
-                                    to.getLayout().getControlPoints(),
-                                    to.getLayout().getLayerId()));
-
-    // Store the instance in the global object pool.
-    objectPool.addObject(newPath);
-
-    objectPool.emitObjectEvent(newPath,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-
-    addPointOutgoingPath(srcPoint.getReference(), newPath.getReference());
-    addPointIncomingPath(destPoint.getReference(), newPath.getReference());
-
-    return newPath;
-  }
-
-  /**
    * Locks/Unlocks a path.
    *
    * @param ref A reference to the path to be modified.
@@ -314,88 +212,13 @@ public class Model {
    */
   public Path setPathLocked(TCSObjectReference<Path> ref, boolean newLocked)
       throws ObjectUnknownException {
-    Path path = objectPool.getObject(Path.class, ref);
-    Path previousState = path;
-    path = objectPool.replaceObject(path.withLocked(newLocked));
-    objectPool.emitObjectEvent(path,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Path previousState = getObjectRepo().getObject(Path.class, ref);
+    Path path = previousState.withLocked(newLocked);
+    getObjectRepo().replaceObject(path.withLocked(newLocked));
+    emitObjectEvent(path,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return path;
-  }
-
-  /**
-   * Creates a new location type with a unique name and all other attributes set
-   * to their default values.
-   *
-   * @param to The transfer object from which to create the new location type.
-   * @return The newly created location type.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   */
-  public LocationType createLocationType(LocationTypeCreationTO to)
-      throws ObjectExistsException {
-    LocationType newType = new LocationType(to.getName())
-        .withAllowedOperations(to.getAllowedOperations())
-        .withAllowedPeripheralOperations(to.getAllowedPeripheralOperations())
-        .withProperties(to.getProperties())
-        .withLayout(new LocationType.Layout(to.getLayout().getLocationRepresentation()));
-    objectPool.addObject(newType);
-    objectPool.emitObjectEvent(newType,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-    return newType;
-  }
-
-  /**
-   * Creates a new location with a unique name and all other attributes set to
-   * default values.
-   *
-   * @param to The transfer object from which to create the new location type.
-   * @return The newly created location.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
-   */
-  public Location createLocation(LocationCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException {
-    LocationType type = objectPool.getObject(LocationType.class, to.getTypeName());
-    Location newLocation = new Location(to.getName(), type.getReference())
-        .withPosition(to.getPosition())
-        .withLocked(to.isLocked())
-        .withProperties(to.getProperties())
-        .withLayout(new Location.Layout(to.getLayout().getPosition(),
-                                        to.getLayout().getLabelOffset(),
-                                        to.getLayout().getLocationRepresentation(),
-                                        to.getLayout().getLayerId()));
-
-    Set<Location.Link> locationLinks = new HashSet<>();
-    for (Map.Entry<String, Set<String>> linkEntry : to.getLinks().entrySet()) {
-      Point point = objectPool.getObject(Point.class, linkEntry.getKey());
-      Location.Link link = new Location.Link(newLocation.getReference(), point.getReference())
-          .withAllowedOperations(linkEntry.getValue());
-      locationLinks.add(link);
-    }
-    newLocation = newLocation.withAttachedLinks(locationLinks);
-
-    objectPool.addObject(newLocation);
-    objectPool.emitObjectEvent(newLocation,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-
-    // Add the location's links to the respective points, too.
-    for (Location.Link link : locationLinks) {
-      Point point = objectPool.getObjectOrNull(Point.class, link.getPoint());
-
-      Set<Location.Link> pointLinks = new HashSet<>(point.getAttachedLinks());
-      pointLinks.add(link);
-
-      Point previousPointState = point;
-      point = objectPool.replaceObject(point.withAttachedLinks(pointLinks));
-
-      objectPool.emitObjectEvent(point,
-                                 previousPointState,
-                                 TCSObjectEvent.Type.OBJECT_MODIFIED);
-    }
-
-    return newLocation;
   }
 
   /**
@@ -409,12 +232,12 @@ public class Model {
    */
   public Location setLocationLocked(TCSObjectReference<Location> ref, boolean newLocked)
       throws ObjectUnknownException {
-    Location location = objectPool.getObject(Location.class, ref);
-    Location previousState = location;
-    location = objectPool.replaceObject(location.withLocked(newLocked));
-    objectPool.emitObjectEvent(location,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Location previousState = getObjectRepo().getObject(Location.class, ref);
+    Location location = previousState.withLocked(newLocked);
+    getObjectRepo().replaceObject(location);
+    emitObjectEvent(location,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return location;
   }
 
@@ -428,14 +251,14 @@ public class Model {
    */
   public Location setLocationReservationToken(TCSObjectReference<Location> ref, String newToken)
       throws ObjectUnknownException {
-    Location location = objectPool.getObject(Location.class, ref);
-    Location previousState = location;
-    location = objectPool.replaceObject(location.withPeripheralInformation(
-        location.getPeripheralInformation().withReservationToken(newToken)
-    ));
-    objectPool.emitObjectEvent(location,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Location previousState = getObjectRepo().getObject(Location.class, ref);
+    Location location = previousState.withPeripheralInformation(
+        previousState.getPeripheralInformation().withReservationToken(newToken)
+    );
+    getObjectRepo().replaceObject(location);
+    emitObjectEvent(location,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return location;
   }
 
@@ -450,14 +273,14 @@ public class Model {
   public Location setLocationProcState(TCSObjectReference<Location> ref,
                                        PeripheralInformation.ProcState newState)
       throws ObjectUnknownException {
-    Location location = objectPool.getObject(Location.class, ref);
-    Location previousState = location;
-    location = objectPool.replaceObject(location.withPeripheralInformation(
-        location.getPeripheralInformation().withProcState(newState)
-    ));
-    objectPool.emitObjectEvent(location,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Location previousState = getObjectRepo().getObject(Location.class, ref);
+    Location location = previousState.withPeripheralInformation(
+        previousState.getPeripheralInformation().withProcState(newState)
+    );
+    getObjectRepo().replaceObject(location);
+    emitObjectEvent(location,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return location;
   }
 
@@ -472,14 +295,14 @@ public class Model {
   public Location setLocationState(TCSObjectReference<Location> ref,
                                    PeripheralInformation.State newState)
       throws ObjectUnknownException {
-    Location location = objectPool.getObject(Location.class, ref);
-    Location previousState = location;
-    location = objectPool.replaceObject(location.withPeripheralInformation(
-        location.getPeripheralInformation().withState(newState)
-    ));
-    objectPool.emitObjectEvent(location,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Location previousState = getObjectRepo().getObject(Location.class, ref);
+    Location location = previousState.withPeripheralInformation(
+        previousState.getPeripheralInformation().withState(newState)
+    );
+    getObjectRepo().replaceObject(location);
+    emitObjectEvent(location,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return location;
   }
 
@@ -494,42 +317,15 @@ public class Model {
   public Location setLocationPeripheralJob(TCSObjectReference<Location> ref,
                                            TCSObjectReference<PeripheralJob> newJob)
       throws ObjectUnknownException {
-    Location location = objectPool.getObject(Location.class, ref);
-    Location previousState = location;
-    location = objectPool.replaceObject(location.withPeripheralInformation(
-        location.getPeripheralInformation().withPeripheralJob(newJob)
-    ));
-    objectPool.emitObjectEvent(location,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Location previousState = getObjectRepo().getObject(Location.class, ref);
+    Location location = previousState.withPeripheralInformation(
+        previousState.getPeripheralInformation().withPeripheralJob(newJob)
+    );
+    getObjectRepo().replaceObject(location);
+    emitObjectEvent(location,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return location;
-  }
-
-  /**
-   * Creates a new vehicle with a unique name and all other attributes set to
-   * their default values.
-   *
-   * @param to The transfer object from which to create the new group.
-   * @return The newly created group.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   */
-  public Vehicle createVehicle(VehicleCreationTO to)
-      throws ObjectExistsException {
-    Vehicle newVehicle = new Vehicle(to.getName())
-        .withLength(to.getLength())
-        .withEnergyLevelGood(to.getEnergyLevelGood())
-        .withEnergyLevelCritical(to.getEnergyLevelCritical())
-        .withEnergyLevelFullyRecharged(to.getEnergyLevelFullyRecharged())
-        .withEnergyLevelSufficientlyRecharged(to.getEnergyLevelSufficientlyRecharged())
-        .withMaxVelocity(to.getMaxVelocity())
-        .withMaxReverseVelocity(to.getMaxReverseVelocity())
-        .withProperties(to.getProperties())
-        .withLayout(new Vehicle.Layout(to.getLayout().getRouteColor()));
-    objectPool.addObject(newVehicle);
-    objectPool.emitObjectEvent(newVehicle,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-    return newVehicle;
   }
 
   /**
@@ -543,15 +339,12 @@ public class Model {
   public Vehicle setVehicleEnergyLevel(TCSObjectReference<Vehicle> ref,
                                        int energyLevel)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObjectOrNull(Vehicle.class, ref);
-    if (vehicle == null) {
-      throw new ObjectUnknownException(ref);
-    }
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withEnergyLevel(energyLevel));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+    Vehicle vehicle = previousState.withEnergyLevel(energyLevel);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -566,18 +359,18 @@ public class Model {
   public Vehicle setVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                              String rechargeOperation)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.info("Vehicle's recharge operation changes: {} -- {} -> {}",
-             vehicle.getName(),
-             vehicle.getRechargeOperation(),
+             previousState.getName(),
+             previousState.getRechargeOperation(),
              rechargeOperation);
 
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withRechargeOperation(rechargeOperation));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle vehicle = previousState.withRechargeOperation(rechargeOperation);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -592,12 +385,12 @@ public class Model {
   public Vehicle setVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                                List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withLoadHandlingDevices(devices));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+    Vehicle vehicle = previousState.withLoadHandlingDevices(devices);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -612,18 +405,18 @@ public class Model {
   public Vehicle setVehicleState(TCSObjectReference<Vehicle> ref,
                                  Vehicle.State newState)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.debug("Vehicle's state changes: {} -- {} -> {}",
-              vehicle.getName(),
-              vehicle.getState(),
+              previousState.getName(),
+              previousState.getState(),
               newState);
 
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withState(newState));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle vehicle = previousState.withState(newState);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -638,18 +431,18 @@ public class Model {
   public Vehicle setVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                             Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.info("Vehicle's integration level changes: {} -- {} -> {}",
-             vehicle.getName(),
-             vehicle.getIntegrationLevel(),
+             previousState.getName(),
+             previousState.getIntegrationLevel(),
              integrationLevel);
 
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withIntegrationLevel(integrationLevel));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle vehicle = previousState.withIntegrationLevel(integrationLevel);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -664,18 +457,18 @@ public class Model {
   public Vehicle setVehiclePaused(TCSObjectReference<Vehicle> ref,
                                   boolean paused)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.info("Vehicle's paused state changes: {} -- {} -> {}",
-             vehicle.getName(),
-             vehicle.isPaused(),
+             previousState.getName(),
+             previousState.isPaused(),
              paused);
 
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withPaused(paused));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle vehicle = previousState.withPaused(paused);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -690,12 +483,12 @@ public class Model {
   public Vehicle setVehicleProcState(TCSObjectReference<Vehicle> ref,
                                      Vehicle.ProcState newState)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withProcState(newState));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+    Vehicle vehicle = previousState.withProcState(newState);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -710,18 +503,18 @@ public class Model {
   public Vehicle setVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.info("Vehicle's allowed order types change: {} -- {} -> {}",
-             vehicle.getName(),
-             vehicle.getAllowedOrderTypes(),
+             previousState.getName(),
+             previousState.getAllowedOrderTypes(),
              allowedOrderTypes);
 
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withAllowedOrderTypes(allowedOrderTypes));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle vehicle = previousState.withAllowedOrderTypes(allowedOrderTypes);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -736,7 +529,7 @@ public class Model {
   public Vehicle setVehiclePosition(TCSObjectReference<Vehicle> ref,
                                     TCSObjectReference<Point> newPosRef)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
+    Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.debug("Vehicle's position changes: {} -- {} -> {}",
               vehicle.getName(),
@@ -746,26 +539,29 @@ public class Model {
     Vehicle previousVehicleState = vehicle;
     // If the vehicle was occupying a point before, clear it and send an event.
     if (vehicle.getCurrentPosition() != null) {
-      Point oldVehiclePos = objectPool.getObject(Point.class, vehicle.getCurrentPosition());
+      Point oldVehiclePos = getObjectRepo().getObject(Point.class, vehicle.getCurrentPosition());
       Point previousPointState = oldVehiclePos;
-      oldVehiclePos = objectPool.replaceObject(oldVehiclePos.withOccupyingVehicle(null));
-      objectPool.emitObjectEvent(oldVehiclePos,
-                                 previousPointState,
-                                 TCSObjectEvent.Type.OBJECT_MODIFIED);
+      oldVehiclePos = oldVehiclePos.withOccupyingVehicle(null);
+      getObjectRepo().replaceObject(oldVehiclePos);
+      emitObjectEvent(oldVehiclePos,
+                      previousPointState,
+                      TCSObjectEvent.Type.OBJECT_MODIFIED);
     }
     // If the vehicle is occupying a point now, set that and send an event.
     if (newPosRef != null) {
-      Point newVehiclePos = objectPool.getObject(Point.class, newPosRef);
+      Point newVehiclePos = getObjectRepo().getObject(Point.class, newPosRef);
       Point previousPointState = newVehiclePos;
-      newVehiclePos = objectPool.replaceObject(newVehiclePos.withOccupyingVehicle(ref));
-      objectPool.emitObjectEvent(newVehiclePos,
-                                 previousPointState,
-                                 TCSObjectEvent.Type.OBJECT_MODIFIED);
+      newVehiclePos = newVehiclePos.withOccupyingVehicle(ref);
+      getObjectRepo().replaceObject(newVehiclePos);
+      emitObjectEvent(newVehiclePos,
+                      previousPointState,
+                      TCSObjectEvent.Type.OBJECT_MODIFIED);
     }
-    vehicle = objectPool.replaceObject(vehicle.withCurrentPosition(newPosRef));
-    objectPool.emitObjectEvent(vehicle,
-                               previousVehicleState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    vehicle = vehicle.withCurrentPosition(newPosRef);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousVehicleState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
 
     return vehicle;
   }
@@ -782,12 +578,12 @@ public class Model {
   public Vehicle setVehicleNextPosition(TCSObjectReference<Vehicle> ref,
                                         TCSObjectReference<Point> newPosition)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withNextPosition(newPosition));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+    Vehicle vehicle = previousState.withNextPosition(newPosition);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -802,12 +598,12 @@ public class Model {
   public Vehicle setVehiclePrecisePosition(TCSObjectReference<Vehicle> ref,
                                            Triple newPosition)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withPrecisePosition(newPosition));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+    Vehicle vehicle = previousState.withPrecisePosition(newPosition);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -822,12 +618,12 @@ public class Model {
   public Vehicle setVehicleOrientationAngle(TCSObjectReference<Vehicle> ref,
                                             double angle)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, ref);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withOrientationAngle(angle));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+    Vehicle vehicle = previousState.withOrientationAngle(angle);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -842,18 +638,20 @@ public class Model {
   public Vehicle setVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                           TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
+    Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     if (orderRef == null) {
-      vehicle = objectPool.replaceObject(vehicle.withTransportOrder(null));
+      vehicle = vehicle.withTransportOrder(null);
+      getObjectRepo().replaceObject(vehicle);
     }
     else {
-      TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
-      vehicle = objectPool.replaceObject(vehicle.withTransportOrder(order.getReference()));
+      TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
+      vehicle = vehicle.withTransportOrder(order.getReference());
+      getObjectRepo().replaceObject(vehicle);
     }
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -868,18 +666,20 @@ public class Model {
   public Vehicle setVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                          TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
+    Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
     if (seqRef == null) {
-      vehicle = objectPool.replaceObject(vehicle.withOrderSequence(null));
+      vehicle = vehicle.withOrderSequence(null);
+      getObjectRepo().replaceObject(vehicle);
     }
     else {
-      OrderSequence seq = objectPool.getObject(OrderSequence.class, seqRef);
-      vehicle = objectPool.replaceObject(vehicle.withOrderSequence(seq.getReference()));
+      OrderSequence seq = getObjectRepo().getObject(OrderSequence.class, seqRef);
+      vehicle = vehicle.withOrderSequence(seq.getReference());
+      getObjectRepo().replaceObject(vehicle);
     }
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -895,12 +695,12 @@ public class Model {
   public Vehicle setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
                                               int index)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withRouteProgressIndex(index));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+    Vehicle vehicle = previousState.withRouteProgressIndex(index);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -915,12 +715,12 @@ public class Model {
   public Vehicle setVehicleClaimedResources(TCSObjectReference<Vehicle> vehicleRef,
                                             List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withClaimedResources(unmodifiableCopy(resources)));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+    Vehicle vehicle = previousState.withClaimedResources(unmodifiableCopy(resources));
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
   }
 
@@ -935,76 +735,13 @@ public class Model {
   public Vehicle setVehicleAllocatedResources(TCSObjectReference<Vehicle> vehicleRef,
                                               List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-    Vehicle previousState = vehicle;
-    vehicle = objectPool.replaceObject(vehicle.withAllocatedResources(unmodifiableCopy(resources)));
-    objectPool.emitObjectEvent(vehicle,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+    Vehicle vehicle = previousState.withAllocatedResources(unmodifiableCopy(resources));
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return vehicle;
-  }
-
-  /**
-   * Creates a new block with a unique name and all other attributes set to
-   * default values.
-   *
-   * @param to The transfer object from which to create the new block.
-   * @return The newly created block.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
-   */
-  public Block createBlock(BlockCreationTO to)
-      throws ObjectExistsException, ObjectUnknownException {
-    Set<TCSResourceReference<?>> members = new HashSet<>();
-    for (String memberName : to.getMemberNames()) {
-      TCSObject<?> object = objectPool.getObject(memberName);
-      if (!(object instanceof TCSResource)) {
-        throw new ObjectUnknownException(memberName);
-      }
-      members.add(((TCSResource) object).getReference());
-    }
-    Block newBlock = new Block(to.getName())
-        .withType(to.getType())
-        .withMembers(members)
-        .withProperties(to.getProperties())
-        .withLayout(new Block.Layout(to.getLayout().getColor()));
-    objectPool.addObject(newBlock);
-    objectPool.emitObjectEvent(newBlock,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created block.
-    return newBlock;
-  }
-
-  /**
-   * Creates a new group with a unique name and all other attributes set to
-   * default values.
-   *
-   * @param to The transfer object from which to create the new group.
-   * @return The newly created group.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
-   */
-  @Deprecated
-  public org.opentcs.data.model.Group createGroup(org.opentcs.access.to.model.GroupCreationTO to)
-      throws ObjectExistsException, ObjectUnknownException {
-    Set<TCSObjectReference<?>> members = new HashSet<>();
-    for (String memberName : to.getMemberNames()) {
-      TCSObject<?> object = objectPool.getObject(memberName);
-      if (object == null) {
-        throw new ObjectUnknownException(memberName);
-      }
-      members.add(object.getReference());
-    }
-    org.opentcs.data.model.Group newGroup = new org.opentcs.data.model.Group(to.getName())
-        .withMembers(members)
-        .withProperties(to.getProperties());
-    objectPool.addObject(newGroup);
-    objectPool.emitObjectEvent(newGroup,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created group.
-    return newGroup;
   }
 
   /**
@@ -1026,13 +763,50 @@ public class Model {
         .withVisualLayout(getVisualLayout());
   }
 
+  /**
+   * Expands a set of resources <em>A</em> to a set of resources <em>B</em>.
+   * <em>B</em> contains the resources in <em>A</em> with blocks expanded to
+   * their actual members.
+   * The given set is not modified.
+   *
+   * @param resources The set of resources to be expanded.
+   * @return The given set with resources expanded.
+   * @throws ObjectUnknownException If an object referenced in the given set
+   * does not exist.
+   */
+  public Set<TCSResource<?>> expandResources(@Nonnull Set<TCSResourceReference<?>> resources)
+      throws ObjectUnknownException {
+    requireNonNull(resources, "resources");
+
+    Set<Block> blocks = getObjectRepo().getObjects(Block.class);
+
+    // First, collect the given references plus references to all members of blocks that contain the
+    // given references in a set.
+    // We could look up all resources and add them to the result immediately, but by first
+    // collecting all references, we ensure that we look up each resource only once.
+    Set<TCSResourceReference<?>> refsToLookUp = new HashSet<>();
+    for (TCSResourceReference<?> resourceRef : resources) {
+      refsToLookUp.add(resourceRef);
+
+      blocks.stream()
+          .filter(block -> block.getMembers().contains(resourceRef))
+          .flatMap(block -> block.getMembers().stream())
+          .forEach(memberRef -> refsToLookUp.add(memberRef));
+    }
+
+    // Look up and return the actual resources.
+    return refsToLookUp.stream()
+        .map(memberRef -> (TCSResource<?>) getObjectRepo().getObject(memberRef))
+        .collect(Collectors.toSet());
+  }
+
   private List<PeripheralOperation> mapPeripheralOperationTOs(
       List<PeripheralOperationCreationTO> creationTOs) {
     return creationTOs.stream()
         .map(
             operationTO -> new PeripheralOperation(
-                objectPool.getObject(Location.class,
-                                     operationTO.getLocationName()).getReference(),
+                getObjectRepo().getObject(Location.class,
+                                          operationTO.getLocationName()).getReference(),
                 operationTO.getOperation(),
                 operationTO.getExecutionTrigger(),
                 operationTO.isCompletionRequired())
@@ -1046,7 +820,7 @@ public class Model {
    * @return A list of {@link PointCreationTO Points} for all points in a model.
    */
   private List<PointCreationTO> getPoints() {
-    Set<Point> points = objectPool.getObjects(Point.class);
+    Set<Point> points = getObjectRepo().getObjects(Point.class);
     List<PointCreationTO> result = new ArrayList<>();
 
     for (Point curPoint : points) {
@@ -1073,7 +847,7 @@ public class Model {
    */
   @SuppressWarnings("deprecation")
   private List<PathCreationTO> getPaths() {
-    Set<Path> paths = objectPool.getObjects(Path.class);
+    Set<Path> paths = getObjectRepo().getObjects(Path.class);
     List<PathCreationTO> result = new ArrayList<>();
 
     for (Path curPath : paths) {
@@ -1113,7 +887,7 @@ public class Model {
    * @return A list of {@link VehicleCreationTO Vehicles} for all vehicles in a model.
    */
   private List<VehicleCreationTO> getVehicles() {
-    Set<Vehicle> vehicles = objectPool.getObjects(Vehicle.class);
+    Set<Vehicle> vehicles = getObjectRepo().getObjects(Vehicle.class);
     List<VehicleCreationTO> result = new ArrayList<>();
 
     for (Vehicle vehicle : vehicles) {
@@ -1143,7 +917,7 @@ public class Model {
    * model.
    */
   private List<LocationTypeCreationTO> getLocationTypes() {
-    Set<LocationType> locTypes = objectPool.getObjects(LocationType.class);
+    Set<LocationType> locTypes = getObjectRepo().getObjects(LocationType.class);
     List<LocationTypeCreationTO> result = new ArrayList<>();
 
     for (LocationType curType : locTypes) {
@@ -1168,7 +942,7 @@ public class Model {
    * @return A list of {@link LocationCreationTO Locations} for all locations in a model.
    */
   private List<LocationCreationTO> getLocations() {
-    Set<Location> locations = objectPool.getObjects(Location.class);
+    Set<Location> locations = getObjectRepo().getObjects(Location.class);
     List<LocationCreationTO> result = new ArrayList<>();
 
     for (Location curLoc : locations) {
@@ -1200,7 +974,7 @@ public class Model {
    * @return A list of {@link BlockCreationTO Blocks} for all blocks in a model.
    */
   private List<BlockCreationTO> getBlocks() {
-    Set<Block> blocks = objectPool.getObjects(Block.class);
+    Set<Block> blocks = getObjectRepo().getObjects(Block.class);
     List<BlockCreationTO> result = new ArrayList<>();
 
     for (Block curBlock : blocks) {
@@ -1227,7 +1001,7 @@ public class Model {
   @Deprecated
   private List<org.opentcs.access.to.model.GroupCreationTO> getGroups() {
     Set<org.opentcs.data.model.Group> groups
-        = objectPool.getObjects(org.opentcs.data.model.Group.class);
+        = getObjectRepo().getObjects(org.opentcs.data.model.Group.class);
     List<org.opentcs.access.to.model.GroupCreationTO> result = new ArrayList<>();
 
     for (org.opentcs.data.model.Group curGroup : groups) {
@@ -1250,7 +1024,7 @@ public class Model {
    * @return A {@link VisualLayoutCreationTO} for the visual layouts in a model.
    */
   private VisualLayoutCreationTO getVisualLayout() {
-    Set<VisualLayout> layouts = objectPool.getObjects(VisualLayout.class);
+    Set<VisualLayout> layouts = getObjectRepo().getObjects(VisualLayout.class);
     checkState(layouts.size() == 1,
                "There has to be one, and only one, visual layout. Number of visual layouts: %d",
                layouts.size());
@@ -1265,36 +1039,258 @@ public class Model {
   }
 
   /**
-   * Expands a set of resources <em>A</em> to a set of resources <em>B</em>.
-   * <em>B</em> contains the resources in <em>A</em> with blocks expanded to
-   * their actual members.
-   * The given set is not modified.
+   * Creates a new visual layout with a unique name and all other attributes set
+   * to default values.
    *
-   * @param resources The set of resources to be expanded.
-   * @return The given set with resources expanded.
-   * @throws ObjectUnknownException If an object referenced in the given set
-   * does not exist.
+   * @param to The transfer object from which to create the new layout.
+   * @return The newly created layout.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
-  public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
-      throws ObjectUnknownException {
-    Set<TCSResource<?>> result = new HashSet<>();
-    Set<Block> blocks = getObjectPool().getObjects(Block.class);
-    for (TCSResourceReference<?> curRef : resources) {
-      TCSObject<?> object = objectPool.getObject(curRef);
-      TCSResource<?> resource = (TCSResource<?>) object;
-      result.add(resource);
-      for (Block curBlock : blocks) {
-        // If the current block contains the resource, add all of the block's
-        // members to the result.
-        if (curBlock.getMembers().contains(resource.getReference())) {
-          for (TCSResourceReference<?> curResRef : curBlock.getMembers()) {
-            TCSResource<?> member = (TCSResource<?>) objectPool.getObject(curResRef);
-            result.add(member);
-          }
-        }
-      }
+  private VisualLayout createVisualLayout(VisualLayoutCreationTO to)
+      throws ObjectUnknownException, ObjectExistsException {
+    VisualLayout newLayout = new VisualLayout(to.getName())
+        .withScaleX(to.getScaleX())
+        .withScaleY(to.getScaleY())
+        .withLayers(to.getLayers())
+        .withLayerGroups(to.getLayerGroups());
+
+    getObjectRepo().addObject(newLayout);
+    emitObjectEvent(newLayout,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+    // Return the newly created layout.
+    return newLayout;
+  }
+
+  /**
+   * Creates a new point with a unique name and all other attributes set to
+   * default values.
+   *
+   * @param to The transfer object from which to create the new point.
+   * @return The newly created point.
+   * @throws ObjectExistsException If an object with the point's name already exists.
+   */
+  private Point createPoint(PointCreationTO to)
+      throws ObjectExistsException {
+    // Get a unique ID for the new point and create an instance.
+    Point newPoint = new Point(to.getName())
+        .withPosition(to.getPosition())
+        .withType(to.getType())
+        .withVehicleOrientationAngle(to.getVehicleOrientationAngle())
+        .withProperties(to.getProperties())
+        .withLayout(new Point.Layout(to.getLayout().getPosition(),
+                                     to.getLayout().getLabelOffset(),
+                                     to.getLayout().getLayerId()));
+    getObjectRepo().addObject(newPoint);
+    emitObjectEvent(newPoint, null, TCSObjectEvent.Type.OBJECT_CREATED);
+    // Return the newly created point.
+    return newPoint;
+  }
+
+  /**
+   * Creates a new path from the given transfer object.
+   *
+   * @param to The transfer object from which to create the new path.
+   * @return The newly created path.
+   * @throws ObjectUnknownException If the referenced point does not exist.
+   * @throws ObjectExistsException If an object with the same name as the path already exists.
+   */
+  private Path createPath(PathCreationTO to)
+      throws ObjectUnknownException, ObjectExistsException {
+    requireNonNull(to, "to");
+
+    Point srcPoint = getObjectRepo().getObject(Point.class, to.getSrcPointName());
+    Point destPoint = getObjectRepo().getObject(Point.class, to.getDestPointName());
+    Path newPath = new Path(to.getName(),
+                            srcPoint.getReference(),
+                            destPoint.getReference())
+        .withLength(to.getLength())
+        .withMaxVelocity(to.getMaxVelocity())
+        .withMaxReverseVelocity(to.getMaxReverseVelocity())
+        .withPeripheralOperations(mapPeripheralOperationTOs(to.getPeripheralOperations()))
+        .withProperties(to.getProperties())
+        .withLocked(to.isLocked())
+        .withLayout(new Path.Layout(to.getLayout().getConnectionType(),
+                                    to.getLayout().getControlPoints(),
+                                    to.getLayout().getLayerId()));
+
+    getObjectRepo().addObject(newPath);
+
+    emitObjectEvent(newPath,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+
+    addPointOutgoingPath(srcPoint.getReference(), newPath.getReference());
+    addPointIncomingPath(destPoint.getReference(), newPath.getReference());
+
+    return newPath;
+  }
+
+  /**
+   * Creates a new location type with a unique name and all other attributes set
+   * to their default values.
+   *
+   * @param to The transfer object from which to create the new location type.
+   * @return The newly created location type.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   */
+  private LocationType createLocationType(LocationTypeCreationTO to)
+      throws ObjectExistsException {
+    LocationType newType = new LocationType(to.getName())
+        .withAllowedOperations(to.getAllowedOperations())
+        .withAllowedPeripheralOperations(to.getAllowedPeripheralOperations())
+        .withProperties(to.getProperties())
+        .withLayout(new LocationType.Layout(to.getLayout().getLocationRepresentation()));
+    getObjectRepo().addObject(newType);
+    emitObjectEvent(newType,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+    return newType;
+  }
+
+  /**
+   * Creates a new location with a unique name and all other attributes set to
+   * default values.
+   *
+   * @param to The transfer object from which to create the new location type.
+   * @return The newly created location.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   */
+  private Location createLocation(LocationCreationTO to)
+      throws ObjectUnknownException, ObjectExistsException {
+    LocationType type = getObjectRepo().getObject(LocationType.class, to.getTypeName());
+    Location newLocation = new Location(to.getName(), type.getReference())
+        .withPosition(to.getPosition())
+        .withLocked(to.isLocked())
+        .withProperties(to.getProperties())
+        .withLayout(new Location.Layout(to.getLayout().getPosition(),
+                                        to.getLayout().getLabelOffset(),
+                                        to.getLayout().getLocationRepresentation(),
+                                        to.getLayout().getLayerId()));
+
+    Set<Location.Link> locationLinks = new HashSet<>();
+    for (Map.Entry<String, Set<String>> linkEntry : to.getLinks().entrySet()) {
+      Point point = getObjectRepo().getObject(Point.class, linkEntry.getKey());
+      Location.Link link = new Location.Link(newLocation.getReference(), point.getReference())
+          .withAllowedOperations(linkEntry.getValue());
+      locationLinks.add(link);
     }
-    return result;
+    newLocation = newLocation.withAttachedLinks(locationLinks);
+
+    getObjectRepo().addObject(newLocation);
+    emitObjectEvent(newLocation,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+
+    // Add the location's links to the respective points, too.
+    for (Location.Link link : locationLinks) {
+      Point point = getObjectRepo().getObject(Point.class, link.getPoint());
+
+      Set<Location.Link> pointLinks = new HashSet<>(point.getAttachedLinks());
+      pointLinks.add(link);
+
+      Point previousPointState = point;
+      point = point.withAttachedLinks(pointLinks);
+      getObjectRepo().replaceObject(point);
+
+      emitObjectEvent(point,
+                      previousPointState,
+                      TCSObjectEvent.Type.OBJECT_MODIFIED);
+    }
+
+    return newLocation;
+  }
+
+  /**
+   * Creates a new vehicle with a unique name and all other attributes set to
+   * their default values.
+   *
+   * @param to The transfer object from which to create the new group.
+   * @return The newly created group.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   */
+  private Vehicle createVehicle(VehicleCreationTO to)
+      throws ObjectExistsException {
+    Vehicle newVehicle = new Vehicle(to.getName())
+        .withLength(to.getLength())
+        .withEnergyLevelGood(to.getEnergyLevelGood())
+        .withEnergyLevelCritical(to.getEnergyLevelCritical())
+        .withEnergyLevelFullyRecharged(to.getEnergyLevelFullyRecharged())
+        .withEnergyLevelSufficientlyRecharged(to.getEnergyLevelSufficientlyRecharged())
+        .withMaxVelocity(to.getMaxVelocity())
+        .withMaxReverseVelocity(to.getMaxReverseVelocity())
+        .withProperties(to.getProperties())
+        .withLayout(new Vehicle.Layout(to.getLayout().getRouteColor()));
+    getObjectRepo().addObject(newVehicle);
+    emitObjectEvent(newVehicle,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+    return newVehicle;
+  }
+
+  /**
+   * Creates a new block with a unique name and all other attributes set to
+   * default values.
+   *
+   * @param to The transfer object from which to create the new block.
+   * @return The newly created block.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   */
+  private Block createBlock(BlockCreationTO to)
+      throws ObjectExistsException, ObjectUnknownException {
+    Set<TCSResourceReference<?>> members = new HashSet<>();
+    for (String memberName : to.getMemberNames()) {
+      TCSObject<?> object = getObjectRepo().getObject(memberName);
+      if (!(object instanceof TCSResource)) {
+        throw new ObjectUnknownException(memberName);
+      }
+      members.add(((TCSResource) object).getReference());
+    }
+    Block newBlock = new Block(to.getName())
+        .withType(to.getType())
+        .withMembers(members)
+        .withProperties(to.getProperties())
+        .withLayout(new Block.Layout(to.getLayout().getColor()));
+    getObjectRepo().addObject(newBlock);
+    emitObjectEvent(newBlock,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+    // Return the newly created block.
+    return newBlock;
+  }
+
+  /**
+   * Creates a new group with a unique name and all other attributes set to
+   * default values.
+   *
+   * @param to The transfer object from which to create the new group.
+   * @return The newly created group.
+   * @throws ObjectExistsException If an object with the new object's name already exists.
+   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   */
+  @Deprecated
+  private org.opentcs.data.model.Group createGroup(org.opentcs.access.to.model.GroupCreationTO to)
+      throws ObjectExistsException, ObjectUnknownException {
+    Set<TCSObjectReference<?>> members = new HashSet<>();
+    for (String memberName : to.getMemberNames()) {
+      TCSObject<?> object = getObjectRepo().getObject(memberName);
+      if (object == null) {
+        throw new ObjectUnknownException(memberName);
+      }
+      members.add(object.getReference());
+    }
+    org.opentcs.data.model.Group newGroup = new org.opentcs.data.model.Group(to.getName())
+        .withMembers(members)
+        .withProperties(to.getProperties());
+    getObjectRepo().addObject(newGroup);
+    emitObjectEvent(newGroup,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
+    // Return the newly created group.
+    return newGroup;
   }
 
   /**
@@ -1306,8 +1302,9 @@ public class Model {
   @Deprecated
   @ScheduledApiChange(details = "Will be removed.", when = "6.0")
   private void overrideLayoutData(VisualLayoutCreationTO layout) {
-    for (org.opentcs.access.to.model.ModelLayoutElementCreationTO mleTO : layout.getModelElements()) {
-      TCSObject<?> object = objectPool.getObject(mleTO.getName());
+    for (org.opentcs.access.to.model.ModelLayoutElementCreationTO mleTO
+             : layout.getModelElements()) {
+      TCSObject<?> object = getObjectRepo().getObject(mleTO.getName());
       Map<String, String> props = mleTO.getProperties();
 
       if (object instanceof Point) {
@@ -1347,8 +1344,8 @@ public class Model {
                          new Couple(labelOffsetX, labelOffsetY),
                          oldPoint.getLayout().getLayerId())
     );
-    objectPool.replaceObject(newPoint);
-    objectPool.emitObjectEvent(newPoint, oldPoint, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    getObjectRepo().replaceObject(newPoint);
+    emitObjectEvent(newPoint, oldPoint, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   private void overridePathLayoutData(Path oldPath, Map<String, String> properties)
@@ -1396,8 +1393,8 @@ public class Model {
                                                       controlPoints,
                                                       oldPath.getLayout().getLayerId()));
 
-    objectPool.replaceObject(newPath);
-    objectPool.emitObjectEvent(newPath, oldPath, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    getObjectRepo().replaceObject(newPath);
+    emitObjectEvent(newPath, oldPath, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   private void overrideLocationLayoutData(Location oldLocation, Map<String, String> properties)
@@ -1420,8 +1417,8 @@ public class Model {
                             oldLocation.getLayout().getLocationRepresentation(),
                             oldLocation.getLayout().getLayerId())
     );
-    objectPool.replaceObject(newLocation);
-    objectPool.emitObjectEvent(newLocation, oldLocation, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    getObjectRepo().replaceObject(newLocation);
+    emitObjectEvent(newLocation, oldLocation, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   private void overrideBlockLayoutData(Block oldBlock, Map<String, String> properties)
@@ -1430,8 +1427,8 @@ public class Model {
         ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.BLOCK_COLOR))
         : oldBlock.getLayout().getColor();
     Block newBlock = oldBlock.withLayout(new Block.Layout(color));
-    objectPool.replaceObject(newBlock);
-    objectPool.emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    getObjectRepo().replaceObject(newBlock);
+    emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   private void overrideVehicleLayoutData(TCSObject<?> object, Map<String, String> properties)
@@ -1441,8 +1438,8 @@ public class Model {
         ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR))
         : oldVehicle.getLayout().getRouteColor();
     Vehicle newVehicle = oldVehicle.withLayout(new Vehicle.Layout(routeColor));
-    objectPool.replaceObject(newVehicle);
-    objectPool.emitObjectEvent(newVehicle, oldVehicle, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    getObjectRepo().replaceObject(newVehicle);
+    emitObjectEvent(newVehicle, oldVehicle, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**
@@ -1457,8 +1454,8 @@ public class Model {
   private Point addPointIncomingPath(TCSObjectReference<Point> pointRef,
                                      TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
-    Point point = objectPool.getObject(Point.class, pointRef);
-    Path path = objectPool.getObject(Path.class, pathRef);
+    Point point = getObjectRepo().getObject(Point.class, pointRef);
+    Path path = getObjectRepo().getObject(Path.class, pathRef);
     // Check if the point really is the path's destination point.
     if (!path.getDestinationPoint().equals(point.getReference())) {
       throw new IllegalArgumentException("Point is not the path's destination.");
@@ -1466,10 +1463,11 @@ public class Model {
     Path previousState = path;
     Set<TCSObjectReference<Path>> incomingPaths = new HashSet<>(point.getIncomingPaths());
     incomingPaths.add(path.getReference());
-    point = objectPool.replaceObject(point.withIncomingPaths(incomingPaths));
-    objectPool.emitObjectEvent(point,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    point = point.withIncomingPaths(incomingPaths);
+    getObjectRepo().replaceObject(point);
+    emitObjectEvent(point,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return point;
   }
 
@@ -1485,8 +1483,8 @@ public class Model {
   private Point addPointOutgoingPath(TCSObjectReference<Point> pointRef,
                                      TCSObjectReference<Path> pathRef)
       throws ObjectUnknownException {
-    Point point = objectPool.getObject(Point.class, pointRef);
-    Path path = objectPool.getObject(Path.class, pathRef);
+    Point point = getObjectRepo().getObject(Point.class, pointRef);
+    Path path = getObjectRepo().getObject(Path.class, pathRef);
     // Check if the point really is the path's source.
     if (!path.getSourcePoint().equals(point.getReference())) {
       throw new IllegalArgumentException("Point is not the path's source.");
@@ -1494,10 +1492,11 @@ public class Model {
     Path previousState = path;
     Set<TCSObjectReference<Path>> outgoingPaths = new HashSet<>(point.getOutgoingPaths());
     outgoingPaths.add(path.getReference());
-    point = objectPool.replaceObject(point.withOutgoingPaths(outgoingPaths));
-    objectPool.emitObjectEvent(point,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    point = point.withOutgoingPaths(outgoingPaths);
+    getObjectRepo().replaceObject(point);
+    emitObjectEvent(point,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return point;
   }
 

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -22,6 +21,7 @@ import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -34,29 +34,26 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.util.Assertions.checkArgument;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@code TransportOrderPool} keeps all {@code TransportOrder}s for an openTCS
- * kernel and provides methods to create and manipulate them.
+ * Keeps all {@code TransportOrder}s and provides methods to create and manipulate them.
  * <p>
- * Note that no synchronization is done inside this class. Concurrent access of
- * instances of this class must be synchronized externally.
+ * Note that no synchronization is done inside this class. Concurrent access of instances of this
+ * class must be synchronized externally.
  * </p>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class TransportOrderPool {
+public class TransportOrderPoolManager
+    extends TCSObjectManager {
 
   /**
    * This class's Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(TransportOrderPool.class);
-  /**
-   * The system's global object pool.
-   */
-  private final TCSObjectPool objectPool;
+  private static final Logger LOG = LoggerFactory.getLogger(TransportOrderPoolManager.class);
   /**
    * Provides names for transport orders and order sequences.
    */
@@ -65,39 +62,31 @@ public class TransportOrderPool {
   /**
    * Creates a new instance.
    *
-   * @param objectPool The object pool serving as the container for this order pool's data.
+   * @param objectRepo The object repo.
+   * @param eventHandler The event handler to publish events to.
    * @param orderNameProvider Provides names for transport orders.
    */
   @Inject
-  public TransportOrderPool(TCSObjectPool objectPool,
-                            ObjectNameProvider orderNameProvider) {
-    this.objectPool = requireNonNull(objectPool, "objectPool");
+  public TransportOrderPoolManager(@Nonnull TCSObjectRepository objectRepo,
+                                   @Nonnull @ApplicationEventBus EventHandler eventHandler,
+                                   @Nonnull ObjectNameProvider orderNameProvider) {
+    super(objectRepo, eventHandler);
     this.objectNameProvider = requireNonNull(orderNameProvider, "orderNameProvider");
-  }
-
-  /**
-   * Returns the <code>TCSObjectPool</code> serving as the container for this
-   * order pool's data.
-   *
-   * @return The <code>TCSObjectPool</code> serving as the container for this
-   * order pool's data.
-   */
-  public TCSObjectPool getObjectPool() {
-    return objectPool;
   }
 
   /**
    * Removes all transport orders from this pool.
    */
   public void clear() {
-    for (TCSObject<?> curObject : objectPool.getObjects((Pattern) null)) {
-      if (curObject instanceof TransportOrder
-          || curObject instanceof OrderSequence) {
-        objectPool.removeObject(curObject.getReference());
-        objectPool.emitObjectEvent(null,
-                                   curObject,
-                                   TCSObjectEvent.Type.OBJECT_REMOVED);
-      }
+    List<TCSObject<?>> objects = new ArrayList<>();
+    objects.addAll(getObjectRepo().getObjects(OrderSequence.class));
+    objects.addAll(getObjectRepo().getObjects(TransportOrder.class));
+
+    for (TCSObject<?> curObject : objects) {
+      getObjectRepo().removeObject(curObject.getReference());
+      emitObjectEvent(null,
+                      curObject,
+                      TCSObjectEvent.Type.OBJECT_REMOVED);
     }
   }
 
@@ -131,15 +120,16 @@ public class TransportOrderPool {
              newOrder.getName(),
              newOrder.getAllDriveOrders());
 
-    objectPool.addObject(newOrder);
-    objectPool.emitObjectEvent(newOrder, null, TCSObjectEvent.Type.OBJECT_CREATED);
+    getObjectRepo().addObject(newOrder);
+    emitObjectEvent(newOrder, null, TCSObjectEvent.Type.OBJECT_CREATED);
 
     if (newOrder.getWrappingSequence() != null) {
-      OrderSequence sequence = objectPool.getObject(OrderSequence.class,
-                                                    newOrder.getWrappingSequence());
+      OrderSequence sequence = getObjectRepo().getObject(OrderSequence.class,
+                                                         newOrder.getWrappingSequence());
       OrderSequence prevSeq = sequence;
-      sequence = objectPool.replaceObject(sequence.withOrder(newOrder.getReference()));
-      objectPool.emitObjectEvent(sequence, prevSeq, TCSObjectEvent.Type.OBJECT_MODIFIED);
+      sequence = sequence.withOrder(newOrder.getReference());
+      getObjectRepo().replaceObject(sequence);
+      emitObjectEvent(sequence, prevSeq, TCSObjectEvent.Type.OBJECT_MODIFIED);
     }
 
     // Return the newly created transport order.
@@ -158,18 +148,18 @@ public class TransportOrderPool {
   public TransportOrder setTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                                TransportOrder.State newState)
       throws ObjectUnknownException {
-    TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
+    TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
 
     LOG.info("Transport order's state changes: {} -- {} -> {}",
-             order.getName(),
-             order.getState(),
+             previousState.getName(),
+             previousState.getState(),
              newState);
 
-    TransportOrder previousState = order;
-    order = objectPool.replaceObject(order.withState(newState));
-    objectPool.emitObjectEvent(order,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    TransportOrder order = previousState.withState(newState);
+    getObjectRepo().replaceObject(order);
+    emitObjectEvent(order,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return order;
   }
 
@@ -192,7 +182,7 @@ public class TransportOrderPool {
       TCSObjectReference<Vehicle> vehicleRef,
       List<DriveOrder> driveOrders)
       throws ObjectUnknownException, IllegalArgumentException {
-    TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
+    TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
 
     LOG.info("Transport order's processing vehicle changes: {} -- {} -> {}",
              order.getName(),
@@ -201,23 +191,23 @@ public class TransportOrderPool {
 
     TransportOrder previousState = order;
     if (vehicleRef == null) {
-      order = objectPool.replaceObject(order.withProcessingVehicle(null));
+      order = order.withProcessingVehicle(null);
+      getObjectRepo().replaceObject(order);
     }
     else {
-      Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-      order = objectPool.replaceObject(
-          order.withProcessingVehicle(vehicle.getReference())
-              .withDriveOrders(driveOrders)
-              .withCurrentDriveOrderIndex(0)
-      );
+      Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+      order = order.withProcessingVehicle(vehicle.getReference())
+          .withDriveOrders(driveOrders)
+          .withCurrentDriveOrderIndex(0);
+      getObjectRepo().replaceObject(order);
       if (order.getCurrentDriveOrder() != null) {
-        order = objectPool.replaceObject(
-            order.withCurrentDriveOrderState(DriveOrder.State.TRAVELLING));
+        order = order.withCurrentDriveOrderState(DriveOrder.State.TRAVELLING);
+        getObjectRepo().replaceObject(order);
       }
     }
-    objectPool.emitObjectEvent(order,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(order,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return order;
   }
 
@@ -238,12 +228,12 @@ public class TransportOrderPool {
   public TransportOrder setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
                                                      List<DriveOrder> newOrders)
       throws ObjectUnknownException, IllegalArgumentException {
-    TransportOrder order = objectPool.getObject(TransportOrder.class, orderRef);
-    TransportOrder previousState = order;
-    order = objectPool.replaceObject(order.withDriveOrders(newOrders));
-    objectPool.emitObjectEvent(order,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, orderRef);
+    TransportOrder order = previousState.withDriveOrders(newOrders);
+    getObjectRepo().replaceObject(order);
+    emitObjectEvent(order,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return order;
   }
 
@@ -262,8 +252,8 @@ public class TransportOrderPool {
    */
   public TransportOrder setTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
-    TransportOrder previousState = order;
+    TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
+    TransportOrder order = previousState;
     // First, mark the current drive order as FINISHED and send an event.
     // Then, shift drive orders and send a second event.
     // Then, mark the current drive order as TRAVELLING and send another event.
@@ -272,32 +262,33 @@ public class TransportOrderPool {
                order.getName(),
                order.getCurrentDriveOrder().getDestination());
 
-      order = objectPool.replaceObject(order.withCurrentDriveOrderState(DriveOrder.State.FINISHED));
+      order = order.withCurrentDriveOrderState(DriveOrder.State.FINISHED);
+      getObjectRepo().replaceObject(order);
       TransportOrder newState = order;
-      objectPool.emitObjectEvent(newState,
-                                 previousState,
-                                 TCSObjectEvent.Type.OBJECT_MODIFIED);
+      emitObjectEvent(newState,
+                      previousState,
+                      TCSObjectEvent.Type.OBJECT_MODIFIED);
       previousState = newState;
-      order = objectPool.replaceObject(
-          order.withCurrentDriveOrderIndex(order.getCurrentDriveOrderIndex() + 1));
+      order = order.withCurrentDriveOrderIndex(order.getCurrentDriveOrderIndex() + 1);
+      getObjectRepo().replaceObject(order);
       newState = order;
-      objectPool.emitObjectEvent(newState,
-                                 previousState,
-                                 TCSObjectEvent.Type.OBJECT_MODIFIED);
+      emitObjectEvent(newState,
+                      previousState,
+                      TCSObjectEvent.Type.OBJECT_MODIFIED);
       previousState = newState;
       if (order.getCurrentDriveOrder() != null) {
-        order = objectPool.replaceObject(
-            order.withCurrentDriveOrderState(DriveOrder.State.TRAVELLING));
+        order = order.withCurrentDriveOrderState(DriveOrder.State.TRAVELLING);
+        getObjectRepo().replaceObject(order);
         newState = order;
-        objectPool.emitObjectEvent(newState,
-                                   previousState,
-                                   TCSObjectEvent.Type.OBJECT_MODIFIED);
+        emitObjectEvent(newState,
+                        previousState,
+                        TCSObjectEvent.Type.OBJECT_MODIFIED);
         previousState = newState;
       }
     }
-    objectPool.emitObjectEvent(order,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(order,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return order;
   }
 
@@ -311,15 +302,15 @@ public class TransportOrderPool {
    */
   public TransportOrder removeTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
-    TransportOrder order = objectPool.getObject(TransportOrder.class, ref);
+    TransportOrder order = getObjectRepo().getObject(TransportOrder.class, ref);
     // Make sure orders currently being processed are not removed.
     checkArgument(!order.hasState(TransportOrder.State.BEING_PROCESSED),
                   "Transport order %s is being processed.",
                   order.getName());
-    objectPool.removeObject(ref);
-    objectPool.emitObjectEvent(null,
-                               order,
-                               TCSObjectEvent.Type.OBJECT_REMOVED);
+    getObjectRepo().removeObject(ref);
+    emitObjectEvent(null,
+                    order,
+                    TCSObjectEvent.Type.OBJECT_REMOVED);
     return order;
   }
 
@@ -341,10 +332,10 @@ public class TransportOrderPool {
 
     LOG.info("Order sequence is being created: {}", newSequence.getName());
 
-    objectPool.addObject(newSequence);
-    objectPool.emitObjectEvent(newSequence,
-                               null,
-                               TCSObjectEvent.Type.OBJECT_CREATED);
+    getObjectRepo().addObject(newSequence);
+    emitObjectEvent(newSequence,
+                    null,
+                    TCSObjectEvent.Type.OBJECT_CREATED);
     // Return the newly created transport order.
     return newSequence;
   }
@@ -361,12 +352,12 @@ public class TransportOrderPool {
   public OrderSequence setOrderSequenceFinishedIndex(TCSObjectReference<OrderSequence> seqRef,
                                                      int index)
       throws ObjectUnknownException {
-    OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
-    OrderSequence previousState = sequence;
-    sequence = objectPool.replaceObject(sequence.withFinishedIndex(index));
-    objectPool.emitObjectEvent(sequence,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+    OrderSequence sequence = previousState.withFinishedIndex(index);
+    getObjectRepo().replaceObject(sequence);
+    emitObjectEvent(sequence,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return sequence;
   }
 
@@ -381,12 +372,12 @@ public class TransportOrderPool {
   public OrderSequence setOrderSequenceComplete(
       TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
-    OrderSequence previousState = sequence;
-    sequence = objectPool.replaceObject(sequence.withComplete(true));
-    objectPool.emitObjectEvent(sequence,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+    OrderSequence sequence = previousState.withComplete(true);
+    getObjectRepo().replaceObject(sequence);
+    emitObjectEvent(sequence,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return sequence;
   }
 
@@ -400,12 +391,12 @@ public class TransportOrderPool {
    */
   public OrderSequence setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
-    OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
-    OrderSequence previousState = sequence;
-    sequence = objectPool.replaceObject(sequence.withFinished(true));
-    objectPool.emitObjectEvent(sequence,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+    OrderSequence sequence = previousState.withFinished(true);
+    getObjectRepo().replaceObject(sequence);
+    emitObjectEvent(sequence,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return sequence;
   }
 
@@ -422,24 +413,26 @@ public class TransportOrderPool {
       TCSObjectReference<OrderSequence> seqRef,
       TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
-    OrderSequence sequence = objectPool.getObject(OrderSequence.class, seqRef);
+    OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
 
     LOG.info("Order sequence's processing vehicle changes: {} -- {} -> {}",
-             sequence.getName(),
-             toObjectName(sequence.getProcessingVehicle()),
+             previousState.getName(),
+             toObjectName(previousState.getProcessingVehicle()),
              toObjectName(vehicleRef));
 
-    OrderSequence previousState = sequence;
+    OrderSequence sequence = previousState;
     if (vehicleRef == null) {
-      sequence = objectPool.replaceObject(sequence.withProcessingVehicle(null));
+      sequence = sequence.withProcessingVehicle(null);
+      getObjectRepo().replaceObject(sequence);
     }
     else {
-      Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleRef);
-      sequence = objectPool.replaceObject(sequence.withProcessingVehicle(vehicle.getReference()));
+      Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+      sequence = sequence.withProcessingVehicle(vehicle.getReference());
+      getObjectRepo().replaceObject(sequence);
     }
-    objectPool.emitObjectEvent(sequence,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(sequence,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return sequence;
   }
 
@@ -452,13 +445,13 @@ public class TransportOrderPool {
    */
   public OrderSequence removeOrderSequence(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
-    OrderSequence sequence = objectPool.getObject(OrderSequence.class, ref);
-    OrderSequence previousState = sequence;
+    OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, ref);
+    OrderSequence sequence = previousState;
     // XXX Any sanity checks here?
-    objectPool.removeObject(ref);
-    objectPool.emitObjectEvent(null,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_REMOVED);
+    getObjectRepo().removeObject(ref);
+    emitObjectEvent(null,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_REMOVED);
     return sequence;
   }
 
@@ -471,11 +464,13 @@ public class TransportOrderPool {
    */
   public void removeFinishedOrderSequenceAndOrders(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException, IllegalArgumentException {
-    OrderSequence sequence = objectPool.getObject(OrderSequence.class, ref);
-    checkArgument(sequence.isFinished(), "Order sequence %s is not finished", sequence.getName());
-    OrderSequence previousState = sequence;
-    objectPool.removeObject(ref);
-    objectPool.emitObjectEvent(null, previousState, TCSObjectEvent.Type.OBJECT_REMOVED);
+    OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, ref);
+    checkArgument(previousState.isFinished(),
+                  "Order sequence %s is not finished",
+                  previousState.getName());
+    OrderSequence sequence = previousState;
+    getObjectRepo().removeObject(ref);
+    emitObjectEvent(null, previousState, TCSObjectEvent.Type.OBJECT_REMOVED);
     // Also remove all orders in the sequence.
     for (TCSObjectReference<TransportOrder> orderRef : sequence.getOrders()) {
       removeTransportOrder(orderRef);
@@ -486,7 +481,7 @@ public class TransportOrderPool {
       throws ObjectUnknownException {
     Set<TCSObjectReference<TransportOrder>> result = new HashSet<>();
     for (String dependencyName : to.getDependencyNames()) {
-      TransportOrder dep = getObjectPool().getObject(TransportOrder.class, dependencyName);
+      TransportOrder dep = getObjectRepo().getObject(TransportOrder.class, dependencyName);
       if (dep == null) {
         throw new ObjectUnknownException(dependencyName);
       }
@@ -501,7 +496,7 @@ public class TransportOrderPool {
     if (to.getWrappingSequence() == null) {
       return null;
     }
-    OrderSequence sequence = getObjectPool().getObject(OrderSequence.class,
+    OrderSequence sequence = getObjectRepo().getObject(OrderSequence.class,
                                                        to.getWrappingSequence());
     if (sequence == null) {
       throw new ObjectUnknownException(to.getWrappingSequence());
@@ -527,7 +522,7 @@ public class TransportOrderPool {
     if (vehicleName == null) {
       return null;
     }
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleName);
+    Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleName);
     return vehicle.getReference();
   }
 
@@ -535,7 +530,7 @@ public class TransportOrderPool {
       throws ObjectUnknownException {
     List<DriveOrder> result = new ArrayList<>(dests.size());
     for (DestinationCreationTO destTo : dests) {
-      TCSObject<?> destObject = objectPool.getObjectOrNull(destTo.getDestLocationName());
+      TCSObject<?> destObject = getObjectRepo().getObjectOrNull(destTo.getDestLocationName());
       if (!(destObject instanceof Location || destObject instanceof Point)) {
         throw new ObjectUnknownException(destTo.getDestLocationName());
       }

@@ -20,7 +20,7 @@ import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.opentcs.kernel.workingset.TransportOrderPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class OrderCleanerTask
   /**
    * Keeps all the transport orders.
    */
-  private final TransportOrderPool orderPool;
+  private final TransportOrderPoolManager orderPoolManager;
   /**
    * Check whether transport orders may be removed.
    */
@@ -61,19 +61,19 @@ public class OrderCleanerTask
    * Creates a new instance.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param orderPool The transport order pool to be used.
+   * @param orderPoolManager The order pool manager to be used.
    * @param orderCleanupApprovals The set of order cleanup approvals to use.
    * @param sequenceCleanupApprovals The set of sequence cleanup approvals to use.
    * @param configuration This class's configuration.
    */
   @Inject
   public OrderCleanerTask(@GlobalSyncObject Object globalSyncObject,
-                          TransportOrderPool orderPool,
+                          TransportOrderPoolManager orderPoolManager,
                           Set<TransportOrderCleanupApproval> orderCleanupApprovals,
                           Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals,
                           OrderPoolConfiguration configuration) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.orderPool = requireNonNull(orderPool, "orderPool");
+    this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
     this.orderCleanupApprovals = requireNonNull(orderCleanupApprovals, "orderCleanupApprovals");
     this.sequenceCleanupApprovals = requireNonNull(sequenceCleanupApprovals,
                                                    "sequenceCleanupApprovals");
@@ -94,17 +94,18 @@ public class OrderCleanerTask
       // Remove all transport orders in a final state that do NOT belong to a sequence and that are
       // older than the threshold.
       for (TransportOrder transportOrder
-               : orderPool.getObjectPool().getObjects(TransportOrder.class,
-                                                      new OrderApproval(creationTimeThreshold))) {
-        orderPool.removeTransportOrder(transportOrder.getReference());
+               : orderPoolManager.getObjectRepo().getObjects(
+              TransportOrder.class,
+              new OrderApproval(creationTimeThreshold))) {
+        orderPoolManager.removeTransportOrder(transportOrder.getReference());
       }
 
       // Remove all order sequences that have been finished, including their transport orders.
       for (OrderSequence orderSequence
-               : orderPool.getObjectPool().getObjects(
+               : orderPoolManager.getObjectRepo().getObjects(
               OrderSequence.class,
               new SequenceApproval(creationTimeThreshold))) {
-        orderPool.removeFinishedOrderSequenceAndOrders(orderSequence.getReference());
+        orderPoolManager.removeFinishedOrderSequenceAndOrders(orderSequence.getReference());
       }
     }
   }
@@ -167,8 +168,8 @@ public class OrderCleanerTask
       List<TCSObjectReference<TransportOrder>> orderRefs = seq.getOrders();
       if (!orderRefs.isEmpty()) {
         TransportOrder lastOrder
-            = orderPool.getObjectPool().getObject(TransportOrder.class,
-                                                  Iterables.getLast(orderRefs));
+            = orderPoolManager.getObjectRepo().getObject(TransportOrder.class,
+                                                         Iterables.getLast(orderRefs));
         if (lastOrder.getCreationTime().isAfter(creationTimeThreshold)) {
           return false;
         }

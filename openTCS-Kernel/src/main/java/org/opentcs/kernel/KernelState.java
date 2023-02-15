@@ -11,8 +11,7 @@ import static java.util.Objects.requireNonNull;
 import org.opentcs.access.Kernel.State;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * The abstract base class for classes that implement state specific kernel
@@ -28,13 +27,9 @@ public abstract class KernelState
    */
   private final Object globalSyncObject;
   /**
-   * The container of all course model and transport order objects.
-   */
-  private final TCSObjectPool globalObjectPool;
-  /**
    * The model facade to the object pool.
    */
-  private final Model model;
+  private final PlantModelManager plantModelManager;
   /**
    * The persister loading and storing model data.
    */
@@ -44,17 +39,14 @@ public abstract class KernelState
    * Creates a new state.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param objectPool The object pool to be used.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    * @param modelPersister The model persister to be used.
    */
   public KernelState(Object globalSyncObject,
-                     TCSObjectPool objectPool,
-                     Model model,
+                     PlantModelManager plantModelManager,
                      ModelPersister modelPersister) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.globalObjectPool = requireNonNull(objectPool, "objectPool");
-    this.model = requireNonNull(model, "model");
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
     this.modelPersister = requireNonNull(modelPersister, "modelPersister");
   }
 
@@ -73,11 +65,7 @@ public abstract class KernelState
     return modelPersister;
   }
 
-  protected TCSObjectPool getGlobalObjectPool() {
-    return globalObjectPool;
-  }
-
-  protected Model getModel() {
-    return model;
+  protected PlantModelManager getPlantModelManager() {
+    return plantModelManager;
   }
 }

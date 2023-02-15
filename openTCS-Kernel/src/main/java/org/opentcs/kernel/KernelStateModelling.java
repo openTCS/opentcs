@@ -15,8 +15,7 @@ import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.customizations.kernel.ActiveInModellingMode;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,22 +44,19 @@ public class KernelStateModelling
    * Creates a new instance.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param objectPool The object pool to be used.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    * @param modelPersister The model persister to be used.
    * @param configuration This class's configuration.
    * @param extensions The kernel extensions to be used.
    */
   @Inject
   public KernelStateModelling(@GlobalSyncObject Object globalSyncObject,
-                              TCSObjectPool objectPool,
-                              Model model,
+                              PlantModelManager plantModelManager,
                               ModelPersister modelPersister,
                               KernelApplicationConfiguration configuration,
                               @ActiveInModellingMode Set<KernelExtension> extensions) {
     super(globalSyncObject,
-          objectPool,
-          model,
+          plantModelManager,
           modelPersister,
           configuration.saveModelOnTerminateModelling());
     this.extensions = requireNonNull(extensions, "extensions");

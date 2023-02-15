@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectEvent;
@@ -23,12 +24,12 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@code PeripheralJobPool} keeps all {@code PeripheralJobs}s for an openTCS kernel and provides
- * methods to create and manipulate them.
+ * Keeps all {@code PeripheralJobs}s and provides methods to create and manipulate them.
  * <p>
  * Note that no synchronization is done inside this class. Concurrent access of instances of this
  * class must be synchronized externally.
@@ -36,16 +37,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
-public class PeripheralJobPool {
+public class PeripheralJobPoolManager
+    extends TCSObjectManager {
 
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(PeripheralJobPool.class);
-  /**
-   * The system's global object pool.
-   */
-  private final TCSObjectPool objectPool;
+  private static final Logger LOG = LoggerFactory.getLogger(PeripheralJobPoolManager.class);
   /**
    * Provides names for peripheral jobs.
    */
@@ -54,13 +52,15 @@ public class PeripheralJobPool {
   /**
    * Creates a new instance.
    *
-   * @param objectPool The object pool serving as the container for this peripheral job pool's data.
+   * @param objectRepo The object repo.
+   * @param eventHandler The event handler to publish events to.
    * @param orderNameProvider Provides names for peripheral jobs.
    */
   @Inject
-  public PeripheralJobPool(TCSObjectPool objectPool,
-                           ObjectNameProvider orderNameProvider) {
-    this.objectPool = requireNonNull(objectPool, "objectPool");
+  public PeripheralJobPoolManager(@Nonnull TCSObjectRepository objectRepo,
+                                  @Nonnull @ApplicationEventBus EventHandler eventHandler,
+                                  @Nonnull ObjectNameProvider orderNameProvider) {
+    super(objectRepo, eventHandler);
     this.objectNameProvider = requireNonNull(orderNameProvider, "orderNameProvider");
   }
 
@@ -68,11 +68,11 @@ public class PeripheralJobPool {
    * Removes all peripheral jobs from this pool.
    */
   public void clear() {
-    for (PeripheralJob job : objectPool.getObjects(PeripheralJob.class)) {
-      objectPool.removeObject(job.getReference());
-      objectPool.emitObjectEvent(null,
-                                 job,
-                                 TCSObjectEvent.Type.OBJECT_REMOVED);
+    for (PeripheralJob job : getObjectRepo().getObjects(PeripheralJob.class)) {
+      getObjectRepo().removeObject(job.getReference());
+      emitObjectEvent(null,
+                      job,
+                      TCSObjectEvent.Type.OBJECT_REMOVED);
     }
   }
 
@@ -97,8 +97,8 @@ public class PeripheralJobPool {
              job.getName(),
              job.getPeripheralOperation());
 
-    objectPool.addObject(job);
-    objectPool.emitObjectEvent(job, null, TCSObjectEvent.Type.OBJECT_CREATED);
+    getObjectRepo().addObject(job);
+    emitObjectEvent(job, null, TCSObjectEvent.Type.OBJECT_CREATED);
 
     return job;
   }
@@ -114,18 +114,18 @@ public class PeripheralJobPool {
   public PeripheralJob setPeripheralJobState(TCSObjectReference<PeripheralJob> ref,
                                              PeripheralJob.State newState)
       throws ObjectUnknownException {
-    PeripheralJob job = objectPool.getObject(PeripheralJob.class, ref);
+    PeripheralJob previousState = getObjectRepo().getObject(PeripheralJob.class, ref);
 
     LOG.info("Peripheral job's state changes: {} -- {} -> {}",
-             job.getName(),
-             job.getState(),
+             previousState.getName(),
+             previousState.getState(),
              newState);
 
-    PeripheralJob previousState = job;
-    job = objectPool.replaceObject(job.withState(newState));
-    objectPool.emitObjectEvent(job,
-                               previousState,
-                               TCSObjectEvent.Type.OBJECT_MODIFIED);
+    PeripheralJob job = previousState.withState(newState);
+    getObjectRepo().replaceObject(job);
+    emitObjectEvent(job,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
     return job;
   }
 
@@ -139,7 +139,7 @@ public class PeripheralJobPool {
 
   private TCSResourceReference<Location> toLocationReference(String locationName)
       throws ObjectUnknownException {
-    Location location = objectPool.getObject(Location.class, locationName);
+    Location location = getObjectRepo().getObject(Location.class, locationName);
     return location.getReference();
   }
 
@@ -148,7 +148,7 @@ public class PeripheralJobPool {
     if (vehicleName == null) {
       return null;
     }
-    Vehicle vehicle = objectPool.getObject(Vehicle.class, vehicleName);
+    Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleName);
     return vehicle.getReference();
   }
 
@@ -157,7 +157,7 @@ public class PeripheralJobPool {
     if (transportOrderName == null) {
       return null;
     }
-    TransportOrder order = objectPool.getObject(TransportOrder.class, transportOrderName);
+    TransportOrder order = getObjectRepo().getObject(TransportOrder.class, transportOrderName);
     return order.getReference();
   }
 

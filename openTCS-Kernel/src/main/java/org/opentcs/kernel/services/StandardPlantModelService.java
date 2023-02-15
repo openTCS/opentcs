@@ -38,7 +38,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.util.event.EventHandler;
 
 /**
@@ -59,9 +59,9 @@ public class StandardPlantModelService
    */
   private final Object globalSyncObject;
   /**
-   * The model facade to the object pool.
+   * The plant model manager.
    */
-  private final Model model;
+  private final PlantModelManager plantModelManager;
   /**
    * The persister loading and storing model data.
    */
@@ -81,7 +81,7 @@ public class StandardPlantModelService
    * @param kernel The kernel.
    * @param objectService The tcs object service.
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    * @param modelPersister The model persister to be used.
    * @param eventHandler Where this instance sends events to.
    * @param notificationService The notification service.
@@ -90,14 +90,14 @@ public class StandardPlantModelService
   public StandardPlantModelService(LocalKernel kernel,
                                    TCSObjectService objectService,
                                    @GlobalSyncObject Object globalSyncObject,
-                                   Model model,
+                                   PlantModelManager plantModelManager,
                                    ModelPersister modelPersister,
                                    @ApplicationEventBus EventHandler eventHandler,
                                    NotificationService notificationService) {
     super(objectService);
     this.kernel = requireNonNull(kernel, "kernel");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.model = requireNonNull(model, "model");
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
     this.modelPersister = requireNonNull(modelPersister, "modelPersister");
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
     this.notificationService = requireNonNull(notificationService, "notificationService");
@@ -107,7 +107,7 @@ public class StandardPlantModelService
   public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      return model.expandResources(resources);
+      return plantModelManager.expandResources(resources);
     }
   }
 
@@ -128,7 +128,7 @@ public class StandardPlantModelService
           : modelCreationTO.getName();
       // Let listeners know we're in transition.
       emitModelEvent(oldModelName, newModelName, true, false);
-      model.createPlantModelObjects(modelCreationTO);
+      plantModelManager.createPlantModelObjects(modelCreationTO);
       // Let listeners know we're done with the transition.
       emitModelEvent(oldModelName, newModelName, true, true);
       notificationService.publishUserNotification(
@@ -141,14 +141,14 @@ public class StandardPlantModelService
   public void savePlantModel()
       throws IllegalStateException {
     synchronized (globalSyncObject) {
-      modelPersister.saveModel(model.createPlantModelCreationTO());
+      modelPersister.saveModel(plantModelManager.createPlantModelCreationTO());
     }
   }
 
   @Override
   public PlantModel getPlantModel() {
     synchronized (globalSyncObject) {
-      return new PlantModel(model.getName())
+      return new PlantModel(plantModelManager.getName())
           .withProperties(getModelProperties())
           .withPoints(fetchObjects(Point.class))
           .withPaths(fetchObjects(Path.class))
@@ -175,7 +175,7 @@ public class StandardPlantModelService
 
     // Create the plant model
     synchronized (globalSyncObject) {
-      model.createPlantModelObjects(to);
+      plantModelManager.createPlantModelObjects(to);
     }
 
     savePlantModel();
@@ -194,7 +194,7 @@ public class StandardPlantModelService
   @Override
   public String getModelName() {
     synchronized (globalSyncObject) {
-      return model.getName();
+      return plantModelManager.getName();
     }
   }
 
@@ -202,7 +202,7 @@ public class StandardPlantModelService
   public Map<String, String> getModelProperties()
       throws KernelRuntimeException {
     synchronized (globalSyncObject) {
-      return model.getProperties();
+      return plantModelManager.getProperties();
     }
   }
 
@@ -210,7 +210,7 @@ public class StandardPlantModelService
   public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setLocationLocked(ref, locked);
+      plantModelManager.setLocationLocked(ref, locked);
     }
   }
 
@@ -219,7 +219,7 @@ public class StandardPlantModelService
   public void updateLocationReservationToken(TCSObjectReference<Location> ref, String token)
       throws ObjectUnknownException, KernelRuntimeException {
     synchronized (globalSyncObject) {
-      model.setLocationReservationToken(ref, token);
+      plantModelManager.setLocationReservationToken(ref, token);
     }
   }
 

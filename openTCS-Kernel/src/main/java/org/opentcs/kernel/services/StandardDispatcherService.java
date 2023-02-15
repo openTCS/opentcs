@@ -17,7 +17,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.TCSObjectRepository;
 
 /**
  * This class is the standard implementation of the {@link DispatcherService} interface.
@@ -34,7 +34,7 @@ public class StandardDispatcherService
   /**
    * The container of all course model and transport order objects.
    */
-  private final TCSObjectPool globalObjectPool;
+  private final TCSObjectRepository objectRepo;
   /**
    * The dispatcher.
    */
@@ -44,15 +44,15 @@ public class StandardDispatcherService
    * Creates a new instance.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param globalObjectPool The object pool to be used.
+   * @param objectRepo The object repo to be used.
    * @param dispatcher The dispatcher.
    */
   @Inject
   public StandardDispatcherService(@GlobalSyncObject Object globalSyncObject,
-                                   TCSObjectPool globalObjectPool,
+                                   TCSObjectRepository objectRepo,
                                    Dispatcher dispatcher) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
+    this.objectRepo = requireNonNull(objectRepo, "objectRepo");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
   }
 
@@ -67,7 +67,7 @@ public class StandardDispatcherService
   public void withdrawByVehicle(TCSObjectReference<Vehicle> ref, boolean immediateAbort)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      dispatcher.withdrawOrder(globalObjectPool.getObject(Vehicle.class, ref), immediateAbort);
+      dispatcher.withdrawOrder(objectRepo.getObject(Vehicle.class, ref), immediateAbort);
     }
   }
 
@@ -76,7 +76,7 @@ public class StandardDispatcherService
                                        boolean immediateAbort)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      dispatcher.withdrawOrder(globalObjectPool.getObject(TransportOrder.class, ref),
+      dispatcher.withdrawOrder(objectRepo.getObject(TransportOrder.class, ref),
                                immediateAbort);
     }
   }
@@ -85,7 +85,7 @@ public class StandardDispatcherService
   public void reroute(TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      dispatcher.reroute(globalObjectPool.getObject(Vehicle.class, ref), reroutingType);
+      dispatcher.reroute(objectRepo.getObject(Vehicle.class, ref), reroutingType);
     }
   }
 }

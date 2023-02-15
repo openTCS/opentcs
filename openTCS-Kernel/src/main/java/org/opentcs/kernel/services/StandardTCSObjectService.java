@@ -20,7 +20,8 @@ import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.TCSObjectManager;
+import org.opentcs.kernel.workingset.TCSObjectRepository;
 
 /**
  * This class is the standard implementation of the {@link TCSObjectService} interface.
@@ -35,41 +36,41 @@ public class StandardTCSObjectService
    */
   private final Object globalSyncObject;
   /**
-   * The container of all course model and transport order objects.
+   * The object manager.
    */
-  private final TCSObjectPool globalObjectPool;
+  private final TCSObjectManager objectManager;
 
   /**
    * Creates a new instance.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param globalObjectPool The object pool to be used.
+   * @param objectManager The object manager.
    */
   @Inject
   public StandardTCSObjectService(@GlobalSyncObject Object globalSyncObject,
-                                  TCSObjectPool globalObjectPool) {
+                                  TCSObjectManager objectManager) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
+    this.objectManager = requireNonNull(objectManager, "objectManager");
   }
 
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref) {
     synchronized (getGlobalSyncObject()) {
-      return getGlobalObjectPool().getObjectOrNull(clazz, ref);
+      return getObjectRepo().getObjectOrNull(clazz, ref);
     }
   }
 
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name) {
     synchronized (getGlobalSyncObject()) {
-      return getGlobalObjectPool().getObjectOrNull(clazz, name);
+      return getObjectRepo().getObjectOrNull(clazz, name);
     }
   }
 
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz) {
     synchronized (getGlobalSyncObject()) {
-      Set<T> objects = getGlobalObjectPool().getObjects(clazz);
+      Set<T> objects = getObjectRepo().getObjects(clazz);
       Set<T> copies = new HashSet<>();
       for (T object : objects) {
         copies.add(object);
@@ -82,7 +83,7 @@ public class StandardTCSObjectService
   public <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
                                                       @Nonnull Predicate<? super T> predicate) {
     synchronized (getGlobalSyncObject()) {
-      return getGlobalObjectPool().getObjects(clazz, predicate);
+      return getObjectRepo().getObjects(clazz, predicate);
     }
   }
 
@@ -90,7 +91,7 @@ public class StandardTCSObjectService
   public void updateObjectProperty(TCSObjectReference<?> ref, String key, @Nullable String value)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      getGlobalObjectPool().setObjectProperty(ref, key, value);
+      objectManager.setObjectProperty(ref, key, value);
     }
   }
 
@@ -98,7 +99,7 @@ public class StandardTCSObjectService
   public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
       throws ObjectUnknownException {
     synchronized (getGlobalSyncObject()) {
-      getGlobalObjectPool().appendObjectHistoryEntry(ref, entry);
+      objectManager.appendObjectHistoryEntry(ref, entry);
     }
   }
 
@@ -106,7 +107,7 @@ public class StandardTCSObjectService
     return globalSyncObject;
   }
 
-  protected TCSObjectPool getGlobalObjectPool() {
-    return globalObjectPool;
+  protected TCSObjectRepository getObjectRepo() {
+    return objectManager.getObjectRepo();
   }
 }

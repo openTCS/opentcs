@@ -30,10 +30,9 @@ import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
 import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.PeripheralJobPool;
-import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
+import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
+import org.opentcs.kernel.workingset.TransportOrderPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,13 +49,13 @@ public class KernelStateOperating
    */
   private static final Logger LOG = LoggerFactory.getLogger(KernelStateOperating.class);
   /**
-   * The order facade to the object pool.
+   * The order pool manager.
    */
-  private final TransportOrderPool orderPool;
+  private final TransportOrderPoolManager orderPoolManager;
   /**
-   * The peripheral job facade to the object pool.
+   * The job pool manager.
    */
-  private final PeripheralJobPool jobPool;
+  private final PeripheralJobPoolManager jobPoolManager;
   /**
    * This kernel's router.
    */
@@ -115,13 +114,12 @@ public class KernelStateOperating
   private boolean initialized;
 
   /**
-   * Creates a new KernelStateOperating.
+   * Creates a new instance.
    *
    * @param globalSyncObject kernel threads' global synchronization object.
-   * @param objectPool The object pool to be used.
-   * @param model The model to be used
-   * @param orderPool The transport order pool to be used.
-   * @param jobPool The peripheral job pool top be used.
+   * @param plantModelManager The plant model manager to be used.
+   * @param orderPoolManager The order pool manager to be used.
+   * @param jobPoolManager The job pool manager to be used.
    * @param modelPersister The model persister to be used.
    * @param configuration This class's configuration.
    * @param router The router to be used.
@@ -139,10 +137,9 @@ public class KernelStateOperating
    */
   @Inject
   public KernelStateOperating(@GlobalSyncObject Object globalSyncObject,
-                              TCSObjectPool objectPool,
-                              Model model,
-                              TransportOrderPool orderPool,
-                              PeripheralJobPool jobPool,
+                              PlantModelManager plantModelManager,
+                              TransportOrderPoolManager orderPoolManager,
+                              PeripheralJobPoolManager jobPoolManager,
                               ModelPersister modelPersister,
                               KernelApplicationConfiguration configuration,
                               Router router,
@@ -158,12 +155,11 @@ public class KernelStateOperating
                               PeripheralAttachmentManager peripheralAttachmentManager,
                               InternalVehicleService vehicleService) {
     super(globalSyncObject,
-          objectPool,
-          model,
+          plantModelManager,
           modelPersister,
           configuration.saveModelOnTerminateOperating());
-    this.orderPool = requireNonNull(orderPool, "orderPool");
-    this.jobPool = requireNonNull(jobPool, "jobPool");
+    this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
+    this.jobPoolManager = requireNonNull(jobPoolManager, "jobPoolManager");
     this.router = requireNonNull(router, "router");
     this.scheduler = requireNonNull(scheduler, "scheduler");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
@@ -291,9 +287,9 @@ public class KernelStateOperating
     }
 
     // Remove all orders and order sequences from the pool.
-    orderPool.clear();
+    orderPoolManager.clear();
     // Remove all peripheral jobs from the pool.
-    jobPool.clear();
+    jobPoolManager.clear();
 
     initialized = false;
 

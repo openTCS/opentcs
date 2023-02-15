@@ -19,7 +19,7 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.kernel.workingset.PeripheralJobPool;
+import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
 
 /**
  * This class is the standard implementation of the {@link PeripheralJobService} interface.
@@ -35,24 +35,24 @@ public class StandardPeripheralJobService
    */
   private final Object globalSyncObject;
   /**
-   * The peripheral job facade to the object pool.
+   * The job pool manager.
    */
-  private final PeripheralJobPool jobPool;
+  private final PeripheralJobPoolManager jobPoolManager;
 
   /**
    * Creates a new instance.
    *
    * @param objectService The tcs obejct service.
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param jobPool The peripheral job pool to be used.
+   * @param jobPoolManager The job pool manager to be used.
    */
   @Inject
   public StandardPeripheralJobService(TCSObjectService objectService,
                                       @GlobalSyncObject Object globalSyncObject,
-                                      PeripheralJobPool jobPool) {
+                                      PeripheralJobPoolManager jobPoolManager) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
-    this.jobPool = requireNonNull(jobPool, "jobPool");
+    this.jobPoolManager = requireNonNull(jobPoolManager, "jobPoolManager");
   }
 
   @Override
@@ -60,7 +60,7 @@ public class StandardPeripheralJobService
                                        PeripheralJob.State state)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      jobPool.setPeripheralJobState(ref, state);
+      jobPoolManager.setPeripheralJobState(ref, state);
     }
   }
 
@@ -68,7 +68,7 @@ public class StandardPeripheralJobService
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException {
     synchronized (globalSyncObject) {
-      return jobPool.createPeripheralJob(to);
+      return jobPoolManager.createPeripheralJob(to);
     }
   }
 }

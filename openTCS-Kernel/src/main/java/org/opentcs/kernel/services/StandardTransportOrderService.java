@@ -23,9 +23,9 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
+import org.opentcs.kernel.workingset.TCSObjectRepository;
+import org.opentcs.kernel.workingset.TransportOrderPoolManager;
 
 /**
  * This class is the standard implementation of the {@link TransportOrderService} interface.
@@ -43,15 +43,15 @@ public class StandardTransportOrderService
   /**
    * The container of all course model and transport order objects.
    */
-  private final TCSObjectPool globalObjectPool;
+  private final TCSObjectRepository globalObjectPool;
   /**
-   * The order facade to the object pool.
+   * The order pool manager.
    */
-  private final TransportOrderPool orderPool;
+  private final TransportOrderPoolManager orderPoolManager;
   /**
-   * The model facade to the object pool.
+   * The plant model manager.
    */
-  private final Model model;
+  private final PlantModelManager plantModelManager;
 
   /**
    * Creates a new instance.
@@ -59,20 +59,20 @@ public class StandardTransportOrderService
    * @param objectService The tcs obejct service.
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param globalObjectPool The object pool to be used.
-   * @param orderPool The oder pool to be used.
-   * @param model The model to be used.
+   * @param orderPoolManager The order pool manager to be used.
+   * @param plantModelManager The plant model manager to be used.
    */
   @Inject
   public StandardTransportOrderService(TCSObjectService objectService,
                                        @GlobalSyncObject Object globalSyncObject,
-                                       TCSObjectPool globalObjectPool,
-                                       TransportOrderPool orderPool,
-                                       Model model) {
+                                       TCSObjectRepository globalObjectPool,
+                                       TransportOrderPoolManager orderPoolManager,
+                                       PlantModelManager plantModelManager) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
-    this.orderPool = requireNonNull(orderPool, "orderPool");
-    this.model = requireNonNull(model, "model");
+    this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
   }
 
   @Override
@@ -86,13 +86,13 @@ public class StandardTransportOrderService
         return;
       }
 
-      orderPool.setOrderSequenceFinished(ref);
+      orderPoolManager.setOrderSequenceFinished(ref);
       // If the sequence was being processed by a vehicle, clear its back reference to the sequence
       // to make it available again and dispatch it.
       if (seq.getProcessingVehicle() != null) {
         Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,
                                                      seq.getProcessingVehicle());
-        model.setVehicleOrderSequence(vehicle.getReference(), null);
+        plantModelManager.setVehicleOrderSequence(vehicle.getReference(), null);
       }
     }
   }
@@ -101,7 +101,7 @@ public class StandardTransportOrderService
   public void updateOrderSequenceFinishedIndex(TCSObjectReference<OrderSequence> ref, int index)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      orderPool.setOrderSequenceFinishedIndex(ref, index);
+      orderPoolManager.setOrderSequenceFinishedIndex(ref, index);
     }
   }
 
@@ -110,7 +110,7 @@ public class StandardTransportOrderService
                                                    TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      orderPool.setOrderSequenceProcessingVehicle(seqRef, vehicleRef);
+      orderPoolManager.setOrderSequenceProcessingVehicle(seqRef, vehicleRef);
     }
   }
 
@@ -120,7 +120,7 @@ public class StandardTransportOrderService
                                                     List<DriveOrder> driveOrders)
       throws ObjectUnknownException, IllegalArgumentException {
     synchronized (globalSyncObject) {
-      orderPool.setTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
+      orderPoolManager.setTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
     }
   }
 
@@ -129,7 +129,7 @@ public class StandardTransportOrderService
                                               List<DriveOrder> driveOrders)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      orderPool.setTransportOrderDriveOrders(ref, driveOrders);
+      orderPoolManager.setTransportOrderDriveOrders(ref, driveOrders);
     }
   }
 
@@ -137,7 +137,7 @@ public class StandardTransportOrderService
   public void updateTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      orderPool.setTransportOrderNextDriveOrder(ref);
+      orderPoolManager.setTransportOrderNextDriveOrder(ref);
     }
   }
 
@@ -146,14 +146,14 @@ public class StandardTransportOrderService
                                         TransportOrder.State state)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      orderPool.setTransportOrderState(ref, state);
+      orderPoolManager.setTransportOrderState(ref, state);
     }
   }
 
   @Override
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
     synchronized (globalSyncObject) {
-      return orderPool.createOrderSequence(to);
+      return orderPoolManager.createOrderSequence(to);
     }
   }
 
@@ -161,7 +161,7 @@ public class StandardTransportOrderService
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
     synchronized (globalSyncObject) {
-      return orderPool.createTransportOrder(to);
+      return orderPoolManager.createTransportOrder(to);
     }
   }
 
@@ -175,17 +175,17 @@ public class StandardTransportOrderService
       if (seq.isComplete()) {
         return;
       }
-      orderPool.setOrderSequenceComplete(ref);
+      orderPoolManager.setOrderSequenceComplete(ref);
       // If there aren't any transport orders left to be processed as part of the sequence, mark
       // it as finished, too.
       if (seq.getNextUnfinishedOrder() == null) {
-        orderPool.setOrderSequenceFinished(ref);
+        orderPoolManager.setOrderSequenceFinished(ref);
         // If the sequence was being processed by a vehicle, clear its back reference to the
         // sequence to make it available again and dispatch it.
         if (seq.getProcessingVehicle() != null) {
           Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,
                                                        seq.getProcessingVehicle());
-          model.setVehicleOrderSequence(vehicle.getReference(), null);
+          plantModelManager.setVehicleOrderSequence(vehicle.getReference(), null);
         }
       }
     }

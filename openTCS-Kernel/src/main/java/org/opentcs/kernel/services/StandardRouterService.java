@@ -19,7 +19,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.kernel.KernelApplicationConfiguration;
-import org.opentcs.kernel.workingset.Model;
+import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * This class is the standard implementation of the {@link RouterService} interface.
@@ -46,9 +46,9 @@ public class StandardRouterService
    */
   private final Dispatcher dispatcher;
   /**
-   * The model facade to the object pool.
+   * The plant model manager.
    */
-  private final Model model;
+  private final PlantModelManager plantModelManager;
   /**
    * The kernel application's configuration.
    */
@@ -61,7 +61,7 @@ public class StandardRouterService
    * @param kernel The kernel.
    * @param router The scheduler.
    * @param dispatcher The dispatcher.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    * @param configuration The kernel application's configuration.
    */
   @Inject
@@ -69,13 +69,13 @@ public class StandardRouterService
                                LocalKernel kernel,
                                Router router,
                                Dispatcher dispatcher,
-                               Model model,
+                               PlantModelManager plantModelManager,
                                KernelApplicationConfiguration configuration) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.kernel = requireNonNull(kernel, "kernel");
     this.router = requireNonNull(router, "router");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
-    this.model = requireNonNull(model, "model");
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -83,7 +83,7 @@ public class StandardRouterService
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
-      model.setPathLocked(ref, locked);
+      plantModelManager.setPathLocked(ref, locked);
       if (kernel.getState() == Kernel.State.OPERATING
           && configuration.updateRoutingTopologyOnPathLockChange()) {
         updateRoutingTopology();

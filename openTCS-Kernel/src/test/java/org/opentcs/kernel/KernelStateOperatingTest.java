@@ -33,11 +33,12 @@ import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
 import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.PeripheralJobPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
+import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
-import org.opentcs.kernel.workingset.TCSObjectPool;
-import org.opentcs.kernel.workingset.TransportOrderPool;
+import org.opentcs.kernel.workingset.TCSObjectRepository;
+import org.opentcs.kernel.workingset.TransportOrderPoolManager;
+import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Tests the operating state of the kernel.
@@ -54,7 +55,7 @@ public class KernelStateOperatingTest {
 
   private KernelApplicationConfiguration configuration;
 
-  private TCSObjectPool objectPool;
+  private TCSObjectRepository objectPool;
 
   private Router router;
 
@@ -73,7 +74,7 @@ public class KernelStateOperatingTest {
   @Before
   public void setUp() {
     objectID = 0;
-    objectPool = mock(TCSObjectPool.class);
+    objectPool = mock(TCSObjectRepository.class);
     configuration = mock(KernelApplicationConfiguration.class);
     router = mock(Router.class);
     scheduler = mock(Scheduler.class);
@@ -83,13 +84,6 @@ public class KernelStateOperatingTest {
     attachmentManager = mock(AttachmentManager.class);
     vehicleService = mock(InternalVehicleService.class);
     when(vehicleService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
-  }
-
-  @After
-  public void tearDown() {
-    operating = null;
-    configuration = null;
-    objectPool = null;
   }
 
   @Test
@@ -160,26 +154,31 @@ public class KernelStateOperatingTest {
     when(executorMock.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
         .thenReturn(mock(ScheduledFuture.class));
 
-    return spy(new KernelStateOperating(new Object(),
-                                        objectPool,
-                                        mock(Model.class),
-                                        new TransportOrderPool(objectPool,
-                                                               new PrefixedUlidObjectNameProvider()),
-                                        new PeripheralJobPool(objectPool,
-                                                              new PrefixedUlidObjectNameProvider()),
-                                        mock(ModelPersister.class),
-                                        configuration,
-                                        router,
-                                        scheduler,
-                                        dispatcher,
-                                        peripheralJobDispatcher,
-                                        controllerPool,
-                                        mock(LocalPeripheralControllerPool.class),
-                                        executorMock,
-                                        mock(OrderCleanerTask.class),
-                                        extensions,
-                                        attachmentManager,
-                                        mock(PeripheralAttachmentManager.class),
-                                        vehicleService));
+    return spy(
+        new KernelStateOperating(
+            new Object(),
+            mock(PlantModelManager.class),
+            new TransportOrderPoolManager(objectPool,
+                                          new SimpleEventBus(),
+                                          new PrefixedUlidObjectNameProvider()),
+            new PeripheralJobPoolManager(objectPool,
+                                         new SimpleEventBus(),
+                                         new PrefixedUlidObjectNameProvider()),
+            mock(ModelPersister.class),
+            configuration,
+            router,
+            scheduler,
+            dispatcher,
+            peripheralJobDispatcher,
+            controllerPool,
+            mock(LocalPeripheralControllerPool.class),
+            executorMock,
+            mock(OrderCleanerTask.class),
+            extensions,
+            attachmentManager,
+            mock(PeripheralAttachmentManager.class),
+            vehicleService
+        )
+    );
   }
 }

@@ -11,8 +11,7 @@ import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * This class implements the standard openTCS kernel when it's shut down.
@@ -30,19 +29,16 @@ public class KernelStateShutdown
   /**
    * Creates a new StandardKernelShutdownState.
    *
-   * @param globalSyncObject The kernel threads' global synchronization object
-   * @param objectPool The object pool to be used.
-   * @param model The model to be used.
+   * @param globalSyncObject The kernel threads' global synchronization object.
+   * @param plantModelManager The plant model manager to be used.
    * @param modelPersister The model persister to be used.
    */
   @Inject
   public KernelStateShutdown(@GlobalSyncObject Object globalSyncObject,
-                             TCSObjectPool objectPool,
-                             Model model,
+                             PlantModelManager plantModelManager,
                              ModelPersister modelPersister) {
     super(globalSyncObject,
-          objectPool,
-          model,
+          plantModelManager,
           modelPersister);
   }
 

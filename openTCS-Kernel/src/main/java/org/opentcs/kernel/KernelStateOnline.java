@@ -8,8 +8,7 @@
 package org.opentcs.kernel;
 
 import org.opentcs.kernel.persistence.ModelPersister;
-import org.opentcs.kernel.workingset.Model;
-import org.opentcs.kernel.workingset.TCSObjectPool;
+import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * The base class for the kernel's online states.
@@ -28,17 +27,15 @@ public abstract class KernelStateOnline
    * Creates a new instance.
    *
    * @param globalSyncObject The kernel threads' global synchronization object.
-   * @param objectPool The object pool to be used.
-   * @param model The model to be used.
+   * @param plantModelManager The plant model manager to be used.
    * @param modelPersister The model persister to be used.
    * @param saveModelOnTerminate Whether to save the model when this state is terminated.
    */
   public KernelStateOnline(Object globalSyncObject,
-                           TCSObjectPool objectPool,
-                           Model model,
+                           PlantModelManager plantModelManager,
                            ModelPersister modelPersister,
                            boolean saveModelOnTerminate) {
-    super(globalSyncObject, objectPool, model, modelPersister);
+    super(globalSyncObject, plantModelManager, modelPersister);
     this.saveModelOnTerminate = saveModelOnTerminate;
   }
 
@@ -52,7 +49,7 @@ public abstract class KernelStateOnline
   private void savePlantModel()
       throws IllegalStateException {
     synchronized (getGlobalSyncObject()) {
-      getModelPersister().saveModel(getModel().createPlantModelCreationTO());
+      getModelPersister().saveModel(getPlantModelManager().createPlantModelCreationTO());
     }
   }
 }
