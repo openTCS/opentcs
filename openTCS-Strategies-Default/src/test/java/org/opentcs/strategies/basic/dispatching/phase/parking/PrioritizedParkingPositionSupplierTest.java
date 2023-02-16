@@ -11,10 +11,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -37,10 +38,7 @@ public class PrioritizedParkingPositionSupplierTest {
   private Router router;
   private ParkingPositionToPriorityFunction priorityFunction;
 
-  public PrioritizedParkingPositionSupplierTest() {
-  }
-
-  @Before
+  @BeforeEach
   public void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
@@ -65,7 +63,7 @@ public class PrioritizedParkingPositionSupplierTest {
     when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue("expected a prioritized parking position to be present", result.isPresent());
+    assertTrue(result.isPresent());
     assertEquals(point3, result.get());
   }
 
@@ -88,7 +86,7 @@ public class PrioritizedParkingPositionSupplierTest {
     when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue("expected a prioritized parking position to be present", result.isPresent());
+    assertTrue(result.isPresent());
     assertEquals(point3, result.get());
   }
 
@@ -112,7 +110,7 @@ public class PrioritizedParkingPositionSupplierTest {
     when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue("expected a prioritized parking position to be present", result.isPresent());
+    assertTrue(result.isPresent());
     assertEquals(point3, result.get());
   }
 
@@ -135,7 +133,7 @@ public class PrioritizedParkingPositionSupplierTest {
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertFalse("expected no prioritized parking position to be present", result.isPresent());
+    assertFalse(result.isPresent());
   }
 
   @Test
@@ -157,7 +155,7 @@ public class PrioritizedParkingPositionSupplierTest {
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertFalse("expected no prioritized parking position to be present", result.isPresent());
+    assertFalse(result.isPresent());
   }
 
   @Test
@@ -175,7 +173,7 @@ public class PrioritizedParkingPositionSupplierTest {
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertFalse("expected no prioritized parking position to be present", result.isPresent());
+    assertFalse(result.isPresent());
   }
 
   @SuppressWarnings("unchecked")

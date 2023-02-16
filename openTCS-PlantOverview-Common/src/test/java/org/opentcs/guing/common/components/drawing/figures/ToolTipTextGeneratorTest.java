@@ -10,7 +10,8 @@ package org.opentcs.guing.common.components.drawing.figures;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.model.elements.VehicleModel;
@@ -26,7 +27,7 @@ public class ToolTipTextGeneratorTest {
 
   private ToolTipTextGenerator toolTipTextGenerator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     modelManager = Mockito.mock(ModelManager.class);
     toolTipTextGenerator = new ToolTipTextGenerator(modelManager);

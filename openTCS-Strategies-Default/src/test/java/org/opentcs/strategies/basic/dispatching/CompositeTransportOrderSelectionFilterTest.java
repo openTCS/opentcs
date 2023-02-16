@@ -14,8 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
@@ -41,7 +42,7 @@ public class CompositeTransportOrderSelectionFilterTest {
   public CompositeTransportOrderSelectionFilterTest() {
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     transportOrders = new ArrayList<>();
     transportOrders.add(createTransportOrder(NAME_TRANSPORT));

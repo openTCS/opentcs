@@ -8,7 +8,8 @@
 package org.opentcs.documentation;
 
 import java.util.Collections;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -34,7 +35,7 @@ public class WithdrawTransportOrderTest {
   private TCSObjectService objService;
   private Vehicle vehicle;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     dispService = mock(DispatcherService.class);
     objService = mock(TCSObjectService.class);

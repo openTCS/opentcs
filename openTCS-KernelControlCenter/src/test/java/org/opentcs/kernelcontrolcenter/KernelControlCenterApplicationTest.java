@@ -7,7 +7,10 @@
  */
 package org.opentcs.kernelcontrolcenter;
 
-import org.junit.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -52,7 +55,7 @@ public class KernelControlCenterApplicationTest {
    */
   private KernelControlCenterConfiguration configuration;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     eventBus = mock(EventBus.class);
     portalManager = mock(PortalManager.class);
@@ -71,7 +74,7 @@ public class KernelControlCenterApplicationTest {
     application.initialize();
     application.initialize();
 
-    Assert.assertTrue("Control center is not initialized", application.isInitialized());
+    assertTrue(application.isInitialized());
     verify(controlCenter, times(1)).initialize();
     verify(portalManager, times(1)).connect(any());
     verify(application, times(1)).online(anyBoolean());
@@ -84,7 +87,7 @@ public class KernelControlCenterApplicationTest {
     application.terminate();
     application.terminate();
 
-    Assert.assertFalse("Control center is initialized", application.isInitialized());
+    assertFalse(application.isInitialized());
     verify(controlCenter, times(1)).terminate();
     verify(application, times(1)).offline();
   }
@@ -97,8 +100,8 @@ public class KernelControlCenterApplicationTest {
     application.online(true);
     application.online(true);
 
-    Assert.assertTrue("Control center is not initialized", application.isInitialized());
-    Assert.assertTrue("Control center is not online", application.isOnline());
+    assertTrue(application.isInitialized());
+    assertTrue(application.isOnline());
     verify(controlCenter, times(1)).initialize();
     verify(portalManager, times(1)).connect(any());
   }

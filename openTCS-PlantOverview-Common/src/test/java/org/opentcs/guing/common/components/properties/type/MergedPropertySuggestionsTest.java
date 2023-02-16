@@ -11,8 +11,10 @@ import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.plantoverview.PropertySuggestions;
 
 /**
@@ -25,7 +27,7 @@ public class MergedPropertySuggestionsTest {
   private PropertySuggestions instance2;
   private PropertySuggestions emptyInstance;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     emptyInstance = new PropertySuggestionsImpl();
 

@@ -9,7 +9,9 @@ package org.opentcs.documentation;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -38,7 +40,7 @@ public class ReceiveCommAdapterMessageTest {
 
   private TransportOrder sampleTransportOrder;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     objService = mock(TCSObjectService.class);
     sampleVehicle = createSampleVehicle();
@@ -60,7 +62,7 @@ public class ReceiveCommAdapterMessageTest {
     // Get the actual property you're looking for
     String property = vehicle.getProperty("someKey");
     // end::documentation_receiveMessageFromVehicle[]
-    Assert.assertEquals("someValue", property);
+    assertEquals("someValue", property);
   }
 
   @Test
@@ -76,7 +78,7 @@ public class ReceiveCommAdapterMessageTest {
     // Get the actual property you're looking for
     String property = transportOrder.getProperty("someKey");
     // end::documentation_receiveMessageFromTransportOrder[]
-    Assert.assertEquals("someValue", property);
+    assertEquals("someValue", property);
   }
 
   private TransportOrder createSampleTransportOrder() {

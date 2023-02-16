@@ -5,10 +5,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-/*
- *
- * Created on September 20, 2006, 9:21 AM
- */
 package org.opentcs.kernel;
 
 import com.google.inject.Provider;
@@ -16,8 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,7 +40,7 @@ public class StandardKernelTest {
   private KernelState kernelStateModelling;
   private KernelState kernelStateOperating;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // Build a map of providers for our mocked state objects.
     Map<Kernel.State, Provider<KernelState>> stateMap = new HashMap<>();

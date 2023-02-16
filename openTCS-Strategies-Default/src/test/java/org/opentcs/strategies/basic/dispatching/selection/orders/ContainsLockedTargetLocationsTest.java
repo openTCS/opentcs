@@ -12,8 +12,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -47,7 +49,7 @@ public class ContainsLockedTargetLocationsTest {
    */
   private Map<TCSObjectReference<?>, TCSObject<?>> localObjectPool;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     localObjectPool = new HashMap<>();
     objectService = mock(TCSObjectService.class);

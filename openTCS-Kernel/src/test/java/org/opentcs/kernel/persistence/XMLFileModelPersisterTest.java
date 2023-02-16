@@ -9,8 +9,9 @@ package org.opentcs.kernel.persistence;
 
 import java.io.File;
 import java.io.IOException;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -56,7 +57,7 @@ public class XMLFileModelPersisterTest {
   @Captor
   private ArgumentCaptor<File> fileCaptor;
 
-  @Before
+  @BeforeEach
   public void setUp()
       throws IOException {
     modelParser = mock(ModelParser.class);

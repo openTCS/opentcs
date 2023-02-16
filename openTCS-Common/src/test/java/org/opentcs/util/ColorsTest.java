@@ -8,8 +8,8 @@
 package org.opentcs.util;
 
 import java.awt.Color;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  *

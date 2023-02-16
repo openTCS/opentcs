@@ -7,7 +7,9 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import org.junit.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
@@ -42,7 +44,7 @@ public class StandardVehicleManagerPoolTest {
    */
   private LocalVehicleControllerPool vehManagerPool;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     vehicleService = mock(InternalVehicleService.class);
     commAdapter = mock(VehicleCommAdapter.class);
@@ -50,24 +52,28 @@ public class StandardVehicleManagerPoolTest {
                                                       new MockedVehicleManagerFactory());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testThrowsNPEIfVehicleNameIsNull() {
-    vehManagerPool.attachVehicleController(null, commAdapter);
+    assertThrows(NullPointerException.class,
+                 () -> vehManagerPool.attachVehicleController(null, commAdapter));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testThrowsNPEIfCommAdapterIsNull() {
-    vehManagerPool.attachVehicleController(A_VEHICLE_NAME, null);
+    assertThrows(NullPointerException.class,
+                 () -> vehManagerPool.attachVehicleController(A_VEHICLE_NAME, null));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testThrowsExceptionForUnknownVehicleName() {
-    vehManagerPool.attachVehicleController(UNKNOWN_VEHICLE_NAME, commAdapter);
+    assertThrows(IllegalArgumentException.class,
+                 () -> vehManagerPool.attachVehicleController(UNKNOWN_VEHICLE_NAME, commAdapter));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testThrowsNPEIfDetachingNullVehicleName() {
-    vehManagerPool.detachVehicleController(null);
+    assertThrows(NullPointerException.class,
+                 () -> vehManagerPool.detachVehicleController(null));
   }
 
   /**

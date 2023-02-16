@@ -7,7 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,7 @@ public class ImplicitDispatchTriggerTest {
 
   private ImplicitDispatchTrigger listener;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     dispatcher = mock(Dispatcher.class);
     listener = new ImplicitDispatchTrigger(dispatcher);

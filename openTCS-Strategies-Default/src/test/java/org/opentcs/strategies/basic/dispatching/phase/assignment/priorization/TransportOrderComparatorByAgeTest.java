@@ -15,7 +15,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByAge;
 
@@ -27,7 +28,7 @@ public class TransportOrderComparatorByAgeTest {
 
   private TransportOrderComparatorByAge comparator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     comparator = new TransportOrderComparatorByAge();
   }

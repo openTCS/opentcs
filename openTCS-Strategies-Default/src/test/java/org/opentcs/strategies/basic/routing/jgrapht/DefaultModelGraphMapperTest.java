@@ -10,9 +10,10 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.jgrapht.Graph;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,7 +45,7 @@ public class DefaultModelGraphMapperTest {
   private ShortestPathConfiguration configuration;
   private DefaultModelGraphMapper mapper;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     pointA = new Point("A");
     pointB = new Point("B");
@@ -78,9 +79,8 @@ public class DefaultModelGraphMapperTest {
     Graph<String, Edge> graph = mapper.translateModel(new HashSet<>(),
                                                       new HashSet<>(),
                                                       vehicle);
-
-    assertEquals("Number of vertices", 0, graph.vertexSet().size());
-    assertEquals("Number of edges", 0, graph.edgeSet().size());
+    assertEquals(0, graph.vertexSet().size());
+    assertEquals(0, graph.edgeSet().size());
     verify(evaluator).onGraphComputationStart(vehicle);
     verify(evaluator).onGraphComputationEnd(vehicle);
   }
@@ -94,12 +94,12 @@ public class DefaultModelGraphMapperTest {
                                 new HashSet<>(),
                                 vehicle);
 
-    assertEquals("Number of vertices", 4, graph.vertexSet().size());
+    assertEquals(4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
     assertTrue(graph.vertexSet().contains(pointC.getName()));
     assertTrue(graph.vertexSet().contains(pointD.getName()));
-    assertEquals("Number of edges", 0, graph.edgeSet().size());
+    assertEquals(0, graph.edgeSet().size());
     verify(evaluator).onGraphComputationStart(vehicle);
     verify(evaluator).onGraphComputationEnd(vehicle);
   }
@@ -113,14 +113,13 @@ public class DefaultModelGraphMapperTest {
                                 new HashSet<>(Arrays.asList(pathAB)),
                                 vehicle);
 
-    assertEquals("Number of vertices", 4, graph.vertexSet().size());
+    assertEquals(4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
     assertTrue(graph.vertexSet().contains(pointC.getName()));
     assertTrue(graph.vertexSet().contains(pointD.getName()));
-    assertEquals("Number of edges", 1, graph.edgeSet().size());
-    assertEquals("Forward edges for path " + pathAB.getName(),
-                 1,
+    assertEquals(1, graph.edgeSet().size());
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathAB.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
@@ -138,20 +137,18 @@ public class DefaultModelGraphMapperTest {
                                 new HashSet<>(Arrays.asList(pathAD)),
                                 vehicle);
 
-    assertEquals("Number of vertices", 4, graph.vertexSet().size());
+    assertEquals(4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
     assertTrue(graph.vertexSet().contains(pointC.getName()));
     assertTrue(graph.vertexSet().contains(pointD.getName()));
-    assertEquals("Number of edges", 2, graph.edgeSet().size());
-    assertEquals("Forward edges for path " + pathAD.getName(),
-                 1,
+    assertEquals(2, graph.edgeSet().size());
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
-    assertEquals("Reverse edges for path " + pathAD.getName(),
-                 1,
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> edge.isTravellingReverse())
@@ -169,38 +166,33 @@ public class DefaultModelGraphMapperTest {
                                 new HashSet<>(Arrays.asList(pathAB, pathBC, pathCD, pathAD)),
                                 vehicle);
 
-    assertEquals("Number of vertices", 4, graph.vertexSet().size());
+    assertEquals(4, graph.vertexSet().size());
     assertTrue(graph.vertexSet().contains(pointA.getName()));
     assertTrue(graph.vertexSet().contains(pointB.getName()));
     assertTrue(graph.vertexSet().contains(pointC.getName()));
     assertTrue(graph.vertexSet().contains(pointD.getName()));
-    assertEquals("Number of edges", 5, graph.edgeSet().size());
-    assertEquals("Forward edges for path " + pathAB.getName(),
-                 1,
+    assertEquals(5, graph.edgeSet().size());
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathAB.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
-    assertEquals("Forward edges for path " + pathBC.getName(),
-                 1,
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathBC.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
-    assertEquals("Forward edges for path " + pathCD.getName(),
-                 1,
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathCD.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
-    assertEquals("Forward edges for path " + pathAD.getName(),
-                 1,
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> !edge.isTravellingReverse())
                      .count());
-    assertEquals("Reverse edges for path " + pathAD.getName(),
-                 1,
+    assertEquals(1,
                  graph.edgeSet().stream()
                      .filter(edge -> edge.getPath().getName().equals(pathAD.getName()))
                      .filter(edge -> edge.isTravellingReverse())

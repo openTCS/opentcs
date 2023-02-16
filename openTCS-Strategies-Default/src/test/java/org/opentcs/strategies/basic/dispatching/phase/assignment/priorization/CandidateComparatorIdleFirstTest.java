@@ -15,7 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
@@ -32,7 +33,7 @@ public class CandidateComparatorIdleFirstTest {
 
   private CandidateComparatorIdleFirst comparator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     comparator = new CandidateComparatorIdleFirst();
   }

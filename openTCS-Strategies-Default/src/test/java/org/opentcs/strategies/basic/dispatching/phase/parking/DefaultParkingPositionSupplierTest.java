@@ -13,9 +13,11 @@ import java.util.Optional;
 import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -38,7 +40,7 @@ public class DefaultParkingPositionSupplierTest {
   private Vehicle vehicle;
   private DefaultParkingPositionSupplier supplier;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
@@ -46,7 +48,7 @@ public class DefaultParkingPositionSupplierTest {
     supplier = new DefaultParkingPositionSupplier(plantModelService, router);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     supplier.terminate();
   }
@@ -95,7 +97,7 @@ public class DefaultParkingPositionSupplierTest {
     when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue("expected a parking position to be present", result.isPresent());
+    assertTrue(result.isPresent());
     assertEquals(point3, result.get());
   }
 

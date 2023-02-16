@@ -7,12 +7,13 @@
  */
 package org.opentcs.virtualvehicle;
 
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -50,28 +51,28 @@ public class VelocityControllerTest {
     assertNull(controller.getCurrentWayEntry());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testAddNullVelocityListenerShouldThrowException() {
     VelocityController controller
         = new VelocityController(MAX_DECEL, MAX_ACCEL,
                                  MAX_REV_VELO, MAX_FWD_VELO);
-    controller.addVelocityListener(null);
+    assertThrows(NullPointerException.class, () -> controller.addVelocityListener(null));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testAddNullWayEntryShouldThrowException() {
     VelocityController controller
         = new VelocityController(MAX_DECEL, MAX_ACCEL,
                                  MAX_REV_VELO, MAX_FWD_VELO);
-    controller.addWayEntry(null);
+    assertThrows(NullPointerException.class, () -> controller.addWayEntry(null));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testNegativeAdvanceTimeShouldThrowException() {
     VelocityController controller
         = new VelocityController(MAX_DECEL, MAX_ACCEL,
                                  MAX_REV_VELO, MAX_FWD_VELO);
-    controller.advanceTime(-1);
+    assertThrows(IllegalArgumentException.class, () -> controller.advanceTime(-1));
   }
 
   @Test

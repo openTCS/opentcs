@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -42,7 +43,7 @@ public class EdgeEvaluatorCompositeTest {
   private ShortestPathConfiguration configuration;
   private final Map<String, EdgeEvaluator> evaluators = new HashMap<>();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Point srcPoint = new Point("srcPoint");
     Point dstPoint = new Point("dstPoint");

@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
-import org.junit.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import spark.Request;
@@ -24,7 +25,7 @@ public class AuthenticatorTest {
 
   private Authenticator authenticator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     configuration = mock(ServiceWebApiConfiguration.class);
     authenticator = new Authenticator(configuration);

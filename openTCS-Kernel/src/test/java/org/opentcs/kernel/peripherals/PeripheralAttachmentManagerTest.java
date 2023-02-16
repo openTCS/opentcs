@@ -13,8 +13,9 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -68,16 +69,12 @@ public class PeripheralAttachmentManagerTest {
     location = createLocation(LOCATION_NAME);
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Set<Location> locations = new HashSet<>();
     locations.add(location);
     when(peripheralService.fetchObjects(Location.class)).thenReturn(locations);
     when(peripheralService.fetchObject(any(), eq(location.getReference()))).thenReturn(location);
-  }
-
-  @After
-  public void tearDown() {
   }
 
   @Test

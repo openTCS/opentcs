@@ -11,7 +11,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.data.model.Point;
 
@@ -23,7 +24,7 @@ public class ParkingPositionPriorityComparatorTest {
 
   private ParkingPositionPriorityComparator comparator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     comparator = new ParkingPositionPriorityComparator(new ParkingPositionToPriorityFunction());
   }

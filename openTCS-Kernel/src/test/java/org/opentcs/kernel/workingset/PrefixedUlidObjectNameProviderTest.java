@@ -15,7 +15,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.CreationTO;
 
 /**
@@ -27,7 +28,7 @@ public class PrefixedUlidObjectNameProviderTest {
 
   private PrefixedUlidObjectNameProvider nameProvider;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     this.nameProvider = new PrefixedUlidObjectNameProvider();
   }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Point;

@@ -17,7 +17,8 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -39,7 +40,7 @@ public class CompositeVehicleCandidateComparatorTest {
   private DefaultDispatcherConfiguration configuration;
   private Map<String, Comparator<AssignmentCandidate>> availableComparators;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     availableComparators = new HashMap<>();

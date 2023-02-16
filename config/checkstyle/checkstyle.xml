@@ -203,7 +203,6 @@
     </module>
 
     <module name="AvoidStarImport">
-      <property name="excludes" value="org.junit,org.junit.Assert,org.junit.jupiter.params,org.junit.jupiter.params.provider"/>
       <property name="severity" value="warning"/>
     </module>
 

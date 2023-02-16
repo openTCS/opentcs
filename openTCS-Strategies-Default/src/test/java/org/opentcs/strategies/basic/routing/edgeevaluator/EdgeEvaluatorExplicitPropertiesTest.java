@@ -9,7 +9,8 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Router;
@@ -28,7 +29,7 @@ public class EdgeEvaluatorExplicitPropertiesTest {
 
   private ExplicitPropertiesConfiguration configuration;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     configuration = mock(ExplicitPropertiesConfiguration.class);
     edgeEvaluator = new EdgeEvaluatorExplicitProperties(configuration);

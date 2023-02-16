@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty.Unit;
 import org.opentcs.guing.base.model.AbstractModelComponent;
 

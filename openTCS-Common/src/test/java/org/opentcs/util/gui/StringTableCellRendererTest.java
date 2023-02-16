@@ -13,7 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 
@@ -25,7 +26,7 @@ public class StringTableCellRendererTest {
 
   private StringTableCellRenderer<TCSObjectReference<?>> renderer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     renderer = new StringTableCellRenderer<>(x -> x == null ? "" : x.getName());
   }

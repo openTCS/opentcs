@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,7 @@ public class CreateTransportOrderSequenceTest {
   private TransportOrderService orderService;
   private DispatcherService dispService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     orderService = mock(InternalTransportOrderService.class);
     dispService = mock(DispatcherService.class);

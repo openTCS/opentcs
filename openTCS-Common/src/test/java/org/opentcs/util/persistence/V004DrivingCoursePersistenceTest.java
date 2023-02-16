@@ -19,8 +19,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.junit.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 import org.opentcs.util.persistence.v004.AllowedOperationTO;
 import org.opentcs.util.persistence.v004.BlockTO;
 import org.opentcs.util.persistence.v004.LocationTO;
@@ -45,9 +45,6 @@ import org.xml.sax.SAXException;
 public class V004DrivingCoursePersistenceTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(V004DrivingCoursePersistenceTest.class);
-
-  public V004DrivingCoursePersistenceTest() {
-  }
 
   @Test
   public void testToXml()

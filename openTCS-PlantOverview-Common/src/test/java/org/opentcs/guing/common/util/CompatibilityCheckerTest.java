@@ -9,7 +9,7 @@ package org.opentcs.guing.common.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  *

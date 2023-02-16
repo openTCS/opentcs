@@ -9,8 +9,9 @@ package org.opentcs.guing.common.components.properties.table;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty.Unit;
@@ -33,7 +34,7 @@ public class QuantityCellEditorTest {
   public QuantityCellEditorTest() {
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     textField = new JTextField();
     lp = new LengthProperty(mock(ModelComponent.class), 10, LengthProperty.Unit.CM);

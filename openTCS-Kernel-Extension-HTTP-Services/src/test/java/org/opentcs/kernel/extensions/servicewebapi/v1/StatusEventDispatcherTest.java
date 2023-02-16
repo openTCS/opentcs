@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.data.TCSObjectEvent;
@@ -33,7 +34,7 @@ public class StatusEventDispatcherTest {
 
   private StatusEventDispatcher statusEventDispatcher;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     configuration = mock(ServiceWebApiConfiguration.class);
     eventSource = new SimpleEventBus();

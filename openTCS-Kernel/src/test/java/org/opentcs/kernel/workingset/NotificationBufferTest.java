@@ -5,15 +5,12 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-/*
- *
- * Created on May 19, 2006, 11:48 AM
- */
 package org.opentcs.kernel.workingset;
 
 import java.util.List;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.util.event.SimpleEventBus;
 
@@ -33,15 +30,10 @@ public class NotificationBufferTest {
    */
   private NotificationBuffer testBuffer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     testBuffer = new NotificationBuffer(new SimpleEventBus());
     testBuffer.setCapacity(CAPACITY);
-  }
-
-  @After
-  public void tearDown() {
-    testBuffer = null;
   }
 
   /**

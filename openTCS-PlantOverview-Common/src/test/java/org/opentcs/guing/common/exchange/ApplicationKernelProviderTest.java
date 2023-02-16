@@ -7,7 +7,9 @@
  */
 package org.opentcs.guing.common.exchange;
 
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -42,7 +44,7 @@ public class ApplicationKernelProviderTest {
    */
   private SharedKernelServicePortalProvider portalProvider;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     portalManager = mock(PortalManager.class);
     dialog = mock(ConnectToServerDialog.class);
@@ -51,7 +53,7 @@ public class ApplicationKernelProviderTest {
                                                    appConfig);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void shouldConnectOnClientRegistration() {
     when(portalManager.isConnected()).thenReturn(false, false, true);
@@ -62,7 +64,7 @@ public class ApplicationKernelProviderTest {
     verify(dialog).setVisible(true);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void shouldNotConnectIfAlreadyConnected() {
     when(portalManager.isConnected()).thenReturn(true);

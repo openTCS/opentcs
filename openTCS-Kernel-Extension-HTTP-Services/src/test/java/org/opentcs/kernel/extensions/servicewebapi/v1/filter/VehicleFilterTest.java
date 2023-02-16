@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.filter;
 
-import org.junit.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Vehicle;
 
 /**
@@ -25,7 +26,7 @@ public class VehicleFilterTest {
   public VehicleFilterTest() {
   }
 
-  @Before
+  @BeforeEach
   @SuppressWarnings("deprecation")
   public void setUp() {
     vehicle1 = new Vehicle("Vehicle-001")

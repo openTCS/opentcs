@@ -17,10 +17,11 @@ import static org.hamcrest.Matchers.empty;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -43,7 +44,7 @@ public class ShortestPathPointRouterTest {
 
   private ShortestPathPointRouter pointRouter;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     pointA = new Point("A");
     pointB = new Point("B");

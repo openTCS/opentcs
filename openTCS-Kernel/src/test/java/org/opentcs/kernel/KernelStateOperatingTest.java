@@ -13,7 +13,8 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import javax.annotation.Nonnull;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -71,7 +72,7 @@ public class KernelStateOperatingTest {
 
   private InternalVehicleService vehicleService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     objectID = 0;
     objectPool = mock(TCSObjectRepository.class);

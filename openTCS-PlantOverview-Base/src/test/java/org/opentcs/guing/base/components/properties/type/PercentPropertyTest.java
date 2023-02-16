@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.model.AbstractModelComponent;
 
 /**

@@ -15,7 +15,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
 import org.opentcs.data.order.TransportOrder;
@@ -32,7 +33,7 @@ public class TransportOrderComparatorDeadlineAtRiskFirstTest {
 
   private DefaultDispatcherConfiguration configuration;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     when(configuration.deadlineAtRiskPeriod()).thenReturn(Long.valueOf(60 * 60 * 1000));

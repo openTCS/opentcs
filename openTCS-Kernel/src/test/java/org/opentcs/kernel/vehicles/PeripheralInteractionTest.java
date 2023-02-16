@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -70,7 +71,7 @@ public class PeripheralInteractionTest {
   public PeripheralInteractionTest() {
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     peripheralJobService = mock(PeripheralJobService.class);
     succeededCallback = mock(Runnable.class);

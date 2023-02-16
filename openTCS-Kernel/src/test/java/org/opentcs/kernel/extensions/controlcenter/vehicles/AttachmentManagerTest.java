@@ -14,8 +14,10 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.*;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -85,7 +87,7 @@ public class AttachmentManagerTest {
                       RefusingCommAdapterFactory.class.getName());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Set<Vehicle> vehicles = new HashSet<>();
     vehicles.add(vehicle1);
@@ -98,7 +100,7 @@ public class AttachmentManagerTest {
     }
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     attachmentManager.terminate();
   }

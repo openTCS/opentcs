@@ -13,7 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -89,7 +92,7 @@ public class ModelValidatorTest {
    */
   private Map<String, ModelComponent> components;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     model = mock(SystemModel.class);
     validator = new ModelValidator();
@@ -108,24 +111,16 @@ public class ModelValidatorTest {
     });
   }
 
-  @After
-  public void tearDown() {
-
-  }
-
   @Test
   public void shouldInvalidateIfNull() {
-    Assert.assertFalse("Validator said valid for null input as model object.",
-                       validator.isValidWith(model, null));
+    assertFalse(validator.isValidWith(model, null));
 
-    Assert.assertFalse("Validator said valid for null input as system model.",
-                       validator.isValidWith(null, mock(ModelComponent.class)));
+    assertFalse(validator.isValidWith(null, mock(ModelComponent.class)));
   }
 
   @Test
   public void shouldInvalidateWhenEmptyName() {
-    Assert.assertFalse("Validator said valid for empty component name",
-                       validator.isValidWith(model, createComponentWithName(ModelComponent.class, "")));
+    assertFalse(validator.isValidWith(model, createComponentWithName(ModelComponent.class, "")));
   }
 
   @Test
@@ -134,24 +129,23 @@ public class ModelValidatorTest {
     components.put(POINT_NAME, component);
     when(model.getModelComponent(POINT_NAME)).thenReturn(component);
 
-    Assert.assertFalse("Validator said valid for duplicate names in the components list",
-                       validator.isValidWith(model, createComponentWithName(ModelComponent.class, POINT_NAME)));
+    assertFalse(
+        validator.isValidWith(model, createComponentWithName(ModelComponent.class, POINT_NAME))
+    );
   }
 
   @Test
   public void testPointNegativeOrientationAngle() {
     PointModel point = createPointModel(POINT_NAME);
     addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, -5d);
-    Assert.assertTrue("Validator said invalid for negative orientation angle.",
-                      validator.isValidWith(model, point));
+    assertTrue(validator.isValidWith(model, point));
   }
 
   @Test
   public void testPathNegativeLength() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     addProperty(path, LengthProperty.class, PathModel.LENGTH, -5d);
-    Assert.assertFalse("Validator said valid for negative path length.",
-                       validator.isValidWith(model, path));
+    assertFalse(validator.isValidWith(model, path));
   }
 
   @Test
@@ -159,8 +153,7 @@ public class ModelValidatorTest {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
     components.remove(POINT_NAME);
-    Assert.assertFalse("Validator said valid for invalid start point.",
-                       validator.isValidWith(model, path));
+    assertFalse(validator.isValidWith(model, path));
   }
 
   @Test
@@ -168,8 +161,7 @@ public class ModelValidatorTest {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     components.remove(POINT_NAME_2);
-    Assert.assertFalse("Validator said valid for invalid end point.",
-                       validator.isValidWith(model, path));
+    assertFalse(validator.isValidWith(model, path));
   }
 
   @Test
@@ -177,39 +169,34 @@ public class ModelValidatorTest {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
-    Assert.assertTrue("Validator said invalid for valid path model.",
-                      validator.isValidWith(model, path));
+    assertTrue(validator.isValidWith(model, path));
   }
 
   @Test
   public void testLocationInvalidType() {
     LocationModel location = createLocation(LOCATION_NAME);
     components.remove(LOCATION_TYPE_NAME);
-    Assert.assertFalse("Validator said valid for invalid location type.",
-                       validator.isValidWith(model, location));
+    assertFalse(validator.isValidWith(model, location));
   }
 
   @Test
   public void testLocationValid() {
     LocationModel location = createLocation(LOCATION_NAME);
-    Assert.assertTrue("Validator said invalid for valid location model.",
-                      validator.isValidWith(model, location));
+    assertTrue(validator.isValidWith(model, location));
   }
 
   @Test
   public void testLinkInvalidEndPoint() {
     LinkModel link = createLink(LINK_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
-    Assert.assertFalse("Validator said valid for missing end point.",
-                       validator.isValidWith(model, link));
+    assertFalse(validator.isValidWith(model, link));
   }
 
   @Test
   public void testLinkInvalidStartPoint() {
     LinkModel link = createLink(LINK_NAME);
     when(model.getModelComponent(LOCATION_NAME)).thenReturn(components.get(LOCATION_NAME));
-    Assert.assertFalse("Validator said valid for missing start point.",
-                       validator.isValidWith(model, link));
+    assertFalse(validator.isValidWith(model, link));
   }
 
   @Test
@@ -217,16 +204,14 @@ public class ModelValidatorTest {
     LinkModel link = createLink(LINK_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     when(model.getModelComponent(LOCATION_NAME)).thenReturn(components.get(LOCATION_NAME));
-    Assert.assertTrue("Validator said invalid for valid link model.",
-                      validator.isValidWith(model, link));
+    assertTrue(validator.isValidWith(model, link));
   }
 
   @Test
   public void testVehicleInvalidNextPosition() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
-    Assert.assertFalse("Validator said valid for invalid vehicle model.",
-                       validator.isValidWith(model, vehicle));
+    assertFalse(validator.isValidWith(model, vehicle));
   }
 
   @Test
@@ -234,8 +219,7 @@ public class ModelValidatorTest {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, "null");
     addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, "null");
-    Assert.assertTrue("Validator said invalid for valid vehicle model.",
-                      validator.isValidWith(model, vehicle));
+    assertTrue(validator.isValidWith(model, vehicle));
   }
 
   @Test
@@ -243,8 +227,7 @@ public class ModelValidatorTest {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
-    Assert.assertTrue("Validator said invalid for valid vehicle model.",
-                      validator.isValidWith(model, vehicle));
+    assertTrue(validator.isValidWith(model, vehicle));
   }
 
   /**

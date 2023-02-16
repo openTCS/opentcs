@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
-import org.junit.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -23,13 +24,9 @@ public class EdgeEvaluatorTravelTimeTest {
 
   private EdgeEvaluatorTravelTime edgeEvaluator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     edgeEvaluator = new EdgeEvaluatorTravelTime();
-  }
-
-  @After
-  public void tearDown() {
   }
 
   @Test

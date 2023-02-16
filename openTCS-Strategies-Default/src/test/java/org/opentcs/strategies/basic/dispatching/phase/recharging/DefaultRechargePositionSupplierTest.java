@@ -15,8 +15,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import org.junit.*;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Dispatcher;
@@ -48,14 +50,14 @@ public class DefaultRechargePositionSupplierTest {
    */
   private DefaultRechargePositionSupplier rechargePosSupplier;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     rechargePosSupplier = new DefaultRechargePositionSupplier(plantModelService, router);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     rechargePosSupplier.terminate();
   }

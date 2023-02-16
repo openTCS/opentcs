@@ -9,7 +9,8 @@ package org.opentcs.strategies.basic.routing;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -63,7 +64,7 @@ public class DefaultRouterTest {
    */
   private DefaultRouterConfiguration configuration;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     objectService = mock(TCSObjectService.class);
     builder = mock(PointRouterFactory.class);

@@ -10,9 +10,10 @@ package org.opentcs.strategies.basic.scheduling.modules;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -35,24 +36,17 @@ public class SingleVehicleBlockModuleTest {
   /**
    * The module to test.
    */
-  private final SingleVehicleBlockModule module;
+  private SingleVehicleBlockModule module;
 
-  private final ReservationPool reservationPool;
+  private ReservationPool reservationPool;
 
-  private final InternalPlantModelService plantModelService;
+  private InternalPlantModelService plantModelService;
 
-  public SingleVehicleBlockModuleTest() {
+  @BeforeEach
+  public void setUp() {
     reservationPool = mock(ReservationPool.class);
     plantModelService = mock(InternalPlantModelService.class);
     module = new SingleVehicleBlockModule(reservationPool, plantModelService, new Object());
-  }
-
-  @Before
-  public void setUp() {
-  }
-
-  @After
-  public void tearDown() {
   }
 
   @Test
