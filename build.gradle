@@ -87,12 +87,10 @@ task distSrcZip(type: Zip) {
   includes << 'gradle/**'
   includes << 'openTCS-*/**'
   includes << 'src/**'
-  includes << '.nb-gradle-properties'
   includes << '*.gradle'
   includes << 'gradlew'
   includes << 'gradlew.bat'
 
-  excludes << '.codeclimate.yml'
   excludes << '.gitlab'
   excludes << '.gitlab-ci.yml'
   excludes << '.gradle'
