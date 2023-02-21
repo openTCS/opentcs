@@ -14,6 +14,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
+import org.opentcs.components.kernel.PeripheralJobCleanupApproval;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
@@ -130,6 +131,15 @@ public abstract class KernelInjectionModule
    */
   protected Multibinder<OrderSequenceCleanupApproval> orderSequenceCleanupApprovalBinder() {
     return Multibinder.newSetBinder(binder(), OrderSequenceCleanupApproval.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register peripheral job cleanup approvals.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<PeripheralJobCleanupApproval> peripheralJobCleanupApprovalBinder() {
+    return Multibinder.newSetBinder(binder(), PeripheralJobCleanupApproval.class);
   }
 
   /**

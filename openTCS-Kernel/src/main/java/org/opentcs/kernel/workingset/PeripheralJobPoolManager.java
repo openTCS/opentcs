@@ -24,6 +24,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,6 +127,27 @@ public class PeripheralJobPoolManager
     emitObjectEvent(job,
                     previousState,
                     TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return job;
+  }
+
+  /**
+   * Removes the referenced peripheral job from the pool.
+   *
+   * @param ref A reference to the peripheral job to be removed.
+   * @return The removed peripheral job.
+   * @throws ObjectUnknownException If the referenced peripheral job is not in the pool.
+   */
+  public PeripheralJob removePeripheralJob(TCSObjectReference<PeripheralJob> ref)
+      throws ObjectUnknownException {
+    PeripheralJob job = getObjectRepo().getObject(PeripheralJob.class, ref);
+    // Make sure only jobs in a final state are removed.
+    checkArgument(job.getState().isFinalState(),
+                  "Peripheral job %s is not in a final state.",
+                  job.getName());
+    getObjectRepo().removeObject(ref);
+    emitObjectEvent(null,
+                    job,
+                    TCSObjectEvent.Type.OBJECT_REMOVED);
     return job;
   }
 

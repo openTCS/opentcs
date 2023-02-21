@@ -30,6 +30,6 @@ public interface OrderPoolConfiguration {
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The minimum age of orders to remove in a sweep (in ms).")
+      description = "The minimum age of orders or peripheral jobs to remove in a sweep (in ms).")
   int sweepAge();
 }

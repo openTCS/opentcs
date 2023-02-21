@@ -257,6 +257,7 @@ public class DefaultKernelInjectionModule
 
     transportOrderCleanupApprovalBinder();
     orderSequenceCleanupApprovalBinder();
+    peripheralJobCleanupApprovalBinder();
   }
 
   private void configureKernelStarterDependencies() {

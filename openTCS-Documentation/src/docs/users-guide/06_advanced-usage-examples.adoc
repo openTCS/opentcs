@@ -100,14 +100,14 @@ You can change this in the kernel's configuration file:
 
 === Configuring order pool cleanup
 
-By default, openTCS checks every minute for finished or failed transport orders that are older than 24 hours.
-These orders are removed from the pool.
+By default, openTCS checks every minute for finished or failed transport orders and peripheral jobs that are older than 24 hours.
+These orders and jobs are removed from the pool.
 To customize this behaviour, do the following:
 
 . Set the configuration entry `orderpool.sweepInterval` to a value according to your needs.
   The default value is 60.000 (milliseconds, corresponding to an interval of one minute).
-. Set the configuration entry `orderpool.sweepAge` to a maximum age of finished orders according to your needs.
-  The default value is 86.400.000 (milliseconds, corresponding to 24 hours that a finished order should be kept in the pool).
+. Set the configuration entry `orderpool.sweepAge` to a maximum age of finished orders and jobs according to your needs.
+  The default value is 86.400.000 (milliseconds, corresponding to 24 hours that a finished order or job should be kept in the pool).
 
 === Using model element properties for project-specific data
 
