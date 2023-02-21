@@ -34,6 +34,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Fix resource management for cases in which a vehicle's transport order was withdrawn while the vehicle was waiting for a resource allocation.
 ** Fix resource management / order processing for cases in which the plant model contains report points.
 ** Fix a bug where the btn:[menu:View[Reset window arrangement]] option in the Operations Desk application would not restore the peripheral job view.
+** Fix a bug in the `GET /events` web API endpoint where the type of individual events would not be included in the response.
 * Other changes:
 ** Update JAXB Runtime to 2.3.7.
 ** Update Jackson to 2.14.2.

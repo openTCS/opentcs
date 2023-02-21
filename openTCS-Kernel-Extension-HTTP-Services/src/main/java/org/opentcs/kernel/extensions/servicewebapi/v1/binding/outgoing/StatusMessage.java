@@ -7,6 +7,8 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.time.Instant;
 
 /**
@@ -14,6 +16,15 @@ import java.time.Instant;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type")
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = OrderStatusMessage.class, name = "TransportOrder"),
+  @JsonSubTypes.Type(value = VehicleStatusMessage.class, name = "Vehicle"),
+  @JsonSubTypes.Type(value = PeripheralJobStatusMessage.class, name = "PeripheralJob")
+})
 public abstract class StatusMessage {
 
   private long sequenceNumber;
