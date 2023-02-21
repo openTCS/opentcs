@@ -12,7 +12,4 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteract
 
 RUN npm install -g violations-command-line@1.21.0
 
-RUN adduser --gecos "" --disabled-password builder
-USER builder
-
 CMD ["/bin/bash"]

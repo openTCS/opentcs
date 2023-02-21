@@ -46,7 +46,7 @@ task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from 
 
 test {
   useJUnitPlatform()
-  ignoreFailures = true
+  // ignoreFailures = true
   systemProperties.put("java.awt.headless", "true")
 }
 
