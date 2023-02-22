@@ -20,11 +20,11 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.OrderStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessageList;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEventsResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.StatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
 import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
@@ -145,13 +145,13 @@ public class StatusEventDispatcher
    * @param timeout The maximum time to wait for events (in ms) if there currently aren't any.
    * @return A list of events within the given range.
    */
-  public StatusMessageList fetchEvents(long minSequenceNo, long maxSequenceNo, long timeout)
+  public GetEventsResponseTO fetchEvents(long minSequenceNo, long maxSequenceNo, long timeout)
       throws IllegalArgumentException {
     checkInRange(minSequenceNo, 0, Long.MAX_VALUE, "minSequenceNo");
     checkInRange(maxSequenceNo, minSequenceNo, Long.MAX_VALUE, "maxSequenceNo");
     checkInRange(timeout, 0, Long.MAX_VALUE, "timeout");
 
-    StatusMessageList result = new StatusMessageList();
+    GetEventsResponseTO result = new GetEventsResponseTO();
     synchronized (events) {
       Collection<StatusMessage> messages = events.subMap(minSequenceNo, maxSequenceNo).values();
       if (messages.isEmpty()) {

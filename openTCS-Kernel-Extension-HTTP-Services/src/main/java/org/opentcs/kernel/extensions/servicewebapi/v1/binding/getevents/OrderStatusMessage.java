@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -29,7 +30,7 @@ public class OrderStatusMessage
 
   private OrderState orderState;
 
-  private List<Destination> destinations = new ArrayList<>();
+  private List<DestinationState> destinations = new ArrayList<>();
 
   private List<Property> properties = new ArrayList<>();
 
@@ -63,11 +64,11 @@ public class OrderStatusMessage
     this.orderState = orderState;
   }
 
-  public List<Destination> getDestinations() {
+  public List<DestinationState> getDestinations() {
     return destinations;
   }
 
-  public void setDestinations(List<Destination> destinations) {
+  public void setDestinations(List<DestinationState> destinations) {
     this.destinations = destinations;
   }
 
@@ -95,7 +96,7 @@ public class OrderStatusMessage
         order.getProcessingVehicle() == null ? null : order.getProcessingVehicle().getName());
     orderMessage.setOrderState(OrderState.fromTransportOrderState(order.getState()));
     for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
-      orderMessage.getDestinations().add(Destination.fromDriveOrder(curDriveOrder));
+      orderMessage.getDestinations().add(DestinationState.fromDriveOrder(curDriveOrder));
     }
     for (Map.Entry<String, String> mapEntry : order.getProperties().entrySet()) {
       orderMessage.getProperties().add(new Property(mapEntry.getKey(), mapEntry.getValue()));

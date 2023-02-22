@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessageList;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEventsResponseTO;
 import org.opentcs.util.event.EventSource;
 import org.opentcs.util.event.SimpleEventBus;
 
@@ -45,7 +45,7 @@ public class StatusEventDispatcherTest {
   public void returnEmptyListIfThereWereNoEvents() {
     statusEventDispatcher.initialize();
 
-    StatusMessageList list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
+    GetEventsResponseTO list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
     assertThat(list.getStatusMessages(), is(empty()));
   }
 
@@ -63,7 +63,7 @@ public class StatusEventDispatcherTest {
       );
     }
 
-    StatusMessageList list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
+    GetEventsResponseTO list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
     assertThat(list.getStatusMessages().size(), is(capacity));
     assertThat(list.getStatusMessages().get(capacity - 1).getSequenceNumber(),
                is((long) eventCount - 1));
@@ -83,7 +83,7 @@ public class StatusEventDispatcherTest {
       );
     }
 
-    StatusMessageList list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
+    GetEventsResponseTO list = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
     assertThat(list.getStatusMessages().size(), is(eventCount));
     assertThat(list.getStatusMessages().get(eventCount - 1).getSequenceNumber(),
                is((long) eventCount - 1));

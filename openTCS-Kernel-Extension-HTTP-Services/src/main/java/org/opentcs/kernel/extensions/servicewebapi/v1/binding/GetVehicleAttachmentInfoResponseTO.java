@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -17,7 +17,7 @@ import org.opentcs.drivers.vehicle.management.AttachmentInformation;
  *
  * @author Sebastian Bonna (Fraunhofer IML)
  */
-public class AttachmentInformationTO {
+public class GetVehicleAttachmentInfoResponseTO {
 
   /**
    * The vehicle this attachment information belongs to.
@@ -32,7 +32,7 @@ public class AttachmentInformationTO {
    */
   private String attachedCommAdapter;
 
-  private AttachmentInformationTO() {
+  private GetVehicleAttachmentInfoResponseTO() {
   }
 
   public void setVehicleName(String vehicleName) {
@@ -65,12 +65,12 @@ public class AttachmentInformationTO {
    * @param attachmentInformation The <code>AttachmentInformation</code> to create an instance from.
    * @return A new instance containing the data from the given <code>AttachmentInformation</code>.
    */
-  public static AttachmentInformationTO fromAttachmentInformation(
+  public static GetVehicleAttachmentInfoResponseTO fromAttachmentInformation(
       AttachmentInformation attachmentInformation) {
     if (attachmentInformation == null) {
       return null;
     }
-    AttachmentInformationTO attachmentInformationTO = new AttachmentInformationTO();
+    GetVehicleAttachmentInfoResponseTO attachmentInformationTO = new GetVehicleAttachmentInfoResponseTO();
 
     attachmentInformationTO.setVehicleName(
         attachmentInformation.getVehicleReference()

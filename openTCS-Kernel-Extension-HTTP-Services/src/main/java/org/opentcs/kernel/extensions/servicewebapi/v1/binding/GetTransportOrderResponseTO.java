@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +14,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 
 /**
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
-public class TransportOrderState {
+public class GetTransportOrderResponseTO {
 
   private boolean dispensable;
 
@@ -37,9 +38,9 @@ public class TransportOrderState {
 
   private String processingVehicle;
 
-  private List<Destination> destinations = new ArrayList<>();
+  private List<DestinationState> destinations = new ArrayList<>();
 
-  private TransportOrderState() {
+  private GetTransportOrderResponseTO() {
   }
 
   public boolean isDispensable() {
@@ -106,11 +107,11 @@ public class TransportOrderState {
     this.processingVehicle = processingVehicle;
   }
 
-  public List<Destination> getDestinations() {
+  public List<DestinationState> getDestinations() {
     return destinations;
   }
 
-  public void setDestinations(List<Destination> destinations) {
+  public void setDestinations(List<DestinationState> destinations) {
     this.destinations = requireNonNull(destinations, "destinations");
   }
 
@@ -120,11 +121,11 @@ public class TransportOrderState {
    * @param transportOrder The transport order to create an instance from.
    * @return A new instance containing the data from the given transport order.
    */
-  public static TransportOrderState fromTransportOrder(TransportOrder transportOrder) {
+  public static GetTransportOrderResponseTO fromTransportOrder(TransportOrder transportOrder) {
     if (transportOrder == null) {
       return null;
     }
-    TransportOrderState transportOrderState = new TransportOrderState();
+    GetTransportOrderResponseTO transportOrderState = new GetTransportOrderResponseTO();
     transportOrderState.setDispensable(transportOrder.isDispensable());
     transportOrderState.setName(transportOrder.getName());
     transportOrderState.setPeripheralReservationToken(
@@ -134,10 +135,9 @@ public class TransportOrderState {
         nameOfNullableReference(transportOrder.getWrappingSequence())
     );
     transportOrderState.setType(transportOrder.getType());
-    transportOrderState.setDestinations(
-        transportOrder.getAllDriveOrders()
+    transportOrderState.setDestinations(transportOrder.getAllDriveOrders()
             .stream()
-            .map(driveOrder -> Destination.fromDriveOrder(driveOrder))
+            .map(driveOrder -> DestinationState.fromDriveOrder(driveOrder))
             .collect(Collectors.toList()));
     transportOrderState.setIntendedVehicle(
         nameOfNullableReference(transportOrder.getIntendedVehicle()));

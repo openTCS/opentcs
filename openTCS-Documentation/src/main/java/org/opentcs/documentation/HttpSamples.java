@@ -27,13 +27,13 @@ import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Destination;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Transport;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.OrderStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.StatusMessageList;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEventsResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +86,7 @@ public class HttpSamples {
         .withProcState(Vehicle.ProcState.AWAITING_ORDER)
         .withEnergyLevel(60)
         .withProperty("someKey", "someValue");
-    VehicleState vehicleState = VehicleState.fromVehicle(vehicle);
+    GetVehicleResponseTO vehicleState = GetVehicleResponseTO.fromVehicle(vehicle);
 
     writeToFile(vehicleState, outputFile);
   }
@@ -103,10 +103,10 @@ public class HttpSamples {
     vehicles.add(new Vehicle("Vehicle-3")
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
         .withEnergyLevel(40));
-    List<VehicleState> vehicleStates
+    List<GetVehicleResponseTO> vehicleStates
         = vehicles
             .stream()
-            .map(vehicle -> VehicleState.fromVehicle(vehicle))
+            .map(vehicle -> GetVehicleResponseTO.fromVehicle(vehicle))
             .collect(Collectors.toList());
     writeToFile(vehicleStates, outputFile);
   }
@@ -118,8 +118,8 @@ public class HttpSamples {
                                      new Vehicle("Vehicle-1")
                                          .withProcState(Vehicle.ProcState.IDLE)
                                          .withEnergyLevel(50));
-    TransportOrderState transportOrderState
-        = TransportOrderState.fromTransportOrder(transportOrder);
+    GetTransportOrderResponseTO transportOrderState
+        = GetTransportOrderResponseTO.fromTransportOrder(transportOrder);
     writeToFile(transportOrderState, outputFile);
   }
 
@@ -134,10 +134,10 @@ public class HttpSamples {
     transportOrders.add(createSampleTransportOrder(0, "cat1", simpleVehicle1));
     transportOrders.add(createSampleTransportOrder(1, "cat1", simpleVehicle2));
     transportOrders.add(createSampleTransportOrder(2, "cat2", simpleVehicle1));
-    List<TransportOrderState> transportOrderStates
+    List<GetTransportOrderResponseTO> transportOrderStates
         = transportOrders
             .stream()
-            .map(x -> TransportOrderState.fromTransportOrder(x))
+            .map(x -> GetTransportOrderResponseTO.fromTransportOrder(x))
             .collect(Collectors.toList());
     writeToFile(transportOrderStates, outputFile);
   }
@@ -160,7 +160,7 @@ public class HttpSamples {
   }
 
   private static void writeStatusEventsSample(File outputFile) {
-    StatusMessageList result = new StatusMessageList();
+    GetEventsResponseTO result = new GetEventsResponseTO();
 
     TransportOrder order
         = new TransportOrder("TOrder-XYZ",
@@ -195,7 +195,7 @@ public class HttpSamples {
   }
 
   private static void writeTransportOrderCreationSample(File outputFile) {
-    Transport transport = new Transport(
+    PostTransportOrderRequestTO transport = new PostTransportOrderRequestTO(
         false,
         false,
         Instant.now(),

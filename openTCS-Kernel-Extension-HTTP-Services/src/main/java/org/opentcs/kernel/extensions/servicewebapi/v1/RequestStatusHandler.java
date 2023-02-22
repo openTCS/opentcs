@@ -25,9 +25,9 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.VehicleState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.PeripheralJobFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.TransportOrderFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.VehicleFilter;
@@ -76,7 +76,7 @@ public class RequestStatusHandler {
    * value is null.
    * @return A list of transport orders that match the filter.
    */
-  public List<TransportOrderState> getTransportOrdersState(@Nullable String intendedVehicle) {
+  public List<GetTransportOrderResponseTO> getTransportOrdersState(@Nullable String intendedVehicle) {
     if (intendedVehicle != null) {
       Vehicle vehicle = orderService.fetchObject(Vehicle.class, intendedVehicle);
       if (vehicle == null) {
@@ -87,7 +87,7 @@ public class RequestStatusHandler {
     return orderService.fetchObjects(TransportOrder.class,
                                      new TransportOrderFilter(intendedVehicle))
         .stream()
-        .map(order -> TransportOrderState.fromTransportOrder(order))
+        .map(order -> GetTransportOrderResponseTO.fromTransportOrder(order))
         .collect(Collectors.toList());
   }
 
@@ -98,14 +98,14 @@ public class RequestStatusHandler {
    * @return A single transport order with the given name.
    * @throws ObjectUnknownException If a transport order with the given name does not exist.
    */
-  public TransportOrderState getTransportOrderByName(String name)
+  public GetTransportOrderResponseTO getTransportOrderByName(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
     return orderService.fetchObjects(TransportOrder.class,
                                      t -> t.getName().equals(name))
         .stream()
-        .map(t -> TransportOrderState.fromTransportOrder(t))
+        .map(t -> GetTransportOrderResponseTO.fromTransportOrder(t))
         .findAny()
         .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
   }
@@ -119,7 +119,7 @@ public class RequestStatusHandler {
    * if the value is null.
    * @return List of peripheral job states.
    */
-  public List<PeripheralJobState> getPeripheralJobs(@Nullable String relatedVehicle,
+  public List<GetPeripheralJobResponseTO> getPeripheralJobs(@Nullable String relatedVehicle,
                                                     @Nullable String relatedTransportOrder) {
     // If a related vehicle or transport order is set, make sure they exist.
     if (relatedVehicle != null && orderService.fetchObject(Vehicle.class, relatedVehicle) == null) {
@@ -133,7 +133,7 @@ public class RequestStatusHandler {
     return orderService.fetchObjects(PeripheralJob.class,
                                      new PeripheralJobFilter(relatedVehicle, relatedTransportOrder))
         .stream()
-        .map(peripheralJob -> PeripheralJobState.fromPeripheralJob(peripheralJob))
+        .map(peripheralJob -> GetPeripheralJobResponseTO.fromPeripheralJob(peripheralJob))
         .collect(Collectors.toList());
   }
 
@@ -143,7 +143,7 @@ public class RequestStatusHandler {
    * @param name The name of the peripheral job.
    * @return The peripheral job state.
    */
-  public PeripheralJobState getPeripheralJobByName(@Nonnull String name) {
+  public GetPeripheralJobResponseTO getPeripheralJobByName(@Nonnull String name) {
     requireNonNull(name, "name");
 
     PeripheralJob job = orderService.fetchObject(PeripheralJob.class, name);
@@ -151,7 +151,7 @@ public class RequestStatusHandler {
       throw new ObjectUnknownException("Unknown peripheral job: " + name);
     }
 
-    return PeripheralJobState.fromPeripheralJob(job);
+    return GetPeripheralJobResponseTO.fromPeripheralJob(job);
   }
 
   /**
@@ -161,11 +161,11 @@ public class RequestStatusHandler {
    * The filtering is disabled for this parameter if the value is null.
    * @return A list of vehicles, that match the filter.
    */
-  public List<VehicleState> getVehiclesState(@Nullable String procState) {
-    List<VehicleState> vehicles = orderService.fetchObjects(Vehicle.class,
+  public List<GetVehicleResponseTO> getVehiclesState(@Nullable String procState) {
+    List<GetVehicleResponseTO> vehicles = orderService.fetchObjects(Vehicle.class,
                                                             new VehicleFilter(procState))
         .stream()
-        .map(vehicle -> VehicleState.fromVehicle(vehicle))
+        .map(vehicle -> GetVehicleResponseTO.fromVehicle(vehicle))
         .collect(Collectors.toList());
     return vehicles;
   }
@@ -177,13 +177,13 @@ public class RequestStatusHandler {
    * @return A single vehicle that has the given name.
    * @throws ObjectUnknownException If a vehicle with the given name does not exist.
    */
-  public VehicleState getVehicleStateByName(String name)
+  public GetVehicleResponseTO getVehicleStateByName(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
     return orderService.fetchObjects(Vehicle.class, v -> v.getName().equals(name))
         .stream()
-        .map(v -> VehicleState.fromVehicle(v))
+        .map(v -> GetVehicleResponseTO.fromVehicle(v))
         .findAny()
         .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
   }

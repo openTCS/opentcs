@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import org.opentcs.data.model.Vehicle.State;
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
-public class VehicleState {
+public class GetVehicleResponseTO {
 
   private String name;
 
@@ -58,7 +58,7 @@ public class VehicleState {
 
   private List<List<String>> claimedResources = new ArrayList<>();
 
-  private VehicleState() {
+  private GetVehicleResponseTO() {
   }
 
   public String getName() {
@@ -188,11 +188,11 @@ public class VehicleState {
    * instance.
    * @return A new <Code>VehicleState</Code> instance filled with data from the given vehicle.
    */
-  public static VehicleState fromVehicle(Vehicle vehicle) {
+  public static GetVehicleResponseTO fromVehicle(Vehicle vehicle) {
     if (vehicle == null) {
       return null;
     }
-    VehicleState vehicleState = new VehicleState();
+    GetVehicleResponseTO vehicleState = new GetVehicleResponseTO();
     vehicleState.setName(vehicle.getName());
     vehicleState.setProperties(vehicle.getProperties());
     vehicleState.setLength(vehicle.getLength());

@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +14,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -21,7 +22,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class Transport {
+public class PostTransportOrderRequestTO {
 
   private boolean incompleteName;
 
@@ -44,7 +45,7 @@ public class Transport {
   private List<String> dependencies;
 
   @JsonCreator
-  public Transport(
+  public PostTransportOrderRequestTO(
       @JsonProperty(required = false, value = "incompleteName") boolean incompleteName,
       @JsonProperty(required = false, value = "dispensable") boolean dispensable,
       @Nullable @JsonProperty(required = false, value = "deadline") Instant deadline,

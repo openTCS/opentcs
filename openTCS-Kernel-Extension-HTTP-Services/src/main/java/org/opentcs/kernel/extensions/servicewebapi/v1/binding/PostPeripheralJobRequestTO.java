@@ -5,10 +5,10 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.util.List;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralOperationDescription;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -16,7 +16,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
  *
  * @author Leonard Schüngel (Fraunhofer IML)
  */
-public class Job {
+public class PostPeripheralJobRequestTO {
 
   private boolean incompleteName;
 
@@ -30,7 +30,7 @@ public class Job {
 
   private List<Property> properties;
 
-  public Job() {
+  public PostPeripheralJobRequestTO() {
   }
 
   public boolean isIncompleteName() {

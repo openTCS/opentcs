@@ -5,13 +5,14 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralJob.State;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -19,7 +20,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
  *
  * @author Leonard Schüngel (Fraunhofer IML)
  */
-public class PeripheralJobState {
+public class GetPeripheralJobResponseTO {
 
   private String name;
 
@@ -39,7 +40,7 @@ public class PeripheralJobState {
 
   private List<Property> properties;
 
-  private PeripheralJobState() {
+  private GetPeripheralJobResponseTO() {
   }
 
   public String getName() {
@@ -78,8 +79,8 @@ public class PeripheralJobState {
     return properties;
   }
 
-  public static PeripheralJobState fromPeripheralJob(PeripheralJob job) {
-    PeripheralJobState state = new PeripheralJobState();
+  public static GetPeripheralJobResponseTO fromPeripheralJob(PeripheralJob job) {
+    GetPeripheralJobResponseTO state = new GetPeripheralJobResponseTO();
     state.name = job.getName();
     state.reservationToken = job.getReservationToken();
     if (job.getRelatedVehicle() != null) {

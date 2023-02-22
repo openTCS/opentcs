@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +13,11 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A {@link org.opentcs.data.order.DriveOrder DriveOrder}'s destination.
  */
-public class Destination {
+public class DestinationState {
 
   private String locationName = "";
 
@@ -31,7 +30,7 @@ public class Destination {
   /**
    * Creates a new instance.
    */
-  public Destination() {
+  public DestinationState() {
   }
 
   @Nonnull
@@ -70,11 +69,11 @@ public class Destination {
     this.properties = requireNonNull(properties, "properties");
   }
 
-  public static Destination fromDriveOrder(DriveOrder driveOrder) {
+  public static DestinationState fromDriveOrder(DriveOrder driveOrder) {
     if (driveOrder == null) {
       return null;
     }
-    Destination destination = new Destination();
+    DestinationState destination = new DestinationState();
     destination.setLocationName(driveOrder.getDestination().getDestination().getName());
     destination.setOperation(driveOrder.getDestination().getOperation());
     destination.setState(mapDriveOrderState(driveOrder.getState()));
@@ -86,18 +85,18 @@ public class Destination {
     return destination;
   }
 
-  private static Destination.State mapDriveOrderState(DriveOrder.State driveOrderState) {
+  private static DestinationState.State mapDriveOrderState(DriveOrder.State driveOrderState) {
     switch (driveOrderState) {
       case PRISTINE:
-        return Destination.State.PRISTINE;
+        return DestinationState.State.PRISTINE;
       case TRAVELLING:
-        return Destination.State.TRAVELLING;
+        return DestinationState.State.TRAVELLING;
       case OPERATING:
-        return Destination.State.OPERATING;
+        return DestinationState.State.OPERATING;
       case FINISHED:
-        return Destination.State.FINISHED;
+        return DestinationState.State.FINISHED;
       case FAILED:
-        return Destination.State.FAILED;
+        return DestinationState.State.FAILED;
       default:
         throw new IllegalArgumentException("Unhandled drive order state: " + driveOrderState);
     }

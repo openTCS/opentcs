@@ -5,19 +5,20 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing;
+package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.StatusMessage;
 
 /**
  * A set of status messages sent via the status channel.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class StatusMessageList {
+public class GetEventsResponseTO {
 
   private Instant timeStamp = Instant.now();
 
@@ -26,7 +27,7 @@ public class StatusMessageList {
   /**
    * Creates a new instance.
    */
-  public StatusMessageList() {
+  public GetEventsResponseTO() {
   }
 
   public List<StatusMessage> getStatusMessages() {

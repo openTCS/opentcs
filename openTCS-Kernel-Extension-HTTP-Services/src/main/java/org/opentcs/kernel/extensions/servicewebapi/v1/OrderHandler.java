@@ -38,9 +38,9 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Destination;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Job;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Transport;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -100,7 +100,7 @@ public class OrderHandler {
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
-  public TransportOrder createOrder(String name, Transport order)
+  public TransportOrder createOrder(String name, PostTransportOrderRequestTO order)
       throws ObjectUnknownException,
              ObjectExistsException,
              KernelRuntimeException,
@@ -139,7 +139,7 @@ public class OrderHandler {
     }
   }
 
-  public PeripheralJob createPeripheralJob(String name, Job job) {
+  public PeripheralJob createPeripheralJob(String name, PostPeripheralJobRequestTO job) {
     requireNonNull(name, "name");
     requireNonNull(job, "job");
 
@@ -287,7 +287,7 @@ public class OrderHandler {
     });
   }
 
-  private List<DestinationCreationTO> destinations(Transport order) {
+  private List<DestinationCreationTO> destinations(PostTransportOrderRequestTO order) {
     List<DestinationCreationTO> result = new ArrayList<>(order.getDestinations().size());
 
     for (Destination dest : order.getDestinations()) {
@@ -310,7 +310,7 @@ public class OrderHandler {
     return dependencies == null ? new HashSet<>() : new HashSet<>(dependencies);
   }
 
-  private Instant deadline(Transport order) {
+  private Instant deadline(PostTransportOrderRequestTO order) {
     return order.getDeadline() == null ? Instant.MAX : order.getDeadline();
   }
 

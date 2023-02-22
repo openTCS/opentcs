@@ -19,11 +19,11 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
 import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Job;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.incoming.Transport;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.PeripheralJobState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.TransportOrderState;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.outgoing.AttachmentInformationTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachmentInfoResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -173,8 +173,7 @@ public class V1RequestHandler
   private Object handleGetVehicleCommAdapterAttachmentInfo(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(
-        AttachmentInformationTO.fromAttachmentInformation(
+    return toJson(GetVehicleAttachmentInfoResponseTO.fromAttachmentInformation(
             statusInformationProvider.getVehicleCommAdapterAttachmentInformation(
                 request.params(":NAME")
             )
@@ -198,10 +197,8 @@ public class V1RequestHandler
              IllegalArgumentException,
              IllegalStateException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(
-        TransportOrderState.fromTransportOrder(
-            orderHandler.createOrder(request.params(":NAME"),
-                                     fromJson(request.body(), Transport.class))
+    return toJson(GetTransportOrderResponseTO.fromTransportOrder(orderHandler.createOrder(request.params(":NAME"),
+                                     fromJson(request.body(), PostTransportOrderRequestTO.class))
         )
     );
   }
@@ -304,10 +301,8 @@ public class V1RequestHandler
 
   private Object handlePostPeripheralJobsByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(
-        PeripheralJobState.fromPeripheralJob(
-            orderHandler.createPeripheralJob(request.params(":NAME"),
-                                             fromJson(request.body(), Job.class))
+    return toJson(GetPeripheralJobResponseTO.fromPeripheralJob(orderHandler.createPeripheralJob(request.params(":NAME"),
+                                             fromJson(request.body(), PostPeripheralJobRequestTO.class))
         )
     );
   }
