@@ -36,13 +36,13 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
-import org.opentcs.guing.base.model.SimpleFolder;
 import org.opentcs.guing.base.model.elements.AbstractConnection;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.ApplicationState;
 import org.opentcs.guing.common.components.drawing.ZoomPoint;
+import org.opentcs.guing.common.components.drawing.course.Origin;
 import org.opentcs.guing.common.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.common.components.drawing.figures.LabeledPointFigure;
 import org.opentcs.guing.common.components.drawing.figures.PathConnection;
@@ -51,7 +51,6 @@ import org.opentcs.guing.common.components.drawing.figures.TCSFigure;
 import org.opentcs.guing.common.components.drawing.figures.ToolTipTextGenerator;
 import org.opentcs.guing.common.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.common.components.drawing.figures.liner.TupelBezierLiner;
-import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.menus.MenuFactory;
 import org.opentcs.operationsdesk.application.menus.VehiclePopupMenu;
@@ -269,15 +268,11 @@ public class VehicleFigure
     if (!ignorePrecisePosition) {
       if (precisePosition != null) {
         setVisible(true);
-        // Tree-Folder "Vehicles"
-        SimpleFolder folder = (SimpleFolder) model.getParent();
-        SystemModel systemModel = (SystemModel) folder.getParent();
-        double scaleX = systemModel.getDrawingMethod().getOrigin().getScaleX();
-        double scaleY = systemModel.getDrawingMethod().getOrigin().getScaleY();
+        Origin origin = modelManager.getModel().getDrawingMethod().getOrigin();
 
-        if (scaleX != 0.0 && scaleY != 0.0) {
-          anchor.x = precisePosition.getX() / scaleX;
-          anchor.y = -precisePosition.getY() / scaleY;
+        if (origin.getScaleX() != 0.0 && origin.getScaleY() != 0.0) {
+          anchor.x = precisePosition.getX() / origin.getScaleX();
+          anchor.y = -precisePosition.getY() / origin.getScaleY();
         }
       }
     }
