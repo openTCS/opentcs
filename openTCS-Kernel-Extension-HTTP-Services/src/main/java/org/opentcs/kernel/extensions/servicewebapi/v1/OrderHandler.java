@@ -110,7 +110,7 @@ public class OrderHandler {
 
     TransportOrderCreationTO to
         = new TransportOrderCreationTO(name, destinations(order))
-            .withIncompleteName(order.hasIncompleteName())
+            .withIncompleteName(order.isIncompleteName())
             .withDispensable(order.isDispensable())
             .withIntendedVehicleName(order.getIntendedVehicle())
             .withDependencyNames(dependencyNames(order.getDependencies()))

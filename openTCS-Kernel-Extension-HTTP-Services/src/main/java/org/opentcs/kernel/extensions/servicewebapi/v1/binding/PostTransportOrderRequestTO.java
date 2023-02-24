@@ -68,20 +68,25 @@ public class PostTransportOrderRequestTO {
     this.dependencies = dependencies;
   }
 
-  public boolean hasIncompleteName() {
+  public PostTransportOrderRequestTO() {
+  }
+
+  public boolean isIncompleteName() {
     return incompleteName;
   }
 
-  public void setIncompleteName(boolean incompleteName) {
+  public PostTransportOrderRequestTO setIncompleteName(boolean incompleteName) {
     this.incompleteName = incompleteName;
+    return this;
   }
 
   public boolean isDispensable() {
     return dispensable;
   }
 
-  public void setDispensable(boolean dispensable) {
+  public PostTransportOrderRequestTO setDispensable(boolean dispensable) {
     this.dispensable = dispensable;
+    return this;
   }
 
   @Nullable
@@ -89,8 +94,9 @@ public class PostTransportOrderRequestTO {
     return deadline;
   }
 
-  public void setDeadline(@Nullable Instant deadline) {
+  public PostTransportOrderRequestTO setDeadline(@Nullable Instant deadline) {
     this.deadline = deadline;
+    return this;
   }
 
   @Nullable
@@ -98,8 +104,9 @@ public class PostTransportOrderRequestTO {
     return intendedVehicle;
   }
 
-  public void setIntendedVehicle(@Nullable String intendedVehicle) {
+  public PostTransportOrderRequestTO setIntendedVehicle(@Nullable String intendedVehicle) {
     this.intendedVehicle = intendedVehicle;
+    return this;
   }
 
   @Nullable
@@ -107,8 +114,10 @@ public class PostTransportOrderRequestTO {
     return peripheralReservationToken;
   }
 
-  public void setPeripheralReservationToken(@Nullable String peripheralReservationToken) {
+  public PostTransportOrderRequestTO setPeripheralReservationToken(
+      @Nullable String peripheralReservationToken) {
     this.peripheralReservationToken = peripheralReservationToken;
+    return this;
   }
 
   @Nullable
@@ -116,8 +125,9 @@ public class PostTransportOrderRequestTO {
     return wrappingSequence;
   }
 
-  public void setWrappingSequence(@Nullable String wrappingSequence) {
+  public PostTransportOrderRequestTO setWrappingSequence(@Nullable String wrappingSequence) {
     this.wrappingSequence = wrappingSequence;
+    return this;
   }
 
   @Nullable
@@ -125,8 +135,9 @@ public class PostTransportOrderRequestTO {
     return type;
   }
 
-  public void setType(@Nullable String type) {
+  public PostTransportOrderRequestTO setType(@Nullable String type) {
     this.type = type;
+    return this;
   }
 
   @Nonnull
@@ -134,8 +145,9 @@ public class PostTransportOrderRequestTO {
     return destinations;
   }
 
-  public void setDestinations(@Nonnull List<Destination> destinations) {
+  public PostTransportOrderRequestTO setDestinations(@Nonnull List<Destination> destinations) {
     this.destinations = requireNonNull(destinations, "destinations");
+    return this;
   }
 
   @Nullable
@@ -143,8 +155,9 @@ public class PostTransportOrderRequestTO {
     return properties;
   }
 
-  public void setProperties(@Nullable List<Property> properties) {
+  public PostTransportOrderRequestTO setProperties(@Nullable List<Property> properties) {
     this.properties = properties;
+    return this;
   }
 
   @Nullable
@@ -152,7 +165,8 @@ public class PostTransportOrderRequestTO {
     return dependencies;
   }
 
-  public void setDependencies(@Nullable List<String> dependencies) {
+  public PostTransportOrderRequestTO setDependencies(@Nullable List<String> dependencies) {
     this.dependencies = dependencies;
+    return this;
   }
 }

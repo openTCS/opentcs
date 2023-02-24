@@ -38,13 +38,17 @@ public class Destination {
     this.properties = properties;
   }
 
+  public Destination() {
+  }
+
   @Nonnull
   public String getLocationName() {
     return locationName;
   }
 
-  public void setLocationName(@Nonnull String locationName) {
+  public Destination setLocationName(@Nonnull String locationName) {
     this.locationName = requireNonNull(locationName, "locationName");
+    return this;
   }
 
   @Nonnull
@@ -52,8 +56,9 @@ public class Destination {
     return operation;
   }
 
-  public void setOperation(@Nonnull String operation) {
+  public Destination setOperation(@Nonnull String operation) {
     this.operation = requireNonNull(operation, "operation");
+    return this;
   }
 
   @Nullable
@@ -61,7 +66,8 @@ public class Destination {
     return properties;
   }
 
-  public void setProperties(@Nullable List<Property> properties) {
+  public Destination setProperties(@Nullable List<Property> properties) {
     this.properties = properties;
+    return this;
   }
 }

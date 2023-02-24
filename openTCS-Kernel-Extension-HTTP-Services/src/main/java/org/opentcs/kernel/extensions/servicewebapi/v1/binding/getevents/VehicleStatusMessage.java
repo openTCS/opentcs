@@ -48,76 +48,95 @@ public class VehicleStatusMessage
   public VehicleStatusMessage() {
   }
 
+  @Override
+  public VehicleStatusMessage setSequenceNumber(long sequenceNumber) {
+    return (VehicleStatusMessage) super.setSequenceNumber(sequenceNumber);
+  }
+
+  @Override
+  public VehicleStatusMessage setCreationTimeStamp(Instant creationTimeStamp) {
+    return (VehicleStatusMessage) super.setCreationTimeStamp(creationTimeStamp);
+  }
+
   public String getVehicleName() {
     return vehicleName;
   }
 
-  public void setVehicleName(String vehicleName) {
+  public VehicleStatusMessage setVehicleName(String vehicleName) {
     this.vehicleName = vehicleName;
+    return this;
   }
 
   public String getTransportOrderName() {
     return transportOrderName;
   }
 
-  public void setTransportOrderName(String transportOrderName) {
+  public VehicleStatusMessage setTransportOrderName(String transportOrderName) {
     this.transportOrderName = transportOrderName;
+    return this;
   }
 
   public String getPosition() {
     return position;
   }
 
-  public void setPosition(String position) {
+  public VehicleStatusMessage setPosition(String position) {
     this.position = position;
+    return this;
   }
 
   public PrecisePosition getPrecisePosition() {
     return precisePosition;
   }
 
-  public void setPrecisePosition(PrecisePosition precisePosition) {
+  public VehicleStatusMessage setPrecisePosition(PrecisePosition precisePosition) {
     this.precisePosition = precisePosition;
+    return this;
   }
 
   public boolean isPaused() {
     return paused;
   }
 
-  public void setPaused(boolean paused) {
+  public VehicleStatusMessage setPaused(boolean paused) {
     this.paused = paused;
+    return this;
   }
 
   public Vehicle.State getState() {
     return state;
   }
 
-  public void setState(Vehicle.State state) {
+  public VehicleStatusMessage setState(Vehicle.State state) {
     this.state = state;
+    return this;
   }
 
   public Vehicle.ProcState getProcState() {
     return procState;
   }
 
-  public void setProcState(Vehicle.ProcState procState) {
+  public VehicleStatusMessage setProcState(Vehicle.ProcState procState) {
     this.procState = procState;
+    return this;
   }
 
   public List<List<String>> getAllocatedResources() {
     return allocatedResources;
   }
 
-  public void setAllocatedResources(List<List<String>> allocatedResources) {
+  public VehicleStatusMessage setAllocatedResources(List<List<String>> allocatedResources) {
     this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
+    return this;
   }
 
   public List<List<String>> getClaimedResources() {
     return claimedResources;
   }
 
-  public void setClaimedResources(List<List<String>> claimedResources) {
+  public VehicleStatusMessage setClaimedResources(List<List<String>> claimedResources) {
     this.claimedResources = requireNonNull(claimedResources, "claimedResources");
+    return this;
   }
 
   public static VehicleStatusMessage fromVehicle(Vehicle vehicle,

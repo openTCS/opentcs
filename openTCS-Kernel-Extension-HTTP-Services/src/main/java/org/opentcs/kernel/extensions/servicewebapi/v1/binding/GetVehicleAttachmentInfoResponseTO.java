@@ -32,27 +32,31 @@ public class GetVehicleAttachmentInfoResponseTO {
    */
   private String attachedCommAdapter;
 
-  private GetVehicleAttachmentInfoResponseTO() {
+  public GetVehicleAttachmentInfoResponseTO() {
   }
 
-  public void setVehicleName(String vehicleName) {
+  public GetVehicleAttachmentInfoResponseTO setVehicleName(String vehicleName) {
     this.vehicleName = requireNonNull(vehicleName, "vehicleName");
+    return this;
   }
 
   public String getVehicleName() {
     return vehicleName;
   }
 
-  public void setAvailableCommAdapters(List<String> availableCommAdapters) {
+  public GetVehicleAttachmentInfoResponseTO setAvailableCommAdapters(
+      List<String> availableCommAdapters) {
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
+    return this;
   }
 
   public List<String> getAvailableCommAdapters() {
     return availableCommAdapters;
   }
 
-  public void setAttachedCommAdapter(String attachedCommAdapter) {
+  public GetVehicleAttachmentInfoResponseTO setAttachedCommAdapter(String attachedCommAdapter) {
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
+    return this;
   }
 
   public String getAttachedCommAdapter() {

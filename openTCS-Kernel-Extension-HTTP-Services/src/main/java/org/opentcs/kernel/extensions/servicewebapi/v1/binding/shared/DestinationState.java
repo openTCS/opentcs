@@ -38,8 +38,9 @@ public class DestinationState {
     return locationName;
   }
 
-  public void setLocationName(@Nonnull String name) {
+  public DestinationState setLocationName(@Nonnull String name) {
     this.locationName = requireNonNull(name, "name");
+    return this;
   }
 
   @Nonnull
@@ -47,8 +48,9 @@ public class DestinationState {
     return operation;
   }
 
-  public void setOperation(@Nonnull String operation) {
+  public DestinationState setOperation(@Nonnull String operation) {
     this.operation = requireNonNull(operation, "operation");
+    return this;
   }
 
   @Nonnull
@@ -56,8 +58,9 @@ public class DestinationState {
     return state;
   }
 
-  public void setState(@Nonnull State state) {
+  public DestinationState setState(@Nonnull State state) {
     this.state = requireNonNull(state, "state");
+    return this;
   }
 
   @Nonnull
@@ -65,8 +68,9 @@ public class DestinationState {
     return properties;
   }
 
-  public void setProperties(@Nonnull List<Property> properties) {
+  public DestinationState setProperties(@Nonnull List<Property> properties) {
     this.properties = requireNonNull(properties, "properties");
+    return this;
   }
 
   public static DestinationState fromDriveOrder(DriveOrder driveOrder) {

@@ -24,3 +24,6 @@ gradlew text eol=lf
 *.jpg binary
 *.png binary
 *.tar.gz binary
+
+# Declare approved approval test results as binary.
+*.approved.txt binary

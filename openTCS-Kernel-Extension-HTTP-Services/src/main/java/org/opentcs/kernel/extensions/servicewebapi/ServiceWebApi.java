@@ -7,10 +7,6 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.Uninterruptibles;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.TimeUnit;
@@ -50,12 +46,9 @@ public class ServiceWebApi
    */
   private final V1RequestHandler v1RequestHandler;
   /**
-   * Maps between objects and their JSON representations.
+   * Binds JSON data to objects and vice versa.
    */
-  private final ObjectMapper objectMapper
-      = new ObjectMapper()
-          .registerModule(new JavaTimeModule())
-          .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+  private final JsonBinder jsonBinder;
   /**
    * The connection encryption configuration.
    */
@@ -75,17 +68,20 @@ public class ServiceWebApi
    * @param configuration The interface configuration.
    * @param sslParamSet The SSL parameter set.
    * @param authenticator Authenticates incoming requests.
+   * @param jsonBinder Binds JSON data to objects and vice versa.
    * @param v1RequestHandler Handles requests for API version 1.
    */
   @Inject
   public ServiceWebApi(ServiceWebApiConfiguration configuration,
                        SslParameterSet sslParamSet,
                        Authenticator authenticator,
+                       JsonBinder jsonBinder,
                        V1RequestHandler v1RequestHandler) {
     this.configuration = requireNonNull(configuration, "configuration");
-    this.authenticator = requireNonNull(authenticator, "authenticator");
-    this.v1RequestHandler = requireNonNull(v1RequestHandler, "v1RequestHandler");
     this.sslParamSet = requireNonNull(sslParamSet, "sslParamSet");
+    this.authenticator = requireNonNull(authenticator, "authenticator");
+    this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
+    this.v1RequestHandler = requireNonNull(v1RequestHandler, "v1RequestHandler");
   }
 
   @Override
@@ -145,27 +141,27 @@ public class ServiceWebApi
     service.exception(IllegalArgumentException.class, (exception, request, response) -> {
                     response.status(400);
                     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(toJson(exception.getMessage()));
+                    response.body(jsonBinder.toJson(exception));
                   });
     service.exception(ObjectUnknownException.class, (exception, request, response) -> {
                     response.status(404);
                     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(toJson(exception.getMessage()));
+                    response.body(jsonBinder.toJson(exception));
                   });
     service.exception(ObjectExistsException.class, (exception, request, response) -> {
                     response.status(409);
                     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(toJson(exception.getMessage()));
+                    response.body(jsonBinder.toJson(exception));
                   });
     service.exception(KernelRuntimeException.class, (exception, request, response) -> {
                     response.status(500);
                     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(toJson(exception.getMessage()));
+                    response.body(jsonBinder.toJson(exception));
                   });
     service.exception(IllegalStateException.class, (exception, request, response) -> {
                     response.status(500);
                     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(toJson(exception.getMessage()));
+                    response.body(jsonBinder.toJson(exception));
                   });
 
     initialized = true;
@@ -188,15 +184,4 @@ public class ServiceWebApi
     return initialized;
   }
 
-  private String toJson(String exceptionMessage)
-      throws IllegalStateException {
-    try {
-      return objectMapper
-          .writerWithDefaultPrettyPrinter()
-          .writeValueAsString(objectMapper.createArrayNode().add(exceptionMessage));
-    }
-    catch (JsonProcessingException exc) {
-      throw new IllegalStateException("Could not produce JSON output", exc);
-    }
-  }
 }

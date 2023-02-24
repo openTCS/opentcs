@@ -37,48 +37,55 @@ public class PostPeripheralJobRequestTO {
     return incompleteName;
   }
 
-  public void setIncompleteName(boolean incompleteName) {
+  public PostPeripheralJobRequestTO setIncompleteName(boolean incompleteName) {
     this.incompleteName = incompleteName;
+    return this;
   }
 
   public String getReservationToken() {
     return reservationToken;
   }
 
-  public void setReservationToken(String reservationToken) {
+  public PostPeripheralJobRequestTO setReservationToken(String reservationToken) {
     this.reservationToken = reservationToken;
+    return this;
   }
 
   public String getRelatedVehicle() {
     return relatedVehicle;
   }
 
-  public void setRelatedVehicle(String relatedVehicle) {
+  public PostPeripheralJobRequestTO setRelatedVehicle(String relatedVehicle) {
     this.relatedVehicle = relatedVehicle;
+    return this;
   }
 
   public String getRelatedTransportOrder() {
     return relatedTransportOrder;
   }
 
-  public void setRelatedTransportOrder(String relatedTransportOrder) {
+  public PostPeripheralJobRequestTO setRelatedTransportOrder(String relatedTransportOrder) {
     this.relatedTransportOrder = relatedTransportOrder;
+    return this;
   }
 
   public PeripheralOperationDescription getPeripheralOperation() {
     return peripheralOperation;
   }
 
-  public void setPeripheralOperation(PeripheralOperationDescription peripheralOperation) {
+  public PostPeripheralJobRequestTO setPeripheralOperation(
+      PeripheralOperationDescription peripheralOperation) {
     this.peripheralOperation = peripheralOperation;
+    return this;
   }
 
   public List<Property> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<Property> properties) {
+  public PostPeripheralJobRequestTO setProperties(List<Property> properties) {
     this.properties = properties;
+    return this;
   }
 
 }

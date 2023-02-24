@@ -40,79 +40,89 @@ public class GetTransportOrderResponseTO {
 
   private List<DestinationState> destinations = new ArrayList<>();
 
-  private GetTransportOrderResponseTO() {
+  public GetTransportOrderResponseTO() {
   }
 
   public boolean isDispensable() {
     return dispensable;
   }
 
-  public void setDispensable(boolean dispensable) {
+  public GetTransportOrderResponseTO setDispensable(boolean dispensable) {
     this.dispensable = dispensable;
+    return this;
   }
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public GetTransportOrderResponseTO setName(String name) {
     this.name = requireNonNull(name, "name");
+    return this;
   }
 
   public String getPeripheralReservationToken() {
     return peripheralReservationToken;
   }
 
-  public void setPeripheralReservationToken(String peripheralReservationToken) {
+  public GetTransportOrderResponseTO setPeripheralReservationToken(
+      String peripheralReservationToken) {
     this.peripheralReservationToken = peripheralReservationToken;
+    return this;
   }
 
   public String getWrappingSequence() {
     return wrappingSequence;
   }
 
-  public void setWrappingSequence(String wrappingSequence) {
+  public GetTransportOrderResponseTO setWrappingSequence(String wrappingSequence) {
     this.wrappingSequence = wrappingSequence;
+    return this;
   }
 
   public String getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public GetTransportOrderResponseTO setType(String type) {
     this.type = type;
+    return this;
   }
 
   public TransportOrder.State getState() {
     return state;
   }
 
-  public void setState(TransportOrder.State state) {
+  public GetTransportOrderResponseTO setState(TransportOrder.State state) {
     this.state = requireNonNull(state, "state");
+    return this;
   }
 
   public String getIntendedVehicle() {
     return intendedVehicle;
   }
 
-  public void setIntendedVehicle(String intendedVehicle) {
+  public GetTransportOrderResponseTO setIntendedVehicle(String intendedVehicle) {
     this.intendedVehicle = intendedVehicle;
+    return this;
   }
 
   public String getProcessingVehicle() {
     return processingVehicle;
   }
 
-  public void setProcessingVehicle(String processingVehicle) {
+  public GetTransportOrderResponseTO setProcessingVehicle(String processingVehicle) {
     this.processingVehicle = processingVehicle;
+    return this;
   }
 
   public List<DestinationState> getDestinations() {
     return destinations;
   }
 
-  public void setDestinations(List<DestinationState> destinations) {
+  public GetTransportOrderResponseTO setDestinations(List<DestinationState> destinations) {
     this.destinations = requireNonNull(destinations, "destinations");
+    return this;
   }
 
   /**
@@ -136,9 +146,9 @@ public class GetTransportOrderResponseTO {
     );
     transportOrderState.setType(transportOrder.getType());
     transportOrderState.setDestinations(transportOrder.getAllDriveOrders()
-            .stream()
-            .map(driveOrder -> DestinationState.fromDriveOrder(driveOrder))
-            .collect(Collectors.toList()));
+        .stream()
+        .map(driveOrder -> DestinationState.fromDriveOrder(driveOrder))
+        .collect(Collectors.toList()));
     transportOrderState.setIntendedVehicle(
         nameOfNullableReference(transportOrder.getIntendedVehicle()));
     transportOrderState.setProcessingVehicle(

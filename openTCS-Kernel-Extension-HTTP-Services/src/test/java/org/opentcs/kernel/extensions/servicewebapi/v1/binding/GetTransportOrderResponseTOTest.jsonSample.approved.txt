@@ -1,0 +1,22 @@
+{
+  "dispensable" : true,
+  "name" : "some-order",
+  "peripheralReservationToken" : "some-token",
+  "wrappingSequence" : "some-sequence",
+  "type" : "some-type",
+  "state" : "BEING_PROCESSED",
+  "intendedVehicle" : "some-vehicle",
+  "processingVehicle" : "some-vehicle",
+  "destinations" : [ {
+    "locationName" : "some-location",
+    "operation" : "some-operation",
+    "state" : "TRAVELLING",
+    "properties" : [ {
+      "key" : "some-key",
+      "value" : "some-value"
+    }, {
+      "key" : "some-other-key",
+      "value" : "some-other-value"
+    } ]
+  } ]
+}

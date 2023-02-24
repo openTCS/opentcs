@@ -58,127 +58,142 @@ public class GetVehicleResponseTO {
 
   private List<List<String>> claimedResources = new ArrayList<>();
 
-  private GetVehicleResponseTO() {
+  public GetVehicleResponseTO() {
   }
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public GetVehicleResponseTO setName(String name) {
     this.name = requireNonNull(name, "name");
+    return this;
   }
 
   public int getLength() {
     return length;
   }
 
-  public void setLength(int length) {
+  public GetVehicleResponseTO setLength(int length) {
     this.length = length;
+    return this;
   }
 
   public int getEnergyLevelGood() {
     return energyLevelGood;
   }
 
-  public void setEnergyLevelGood(int energyLevelGood) {
+  public GetVehicleResponseTO setEnergyLevelGood(int energyLevelGood) {
     this.energyLevelGood = energyLevelGood;
+    return this;
   }
 
   public int getEnergyLevelCritical() {
     return energyLevelCritical;
   }
 
-  public void setEnergyLevelCritical(int energyLevelCritical) {
+  public GetVehicleResponseTO setEnergyLevelCritical(int energyLevelCritical) {
     this.energyLevelCritical = energyLevelCritical;
+    return this;
   }
 
   public int getEnergyLevel() {
     return energyLevel;
   }
 
-  public void setEnergyLevel(int energyLevel) {
+  public GetVehicleResponseTO setEnergyLevel(int energyLevel) {
     this.energyLevel = energyLevel;
+    return this;
   }
 
   public IntegrationLevel getIntegrationLevel() {
     return integrationLevel;
   }
 
-  public void setIntegrationLevel(IntegrationLevel integrationLevel) {
+  public GetVehicleResponseTO setIntegrationLevel(IntegrationLevel integrationLevel) {
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
+    return this;
   }
 
   public boolean isPaused() {
     return paused;
   }
 
-  public void setPaused(boolean paused) {
+  public GetVehicleResponseTO setPaused(boolean paused) {
     this.paused = paused;
+    return this;
   }
 
   public ProcState getProcState() {
     return procState;
   }
 
-  public void setProcState(Vehicle.ProcState procState) {
+  public GetVehicleResponseTO setProcState(Vehicle.ProcState procState) {
     this.procState = requireNonNull(procState, "procState");
+    return this;
   }
 
   public String getTransportOrder() {
     return transportOrder;
   }
 
-  public void setTransportOrder(String transportOrder) {
+  public GetVehicleResponseTO setTransportOrder(String transportOrder) {
     this.transportOrder = transportOrder;
+    return this;
   }
 
   public String getCurrentPosition() {
     return currentPosition;
   }
 
-  public void setCurrentPosition(String currentPosition) {
+  public GetVehicleResponseTO setCurrentPosition(String currentPosition) {
     this.currentPosition = currentPosition;
+    return this;
   }
 
   public PrecisePosition getPrecisePosition() {
     return precisePosition;
   }
 
-  public void setPrecisePosition(PrecisePosition precisePosition) {
+  public GetVehicleResponseTO setPrecisePosition(PrecisePosition precisePosition) {
     this.precisePosition = precisePosition;
+    return this;
   }
 
   public State getState() {
     return state;
   }
 
-  public void setState(State state) {
+  public GetVehicleResponseTO setState(State state) {
     this.state = requireNonNull(state, "state");
+    return this;
   }
 
   public List<List<String>> getAllocatedResources() {
     return allocatedResources;
   }
 
-  public void setAllocatedResources(List<List<String>> allocatedResources) {
+  public GetVehicleResponseTO setAllocatedResources(List<List<String>> allocatedResources) {
     this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
+    return this;
   }
 
   public List<List<String>> getClaimedResources() {
     return claimedResources;
   }
 
-  public void setClaimedResources(List<List<String>> claimedResources) {
+  public GetVehicleResponseTO setClaimedResources(List<List<String>> claimedResources) {
     this.claimedResources = requireNonNull(claimedResources, "claimedResources");
+    return this;
   }
 
   public Map<String, String> getProperties() {
     return properties;
   }
 
-  public void setProperties(Map<String, String> properties) {
+  public GetVehicleResponseTO setProperties(Map<String, String> properties) {
     this.properties = requireNonNull(properties, "properties");
+    return this;
   }
 
   /**

@@ -32,32 +32,36 @@ public class PeripheralOperationDescription {
     return operation;
   }
 
-  public void setOperation(String operation) {
+  public PeripheralOperationDescription setOperation(String operation) {
     this.operation = operation;
+    return this;
   }
 
   public String getLocationName() {
     return locationName;
   }
 
-  public void setLocationName(String locationName) {
+  public PeripheralOperationDescription setLocationName(String locationName) {
     this.locationName = locationName;
+    return this;
   }
 
   public ExecutionTrigger getExecutionTrigger() {
     return executionTrigger;
   }
 
-  public void setExecutionTrigger(ExecutionTrigger executionTrigger) {
+  public PeripheralOperationDescription setExecutionTrigger(ExecutionTrigger executionTrigger) {
     this.executionTrigger = executionTrigger;
+    return this;
   }
 
   public boolean isCompletionRequired() {
     return completionRequired;
   }
 
-  public void setCompletionRequired(boolean completionRequired) {
+  public PeripheralOperationDescription setCompletionRequired(boolean completionRequired) {
     this.completionRequired = completionRequired;
+    return this;
   }
 
   public static PeripheralOperationDescription fromPeripheralOperation(

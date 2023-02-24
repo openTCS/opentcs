@@ -1,0 +1,28 @@
+{
+  "incompleteName" : true,
+  "dispensable" : true,
+  "deadline" : "1970-01-01T00:00:00Z",
+  "intendedVehicle" : "some-vehicle",
+  "peripheralReservationToken" : "some-token",
+  "wrappingSequence" : "some-sequence",
+  "type" : "some-type",
+  "destinations" : [ {
+    "locationName" : "some-location",
+    "operation" : "some-operation",
+    "properties" : [ {
+      "key" : "some-key",
+      "value" : "some-value"
+    }, {
+      "key" : "some-other-key",
+      "value" : "some-other-value"
+    } ]
+  } ],
+  "properties" : [ {
+    "key" : "some-key",
+    "value" : "some-value"
+  }, {
+    "key" : "some-other-key",
+    "value" : "some-other-value"
+  } ],
+  "dependencies" : [ "some-other-order", "another-order" ]
+}

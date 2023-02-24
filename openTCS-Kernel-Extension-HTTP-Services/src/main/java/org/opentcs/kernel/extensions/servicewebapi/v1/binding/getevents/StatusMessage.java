@@ -41,16 +41,18 @@ public abstract class StatusMessage {
     return sequenceNumber;
   }
 
-  public void setSequenceNumber(long sequenceNumber) {
+  public StatusMessage setSequenceNumber(long sequenceNumber) {
     this.sequenceNumber = sequenceNumber;
+    return this;
   }
 
   public Instant getCreationTimeStamp() {
     return creationTimeStamp;
   }
 
-  public void setCreationTimeStamp(Instant creationTimeStamp) {
+  public StatusMessage setCreationTimeStamp(Instant creationTimeStamp) {
     this.creationTimeStamp = creationTimeStamp;
+    return this;
   }
 
 }

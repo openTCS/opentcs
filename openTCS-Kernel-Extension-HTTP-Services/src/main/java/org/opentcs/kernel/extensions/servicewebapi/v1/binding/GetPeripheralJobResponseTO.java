@@ -40,43 +40,89 @@ public class GetPeripheralJobResponseTO {
 
   private List<Property> properties;
 
-  private GetPeripheralJobResponseTO() {
+  public GetPeripheralJobResponseTO() {
   }
 
   public String getName() {
     return name;
   }
 
+  public GetPeripheralJobResponseTO setName(String name) {
+    this.name = name;
+    return this;
+  }
+
   public String getReservationToken() {
     return reservationToken;
+  }
+
+  public GetPeripheralJobResponseTO setReservationToken(String reservationToken) {
+    this.reservationToken = reservationToken;
+    return this;
   }
 
   public String getRelatedVehicle() {
     return relatedVehicle;
   }
 
+  public GetPeripheralJobResponseTO setRelatedVehicle(String relatedVehicle) {
+    this.relatedVehicle = relatedVehicle;
+    return this;
+  }
+
   public String getRelatedTransportOrder() {
     return relatedTransportOrder;
+  }
+
+  public GetPeripheralJobResponseTO setRelatedTransportOrder(String relatedTransportOrder) {
+    this.relatedTransportOrder = relatedTransportOrder;
+    return this;
   }
 
   public PeripheralOperationDescription getPeripheralOperation() {
     return peripheralOperation;
   }
 
+  public GetPeripheralJobResponseTO setPeripheralOperation(
+      PeripheralOperationDescription peripheralOperation) {
+    this.peripheralOperation = peripheralOperation;
+    return this;
+  }
+
   public State getState() {
     return state;
+  }
+
+  public GetPeripheralJobResponseTO setState(State state) {
+    this.state = state;
+    return this;
   }
 
   public Instant getCreationTime() {
     return creationTime;
   }
 
+  public GetPeripheralJobResponseTO setCreationTime(Instant creationTime) {
+    this.creationTime = creationTime;
+    return this;
+  }
+
   public Instant getFinishedTime() {
     return finishedTime;
   }
 
+  public GetPeripheralJobResponseTO setFinishedTime(Instant finishedTime) {
+    this.finishedTime = finishedTime;
+    return this;
+  }
+
   public List<Property> getProperties() {
     return properties;
+  }
+
+  public GetPeripheralJobResponseTO setProperties(List<Property> properties) {
+    this.properties = properties;
+    return this;
   }
 
   public static GetPeripheralJobResponseTO fromPeripheralJob(PeripheralJob job) {

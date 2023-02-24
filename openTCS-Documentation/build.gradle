@@ -26,7 +26,6 @@ apply plugin: 'distribution'
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
 def webApiDir = file("$buildDir/swagger-ui-servicewebapiv1")
-def samplesDir = file("$buildDir/samples")
 def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
 def devManualDir = file("$buildDir/developers-guide")
@@ -215,7 +214,6 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
 }
 
 task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
-  dependsOn 'samplesgen'
   // Document type: article (default), book, inline, manpage)
   options doctype: 'book'
   // Where to look for AsciiDoc files. Default: src/docs/asciidoc
@@ -270,45 +268,6 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
   }
   doLast{
     delete "$devManualDir/.asciidoctor"
-  }
-}
-
-task samplesgen {
-  dependsOn 'jar'
-  doLast {
-    mkdir(samplesDir)
-    //Args contains a tupel of (task-name, outputFile)
-    javaexec {
-      classpath configurations.compileClasspath, jar.outputs.files
-      main = 'org.opentcs.documentation.HttpSamples'
-      args "STATUS", "${samplesDir}/sample-status.json"
-    }
-    javaexec {
-      classpath configurations.compileClasspath, jar.outputs.files
-      main = 'org.opentcs.documentation.HttpSamples'
-      args "STATUS_TRANSPORT_ORDERS", "${samplesDir}/sample-transport-orders.json"
-    }
-    javaexec {
-      classpath configurations.compileClasspath, jar.outputs.files
-      main = 'org.opentcs.documentation.HttpSamples'
-      args "STATUS_SINGLE_TRANSPORT_ORDER", "${samplesDir}/sample-single-transport-order.json"
-    }
-    javaexec {
-      classpath configurations.compileClasspath, jar.outputs.files
-      main = 'org.opentcs.documentation.HttpSamples'
-      args "STATUS_VEHICLES", "${samplesDir}/sample-vehicles.json"
-    }
-    javaexec {
-      classpath configurations.compileClasspath, jar.outputs.files
-      main = 'org.opentcs.documentation.HttpSamples'
-      args "STATUS_SINGLE_VEHICLE", "${samplesDir}/sample-single-vehicle.json"
-    }
-
-    javaexec {
-      classpath configurations.compileClasspath, jar.outputs.files
-      main = 'org.opentcs.documentation.HttpSamples'
-      args "CREATE_ORDER", "${samplesDir}/sample-create-order.json"
-    }
   }
 }
 

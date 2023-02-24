@@ -41,76 +41,96 @@ public class PeripheralJobStatusMessage
 
   private List<Property> properties;
 
+  @Override
+  public PeripheralJobStatusMessage setSequenceNumber(long sequenceNumber) {
+    return (PeripheralJobStatusMessage) super.setSequenceNumber(sequenceNumber);
+  }
+
+  @Override
+  public PeripheralJobStatusMessage setCreationTimeStamp(Instant creationTimeStamp) {
+    return (PeripheralJobStatusMessage) super.setCreationTimeStamp(creationTimeStamp);
+  }
+
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public PeripheralJobStatusMessage setName(String name) {
     this.name = name;
+    return this;
   }
 
   public String getReservationToken() {
     return reservationToken;
   }
 
-  public void setReservationToken(String reservationToken) {
+  public PeripheralJobStatusMessage setReservationToken(String reservationToken) {
     this.reservationToken = reservationToken;
+    return this;
   }
 
   public String getRelatedVehicle() {
     return relatedVehicle;
   }
 
-  public void setRelatedVehicle(String relatedVehicle) {
+  public PeripheralJobStatusMessage setRelatedVehicle(String relatedVehicle) {
     this.relatedVehicle = relatedVehicle;
+    return this;
   }
 
   public String getRelatedTransportOrder() {
     return relatedTransportOrder;
   }
 
-  public void setRelatedTransportOrder(String relatedTransportOrder) {
+  public PeripheralJobStatusMessage setRelatedTransportOrder(String relatedTransportOrder) {
     this.relatedTransportOrder = relatedTransportOrder;
+    return this;
   }
 
   public PeripheralOperationDescription getPeripheralOperation() {
     return peripheralOperation;
   }
 
-  public void setPeripheralOperation(PeripheralOperationDescription peripheralOperation) {
+  public PeripheralJobStatusMessage setPeripheralOperation(
+      PeripheralOperationDescription peripheralOperation) {
     this.peripheralOperation = peripheralOperation;
+    return this;
   }
 
   public State getState() {
     return state;
   }
 
-  public void setState(State state) {
+  public PeripheralJobStatusMessage setState(State state) {
     this.state = state;
+    return this;
   }
 
   public Instant getCreationTime() {
     return creationTime;
   }
 
-  public void setCreationTime(Instant creationTime) {
+  public PeripheralJobStatusMessage setCreationTime(Instant creationTime) {
     this.creationTime = creationTime;
+    return this;
   }
 
   public Instant getFinishedTime() {
     return finishedTime;
   }
 
-  public void setFinishedTime(Instant finishedTime) {
+  public PeripheralJobStatusMessage setFinishedTime(Instant finishedTime) {
     this.finishedTime = finishedTime;
+    return this;
   }
 
   public List<Property> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<Property> properties) {
+  public PeripheralJobStatusMessage setProperties(List<Property> properties) {
     this.properties = properties;
+    return this;
   }
 
   public static PeripheralJobStatusMessage fromPeripheralJob(PeripheralJob job,

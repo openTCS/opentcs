@@ -40,44 +40,59 @@ public class OrderStatusMessage
   public OrderStatusMessage() {
   }
 
+  @Override
+  public OrderStatusMessage setSequenceNumber(long sequenceNumber) {
+    return (OrderStatusMessage) super.setSequenceNumber(sequenceNumber);
+  }
+
+  @Override
+  public OrderStatusMessage setCreationTimeStamp(Instant creationTimeStamp) {
+    return (OrderStatusMessage) super.setCreationTimeStamp(creationTimeStamp);
+  }
+
   public String getOrderName() {
     return orderName;
   }
 
-  public void setOrderName(String orderName) {
+  public OrderStatusMessage setOrderName(String orderName) {
     this.orderName = orderName;
+    return this;
   }
 
   public String getProcessingVehicleName() {
     return processingVehicleName;
   }
 
-  public void setProcessingVehicleName(String processingVehicleName) {
+  public OrderStatusMessage setProcessingVehicleName(String processingVehicleName) {
     this.processingVehicleName = processingVehicleName;
+    return this;
   }
 
   public OrderState getOrderState() {
     return orderState;
   }
 
-  public void setOrderState(OrderState orderState) {
+  public OrderStatusMessage setOrderState(OrderState orderState) {
     this.orderState = orderState;
+    return this;
   }
 
   public List<DestinationState> getDestinations() {
     return destinations;
   }
 
-  public void setDestinations(List<DestinationState> destinations) {
+  public OrderStatusMessage setDestinations(List<DestinationState> destinations) {
     this.destinations = destinations;
+    return this;
   }
 
   public List<Property> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<Property> properties) {
+  public OrderStatusMessage setProperties(List<Property> properties) {
     this.properties = properties;
+    return this;
   }
 
   public static OrderStatusMessage fromTransportOrder(TransportOrder order,

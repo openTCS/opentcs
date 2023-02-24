@@ -7,11 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
+import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
@@ -38,12 +34,9 @@ public class V1RequestHandler
     implements RequestHandler {
 
   /**
-   * Maps between objects and their JSON representations.
+   * Binds JSON data to objects and vice versa.
    */
-  private final ObjectMapper objectMapper
-      = new ObjectMapper()
-          .registerModule(new JavaTimeModule())
-          .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+  private final JsonBinder jsonBinder;
   /**
    * Collects interesting events and provides them for client requests.
    */
@@ -60,9 +53,11 @@ public class V1RequestHandler
   private boolean initialized;
 
   @Inject
-  public V1RequestHandler(StatusEventDispatcher statusEventDispatcher,
+  public V1RequestHandler(JsonBinder jsonBinder,
+                          StatusEventDispatcher statusEventDispatcher,
                           OrderHandler orderHandler,
                           RequestStatusHandler requestHandler) {
+    this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.statusEventDispatcher = requireNonNull(statusEventDispatcher, "statusEventDispatcher");
     this.orderHandler = requireNonNull(orderHandler, "orderHandler");
     this.statusInformationProvider = requireNonNull(requestHandler, "requestHandler");
@@ -155,9 +150,9 @@ public class V1RequestHandler
   private Object handleGetEvents(Request request, Response response)
       throws IllegalArgumentException, IllegalStateException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(statusEventDispatcher.fetchEvents(minSequenceNo(request),
-                                                    maxSequenceNo(request),
-                                                    timeout(request)));
+    return jsonBinder.toJson(statusEventDispatcher.fetchEvents(minSequenceNo(request),
+                                                               maxSequenceNo(request),
+                                                               timeout(request)));
   }
 
   private Object handlePutVehicleCommAdapterEnabled(Request request, Response response)
@@ -173,11 +168,11 @@ public class V1RequestHandler
   private Object handleGetVehicleCommAdapterAttachmentInfo(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(GetVehicleAttachmentInfoResponseTO.fromAttachmentInformation(
-            statusInformationProvider.getVehicleCommAdapterAttachmentInformation(
-                request.params(":NAME")
-            )
+    return jsonBinder.toJson(GetVehicleAttachmentInfoResponseTO.fromAttachmentInformation(
+        statusInformationProvider.getVehicleCommAdapterAttachmentInformation(
+            request.params(":NAME")
         )
+    )
     );
   }
 
@@ -197,8 +192,12 @@ public class V1RequestHandler
              IllegalArgumentException,
              IllegalStateException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(GetTransportOrderResponseTO.fromTransportOrder(orderHandler.createOrder(request.params(":NAME"),
-                                     fromJson(request.body(), PostTransportOrderRequestTO.class))
+    return jsonBinder.toJson(
+        GetTransportOrderResponseTO.fromTransportOrder(
+            orderHandler.createOrder(
+                request.params(":NAME"),
+                jsonBinder.fromJson(request.body(), PostTransportOrderRequestTO.class)
+            )
         )
     );
   }
@@ -237,7 +236,7 @@ public class V1RequestHandler
 
   private Object handleGetTransportOrders(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(
+    return jsonBinder.toJson(
         statusInformationProvider.getTransportOrdersState(
             valueIfKeyPresent(request.queryMap(), "intendedVehicle")
         )
@@ -246,13 +245,15 @@ public class V1RequestHandler
 
   private Object handleGetTransportOrderByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(statusInformationProvider.getTransportOrderByName(request.params(":NAME")));
+    return jsonBinder.toJson(
+        statusInformationProvider.getTransportOrderByName(request.params(":NAME"))
+    );
   }
 
   private Object handleGetVehicles(Request request, Response response)
       throws IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(
+    return jsonBinder.toJson(
         statusInformationProvider.getVehiclesState(valueIfKeyPresent(request.queryMap(),
                                                                      "procState"))
     );
@@ -261,7 +262,9 @@ public class V1RequestHandler
   private Object handleGetVehicleByName(Request request, Response response)
       throws ObjectUnknownException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(statusInformationProvider.getVehicleStateByName(request.params(":NAME")));
+    return jsonBinder.toJson(
+        statusInformationProvider.getVehicleStateByName(request.params(":NAME"))
+    );
   }
 
   private Object handlePutVehicleIntegrationLevel(Request request, Response response)
@@ -286,7 +289,7 @@ public class V1RequestHandler
 
   private Object handleGetPeripheralJobs(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(
+    return jsonBinder.toJson(
         statusInformationProvider.getPeripheralJobs(
             valueIfKeyPresent(request.queryMap(), "relatedVehicle"),
             valueIfKeyPresent(request.queryMap(), "relatedTransportOrder")
@@ -296,13 +299,19 @@ public class V1RequestHandler
 
   private Object handleGetPeripheralJobsByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(statusInformationProvider.getPeripheralJobByName(request.params(":NAME")));
+    return jsonBinder.toJson(
+        statusInformationProvider.getPeripheralJobByName(request.params(":NAME"))
+    );
   }
 
   private Object handlePostPeripheralJobsByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return toJson(GetPeripheralJobResponseTO.fromPeripheralJob(orderHandler.createPeripheralJob(request.params(":NAME"),
-                                             fromJson(request.body(), PostPeripheralJobRequestTO.class))
+    return jsonBinder.toJson(
+        GetPeripheralJobResponseTO.fromPeripheralJob(
+            orderHandler.createPeripheralJob(
+                request.params(":NAME"),
+                jsonBinder.fromJson(request.body(), PostPeripheralJobRequestTO.class)
+            )
         )
     );
   }
@@ -319,28 +328,6 @@ public class V1RequestHandler
     }
     else {
       return null;
-    }
-  }
-
-  private <T> T fromJson(String jsonString, Class<T> clazz)
-      throws IllegalArgumentException {
-    try {
-      return objectMapper.readValue(jsonString, clazz);
-    }
-    catch (IOException exc) {
-      throw new IllegalArgumentException("Could not parse JSON input", exc);
-    }
-  }
-
-  private String toJson(Object object)
-      throws IllegalStateException {
-    try {
-      return objectMapper
-          .writerWithDefaultPrettyPrinter()
-          .writeValueAsString(object);
-    }
-    catch (JsonProcessingException exc) {
-      throw new IllegalStateException("Could not produce JSON output", exc);
     }
   }
 

@@ -34,15 +34,17 @@ public class GetEventsResponseTO {
     return statusMessages;
   }
 
-  public void setStatusMessages(List<StatusMessage> statusMessages) {
+  public GetEventsResponseTO setStatusMessages(List<StatusMessage> statusMessages) {
     this.statusMessages = requireNonNull(statusMessages, "statusMessages");
+    return this;
   }
 
   public Instant getTimeStamp() {
     return timeStamp;
   }
 
-  public void setTimeStamp(Instant timeStamp) {
+  public GetEventsResponseTO setTimeStamp(Instant timeStamp) {
     this.timeStamp = requireNonNull(timeStamp, "timeStamp");
+    return this;
   }
 }
